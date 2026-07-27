@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "gate": "design-system-contract",
+  "passed": true,
+  "status": "passed",
+  "gitHead": "3371c7385a3c70e350e015cbb3bd8d61b95b5b07",
+  "startedAt": "2026-07-26T23:12:55+00:00",
+  "completedAt": "2026-07-26T23:12:55+00:00",
+  "durationMs": 63,
+  "reportPath": "output/test-runner/design-system-contract/design-system-report.json",
+  "sourceSha256": "14b3dbae1d2981c02dc5ea131020993da5920b51c6d457b45a799990a16c998c",
+  "astryx": {
+    "core": "0.1.6",
+    "themeNeutral": "0.1.6",
+    "cli": "0.1.6",
+    "stylex": "0.19.0",
+    "themeName": "codaro"
+  },
+  "sharedPackages": {
+    "@astryxdesign/core": "0.1.6",
+    "@astryxdesign/theme-neutral": "0.1.6",
+    "@stylexjs/stylex": "0.19.0",
+    "lucide-react": "1.25.0",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "typescript": "6.0.3",
+    "yaml": "2.9.0"
+  },
+  "failures": []
+}

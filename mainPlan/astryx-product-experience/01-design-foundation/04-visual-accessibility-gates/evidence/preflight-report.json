@@ -1,0 +1,97 @@
+{
+  "sequence": "preflight",
+  "passed": true,
+  "completedGateCount": 3,
+  "softFailureCount": 0,
+  "totalGateCount": 3,
+  "totalMs": 436812,
+  "startedAt": "2026-07-26T23:33:15+00:00",
+  "completedAt": "2026-07-26T23:40:32+00:00",
+  "gitHead": "3371c7385a3c70e350e015cbb3bd8d61b95b5b07",
+  "summaryPath": "output\\test-runner\\preflight\\sequence-summary.json",
+  "failedGate": null,
+  "gates": [
+    {
+      "gate": "root-clean",
+      "returnCode": 0,
+      "commandReturnCode": 0,
+      "softFailure": false,
+      "artifactFailure": false,
+      "durationMs": 2719,
+      "logs": [
+        {
+          "path": "output\\test-runner\\root-clean\\logs\\1785108795652072900-uv.log",
+          "exists": true,
+          "fresh": true,
+          "modifiedAtNs": 1785108798041104600,
+          "bytes": 183
+        }
+      ],
+      "artifacts": []
+    },
+    {
+      "gate": "docs",
+      "returnCode": 0,
+      "commandReturnCode": 0,
+      "softFailure": false,
+      "artifactFailure": false,
+      "durationMs": 45734,
+      "logs": [
+        {
+          "path": "output\\test-runner\\docs\\logs\\1785108798368284300-uv.log",
+          "exists": true,
+          "fresh": true,
+          "modifiedAtNs": 1785108799870907700,
+          "bytes": 151
+        },
+        {
+          "path": "output\\test-runner\\docs\\logs\\1785108799885890700-uv.log",
+          "exists": true,
+          "fresh": true,
+          "modifiedAtNs": 1785108801317799600,
+          "bytes": 164
+        },
+        {
+          "path": "output\\test-runner\\docs\\logs\\1785108801324662500-uv.log",
+          "exists": true,
+          "fresh": true,
+          "modifiedAtNs": 1785108832780735400,
+          "bytes": 154
+        },
+        {
+          "path": "output\\test-runner\\docs\\logs\\1785108832784720700-uv.log",
+          "exists": true,
+          "fresh": true,
+          "modifiedAtNs": 1785108841799808800,
+          "bytes": 277
+        },
+        {
+          "path": "output\\test-runner\\docs\\logs\\1785108841803381600-uv.log",
+          "exists": true,
+          "fresh": true,
+          "modifiedAtNs": 1785108842567815000,
+          "bytes": 133
+        }
+      ],
+      "artifacts": []
+    },
+    {
+      "gate": "backend",
+      "returnCode": 0,
+      "commandReturnCode": 0,
+      "softFailure": false,
+      "artifactFailure": false,
+      "durationMs": 388359,
+      "logs": [
+        {
+          "path": "output\\test-runner\\backend\\logs\\1785108844113853500-uv.log",
+          "exists": true,
+          "fresh": true,
+          "modifiedAtNs": 1785109232136199900,
+          "bytes": 5105
+        }
+      ],
+      "artifacts": []
+    }
+  ]
+}

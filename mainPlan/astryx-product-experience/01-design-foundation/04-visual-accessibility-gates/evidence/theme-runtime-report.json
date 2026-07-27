@@ -1,0 +1,612 @@
+{
+  "schemaVersion": 1,
+  "gate": "theme-runtime-browser",
+  "passed": true,
+  "status": "passed",
+  "gitHead": "3371c7385a3c70e350e015cbb3bd8d61b95b5b07",
+  "startedAt": "2026-07-26T23:14:03.990654+00:00",
+  "completedAt": "2026-07-26T23:14:10.225683+00:00",
+  "durationMs": 6234,
+  "browser": {
+    "engine": "chromium",
+    "version": "149.0.7827.55"
+  },
+  "matrix": {
+    "caseCount": 8,
+    "products": [
+      "landing",
+      "local",
+      "run"
+    ],
+    "themeModes": [
+      "light",
+      "dark",
+      "system"
+    ],
+    "reducedMotion": [
+      false,
+      true
+    ],
+    "densities": [
+      "public",
+      "learningComfortable",
+      "studioDense"
+    ],
+    "accents": [
+      "plum",
+      "blue",
+      "teal"
+    ]
+  },
+  "cases": [
+    {
+      "case": {
+        "name": "landing-stored-light-over-os-dark",
+        "product": "landing",
+        "route": "/codaro/",
+        "storedTheme": "light",
+        "osTheme": "dark",
+        "reducedMotion": false,
+        "expectedTheme": "light",
+        "expectedDensity": "public",
+        "expectedAccent": "plum",
+        "togglePersistence": false,
+        "systemLiveSwitch": false
+      },
+      "url": "http://127.0.0.1:56487/codaro/",
+      "passed": true,
+      "initial": {
+        "theme": "light",
+        "resolvedTheme": "light",
+        "rootDensity": "public",
+        "scopeDensity": "public",
+        "rootAccent": "plum",
+        "scopeAccent": "plum",
+        "rootColorScheme": "light",
+        "scopeColorScheme": "light",
+        "rootBackground": "rgb(245, 246, 248)",
+        "themeColor": "#f5f6f8",
+        "darkClass": false,
+        "storedTheme": "light",
+        "storedAccent": null,
+        "prefersDark": true,
+        "reducedMotion": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "themeTransitions": [
+          "light"
+        ],
+        "runtimeTier": "web",
+        "activeSurface": null,
+        "themeToggleLabels": [
+          "다크 모드로"
+        ]
+      },
+      "afterSystemSwitch": null,
+      "afterToggle": null,
+      "afterReload": null,
+      "durationMs": 625,
+      "failures": []
+    },
+    {
+      "case": {
+        "name": "landing-stored-dark-toggle-reload",
+        "product": "landing",
+        "route": "/codaro/",
+        "storedTheme": "dark",
+        "osTheme": "light",
+        "reducedMotion": false,
+        "expectedTheme": "dark",
+        "expectedDensity": "public",
+        "expectedAccent": "plum",
+        "togglePersistence": true,
+        "systemLiveSwitch": false
+      },
+      "url": "http://127.0.0.1:56487/codaro/",
+      "passed": true,
+      "initial": {
+        "theme": "dark",
+        "resolvedTheme": "dark",
+        "rootDensity": "public",
+        "scopeDensity": "public",
+        "rootAccent": "plum",
+        "scopeAccent": "plum",
+        "rootColorScheme": "dark",
+        "scopeColorScheme": "dark",
+        "rootBackground": "rgb(21, 22, 25)",
+        "themeColor": "#151619",
+        "darkClass": true,
+        "storedTheme": "dark",
+        "storedAccent": null,
+        "prefersDark": false,
+        "reducedMotion": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "themeTransitions": [
+          "dark"
+        ],
+        "runtimeTier": "web",
+        "activeSurface": null,
+        "themeToggleLabels": [
+          "라이트 모드로"
+        ]
+      },
+      "afterSystemSwitch": null,
+      "afterToggle": {
+        "theme": "light",
+        "resolvedTheme": "light",
+        "rootDensity": "public",
+        "scopeDensity": "public",
+        "rootAccent": "plum",
+        "scopeAccent": "plum",
+        "rootColorScheme": "light",
+        "scopeColorScheme": "light",
+        "rootBackground": "rgb(245, 246, 248)",
+        "themeColor": "#f5f6f8",
+        "darkClass": false,
+        "storedTheme": "light",
+        "storedAccent": null,
+        "prefersDark": false,
+        "reducedMotion": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "themeTransitions": [
+          "dark",
+          "light"
+        ],
+        "runtimeTier": "web",
+        "activeSurface": null,
+        "themeToggleLabels": [
+          "다크 모드로"
+        ]
+      },
+      "afterReload": {
+        "theme": "light",
+        "resolvedTheme": "light",
+        "rootDensity": "public",
+        "scopeDensity": "public",
+        "rootAccent": "plum",
+        "scopeAccent": "plum",
+        "rootColorScheme": "light",
+        "scopeColorScheme": "light",
+        "rootBackground": "rgb(245, 246, 248)",
+        "themeColor": "#f5f6f8",
+        "darkClass": false,
+        "storedTheme": "light",
+        "storedAccent": null,
+        "prefersDark": false,
+        "reducedMotion": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "themeTransitions": [
+          "light"
+        ],
+        "runtimeTier": "web",
+        "activeSurface": null,
+        "themeToggleLabels": [
+          "다크 모드로"
+        ]
+      },
+      "durationMs": 531,
+      "failures": []
+    },
+    {
+      "case": {
+        "name": "landing-system-live-switch",
+        "product": "landing",
+        "route": "/codaro/",
+        "storedTheme": null,
+        "osTheme": "light",
+        "reducedMotion": false,
+        "expectedTheme": "light",
+        "expectedDensity": "public",
+        "expectedAccent": "plum",
+        "togglePersistence": false,
+        "systemLiveSwitch": true
+      },
+      "url": "http://127.0.0.1:56487/codaro/",
+      "passed": true,
+      "initial": {
+        "theme": "light",
+        "resolvedTheme": "light",
+        "rootDensity": "public",
+        "scopeDensity": "public",
+        "rootAccent": "plum",
+        "scopeAccent": "plum",
+        "rootColorScheme": "light",
+        "scopeColorScheme": "light",
+        "rootBackground": "rgb(245, 246, 248)",
+        "themeColor": "#f5f6f8",
+        "darkClass": false,
+        "storedTheme": null,
+        "storedAccent": null,
+        "prefersDark": false,
+        "reducedMotion": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "themeTransitions": [
+          "light"
+        ],
+        "runtimeTier": "web",
+        "activeSurface": null,
+        "themeToggleLabels": [
+          "다크 모드로"
+        ]
+      },
+      "afterSystemSwitch": {
+        "theme": "dark",
+        "resolvedTheme": "dark",
+        "rootDensity": "public",
+        "scopeDensity": "public",
+        "rootAccent": "plum",
+        "scopeAccent": "plum",
+        "rootColorScheme": "dark",
+        "scopeColorScheme": "dark",
+        "rootBackground": "rgb(21, 22, 25)",
+        "themeColor": "#151619",
+        "darkClass": true,
+        "storedTheme": null,
+        "storedAccent": null,
+        "prefersDark": true,
+        "reducedMotion": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "themeTransitions": [
+          "light",
+          "dark"
+        ],
+        "runtimeTier": "web",
+        "activeSurface": null,
+        "themeToggleLabels": [
+          "라이트 모드로"
+        ]
+      },
+      "afterToggle": null,
+      "afterReload": null,
+      "durationMs": 375,
+      "failures": []
+    },
+    {
+      "case": {
+        "name": "landing-learning-reduced-motion",
+        "product": "landing",
+        "route": "/codaro/learn/",
+        "storedTheme": null,
+        "osTheme": "dark",
+        "reducedMotion": true,
+        "expectedTheme": "dark",
+        "expectedDensity": "learningComfortable",
+        "expectedAccent": "plum",
+        "togglePersistence": false,
+        "systemLiveSwitch": false
+      },
+      "url": "http://127.0.0.1:56487/codaro/learn/",
+      "passed": true,
+      "initial": {
+        "theme": "dark",
+        "resolvedTheme": "dark",
+        "rootDensity": "learningComfortable",
+        "scopeDensity": "learningComfortable",
+        "rootAccent": "plum",
+        "scopeAccent": "plum",
+        "rootColorScheme": "dark",
+        "scopeColorScheme": "dark",
+        "rootBackground": "rgb(21, 22, 25)",
+        "themeColor": "#151619",
+        "darkClass": true,
+        "storedTheme": null,
+        "storedAccent": null,
+        "prefersDark": true,
+        "reducedMotion": true,
+        "durationFast": "1ms",
+        "durationMedium": "1ms",
+        "durationSlow": "1ms",
+        "themeTransitions": [
+          "dark"
+        ],
+        "runtimeTier": "web",
+        "activeSurface": null,
+        "themeToggleLabels": [
+          "라이트 모드로"
+        ]
+      },
+      "afterSystemSwitch": null,
+      "afterToggle": null,
+      "afterReload": null,
+      "durationMs": 391,
+      "failures": []
+    },
+    {
+      "case": {
+        "name": "run-stored-light-teal-over-os-dark",
+        "product": "run",
+        "route": "/?surface=editor#editor",
+        "storedTheme": "light",
+        "osTheme": "dark",
+        "reducedMotion": false,
+        "expectedTheme": "light",
+        "expectedDensity": "studioDense",
+        "expectedAccent": "teal",
+        "togglePersistence": false,
+        "systemLiveSwitch": false
+      },
+      "url": "http://127.0.0.1:56488/?surface=editor#editor",
+      "passed": true,
+      "initial": {
+        "theme": "light",
+        "resolvedTheme": "light",
+        "rootDensity": "studioDense",
+        "scopeDensity": "studioDense",
+        "rootAccent": "teal",
+        "scopeAccent": "teal",
+        "rootColorScheme": "light",
+        "scopeColorScheme": "light",
+        "rootBackground": "rgb(245, 246, 248)",
+        "themeColor": "#f5f6f8",
+        "darkClass": false,
+        "storedTheme": "light",
+        "storedAccent": "teal",
+        "prefersDark": true,
+        "reducedMotion": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "themeTransitions": [
+          "light"
+        ],
+        "runtimeTier": "web",
+        "activeSurface": "editor",
+        "themeToggleLabels": [
+          "다크 모드로"
+        ]
+      },
+      "afterSystemSwitch": null,
+      "afterToggle": null,
+      "afterReload": null,
+      "durationMs": 406,
+      "failures": []
+    },
+    {
+      "case": {
+        "name": "run-stored-dark-blue-toggle-reload",
+        "product": "run",
+        "route": "/?surface=editor#editor",
+        "storedTheme": "dark",
+        "osTheme": "light",
+        "reducedMotion": false,
+        "expectedTheme": "dark",
+        "expectedDensity": "studioDense",
+        "expectedAccent": "blue",
+        "togglePersistence": true,
+        "systemLiveSwitch": false
+      },
+      "url": "http://127.0.0.1:56488/?surface=editor#editor",
+      "passed": true,
+      "initial": {
+        "theme": "dark",
+        "resolvedTheme": "dark",
+        "rootDensity": "studioDense",
+        "scopeDensity": "studioDense",
+        "rootAccent": "blue",
+        "scopeAccent": "blue",
+        "rootColorScheme": "dark",
+        "scopeColorScheme": "dark",
+        "rootBackground": "rgb(21, 22, 25)",
+        "themeColor": "#151619",
+        "darkClass": true,
+        "storedTheme": "dark",
+        "storedAccent": "blue",
+        "prefersDark": false,
+        "reducedMotion": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "themeTransitions": [
+          "dark"
+        ],
+        "runtimeTier": "web",
+        "activeSurface": "editor",
+        "themeToggleLabels": [
+          "라이트 모드로"
+        ]
+      },
+      "afterSystemSwitch": null,
+      "afterToggle": {
+        "theme": "light",
+        "resolvedTheme": "light",
+        "rootDensity": "studioDense",
+        "scopeDensity": "studioDense",
+        "rootAccent": "blue",
+        "scopeAccent": "blue",
+        "rootColorScheme": "light",
+        "scopeColorScheme": "light",
+        "rootBackground": "rgb(245, 246, 248)",
+        "themeColor": "#f5f6f8",
+        "darkClass": false,
+        "storedTheme": "light",
+        "storedAccent": "blue",
+        "prefersDark": false,
+        "reducedMotion": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "themeTransitions": [
+          "dark",
+          "light"
+        ],
+        "runtimeTier": "web",
+        "activeSurface": "editor",
+        "themeToggleLabels": [
+          "다크 모드로"
+        ]
+      },
+      "afterReload": {
+        "theme": "light",
+        "resolvedTheme": "light",
+        "rootDensity": "studioDense",
+        "scopeDensity": "studioDense",
+        "rootAccent": "blue",
+        "scopeAccent": "blue",
+        "rootColorScheme": "light",
+        "scopeColorScheme": "light",
+        "rootBackground": "rgb(245, 246, 248)",
+        "themeColor": "#f5f6f8",
+        "darkClass": false,
+        "storedTheme": "light",
+        "storedAccent": "blue",
+        "prefersDark": false,
+        "reducedMotion": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "themeTransitions": [
+          "light"
+        ],
+        "runtimeTier": "web",
+        "activeSurface": "editor",
+        "themeToggleLabels": [
+          "다크 모드로"
+        ]
+      },
+      "durationMs": 781,
+      "failures": []
+    },
+    {
+      "case": {
+        "name": "local-system-live-switch",
+        "product": "local",
+        "route": "/?surface=editor#editor",
+        "storedTheme": null,
+        "osTheme": "light",
+        "reducedMotion": false,
+        "expectedTheme": "light",
+        "expectedDensity": "studioDense",
+        "expectedAccent": "plum",
+        "togglePersistence": false,
+        "systemLiveSwitch": true
+      },
+      "url": "http://127.0.0.1:56489/?surface=editor#editor",
+      "passed": true,
+      "initial": {
+        "theme": "light",
+        "resolvedTheme": "light",
+        "rootDensity": "studioDense",
+        "scopeDensity": "studioDense",
+        "rootAccent": "plum",
+        "scopeAccent": "plum",
+        "rootColorScheme": "light",
+        "scopeColorScheme": "light",
+        "rootBackground": "rgb(245, 246, 248)",
+        "themeColor": "#f5f6f8",
+        "darkClass": false,
+        "storedTheme": null,
+        "storedAccent": "plum",
+        "prefersDark": false,
+        "reducedMotion": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "themeTransitions": [
+          "light"
+        ],
+        "runtimeTier": "local",
+        "activeSurface": "editor",
+        "themeToggleLabels": [
+          "다크 모드로"
+        ]
+      },
+      "afterSystemSwitch": {
+        "theme": "dark",
+        "resolvedTheme": "dark",
+        "rootDensity": "studioDense",
+        "scopeDensity": "studioDense",
+        "rootAccent": "plum",
+        "scopeAccent": "plum",
+        "rootColorScheme": "dark",
+        "scopeColorScheme": "dark",
+        "rootBackground": "rgb(21, 22, 25)",
+        "themeColor": "#151619",
+        "darkClass": true,
+        "storedTheme": null,
+        "storedAccent": "plum",
+        "prefersDark": true,
+        "reducedMotion": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "themeTransitions": [
+          "light",
+          "dark"
+        ],
+        "runtimeTier": "local",
+        "activeSurface": "editor",
+        "themeToggleLabels": [
+          "라이트 모드로"
+        ]
+      },
+      "afterToggle": null,
+      "afterReload": null,
+      "durationMs": 609,
+      "failures": []
+    },
+    {
+      "case": {
+        "name": "local-learning-reduced-motion",
+        "product": "local",
+        "route": "/?surface=curriculum#curriculum",
+        "storedTheme": null,
+        "osTheme": "dark",
+        "reducedMotion": true,
+        "expectedTheme": "dark",
+        "expectedDensity": "learningComfortable",
+        "expectedAccent": "plum",
+        "togglePersistence": false,
+        "systemLiveSwitch": false
+      },
+      "url": "http://127.0.0.1:56489/?surface=curriculum#curriculum",
+      "passed": true,
+      "initial": {
+        "theme": "dark",
+        "resolvedTheme": "dark",
+        "rootDensity": "learningComfortable",
+        "scopeDensity": "learningComfortable",
+        "rootAccent": "plum",
+        "scopeAccent": "plum",
+        "rootColorScheme": "dark",
+        "scopeColorScheme": "dark",
+        "rootBackground": "rgb(21, 22, 25)",
+        "themeColor": "#151619",
+        "darkClass": true,
+        "storedTheme": null,
+        "storedAccent": "plum",
+        "prefersDark": true,
+        "reducedMotion": true,
+        "durationFast": "1ms",
+        "durationMedium": "1ms",
+        "durationSlow": "1ms",
+        "themeTransitions": [
+          "dark"
+        ],
+        "runtimeTier": "local",
+        "activeSurface": "curriculum",
+        "themeToggleLabels": [
+          "라이트 모드로"
+        ]
+      },
+      "afterSystemSwitch": null,
+      "afterToggle": null,
+      "afterReload": null,
+      "durationMs": 359,
+      "failures": []
+    }
+  ],
+  "failureCount": 0,
+  "failures": [],
+  "reportPath": "output/test-runner/theme-runtime-browser/theme-runtime-report.json"
+}

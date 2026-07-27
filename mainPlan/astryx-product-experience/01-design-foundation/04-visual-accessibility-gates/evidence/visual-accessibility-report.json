@@ -1,0 +1,2107 @@
+{
+  "schemaVersion": 1,
+  "gate": "visual-accessibility-browser",
+  "passed": true,
+  "status": "passed",
+  "gitHead": "3371c7385a3c70e350e015cbb3bd8d61b95b5b07",
+  "startedAt": "2026-07-26T23:14:18+00:00",
+  "completedAt": "2026-07-26T23:14:42+00:00",
+  "durationMs": 24235,
+  "playwright": {
+    "packageVersion": "1.61.0",
+    "lockedVersion": "1.61.0",
+    "browserVersions": {
+      "chromium": "149.0.7827.55",
+      "firefox": "151.0",
+      "webkit": "26.5"
+    }
+  },
+  "matrix": {
+    "caseCount": 12,
+    "completedCaseCount": 12,
+    "engines": [
+      "chromium",
+      "firefox",
+      "webkit"
+    ],
+    "products": [
+      "landing",
+      "local",
+      "run"
+    ],
+    "viewportWidths": [
+      320,
+      390,
+      900,
+      1440
+    ],
+    "themes": [
+      "dark",
+      "light"
+    ],
+    "forcedColorsCaseCount": 1,
+    "reducedMotionCaseCount": 1,
+    "keyboardDialogCaseCount": 6
+  },
+  "machineEvidenceScope": [
+    "Chromium, Firefox, WebKit representative rendering",
+    "320px, 390px, 900px, 1440px horizontal overflow",
+    "shared theme toggle and social control order",
+    "keyboard reach, focus indicator, modal focus trap, Escape close, focus return",
+    "font loading, token contrast, reduced motion, forced colors",
+    "duplicate IDs, accessible names, image alt, ARIA reference integrity"
+  ],
+  "manualEvidenceNotClaimed": [
+    "installed Windows WebView2 rendering",
+    "NVDA, Narrator, VoiceOver, TalkBack screen-reader output",
+    "IME composition and operating-system zoom behavior",
+    "independent human accessibility review"
+  ],
+  "failureCount": 0,
+  "failures": [],
+  "cases": [
+    {
+      "case": {
+        "name": "chromium-landing-mobile-dark",
+        "engine": "chromium",
+        "product": "landing",
+        "route": "/codaro/",
+        "width": 320,
+        "height": 720,
+        "theme": "dark",
+        "density": "public",
+        "reducedMotion": false,
+        "forcedColors": false,
+        "keyboardDialog": true
+      },
+      "url": "http://127.0.0.1:54279/codaro/",
+      "passed": true,
+      "snapshot": {
+        "theme": "dark",
+        "density": "public",
+        "scopePresent": true,
+        "socialOrder": [
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "socialVisible": true,
+        "themeToggleVisible": true,
+        "horizontalOverflowPx": 0,
+        "duplicateIds": [],
+        "unnamedInteractive": [],
+        "missingImageAltCount": 0,
+        "invalidAriaReferences": [],
+        "deferredAriaControls": [
+          {
+            "id": "public-mobile-menu",
+            "tag": "button"
+          }
+        ],
+        "fonts": [
+          {
+            "family": "Pretendard",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "Space Grotesk",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "JetBrains Mono",
+            "loadedFaceCount": 1
+          }
+        ],
+        "fontStatus": "loaded",
+        "colorPairs": [
+          {
+            "name": "textPrimaryOnBody",
+            "foreground": "rgb(245, 246, 248)",
+            "background": "rgb(21, 22, 25)",
+            "ratio": 16.73
+          },
+          {
+            "name": "textSecondaryOnBody",
+            "foreground": "rgb(174, 179, 189)",
+            "background": "rgb(21, 22, 25)",
+            "ratio": 8.6
+          },
+          {
+            "name": "textPrimaryOnSurface",
+            "foreground": "rgb(245, 246, 248)",
+            "background": "rgb(34, 35, 39)",
+            "ratio": 14.52
+          },
+          {
+            "name": "textSecondaryOnSurface",
+            "foreground": "rgb(174, 179, 189)",
+            "background": "rgb(34, 35, 39)",
+            "ratio": 7.46
+          },
+          {
+            "name": "accentOnBody",
+            "foreground": "rgb(174, 180, 255)",
+            "background": "rgb(21, 22, 25)",
+            "ratio": 9.28
+          }
+        ],
+        "reducedMotion": false,
+        "forcedColors": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "forcedColorSocialBorder": "none"
+      },
+      "keyboard": {
+        "focusedTopControls": [
+          "theme",
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "topLaneTabOrder": [
+          "theme",
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "focusIndicators": {
+          "theme": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "github": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "support": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "youtube": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "threads": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          }
+        },
+        "firstDialogFocus": {
+          "marker": null,
+          "label": "닫기",
+          "socialId": null,
+          "tag": "button",
+          "insideDialog": true,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        },
+        "shiftTabFocus": {
+          "marker": null,
+          "label": "계좌번호 1002-0421-4626 복사",
+          "socialId": null,
+          "tag": "button",
+          "insideDialog": true,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        },
+        "wrappedFocus": {
+          "marker": null,
+          "label": "닫기",
+          "socialId": null,
+          "tag": "button",
+          "insideDialog": true,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        },
+        "accountNumber": "1002-0421-4626",
+        "dialogLabel": "후원·기여",
+        "dialogLayout": {
+          "viewportWidth": 320,
+          "dialogLeft": 12,
+          "dialogRight": 308,
+          "dialogWidth": 296,
+          "headerPaddingLeft": "22px",
+          "headerPaddingRight": "18px",
+          "bodyPaddingLeft": "22px",
+          "bodyPaddingRight": "22px",
+          "bodyGap": "26px",
+          "waysColumns": "250px"
+        },
+        "dialogContrast": [
+          {
+            "selector": ".codaroSupportHeader h2",
+            "foreground": "rgb(244, 244, 245)",
+            "background": "rgba(17, 17, 20, 0.96)",
+            "ratio": 17.15
+          },
+          {
+            "selector": ".codaroSupportHero p",
+            "foreground": "rgb(194, 194, 202)",
+            "background": "rgb(17, 17, 20)",
+            "ratio": 10.65
+          },
+          {
+            "selector": ".codaroSupportSection h3",
+            "foreground": "rgb(165, 165, 174)",
+            "background": "rgb(17, 17, 20)",
+            "ratio": 7.71
+          },
+          {
+            "selector": ".codaroSupportWays a",
+            "foreground": "rgb(201, 201, 208)",
+            "background": "rgb(24, 24, 28)",
+            "ratio": 10.75
+          },
+          {
+            "selector": ".codaroSupportRow strong",
+            "foreground": "rgb(241, 241, 243)",
+            "background": "rgb(23, 23, 27)",
+            "ratio": 15.85
+          },
+          {
+            "selector": ".codaroSupportRow > span",
+            "foreground": "rgb(165, 165, 174)",
+            "background": "rgb(23, 23, 27)",
+            "ratio": 7.31
+          },
+          {
+            "selector": ".codaroSupportAccount button",
+            "foreground": "rgb(214, 214, 220)",
+            "background": "rgb(34, 34, 40)",
+            "ratio": 10.93
+          },
+          {
+            "selector": ".codaroSupportNote",
+            "foreground": "rgb(152, 152, 162)",
+            "background": "rgb(17, 17, 20)",
+            "ratio": 6.6
+          }
+        ],
+        "dialogScreenshot": "output/test-runner/visual-accessibility-browser/screenshots/chromium/chromium-landing-mobile-dark-support-dialog.png",
+        "dialogClosedWithEscape": true,
+        "returnedFocus": {
+          "marker": "support",
+          "label": "후원·기여",
+          "socialId": "support",
+          "tag": "button",
+          "insideDialog": false,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        }
+      },
+      "screenshot": "output/test-runner/visual-accessibility-browser/screenshots/chromium/chromium-landing-mobile-dark.png",
+      "durationMs": 906,
+      "failures": []
+    },
+    {
+      "case": {
+        "name": "chromium-learn-desktop-light",
+        "engine": "chromium",
+        "product": "landing",
+        "route": "/codaro/learn/",
+        "width": 1440,
+        "height": 900,
+        "theme": "light",
+        "density": "learningComfortable",
+        "reducedMotion": false,
+        "forcedColors": false,
+        "keyboardDialog": false
+      },
+      "url": "http://127.0.0.1:54279/codaro/learn/",
+      "passed": true,
+      "snapshot": {
+        "theme": "light",
+        "density": "learningComfortable",
+        "scopePresent": true,
+        "socialOrder": [
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "socialVisible": true,
+        "themeToggleVisible": true,
+        "horizontalOverflowPx": 0,
+        "duplicateIds": [],
+        "unnamedInteractive": [],
+        "missingImageAltCount": 0,
+        "invalidAriaReferences": [],
+        "deferredAriaControls": [
+          {
+            "id": "public-mobile-menu",
+            "tag": "button"
+          }
+        ],
+        "fonts": [
+          {
+            "family": "Pretendard",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "Space Grotesk",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "JetBrains Mono",
+            "loadedFaceCount": 1
+          }
+        ],
+        "fontStatus": "loaded",
+        "colorPairs": [
+          {
+            "name": "textPrimaryOnBody",
+            "foreground": "rgb(24, 25, 29)",
+            "background": "rgb(245, 246, 248)",
+            "ratio": 16.24
+          },
+          {
+            "name": "textSecondaryOnBody",
+            "foreground": "rgb(93, 98, 109)",
+            "background": "rgb(245, 246, 248)",
+            "ratio": 5.66
+          },
+          {
+            "name": "textPrimaryOnSurface",
+            "foreground": "rgb(24, 25, 29)",
+            "background": "rgb(255, 255, 255)",
+            "ratio": 17.56
+          },
+          {
+            "name": "textSecondaryOnSurface",
+            "foreground": "rgb(93, 98, 109)",
+            "background": "rgb(255, 255, 255)",
+            "ratio": 6.12
+          },
+          {
+            "name": "accentOnBody",
+            "foreground": "rgb(79, 70, 200)",
+            "background": "rgb(245, 246, 248)",
+            "ratio": 6.38
+          }
+        ],
+        "reducedMotion": false,
+        "forcedColors": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "forcedColorSocialBorder": "none"
+      },
+      "keyboard": null,
+      "screenshot": "output/test-runner/visual-accessibility-browser/screenshots/chromium/chromium-learn-desktop-light.png",
+      "durationMs": 437,
+      "failures": []
+    },
+    {
+      "case": {
+        "name": "chromium-run-mobile-forced-colors",
+        "engine": "chromium",
+        "product": "run",
+        "route": "/?surface=editor#editor",
+        "width": 320,
+        "height": 720,
+        "theme": "dark",
+        "density": "studioDense",
+        "reducedMotion": false,
+        "forcedColors": true,
+        "keyboardDialog": true
+      },
+      "url": "http://127.0.0.1:54280/?surface=editor#editor",
+      "passed": true,
+      "snapshot": {
+        "theme": "dark",
+        "density": "studioDense",
+        "scopePresent": true,
+        "socialOrder": [
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "socialVisible": true,
+        "themeToggleVisible": true,
+        "horizontalOverflowPx": 0,
+        "duplicateIds": [],
+        "unnamedInteractive": [],
+        "missingImageAltCount": 0,
+        "invalidAriaReferences": [],
+        "deferredAriaControls": [],
+        "fonts": [
+          {
+            "family": "Pretendard",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "Space Grotesk",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "JetBrains Mono",
+            "loadedFaceCount": 1
+          }
+        ],
+        "fontStatus": "loaded",
+        "colorPairs": [
+          {
+            "name": "textPrimaryOnBody",
+            "foreground": "rgb(255, 255, 255)",
+            "background": "rgb(255, 255, 255)",
+            "ratio": 1
+          },
+          {
+            "name": "textSecondaryOnBody",
+            "foreground": "rgb(255, 255, 255)",
+            "background": "rgb(255, 255, 255)",
+            "ratio": 1
+          },
+          {
+            "name": "textPrimaryOnSurface",
+            "foreground": "rgb(255, 255, 255)",
+            "background": "rgb(255, 255, 255)",
+            "ratio": 1
+          },
+          {
+            "name": "textSecondaryOnSurface",
+            "foreground": "rgb(255, 255, 255)",
+            "background": "rgb(255, 255, 255)",
+            "ratio": 1
+          },
+          {
+            "name": "accentOnBody",
+            "foreground": "rgb(255, 255, 255)",
+            "background": "rgb(255, 255, 255)",
+            "ratio": 1
+          }
+        ],
+        "reducedMotion": false,
+        "forcedColors": true,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "forcedColorSocialBorder": "solid"
+      },
+      "keyboard": {
+        "focusedTopControls": [
+          "theme",
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "topLaneTabOrder": [
+          "theme",
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "focusIndicators": {
+          "theme": {
+            "outlineStyle": "none",
+            "outlineWidth": "1px",
+            "boxShadow": "none"
+          },
+          "github": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "support": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "youtube": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "threads": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          }
+        },
+        "firstDialogFocus": {
+          "marker": null,
+          "label": "닫기",
+          "socialId": null,
+          "tag": "button",
+          "insideDialog": true,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        },
+        "shiftTabFocus": {
+          "marker": null,
+          "label": "계좌번호 1002-0421-4626 복사",
+          "socialId": null,
+          "tag": "button",
+          "insideDialog": true,
+          "outlineStyle": "auto",
+          "outlineWidth": "1px",
+          "boxShadow": "none"
+        },
+        "wrappedFocus": {
+          "marker": null,
+          "label": "닫기",
+          "socialId": null,
+          "tag": "button",
+          "insideDialog": true,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        },
+        "accountNumber": "1002-0421-4626",
+        "dialogLabel": "후원·기여",
+        "dialogLayout": {
+          "viewportWidth": 320,
+          "dialogLeft": 12,
+          "dialogRight": 308,
+          "dialogWidth": 296,
+          "headerPaddingLeft": "22px",
+          "headerPaddingRight": "18px",
+          "bodyPaddingLeft": "22px",
+          "bodyPaddingRight": "22px",
+          "bodyGap": "26px",
+          "waysColumns": "250px"
+        },
+        "dialogContrast": [
+          {
+            "selector": ".codaroSupportHeader h2",
+            "foreground": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0.96)",
+            "ratio": 21
+          },
+          {
+            "selector": ".codaroSupportHero p",
+            "foreground": "rgb(255, 255, 255)",
+            "background": "rgb(0, 0, 0)",
+            "ratio": 21
+          },
+          {
+            "selector": ".codaroSupportSection h3",
+            "foreground": "rgb(255, 255, 255)",
+            "background": "rgb(0, 0, 0)",
+            "ratio": 21
+          },
+          {
+            "selector": ".codaroSupportWays a",
+            "foreground": "rgb(255, 255, 0)",
+            "background": "rgb(0, 0, 0)",
+            "ratio": 19.56
+          },
+          {
+            "selector": ".codaroSupportRow strong",
+            "foreground": "rgb(255, 255, 0)",
+            "background": "rgb(0, 0, 0)",
+            "ratio": 19.56
+          },
+          {
+            "selector": ".codaroSupportRow > span",
+            "foreground": "rgb(255, 255, 0)",
+            "background": "rgb(0, 0, 0)",
+            "ratio": 19.56
+          },
+          {
+            "selector": ".codaroSupportAccount button",
+            "foreground": "rgb(255, 255, 255)",
+            "background": "rgb(0, 0, 0)",
+            "ratio": 21
+          },
+          {
+            "selector": ".codaroSupportNote",
+            "foreground": "rgb(255, 255, 255)",
+            "background": "rgb(0, 0, 0)",
+            "ratio": 21
+          }
+        ],
+        "dialogScreenshot": "output/test-runner/visual-accessibility-browser/screenshots/chromium/chromium-run-mobile-forced-colors-support-dialog.png",
+        "dialogClosedWithEscape": true,
+        "returnedFocus": {
+          "marker": "support",
+          "label": "후원·기여",
+          "socialId": "support",
+          "tag": "button",
+          "insideDialog": false,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        }
+      },
+      "screenshot": "output/test-runner/visual-accessibility-browser/screenshots/chromium/chromium-run-mobile-forced-colors.png",
+      "durationMs": 766,
+      "failures": []
+    },
+    {
+      "case": {
+        "name": "chromium-run-desktop-reduced-motion",
+        "engine": "chromium",
+        "product": "run",
+        "route": "/?surface=editor#editor",
+        "width": 1440,
+        "height": 900,
+        "theme": "light",
+        "density": "studioDense",
+        "reducedMotion": true,
+        "forcedColors": false,
+        "keyboardDialog": false
+      },
+      "url": "http://127.0.0.1:54280/?surface=editor#editor",
+      "passed": true,
+      "snapshot": {
+        "theme": "light",
+        "density": "studioDense",
+        "scopePresent": true,
+        "socialOrder": [
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "socialVisible": true,
+        "themeToggleVisible": true,
+        "horizontalOverflowPx": 0,
+        "duplicateIds": [],
+        "unnamedInteractive": [],
+        "missingImageAltCount": 0,
+        "invalidAriaReferences": [],
+        "deferredAriaControls": [
+          {
+            "id": "radix-_r_1_",
+            "tag": "button"
+          }
+        ],
+        "fonts": [
+          {
+            "family": "Pretendard",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "Space Grotesk",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "JetBrains Mono",
+            "loadedFaceCount": 1
+          }
+        ],
+        "fontStatus": "loaded",
+        "colorPairs": [
+          {
+            "name": "textPrimaryOnBody",
+            "foreground": "rgb(24, 25, 29)",
+            "background": "rgb(245, 246, 248)",
+            "ratio": 16.24
+          },
+          {
+            "name": "textSecondaryOnBody",
+            "foreground": "rgb(93, 98, 109)",
+            "background": "rgb(245, 246, 248)",
+            "ratio": 5.66
+          },
+          {
+            "name": "textPrimaryOnSurface",
+            "foreground": "rgb(24, 25, 29)",
+            "background": "rgb(255, 255, 255)",
+            "ratio": 17.56
+          },
+          {
+            "name": "textSecondaryOnSurface",
+            "foreground": "rgb(93, 98, 109)",
+            "background": "rgb(255, 255, 255)",
+            "ratio": 6.12
+          },
+          {
+            "name": "accentOnBody",
+            "foreground": "rgb(79, 70, 200)",
+            "background": "rgb(245, 246, 248)",
+            "ratio": 6.38
+          }
+        ],
+        "reducedMotion": true,
+        "forcedColors": false,
+        "durationFast": "1ms",
+        "durationMedium": "1ms",
+        "durationSlow": "1ms",
+        "forcedColorSocialBorder": "none"
+      },
+      "keyboard": null,
+      "screenshot": "output/test-runner/visual-accessibility-browser/screenshots/chromium/chromium-run-desktop-reduced-motion.png",
+      "durationMs": 672,
+      "failures": []
+    },
+    {
+      "case": {
+        "name": "chromium-curriculum-minimum-dark",
+        "engine": "chromium",
+        "product": "run",
+        "route": "/?surface=curriculum#curriculum",
+        "width": 900,
+        "height": 640,
+        "theme": "dark",
+        "density": "learningComfortable",
+        "reducedMotion": false,
+        "forcedColors": false,
+        "keyboardDialog": false
+      },
+      "url": "http://127.0.0.1:54280/?surface=curriculum#curriculum",
+      "passed": true,
+      "snapshot": {
+        "theme": "dark",
+        "density": "learningComfortable",
+        "scopePresent": true,
+        "socialOrder": [
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "socialVisible": true,
+        "themeToggleVisible": true,
+        "horizontalOverflowPx": 0,
+        "duplicateIds": [],
+        "unnamedInteractive": [],
+        "missingImageAltCount": 0,
+        "invalidAriaReferences": [],
+        "deferredAriaControls": [],
+        "fonts": [
+          {
+            "family": "Pretendard",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "Space Grotesk",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "JetBrains Mono",
+            "loadedFaceCount": 1
+          }
+        ],
+        "fontStatus": "loaded",
+        "colorPairs": [
+          {
+            "name": "textPrimaryOnBody",
+            "foreground": "rgb(245, 246, 248)",
+            "background": "rgb(21, 22, 25)",
+            "ratio": 16.73
+          },
+          {
+            "name": "textSecondaryOnBody",
+            "foreground": "rgb(174, 179, 189)",
+            "background": "rgb(21, 22, 25)",
+            "ratio": 8.6
+          },
+          {
+            "name": "textPrimaryOnSurface",
+            "foreground": "rgb(245, 246, 248)",
+            "background": "rgb(34, 35, 39)",
+            "ratio": 14.52
+          },
+          {
+            "name": "textSecondaryOnSurface",
+            "foreground": "rgb(174, 179, 189)",
+            "background": "rgb(34, 35, 39)",
+            "ratio": 7.46
+          },
+          {
+            "name": "accentOnBody",
+            "foreground": "rgb(174, 180, 255)",
+            "background": "rgb(21, 22, 25)",
+            "ratio": 9.28
+          }
+        ],
+        "reducedMotion": false,
+        "forcedColors": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "forcedColorSocialBorder": "none"
+      },
+      "keyboard": null,
+      "screenshot": "output/test-runner/visual-accessibility-browser/screenshots/chromium/chromium-curriculum-minimum-dark.png",
+      "durationMs": 813,
+      "failures": []
+    },
+    {
+      "case": {
+        "name": "chromium-local-run-minimum-light",
+        "engine": "chromium",
+        "product": "local",
+        "route": "/?surface=editor#editor",
+        "width": 900,
+        "height": 640,
+        "theme": "light",
+        "density": "studioDense",
+        "reducedMotion": false,
+        "forcedColors": false,
+        "keyboardDialog": false
+      },
+      "url": "http://127.0.0.1:54281/?surface=editor#editor",
+      "passed": true,
+      "snapshot": {
+        "theme": "light",
+        "density": "studioDense",
+        "scopePresent": true,
+        "socialOrder": [
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "socialVisible": true,
+        "themeToggleVisible": true,
+        "horizontalOverflowPx": 0,
+        "duplicateIds": [],
+        "unnamedInteractive": [],
+        "missingImageAltCount": 0,
+        "invalidAriaReferences": [],
+        "deferredAriaControls": [
+          {
+            "id": "radix-_r_1_",
+            "tag": "button"
+          }
+        ],
+        "fonts": [
+          {
+            "family": "Pretendard",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "Space Grotesk",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "JetBrains Mono",
+            "loadedFaceCount": 1
+          }
+        ],
+        "fontStatus": "loaded",
+        "colorPairs": [
+          {
+            "name": "textPrimaryOnBody",
+            "foreground": "rgb(24, 25, 29)",
+            "background": "rgb(245, 246, 248)",
+            "ratio": 16.24
+          },
+          {
+            "name": "textSecondaryOnBody",
+            "foreground": "rgb(93, 98, 109)",
+            "background": "rgb(245, 246, 248)",
+            "ratio": 5.66
+          },
+          {
+            "name": "textPrimaryOnSurface",
+            "foreground": "rgb(24, 25, 29)",
+            "background": "rgb(255, 255, 255)",
+            "ratio": 17.56
+          },
+          {
+            "name": "textSecondaryOnSurface",
+            "foreground": "rgb(93, 98, 109)",
+            "background": "rgb(255, 255, 255)",
+            "ratio": 6.12
+          },
+          {
+            "name": "accentOnBody",
+            "foreground": "rgb(79, 70, 200)",
+            "background": "rgb(245, 246, 248)",
+            "ratio": 6.38
+          }
+        ],
+        "reducedMotion": false,
+        "forcedColors": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "forcedColorSocialBorder": "none"
+      },
+      "keyboard": null,
+      "screenshot": "output/test-runner/visual-accessibility-browser/screenshots/chromium/chromium-local-run-minimum-light.png",
+      "durationMs": 907,
+      "failures": []
+    },
+    {
+      "case": {
+        "name": "firefox-landing-desktop-dark",
+        "engine": "firefox",
+        "product": "landing",
+        "route": "/codaro/",
+        "width": 1440,
+        "height": 900,
+        "theme": "dark",
+        "density": "public",
+        "reducedMotion": false,
+        "forcedColors": false,
+        "keyboardDialog": true
+      },
+      "url": "http://127.0.0.1:54279/codaro/",
+      "passed": true,
+      "snapshot": {
+        "theme": "dark",
+        "density": "public",
+        "scopePresent": true,
+        "socialOrder": [
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "socialVisible": true,
+        "themeToggleVisible": true,
+        "horizontalOverflowPx": 0,
+        "duplicateIds": [],
+        "unnamedInteractive": [],
+        "missingImageAltCount": 0,
+        "invalidAriaReferences": [],
+        "deferredAriaControls": [
+          {
+            "id": "public-mobile-menu",
+            "tag": "button"
+          }
+        ],
+        "fonts": [
+          {
+            "family": "Pretendard",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "Space Grotesk",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "JetBrains Mono",
+            "loadedFaceCount": 1
+          }
+        ],
+        "fontStatus": "loaded",
+        "colorPairs": [
+          {
+            "name": "textPrimaryOnBody",
+            "foreground": "rgb(245, 246, 248)",
+            "background": "rgb(21, 22, 25)",
+            "ratio": 16.73
+          },
+          {
+            "name": "textSecondaryOnBody",
+            "foreground": "rgb(174, 179, 189)",
+            "background": "rgb(21, 22, 25)",
+            "ratio": 8.6
+          },
+          {
+            "name": "textPrimaryOnSurface",
+            "foreground": "rgb(245, 246, 248)",
+            "background": "rgb(34, 35, 39)",
+            "ratio": 14.52
+          },
+          {
+            "name": "textSecondaryOnSurface",
+            "foreground": "rgb(174, 179, 189)",
+            "background": "rgb(34, 35, 39)",
+            "ratio": 7.46
+          },
+          {
+            "name": "accentOnBody",
+            "foreground": "rgb(174, 180, 255)",
+            "background": "rgb(21, 22, 25)",
+            "ratio": 9.28
+          }
+        ],
+        "reducedMotion": false,
+        "forcedColors": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "forcedColorSocialBorder": "none"
+      },
+      "keyboard": {
+        "focusedTopControls": [
+          "theme",
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "topLaneTabOrder": [
+          "theme",
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "focusIndicators": {
+          "theme": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "github": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "support": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "youtube": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "threads": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          }
+        },
+        "firstDialogFocus": {
+          "marker": null,
+          "label": "닫기",
+          "socialId": null,
+          "tag": "button",
+          "insideDialog": true,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        },
+        "shiftTabFocus": {
+          "marker": null,
+          "label": "계좌번호 1002-0421-4626 복사",
+          "socialId": null,
+          "tag": "button",
+          "insideDialog": true,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        },
+        "wrappedFocus": {
+          "marker": null,
+          "label": "닫기",
+          "socialId": null,
+          "tag": "button",
+          "insideDialog": true,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        },
+        "accountNumber": "1002-0421-4626",
+        "dialogLabel": "후원·기여",
+        "dialogLayout": {
+          "viewportWidth": 1440,
+          "dialogLeft": 440,
+          "dialogRight": 1000,
+          "dialogWidth": 560,
+          "headerPaddingLeft": "22px",
+          "headerPaddingRight": "18px",
+          "bodyPaddingLeft": "22px",
+          "bodyPaddingRight": "22px",
+          "bodyGap": "26px",
+          "waysColumns": "166px 166px 166px"
+        },
+        "dialogContrast": [
+          {
+            "selector": ".codaroSupportHeader h2",
+            "foreground": "rgb(244, 244, 245)",
+            "background": "rgba(17, 17, 20, 0.96)",
+            "ratio": 17.15
+          },
+          {
+            "selector": ".codaroSupportHero p",
+            "foreground": "rgb(194, 194, 202)",
+            "background": "rgb(17, 17, 20)",
+            "ratio": 10.65
+          },
+          {
+            "selector": ".codaroSupportSection h3",
+            "foreground": "rgb(165, 165, 174)",
+            "background": "rgb(17, 17, 20)",
+            "ratio": 7.71
+          },
+          {
+            "selector": ".codaroSupportWays a",
+            "foreground": "rgb(201, 201, 208)",
+            "background": "rgb(24, 24, 28)",
+            "ratio": 10.75
+          },
+          {
+            "selector": ".codaroSupportRow strong",
+            "foreground": "rgb(241, 241, 243)",
+            "background": "rgb(23, 23, 27)",
+            "ratio": 15.85
+          },
+          {
+            "selector": ".codaroSupportRow > span",
+            "foreground": "rgb(165, 165, 174)",
+            "background": "rgb(23, 23, 27)",
+            "ratio": 7.31
+          },
+          {
+            "selector": ".codaroSupportAccount button",
+            "foreground": "rgb(214, 214, 220)",
+            "background": "rgb(34, 34, 40)",
+            "ratio": 10.93
+          },
+          {
+            "selector": ".codaroSupportNote",
+            "foreground": "rgb(152, 152, 162)",
+            "background": "rgb(17, 17, 20)",
+            "ratio": 6.6
+          }
+        ],
+        "dialogScreenshot": "output/test-runner/visual-accessibility-browser/screenshots/firefox/firefox-landing-desktop-dark-support-dialog.png",
+        "dialogClosedWithEscape": true,
+        "returnedFocus": {
+          "marker": "support",
+          "label": "후원·기여",
+          "socialId": "support",
+          "tag": "button",
+          "insideDialog": false,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        }
+      },
+      "screenshot": "output/test-runner/visual-accessibility-browser/screenshots/firefox/firefox-landing-desktop-dark.png",
+      "durationMs": 5828,
+      "failures": []
+    },
+    {
+      "case": {
+        "name": "firefox-learn-mobile-light",
+        "engine": "firefox",
+        "product": "landing",
+        "route": "/codaro/learn/",
+        "width": 320,
+        "height": 720,
+        "theme": "light",
+        "density": "learningComfortable",
+        "reducedMotion": false,
+        "forcedColors": false,
+        "keyboardDialog": false
+      },
+      "url": "http://127.0.0.1:54279/codaro/learn/",
+      "passed": true,
+      "snapshot": {
+        "theme": "light",
+        "density": "learningComfortable",
+        "scopePresent": true,
+        "socialOrder": [
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "socialVisible": true,
+        "themeToggleVisible": true,
+        "horizontalOverflowPx": 0,
+        "duplicateIds": [],
+        "unnamedInteractive": [],
+        "missingImageAltCount": 0,
+        "invalidAriaReferences": [],
+        "deferredAriaControls": [
+          {
+            "id": "public-mobile-menu",
+            "tag": "button"
+          }
+        ],
+        "fonts": [
+          {
+            "family": "Pretendard",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "Space Grotesk",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "JetBrains Mono",
+            "loadedFaceCount": 1
+          }
+        ],
+        "fontStatus": "loaded",
+        "colorPairs": [
+          {
+            "name": "textPrimaryOnBody",
+            "foreground": "rgb(24, 25, 29)",
+            "background": "rgb(245, 246, 248)",
+            "ratio": 16.24
+          },
+          {
+            "name": "textSecondaryOnBody",
+            "foreground": "rgb(93, 98, 109)",
+            "background": "rgb(245, 246, 248)",
+            "ratio": 5.66
+          },
+          {
+            "name": "textPrimaryOnSurface",
+            "foreground": "rgb(24, 25, 29)",
+            "background": "rgb(255, 255, 255)",
+            "ratio": 17.56
+          },
+          {
+            "name": "textSecondaryOnSurface",
+            "foreground": "rgb(93, 98, 109)",
+            "background": "rgb(255, 255, 255)",
+            "ratio": 6.12
+          },
+          {
+            "name": "accentOnBody",
+            "foreground": "rgb(79, 70, 200)",
+            "background": "rgb(245, 246, 248)",
+            "ratio": 6.38
+          }
+        ],
+        "reducedMotion": false,
+        "forcedColors": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "forcedColorSocialBorder": "none"
+      },
+      "keyboard": null,
+      "screenshot": "output/test-runner/visual-accessibility-browser/screenshots/firefox/firefox-learn-mobile-light.png",
+      "durationMs": 1718,
+      "failures": []
+    },
+    {
+      "case": {
+        "name": "firefox-run-mobile-dark",
+        "engine": "firefox",
+        "product": "run",
+        "route": "/?surface=editor#editor",
+        "width": 390,
+        "height": 844,
+        "theme": "dark",
+        "density": "studioDense",
+        "reducedMotion": false,
+        "forcedColors": false,
+        "keyboardDialog": true
+      },
+      "url": "http://127.0.0.1:54280/?surface=editor#editor",
+      "passed": true,
+      "snapshot": {
+        "theme": "dark",
+        "density": "studioDense",
+        "scopePresent": true,
+        "socialOrder": [
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "socialVisible": true,
+        "themeToggleVisible": true,
+        "horizontalOverflowPx": 0,
+        "duplicateIds": [],
+        "unnamedInteractive": [],
+        "missingImageAltCount": 0,
+        "invalidAriaReferences": [],
+        "deferredAriaControls": [],
+        "fonts": [
+          {
+            "family": "Pretendard",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "Space Grotesk",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "JetBrains Mono",
+            "loadedFaceCount": 1
+          }
+        ],
+        "fontStatus": "loaded",
+        "colorPairs": [
+          {
+            "name": "textPrimaryOnBody",
+            "foreground": "rgb(245, 246, 248)",
+            "background": "rgb(21, 22, 25)",
+            "ratio": 16.73
+          },
+          {
+            "name": "textSecondaryOnBody",
+            "foreground": "rgb(174, 179, 189)",
+            "background": "rgb(21, 22, 25)",
+            "ratio": 8.6
+          },
+          {
+            "name": "textPrimaryOnSurface",
+            "foreground": "rgb(245, 246, 248)",
+            "background": "rgb(34, 35, 39)",
+            "ratio": 14.52
+          },
+          {
+            "name": "textSecondaryOnSurface",
+            "foreground": "rgb(174, 179, 189)",
+            "background": "rgb(34, 35, 39)",
+            "ratio": 7.46
+          },
+          {
+            "name": "accentOnBody",
+            "foreground": "rgb(174, 180, 255)",
+            "background": "rgb(21, 22, 25)",
+            "ratio": 9.28
+          }
+        ],
+        "reducedMotion": false,
+        "forcedColors": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "forcedColorSocialBorder": "none"
+      },
+      "keyboard": {
+        "focusedTopControls": [
+          "theme",
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "topLaneTabOrder": [
+          "theme",
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "focusIndicators": {
+          "theme": {
+            "outlineStyle": "none",
+            "outlineWidth": "3px",
+            "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.793077 0.0187472 -0.104796 / 0.5) 0px 0px 0px 3px, rgba(0, 0, 0, 0) 0px 0px 0px 0px"
+          },
+          "github": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "support": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "youtube": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "threads": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          }
+        },
+        "firstDialogFocus": {
+          "marker": null,
+          "label": "닫기",
+          "socialId": null,
+          "tag": "button",
+          "insideDialog": true,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        },
+        "shiftTabFocus": {
+          "marker": null,
+          "label": "계좌번호 1002-0421-4626 복사",
+          "socialId": null,
+          "tag": "button",
+          "insideDialog": true,
+          "outlineStyle": "auto",
+          "outlineWidth": "3px",
+          "boxShadow": "none"
+        },
+        "wrappedFocus": {
+          "marker": null,
+          "label": "닫기",
+          "socialId": null,
+          "tag": "button",
+          "insideDialog": true,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        },
+        "accountNumber": "1002-0421-4626",
+        "dialogLabel": "후원·기여",
+        "dialogLayout": {
+          "viewportWidth": 390,
+          "dialogLeft": 12,
+          "dialogRight": 378,
+          "dialogWidth": 366,
+          "headerPaddingLeft": "22px",
+          "headerPaddingRight": "18px",
+          "bodyPaddingLeft": "22px",
+          "bodyPaddingRight": "22px",
+          "bodyGap": "26px",
+          "waysColumns": "320px"
+        },
+        "dialogContrast": [
+          {
+            "selector": ".codaroSupportHeader h2",
+            "foreground": "rgb(244, 244, 245)",
+            "background": "rgba(17, 17, 20, 0.96)",
+            "ratio": 17.15
+          },
+          {
+            "selector": ".codaroSupportHero p",
+            "foreground": "rgb(194, 194, 202)",
+            "background": "rgb(17, 17, 20)",
+            "ratio": 10.65
+          },
+          {
+            "selector": ".codaroSupportSection h3",
+            "foreground": "rgb(165, 165, 174)",
+            "background": "rgb(17, 17, 20)",
+            "ratio": 7.71
+          },
+          {
+            "selector": ".codaroSupportWays a",
+            "foreground": "rgb(201, 201, 208)",
+            "background": "rgb(24, 24, 28)",
+            "ratio": 10.75
+          },
+          {
+            "selector": ".codaroSupportRow strong",
+            "foreground": "rgb(241, 241, 243)",
+            "background": "rgb(23, 23, 27)",
+            "ratio": 15.85
+          },
+          {
+            "selector": ".codaroSupportRow > span",
+            "foreground": "rgb(165, 165, 174)",
+            "background": "rgb(23, 23, 27)",
+            "ratio": 7.31
+          },
+          {
+            "selector": ".codaroSupportAccount button",
+            "foreground": "rgb(214, 214, 220)",
+            "background": "rgb(34, 34, 40)",
+            "ratio": 10.93
+          },
+          {
+            "selector": ".codaroSupportNote",
+            "foreground": "rgb(152, 152, 162)",
+            "background": "rgb(17, 17, 20)",
+            "ratio": 6.6
+          }
+        ],
+        "dialogScreenshot": "output/test-runner/visual-accessibility-browser/screenshots/firefox/firefox-run-mobile-dark-support-dialog.png",
+        "dialogClosedWithEscape": true,
+        "returnedFocus": {
+          "marker": "support",
+          "label": "후원·기여",
+          "socialId": "support",
+          "tag": "button",
+          "insideDialog": false,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        }
+      },
+      "screenshot": "output/test-runner/visual-accessibility-browser/screenshots/firefox/firefox-run-mobile-dark.png",
+      "durationMs": 2343,
+      "failures": []
+    },
+    {
+      "case": {
+        "name": "webkit-landing-mobile-light",
+        "engine": "webkit",
+        "product": "landing",
+        "route": "/codaro/",
+        "width": 320,
+        "height": 720,
+        "theme": "light",
+        "density": "public",
+        "reducedMotion": false,
+        "forcedColors": false,
+        "keyboardDialog": true
+      },
+      "url": "http://127.0.0.1:54279/codaro/",
+      "passed": true,
+      "snapshot": {
+        "theme": "light",
+        "density": "public",
+        "scopePresent": true,
+        "socialOrder": [
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "socialVisible": true,
+        "themeToggleVisible": true,
+        "horizontalOverflowPx": 0,
+        "duplicateIds": [],
+        "unnamedInteractive": [],
+        "missingImageAltCount": 0,
+        "invalidAriaReferences": [],
+        "deferredAriaControls": [
+          {
+            "id": "public-mobile-menu",
+            "tag": "button"
+          }
+        ],
+        "fonts": [
+          {
+            "family": "Pretendard",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "Space Grotesk",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "JetBrains Mono",
+            "loadedFaceCount": 1
+          }
+        ],
+        "fontStatus": "loaded",
+        "colorPairs": [
+          {
+            "name": "textPrimaryOnBody",
+            "foreground": "rgb(24, 25, 29)",
+            "background": "rgb(245, 246, 248)",
+            "ratio": 16.24
+          },
+          {
+            "name": "textSecondaryOnBody",
+            "foreground": "rgb(93, 98, 109)",
+            "background": "rgb(245, 246, 248)",
+            "ratio": 5.66
+          },
+          {
+            "name": "textPrimaryOnSurface",
+            "foreground": "rgb(24, 25, 29)",
+            "background": "rgb(255, 255, 255)",
+            "ratio": 17.56
+          },
+          {
+            "name": "textSecondaryOnSurface",
+            "foreground": "rgb(93, 98, 109)",
+            "background": "rgb(255, 255, 255)",
+            "ratio": 6.12
+          },
+          {
+            "name": "accentOnBody",
+            "foreground": "rgb(79, 70, 200)",
+            "background": "rgb(245, 246, 248)",
+            "ratio": 6.38
+          }
+        ],
+        "reducedMotion": false,
+        "forcedColors": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "forcedColorSocialBorder": "none"
+      },
+      "keyboard": {
+        "focusedTopControls": [
+          "theme",
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "topLaneTabOrder": [
+          "theme",
+          "support"
+        ],
+        "focusIndicators": {
+          "theme": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "github": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "support": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "youtube": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "threads": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          }
+        },
+        "firstDialogFocus": {
+          "marker": null,
+          "label": "닫기",
+          "socialId": null,
+          "tag": "button",
+          "insideDialog": true,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        },
+        "shiftTabFocus": {
+          "marker": null,
+          "label": "계좌번호 1002-0421-4626 복사",
+          "socialId": null,
+          "tag": "button",
+          "insideDialog": true,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        },
+        "wrappedFocus": {
+          "marker": null,
+          "label": "닫기",
+          "socialId": null,
+          "tag": "button",
+          "insideDialog": true,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        },
+        "accountNumber": "1002-0421-4626",
+        "dialogLabel": "후원·기여",
+        "dialogLayout": {
+          "viewportWidth": 320,
+          "dialogLeft": 12,
+          "dialogRight": 308,
+          "dialogWidth": 296,
+          "headerPaddingLeft": "22px",
+          "headerPaddingRight": "18px",
+          "bodyPaddingLeft": "22px",
+          "bodyPaddingRight": "22px",
+          "bodyGap": "26px",
+          "waysColumns": "250px"
+        },
+        "dialogContrast": [
+          {
+            "selector": ".codaroSupportHeader h2",
+            "foreground": "rgb(244, 244, 245)",
+            "background": "rgba(17, 17, 20, 0.96)",
+            "ratio": 17.15
+          },
+          {
+            "selector": ".codaroSupportHero p",
+            "foreground": "rgb(194, 194, 202)",
+            "background": "rgb(17, 17, 20)",
+            "ratio": 10.65
+          },
+          {
+            "selector": ".codaroSupportSection h3",
+            "foreground": "rgb(165, 165, 174)",
+            "background": "rgb(17, 17, 20)",
+            "ratio": 7.71
+          },
+          {
+            "selector": ".codaroSupportWays a",
+            "foreground": "rgb(201, 201, 208)",
+            "background": "rgb(24, 24, 28)",
+            "ratio": 10.75
+          },
+          {
+            "selector": ".codaroSupportRow strong",
+            "foreground": "rgb(241, 241, 243)",
+            "background": "rgb(23, 23, 27)",
+            "ratio": 15.85
+          },
+          {
+            "selector": ".codaroSupportRow > span",
+            "foreground": "rgb(165, 165, 174)",
+            "background": "rgb(23, 23, 27)",
+            "ratio": 7.31
+          },
+          {
+            "selector": ".codaroSupportAccount button",
+            "foreground": "rgb(214, 214, 220)",
+            "background": "rgb(34, 34, 40)",
+            "ratio": 10.93
+          },
+          {
+            "selector": ".codaroSupportNote",
+            "foreground": "rgb(152, 152, 162)",
+            "background": "rgb(17, 17, 20)",
+            "ratio": 6.6
+          }
+        ],
+        "dialogScreenshot": "output/test-runner/visual-accessibility-browser/screenshots/webkit/webkit-landing-mobile-light-support-dialog.png",
+        "dialogClosedWithEscape": true,
+        "returnedFocus": {
+          "marker": "support",
+          "label": "후원·기여",
+          "socialId": "support",
+          "tag": "button",
+          "insideDialog": false,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        }
+      },
+      "screenshot": "output/test-runner/visual-accessibility-browser/screenshots/webkit/webkit-landing-mobile-light.png",
+      "durationMs": 1594,
+      "failures": []
+    },
+    {
+      "case": {
+        "name": "webkit-learn-desktop-dark",
+        "engine": "webkit",
+        "product": "landing",
+        "route": "/codaro/learn/",
+        "width": 1440,
+        "height": 900,
+        "theme": "dark",
+        "density": "learningComfortable",
+        "reducedMotion": false,
+        "forcedColors": false,
+        "keyboardDialog": false
+      },
+      "url": "http://127.0.0.1:54279/codaro/learn/",
+      "passed": true,
+      "snapshot": {
+        "theme": "dark",
+        "density": "learningComfortable",
+        "scopePresent": true,
+        "socialOrder": [
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "socialVisible": true,
+        "themeToggleVisible": true,
+        "horizontalOverflowPx": 0,
+        "duplicateIds": [],
+        "unnamedInteractive": [],
+        "missingImageAltCount": 0,
+        "invalidAriaReferences": [],
+        "deferredAriaControls": [
+          {
+            "id": "public-mobile-menu",
+            "tag": "button"
+          }
+        ],
+        "fonts": [
+          {
+            "family": "Pretendard",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "Space Grotesk",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "JetBrains Mono",
+            "loadedFaceCount": 1
+          }
+        ],
+        "fontStatus": "loaded",
+        "colorPairs": [
+          {
+            "name": "textPrimaryOnBody",
+            "foreground": "rgb(245, 246, 248)",
+            "background": "rgb(21, 22, 25)",
+            "ratio": 16.73
+          },
+          {
+            "name": "textSecondaryOnBody",
+            "foreground": "rgb(174, 179, 189)",
+            "background": "rgb(21, 22, 25)",
+            "ratio": 8.6
+          },
+          {
+            "name": "textPrimaryOnSurface",
+            "foreground": "rgb(245, 246, 248)",
+            "background": "rgb(34, 35, 39)",
+            "ratio": 14.52
+          },
+          {
+            "name": "textSecondaryOnSurface",
+            "foreground": "rgb(174, 179, 189)",
+            "background": "rgb(34, 35, 39)",
+            "ratio": 7.46
+          },
+          {
+            "name": "accentOnBody",
+            "foreground": "rgb(174, 180, 255)",
+            "background": "rgb(21, 22, 25)",
+            "ratio": 9.28
+          }
+        ],
+        "reducedMotion": false,
+        "forcedColors": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "forcedColorSocialBorder": "none"
+      },
+      "keyboard": null,
+      "screenshot": "output/test-runner/visual-accessibility-browser/screenshots/webkit/webkit-learn-desktop-dark.png",
+      "durationMs": 891,
+      "failures": []
+    },
+    {
+      "case": {
+        "name": "webkit-run-desktop-light",
+        "engine": "webkit",
+        "product": "run",
+        "route": "/?surface=editor#editor",
+        "width": 900,
+        "height": 640,
+        "theme": "light",
+        "density": "studioDense",
+        "reducedMotion": false,
+        "forcedColors": false,
+        "keyboardDialog": true
+      },
+      "url": "http://127.0.0.1:54280/?surface=editor#editor",
+      "passed": true,
+      "snapshot": {
+        "theme": "light",
+        "density": "studioDense",
+        "scopePresent": true,
+        "socialOrder": [
+          "github",
+          "support",
+          "youtube",
+          "threads"
+        ],
+        "socialVisible": true,
+        "themeToggleVisible": true,
+        "horizontalOverflowPx": 0,
+        "duplicateIds": [],
+        "unnamedInteractive": [],
+        "missingImageAltCount": 0,
+        "invalidAriaReferences": [],
+        "deferredAriaControls": [
+          {
+            "id": "radix-_r_1_",
+            "tag": "button"
+          }
+        ],
+        "fonts": [
+          {
+            "family": "Pretendard",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "Space Grotesk",
+            "loadedFaceCount": 1
+          },
+          {
+            "family": "JetBrains Mono",
+            "loadedFaceCount": 1
+          }
+        ],
+        "fontStatus": "loaded",
+        "colorPairs": [
+          {
+            "name": "textPrimaryOnBody",
+            "foreground": "rgb(24, 25, 29)",
+            "background": "rgb(245, 246, 248)",
+            "ratio": 16.24
+          },
+          {
+            "name": "textSecondaryOnBody",
+            "foreground": "rgb(93, 98, 109)",
+            "background": "rgb(245, 246, 248)",
+            "ratio": 5.66
+          },
+          {
+            "name": "textPrimaryOnSurface",
+            "foreground": "rgb(24, 25, 29)",
+            "background": "rgb(255, 255, 255)",
+            "ratio": 17.56
+          },
+          {
+            "name": "textSecondaryOnSurface",
+            "foreground": "rgb(93, 98, 109)",
+            "background": "rgb(255, 255, 255)",
+            "ratio": 6.12
+          },
+          {
+            "name": "accentOnBody",
+            "foreground": "rgb(79, 70, 200)",
+            "background": "rgb(245, 246, 248)",
+            "ratio": 6.38
+          }
+        ],
+        "reducedMotion": false,
+        "forcedColors": false,
+        "durationFast": ".12s",
+        "durationMedium": ".18s",
+        "durationSlow": ".24s",
+        "forcedColorSocialBorder": "none"
+      },
+      "keyboard": {
+        "focusedTopControls": [
+          "theme",
+          "github",
+          "youtube",
+          "threads"
+        ],
+        "topLaneTabOrder": [
+          "theme",
+          "support"
+        ],
+        "focusIndicators": {
+          "theme": {
+            "outlineStyle": "none",
+            "outlineWidth": "3px",
+            "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0.484748 0.031693 -0.191613 / 0.5) 0px 0px 0px 3px, rgba(0, 0, 0, 0) 0px 0px 0px 0px"
+          },
+          "github": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "youtube": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "threads": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          },
+          "support": {
+            "outlineStyle": "solid",
+            "outlineWidth": "2px",
+            "boxShadow": "none"
+          }
+        },
+        "firstDialogFocus": {
+          "marker": null,
+          "label": "닫기",
+          "socialId": null,
+          "tag": "button",
+          "insideDialog": true,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        },
+        "shiftTabFocus": {
+          "marker": null,
+          "label": "계좌번호 1002-0421-4626 복사",
+          "socialId": null,
+          "tag": "button",
+          "insideDialog": true,
+          "outlineStyle": "auto",
+          "outlineWidth": "3px",
+          "boxShadow": "none"
+        },
+        "wrappedFocus": {
+          "marker": null,
+          "label": "닫기",
+          "socialId": null,
+          "tag": "button",
+          "insideDialog": true,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        },
+        "accountNumber": "1002-0421-4626",
+        "dialogLabel": "후원·기여",
+        "dialogLayout": {
+          "viewportWidth": 900,
+          "dialogLeft": 170,
+          "dialogRight": 730,
+          "dialogWidth": 560,
+          "headerPaddingLeft": "22px",
+          "headerPaddingRight": "18px",
+          "bodyPaddingLeft": "22px",
+          "bodyPaddingRight": "22px",
+          "bodyGap": "26px",
+          "waysColumns": "166px 166px 166px"
+        },
+        "dialogContrast": [
+          {
+            "selector": ".codaroSupportHeader h2",
+            "foreground": "rgb(244, 244, 245)",
+            "background": "rgba(17, 17, 20, 0.96)",
+            "ratio": 17.15
+          },
+          {
+            "selector": ".codaroSupportHero p",
+            "foreground": "rgb(194, 194, 202)",
+            "background": "rgb(17, 17, 20)",
+            "ratio": 10.65
+          },
+          {
+            "selector": ".codaroSupportSection h3",
+            "foreground": "rgb(165, 165, 174)",
+            "background": "rgb(17, 17, 20)",
+            "ratio": 7.71
+          },
+          {
+            "selector": ".codaroSupportWays a",
+            "foreground": "rgb(201, 201, 208)",
+            "background": "rgb(24, 24, 28)",
+            "ratio": 10.75
+          },
+          {
+            "selector": ".codaroSupportRow strong",
+            "foreground": "rgb(241, 241, 243)",
+            "background": "rgb(23, 23, 27)",
+            "ratio": 15.85
+          },
+          {
+            "selector": ".codaroSupportRow > span",
+            "foreground": "rgb(165, 165, 174)",
+            "background": "rgb(23, 23, 27)",
+            "ratio": 7.31
+          },
+          {
+            "selector": ".codaroSupportAccount button",
+            "foreground": "rgb(214, 214, 220)",
+            "background": "rgb(34, 34, 40)",
+            "ratio": 10.93
+          },
+          {
+            "selector": ".codaroSupportNote",
+            "foreground": "rgb(152, 152, 162)",
+            "background": "rgb(17, 17, 20)",
+            "ratio": 6.6
+          }
+        ],
+        "dialogScreenshot": "output/test-runner/visual-accessibility-browser/screenshots/webkit/webkit-run-desktop-light-support-dialog.png",
+        "dialogClosedWithEscape": true,
+        "returnedFocus": {
+          "marker": "support",
+          "label": "후원·기여",
+          "socialId": "support",
+          "tag": "button",
+          "insideDialog": false,
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "boxShadow": "none"
+        }
+      },
+      "screenshot": "output/test-runner/visual-accessibility-browser/screenshots/webkit/webkit-run-desktop-light.png",
+      "durationMs": 1859,
+      "failures": []
+    }
+  ],
+  "reportPath": "output/test-runner/visual-accessibility-browser/visual-accessibility-report.json"
+}
