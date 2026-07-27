@@ -50,11 +50,19 @@ whenToUse: 새 UI 컴포넌트 추가, 색/반지름/그림자 변경, 랜딩/�
 - compact editor에서는 파일명, 테마 전환, 공용 SNS가 먼저다. 노트북 제목은 상단 중앙 한 곳에서만 편집하며 진단 알림은 제목과 겹치지 않는다. 진단 복사와 desktop assistant toggle은 `xl` 미만에서 숨기지만 공용 SNS rail은 320px 이상 모든 표면의 우상단에 유지한다.
 - 랜딩과 editor의 테마 버튼은 현재 해석된 테마를 기준으로 light와 dark를 직접 전환한다. 저장값이 `system`이어도 첫 클릭이 같은 화면을 유지하거나 세 번째 상태를 거치면 안 된다.
 - SNS와 외부 링크의 SSOT는 `assets/brand/designSystem/socialLinks.json`이다.
+  - 우상단 control lane은 테마 전환을 먼저 두고 그 뒤에 공용 SNS를 배치한다. 테마 전환은 SNS registry 항목이 아니지만 Landing, Learn, Web Run, Local에서 항상 같은 행에 보인다.
   - 표시 순서는 `GitHub → 하트 → YouTube → Threads`다. 사용자-facing label, URL, SVG path는 이 registry만 수정한다.
-  - 하트는 외부 링크가 아니라 `supportDialog` action이다. 팝업 제목, 안내, 참여 링크, Buy me a coffee, GitHub Sponsors, 토스뱅크 계좌번호와 예금주도 같은 registry의 `supportCenter`가 소유한다.
+  - 하트는 외부 링크가 아니라 `supportDialog` action이다. 팝업 제목, 안내, 참여 링크, Buy Me a Coffee, GitHub Sponsors, 토스뱅크 계좌번호와 예금주도 같은 registry의 `supportCenter`가 소유한다.
   - `assets/brand/tools/buildDesignSystem.py`가 landing과 editor의 `styles/generated/socialLinks.tsx`를 동일 byte로 생성한다.
   - 생성 컴포넌트는 Astryx `IconButton`, body portal 팝업, Escape 닫기, 기존 focus 복원, 계좌번호 복사를 함께 제공한다. landing과 editor는 각 app bundle 안에서 이 생성 컴포넌트를 사용하며 한 제품 표면의 내부 component를 다른 표면에서 직접 import하지 않는다.
+  - 후원 팝업은 DartLab과 같은 560px 편지형 계층을 따른다. 고정 header 아래 내부 body만 스크롤하고, 소개, 함께하는 법 3열, Buy Me a Coffee, GitHub Sponsors, `토스뱅크 1002-0421-4626 김주현`, 별도 복사 control 순서를 유지한다.
   - 공개 Header와 Footer, Web Run과 Local의 공용 top control lane에서 `data-social-links="codaro"` 계약을 항상 렌더링한다.
+- 자유 노트북은 DartLab notebook의 최소 문서 구조를 제품 기준으로 사용한다.
+  - 왼쪽 `Codaro notebook`, 중앙 `Untitled`, 오른쪽 테마와 공용 SNS를 둔다.
+  - 첫 화면은 빈 code cell 하나만 보여주고 runtime rail, 정상 저장 badge, 상시 cell 종류 label을 노출하지 않는다.
+  - 문서 하단은 `+ Code`, `+ Markdown`, 왼쪽 아래는 `compact`, `medium`, `full`, 오른쪽 아래는 실제 reactive 전환과 전체 실행을 둔다.
+  - desktop reactive·실행 control은 36px 원형, mobile target은 44px 이상이다.
+  - Web Run과 Local은 `NotebookSurface → NotebookPanel`을 함께 사용하며 별도 노트북 변종을 만들지 않는다.
 - 제품 section을 떠 있는 card로 만들거나 card 안에 card를 넣지 않는다. card는 반복 항목, modal, 실제 도구 frame에만 사용한다.
 - 실제 제품 screenshot과 학습 결과 이미지를 mascot보다 우선하는 product proof로 사용한다. fake terminal, fake editor, emoji primary icon을 새로 만들지 않는다.
 - 예측 카드는 학습 경험에 다시 도입하지 않는다. 학습 흐름은 설명, 직접 수정, 실행, 오류 수정, 강한 검증, 실무 변주다.

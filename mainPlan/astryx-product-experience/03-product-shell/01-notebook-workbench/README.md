@@ -15,6 +15,7 @@
 - code, output, error, verification의 명확한 시각 계층
 - 44px 이상 mobile Run control과 safe area
 - 기존 cell 실행, reactive dependency, automation 승격 동작 보존
+- DartLab notebook과 같은 `compact`, `medium`, `full` 문서 폭 및 실제 reactive 실행 전환
 - Web Run과 Local의 `NotebookSurface → NotebookPanel` 단일 컴포넌트 트리
 
 ## 종료 조건
@@ -28,13 +29,16 @@
 
 ## 현재 증거
 
-- 새 자유 노트북은 `새노트북.py`와 빈 코드 셀 하나로 시작하고, Python/Markdown 추가는 문서 하단에 배치했다. 파일명은 상단 중앙, 전체 실행은 우측 하단 원형 control로 분리했다.
+- 새 자유 노트북은 `Untitled`와 빈 코드 셀 하나로 시작한다. 화면 제목은 실제 문서 경로와 분리해 포커스를 잃어도 `.py`를 강제로 붙이지 않는다.
+- 상단 왼쪽은 `Codaro notebook`, 중앙은 편집 가능한 제목, 오른쪽은 테마 전환과 공용 `GitHub → 하트 → YouTube → Threads` 순서를 사용한다. 노트북 전용 top lane에서도 같은 생성 컴포넌트를 사용한다.
+- 문서 하단의 추가 control은 DartLab과 같은 `+ Code`, `+ Markdown` 표기다. 왼쪽 아래는 `compact`, `medium`, `full` 폭 전환, 오른쪽 아래는 실제 reactive 실행 전환과 전체 실행을 둔다.
+- desktop 우하단 실행 control은 36px 원형이고 mobile에서는 44px target으로 커진다. reactive를 끄면 `codaro:reactive-trigger` 자동 전체 실행을 차단하고 수동 셀 및 전체 실행은 유지한다.
 - Web draft는 브라우저 저장소에 즉시 보존되고 reload 뒤 복원된다. Local draft는 700ms debounce 뒤 실제 workspace 파일에 저장된다. 저장 측정 속성은 유지하되 화면에는 pending, saving, error만 표시한다.
 - page hide와 background 전환은 일반 저장을 먼저 시작하고 UTF-8 요청 body 60KiB 이하에서만 보조 keepalive를 보낸다. 더 큰 미저장 문서는 keepalive를 강제 차단하고 일반 저장이 끝날 때까지 native 이탈 경고를 사용한다.
 - Local 경로는 `(documentId, path)`가 함께 소유해 새 문서가 이전 파일을 덮지 않는다. server는 session·document별 revision을 잠가 역순 요청을 거절하고 기존 이름과 겹치면 고유 경로를 할당한다.
 - Local 파일은 같은 디렉터리의 임시 파일을 flush·fsync한 뒤 `os.replace`로 교체한다. write, fsync, replace 실패 시 마지막 정상 파일과 원본 mode를 보존하고 임시 파일을 정리한다.
 - `.ipynb` 자동 저장은 출력, metadata, attachment, execution count, magic이 있는 원본을 byte-for-byte 보존하고 같은 디렉터리의 고유 `*.codaro.py` 사본으로 승격한다. 수동 Jupyter round trip은 별도 범위다.
-- mobile 44px 실행 control과 desktop 우측 하단 실행 영역을 적용했다.
+- mobile 44px 실행 control과 desktop 36px 우측 하단 실행 영역을 적용했다.
 - 노트북과 현재 학습 실행 셀은 `workCell.css`의 frame, output, action primitive를 함께 사용한다.
 - Web Run과 Local은 `apiOnline`으로 실행·저장 capability만 나누고 같은 Notebook 컴포넌트 트리와 CSS를 사용한다.
 - Chromium 149.0.7827.55에서 Web Run desktop 1440×900, mobile 320×720·390×844의 Dark 대표 case와 390×844 Light case, Local Run 900×640 Dark case가 통과했다.
@@ -42,7 +46,8 @@
 - Web desktop에서 빈 첫 셀에 코드를 입력하고 `Shift+Enter`를 누른 뒤 출력 생성, 두 번째 빈 code cell 생성, 두 번째 editor 선택과 DOM focus를 확인했다.
 - Local Run은 같은 Notebook 컴포넌트와 CSS로 렌더링됐고 Local kernel session 생성·종료와 runtime tier `local`을 확인했다.
 - Web desktop과 Local minimum에서 실제 Python 셀을 `running → success → running → error`로 전이하고, 정상 상태는 다시 숨기며 성공·오류 결과가 해당 셀 아래에 표시되는지 확인했다.
-- Run·Local·자동화 6-case 모두 공용 우상단 SNS `github`, `support`, `youtube`, `threads`와 같은 theme runtime을 사용한다. Web 자동화의 Local 전용 template은 `Local 필요`, Local 연결 뒤 같은 template은 가용 상태다.
+- Run·Local·자동화 6-case 모두 공용 우상단 SNS `github`, `support`, `youtube`, `threads`와 같은 theme runtime을 사용한다. 최소 노트북 case는 `Codaro notebook`, 세 폭 control, reactive control, `+ Code`, `+ Markdown`을 함께 검사한다. Web 자동화의 Local 전용 template은 `Local 필요`, Local 연결 뒤 같은 template은 가용 상태다.
+- Chromium, Firefox, WebKit 12-case 시각 접근성 검사에서 theme control, SNS 순서, 키보드 focus, 후원 팝업 focus trap, 정확한 계좌번호 `1002-0421-4626`, Dark·Light 대비와 320px 이상 가로 overflow 0px를 확인했다.
 - 시각 증거는 `output/test-runner/product-experience-browser/screenshots/{dark,light}/web-run-{desktop,mobile}.png`, Local 증거는 `output/test-runner/product-experience-browser/screenshots/dark/local-run-minimum.png`에 남겼다.
 - 기계 판정은 `output/test-runner/notebook-redesign/`의 Web Dark·Light와 Local report, `output/test-runner/run-local-state-browser/run-local-state-report.json`에 남겼다.
 
@@ -53,7 +58,8 @@
 
 ## 영향 파일
 
-- `editor/src/components/notebook/notebookCommandBar.tsx`: 가운데 파일명, 점진적 실행·저장 상태, floating 전체 실행
+- `editor/src/components/app/topBar.tsx`: 왼쪽 `Codaro notebook`, 가운데 `Untitled` 제목, 오른쪽 테마와 공용 SNS
+- `editor/src/components/notebook/notebookCommandBar.tsx`: 점진적 실행·저장 상태, 세 문서 폭 control, reactive 전환, floating 전체 실행
 - `editor/src/components/notebook/notebookPanel.tsx`: 빈 code cell, `Shift+Enter` 이동, code/Markdown cell과 output·error 렌더링
 - `editor/src/components/notebook/notebookPanel.css`: 조용한 기본 화면, 문맥형 cell action, compact code/output 계층, mobile control
 - `editor/src/components/app/workCell.css`: 노트북과 현재 학습이 함께 쓰는 실행 셀 시각 primitive
@@ -61,12 +67,12 @@
 - `editor/src/hooks/useNotebookDocumentState.ts`, `editor/src/lib/notebookPersistence.ts`, `editor/src/lib/documentSavePolicy.ts`: Web durable draft와 Local debounce·revision·경로 소유권·bounded keepalive 저장
 - `src/codaro/api/documentRouter.py`: workspace 고유 경로, stale revision 거절, Jupyter 원본 보호 사본
 - `src/codaro/document/service.py`: Python·Percent·Jupyter 공용 원자 저장
-- `editor/src/lib/notebookRuntime.ts`, `editor/src/hooks/useNotebookRuntimeState.ts`: 단일 cell과 reactive notebook 실행 상태
+- `editor/src/lib/notebookRuntime.ts`, `editor/src/hooks/useNotebookRuntimeState.ts`: 단일 cell 실행과 reactive notebook 실행 상태 및 자동 trigger 전환
 - `tests/surface/verifyNotebookAutosavePlaywright.py`, `tests/surface/verifyProductExperiencePlaywright.py`, `tests/surface/verifyMobileLayout.py`: 저장·reload와 Run 대표 여정, overlap·viewport 계약
 
 ## 영향 함수·심볼
 
-- `NotebookCommandBar`, `NotebookPanel`, `NotebookSurface`
+- `TopControls`, `NotebookCommandBar`, `NotebookPanel`, `NotebookSurface`
 - `CodeCellEditor`, `DocumentBlock`, `InsertCellButton`, `NotebookAppendActions`
 - `useNotebookAutosave`, `persistNotebookDocument`, `resolveNotebookSaveCompletion`, `documentSaveSupportsKeepalive`
 - `allocateDocumentPath`, `allocateCodaroCopyPath`, `safeDocumentStem`
@@ -82,12 +88,13 @@
 - `uv run python -X utf8 tests/product/verifyAstryxJourneyAudit.py`: `web-run-mobile`, `web-run-desktop`, `local-run-minimum` 대표 case
 - `uv run python -X utf8 tests/run.py gate mobile-layout`: 44px mobile 실행 control과 responsive layout 계약
 - `uv run python -X utf8 tests/run.py gate run-local-state-browser`: Web 320px와 Local 900×640, 실제 실행 상태 전이, 공용 SNS·테마, Local-required 상태
-- `uv run python -X utf8 tests/run.py gate product-experience-browser`: Notebook 실행과 출력, overlap, horizontal overflow 감사
+- `uv run python -X utf8 tests/run.py gate product-experience-browser`: Notebook 실행과 출력, 세 문서 폭, reactive 전환, overlap, horizontal overflow 감사
+- `uv run python -X utf8 tests/run.py gate visual-accessibility-browser`: 3엔진의 테마·SNS·후원 팝업·키보드·대비 계약
 - 실제 긴 문서의 keyboard 순서와 screen reader reading order는 별도 사람 검수로 남긴다.
 
 ## 롤백
 
-- command bar와 Notebook CSS를 함께 되돌리되 `runNotebookBlock`, reactive dependency, document 저장 계약은 유지한다.
+- top bar, command bar와 Notebook CSS를 함께 되돌리되 `runNotebookBlock`, reactive dependency, document 저장 계약은 유지한다.
 - 빈 초기 셀 계약을 되돌려도 durable 사용자 문서를 덮어쓰지 않고 새 문서의 초기값에만 적용한다.
 - floating control을 되돌릴 때 우측 패널과 control의 overlap 검사를 먼저 red로 확인한다.
 

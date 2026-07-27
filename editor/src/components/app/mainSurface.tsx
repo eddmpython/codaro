@@ -54,6 +54,7 @@ type MainSurfaceProps = {
   notebookPersistence: NotebookPersistenceState;
   pendingBlocks: BlockConfig[];
   prompt: string;
+  reactiveEnabled: boolean;
   referenceLoading: boolean;
   results: ResultMap;
   runningBlockId: string | null;
@@ -89,6 +90,7 @@ type MainSurfaceProps = {
   onSelectCurriculumBlock: (blockId: string) => void;
   onSelectCurriculumLesson: (category: string, contentId: string) => void;
   onToggleEStop: () => void;
+  onToggleReactive: () => void;
 };
 
 export function MainSurface(props: MainSurfaceProps) {
@@ -166,6 +168,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
         notebookPersistence={props.notebookPersistence}
         pendingBlocks={props.pendingBlocks}
         prompt={props.prompt}
+        reactiveEnabled={props.reactiveEnabled}
         results={props.results}
         runningBlockId={props.runningBlockId}
         selectedBlockId={props.selectedBlockId}
@@ -184,6 +187,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
         onRunBlock={props.onRunBlock}
         onRunNotebook={props.onRunNotebook}
         onSelectBlock={props.onSelectBlock}
+        onToggleReactive={props.onToggleReactive}
       />
     );
   }

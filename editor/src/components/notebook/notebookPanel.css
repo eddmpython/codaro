@@ -68,11 +68,69 @@
     z-index: 30;
     display: flex;
     align-items: center;
+    gap: var(--spacing-2);
+  }
+
+  [data-astryx-theme="codaro"] .notebookWidthTools {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-container);
+    padding: 2px;
+    background: var(--color-background-card);
+    box-shadow: var(--shadow-low);
+  }
+
+  [data-astryx-theme="codaro"] .notebookWidthButton,
+  [data-astryx-theme="codaro"] .notebookReactiveButton {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    border: 0;
+    border-radius: var(--radius-element);
+    background: transparent;
+    color: var(--color-icon-secondary);
+    cursor: pointer;
+  }
+
+  [data-astryx-theme="codaro"] .notebookWidthButton:hover,
+  [data-astryx-theme="codaro"] .notebookWidthButton:focus-visible,
+  [data-astryx-theme="codaro"] .notebookReactiveButton:hover,
+  [data-astryx-theme="codaro"] .notebookReactiveButton:focus-visible {
+    background: var(--color-background-muted);
+    color: var(--color-icon-primary);
+  }
+
+  [data-astryx-theme="codaro"] .notebookWidthButton[aria-pressed="true"],
+  [data-astryx-theme="codaro"] .notebookReactiveButton[aria-pressed="true"] {
+    background: var(--color-accent-muted);
+    color: var(--color-icon-accent);
+  }
+
+  [data-astryx-theme="codaro"] .notebookWidthButton svg,
+  [data-astryx-theme="codaro"] .notebookReactiveButton svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  [data-astryx-theme="codaro"] .notebookReactiveButton {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: var(--color-background-card);
+    box-shadow: var(--shadow-low);
   }
 
   [data-astryx-theme="codaro"] .notebookRunAllButton {
-    width: 42px;
-    height: 42px;
+    width: 36px;
+    height: 36px;
     border: 1px solid var(--color-accent);
     border-radius: var(--radius-full);
     padding: 0;
@@ -119,6 +177,15 @@
     gap: 16px;
     padding: 30px 40px 100px !important;
     background: transparent;
+  }
+
+  [data-astryx-theme="codaro"] .notebookDocument[data-notebook-width="compact"] {
+    width: min(100%, 860px);
+  }
+
+  [data-astryx-theme="codaro"] .notebookDocument[data-notebook-width="full"] {
+    width: 100%;
+    max-width: none;
   }
 
   [data-astryx-theme="codaro"] .notebookCell,
@@ -434,6 +501,11 @@
       bottom: 12px;
     }
 
+    [data-astryx-theme="codaro"] .notebookWidthTools {
+      display: none;
+    }
+
+    [data-astryx-theme="codaro"] .notebookReactiveButton,
     [data-astryx-theme="codaro"] .notebookRunAllButton {
       width: 44px;
       height: 44px;

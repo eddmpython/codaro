@@ -214,12 +214,14 @@ function SupportDialog({open, onClose}: {open: boolean; onClose: () => void}) {
           </div>
 
           <div className="codaroSupportRows">
-            <SupportRow href={supportCenter.coffeeHref} label="Buy me a coffee" value="일회성 후원" />
-            <SupportRow href={supportCenter.sponsorsHref} label="GitHub Sponsors" value="정기 후원" />
+            <SupportRow href={supportCenter.coffeeHref} kind="coffee" label="Buy Me a Coffee" />
+            <SupportRow href={supportCenter.sponsorsHref} kind="heart" label="GitHub Sponsors" />
             <div className="codaroSupportRow codaroSupportAccount">
-              <div>
+              <div className="codaroSupportAccountIdentity">
+                <SupportGlyph kind="account" />
                 <strong>{supportCenter.account.bank}</strong>
-                <span>{supportCenter.account.holder}</span>
+                <span data-support-account-number="codaro">{supportCenter.account.number}</span>
+                <span className="codaroSupportAccountHolder">{supportCenter.account.holder}</span>
               </div>
               <button
                 aria-label={`계좌번호 ${supportCenter.account.number} 복사`}
@@ -227,7 +229,7 @@ function SupportDialog({open, onClose}: {open: boolean; onClose: () => void}) {
                 onClick={() => void copyAccount()}
                 type="button"
               >
-                <span data-support-account-number="codaro">{supportCenter.account.number}</span>
+                <SupportGlyph kind={copied ? "check" : "copy"} />
                 <span>{copied ? "복사됨" : "복사"}</span>
               </button>
             </div>
@@ -250,21 +252,51 @@ function SupportLink({href, label}: {href: string; label: string}) {
   );
 }
 
-function SupportRow({href, label, value}: {href: string; label: string; value: string}) {
+function SupportRow({
+  href,
+  kind,
+  label,
+}: {
+  href: string;
+  kind: "coffee" | "heart";
+  label: string;
+}) {
   return (
     <a className="codaroSupportRow" href={href} rel="noopener noreferrer" target="_blank">
+      <SupportGlyph kind={kind} />
       <strong>{label}</strong>
-      <span>{value} ↗</span>
+      <span aria-hidden="true">↗</span>
     </a>
+  );
+}
+
+function SupportGlyph({kind}: {kind: "account" | "check" | "coffee" | "copy" | "heart"}) {
+  const paths = {
+    account: "M3 10h18M5 10v8m4-8v8m6-8v8m4-8v8M3 21h18M12 3 3 7h18l-9-4Z",
+    check: "m5 12 4 4L19 6",
+    coffee: "M10 2v2m4-2v2M4 8h13v5a6 6 0 0 1-6 6H9a5 5 0 0 1-5-5V8Zm13 2h1a3 3 0 0 1 0 6h-2",
+    copy: "M9 9h10v10H9zM5 15H4V5h10v1",
+    heart: "M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z",
+  } as const;
+  return (
+    <svg aria-hidden="true" className={`codaroSupportGlyph codaroSupportGlyph-${kind}`} fill="none" viewBox="0 0 24 24">
+      <path d={paths[kind]} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" />
+    </svg>
   );
 }
 
 function SocialIcon({link}: {link: SocialLink}) {
   return (
-    <svg aria-hidden="true" fill={link.id === "support" ? "none" : "currentColor"} role="img" viewBox={link.viewBox}>
+    <svg
+      aria-hidden="true"
+      fill="currentColor"
+      fillOpacity={link.id === "support" ? 0.24 : 1}
+      role="img"
+      viewBox={link.viewBox}
+    >
       <path
         d={link.path}
-        fill={link.id === "support" ? "none" : "currentColor"}
+        fill="currentColor"
         stroke={link.id === "support" ? "currentColor" : "none"}
         strokeLinecap="round"
         strokeLinejoin="round"

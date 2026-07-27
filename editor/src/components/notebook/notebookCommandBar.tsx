@@ -1,26 +1,40 @@
 import {
+  AlignCenter,
+  AlignJustify,
   CircleAlert,
   Loader2,
+  Maximize,
   Play,
+  Zap,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import type { NotebookPersistenceState } from "@/lib/notebookPersistence";
+
+export type NotebookWidth = "compact" | "medium" | "full";
 
 export function NotebookCommandBar({
   apiOnline,
   canRun,
   notebookRunning,
   persistence,
+  reactiveEnabled,
   runningBlockId,
+  width,
   onRunNotebook,
+  onToggleReactive,
+  onWidthChange,
 }: {
   apiOnline: boolean;
   canRun: boolean;
   notebookRunning: boolean;
   persistence: NotebookPersistenceState;
+  reactiveEnabled: boolean;
   runningBlockId: string | null;
+  width: NotebookWidth;
   onRunNotebook: () => void;
+  onToggleReactive: () => void;
+  onWidthChange: (width: NotebookWidth) => void;
 }) {
   const running = notebookRunning || runningBlockId !== null;
   const persistenceView = notebookPersistenceView(persistence);
@@ -64,7 +78,54 @@ export function NotebookCommandBar({
         </div>
       </header>
 
+      <div className="notebookWidthTools" role="toolbar" aria-label="노트북 셀 폭">
+        <button
+          aria-label="좁은 셀 폭"
+          aria-pressed={width === "compact"}
+          className="notebookWidthButton"
+          data-notebook-width-option="compact"
+          onClick={() => onWidthChange("compact")}
+          title="좁게"
+          type="button"
+        >
+          <AlignCenter aria-hidden="true" />
+        </button>
+        <button
+          aria-label="기본 셀 폭"
+          aria-pressed={width === "medium"}
+          className="notebookWidthButton"
+          data-notebook-width-option="medium"
+          onClick={() => onWidthChange("medium")}
+          title="기본"
+          type="button"
+        >
+          <AlignJustify aria-hidden="true" />
+        </button>
+        <button
+          aria-label="전체 셀 폭"
+          aria-pressed={width === "full"}
+          className="notebookWidthButton"
+          data-notebook-width-option="full"
+          onClick={() => onWidthChange("full")}
+          title="전체 너비"
+          type="button"
+        >
+          <Maximize aria-hidden="true" />
+        </button>
+      </div>
+
       <div className="notebookFloatingTools" role="toolbar" aria-label="노트북 실행">
+        <button
+          aria-label={reactiveEnabled ? "자동 반응 실행 끄기" : "자동 반응 실행 켜기"}
+          aria-pressed={reactiveEnabled}
+          className="notebookReactiveButton"
+          data-notebook-reactive-toggle="true"
+          onClick={onToggleReactive}
+          title={reactiveEnabled ? "자동 반응 실행 켜짐" : "자동 반응 실행 꺼짐"}
+          type="button"
+        >
+          <Zap aria-hidden="true" />
+        </button>
         <Button
           aria-label="모든 셀 실행"
           className="notebookRunAllButton"

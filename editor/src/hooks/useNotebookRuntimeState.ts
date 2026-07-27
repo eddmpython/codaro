@@ -70,6 +70,9 @@ export function useNotebookRuntimeState({
   const [results, setResults] = useState<ResultMap>({});
   const [runningBlockId, setRunningBlockId] = useState<string | null>(null);
   const [notebookRunning, setNotebookRunning] = useState(false);
+  const [reactiveEnabled, setReactiveEnabled] = useState(
+    () => document.runtime?.reactiveMode !== "sequential",
+  );
   const [diagnostics, setDiagnostics] = useState<ReactiveDiagnostics>(emptyReactiveDiagnostics);
   const [automationSessions, setAutomationSessions] = useState<Record<string, string>>({});
   // 마지막 실행 시점에 보낸 셀 내용 스냅샷 — 이후 draft가 달라지면 그 셀(+다운스트림)이 stale.
@@ -87,6 +90,14 @@ export function useNotebookRuntimeState({
     setLastRunContent({});
     setAutomationSessions({});
   }, []);
+
+  const toggleReactive = useCallback(() => {
+    setReactiveEnabled((current) => !current);
+  }, []);
+
+  useEffect(() => {
+    setReactiveEnabled(document.runtime?.reactiveMode !== "sequential");
+  }, [document.id, document.runtime?.reactiveMode]);
 
   const runBlock = useCallback(async (block: BlockConfig, sourceOverride?: string) => {
     if (!isExecutableBlock(block)) return;
@@ -221,13 +232,33 @@ export function useNotebookRuntimeState({
         blockIds?: string[];
         sourceBlockId?: string | null;
       }>).detail;
-      if (!sessionId || (detail?.sessionId && detail.sessionId !== sessionId)) return;
-      if (notebookRunning) return;
-      void runNotebook();
+      if (detail?.sessionId && detail.sessionId !== sessionId) return;
+      if (!reactiveEnabled) return;
+      if (notebookRunning || runningBlockId) return;
+      const targets = (detail?.blockIds ?? [])
+        .map((blockId) => document.blocks.find((block) => block.id === blockId))
+        .filter((block): block is BlockConfig => Boolean(block && isExecutableBlock(block)));
+      if (!targets.length) {
+        void runNotebook();
+        return;
+      }
+      void (async () => {
+        for (const target of targets) {
+          await runBlock(target);
+        }
+      })();
     };
     window.addEventListener("codaro:reactive-trigger", handler);
     return () => window.removeEventListener("codaro:reactive-trigger", handler);
-  }, [sessionId, notebookRunning, runNotebook]);
+  }, [
+    document.blocks,
+    notebookRunning,
+    reactiveEnabled,
+    runBlock,
+    runNotebook,
+    runningBlockId,
+    sessionId,
+  ]);
 
   useEffect(() => {
     if (!sessionId || typeof window === "undefined") return;
@@ -257,6 +288,7 @@ export function useNotebookRuntimeState({
     diagnostics,
     hasRunnableNotebook,
     notebookRunning,
+    reactiveEnabled,
     resetRuntimeState,
     results,
     runBlock,
@@ -266,6 +298,7 @@ export function useNotebookRuntimeState({
     setSessionId,
     setUiValue,
     staleBlockIds,
+    toggleReactive,
     variables,
   };
 }

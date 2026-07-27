@@ -49,6 +49,12 @@ class BuildDesignSystemTest(unittest.TestCase):
         self.assertIn("https://www.threads.net/@eddmpython", source)
         self.assertIn("https://buymeacoffee.com/eddmpython", source)
         self.assertIn('data-support-dialog="codaro"', source)
+        self.assertIn('fillOpacity={link.id === "support" ? 0.24 : 1}', source)
+        self.assertIn('kind="coffee" label="Buy Me a Coffee"', source)
+        self.assertIn('kind="heart" label="GitHub Sponsors"', source)
+        self.assertIn('className="codaroSupportAccountIdentity"', source)
+        self.assertIn('data-support-account-copy="codaro"', source)
+        self.assertIn('data-support-account-number="codaro"', source)
         self.assertIn("1002-0421-4626", source)
 
     def testSocialLinksRejectUnapprovedOrder(self) -> None:

@@ -37,6 +37,7 @@ export type NotebookSurfaceProps = {
   notebookPersistence: NotebookPersistenceState;
   pendingBlocks: BlockConfig[];
   prompt: string;
+  reactiveEnabled: boolean;
   results: ResultMap;
   runningBlockId: string | null;
   selectedBlockId: string;
@@ -55,6 +56,7 @@ export type NotebookSurfaceProps = {
   onRunBlock: (block: BlockConfig, sourceOverride?: string) => void;
   onRunNotebook: () => void;
   onSelectBlock: (blockId: string) => void;
+  onToggleReactive: () => void;
 };
 
 export function NotebookSurface(props: NotebookSurfaceProps) {
@@ -72,6 +74,7 @@ export function NotebookSurface(props: NotebookSurfaceProps) {
         notebookRunning={props.notebookRunning}
         persistence={props.notebookPersistence}
         pendingBlocks={props.pendingBlocks}
+        reactiveEnabled={props.reactiveEnabled}
         results={props.results}
         runningBlockId={props.runningBlockId}
         selectedBlockId={props.selectedBlockId}
@@ -85,6 +88,7 @@ export function NotebookSurface(props: NotebookSurfaceProps) {
         onRunBlock={props.onRunBlock}
         onRunNotebook={props.onRunNotebook}
         onSelectBlock={props.onSelectBlock}
+        onToggleReactive={props.onToggleReactive}
       />
       {props.assistantCollapsed ? null : (
         <div className="absolute inset-y-0 right-0 z-40 hidden w-[380px] min-h-0 shadow-[-16px_0_48px_rgba(0,0,0,0.16)] xl:block" data-notebook-assistant-shell="desktop">

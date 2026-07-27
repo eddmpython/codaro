@@ -3,7 +3,7 @@ import { isExecutableBlock } from "@/lib/cellModel";
 
 export const starterDocument: CodaroDocument = {
   id: "new-notebook",
-  title: "새노트북.py",
+  title: "Untitled",
   blocks: [
     {
       id: "cell-1",
@@ -195,5 +195,5 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function shouldUseGeneratedTitle(title: string) {
-  return title === "새 노트북" || title === "새노트북.py" || title === "생성 노트북";
+  return title === "Untitled" || title === "새 노트북" || title === "새노트북.py" || title === "생성 노트북";
 }

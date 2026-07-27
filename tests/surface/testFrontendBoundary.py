@@ -371,7 +371,6 @@ def testNotebookRuntimeReleasesKernelSessionOnPageHide() -> None:
 
 
 def testAutomationBlocksRemainExecutableInNotebookModel() -> None:
-    appShell = _read("editor/src/App.tsx")
     cellModel = _read("editor/src/lib/cellModel.ts")
     documentModel = _read("editor/src/lib/documentModel.ts")
     runtimeHook = _read("editor/src/hooks/useNotebookRuntimeState.ts")
@@ -388,8 +387,9 @@ def testAutomationBlocksRemainExecutableInNotebookModel() -> None:
     assert 'type: isKernelExecutableBlock(block) ? "code" : "markdown"' in notebookRuntime
     assert "isPersistentAutomationBlock(block)" in notebookPanel
     assert 'data-automation-session-cell={persistentAutomation ? "true" : undefined}' in notebookPanel
-    assert "isExecutableBlock(target)" in appShell
-    assert 'target.type === "code"' not in appShell
+    assert 'window.addEventListener("codaro:reactive-trigger", handler)' in runtimeHook
+    assert "Boolean(block && isExecutableBlock(block))" in runtimeHook
+    assert 'block.type === "code"' not in runtimeHook
 
 
 def testPersistentAutomationCellsUseSessionCellBoundary() -> None:

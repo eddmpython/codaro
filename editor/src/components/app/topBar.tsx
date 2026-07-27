@@ -65,10 +65,21 @@ export function TopControls({
         <div
           className={cn(
             "absolute top-1.5 z-20 hidden xl:block",
-            surface === "editor" ? "left-12" : "left-1/2 -translate-x-1/2",
+            surface === "editor" ? "left-36 max-w-sm" : "left-1/2 -translate-x-1/2",
           )}
+          data-topbar-status-notice={surface}
         >
           <StatusNotice notice={notice} />
+        </div>
+      ) : null}
+
+      {surface === "editor" ? (
+        <div
+          className="absolute left-2 top-1/2 z-20 hidden -translate-y-1/2 items-baseline gap-1.5 sm:flex"
+          data-notebook-brand="codaro"
+        >
+          <span className="text-[13px] font-semibold tracking-tight text-foreground">Codaro</span>
+          <span className="text-[13px] font-semibold tracking-tight text-primary">notebook</span>
         </div>
       ) : null}
 
@@ -79,13 +90,16 @@ export function TopControls({
             className="h-7 w-[clamp(140px,24vw,320px)] border-0 border-b border-transparent bg-transparent px-2 text-center font-mono text-xs text-muted-foreground outline-none hover:text-foreground focus:border-primary focus:text-foreground"
             data-notebook-title="topbar"
             value={notebookTitle}
-            onBlur={(event) => onRenameNotebook(normalizeNotebookFilename(event.target.value))}
+            onBlur={(event) => onRenameNotebook(normalizeNotebookTitle(event.target.value))}
             onChange={(event) => onRenameNotebook(event.target.value)}
           />
         </div>
       ) : null}
 
-      <div className="absolute right-2 top-1.5 z-30 flex items-center gap-0.5">
+      <div
+        className="absolute right-2 top-1.5 z-30 flex items-center gap-0.5"
+        data-topbar-controls={surface}
+      >
         {surface !== "curriculum" && surface !== "editor" && showStatusNotice && onCopyDiagnosticExport ? (
           <div className="hidden xl:block" data-topbar-diagnostic="desktop">
             <DiagnosticExportButton onCopyDiagnosticExport={onCopyDiagnosticExport} />
@@ -113,10 +127,8 @@ export function TopControls({
   );
 }
 
-function normalizeNotebookFilename(value: string) {
-  const trimmed = value.trim() || "notebook.py";
-  if (trimmed.toLowerCase().endsWith(".py")) return trimmed;
-  return `${trimmed.replace(/\.[^/.]+$/, "")}.py`;
+function normalizeNotebookTitle(value: string) {
+  return value.trim() || "Untitled";
 }
 
 function DiagnosticExportButton({ onCopyDiagnosticExport }: { onCopyDiagnosticExport: () => Promise<void> }) {

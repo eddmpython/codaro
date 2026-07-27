@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   autocompletion,
   closeBrackets,
@@ -42,7 +42,10 @@ import {
   PendingNotebookBar,
 } from "@/components/app/appPrimitives";
 import { CellAiActions } from "@/components/app/cellAiActions";
-import { NotebookCommandBar } from "@/components/notebook/notebookCommandBar";
+import {
+  NotebookCommandBar,
+  type NotebookWidth,
+} from "@/components/notebook/notebookCommandBar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
@@ -166,6 +169,7 @@ export function NotebookPanel({
   notebookRunning,
   persistence,
   pendingBlocks,
+  reactiveEnabled,
   results,
   runningBlockId,
   selectedBlockId,
@@ -179,6 +183,7 @@ export function NotebookPanel({
   onRunBlock,
   onRunNotebook,
   onSelectBlock,
+  onToggleReactive,
 }: {
   apiOnline: boolean;
   canRun: boolean;
@@ -189,6 +194,7 @@ export function NotebookPanel({
   notebookRunning: boolean;
   persistence: NotebookPersistenceState;
   pendingBlocks: BlockConfig[];
+  reactiveEnabled: boolean;
   results: ResultMap;
   runningBlockId: string | null;
   selectedBlockId: string;
@@ -202,7 +208,9 @@ export function NotebookPanel({
   onRunBlock: (block: BlockConfig, sourceOverride?: string) => void;
   onRunNotebook: () => void;
   onSelectBlock: (blockId: string) => void;
+  onToggleReactive: () => void;
 }) {
+  const [width, setWidth] = useState<NotebookWidth>("medium");
   const staleSet = new Set(staleBlockIds);
   const cyclePaths = formatCyclePaths(diagnostics.cycles);
   const selectedBlockIndex = document.blocks.findIndex((block) => block.id === selectedBlockId);
@@ -222,8 +230,12 @@ export function NotebookPanel({
         canRun={canRun}
         notebookRunning={notebookRunning}
         persistence={persistence}
+        reactiveEnabled={reactiveEnabled}
         runningBlockId={runningBlockId}
+        width={width}
         onRunNotebook={onRunNotebook}
+        onToggleReactive={onToggleReactive}
+        onWidthChange={setWidth}
       />
       <span
         aria-hidden="true"
@@ -248,7 +260,7 @@ export function NotebookPanel({
       </div>
 
       <ScrollArea className="notebookViewport">
-        <div className="notebookDocument">
+        <div className="notebookDocument" data-notebook-width={width}>
           {document.blocks.length ? (
             <>
               {document.blocks.map((block, blockIndex) => (
@@ -994,12 +1006,10 @@ function NotebookAppendActions({
   return (
     <div className="notebookAppendActions" role="toolbar" aria-label="노트북 셀 추가">
       <button className="notebookAppendButton" type="button" onClick={() => onAddCell("code")}>
-        <Plus className="size-3.5" />
-        Python
+        + Code
       </button>
       <button className="notebookAppendButton" type="button" onClick={() => onAddCell("markdown")}>
-        <MessageSquare className="size-3.5" />
-        Markdown
+        + Markdown
       </button>
     </div>
   );

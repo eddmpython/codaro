@@ -74,21 +74,6 @@ function App() {
     return installBrowserPythonRuntimeDiagnostics();
   }, []);
 
-  useEffect(() => {
-    const handler = (event: Event) => {
-      const detail = (event as CustomEvent<{ blockIds?: string[]; sessionId?: string }>).detail;
-      if (!detail || !Array.isArray(detail.blockIds)) return;
-      const knownBlocks = activeDocumentRef.current.blocks;
-      for (const blockId of detail.blockIds) {
-        const target = knownBlocks.find((block) => block.id === blockId);
-        if (target && isExecutableBlock(target)) {
-          void runBlockRef.current?.(target);
-        }
-      }
-    };
-    window.addEventListener("codaro:reactive-trigger", handler);
-    return () => window.removeEventListener("codaro:reactive-trigger", handler);
-  }, []);
   const { setDesignSurface } = useCodaroDesign();
   useEffect(() => {
     if (surface === "home") setDesignSurface("automation");
@@ -351,6 +336,7 @@ function App() {
     currentResult,
     diagnostics,
     notebookRunning,
+    reactiveEnabled,
     resetRuntimeState,
     results,
     runBlock,
@@ -360,6 +346,7 @@ function App() {
     setSessionId,
     setUiValue,
     staleBlockIds,
+    toggleReactive,
     variables,
   } = useNotebookRuntimeState({
     apiOnline,
@@ -417,13 +404,6 @@ function App() {
       taskId: null,
     }, "replace");
   }, [applyImportedLearningArchiveState, clearPendingChanges, navigateRunRoute, resetRuntimeState]);
-
-  const activeDocumentRef = useRef(activeDocument);
-  const runBlockRef = useRef(runBlock);
-  useEffect(() => {
-    activeDocumentRef.current = activeDocument;
-    runBlockRef.current = runBlock;
-  }, [activeDocument, runBlock]);
 
   useAppBootstrapEffect({
     applyBootstrapCurriculumState,
@@ -576,7 +556,7 @@ function App() {
             notebookTitle={surface === "editor" ? document.title : undefined}
             notice={notice}
             resolvedTheme={resolvedTheme}
-            showSidebarTrigger
+            showSidebarTrigger={surface !== "editor"}
             surface={surface}
             onCopyDiagnosticExport={copyDiagnosticExport}
             onRenameNotebook={renameNotebookDocument}
@@ -604,6 +584,7 @@ function App() {
               messages={messages}
               pendingBlocks={pendingBlocks}
               prompt={prompt}
+              reactiveEnabled={reactiveEnabled}
               referenceLoading={referenceLoading}
               results={results}
               runningBlockId={runningBlockId}
@@ -646,6 +627,7 @@ function App() {
               onSelectCurriculumBlock={activateCurriculumBlock}
               onSelectCurriculumLesson={selectCurriculumLesson}
               onToggleEStop={toggleEStop}
+              onToggleReactive={toggleReactive}
             />
         </div>
         {surface === "curriculum" ? null : (

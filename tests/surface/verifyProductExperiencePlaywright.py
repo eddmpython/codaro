@@ -1987,6 +1987,27 @@ async ({ surface, expectedTier }) => {
   const notebookDocument = document.querySelector(".notebookDocument");
   const notebookDocumentRect = notebookDocument?.getBoundingClientRect();
   const notebookDocumentStyle = notebookDocument ? getComputedStyle(notebookDocument) : null;
+  const notebookTopLaneItems = [
+    ["brand", document.querySelector('[data-notebook-brand="codaro"]')],
+    ["notice", document.querySelector('[data-topbar-status-notice="editor"]')],
+    ["title", document.querySelector('[data-notebook-title="topbar"]')],
+    ["controls", document.querySelector('[data-topbar-controls="editor"]')],
+  ].filter(([, element]) => element && visible(element)).map(([name, element]) => {
+    const rect = element.getBoundingClientRect();
+    return { name, x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+  });
+  const notebookTopLaneOverlaps = [];
+  for (let leftIndex = 0; leftIndex < notebookTopLaneItems.length; leftIndex += 1) {
+    for (let rightIndex = leftIndex + 1; rightIndex < notebookTopLaneItems.length; rightIndex += 1) {
+      const left = notebookTopLaneItems[leftIndex];
+      const right = notebookTopLaneItems[rightIndex];
+      const overlapWidth = Math.min(left.x + left.width, right.x + right.width) - Math.max(left.x, right.x);
+      const overlapHeight = Math.min(left.y + left.height, right.y + right.height) - Math.max(left.y, right.y);
+      if (overlapWidth > 1 && overlapHeight > 1) {
+        notebookTopLaneOverlaps.push({ left: left.name, right: right.name, overlapWidth, overlapHeight });
+      }
+    }
+  }
   let webProgressLessonCount = 0;
   let webVerifiedPracticeCount = 0;
   let webVerifiedStrongCheckCount = 0;
@@ -2142,6 +2163,12 @@ async ({ surface, expectedTier }) => {
     } : null,
     notebookBlankInputCount: [...document.querySelectorAll("[data-notebook-input='code'] .cm-content")]
       .filter((editor) => !editorText(editor)).length,
+    notebookBrandCount: document.querySelectorAll('[data-notebook-brand="codaro"]').length,
+    notebookTopLaneOverlaps,
+    notebookWidthControlCount: document.querySelectorAll("[data-notebook-width-option]").length,
+    notebookReactiveToggleCount: document.querySelectorAll('[data-notebook-reactive-toggle="true"]').length,
+    notebookAppendLabels: [...document.querySelectorAll(".notebookAppendButton")]
+      .map((button) => actionName(button)),
     visibleNotebookCellToolCount: [...document.querySelectorAll(".notebookCellMeta")]
       .filter((element) => (
         visible(element) && Number(getComputedStyle(element).opacity || "1") > 0.1
@@ -2449,6 +2476,23 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
                 failures.append(
                     f"{name}: default notebook must contain one blank code input, "
                     f"got {audit['notebookBlankInputCount']}"
+                )
+            if audit["notebookBrandCount"] != 1:
+                failures.append(f"{name}: Codaro notebook identity is missing from the top lane")
+            if audit["notebookTopLaneOverlaps"]:
+                failures.append(
+                    f"{name}: notebook top lane controls overlap: {audit['notebookTopLaneOverlaps']}"
+                )
+            if audit["notebookWidthControlCount"] != 3:
+                failures.append(
+                    f"{name}: expected three DartLab-compatible width controls, "
+                    f"got {audit['notebookWidthControlCount']}"
+                )
+            if audit["notebookReactiveToggleCount"] != 1:
+                failures.append(f"{name}: reactive notebook control is missing")
+            if audit["notebookAppendLabels"] != ["+ Code", "+ Markdown"]:
+                failures.append(
+                    f"{name}: notebook append controls drifted: {audit['notebookAppendLabels']}"
                 )
             viewportWidth = int((case.get("viewport") or {}).get("width") or 0)
             notebookGeometry = audit.get("notebookDocumentGeometry")
@@ -3811,9 +3855,49 @@ def runBrowserMatrix(
                         page.screenshot(path=str(supportScreenshotPath), full_page=False)
                         page.keyboard.press("Escape")
                         page.wait_for_selector('[data-support-dialog="codaro"]', state="detached", timeout=5_000)
+                        notebookTitle = page.locator('[data-notebook-title="topbar"]')
+                        notebookTitle.fill("Notebook Draft")
+                        notebookTitle.press("Tab")
+                        if notebookTitle.input_value() != "Notebook Draft":
+                            raise AssertionError("notebook title blur added an unexpected file extension")
+                        notebookTitle.fill("Untitled")
+                        notebookTitle.press("Tab")
                         firstNotebookEditor = page.locator(
                             "[data-notebook-input='code'] .cm-content"
                         ).first
+                        firstNotebookEditor.fill("print('reactive probe')")
+                        reactiveToggle = page.locator('[data-notebook-reactive-toggle="true"]')
+                        if reactiveToggle.get_attribute("aria-pressed") != "true":
+                            raise AssertionError("reactive notebook control did not start from the document contract")
+                        reactiveToggle.click()
+                        if reactiveToggle.get_attribute("aria-pressed") != "false":
+                            raise AssertionError("reactive notebook control did not disable automatic triggers")
+                        page.evaluate(
+                            """() => window.dispatchEvent(new CustomEvent('codaro:reactive-trigger', {
+                              detail: { blockIds: ['cell-1'] },
+                            }))"""
+                        )
+                        page.wait_for_timeout(400)
+                        if page.locator('[data-notebook-cell="code"]').first.get_attribute(
+                            "data-notebook-cell-status"
+                        ) != "idle":
+                            raise AssertionError("disabled reactive mode still executed the target cell")
+                        reactiveToggle.click()
+                        page.evaluate(
+                            """() => window.dispatchEvent(new CustomEvent('codaro:reactive-trigger', {
+                              detail: { blockIds: ['cell-1'] },
+                            }))"""
+                        )
+                        page.wait_for_selector(
+                            '[data-notebook-cell="code"][data-notebook-cell-status="success"]',
+                            timeout=120_000,
+                        )
+                        widthCompact = page.locator('[data-notebook-width-option="compact"]')
+                        widthCompact.click()
+                        if page.locator(".notebookDocument").get_attribute("data-notebook-width") != "compact":
+                            raise AssertionError("notebook width control did not update the shared document canvas")
+                        page.locator('[data-notebook-width-option="medium"]').click()
+                        firstNotebookEditor.fill("")
                         firstNotebookText = firstNotebookEditor.evaluate(
                             """
                             (editor) => {

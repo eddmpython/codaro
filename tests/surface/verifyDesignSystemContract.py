@@ -283,6 +283,10 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
     curriculumSectionRenderer = (ROOT / "editor/src/components/curriculum/curriculumSectionRenderer.tsx").read_text(encoding="utf-8")
     loadingSurface = (ROOT / "editor/src/components/app/currentLearningSurface.tsx").read_text(encoding="utf-8")
     notebookSurface = (ROOT / "editor/src/components/app/notebookSurface.tsx").read_text(encoding="utf-8")
+    notebookCommandBar = (ROOT / "editor/src/components/notebook/notebookCommandBar.tsx").read_text(encoding="utf-8")
+    notebookPanel = (ROOT / "editor/src/components/notebook/notebookPanel.tsx").read_text(encoding="utf-8")
+    notebookCss = (ROOT / "editor/src/components/notebook/notebookPanel.css").read_text(encoding="utf-8")
+    documentModel = (ROOT / "editor/src/lib/documentModel.ts").read_text(encoding="utf-8")
     runtimeRail = (ROOT / "editor/src/components/app/runtimeCapabilityRail.tsx").read_text(encoding="utf-8")
     automationSurface = (ROOT / "editor/src/components/automation/automationSurface.tsx").read_text(encoding="utf-8")
     automationOperationStrip = (ROOT / "editor/src/components/automation/automationOperationStrip.tsx").read_text(encoding="utf-8")
@@ -358,6 +362,23 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
         failures,
     )
     require(
+        'data-notebook-brand="codaro"' in topBar
+        and 'return value.trim() || "Untitled";' in topBar
+        and 'title: "Untitled"' in documentModel
+        and 'data-notebook-width-option="compact"' in notebookCommandBar
+        and 'data-notebook-width-option="medium"' in notebookCommandBar
+        and 'data-notebook-width-option="full"' in notebookCommandBar
+        and 'data-notebook-reactive-toggle="true"' in notebookCommandBar
+        and 'data-notebook-width={width}' in notebookPanel
+        and "+ Code" in notebookPanel
+        and "+ Markdown" in notebookPanel
+        and 'width: min(100%, 860px)' in notebookCss
+        and 'width: min(100%, 1120px)' in notebookCss
+        and "RuntimeCapabilityRail" not in notebookSurface,
+        "notebook must preserve the DartLab-compatible minimal canvas and real runtime controls",
+        failures,
+    )
+    require(
         '--color-accent: var(--accent)' not in editorCss
         and '--color-accent-surface: var(--accent)' in editorCss,
         "Tailwind surface accent must not overwrite the Astryx brand accent token",
@@ -416,6 +437,9 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
         and '{surface === "curriculum" ? null : (' in app
         and '? "relative h-12 shrink-0 bg-background"' in app
         and ': "relative h-9 shrink-0 border-b border-border bg-background"' in app
+        and 'surface === "editor" ? "left-36 max-w-sm"' in topBar
+        and 'data-topbar-status-notice={surface}' in topBar
+        and 'data-topbar-controls={surface}' in topBar
         and 'data-topbar-diagnostic="desktop"' in topBar
         and 'surface !== "curriculum" && surface !== "editor" && showStatusNotice' in topBar
         and 'const showStatusNotice = surface !== "curriculum"' in topBar

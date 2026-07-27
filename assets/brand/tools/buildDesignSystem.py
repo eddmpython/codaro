@@ -668,12 +668,14 @@ function SupportDialog({open, onClose}: {open: boolean; onClose: () => void}) {
           </div>
 
           <div className="codaroSupportRows">
-            <SupportRow href={supportCenter.coffeeHref} label="Buy me a coffee" value="일회성 후원" />
-            <SupportRow href={supportCenter.sponsorsHref} label="GitHub Sponsors" value="정기 후원" />
+            <SupportRow href={supportCenter.coffeeHref} kind="coffee" label="Buy Me a Coffee" />
+            <SupportRow href={supportCenter.sponsorsHref} kind="heart" label="GitHub Sponsors" />
             <div className="codaroSupportRow codaroSupportAccount">
-              <div>
+              <div className="codaroSupportAccountIdentity">
+                <SupportGlyph kind="account" />
                 <strong>{supportCenter.account.bank}</strong>
-                <span>{supportCenter.account.holder}</span>
+                <span data-support-account-number="codaro">{supportCenter.account.number}</span>
+                <span className="codaroSupportAccountHolder">{supportCenter.account.holder}</span>
               </div>
               <button
                 aria-label={`계좌번호 ${supportCenter.account.number} 복사`}
@@ -681,7 +683,7 @@ function SupportDialog({open, onClose}: {open: boolean; onClose: () => void}) {
                 onClick={() => void copyAccount()}
                 type="button"
               >
-                <span data-support-account-number="codaro">{supportCenter.account.number}</span>
+                <SupportGlyph kind={copied ? "check" : "copy"} />
                 <span>{copied ? "복사됨" : "복사"}</span>
               </button>
             </div>
@@ -704,21 +706,51 @@ function SupportLink({href, label}: {href: string; label: string}) {
   );
 }
 
-function SupportRow({href, label, value}: {href: string; label: string; value: string}) {
+function SupportRow({
+  href,
+  kind,
+  label,
+}: {
+  href: string;
+  kind: "coffee" | "heart";
+  label: string;
+}) {
   return (
     <a className="codaroSupportRow" href={href} rel="noopener noreferrer" target="_blank">
+      <SupportGlyph kind={kind} />
       <strong>{label}</strong>
-      <span>{value} ↗</span>
+      <span aria-hidden="true">↗</span>
     </a>
+  );
+}
+
+function SupportGlyph({kind}: {kind: "account" | "check" | "coffee" | "copy" | "heart"}) {
+  const paths = {
+    account: "M3 10h18M5 10v8m4-8v8m6-8v8m4-8v8M3 21h18M12 3 3 7h18l-9-4Z",
+    check: "m5 12 4 4L19 6",
+    coffee: "M10 2v2m4-2v2M4 8h13v5a6 6 0 0 1-6 6H9a5 5 0 0 1-5-5V8Zm13 2h1a3 3 0 0 1 0 6h-2",
+    copy: "M9 9h10v10H9zM5 15H4V5h10v1",
+    heart: "M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z",
+  } as const;
+  return (
+    <svg aria-hidden="true" className={`codaroSupportGlyph codaroSupportGlyph-${kind}`} fill="none" viewBox="0 0 24 24">
+      <path d={paths[kind]} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" />
+    </svg>
   );
 }
 
 function SocialIcon({link}: {link: SocialLink}) {
   return (
-    <svg aria-hidden="true" fill={link.id === "support" ? "none" : "currentColor"} role="img" viewBox={link.viewBox}>
+    <svg
+      aria-hidden="true"
+      fill="currentColor"
+      fillOpacity={link.id === "support" ? 0.24 : 1}
+      role="img"
+      viewBox={link.viewBox}
+    >
       <path
         d={link.path}
-        fill={link.id === "support" ? "none" : "currentColor"}
+        fill="currentColor"
         stroke={link.id === "support" ? "currentColor" : "none"}
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -822,17 +854,19 @@ def renderSharedComponentCss() -> str:
     inset: 0;
     display: grid;
     place-items: center;
-    padding: 24px;
-    background: rgba(3, 3, 5, 0.76);
-    backdrop-filter: blur(8px);
+    padding: 28px;
+    background: rgba(3, 3, 5, 0.74);
+    backdrop-filter: blur(2px);
   }
 
   .codaroSupportDialog {
     width: min(560px, 100%);
-    max-height: min(780px, calc(100svh - 48px));
-    overflow: hidden auto;
+    max-height: 88svh;
+    display: flex;
+    overflow: hidden;
+    flex-direction: column;
     border: 1px solid #2d2d34;
-    border-radius: 12px;
+    border-radius: 8px;
     background: #111114 !important;
     color: #f4f4f5 !important;
     color-scheme: dark;
@@ -840,14 +874,12 @@ def renderSharedComponentCss() -> str:
   }
 
   .codaroSupportHeader {
-    position: sticky;
-    z-index: 1;
-    top: 0;
     display: flex;
+    flex: 0 0 auto;
     align-items: center;
     justify-content: space-between;
-    min-height: 58px;
-    padding: 0 18px 0 22px;
+    min-height: 38px;
+    padding: 7px 12px;
     border-bottom: 1px solid #29292f;
     background: rgba(17, 17, 20, 0.96);
     backdrop-filter: blur(12px);
@@ -855,17 +887,19 @@ def renderSharedComponentCss() -> str:
 
   .codaroSupportHeader h2 {
     margin: 0;
-    color: #f4f4f5 !important;
-    font-size: 15px;
+    color: #a88bff !important;
+    font-family: var(--font-family-code);
+    font-size: 12px;
     line-height: 1;
-    font-weight: 650;
-    letter-spacing: -0.02em;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 
   .codaroSupportClose {
     display: grid;
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     place-items: center;
     border: 0;
     border-radius: 7px;
@@ -891,22 +925,26 @@ def renderSharedComponentCss() -> str:
   }
 
   .codaroSupportBody {
-    display: grid;
-    gap: 26px;
-    padding: 26px 22px 22px;
+    display: flex;
+    min-height: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 18px;
+    overflow-y: auto;
+    padding: 16px 18px 18px;
   }
 
   .codaroSupportHero {
     display: grid;
-    grid-template-columns: 48px 1fr;
-    align-items: center;
-    gap: 16px;
+    grid-template-columns: 52px 1fr;
+    align-items: start;
+    gap: 12px;
   }
 
   .codaroSupportHeart {
     display: grid;
-    width: 48px;
-    height: 48px;
+    width: 52px;
+    height: 52px;
     place-items: center;
     border: 1px solid rgba(233, 103, 135, 0.26);
     border-radius: 50%;
@@ -920,22 +958,23 @@ def renderSharedComponentCss() -> str:
   }
 
   .codaroSupportHero p {
-    margin: 0;
+    margin: 2px 0 0;
     color: #c2c2ca !important;
-    font-size: 13px;
-    line-height: 1.72;
+    font-size: 12.5px;
+    line-height: 1.65;
     word-break: keep-all;
   }
 
   .codaroSupportSection {
     display: grid;
-    gap: 10px;
+    gap: 8px;
   }
 
   .codaroSupportSection h3 {
     margin: 0;
     color: #a5a5ae !important;
-    font-size: 10px;
+    font-family: var(--font-family-code);
+    font-size: 10.5px;
     line-height: 1;
     font-weight: 650;
     letter-spacing: 0.12em;
@@ -945,15 +984,16 @@ def renderSharedComponentCss() -> str:
   .codaroSupportWays {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
+    gap: 7px;
   }
 
   .codaroSupportWays a {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 6px;
     min-width: 0;
-    padding: 11px 12px;
+    padding: 8px;
     border: 1px solid #2b2b31;
     border-radius: 8px;
     background: #18181c;
@@ -971,27 +1011,21 @@ def renderSharedComponentCss() -> str:
 
   .codaroSupportRows {
     display: grid;
-    overflow: hidden;
-    border: 1px solid #2b2b31;
-    border-radius: 9px;
-    background: #17171b;
+    gap: 7px;
   }
 
   .codaroSupportRow {
     display: flex;
-    min-height: 52px;
+    min-height: 44px;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 0 14px;
-    border-bottom: 1px solid #28282e;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid #2b2b31;
+    border-radius: 7px;
+    background: #0d0d10;
     color: #f1f1f3 !important;
     font-size: 12px;
     text-decoration: none;
-  }
-
-  .codaroSupportRow:last-child {
-    border-bottom: 0;
   }
 
   .codaroSupportRow:hover,
@@ -1005,26 +1039,60 @@ def renderSharedComponentCss() -> str:
     font-weight: 580;
   }
 
-  .codaroSupportRow > span,
-  .codaroSupportRow > div > span {
+  .codaroSupportRow > span {
+    margin-left: auto;
     color: #a5a5ae !important;
     font-size: 11px;
   }
 
-  .codaroSupportAccount > div {
+  .codaroSupportGlyph {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 auto;
+    color: #a88bff;
+  }
+
+  .codaroSupportGlyph-coffee {
+    color: #ffdd00;
+  }
+
+  .codaroSupportGlyph-heart {
+    color: #fb7185;
+  }
+
+  .codaroSupportAccountIdentity {
     display: flex;
+    min-width: 0;
     align-items: baseline;
-    gap: 8px;
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+
+  .codaroSupportAccountIdentity .codaroSupportGlyph {
+    align-self: center;
+  }
+
+  .codaroSupportAccountIdentity > span {
+    color: #d6d6dc !important;
+    font-family: var(--font-family-code);
+    font-size: 11.5px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .codaroSupportAccountIdentity .codaroSupportAccountHolder {
+    color: #8f8f99 !important;
+    font-family: var(--font-family-body);
   }
 
   .codaroSupportAccount button {
     display: flex;
+    margin-left: auto;
     align-items: center;
-    gap: 9px;
-    border: 0;
+    gap: 4px;
+    border: 1px solid #2d2d34;
     border-radius: 6px;
     padding: 7px 9px;
-    background: #222228;
+    background: transparent;
     color: #d6d6dc !important;
     font: inherit;
     cursor: pointer;
@@ -1043,11 +1111,11 @@ def renderSharedComponentCss() -> str:
   }
 
   .codaroSupportNote {
-    margin: -6px 0 0;
+    margin: 4px 2px 0;
     color: #9898a2 !important;
     font-size: 10px;
     line-height: 1.6;
-    text-align: center;
+    text-align: left;
   }
 
   @media (max-width: 560px) {
@@ -1058,7 +1126,7 @@ def renderSharedComponentCss() -> str:
 
     .codaroSupportDialog {
       max-height: calc(100svh - 24px);
-      border-radius: 12px;
+      border-radius: 8px;
     }
 
     .codaroSupportWays {
@@ -1069,6 +1137,10 @@ def renderSharedComponentCss() -> str:
       align-items: flex-start;
       flex-direction: column;
       padding-block: 12px;
+    }
+
+    .codaroSupportAccount button {
+      margin-left: 25px;
     }
   }
 '''
