@@ -59,6 +59,7 @@ def testGateNamesAreStable() -> None:
         "service-readiness-audit",
         "diagnostic-summary-contract",
         "install-launcher-smoke",
+        "product-browser-webview2-evergreen",
         "runtime-recovery-contract",
         "runtime-recovery-browser",
         "pyproc-assets-browser",

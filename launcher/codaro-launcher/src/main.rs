@@ -572,7 +572,7 @@ fn run_launch(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
 
 fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
     use std::sync::{Arc, Mutex};
-    use tao::dpi::{LogicalPosition, LogicalSize};
+    use tao::dpi::{LogicalSize, PhysicalPosition};
     use tao::event::{Event, WindowEvent};
     use tao::event_loop::{ControlFlow, EventLoopBuilder};
     use tao::window::WindowBuilder;
@@ -737,8 +737,8 @@ fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
                 ..
             } => {
                 let _ = webview.set_bounds(Rect {
-                    position: LogicalPosition::new(0, 0).into(),
-                    size: LogicalSize::new(size.width, size.height).into(),
+                    position: PhysicalPosition::new(0, 0).into(),
+                    size: size.into(),
                 });
             }
             Event::WindowEvent {

@@ -281,3 +281,43 @@ jobs:
 
       - name: Run tests
         run: python -X utf8 tests/run.py gate launcher-test
+
+  webview2-evergreen:
+    runs-on: windows-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install Python dependencies
+        run: uv sync --extra dev --python 3.12
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: editor/package-lock.json
+
+      - name: Install editor
+        working-directory: editor
+        run: npm ci
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache WebView2 smoke cargo build
+        uses: actions/cache@v4
+        with:
+          path: output/test-runner/product-browser-webview2-evergreen/cargo-target/
+          key: webview2-cargo-${{ runner.os }}-${{ hashFiles('launcher/codaro-launcher/Cargo.lock') }}
+
+      - name: Verify native WebView2 product
+        run: uv run python -X utf8 tests/run.py gate product-browser-webview2-evergreen

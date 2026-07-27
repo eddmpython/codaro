@@ -112,6 +112,9 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
         "output/test-runner/astryx-journey/astryx-journey-report.json",
     ),
     "install-launcher-smoke": ("output/test-runner/install-launcher-smoke/install-launcher-report.json",),
+    "product-browser-webview2-evergreen": (
+        "output/test-runner/product-browser-webview2-evergreen/webview2-product-smoke-report.json",
+    ),
     "onboarding-browser": ("output/test-runner/onboarding-browser/onboarding-report.json",),
     "completion-bootstrap": (
         "output/test-runner/completion-bootstrap/completion-bootstrap-report.json",
@@ -367,6 +370,18 @@ GATES: dict[str, Gate] = {
             command(("cargo", "check"), cwd="launcher/codaro-launcher"),
         ),
         ci_required=False,
+    ),
+    "product-browser-webview2-evergreen": Gate(
+        tier="release",
+        description="Windows의 실제 launcher WebView2에서 설치 wheel과 Local Home·Notebook·Automation viewport를 확인한다.",
+        commands=(
+            command(("npm", "run", "build"), cwd="editor"),
+            command(("cargo", "build"), cwd="launcher/codaro-launcher", timeoutSeconds=1200),
+            command((
+                "uv", "run", "python", "-X", "utf8",
+                "tests/product/verifyWebView2ProductSmoke.py",
+            ), timeoutSeconds=600),
+        ),
     ),
     "runtime-recovery-contract": Gate(
         tier="fast",
@@ -1695,8 +1710,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 60:
-        failures.append(f"expected 60 gates, found {len(GATES)}")
+    if len(GATES) != 61:
+        failures.append(f"expected 61 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

@@ -56,7 +56,8 @@
 
 ## 남은 조건
 
-- 실제 WebView2에서 긴 notebook, keyboard-only cell 이동, screen reader reading order 수동 검수
+- 실제 WebView2 기본 notebook 1024x768, 공용 테마·SNS와 native client·DOM 크기 일치는 자동 검증됐다.
+- 실제 WebView2에서 긴 notebook, keyboard-only cell 이동, screen reader reading order, IME 수동 검수
 - 배포 commit의 Local 설치본 round trip 증거
 
 ## 영향 파일
@@ -107,7 +108,7 @@
 ### 개발자 관점
 
 - 기존 runtime API를 유지하면서 빈 document, 실행 후 focus 이동, 공통 work-cell primitive만 조정해 실행 엔진 회귀 범위를 제한했다.
-- 대표 Chromium case는 green이지만 실제 WebView2의 긴 notebook, IME, keyboard-only 조작 증거가 없어 완료 자격은 없다.
+- 대표 Chromium과 current Evergreen WebView2 기본 notebook case는 green이지만 긴 notebook, IME, keyboard-only 조작과 보조기술 증거가 없어 완료 자격은 없다.
 
 ### PM 관점
 
