@@ -255,6 +255,46 @@ def testNotebookReadingOrderFollowsTheVisibleDocumentFlow() -> None:
         assert marker in productGate
 
 
+def testLongNotebookKeyboardNavigationSharesCodeAndMarkdownBoundaries() -> None:
+    notebookPanel = _read("editor/src/components/notebook/notebookPanel.tsx")
+    navigation = _read("editor/src/lib/notebookCellNavigation.ts")
+    productGate = _read("tests/surface/verifyProductExperiencePlaywright.py")
+    webviewGate = _read("tests/product/verifyWebView2ProductSmoke.py")
+
+    for marker in (
+        'key: "ArrowUp"',
+        'key: "ArrowDown"',
+        "view.composing",
+        "completionStatus(view.state)",
+        "event.nativeEvent.isComposing",
+        "markdownEditorRef",
+        "onBoundaryNavigate={onMoveCell}",
+    ):
+        assert marker in notebookPanel
+    for marker in (
+        "selectionAnchor !== selectionHead",
+        'key === "ArrowUp" && selectionHead === 0',
+        'key === "ArrowDown" && selectionHead === textLength',
+    ):
+        assert marker in navigation
+    for marker in (
+        "verifyLongNotebookKeyboardNavigation",
+        "notebookKeyboardNavigationEvidence",
+        "12-cell notebook did not create a long scrollable document",
+        "keyboard navigation did not focus the Markdown textarea",
+    ):
+        assert marker in productGate
+    assert productGate.count('"verifyNotebookKeyboardNavigation": True') == 2
+    for marker in (
+        "verify_long_notebook_keyboard_navigation",
+        '"local-notebook-keyboard-12-cells"',
+        '"markdownFocusedUp"',
+        '"markdownFocusedDown"',
+        "12-cell Code and Markdown keyboard boundary navigation with focus scrolling",
+    ):
+        assert marker in webviewGate
+
+
 def testLocalLearningArchiveReturnsToWebWithoutChangingPortableContent() -> None:
     productGate = _read("tests/surface/verifyProductExperiencePlaywright.py")
 

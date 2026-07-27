@@ -98,6 +98,13 @@ def main() -> int:
                         )
                     )
 
+                cases.append(
+                    verify_long_notebook_keyboard_navigation(
+                        page,
+                        hwnd=hwnd,
+                        app_port=app_port,
+                    )
+                )
                 support_case = verify_support_dialog(page)
                 cases.append(support_case)
                 cases.append(
@@ -177,6 +184,7 @@ def main() -> int:
                 "1440x900 Local Automation",
                 "shared theme and social controls",
                 "shared support dialog account structure",
+                "12-cell Code and Markdown keyboard boundary navigation with focus scrolling",
                 "isolated installed-product user data",
                 "Web-origin learning archive Local import, reload, re-export, and disabled automation adoption",
             ] + ([
@@ -478,6 +486,169 @@ def verify_surface_case(
         "passed": not case_failures,
         "failures": case_failures,
     }
+
+
+def verify_long_notebook_keyboard_navigation(
+    page: Page,
+    *,
+    hwnd: int,
+    app_port: int,
+) -> dict[str, Any]:
+    case_id = "local-notebook-keyboard-12-cells"
+    response = page.goto(
+        f"http://127.0.0.1:{app_port}/?surface=editor&runtime=local#editor",
+        wait_until="domcontentloaded",
+        timeout=45_000,
+    )
+    if response is not None and response.status >= 400:
+        raise VerificationError(f"{case_id} returned HTTP {response.status}")
+    page.wait_for_selector("[data-notebook-studio='true']", state="visible", timeout=45_000)
+    dpr = float(page.evaluate("window.devicePixelRatio"))
+    resize_native_client(hwnd, 1024, 768, dpr)
+    page.wait_for_timeout(300)
+
+    cells = page.locator("[data-notebook-cell]")
+    append_toolbar = page.get_by_role("toolbar", name="노트북 셀 추가")
+    append_code = append_toolbar.get_by_role("button", name="+ Code")
+    append_markdown = append_toolbar.get_by_role("button", name="+ Markdown")
+    target_count = 12
+    if cells.count() > target_count:
+        raise VerificationError(
+            f"{case_id} expected at most {target_count} cells, found {cells.count()}"
+        )
+    while cells.count() < 8:
+        append_code.click()
+    if not page.locator('[data-notebook-cell="markdown"]').count():
+        append_markdown.click()
+    while cells.count() < target_count:
+        append_code.click()
+
+    page.wait_for_function(
+        """
+        (expectedIndex) => {
+          const cells = [...document.querySelectorAll('[data-notebook-cell]')];
+          const selected = document.querySelector('[data-notebook-cell-selected="true"]');
+          return selected === cells[expectedIndex]
+            && selected?.contains(document.activeElement);
+        }
+        """,
+        arg=target_count - 1,
+        timeout=20_000,
+    )
+    initial_scroll = page.evaluate(
+        """() => {
+          const viewport = document.querySelector(
+            '.notebookViewport [data-slot="scroll-area-viewport"]'
+          );
+          if (!(viewport instanceof HTMLElement)) {
+            throw new Error('notebook scroll viewport is missing');
+          }
+          return {
+            scrollHeight: viewport.scrollHeight,
+            clientHeight: viewport.clientHeight,
+            scrollTop: viewport.scrollTop,
+          };
+        }"""
+    )
+    if initial_scroll["scrollHeight"] <= initial_scroll["clientHeight"]:
+        raise VerificationError(f"{case_id} did not create a long scrollable notebook")
+
+    markdown_up = False
+    for expected_index in range(target_count - 2, -1, -1):
+        page.keyboard.press("Control+Home")
+        page.keyboard.press("ArrowUp")
+        page.wait_for_function(
+            """
+            (expectedIndex) => {
+              const cells = [...document.querySelectorAll('[data-notebook-cell]')];
+              const selected = document.querySelector('[data-notebook-cell-selected="true"]');
+              return selected === cells[expectedIndex]
+                && selected?.contains(document.activeElement);
+            }
+            """,
+            arg=expected_index,
+            timeout=20_000,
+        )
+        if cells.nth(expected_index).get_attribute("data-notebook-cell") == "markdown":
+            markdown_up = page.evaluate("document.activeElement?.tagName") == "TEXTAREA"
+
+    top_state = notebook_navigation_viewport_state(page)
+    markdown_down = False
+    for expected_index in range(1, target_count):
+        page.keyboard.press("Control+End")
+        page.keyboard.press("ArrowDown")
+        page.wait_for_function(
+            """
+            (expectedIndex) => {
+              const cells = [...document.querySelectorAll('[data-notebook-cell]')];
+              const selected = document.querySelector('[data-notebook-cell-selected="true"]');
+              return selected === cells[expectedIndex]
+                && selected?.contains(document.activeElement);
+            }
+            """,
+            arg=expected_index,
+            timeout=20_000,
+        )
+        if cells.nth(expected_index).get_attribute("data-notebook-cell") == "markdown":
+            markdown_down = page.evaluate("document.activeElement?.tagName") == "TEXTAREA"
+
+    bottom_state = notebook_navigation_viewport_state(page)
+    screenshot_path = SCREENSHOT_ROOT / f"{case_id}.png"
+    page.screenshot(path=str(screenshot_path))
+    checks = {
+        "cellCount": cells.count() == target_count,
+        "longDocument": initial_scroll["scrollHeight"] > initial_scroll["clientHeight"],
+        "firstCellReached": top_state["selectedIndex"] == 0,
+        "firstCellVisible": bool(top_state["selectedVisible"]),
+        "lastCellReached": bottom_state["selectedIndex"] == target_count - 1,
+        "lastCellVisible": bool(bottom_state["selectedVisible"]),
+        "markdownFocusedUp": markdown_up,
+        "markdownFocusedDown": markdown_down,
+    }
+    case_failures = [
+        f"{check} check failed"
+        for check, passed in checks.items()
+        if not passed
+    ]
+    return {
+        "id": case_id,
+        "surface": "editor",
+        "requestedCssViewport": {"width": 1024, "height": 768},
+        "snapshot": {
+            "cellCount": cells.count(),
+            "scrollHeight": initial_scroll["scrollHeight"],
+            "viewportHeight": initial_scroll["clientHeight"],
+            "topScrollTop": top_state["scrollTop"],
+            "bottomScrollTop": bottom_state["scrollTop"],
+        },
+        "screenshot": display_path(screenshot_path),
+        "checks": checks,
+        "passed": not case_failures,
+        "failures": case_failures,
+    }
+
+
+def notebook_navigation_viewport_state(page: Page) -> dict[str, Any]:
+    return page.evaluate(
+        """() => {
+          const viewport = document.querySelector(
+            '.notebookViewport [data-slot="scroll-area-viewport"]'
+          );
+          const cells = [...document.querySelectorAll('[data-notebook-cell]')];
+          const selected = document.querySelector('[data-notebook-cell-selected="true"]');
+          if (!(viewport instanceof HTMLElement) || !(selected instanceof HTMLElement)) {
+            throw new Error('notebook navigation target is missing');
+          }
+          const viewportRect = viewport.getBoundingClientRect();
+          const selectedRect = selected.getBoundingClientRect();
+          return {
+            selectedIndex: cells.indexOf(selected),
+            selectedVisible: selectedRect.top < viewportRect.bottom
+              && selectedRect.bottom > viewportRect.top,
+            scrollTop: viewport.scrollTop,
+          };
+        }"""
+    )
 
 
 def verify_support_dialog(page: Page) -> dict[str, Any]:

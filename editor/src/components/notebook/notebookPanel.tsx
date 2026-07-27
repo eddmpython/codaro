@@ -3,6 +3,7 @@ import {
   autocompletion,
   closeBrackets,
   closeBracketsKeymap,
+  completionStatus,
   completionKeymap,
   type CompletionContext,
   type CompletionResult,
@@ -58,6 +59,10 @@ import {
   type CellAiAction,
 } from "@/lib/cellModel";
 import type { NotebookPersistenceState } from "@/lib/notebookPersistence";
+import {
+  resolveNotebookCellBoundaryNavigation,
+  type NotebookCellNavigationDirection,
+} from "@/lib/notebookCellNavigation";
 import type { CellAiHelpState } from "@/lib/assistantTypes";
 import { statusLabel } from "@/lib/displayFormat";
 import {
@@ -279,6 +284,15 @@ export function NotebookPanel({
                   onDelete={() => onDeleteCell(block.id)}
                   onDraftChange={(value) => onDraftChange(block.id, value)}
                   onInsertCell={(type, placement) => onAddCell(type, block.id, placement)}
+                  onMoveCell={(direction) => {
+                    const targetIndex = direction === "previous"
+                      ? blockIndex - 1
+                      : blockIndex + 1;
+                    const targetBlock = document.blocks[targetIndex];
+                    if (!targetBlock) return false;
+                    onSelectBlock(targetBlock.id);
+                    return true;
+                  }}
                   onRun={(sourceOverride) => onRunBlock(block, sourceOverride)}
                   onRunAndAdvance={(sourceOverride) => {
                     onRunBlock(block, sourceOverride);
@@ -481,6 +495,7 @@ export function CodeCellEditor({
   value,
   onChange,
   onFocus,
+  onBoundaryNavigate,
   onRun,
   onRunAndAdvance,
   completionContext,
@@ -495,6 +510,7 @@ export function CodeCellEditor({
   value: string;
   onChange: (value: string) => void;
   onFocus: () => void;
+  onBoundaryNavigate?: (direction: NotebookCellNavigationDirection) => boolean;
   onRun?: (source: string) => void;
   onRunAndAdvance?: (source: string) => void;
   completionContext?: CompletionContextProvider;
@@ -506,6 +522,7 @@ export function CodeCellEditor({
   const viewRef = useRef<EditorView | null>(null);
   const onChangeRef = useRef(onChange);
   const onFocusRef = useRef(onFocus);
+  const onBoundaryNavigateRef = useRef(onBoundaryNavigate);
   const onRunRef = useRef(onRun);
   const onRunAndAdvanceRef = useRef(onRunAndAdvance);
   const completionContextRef = useRef(completionContext);
@@ -513,10 +530,11 @@ export function CodeCellEditor({
   useEffect(() => {
     onChangeRef.current = onChange;
     onFocusRef.current = onFocus;
+    onBoundaryNavigateRef.current = onBoundaryNavigate;
     onRunRef.current = onRun;
     onRunAndAdvanceRef.current = onRunAndAdvance;
     completionContextRef.current = completionContext;
-  }, [onChange, onFocus, onRun, onRunAndAdvance, completionContext]);
+  }, [onChange, onFocus, onBoundaryNavigate, onRun, onRunAndAdvance, completionContext]);
 
   const aiCompletionSource = async (context: CompletionContext): Promise<CompletionResult | null> => {
     const word = context.matchBefore(/[\w.]*/);
@@ -574,6 +592,38 @@ export function CodeCellEditor({
         aiCommentGutter,
         Prec.high(keymap.of([
           {
+            key: "ArrowUp",
+            run: (view) => {
+              if (view.composing || completionStatus(view.state) !== null) return false;
+              const selection = view.state.selection.main;
+              const direction = resolveNotebookCellBoundaryNavigation({
+                key: "ArrowUp",
+                selectionAnchor: selection.anchor,
+                selectionHead: selection.head,
+                textLength: view.state.doc.length,
+              });
+              return direction
+                ? onBoundaryNavigateRef.current?.(direction) ?? false
+                : false;
+            },
+          },
+          {
+            key: "ArrowDown",
+            run: (view) => {
+              if (view.composing || completionStatus(view.state) !== null) return false;
+              const selection = view.state.selection.main;
+              const direction = resolveNotebookCellBoundaryNavigation({
+                key: "ArrowDown",
+                selectionAnchor: selection.anchor,
+                selectionHead: selection.head,
+                textLength: view.state.doc.length,
+              });
+              return direction
+                ? onBoundaryNavigateRef.current?.(direction) ?? false
+                : false;
+            },
+          },
+          {
             key: "Shift-Enter",
             run: () => {
               const source = viewRef.current?.state.doc.toString() ?? "";
@@ -627,7 +677,13 @@ export function CodeCellEditor({
 
   useEffect(() => {
     if (!autoFocus) return;
-    window.requestAnimationFrame(() => viewRef.current?.focus());
+    const focusFrame = window.requestAnimationFrame(() => {
+      viewRef.current?.focus();
+      hostRef.current
+        ?.closest("[data-notebook-cell]")
+        ?.scrollIntoView({ block: "nearest" });
+    });
+    return () => window.cancelAnimationFrame(focusFrame);
   }, [autoFocus]);
 
   useEffect(() => {
@@ -694,6 +750,7 @@ function DocumentBlock({
   onDraftChange,
   onDelete,
   onInsertCell,
+  onMoveCell,
   onRun,
   onRunAndAdvance,
   onSelect,
@@ -717,6 +774,7 @@ function DocumentBlock({
   onDelete: () => void;
   onDraftChange: (value: string) => void;
   onInsertCell: (type: "code" | "markdown", placement: "before" | "after") => void;
+  onMoveCell: (direction: NotebookCellNavigationDirection) => boolean;
   onRun: (sourceOverride?: string) => void;
   onRunAndAdvance: (sourceOverride?: string) => void;
   onSelect: () => void;
@@ -733,10 +791,22 @@ function DocumentBlock({
   // 우선순위: 실행 중 → 순환(conflict, 빨강) → stale(오래됨) → 실행 결과 → 대기.
   const resultStatus = isRunning ? "running" : inCycle ? "conflict" : isStale ? "stale" : result?.status ?? "idle";
   const draftRef = useRef(draft);
+  const markdownEditorRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     draftRef.current = draft;
   }, [draft]);
+
+  useEffect(() => {
+    if (!autoFocus || block.type !== "markdown") return;
+    const focusFrame = window.requestAnimationFrame(() => {
+      markdownEditorRef.current?.focus();
+      markdownEditorRef.current
+        ?.closest("[data-notebook-cell]")
+        ?.scrollIntoView({ block: "nearest" });
+    });
+    return () => window.cancelAnimationFrame(focusFrame);
+  }, [autoFocus, block.type]);
 
   const updateDraft = (value: string) => {
     draftRef.current = value;
@@ -787,9 +857,31 @@ function DocumentBlock({
                 isSelected && "notebookMarkdownEditorSelected",
               )}
               placeholder="Markdown을 입력하세요. {변수}로 값 보간."
+              ref={markdownEditorRef}
               value={draft}
               onChange={(event) => updateDraft(event.target.value)}
               onFocus={onSelect}
+              onKeyDown={(event) => {
+                if (
+                  event.nativeEvent.isComposing
+                  || event.altKey
+                  || event.ctrlKey
+                  || event.metaKey
+                  || event.shiftKey
+                  || (event.key !== "ArrowUp" && event.key !== "ArrowDown")
+                ) {
+                  return;
+                }
+                const direction = resolveNotebookCellBoundaryNavigation({
+                  key: event.key,
+                  selectionAnchor: event.currentTarget.selectionStart,
+                  selectionHead: event.currentTarget.selectionEnd,
+                  textLength: event.currentTarget.value.length,
+                });
+                if (direction && onMoveCell(direction)) {
+                  event.preventDefault();
+                }
+              }}
             />
           )}
         </div>
@@ -839,6 +931,7 @@ function DocumentBlock({
             value={draft}
             onChange={updateDraft}
             onFocus={onSelect}
+            onBoundaryNavigate={onMoveCell}
             onRun={onRun}
             onRunAndAdvance={runAndAdvanceCurrentDraft}
             errorLines={combineErrorSources(

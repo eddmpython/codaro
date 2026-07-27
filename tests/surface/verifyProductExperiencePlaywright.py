@@ -930,6 +930,166 @@ def verifyNotebookExecutionStates(
     }
 
 
+def verifyLongNotebookKeyboardNavigation(
+    page: Any,
+    case: dict[str, Any],
+    colorScheme: str,
+) -> dict[str, Any]:
+    cells = page.locator("[data-notebook-cell]")
+    appendToolbar = page.get_by_role("toolbar", name="노트북 셀 추가")
+    appendCode = appendToolbar.get_by_role("button", name="+ Code")
+    appendMarkdown = appendToolbar.get_by_role("button", name="+ Markdown")
+    targetCellCount = 12
+    if cells.count() > targetCellCount:
+        raise AssertionError(
+            f"long notebook keyboard check expected at most {targetCellCount} cells, "
+            f"found {cells.count()}"
+        )
+
+    while cells.count() < 8:
+        appendCode.click()
+    if not page.locator('[data-notebook-cell="markdown"]').count():
+        appendMarkdown.click()
+    while cells.count() < targetCellCount:
+        appendCode.click()
+    if cells.count() != targetCellCount:
+        raise AssertionError(
+            f"long notebook keyboard fixture drifted: {cells.count()} cells"
+        )
+
+    page.wait_for_function(
+        """
+        (expectedIndex) => {
+          const cells = [...document.querySelectorAll('[data-notebook-cell]')];
+          const selected = document.querySelector('[data-notebook-cell-selected="true"]');
+          return selected === cells[expectedIndex]
+            && selected?.contains(document.activeElement);
+        }
+        """,
+        arg=targetCellCount - 1,
+        timeout=20_000,
+    )
+    scrollSnapshot = page.evaluate(
+        """() => {
+          const viewport = document.querySelector(
+            '.notebookViewport [data-slot="scroll-area-viewport"]'
+          );
+          if (!(viewport instanceof HTMLElement)) {
+            throw new Error('notebook scroll viewport is missing');
+          }
+          return {
+            bottomScrollTop: viewport.scrollTop,
+            scrollHeight: viewport.scrollHeight,
+            clientHeight: viewport.clientHeight,
+          };
+        }"""
+    )
+    if scrollSnapshot["scrollHeight"] <= scrollSnapshot["clientHeight"]:
+        raise AssertionError("12-cell notebook did not create a long scrollable document")
+
+    markdownVisited = False
+    for expectedIndex in range(targetCellCount - 2, -1, -1):
+        page.keyboard.press("Control+Home")
+        page.keyboard.press("ArrowUp")
+        page.wait_for_function(
+            """
+            (expectedIndex) => {
+              const cells = [...document.querySelectorAll('[data-notebook-cell]')];
+              const selected = document.querySelector('[data-notebook-cell-selected="true"]');
+              return selected === cells[expectedIndex]
+                && selected?.contains(document.activeElement);
+            }
+            """,
+            arg=expectedIndex,
+            timeout=20_000,
+        )
+        if cells.nth(expectedIndex).get_attribute("data-notebook-cell") == "markdown":
+            markdownVisited = (
+                page.evaluate("document.activeElement?.tagName") == "TEXTAREA"
+            )
+
+    topSnapshot = page.evaluate(
+        """() => {
+          const viewport = document.querySelector(
+            '.notebookViewport [data-slot="scroll-area-viewport"]'
+          );
+          const selected = document.querySelector('[data-notebook-cell-selected="true"]');
+          if (!(viewport instanceof HTMLElement) || !(selected instanceof HTMLElement)) {
+            throw new Error('notebook navigation target is missing');
+          }
+          const viewportRect = viewport.getBoundingClientRect();
+          const selectedRect = selected.getBoundingClientRect();
+          return {
+            scrollTop: viewport.scrollTop,
+            selectedVisible: selectedRect.top >= viewportRect.top - 1
+              && selectedRect.top < viewportRect.bottom,
+          };
+        }"""
+    )
+    if not topSnapshot["selectedVisible"]:
+        raise AssertionError("keyboard navigation did not reveal the first notebook cell")
+
+    for expectedIndex in range(1, targetCellCount):
+        page.keyboard.press("Control+End")
+        page.keyboard.press("ArrowDown")
+        page.wait_for_function(
+            """
+            (expectedIndex) => {
+              const cells = [...document.querySelectorAll('[data-notebook-cell]')];
+              const selected = document.querySelector('[data-notebook-cell-selected="true"]');
+              return selected === cells[expectedIndex]
+                && selected?.contains(document.activeElement);
+            }
+            """,
+            arg=expectedIndex,
+            timeout=20_000,
+        )
+        if cells.nth(expectedIndex).get_attribute("data-notebook-cell") == "markdown":
+            markdownVisited = markdownVisited and (
+                page.evaluate("document.activeElement?.tagName") == "TEXTAREA"
+            )
+
+    bottomSnapshot = page.evaluate(
+        """() => {
+          const viewport = document.querySelector(
+            '.notebookViewport [data-slot="scroll-area-viewport"]'
+          );
+          const selected = document.querySelector('[data-notebook-cell-selected="true"]');
+          if (!(viewport instanceof HTMLElement) || !(selected instanceof HTMLElement)) {
+            throw new Error('notebook navigation target is missing');
+          }
+          const viewportRect = viewport.getBoundingClientRect();
+          const selectedRect = selected.getBoundingClientRect();
+          return {
+            scrollTop: viewport.scrollTop,
+            selectedVisible: selectedRect.bottom <= viewportRect.bottom + 1
+              && selectedRect.bottom > viewportRect.top,
+          };
+        }"""
+    )
+    if not bottomSnapshot["selectedVisible"]:
+        raise AssertionError("keyboard navigation did not reveal the final notebook cell")
+    if not markdownVisited:
+        raise AssertionError("keyboard navigation did not focus the Markdown textarea")
+
+    screenshotPath = (
+        SCREENSHOT_ROOT / colorScheme / f"{case['name']}-long-notebook-keyboard.png"
+    )
+    screenshotPath.parent.mkdir(parents=True, exist_ok=True)
+    page.screenshot(path=str(screenshotPath), full_page=False)
+    return {
+        "cellCount": targetCellCount,
+        "firstCellReached": True,
+        "lastCellReached": True,
+        "markdownVisited": markdownVisited,
+        "scrollHeight": scrollSnapshot["scrollHeight"],
+        "viewportHeight": scrollSnapshot["clientHeight"],
+        "topScrollTop": topSnapshot["scrollTop"],
+        "bottomScrollTop": bottomSnapshot["scrollTop"],
+        "screenshot": str(screenshotPath.relative_to(ROOT)).replace("\\", "/"),
+    }
+
+
 def installChromium() -> tuple[bool, str]:
     try:
         result = subprocess.run(
@@ -1782,6 +1942,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "waitFor": "[data-notebook-input='code']",
             "expectMinimalNotebook": True,
             "verifyNotebookExecutionStates": True,
+            "verifyNotebookKeyboardNavigation": True,
             "verifyNotebookRunAdvance": True,
             "verifyNotebookTools": True,
         },
@@ -1825,6 +1986,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "waitFor": "[data-notebook-input='code']",
             "expectMinimalNotebook": True,
             "verifyNotebookExecutionStates": True,
+            "verifyNotebookKeyboardNavigation": True,
         },
         {
             "name": "local-home-minimum",
@@ -3046,6 +3208,7 @@ def runBrowserMatrix(
                 notebookRunAdvanceVerified = False
                 notebookToolsVerified = False
                 notebookStateEvidence: dict[str, Any] | None = None
+                notebookKeyboardNavigationEvidence: dict[str, Any] | None = None
                 localCheckTransport = {"aborted": 0, "expectedConsoleErrors": 0, "requests": 0}
                 consoleErrors: list[dict[str, str]] = []
                 assetFailures: list[str] = []
@@ -4494,6 +4657,14 @@ def runBrowserMatrix(
                             case,
                             colorScheme,
                         )
+                    if case.get("verifyNotebookKeyboardNavigation"):
+                        notebookKeyboardNavigationEvidence = (
+                            verifyLongNotebookKeyboardNavigation(
+                                page,
+                                case,
+                                colorScheme,
+                            )
+                        )
                     if case.get("verifyNotebookRunAdvance"):
                         beforeTheme = page.locator("html").get_attribute("data-theme")
                         themeButton = page.get_by_role(
@@ -4532,6 +4703,9 @@ def runBrowserMatrix(
                             "notebookRunAdvanceVerified": notebookRunAdvanceVerified,
                             "notebookToolsVerified": notebookToolsVerified,
                             "notebookStateEvidence": notebookStateEvidence,
+                            "notebookKeyboardNavigationEvidence": (
+                                notebookKeyboardNavigationEvidence
+                            ),
                             "failures": caseFailures,
                             "screenshot": str(screenshotPath.relative_to(ROOT)).replace("\\", "/"),
                         }
