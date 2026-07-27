@@ -121,12 +121,14 @@ const codeCellEditorTheme = EditorView.theme({
   ".cm-lineNumbers .cm-gutterElement": {
     padding: "0 0.5rem",
   },
-  ".cm-activeLine": {
-    backgroundColor: "color-mix(in oklab, var(--color-accent-muted) 66%, transparent)",
+  ".cm-activeLine, .cm-activeLineGutter": {
+    backgroundColor: "transparent",
   },
-  ".cm-activeLineGutter": {
-    backgroundColor: "var(--color-accent-muted, var(--accent))",
-    color: "var(--color-text-accent, var(--accent-foreground))",
+  "&.cm-focused .cm-activeLine, &.cm-focused .cm-activeLineGutter": {
+    backgroundColor: "color-mix(in oklab, var(--color-background-muted) 76%, transparent)",
+  },
+  "&.cm-focused .cm-activeLineGutter": {
+    color: "var(--color-text-primary)",
   },
   ".cm-cursor": {
     borderLeftColor: "var(--color-accent, var(--foreground))",

@@ -1112,6 +1112,58 @@ def verifyLongNotebookKeyboardNavigation(
     if not markdownVisited:
         raise AssertionError("keyboard navigation did not focus the Markdown textarea")
 
+    lineVisualSnapshot = page.evaluate(
+        """() => {
+          const selectedCell = document.querySelector(
+            '[data-notebook-cell="code"][data-notebook-cell-selected="true"]'
+          );
+          const unselectedCell = document.querySelector(
+            '[data-notebook-cell="code"][data-notebook-cell-selected="false"]'
+            + '[data-notebook-cell-status="idle"]'
+          );
+          const selectedLine = selectedCell?.querySelector('.cm-activeLine');
+          const unselectedLine = unselectedCell?.querySelector('.cm-activeLine');
+          const selectedFrame = selectedCell?.querySelector('.notebookCodeFrame');
+          const unselectedFrame = unselectedCell?.querySelector('.notebookCodeFrame');
+          if (
+            !(selectedLine instanceof HTMLElement)
+            || !(unselectedLine instanceof HTMLElement)
+            || !(selectedFrame instanceof HTMLElement)
+            || !(unselectedFrame instanceof HTMLElement)
+          ) {
+            throw new Error('notebook line visual targets are missing');
+          }
+          return {
+            selectedLineBackground: getComputedStyle(selectedLine).backgroundColor,
+            unselectedLineBackground: getComputedStyle(unselectedLine).backgroundColor,
+            selectedFrameBorder: getComputedStyle(selectedFrame).borderColor,
+            unselectedFrameBorder: getComputedStyle(unselectedFrame).borderColor,
+          };
+        }"""
+    )
+    transparentBackgrounds = {"rgba(0, 0, 0, 0)", "transparent"}
+    if lineVisualSnapshot["unselectedLineBackground"] not in transparentBackgrounds:
+        raise AssertionError(
+            "unselected idle notebook cells retain an active-line fill: "
+            f"{lineVisualSnapshot}"
+        )
+    if (
+        lineVisualSnapshot["selectedLineBackground"]
+        == lineVisualSnapshot["unselectedLineBackground"]
+    ):
+        raise AssertionError(
+            "selected notebook line is not visually distinct from inactive cells: "
+            f"{lineVisualSnapshot}"
+        )
+    if (
+        lineVisualSnapshot["selectedFrameBorder"]
+        == lineVisualSnapshot["unselectedFrameBorder"]
+    ):
+        raise AssertionError(
+            "selected notebook frame is not visually distinct from inactive cells: "
+            f"{lineVisualSnapshot}"
+        )
+
     screenshotPath = (
         SCREENSHOT_ROOT / colorScheme / f"{case['name']}-long-notebook-keyboard.png"
     )
@@ -1126,6 +1178,7 @@ def verifyLongNotebookKeyboardNavigation(
         "viewportHeight": scrollSnapshot["clientHeight"],
         "topScrollTop": topSnapshot["scrollTop"],
         "bottomScrollTop": bottomSnapshot["scrollTop"],
+        "lineVisuals": lineVisualSnapshot,
         "screenshot": str(screenshotPath.relative_to(ROOT)).replace("\\", "/"),
     }
 

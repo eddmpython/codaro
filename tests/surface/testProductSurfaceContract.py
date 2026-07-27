@@ -217,6 +217,11 @@ def testNotebookKeepsMobileTitleAndCollapsesSecondaryCellActions() -> None:
     assert ".notebookCodeFrame .cm-content {" in notebookStyles
     assert "min-height: 52px;" in notebookStyles
     assert "padding-right: 104px;" in notebookStyles
+    assert '".cm-activeLine, .cm-activeLineGutter"' in notebookPanel
+    assert '"&.cm-focused .cm-activeLine, &.cm-focused .cm-activeLineGutter"' in notebookPanel
+    assert "var(--color-background-muted) 76%" in notebookPanel
+    assert "unselected idle notebook cells retain an active-line fill" in productGate
+    assert '"lineVisuals": lineVisualSnapshot' in productGate
     assert autosaveGate.count('state="attached"') >= 4
     assert 'page.locator("[data-notebook-cell]").first.hover' in autosaveGate
     assert 'page.get_by_label("셀 작업 더보기").first.click' in autosaveGate
