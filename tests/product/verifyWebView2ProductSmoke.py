@@ -555,9 +555,13 @@ def capture_deployed_web_learning_archive(playwright: Any) -> dict[str, Any]:
             """() => new URL(window.location.href).searchParams.get("surface") !== "curriculum" """,
             timeout=20_000,
         )
+        page.locator("[data-product-surface-view='editor']:visible").wait_for(
+            state="visible",
+            timeout=20_000,
+        )
         learning_data = open_learning_data_settings(page)
         with page.expect_download(timeout=20_000) as download_info:
-            learning_data.locator("button[aria-label^='학습 작업 내보내기']").click()
+            learning_archive_export_control(learning_data).click()
         download = download_info.value
         download.save_as(str(DEPLOYED_WEB_ARCHIVE_PATH))
         if not DEPLOYED_WEB_ARCHIVE_PATH.is_file():
@@ -697,7 +701,7 @@ def verify_web_to_local_roundtrip(
         draft_id,
     )
     with page.expect_download(timeout=20_000) as download_info:
-        learning_data.locator("button[aria-label^='학습 작업 내보내기']").click()
+        learning_archive_export_control(learning_data).click()
     download_path = download_info.value.path()
     if download_path is None:
         raise VerificationError("installed Local learning archive re-export has no path")
@@ -847,7 +851,7 @@ def verify_deployed_web_to_local_roundtrip(
     page.wait_for_selector("[data-local-home-surface='true']", state="visible", timeout=20_000)
     learning_data = open_learning_data_settings(page)
     with page.expect_download(timeout=20_000) as download_info:
-        learning_data.locator("button[aria-label^='학습 작업 내보내기']").click()
+        learning_archive_export_control(learning_data).click()
     download_path = download_info.value.path()
     if download_path is None:
         raise VerificationError("deployed Web archive Local re-export has no path")
@@ -1028,8 +1032,32 @@ def open_learning_data_settings(page: Page) -> Any:
         sidebar_trigger.click()
         settings = page.locator("[data-product-appearance-settings='true']:visible")
     settings.wait_for(state="visible", timeout=20_000)
-    settings.click()
     learning_data = page.locator("[data-product-learning-data-settings='true']:visible")
+    for attempt in range(3):
+        settings.click()
+        opened_stably = page.evaluate(
+            """async () => {
+              const trigger = document.querySelector(
+                "[data-product-appearance-settings='true'][aria-expanded='true']",
+              );
+              if (!(trigger instanceof HTMLElement)) return false;
+              for (let frame = 0; frame < 12; frame += 1) {
+                await new Promise(requestAnimationFrame);
+                if (
+                  !trigger.isConnected
+                  || trigger.getAttribute("aria-expanded") !== "true"
+                  || !document.querySelector("[data-product-learning-data-settings='true']")
+                ) return false;
+              }
+              return true;
+            }"""
+        )
+        if opened_stably:
+            break
+        if attempt == 2:
+            raise VerificationError("product settings did not remain open after the surface transition")
+        settings = page.locator("[data-product-appearance-settings='true']:visible")
+        settings.wait_for(state="visible", timeout=20_000)
     learning_data.wait_for(state="visible", timeout=20_000)
     menu = learning_data.locator("[data-learning-archive-menu='true']")
     if menu.get_attribute("open") is None:
@@ -1039,6 +1067,13 @@ def open_learning_data_settings(page: Page) -> Any:
         timeout=20_000,
     )
     return learning_data
+
+
+def learning_archive_export_control(learning_data: Any) -> Any:
+    return learning_data.locator(
+        "[data-learning-archive-export='true'], "
+        "button[aria-label^='학습 작업 내보내기']"
+    )
 
 
 def wait_for_editor_source(page: Page, expected: str) -> None:

@@ -222,6 +222,7 @@ export function LearningArchiveMenu({
             <div className="flex shrink-0 items-center gap-1">
               <IconButton
                 className="size-8 rounded-md"
+                data-learning-archive-export="true"
                 disabled={!document || !lessonRef}
                 label={t("learning.evidence.export", { count: summary.events })}
                 variant="ghost"

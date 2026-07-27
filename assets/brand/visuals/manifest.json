@@ -67,7 +67,7 @@
           "editor/src/styles",
           "editor/vite.config.ts"
         ],
-        "sourceSetHash": "sha256-ee57917eb90341a482e2a0671ceefa1167481ec525b7565320e3bac4cb9f4431"
+        "sourceSetHash": "sha256-ecf15b2104f576ca39b278cbe62eb55cdff884cbd4eff6fc1ea90b97b05411e1"
       }
     },
     {
@@ -136,7 +136,7 @@
           "editor/src/styles",
           "editor/vite.config.ts"
         ],
-        "sourceSetHash": "sha256-ee57917eb90341a482e2a0671ceefa1167481ec525b7565320e3bac4cb9f4431"
+        "sourceSetHash": "sha256-ecf15b2104f576ca39b278cbe62eb55cdff884cbd4eff6fc1ea90b97b05411e1"
       }
     },
     {
