@@ -333,8 +333,8 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
         "TeacherPanel" not in loadingSurface
         and "CellAiActions" not in curriculumLearningCell
         and "CellAiActions" not in curriculumSectionRenderer
-        and 'const showAssistantToggle = surface === "editor"' in topBar,
-        "curriculum must rely on automatic inline feedback without duplicate AI controls",
+        and 'const showNotebookToolsToggle = surface === "editor"' in topBar,
+        "curriculum must rely on automatic inline feedback without duplicate assistant controls",
         failures,
     )
     require(
@@ -356,9 +356,10 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
         failures,
     )
     require(
-        'data-notebook-assistant-shell="desktop"' in notebookSurface
+        "props.notebookToolsOpen ? (" in notebookSurface
+        and 'data-notebook-tools-panel="desktop"' in notebookSurface
         and 'className="absolute inset-y-0 right-0 z-40 hidden w-[380px] min-h-0 shadow-[-16px_0_48px_rgba(0,0,0,0.16)] xl:block"' in notebookSurface,
-        "mobile notebook must not place the desktop assistant below the first cells",
+        "mobile notebook must not place the desktop tools below the first cells",
         failures,
     )
     require(

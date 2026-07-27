@@ -37,7 +37,7 @@ type MainSurfaceProps = {
   apiOnline: boolean;
   auditCount: number;
   automationSection: AutomationSection;
-  assistantCollapsed: boolean;
+  notebookToolsOpen: boolean;
   assistantLoading: boolean;
   canRun: boolean;
   cellHelpByBlockId: Record<string, CellAiHelpState>;
@@ -156,7 +156,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
         aiConnecting={props.aiConnecting}
         aiProfile={props.aiProfile}
         apiOnline={props.apiOnline}
-        assistantCollapsed={props.assistantCollapsed}
+        notebookToolsOpen={props.notebookToolsOpen}
         assistantLoading={props.assistantLoading}
         canRun={props.canRun}
         cellHelpByBlockId={props.cellHelpByBlockId}

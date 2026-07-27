@@ -30,7 +30,7 @@
 ## 현재 증거
 
 - 새 자유 노트북은 `Untitled`와 빈 코드 셀 하나로 시작한다. 화면 제목은 실제 문서 경로와 분리해 포커스를 잃어도 `.py`를 강제로 붙이지 않는다.
-- 상단 왼쪽은 `Codaro notebook`, 중앙은 편집 가능한 제목, 오른쪽은 테마 전환과 공용 `GitHub → 하트 → YouTube → Threads` 순서를 사용한다. 노트북 전용 top lane에서도 같은 생성 컴포넌트를 사용한다.
+- 상단 왼쪽은 `Codaro notebook`, 중앙은 편집 가능한 제목, 오른쪽은 `테마 → 노트북 설정 → GitHub → 하트 → YouTube → Threads` 순서를 사용한다. 공용 SNS는 생성 컴포넌트를 소비하고, 설정 버튼은 닫힌 상태에서 시작해 tutor·변수·dependency 도구를 명시적으로 열고 닫는다.
 - 문서 하단의 추가 control은 DartLab과 같은 `+ Code`, `+ Markdown` 표기다. 왼쪽 아래는 `compact`, `medium`, `full` 폭 전환, 오른쪽 아래는 실제 reactive 실행 전환과 전체 실행을 둔다.
 - desktop 우하단 실행 control은 36px 원형이고 mobile에서는 44px target으로 커진다. reactive를 끄면 `codaro:reactive-trigger` 자동 전체 실행을 차단하고 수동 셀 및 전체 실행은 유지한다.
 - Web draft는 브라우저 저장소에 즉시 보존되고 reload 뒤 복원된다. Local draft는 700ms debounce 뒤 실제 workspace 파일에 저장된다. 저장 측정 속성은 유지하되 화면에는 pending, saving, error만 표시한다.
@@ -51,6 +51,9 @@
 - Chromium, Firefox, WebKit 12-case 시각 접근성 검사에서 theme control, SNS 순서, 키보드 focus, 후원 팝업 focus trap, 정확한 계좌번호 `1002-0421-4626`, Dark·Light 대비와 320px 이상 가로 overflow 0px를 확인했다.
 - 2026-07-27 프로덕션 산출물 기준 `web-run-compact` Dark, `web-run-mobile` Light, `web-run-desktop` Dark, `local-run-minimum` Dark가 Chromium 149에서 각각 통과했다. 모바일 case는 제목 노출, 닫힌 셀 보조 메뉴, 44px trigger의 셀 내부 배치까지 검사한다.
 - 레슨의 category, lesson, path, section query를 가진 URL에서 자유 노트북으로 전환해도 bundled curriculum 로드를 경고로 표시하지 않는다. `web-run-desktop`은 이 실제 전환 URL에서 상단 배경 알림 0개, 빈 code cell 1개와 노트북 control lane을 확인한다.
+- 연결 이력이 없는 외부 제공자 안내와 끊어진 연결 안내는 대화 surface에서만 보인다. backend offline은 실행과 저장에 직접 영향을 주므로 비학습 surface 전체에 유지하고, 집중 학습 surface에는 연결 안내를 렌더하지 않는다.
+- 2026-07-27 production build 뒤 Chromium `web-run-desktop` 1440×900 Dark에서 기본 연결 안내 0개, 닫힌 도구 패널 0개를 확인하고 설정 버튼의 `aria-pressed=false → true → false`와 패널 mount·detach를 실제 클릭으로 검증했다.
+- 같은 source를 포함한 current-commit wheel을 설치한 Windows 11 build 26200, WebView2 `Edg/150.0.4078.99`의 Local Notebook 1024×768에서 연결 안내 0개, 기본 도구 패널 0개, overflow 0px, 공용 SNS 순서와 테마 control을 확인했다.
 - 시각 증거는 `output/test-runner/product-experience-browser/screenshots/{dark,light}/web-run-{desktop,mobile}.png`, Local 증거는 `output/test-runner/product-experience-browser/screenshots/dark/local-run-minimum.png`에 남겼다.
 - 기계 판정은 `output/test-runner/notebook-redesign/`의 Web Dark·Light와 Local report, `output/test-runner/run-local-state-browser/run-local-state-report.json`에 남겼다.
 
@@ -58,7 +61,7 @@
 
 - 실제 WebView2 기본 notebook 1024x768, 공용 테마·SNS와 native client·DOM 크기 일치는 자동 검증됐다.
 - 실제 WebView2에서 긴 notebook, keyboard-only cell 이동, screen reader reading order, IME 수동 검수
-- 배포 commit의 Local 설치본 round trip 증거
+- Local 재내보내기 파일을 공개 Web이 다시 수입하는 역방향 round trip 증거
 
 ## 영향 파일
 
@@ -69,6 +72,7 @@
 - `editor/src/components/notebook/notebookPanel.css`: 조용한 기본 화면, 문맥형 cell action, compact code/output 계층, mobile control
 - `editor/src/components/app/workCell.css`: 노트북과 현재 학습이 함께 쓰는 실행 셀 시각 primitive
 - `editor/src/components/app/notebookSurface.tsx`: Notebook panel과 inspector 조합
+- `editor/src/lib/providerReconnectPolicy.ts`: surface와 연결 상태별로 복구 안내를 노출할 수 있는 범위
 - `editor/src/hooks/useNotebookDocumentState.ts`, `editor/src/lib/notebookPersistence.ts`, `editor/src/lib/documentSavePolicy.ts`: Web durable draft와 Local debounce·revision·경로 소유권·bounded keepalive 저장
 - `src/codaro/api/documentRouter.py`: workspace 고유 경로, stale revision 거절, Jupyter 원본 보호 사본
 - `src/codaro/document/service.py`: Python·Percent·Jupyter 공용 원자 저장
@@ -113,6 +117,6 @@
 ### PM 관점
 
 - `/run/` 첫 진입에서 불필요한 badge와 sample code 없이 편집 가능한 빈 셀이 바로 보이고, 실행 결과는 별도 확인 command 없이 cell 아래에 나타난다.
-- 공용 source와 loopback Local 상태의 동일 컴포넌트·실행 전이는 기계 검증됐다. 그러나 배포된 공개 Web에서 실제 설치된 Local WebView2로 같은 문서를 넘기고 다시 여는 round trip 증거가 남아 있어 상태는 `진행`이다.
+- 공용 source와 실제 설치형 Local WebView2의 동일 컴포넌트·실행 전이, 공개 Web archive의 Local 수입·reload·재내보내기는 기계 검증됐다. 그러나 Local 재내보내기 파일의 공개 Web 재수입과 수동 보조기술 검수가 남아 있어 상태는 `진행`이다.
 
 완료 전에는 `_done`으로 이동하지 않는다.

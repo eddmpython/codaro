@@ -25,7 +25,7 @@ export type NotebookSurfaceProps = {
   aiConnecting: boolean;
   aiProfile: AiProfile | null;
   apiOnline: boolean;
-  assistantCollapsed: boolean;
+  notebookToolsOpen: boolean;
   assistantLoading: boolean;
   canRun: boolean;
   cellHelpByBlockId: Record<string, CellAiHelpState>;
@@ -90,11 +90,11 @@ export function NotebookSurface(props: NotebookSurfaceProps) {
         onSelectBlock={props.onSelectBlock}
         onToggleReactive={props.onToggleReactive}
       />
-      {props.assistantCollapsed ? null : (
-        <div className="absolute inset-y-0 right-0 z-40 hidden w-[380px] min-h-0 shadow-[-16px_0_48px_rgba(0,0,0,0.16)] xl:block" data-notebook-assistant-shell="desktop">
+      {props.notebookToolsOpen ? (
+        <div className="absolute inset-y-0 right-0 z-40 hidden w-[380px] min-h-0 shadow-[-16px_0_48px_rgba(0,0,0,0.16)] xl:block" data-notebook-tools-panel="desktop">
           <NotebookInspector {...props} />
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

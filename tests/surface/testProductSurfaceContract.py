@@ -222,6 +222,31 @@ def testNotebookKeepsMobileTitleAndCollapsesSecondaryCellActions() -> None:
     assert 'tone: "success"' in curriculumSelection
     assert "visibleNotebookNoticeCount" in productGate
     assert "background curriculum notice leaked into the free notebook top lane" in productGate
+    assert "unrelated reconnect prompt leaked into the default notebook" in productGate
+    assert '"verifyNotebookTools": True' in productGate
+    assert "notebookToolsVerified" in productGate
+
+
+def testReconnectPromptsStayOnSurfacesWhereTheyAreActionable() -> None:
+    app = _read("editor/src/App.tsx")
+    policy = _read("editor/src/lib/providerReconnectPolicy.ts")
+    topBar = _read("editor/src/components/app/topBar.tsx")
+    notebookSurface = _read("editor/src/components/app/notebookSurface.tsx")
+    nativeGate = _read("tests/product/verifyWebView2ProductSmoke.py")
+
+    assert "reconnectVariantForSurface(surface, reconnect.variant)" in app
+    assert "variant={visibleReconnectVariant}" in app
+    assert 'surface === "curriculum"' in policy
+    assert 'variant === "offline"' in policy
+    assert 'surface === "chat" ? variant : null' in policy
+    assert 'data-notebook-tools-toggle="true"' in topBar
+    assert 'label={notebookToolsOpen ? "노트북 도구 닫기" : "노트북 도구 열기"}' in topBar
+    assert "<Settings />" in topBar
+    assert "PanelRightOpen" not in topBar
+    assert 'data-notebook-tools-panel="desktop"' in notebookSurface
+    assert "notebookToolsOpen" in notebookSurface
+    assert "visibleProviderReconnectVariants" in nativeGate
+    assert '"reconnectPromptClean"' in nativeGate
 
 
 def testPagesDeploymentVerifiesThePublicWebToInstalledLocalPath() -> None:

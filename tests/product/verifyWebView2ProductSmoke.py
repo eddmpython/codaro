@@ -410,6 +410,14 @@ def verify_surface_case(
             socialOrder: social,
             socialMatches: JSON.stringify(social) === JSON.stringify(expectedSocialOrder),
             collapsedSidebarVisibleTextFragments,
+            visibleProviderReconnectVariants: [
+              ...document.querySelectorAll("[data-provider-reconnect-bar]")
+            ].filter(visible).map(
+              (element) => element.getAttribute("data-provider-reconnect-bar")
+            ),
+            notebookToolsPanelCount: document.querySelectorAll(
+              '[data-notebook-tools-panel="desktop"]'
+            ).length,
             controlOverlaps: overlaps,
             readySurfaceVisible: [...document.querySelectorAll(
               surface === "home"
@@ -439,6 +447,11 @@ def verify_surface_case(
         "collapsedSidebarClean": (
             surface != "editor"
             or not snapshot["collapsedSidebarVisibleTextFragments"]
+        ),
+        "reconnectPromptClean": not snapshot["visibleProviderReconnectVariants"],
+        "notebookToolsQuiet": (
+            surface != "editor"
+            or snapshot["notebookToolsPanelCount"] == 0
         ),
         "controlOverlap": not snapshot["controlOverlaps"],
         "surfaceVisible": bool(snapshot["readySurfaceVisible"]),

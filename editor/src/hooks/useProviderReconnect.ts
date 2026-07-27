@@ -5,8 +5,7 @@ import {
   saveProviderPromptDismissed,
 } from "@/lib/connectionDismissal";
 import type { ConnectionPhase } from "@/lib/connectionStatus";
-
-export type ReconnectVariant = "offline" | "dropped" | "never";
+import type { ReconnectVariant } from "@/lib/providerReconnectPolicy";
 
 type UseProviderReconnectInput = {
   apiOnline: boolean;

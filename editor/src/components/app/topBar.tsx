@@ -6,8 +6,7 @@ import {
   Clipboard,
   ClipboardCheck,
   Moon,
-  PanelRightClose,
-  PanelRightOpen,
+  Settings,
   Sun,
   XCircle,
 } from "lucide-react";
@@ -27,7 +26,7 @@ import type { AppNotice } from "@/types";
 // - 상단 중앙: 진단/상태 알림(에러·경고일 때만)
 // 노트북 실행 버튼은 에디터 본문(NotebookPanel)으로 이동했다.
 export function TopControls({
-  assistantCollapsed,
+  notebookToolsOpen,
   notebookTitle,
   notice,
   resolvedTheme,
@@ -36,9 +35,9 @@ export function TopControls({
   onCopyDiagnosticExport,
   onRenameNotebook,
   onToggleTheme,
-  onToggleAssistant,
+  onToggleNotebookTools,
 }: {
-  assistantCollapsed: boolean;
+  notebookToolsOpen: boolean;
   notebookTitle?: string;
   notice: AppNotice;
   resolvedTheme: "light" | "dark";
@@ -47,10 +46,10 @@ export function TopControls({
   onCopyDiagnosticExport?: () => Promise<void>;
   onRenameNotebook?: (title: string) => void;
   onToggleTheme: () => void;
-  onToggleAssistant: () => void;
+  onToggleNotebookTools: () => void;
 }) {
   const { t } = useLocale();
-  const showAssistantToggle = surface === "editor";
+  const showNotebookToolsToggle = surface === "editor";
   const showStatusNotice = surface !== "curriculum" && (notice.tone === "error" || notice.tone === "warning");
 
   return (
@@ -108,15 +107,6 @@ export function TopControls({
             <DiagnosticExportButton onCopyDiagnosticExport={onCopyDiagnosticExport} />
           </div>
         ) : null}
-        {showAssistantToggle ? (
-          <TopBarIconButton
-            className="hidden xl:inline-flex"
-            label={assistantCollapsed ? t("topbar.aiOpen") : t("topbar.aiClose")}
-            onClick={onToggleAssistant}
-          >
-            {assistantCollapsed ? <PanelRightOpen /> : <PanelRightClose />}
-          </TopBarIconButton>
-        ) : null}
         <TopBarIconButton
           label={resolvedTheme === "dark" ? "라이트 모드로" : "다크 모드로"}
           onClick={onToggleTheme}
@@ -124,6 +114,18 @@ export function TopControls({
         >
           {resolvedTheme === "dark" ? <Sun /> : <Moon />}
         </TopBarIconButton>
+        {showNotebookToolsToggle ? (
+          <TopBarIconButton
+            className="hidden xl:inline-flex"
+            aria-pressed={notebookToolsOpen}
+            data-notebook-tools-toggle="true"
+            label={notebookToolsOpen ? "노트북 도구 닫기" : "노트북 도구 열기"}
+            onClick={onToggleNotebookTools}
+            variant="ghost"
+          >
+            <Settings />
+          </TopBarIconButton>
+        ) : null}
         <SocialLinks label="Codaro SNS" />
       </div>
     </>

@@ -1,8 +1,8 @@
 import { AlertTriangle, Sparkles, WifiOff, X, type LucideIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import type { ReconnectVariant } from "@/hooks/useProviderReconnect";
 import { useLocale } from "@/lib/localeContext";
+import type { ReconnectVariant } from "@/lib/providerReconnectPolicy";
 import { cn } from "@/lib/utils";
 
 // 화면 하단 슬림 바: 연결이 끊겼을 때 다시 연결하거나, X 로 닫는다.

@@ -15,7 +15,7 @@ import { useAppBootstrapEffect } from "@/hooks/useAppBootstrapEffect";
 import { useAssistantTurnState } from "@/hooks/useAssistantTurnState";
 import { useAutomationState } from "@/hooks/useAutomationState";
 import { useConnectionStatus } from "@/hooks/useConnectionStatus";
-import { useProviderReconnect, type ReconnectVariant } from "@/hooks/useProviderReconnect";
+import { useProviderReconnect } from "@/hooks/useProviderReconnect";
 import { useCustomCurriculaState } from "@/hooks/useCustomCurriculaState";
 import { useCurriculumLibraryState } from "@/hooks/useCurriculumLibraryState";
 import { useCurriculumNavigationState } from "@/hooks/useCurriculumNavigationState";
@@ -37,6 +37,10 @@ import { loadSystemDiagnosticExport } from "@/lib/systemDiagnostics";
 import type { LearningArchiveMaterialization } from "@/lib/learningArchive";
 import { lessonKeyFromRef, lessonRefFromKey } from "@/lib/runRouteState";
 import { providerProfileReady } from "@/lib/providerProfile";
+import {
+  reconnectVariantForSurface,
+  type ReconnectVariant,
+} from "@/lib/providerReconnectPolicy";
 import { WidgetSessionProvider } from "@/lib/widgetSession";
 import { installBrowserPythonRuntimeDiagnostics } from "@/lib/browserPythonRuntime";
 import {
@@ -244,11 +248,11 @@ function App() {
   const { resolvedTheme, themeMode, toggleThemeMode } = useThemeMode();
   const { accentColor, selectAccentColor } = useAccentColor();
   const [sidebarOpen, setSidebarOpen] = useState(() => surface !== "editor");
-  const [assistantCollapsed, setAssistantCollapsed] = useState(true);
+  const [notebookToolsOpen, setNotebookToolsOpen] = useState(false);
   useEffect(() => {
     if (surface !== "editor") return;
     setSidebarOpen(false);
-    setAssistantCollapsed(true);
+    setNotebookToolsOpen(false);
   }, [surface]);
   const {
     auditCount,
@@ -292,6 +296,7 @@ function App() {
     phase: connection.phase,
     providerReady,
   });
+  const visibleReconnectVariant = reconnectVariantForSurface(surface, reconnect.variant);
   const handleReconnectAction = useCallback((variant: ReconnectVariant) => {
     if (variant === "offline") {
       connection.probeNow();
@@ -556,7 +561,7 @@ function App() {
           data-top-control-lane="true"
         >
           <TopControls
-            assistantCollapsed={assistantCollapsed}
+            notebookToolsOpen={notebookToolsOpen}
             notebookTitle={surface === "editor" ? document.title : undefined}
             notice={notice}
             resolvedTheme={resolvedTheme}
@@ -565,7 +570,7 @@ function App() {
             onCopyDiagnosticExport={copyDiagnosticExport}
             onRenameNotebook={renameNotebookDocument}
             onToggleTheme={toggleThemeMode}
-            onToggleAssistant={() => setAssistantCollapsed((current) => !current)}
+            onToggleNotebookTools={() => setNotebookToolsOpen((current) => !current)}
           />
         </div>
         <div className="min-h-0 flex-1">
@@ -602,7 +607,7 @@ function App() {
               tasks={tasks}
               variables={variables}
               loadState={loadState}
-              assistantCollapsed={assistantCollapsed}
+              notebookToolsOpen={notebookToolsOpen}
               onAddCell={addNotebookCell}
               onAsk={askAssistant}
               onAcceptPendingBlocks={acceptPendingBlocks}
@@ -634,14 +639,14 @@ function App() {
               onToggleReactive={toggleReactive}
             />
         </div>
-        {surface === "curriculum" ? null : (
+        {visibleReconnectVariant ? (
           <ProviderReconnectBar
-            variant={reconnect.variant}
+            variant={visibleReconnectVariant}
             busy={aiConnecting}
             onAction={handleReconnectAction}
             onDismiss={reconnect.dismiss}
           />
-        )}
+        ) : null}
         {terminalOpen && surface !== "curriculum" ? (
           <div className="h-72 min-h-0 shrink-0">
             <TerminalPanel

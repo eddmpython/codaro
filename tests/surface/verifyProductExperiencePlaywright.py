@@ -1708,6 +1708,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "expectMinimalNotebook": True,
             "verifyNotebookExecutionStates": True,
             "verifyNotebookRunAdvance": True,
+            "verifyNotebookTools": True,
         },
         {
             "name": "local-strong-learning-desktop",
@@ -2042,6 +2043,10 @@ async ({ surface, expectedTier }) => {
           rect: visibleRect(element),
         }))
     : [];
+  const visibleProviderReconnectVariants = [
+    ...document.querySelectorAll("[data-provider-reconnect-bar]")
+  ].filter(visible).map((element) => element.getAttribute("data-provider-reconnect-bar"));
+  const notebookToolsToggle = document.querySelector('[data-notebook-tools-toggle="true"]');
   let webProgressLessonCount = 0;
   let webVerifiedPracticeCount = 0;
   let webVerifiedStrongCheckCount = 0;
@@ -2199,7 +2204,11 @@ async ({ surface, expectedTier }) => {
       .filter((editor) => !editorText(editor)).length,
     notebookBrandCount: document.querySelectorAll('[data-notebook-brand="codaro"]').length,
     notebookTitleVisible: Boolean(notebookTitle && inViewport(notebookTitle)),
+    notebookToolsToggleCount: document.querySelectorAll('[data-notebook-tools-toggle="true"]').length,
+    notebookToolsTogglePressed: notebookToolsToggle?.getAttribute("aria-pressed") || null,
+    notebookToolsPanelCount: document.querySelectorAll('[data-notebook-tools-panel="desktop"]').length,
     collapsedSidebarVisibleTextFragments,
+    visibleProviderReconnectVariants,
     visibleNotebookNoticeCount: [...document.querySelectorAll('[data-topbar-status-notice="editor"]')]
       .filter(visible).length,
     notebookTopLaneOverlaps,
@@ -2534,6 +2543,22 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
                 failures.append(
                     f"{name}: background curriculum notice leaked into the free notebook top lane"
                 )
+            if audit["visibleProviderReconnectVariants"]:
+                failures.append(
+                    f"{name}: unrelated reconnect prompt leaked into the default notebook: "
+                    f"{audit['visibleProviderReconnectVariants']}"
+                )
+            if (
+                audit["notebookToolsToggleCount"] != 1
+                or audit["notebookToolsTogglePressed"] != "false"
+                or audit["notebookToolsPanelCount"] != 0
+            ):
+                failures.append(
+                    f"{name}: notebook tools are not quiet by default: "
+                    f"toggle={audit['notebookToolsToggleCount']}, "
+                    f"pressed={audit['notebookToolsTogglePressed']}, "
+                    f"panel={audit['notebookToolsPanelCount']}"
+                )
             if audit["notebookTopLaneOverlaps"]:
                 failures.append(
                     f"{name}: notebook top lane controls overlap: {audit['notebookTopLaneOverlaps']}"
@@ -2781,6 +2806,7 @@ def runBrowserMatrix(
                 webArtifactEvidence: dict[str, Any] | None = None
                 learnSearchEvidence: dict[str, Any] | None = None
                 notebookRunAdvanceVerified = False
+                notebookToolsVerified = False
                 notebookStateEvidence: dict[str, Any] | None = None
                 localCheckTransport = {"aborted": 0, "expectedConsoleErrors": 0, "requests": 0}
                 consoleErrors: list[dict[str, str]] = []
@@ -4083,6 +4109,27 @@ def runBrowserMatrix(
                     screenshotPath = SCREENSHOT_ROOT / colorScheme / f"{case['name']}.png"
                     screenshotPath.parent.mkdir(parents=True, exist_ok=True)
                     page.screenshot(path=str(screenshotPath), full_page=False)
+                    if case.get("verifyNotebookTools"):
+                        notebookToolsToggle = page.locator('[data-notebook-tools-toggle="true"]')
+                        if not notebookToolsToggle.is_visible():
+                            raise AssertionError("notebook tools control is not visible at desktop width")
+                        if notebookToolsToggle.get_attribute("aria-pressed") != "false":
+                            raise AssertionError("notebook tools control did not start closed")
+                        notebookToolsToggle.click()
+                        page.wait_for_selector(
+                            '[data-notebook-tools-panel="desktop"]',
+                            state="visible",
+                            timeout=5_000,
+                        )
+                        if notebookToolsToggle.get_attribute("aria-pressed") != "true":
+                            raise AssertionError("notebook tools control did not expose its open state")
+                        notebookToolsToggle.click()
+                        page.wait_for_selector(
+                            '[data-notebook-tools-panel="desktop"]',
+                            state="detached",
+                            timeout=5_000,
+                        )
+                        notebookToolsVerified = True
                     if case.get("verifyNotebookRunAdvance"):
                         page.get_by_role("button", name="후원·기여").click()
                         page.wait_for_selector('[data-support-dialog="codaro"]', timeout=5_000)
@@ -4212,6 +4259,7 @@ def runBrowserMatrix(
                             "learnSearchEvidence": learnSearchEvidence,
                             "webArtifactEvidence": webArtifactEvidence,
                             "notebookRunAdvanceVerified": notebookRunAdvanceVerified,
+                            "notebookToolsVerified": notebookToolsVerified,
                             "notebookStateEvidence": notebookStateEvidence,
                             "failures": caseFailures,
                             "screenshot": str(screenshotPath.relative_to(ROOT)).replace("\\", "/"),
