@@ -145,6 +145,33 @@ def testLearningHomeAndLessonRenderInstructionalVisualsWithoutRevealControls() -
     assert "all 8 instructional learning-domain visuals must render" in browserGate
 
 
+def testPublicLearningExplorerPersistsFiltersAndLessonVisualFillsItsFrame() -> None:
+    learn = _read("landing/src/pages/learn.jsx")
+    learnStyles = _read("landing/src/styles/learnExplorer.css")
+    lessonStyles = _read("landing/src/styles/lessonAstryx.css")
+    browserGate = _read("tests/surface/verifyProductExperiencePlaywright.py")
+
+    for marker in (
+        "explorerStateFromSearch(search)",
+        "replaceExplorerSearch(resolvedState)",
+        'params.get("q")',
+        'params.set("runtime", "web")',
+        'params.set("path", selectedPath)',
+        'data-learn-search-input="true"',
+        'aria-controls="learn-catalog"',
+        'aria-describedby="learn-result-count"',
+        "event.nativeEvent.isComposing",
+        "onCompositionEnd",
+    ):
+        assert marker in learn
+    assert "scroll-margin-top: 120px;" in learnStyles
+    assert ".lessonProductImage img {" in lessonStyles
+    assert "height: 100%;" in lessonStyles
+    assert "object-fit: cover;" in lessonStyles
+    assert '"verifyLearnSearch": "pandas"' in browserGate
+    assert "Learn search state drifted across reload" in browserGate
+
+
 def testNotebookAutosaveUsesLocaleIndependentActiveCellMarker() -> None:
     notebookPanel = _read("editor/src/components/notebook/notebookPanel.tsx")
     autosaveGate = _read("tests/surface/verifyNotebookAutosavePlaywright.py")
@@ -162,6 +189,7 @@ def testNotebookKeepsMobileTitleAndCollapsesSecondaryCellActions() -> None:
     topBar = _read("editor/src/components/app/topBar.tsx")
     notebookPanel = _read("editor/src/components/notebook/notebookPanel.tsx")
     notebookStyles = _read("editor/src/components/notebook/notebookPanel.css")
+    autosaveGate = _read("tests/surface/verifyNotebookAutosavePlaywright.py")
 
     assert 'left-11 right-[9.5rem]' in topBar
     assert 'data-notebook-title="topbar"' in topBar
@@ -172,6 +200,9 @@ def testNotebookKeepsMobileTitleAndCollapsesSecondaryCellActions() -> None:
     assert ".notebookCodeFrame .cm-content {" in notebookStyles
     assert "min-height: 52px;" in notebookStyles
     assert "padding-right: 104px;" in notebookStyles
+    assert autosaveGate.count('state="attached"') >= 4
+    assert 'page.locator("[data-notebook-cell]").first.hover' in autosaveGate
+    assert 'page.get_by_label("셀 작업 더보기").first.click' in autosaveGate
 
 
 def testAppDelegatesProductSurfaceSelectionPolicy() -> None:

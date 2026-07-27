@@ -466,6 +466,7 @@
 .learnDomainSection {
   padding-block: 56px 64px;
   border-bottom: 1px solid var(--color-border);
+  scroll-margin-top: 120px;
 }
 
 .learnDomainSection:nth-child(even) {

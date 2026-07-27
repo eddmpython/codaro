@@ -170,6 +170,7 @@ def verifyLocalTransitionFlush(playwright, consoleErrors: list[str], pageErrors:
             )
             page.wait_for_selector(
                 '[data-notebook-persistence="saved"][data-notebook-persistence-mode="local"]',
+                state="attached",
                 timeout=20_000,
             )
             waitForFileContent(documentPath, smallMarker)
@@ -203,6 +204,7 @@ def verifyLocalTransitionFlush(playwright, consoleErrors: list[str], pageErrors:
             )
             page.wait_for_selector(
                 '[data-notebook-persistence="saved"][data-notebook-persistence-mode="local"]',
+                state="attached",
                 timeout=20_000,
             )
             waitForFileContent(documentPath, largeMarker)
@@ -444,6 +446,7 @@ def main(argv: list[str] | None = None) -> int:
                 page.locator(".cm-content").first.fill(marker, timeout=20_000)
                 page.wait_for_selector(
                     '[data-notebook-persistence="saved"][data-notebook-persistence-mode="web"]',
+                    state="attached",
                     timeout=20_000,
                 )
                 page.wait_for_function(
@@ -466,9 +469,12 @@ def main(argv: list[str] | None = None) -> int:
                     '[data-notebook-persistence-mode="web"]:not([data-notebook-persistence="error"])',
                     timeout=10_000,
                 )
-                page.get_by_label("셀 삭제").first.click(force=True, timeout=10_000)
+                page.locator("[data-notebook-cell]").first.hover(timeout=10_000)
+                page.get_by_label("셀 작업 더보기").first.click(timeout=10_000)
+                page.get_by_label("셀 삭제").first.click(timeout=10_000)
                 page.wait_for_selector(
                     '[data-notebook-persistence="saved"][data-notebook-persistence-mode="web"]',
+                    state="attached",
                     timeout=20_000,
                 )
                 page.wait_for_function(

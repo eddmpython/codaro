@@ -18,7 +18,7 @@
 | misconception status | catalog 34개가 전부 draft, reviewed/approved 0개 | 제품 진단에 사용 금지, 승인 경로 신설 |
 | unused illustrations | `illustration.py` 21개와 legacy dynamic loader 제거 | `repository-simplification` green |
 | dead landing source | 수기 home body, 미사용 nav/proof 배열, fake product frame HTML·CSS 제거 | `repository-simplification` green |
-| generated drift | lifecycle manifest, predev/prebuild generator, clean command와 Landing/editor resolver ignore policy 구현 | `repository-simplification` green |
+| generated drift | lifecycle manifest, predev/prebuild generator, 명시적 clean command와 Landing/editor resolver ignore policy 구현. 변경 없는 반복 생성은 입력·출력 SHA-256 일치 시 curriculum 472개와 OG image 5개를 재사용 | `repository-simplification` green |
 | monolith | Landing shell/route 7경계, editor type 7도메인, API 6client, curriculum surface 8경계와 markdown 5경계로 분리 | `repository-simplification` module boundary로 재결합 차단 |
 | package drift | 두 앱을 React 19.2.7, TypeScript 6.0.3, lucide 1.25.0, yaml 2.9.0 exact pin으로 맞춤 | compatibility manifest와 두 lockfile 검증 green |
 
@@ -97,6 +97,10 @@
 - `editor/src/lib/generated/visualAssetManifest.ts`
 
 빌드 전에 import graph가 필요하거나 source package에 반드시 포함돼야 하는 generated metadata는 예외 목록과 이유를 `landing/scripts/generatedManifest.json`에 기록한다. 이유 없는 생성물은 커밋하지 않는다.
+
+일반 `predev`와 `prebuild`는 유효한 생성물을 먼저 삭제하지 않는다. curriculum generator는 script, taxonomy, public catalog, lockfile과 472개 YAML의 입력 지문 및 현재 출력 지문이 모두 일치할 때만 기존 모듈을 재사용한다. OG generator도 script, generated post 목록, lockfile과 hero·post image 5개의 출력 hash가 모두 일치할 때만 재사용한다. 입력이나 출력 하나라도 다르면 전체 owner 출력을 다시 만들고, `npm run generated:clean`은 clean checkout 재현과 문제 진단을 위한 명시적 전체 삭제 경로로 유지한다.
+
+동일 작업 트리 측정에서 변경 전 반복 `npm run build`는 66.41초였고 content generation 28.44초, Vite build 23.28초, 556 route prerender 19.95초가 주요 구간이었다. 입력·출력 지문 재사용 적용 뒤 반복 build는 40.22초였으며 curriculum 472개와 OG image 5개를 재사용했다. Vite는 여전히 2,414개 module을 변환하고 556 route를 prerender하므로 남은 약 40초를 노트북 하드웨어 문제만으로 분류하지 않는다.
 
 ## 모듈 분해
 
@@ -182,11 +186,13 @@
 - 신규 `tests/surface/verifyLandingDeadSourceRemoved.py`: `homeBody`, unused nav, fake frame 0건
 - 신규 `tests/assets/verifyUnusedIllustrationsRemoved.py`: unreferenced executable visual source 0건
 - 신규 `tests/surface/verifyGeneratedSourcePolicy.py`: clean build regeneration과 manifest 예외
+- 수정 `tests/surface/verifyGeneratedSourcePolicy.py`: 일반 lifecycle의 선삭제 금지, 명시적 `generated:clean`, 입력·출력 지문 재사용 계약
 - 수정 `tests/architecture/testTransportBoundary.py`: 제거된 prediction/classroom 경계 삭제
 - 수정 `tests/product/verifyProductQualityAudit.py`: strong gate와 current gitHead 요구
 - 실행: `uv run python -X utf8 tests/run.py gate architecture-boundary`
 - 실행: `uv run python -X utf8 tests/run.py gate learning-content`
 - 실행: `uv run python -X utf8 tests/run.py gate landing-build`
+- 실행: `npm run build` 반복 측정 40.22초, 변경 전 66.41초 대비 26.19초 단축
 
 ## 롤백
 

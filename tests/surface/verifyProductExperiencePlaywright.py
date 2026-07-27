@@ -897,6 +897,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "url": f"http://127.0.0.1:{landingPort}/codaro/learn/",
             "viewport": {"width": 1440, "height": 900},
             "surface": "landing-learn",
+            "verifyLearnSearch": "pandas",
         },
         {
             "name": "landing-public-lesson-desktop",
@@ -2752,6 +2753,7 @@ def runBrowserMatrix(
                     )
                 page = context.new_page()
                 webArtifactEvidence: dict[str, Any] | None = None
+                learnSearchEvidence: dict[str, Any] | None = None
                 notebookRunAdvanceVerified = False
                 notebookStateEvidence: dict[str, Any] | None = None
                 localCheckTransport = {"aborted": 0, "expectedConsoleErrors": 0, "requests": 0}
@@ -2847,6 +2849,60 @@ def runBrowserMatrix(
                             homeEntry.wait_for(state="visible", timeout=20_000)
                         homeEntry.first.click(timeout=20_000)
                         page.wait_for_selector('[data-curriculum-home-goals="true"]', timeout=30_000)
+                    if case.get("verifyLearnSearch"):
+                        expectedQuery = str(case["verifyLearnSearch"])
+                        searchInput = page.locator('[data-learn-search-input="true"]')
+                        if searchInput.count() != 1:
+                            raise AssertionError("Learn search input is missing or duplicated")
+                        searchInput.fill(expectedQuery)
+                        page.wait_for_function(
+                            """
+                            (expected) => {
+                              const query = new URL(window.location.href).searchParams.get("q");
+                              return query === expected
+                                && document.querySelectorAll(".learnLessonRow").length > 0;
+                            }
+                            """,
+                            arg=expectedQuery,
+                            timeout=20_000,
+                        )
+                        beforeReload = page.evaluate(
+                            """
+                            () => ({
+                              query: document.querySelector('[data-learn-search-input="true"]')?.value || "",
+                              resultCount: document.querySelector("#learn-result-count")?.textContent?.trim() || "",
+                              rowCount: document.querySelectorAll(".learnLessonRow").length,
+                              search: window.location.search,
+                            })
+                            """
+                        )
+                        page.reload(wait_until="domcontentloaded", timeout=30_000)
+                        page.wait_for_selector("[data-learn-search-input='true']", timeout=20_000)
+                        page.wait_for_function(
+                            """
+                            (expected) => (
+                              document.querySelector('[data-learn-search-input="true"]')?.value === expected
+                              && document.querySelectorAll(".learnLessonRow").length > 0
+                            )
+                            """,
+                            arg=expectedQuery,
+                            timeout=20_000,
+                        )
+                        afterReload = page.evaluate(
+                            """
+                            () => ({
+                              query: document.querySelector('[data-learn-search-input="true"]')?.value || "",
+                              resultCount: document.querySelector("#learn-result-count")?.textContent?.trim() || "",
+                              rowCount: document.querySelectorAll(".learnLessonRow").length,
+                              search: window.location.search,
+                            })
+                            """
+                        )
+                        if beforeReload != afterReload:
+                            raise AssertionError(
+                                f"Learn search state drifted across reload: {beforeReload} != {afterReload}"
+                            )
+                        learnSearchEvidence = afterReload
                     if case.get("scrollTo"):
                         page.locator(case["scrollTo"]).scroll_into_view_if_needed(timeout=20_000)
                     if case.get("expectCanonicalLesson"):
@@ -4026,6 +4082,7 @@ def runBrowserMatrix(
                             "consoleErrors": consoleErrorSnapshot,
                             "httpFailures": httpFailureSnapshot,
                             "assetFailures": assetFailureSnapshot,
+                            "learnSearchEvidence": learnSearchEvidence,
                             "webArtifactEvidence": webArtifactEvidence,
                             "notebookRunAdvanceVerified": notebookRunAdvanceVerified,
                             "notebookStateEvidence": notebookStateEvidence,

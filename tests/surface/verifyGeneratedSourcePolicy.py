@@ -62,9 +62,13 @@ def main() -> int:
     for producer in producers:
         if not (LANDING_ROOT / producer).is_file():
             failures.append(f"generated producer is missing: {producer}")
-    for required in ("cleanGeneratedSource.mjs", "syncVisualAssets.js", "generateContent.js", "generateCurriculum.js"):
+    for required in ("syncVisualAssets.js", "generateContent.js", "generateCurriculum.js", "generateOgImage.js"):
         if required not in scripts.get("content:generate", ""):
             failures.append(f"content lifecycle is missing {required}")
+    if "cleanGeneratedSource.mjs" in scripts.get("content:generate", ""):
+        failures.append("content lifecycle must preserve valid generated outputs for incremental reuse")
+    if scripts.get("generated:clean") != "node scripts/cleanGeneratedSource.mjs":
+        failures.append("generated:clean must retain the explicit full-clean command")
     for lifecycle in ("predev", "prebuild"):
         if scripts.get(lifecycle) != "npm run content:generate":
             failures.append(f"{lifecycle} must invoke content:generate")

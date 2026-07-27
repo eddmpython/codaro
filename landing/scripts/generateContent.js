@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, extname, posix, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { marked } from "marked";
@@ -301,6 +301,7 @@ function toDocsNavPage(page) {
 }
 
 function writeDocsPageModules(pages) {
+  rmSync(generatedDocsPageRoot, { force: true, recursive: true });
   mkdirSync(generatedDocsPageRoot, { recursive: true });
   for (const page of pages) {
     const content = {

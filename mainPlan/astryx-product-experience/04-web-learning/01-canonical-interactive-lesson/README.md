@@ -30,6 +30,8 @@
 - `web-learning`, `learning-method`, hydration, SEO, public claim과 Light/Dark canonical lesson Chromium case가 통과했다.
 - Pages `main@3a18dd97`의 Day 1 canonical URL을 direct cold load해 H1 `헬로월드`, `codaro-runtime-tier=web`, `codaro-lesson-runtime-tier=browser`와 편집 가능한 학습실이 같은 URL에서 복원됨을 확인했다.
 - 실제 배포 화면에서 instructional image, 학습 목표, 첫 editable exercise와 자동 기록 안내가 별도 reveal command 없이 노출됨을 확인했다.
+- 공개 레슨의 4:3 시각 프레임 안에서 16:9 원본 이미지가 고유 높이만 차지해 아래에 빈 면을 남기던 결함을 수정했다. 이미지가 프레임 너비와 높이를 채우고 중앙 기준으로 잘리도록 고정했다.
+- `landing-public`과 `web-learning` 전체 게이트가 연속 통과해 공개 문서, interactive editor, Run, 자동 check, 저장과 reload 복원을 함께 확인했다.
 
 ## 남은 조건
 
@@ -39,6 +41,7 @@
 
 - `landing/scripts/prerenderReact.js`: 472개 lesson의 semantic SSR body와 같은 URL의 interactive editor shell 생성
 - `landing/src/pages/lesson.jsx`: public lesson metadata와 non-JavaScript 읽기 surface
+- `landing/src/styles/lessonAstryx.css`: instructional image의 4:3 프레임 채움과 중앙 crop
 - `landing/src/lib/curriculumLessons.js`, `landing/src/lib/generated/curriculum.js`: canonical `LessonRef`와 lesson payload
 - `editor/src/lib/runRouteState.ts`: pathname에서 lesson identity와 path·section·runtime tier 복원
 - `editor/src/App.tsx`, `editor/src/components/app/currentLearningSurface.tsx`: canonical lesson URL에서 학습 surface hydrate
@@ -55,7 +58,7 @@
 ## 테스트
 
 - `uv run python -X utf8 tests/learning/verifyWebLearningRoutes.py`: 472 canonical route, lazy payload, sitemap, search identity 일치
-- `uv run python -X utf8 tests/run.py gate landing-public`: canonical, JSON-LD, semantic body, hydration과 direct cold load 대표 case
+- `uv run python -X utf8 tests/run.py gate landing-public`: canonical, JSON-LD, semantic body, hydration, direct cold load와 instructional image 프레임 대표 case
 - `uv run python -X utf8 tests/run.py gate web-learning`: code 수정, Run, output, automatic check와 reload resume
 - `uv run python -X utf8 tests/run.py gate learning-method`: 실행 뒤 별도 check·hint reveal·다음 section open command 0개
 - `uv run python -X utf8 tests/product/verifyAstryxJourneyAudit.py`: Web lesson mobile과 public lesson desktop의 금지 control·image proof

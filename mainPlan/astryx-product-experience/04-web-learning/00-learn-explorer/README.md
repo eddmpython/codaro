@@ -29,15 +29,18 @@
 - Light/Dark Landing Learn desktop/mobile Chromium case와 `landing-public` 계약이 통과했다.
 - Pages `main@3a18dd97`의 `/learn/` direct load에서 Web 310, Local 162, 전체 472와 이어하기, 검색, 결과 경로가 실제 배포물에 표시됨을 확인했다.
 - 390x844 공개 화면에서 제목, 이어하기, 검색, 첫 결과 경로가 한 흐름에 보이고 horizontal overflow가 0임을 확인했다.
+- 검색어, runtime, 결과 경로를 `q`, `runtime`, `path` query로 보존하고 direct URL과 reload에서 같은 explorer 상태를 복원한다. 기존의 다른 query와 hash는 유지한다.
+- Chromium에서 `pandas` 검색 결과 17개와 URL `?q=pandas`를 확인하고 reload 뒤 검색어, 결과 수, 행 수가 모두 같은지 `landing-public` 회귀로 검증했다.
+- 한국어 조합 입력 중에는 URL을 갱신하지 않고 composition 종료 뒤 한 번 반영하며 검색 입력과 결과 목록, 결과 수를 접근성 속성으로 연결했다.
 
 ## 남은 조건
 
-- 실제 검색 유입과 keyboard, screen reader, 한국어 IME 수동 검수
+- 실제 검색 유입과 keyboard, screen reader, 한국어 IME 수동 검수. composition event와 상태 복원은 자동 검증했지만 실제 입력기와 보조 기술의 사람 검수는 포함하지 않는다.
 - 결과 경로별 사람 콘텐츠 검수
 
 ## 영향 파일
 
-- `landing/src/pages/learn.jsx`: 이어하기, 검색, 여섯 결과 경로, 추천·검색 lesson row
+- `landing/src/pages/learn.jsx`: 이어하기, 검색, 여섯 결과 경로, 추천·검색 lesson row, URL 상태 복원과 composition 처리
 - `landing/src/styles/learnExplorer.css`: public learning density와 desktop/mobile layout
 - `landing/src/lib/curriculumLessons.js`, `landing/src/lib/generated/curriculum.js`: 472개 lesson과 runtime·outcome metadata
 - `landing/src/lib/visualAssets.js`, `assets/brand/visuals/manifest.json`: 결과 경로별 instructional image resolution
@@ -55,7 +58,7 @@
 ## 테스트
 
 - `uv run python -X utf8 tests/learning/verifyWebLearningRoutes.py`: contract, generated, prerender, sitemap, search lesson 각 472개와 Web 310·Local 162 분류
-- `uv run python -X utf8 tests/run.py gate landing-public`: 390x844·1440x900 Learn, 초기 lesson row 3개, image·overflow·link 감사
+- `uv run python -X utf8 tests/run.py gate landing-public`: 390x844·1440x900 Learn, 초기 lesson row 3개, image·overflow·link 감사와 `pandas` 검색 URL·reload 복원
 - `uv run python -X utf8 tests/run.py gate web-learning`: Learn에서 canonical lesson으로 이어지는 대표 Chromium 여정
 - `uv run python -X utf8 tests/product/verifyAstryxJourneyAudit.py`: public Learn과 Web learning home의 공용 Astryx·금지 control 계약
 - 실제 검색 유입, keyboard, screen reader, 한국어 IME와 경로별 사람 콘텐츠 품질은 이 machine evidence에 포함되지 않는다.
@@ -70,8 +73,8 @@
 
 ### 개발자 관점
 
-- catalog identity와 UI filter를 분리하고 초기 3개, 검색 최대 30개로 DOM 비용을 제한했다.
-- route·responsive Chromium 검증은 green이지만 keyboard, IME, screen reader 수동 검증은 남아 있다.
+- catalog identity와 UI filter를 분리하고 초기 3개, 검색 최대 30개로 DOM 비용을 제한했다. explorer 선택은 URL에 남아 공유와 새로고침에서 복원된다.
+- route·responsive Chromium과 composition source 계약은 green이지만 실제 keyboard, IME, screen reader 수동 검증은 남아 있다.
 
 ### PM 관점
 

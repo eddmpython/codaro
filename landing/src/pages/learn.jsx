@@ -138,11 +138,47 @@ function pathFilterFromSearch(search) {
   return guidedPaths.some((item) => item.pathId === pathId) ? pathId : "all";
 }
 
+function explorerStateFromSearch(search) {
+  const params = new URLSearchParams(search);
+  const runtimeParam = params.get("runtime");
+  return {
+    query: params.get("q") || "",
+    runtime: runtimeParam === "web" || runtimeParam === "browser"
+      ? "browser"
+      : runtimeParam === "local"
+        ? "local"
+        : "all",
+    selectedPath: pathFilterFromSearch(search),
+  };
+}
+
+function replaceExplorerSearch({ query, runtime, selectedPath }) {
+  if (typeof window === "undefined") return;
+  const params = new URLSearchParams(window.location.search);
+  const normalizedQuery = query.trim();
+
+  if (normalizedQuery) params.set("q", normalizedQuery);
+  else params.delete("q");
+
+  if (runtime === "browser") params.set("runtime", "web");
+  else if (runtime === "local") params.set("runtime", "local");
+  else params.delete("runtime");
+
+  if (selectedPath !== "all") params.set("path", selectedPath);
+  else params.delete("path");
+
+  const nextSearch = params.toString();
+  const nextUrl = `${window.location.pathname}${nextSearch ? `?${nextSearch}` : ""}${window.location.hash}`;
+  const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  if (nextUrl !== currentUrl) window.history.replaceState(window.history.state, "", nextUrl);
+}
+
 export function LearnPage({ search = "" }) {
   const firstPublicLesson = curriculumLessons.find((lesson) => lesson.runtimeTier === "browser") || curriculumLessons[0];
-  const [query, setQuery] = useState("");
-  const [runtime, setRuntime] = useState("all");
-  const [selectedPath, setSelectedPath] = useState("all");
+  const initialExplorerState = explorerStateFromSearch(search);
+  const [query, setQuery] = useState(initialExplorerState.query);
+  const [runtime, setRuntime] = useState(initialExplorerState.runtime);
+  const [selectedPath, setSelectedPath] = useState(initialExplorerState.selectedPath);
   const [resumeLesson, setResumeLesson] = useState(null);
 
   const matchingLessons = useMemo(() => {
@@ -166,7 +202,10 @@ export function LearnPage({ search = "" }) {
   );
 
   useBrowserLayoutEffect(() => {
-    setSelectedPath(pathFilterFromSearch(search));
+    const nextState = explorerStateFromSearch(search);
+    setQuery(nextState.query);
+    setRuntime(nextState.runtime);
+    setSelectedPath(nextState.selectedPath);
   }, [search]);
 
   useEffect(() => {
@@ -177,6 +216,19 @@ export function LearnPage({ search = "" }) {
       setResumeLesson(null);
     }
   }, []);
+
+  function updateExplorer(nextState) {
+    const resolvedState = {
+      query,
+      runtime,
+      selectedPath,
+      ...nextState,
+    };
+    if (Object.hasOwn(nextState, "query")) setQuery(resolvedState.query);
+    if (Object.hasOwn(nextState, "runtime")) setRuntime(resolvedState.runtime);
+    if (Object.hasOwn(nextState, "selectedPath")) setSelectedPath(resolvedState.selectedPath);
+    replaceExplorerSearch(resolvedState);
+  }
 
   return (
     <main className="homeAstryx learnPage learnStudio">
@@ -231,10 +283,20 @@ export function LearnPage({ search = "" }) {
             <label>
               <span>레슨 검색</span>
               <input
+                aria-controls="learn-catalog"
+                aria-describedby="learn-result-count"
+                autoComplete="off"
+                data-learn-search-input="true"
+                enterKeyHint="search"
                 type="search"
                 value={query}
                 placeholder="예: pandas 보고서, 파일 정리"
-                onChange={(event) => setQuery(event.currentTarget.value)}
+                onChange={(event) => {
+                  const nextQuery = event.currentTarget.value;
+                  setQuery(nextQuery);
+                  if (!event.nativeEvent.isComposing) updateExplorer({ query: nextQuery });
+                }}
+                onCompositionEnd={(event) => updateExplorer({ query: event.currentTarget.value })}
               />
             </label>
             <span className="learnSearchHint">제목 · 결과 · 주제 검색</span>
@@ -294,7 +356,7 @@ export function LearnPage({ search = "" }) {
                   aria-pressed={runtime === value}
                   key={value}
                   type="button"
-                  onClick={() => setRuntime(value)}
+                  onClick={() => updateExplorer({ runtime: value })}
                 >
                   {label}
                 </button>
@@ -302,13 +364,21 @@ export function LearnPage({ search = "" }) {
             </fieldset>
             <label className="learnPathSelect">
               <span>목표 경로</span>
-              <select value={selectedPath} onChange={(event) => setSelectedPath(event.currentTarget.value)}>
+              <select
+                value={selectedPath}
+                onChange={(event) => updateExplorer({ selectedPath: event.currentTarget.value })}
+              >
                 <option value="all">모든 목표</option>
                 {guidedPaths.map((item) => <option value={item.pathId} key={item.pathId}>{item.label}</option>)}
               </select>
             </label>
           </div>
-          <p className="learnResultCount" aria-live="polite" data-route-query-sensitive="true">
+          <p
+            className="learnResultCount"
+            id="learn-result-count"
+            aria-live="polite"
+            data-route-query-sensitive="true"
+          >
             {discoveryActive
               ? `${matchingLessons.length}개 중 ${visibleLessons.length}개 표시`
               : `추천 시작점 ${visibleLessons.length}개`}
@@ -330,7 +400,7 @@ export function LearnPage({ search = "" }) {
         </div>
       </nav>
 
-      <div className="learnCatalog" data-route-query-sensitive="true">
+      <div className="learnCatalog" id="learn-catalog" data-route-query-sensitive="true">
         {curriculumTree.map((domain, domainIndex) => {
           const lessons = domain.tracks
             .flatMap((track) => track.lessons)

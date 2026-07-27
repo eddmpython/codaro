@@ -1,12 +1,36 @@
 import { Resvg } from "@resvg/resvg-js";
-import { mkdirSync, writeFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { createHash } from "node:crypto";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const SCRIPT_PATH = fileURLToPath(import.meta.url);
+const __dirname = dirname(SCRIPT_PATH);
 const landingRoot = resolve(__dirname, "..");
+const projectRoot = resolve(landingRoot, "..");
 const ogRoot = resolve(landingRoot, "static", "brand");
 const ogPostsRoot = resolve(landingRoot, "static", "brand", "og");
+const cachePath = resolve(landingRoot, "node_modules", ".cache", "codaro", "og-image-generation.json");
+const postsModulePath = resolve(landingRoot, "src", "lib", "generated", "posts.js");
+const { posts } = await import(pathToFileURL(postsModulePath));
+const expectedOutputs = [
+  resolve(ogRoot, "codaro-og.png"),
+  ...posts.map((post) => resolve(ogPostsRoot, `${post.slug}.png`)),
+];
+const inputFingerprint = fingerprintFiles([
+  SCRIPT_PATH,
+  postsModulePath,
+  resolve(landingRoot, "package-lock.json"),
+]);
+const cachedGeneration = readJson(cachePath);
+if (
+  cachedGeneration?.schemaVersion === 1
+  && cachedGeneration.inputFingerprint === inputFingerprint
+  && cachedGeneration.outputFingerprint === fingerprintFiles(expectedOutputs)
+) {
+  console.log(`[og-image] reused ${expectedOutputs.length} images`);
+  process.exit(0);
+}
 
 const fontStack = "'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR','Inter','Segoe UI',system-ui,-apple-system,sans-serif";
 const monoStack = "'JetBrains Mono','Fira Code',Consolas,monospace";
@@ -179,6 +203,7 @@ function rasterize(svg) {
 }
 
 mkdirSync(ogRoot, { recursive: true });
+rmSync(ogPostsRoot, { force: true, recursive: true });
 mkdirSync(ogPostsRoot, { recursive: true });
 
 const heroPng = rasterize(renderHeroSvg());
@@ -186,8 +211,6 @@ const heroPath = resolve(ogRoot, "codaro-og.png");
 writeFileSync(heroPath, heroPng);
 console.log(`[og-image] hero ${heroPath} (${heroPng.length} bytes)`);
 
-const postsModulePath = resolve(landingRoot, "src", "lib", "generated", "posts.js");
-const { posts } = await import(pathToFileURL(postsModulePath));
 for (const post of posts) {
   const svg = renderSvg({
     kicker: post.categoryLabel ? `CODARO · ${post.categoryLabel.toUpperCase()}` : "CODARO · WRITING",
@@ -201,4 +224,31 @@ for (const post of posts) {
   console.log(`[og-image] post ${post.slug} (${png.length} bytes)`);
 }
 
+mkdirSync(dirname(cachePath), { recursive: true });
+writeFileSync(cachePath, JSON.stringify({
+  schemaVersion: 1,
+  inputFingerprint,
+  outputFingerprint: fingerprintFiles(expectedOutputs),
+}));
 console.log(`[og-image] generated ${1 + posts.length} images`);
+
+function fingerprintFiles(paths) {
+  if (!paths.length || paths.some((path) => !existsSync(path))) return "";
+  const hash = createHash("sha256");
+  for (const path of [...new Set(paths)].sort()) {
+    hash.update(relative(projectRoot, path).replaceAll("\\", "/"));
+    hash.update("\0");
+    hash.update(readFileSync(path));
+    hash.update("\0");
+  }
+  return hash.digest("hex");
+}
+
+function readJson(path) {
+  if (!existsSync(path)) return null;
+  try {
+    return JSON.parse(readFileSync(path, "utf8"));
+  } catch {
+    return null;
+  }
+}

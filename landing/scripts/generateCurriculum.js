@@ -1,17 +1,21 @@
 // generateCurriculum.js - 커리큘럼 SSOT(../../curricula/python)를 읽어
 // 랜딩 학습 페이지용 인덱스(src/lib/generated/curriculum.js)를 생성한다.
 // docsNav/posts 생성기와 같은 패턴. 빌드 prebuild 단계에서 돈다.
+import { createHash } from "node:crypto";
 import { basename, dirname, extname, resolve, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { parse as parseYaml } from "yaml";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const SCRIPT_PATH = fileURLToPath(import.meta.url);
+const __dirname = dirname(SCRIPT_PATH);
+const PROJECT_ROOT = resolve(__dirname, "../..");
 const CURRICULA = resolve(__dirname, "../../curricula/python");
 const TAXONOMY = resolve(CURRICULA, "_taxonomy.yml");
 const PUBLIC_LEARNING_CATALOG = resolve(__dirname, "../../contracts/publicLearningCatalog.json");
 const OUT = resolve(__dirname, "../src/lib/generated/curriculum.js");
 const LESSON_OUT = resolve(__dirname, "../src/lib/generated/curriculumLessons");
+const CACHE_PATH = resolve(__dirname, "../node_modules/.cache/codaro/curriculum-generation.json");
 const RETRYABLE_WRITE_CODES = new Set(["EACCES", "EBUSY", "EPERM", "UNKNOWN"]);
 
 function sleepSync(milliseconds) {
@@ -67,6 +71,24 @@ function domainOf(fileRel) {
 }
 
 const files = existsSync(CURRICULA) ? walkYaml(CURRICULA) : [];
+const inputFingerprint = fingerprintFiles([
+  SCRIPT_PATH,
+  TAXONOMY,
+  PUBLIC_LEARNING_CATALOG,
+  resolve(__dirname, "../package-lock.json"),
+  ...files,
+]);
+const cachedGeneration = readJson(CACHE_PATH);
+const existingOutputs = curriculumOutputFiles();
+if (
+  cachedGeneration?.schemaVersion === 1
+  && cachedGeneration.inputFingerprint === inputFingerprint
+  && existingOutputs.length === Number(cachedGeneration.outputCount)
+  && cachedGeneration.outputFingerprint === fingerprintFiles(existingOutputs)
+) {
+  console.log(`[curriculum] reused ${existingOutputs.length - 1} lesson modules`);
+  process.exit(0);
+}
 const contentContracts = loadContentContracts(PUBLIC_LEARNING_CATALOG);
 const taxonomy = parseYaml(readFileSync(TAXONOMY, "utf8"));
 const lessonOutcomeBackfill = taxonomy?.lessonOutcomes && typeof taxonomy.lessonOutcomes === "object"
@@ -182,6 +204,14 @@ writeGeneratedFile(
   OUT,
   `${banner}\nexport const curriculumTree = ${JSON.stringify(tree, null, 2)};\nexport const curriculumLessons = curriculumTree.flatMap((domain) => domain.tracks.flatMap((track) => track.lessons.map((lesson) => ({ ...lesson, domain: domain.domain, domainLabel: domain.label }))));\nexport const curriculumRuntimeCounts = ${JSON.stringify(runtimeCounts)};\nexport const curriculumLessonCount = ${lessonCount};\n`,
 );
+const generatedOutputs = curriculumOutputFiles();
+mkdirSync(dirname(CACHE_PATH), { recursive: true });
+writeFileSync(CACHE_PATH, JSON.stringify({
+  schemaVersion: 1,
+  inputFingerprint,
+  outputCount: generatedOutputs.length,
+  outputFingerprint: fingerprintFiles(generatedOutputs),
+}));
 console.log(`[curriculum] domains=${tree.length} lessons=${lessonCount} -> ${relative(resolve(__dirname, ".."), OUT)}`);
 
 function compactSection(value, index) {
@@ -241,4 +271,33 @@ function loadContentContracts(path) {
     contracts.set(lessonRef, { checkSpecId, eligiblePathIds, runtimeTier });
   }
   return contracts;
+}
+
+function curriculumOutputFiles() {
+  if (!existsSync(OUT) || !existsSync(LESSON_OUT)) return [];
+  const lessonFiles = readdirSync(LESSON_OUT, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".js"))
+    .map((entry) => resolve(LESSON_OUT, entry.name));
+  return [OUT, ...lessonFiles].sort();
+}
+
+function fingerprintFiles(paths) {
+  if (!paths.length || paths.some((path) => !existsSync(path))) return "";
+  const hash = createHash("sha256");
+  for (const path of [...new Set(paths)].sort()) {
+    hash.update(relative(PROJECT_ROOT, path).replaceAll("\\", "/"));
+    hash.update("\0");
+    hash.update(readFileSync(path));
+    hash.update("\0");
+  }
+  return hash.digest("hex");
+}
+
+function readJson(path) {
+  if (!existsSync(path)) return null;
+  try {
+    return JSON.parse(readFileSync(path, "utf8"));
+  } catch {
+    return null;
+  }
 }
