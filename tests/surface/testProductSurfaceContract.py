@@ -195,6 +195,7 @@ def testNotebookKeepsMobileTitleAndCollapsesSecondaryCellActions() -> None:
     topBar = _read("editor/src/components/app/topBar.tsx")
     notebookPanel = _read("editor/src/components/notebook/notebookPanel.tsx")
     notebookStyles = _read("editor/src/components/notebook/notebookPanel.css")
+    sidebar = _read("editor/src/components/ui/sidebar.tsx")
     curriculumSelection = _read("editor/src/lib/curriculumSelection.ts")
     autosaveGate = _read("tests/surface/verifyNotebookAutosavePlaywright.py")
     productGate = _read("tests/surface/verifyProductExperiencePlaywright.py")
@@ -204,6 +205,10 @@ def testNotebookKeepsMobileTitleAndCollapsesSecondaryCellActions() -> None:
     assert 'className="absolute left-11 top-1/2 z-20 hidden' in topBar
     assert 'surface === "editor" && "sm:hidden"' not in topBar
     assert 'data-notebook-title="topbar"' in topBar
+    assert "group-data-[collapsible=icon]:[&>span]:hidden" in sidebar
+    assert 'const accessibleName = props["aria-label"]' in sidebar
+    assert 'typeof tooltip === "string" ? tooltip' in sidebar
+    assert "collapsedSidebarVisibleTextFragments" in productGate
     assert 'data-notebook-cell-menu="true"' in notebookPanel
     assert 'aria-label="셀 작업 더보기"' in notebookPanel
     assert 'role="button"' in notebookPanel

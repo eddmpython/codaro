@@ -32,7 +32,7 @@ Local을 웹의 큰 버전이 아니라 실제 파일, 패키지, terminal, sche
 | `1024~1439` | resume와 operation을 2행 band | secondary nav 64px, task list 280px, detail, inspector push drawer | detail primary scroll, drawer close 후 trigger focus |
 | `900~1023` | single main column, operation strip horizontal scan | task list와 detail 2 pane, inspector bottom sheet | E-Stop sticky, sheet focus trap/return |
 
-Local desktop의 실제 지원 minimum은 launcher와 같은 `900x640`이다. `<900` component fixture는 overflow 회귀를 찾는 개발 도구일 뿐 제품 지원 viewport가 아니다. Local gate는 simulated browser resize로 통과할 수 없고 실제 WebView2 900x640·1024x768·1440x900에서 Home, Notebook, Automation, inspector를 검증한다.
+Local desktop의 실제 지원 minimum은 launcher와 같은 `900x640`이다. `<900` component fixture는 overflow 회귀를 찾는 개발 도구일 뿐 제품 지원 viewport가 아니다. Local gate는 simulated browser resize로 통과할 수 없고 실제 WebView2 900x640·1024x768·1440x900에서 Home, Notebook, Automation, inspector를 검증한다. Notebook의 접힌 48px 제품 레일은 아이콘만 렌더하고 잘린 라벨·`베타` 배지 fragment 0을 요구하며, 툴팁 기반 `aria-label`로 메뉴 이름을 보존한다.
 
 empty, loading, permissionRequired, paused, scheduled, running, succeeded, failed, cancelled, runtimeDisconnected를 fixture로 고정한다. 실패와 E-Stop은 색만으로 구분하지 않는다.
 

@@ -354,6 +354,22 @@ def verify_surface_case(
           const social = [...document.querySelectorAll("[data-social-link-id]")]
             .filter(visible)
             .map((element) => element.getAttribute("data-social-link-id"));
+          const collapsedSidebarVisibleTextFragments = document.querySelector(
+            '[data-slot="sidebar"][data-state="collapsed"]'
+          )
+            ? [...document.querySelectorAll('[data-sidebar="menu-button"] > span')]
+                .filter(visible)
+                .map((element) => {
+                  const rect = element.getBoundingClientRect();
+                  return {
+                    text: (element.textContent || "").replace(/\\s+/g, " ").trim(),
+                    left: rect.left,
+                    right: rect.right,
+                    top: rect.top,
+                    bottom: rect.bottom,
+                  };
+                })
+            : [];
           const controls = [...document.querySelectorAll("[data-topbar-controls] button, [data-topbar-controls] a")]
             .filter(visible)
             .map((element) => {
@@ -393,6 +409,7 @@ def verify_surface_case(
               .some((element) => visible(element) && /모드로/.test(element.getAttribute("aria-label") || "")),
             socialOrder: social,
             socialMatches: JSON.stringify(social) === JSON.stringify(expectedSocialOrder),
+            collapsedSidebarVisibleTextFragments,
             controlOverlaps: overlaps,
             readySurfaceVisible: [...document.querySelectorAll(
               surface === "home"
@@ -419,6 +436,10 @@ def verify_surface_case(
         "horizontalOverflow": snapshot["horizontalOverflow"] == 0,
         "themeToggle": bool(snapshot["themeToggleVisible"]),
         "socialOrder": bool(snapshot["socialMatches"]),
+        "collapsedSidebarClean": (
+            surface != "editor"
+            or not snapshot["collapsedSidebarVisibleTextFragments"]
+        ),
         "controlOverlap": not snapshot["controlOverlaps"],
         "surfaceVisible": bool(snapshot["readySurfaceVisible"]),
     }

@@ -2032,6 +2032,16 @@ async ({ surface, expectedTier }) => {
       }
     }
   }
+  const collapsedSidebarVisibleTextFragments = document.querySelector(
+    '[data-slot="sidebar"][data-state="collapsed"]'
+  )
+    ? [...document.querySelectorAll('[data-sidebar="menu-button"] > span')]
+        .filter((element) => visibleRect(element))
+        .map((element) => ({
+          text: (element.textContent || "").replace(/\\s+/g, " ").trim(),
+          rect: visibleRect(element),
+        }))
+    : [];
   let webProgressLessonCount = 0;
   let webVerifiedPracticeCount = 0;
   let webVerifiedStrongCheckCount = 0;
@@ -2189,6 +2199,7 @@ async ({ surface, expectedTier }) => {
       .filter((editor) => !editorText(editor)).length,
     notebookBrandCount: document.querySelectorAll('[data-notebook-brand="codaro"]').length,
     notebookTitleVisible: Boolean(notebookTitle && inViewport(notebookTitle)),
+    collapsedSidebarVisibleTextFragments,
     visibleNotebookNoticeCount: [...document.querySelectorAll('[data-topbar-status-notice="editor"]')]
       .filter(visible).length,
     notebookTopLaneOverlaps,
@@ -2514,6 +2525,11 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
                 )
             if audit["notebookBrandCount"] != 1:
                 failures.append(f"{name}: Codaro notebook identity is missing from the top lane")
+            if audit["collapsedSidebarVisibleTextFragments"]:
+                failures.append(
+                    f"{name}: collapsed sidebar leaked clipped labels or badges: "
+                    f"{audit['collapsedSidebarVisibleTextFragments']}"
+                )
             if audit["visibleNotebookNoticeCount"]:
                 failures.append(
                     f"{name}: background curriculum notice leaked into the free notebook top lane"
