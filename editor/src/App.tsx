@@ -556,7 +556,7 @@ function App() {
             notebookTitle={surface === "editor" ? document.title : undefined}
             notice={notice}
             resolvedTheme={resolvedTheme}
-            showSidebarTrigger={surface !== "editor"}
+            showSidebarTrigger
             surface={surface}
             onCopyDiagnosticExport={copyDiagnosticExport}
             onRenameNotebook={renameNotebookDocument}

@@ -56,7 +56,13 @@ export function TopControls({
   return (
     <>
       {showSidebarTrigger ? (
-        <div className="absolute left-1.5 top-1.5 z-30">
+        <div
+          className={cn(
+            "absolute left-1.5 top-1.5 z-30",
+            surface === "editor" && "sm:hidden",
+          )}
+          data-topbar-sidebar-trigger={surface}
+        >
           <SidebarTrigger />
         </div>
       ) : null}
