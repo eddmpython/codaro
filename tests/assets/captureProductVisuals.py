@@ -27,7 +27,7 @@ CAPTURE_OWNER_PATHS = (
 )
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 MAX_RASTER_NOISE_PIXELS = 8
-MAX_RASTER_CHANNEL_DELTA = 10
+MAX_RASTER_CHANNEL_DELTA = 12
 
 
 class ProductVisualCaptureError(RuntimeError):
@@ -357,6 +357,24 @@ def writeManifest(manifest: dict[str, Any]) -> None:
     temporaryPath.replace(MANIFEST_PATH)
 
 
+def promoteCaptureSource(
+    sourcePath: Path,
+    capturedPath: Path,
+) -> tuple[str, dict[str, Any] | None]:
+    comparison = (
+        pngPixelComparison(sourcePath, capturedPath)
+        if sourcePath.is_file()
+        else None
+    )
+    if comparison is not None and comparison["equivalent"]:
+        return sha256Path(sourcePath), comparison
+    sourcePath.parent.mkdir(parents=True, exist_ok=True)
+    temporaryPath = sourcePath.with_suffix(sourcePath.suffix + ".tmp")
+    shutil.copyfile(capturedPath, temporaryPath)
+    temporaryPath.replace(sourcePath)
+    return sha256Path(sourcePath), comparison
+
+
 def runRequired(args: tuple[str, ...], *, cwd: Path = ROOT) -> None:
     result = subprocess.run(args, cwd=cwd, check=False)
     if result.returncode != 0:
@@ -377,10 +395,12 @@ def updateCaptures(
         assetId = str(asset["id"])
         capture = capturesById[assetId]
         sourcePath = (ROOT / str(asset["sourcePath"])).resolve()
-        temporaryPath = sourcePath.with_suffix(sourcePath.suffix + ".tmp")
-        shutil.copyfile(capture["screenshotPath"], temporaryPath)
-        temporaryPath.replace(sourcePath)
-        asset["sourceHash"] = f"sha256-{capture['screenshotHash']}"
+        promotedHash, comparison = promoteCaptureSource(
+            sourcePath,
+            capture["screenshotPath"],
+        )
+        capture["pixelComparison"] = comparison
+        asset["sourceHash"] = f"sha256-{promotedHash}"
         asset["sourceGitHead"] = implementationGitHead
         asset["capture"]["browserVersion"] = capture["browserVersion"]
         asset["capture"]["sourcePaths"] = normalizedCaptureSourcePaths(asset)

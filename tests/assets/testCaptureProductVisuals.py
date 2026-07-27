@@ -125,6 +125,42 @@ class CaptureProductVisualsTest(unittest.TestCase):
                 )["equivalent"]
             )
 
+    def testEquivalentCaptureNoiseDoesNotReplaceCanonicalSource(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="codaro-product-promotion-") as directory:
+            root = Path(directory)
+            sourcePath = root / "canonical.png"
+            equivalentPath = root / "equivalent.png"
+            changedPath = root / "changed.png"
+            source = Image.new("RGBA", (10, 10), (20, 21, 24, 255))
+            source.save(sourcePath)
+            sourceBytes = sourcePath.read_bytes()
+
+            equivalent = source.copy()
+            equivalent.putpixel(
+                (0, 0),
+                (20 + CAPTURE_TOOL.MAX_RASTER_CHANNEL_DELTA, 21, 24, 255),
+            )
+            equivalent.save(equivalentPath)
+            promotedHash, comparison = CAPTURE_TOOL.promoteCaptureSource(
+                sourcePath,
+                equivalentPath,
+            )
+            self.assertTrue(comparison["equivalent"])
+            self.assertEqual(sourcePath.read_bytes(), sourceBytes)
+            self.assertEqual(promotedHash, CAPTURE_TOOL.sha256Path(sourcePath))
+
+            changed = source.copy()
+            for x in range(CAPTURE_TOOL.MAX_RASTER_NOISE_PIXELS + 1):
+                changed.putpixel((x, 0), (100, 21, 24, 255))
+            changed.save(changedPath)
+            promotedHash, comparison = CAPTURE_TOOL.promoteCaptureSource(
+                sourcePath,
+                changedPath,
+            )
+            self.assertFalse(comparison["equivalent"])
+            self.assertEqual(sourcePath.read_bytes(), changedPath.read_bytes())
+            self.assertEqual(promotedHash, CAPTURE_TOOL.sha256Path(changedPath))
+
     def testLocalAutomationFixtureHasStableIdsTimesAndBytes(self) -> None:
         with tempfile.TemporaryDirectory(prefix="codaro-automation-fixture-a-") as first:
             with tempfile.TemporaryDirectory(prefix="codaro-automation-fixture-b-") as second:
