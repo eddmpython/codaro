@@ -12,6 +12,7 @@
 - 결과 경로마다 완성 결과, Web과 Local 범위, 첫 레슨 표시
 - 기본 DOM에는 추천 시작점만 렌더
 - 검색과 필터 결과는 최대 30개까지 렌더
+- 검색 또는 필터가 활성화되면 결과 경로와 도메인 탐색보다 일치 레슨을 먼저 렌더
 - 레슨 행에서 시간, 결과, runtime, 강한 검증 가능 여부 표시
 
 ## 종료 조건
@@ -31,6 +32,9 @@
 - 390x844 공개 화면에서 제목, 이어하기, 검색, 첫 결과 경로가 한 흐름에 보이고 horizontal overflow가 0임을 확인했다.
 - 검색어, runtime, 결과 경로를 `q`, `runtime`, `path` query로 보존하고 direct URL과 reload에서 같은 explorer 상태를 복원한다. 기존의 다른 query와 hash는 유지한다.
 - Chromium에서 `pandas` 검색 결과 17개와 URL `?q=pandas`를 확인하고 reload 뒤 검색어, 결과 수, 행 수가 모두 같은지 `landing-public` 회귀로 검증했다.
+- 검색 또는 필터가 활성화되면 여섯 결과 경로와 도메인 탭을 숨기고 compact filter 바로 아래에 일치 레슨을 평면 목록으로 배치한다. 기본 상태의 여섯 결과 경로와 추천 레슨 구조는 유지한다.
+- `pandas` 검색에서 1440x900과 390x844 모두 첫 일치 레슨이 같은 viewport 안에 들어온다. 모바일 검색 중에는 이어하기 카드를 접어 현재 첫 레슨 146px를 노출하며, 최소 96px와 horizontal overflow 0을 Chromium 회귀가 직접 검증한다.
+- query hydration이 지연된 `?path=dataReporting` direct load에서 추천 경로와 필터를 route query guard에 연결해 CLS를 0.2511에서 0.0으로 낮췄다.
 - 한국어 조합 입력 중에는 URL을 갱신하지 않고 composition 종료 뒤 한 번 반영하며 검색 입력과 결과 목록, 결과 수를 접근성 속성으로 연결했다.
 
 ## 남은 조건
@@ -40,7 +44,7 @@
 
 ## 영향 파일
 
-- `landing/src/pages/learn.jsx`: 이어하기, 검색, 여섯 결과 경로, 추천·검색 lesson row, URL 상태 복원과 composition 처리
+- `landing/src/pages/learn.jsx`: 이어하기, 검색, 여섯 결과 경로, 검색 우선 lesson row, URL 상태 복원과 composition 처리
 - `landing/src/styles/learnExplorer.css`: public learning density와 desktop/mobile layout
 - `landing/src/lib/curriculumLessons.js`, `landing/src/lib/generated/curriculum.js`: 472개 lesson과 runtime·outcome metadata
 - `landing/src/lib/visualAssets.js`, `assets/brand/visuals/manifest.json`: 결과 경로별 instructional image resolution
@@ -50,6 +54,7 @@
 ## 영향 함수·심볼
 
 - `LearnPage`
+- `LessonRow`
 - `pathDefinitions`, `guidedPaths`, `featuredLessons`
 - `lessonHref`, `interactiveLessonHref`, `trackLabel`
 - `resolveVisualAsset`
@@ -58,7 +63,8 @@
 ## 테스트
 
 - `uv run python -X utf8 tests/learning/verifyWebLearningRoutes.py`: contract, generated, prerender, sitemap, search lesson 각 472개와 Web 310·Local 162 분류
-- `uv run python -X utf8 tests/run.py gate landing-public`: 390x844·1440x900 Learn, 초기 lesson row 3개, image·overflow·link 감사와 `pandas` 검색 URL·reload 복원
+- `uv run python -X utf8 tests/run.py gate landing-public`: 공개 문서, SEO, hydration 14개 경로, Light/Dark Landing 화면 검증
+- `CODARO_PRODUCT_CASE=landing-public uv run python -X utf8 tests/surface/verifyProductExperiencePlaywright.py`: 390x844·1440x900 Learn, 초기 lesson row 3개, image·overflow·link 감사와 `pandas` 검색 URL·reload 복원, 검색 상태의 결과 우선 배치
 - `uv run python -X utf8 tests/run.py gate web-learning`: Learn에서 canonical lesson으로 이어지는 대표 Chromium 여정
 - `uv run python -X utf8 tests/product/verifyAstryxJourneyAudit.py`: public Learn과 Web learning home의 공용 Astryx·금지 control 계약
 - 실제 검색 유입, keyboard, screen reader, 한국어 IME와 경로별 사람 콘텐츠 품질은 이 machine evidence에 포함되지 않는다.

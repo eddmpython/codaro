@@ -2878,14 +2878,41 @@ def runBrowserMatrix(
                         )
                         beforeReload = page.evaluate(
                             """
-                            () => ({
-                              query: document.querySelector('[data-learn-search-input="true"]')?.value || "",
-                              resultCount: document.querySelector("#learn-result-count")?.textContent?.trim() || "",
-                              rowCount: document.querySelectorAll(".learnLessonRow").length,
-                              search: window.location.search,
-                            })
+                            () => {
+                              const firstResult = document.querySelector(
+                                '[data-learn-search-results="true"] .learnLessonRow'
+                              );
+                              const firstResultRect = firstResult?.getBoundingClientRect();
+                              return {
+                                query: document.querySelector('[data-learn-search-input="true"]')?.value || "",
+                                resultCount: document.querySelector("#learn-result-count")?.textContent?.trim() || "",
+                                rowCount: document.querySelectorAll(".learnLessonRow").length,
+                                search: window.location.search,
+                                outcomePathCount: document.querySelectorAll(
+                                  '[data-learn-outcome-paths="true"]'
+                                ).length,
+                                searchResultRegionCount: document.querySelectorAll(
+                                  '[data-learn-search-results="true"]'
+                                ).length,
+                                domainNavCount: document.querySelectorAll(".learnDomainNav").length,
+                                firstResultInViewport: Boolean(
+                                  firstResultRect
+                                  && firstResultRect.top < window.innerHeight
+                                  && firstResultRect.bottom > 0
+                                ),
+                              };
+                            }
                             """
                         )
+                        if (
+                            beforeReload["outcomePathCount"] != 0
+                            or beforeReload["searchResultRegionCount"] != 1
+                            or beforeReload["domainNavCount"] != 0
+                            or not beforeReload["firstResultInViewport"]
+                        ):
+                            raise AssertionError(
+                                f"Learn search did not prioritize matching lessons: {beforeReload}"
+                            )
                         page.reload(wait_until="domcontentloaded", timeout=30_000)
                         page.wait_for_selector("[data-learn-search-input='true']", timeout=20_000)
                         page.wait_for_function(
@@ -2900,19 +2927,93 @@ def runBrowserMatrix(
                         )
                         afterReload = page.evaluate(
                             """
-                            () => ({
-                              query: document.querySelector('[data-learn-search-input="true"]')?.value || "",
-                              resultCount: document.querySelector("#learn-result-count")?.textContent?.trim() || "",
-                              rowCount: document.querySelectorAll(".learnLessonRow").length,
-                              search: window.location.search,
-                            })
+                            () => {
+                              const firstResult = document.querySelector(
+                                '[data-learn-search-results="true"] .learnLessonRow'
+                              );
+                              const firstResultRect = firstResult?.getBoundingClientRect();
+                              return {
+                                query: document.querySelector('[data-learn-search-input="true"]')?.value || "",
+                                resultCount: document.querySelector("#learn-result-count")?.textContent?.trim() || "",
+                                rowCount: document.querySelectorAll(".learnLessonRow").length,
+                                search: window.location.search,
+                                outcomePathCount: document.querySelectorAll(
+                                  '[data-learn-outcome-paths="true"]'
+                                ).length,
+                                searchResultRegionCount: document.querySelectorAll(
+                                  '[data-learn-search-results="true"]'
+                                ).length,
+                                domainNavCount: document.querySelectorAll(".learnDomainNav").length,
+                                firstResultInViewport: Boolean(
+                                  firstResultRect
+                                  && firstResultRect.top < window.innerHeight
+                                  && firstResultRect.bottom > 0
+                                ),
+                              };
+                            }
                             """
                         )
                         if beforeReload != afterReload:
                             raise AssertionError(
                                 f"Learn search state drifted across reload: {beforeReload} != {afterReload}"
                             )
-                        learnSearchEvidence = afterReload
+                        originalViewport = page.viewport_size
+                        page.set_viewport_size({"width": 390, "height": 844})
+                        page.wait_for_timeout(120)
+                        mobileLayout = page.evaluate(
+                            """
+                            () => {
+                              const firstResult = document.querySelector(
+                                '[data-learn-search-results="true"] .learnLessonRow'
+                              );
+                              const firstResultRect = firstResult?.getBoundingClientRect();
+                              return {
+                                viewport: {
+                                  width: window.innerWidth,
+                                  height: window.innerHeight,
+                                },
+                                outcomePathCount: document.querySelectorAll(
+                                  '[data-learn-outcome-paths="true"]'
+                                ).length,
+                                searchResultRegionCount: document.querySelectorAll(
+                                  '[data-learn-search-results="true"]'
+                                ).length,
+                                firstResultTop: Math.round(firstResultRect?.top || 0),
+                                firstResultVisiblePixels: firstResultRect
+                                  ? Math.round(Math.max(
+                                    0,
+                                    Math.min(firstResultRect.bottom, window.innerHeight)
+                                      - Math.max(firstResultRect.top, 0)
+                                  ))
+                                  : 0,
+                                firstResultInViewport: Boolean(
+                                  firstResultRect
+                                  && firstResultRect.top < window.innerHeight
+                                  && firstResultRect.bottom > 0
+                                ),
+                                horizontalOverflow: Math.max(
+                                  0,
+                                  document.documentElement.scrollWidth - window.innerWidth
+                                ),
+                              };
+                            }
+                            """
+                        )
+                        if (
+                            mobileLayout["viewport"] != {"width": 390, "height": 844}
+                            or mobileLayout["outcomePathCount"] != 0
+                            or mobileLayout["searchResultRegionCount"] != 1
+                            or not mobileLayout["firstResultInViewport"]
+                            or mobileLayout["firstResultVisiblePixels"] < 96
+                            or mobileLayout["horizontalOverflow"] != 0
+                        ):
+                            raise AssertionError(
+                                f"Learn search mobile layout did not prioritize results: {mobileLayout}"
+                            )
+                        if originalViewport is not None:
+                            page.set_viewport_size(originalViewport)
+                            page.wait_for_timeout(120)
+                        learnSearchEvidence = {**afterReload, "mobileLayout": mobileLayout}
                     if case.get("scrollTo"):
                         page.locator(case["scrollTo"]).scroll_into_view_if_needed(timeout=20_000)
                     if case.get("expectCanonicalLesson"):

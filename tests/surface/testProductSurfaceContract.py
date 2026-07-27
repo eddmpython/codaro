@@ -162,8 +162,14 @@ def testPublicLearningExplorerPersistsFiltersAndLessonVisualFillsItsFrame() -> N
         'aria-describedby="learn-result-count"',
         "event.nativeEvent.isComposing",
         "onCompositionEnd",
+        'data-learn-outcome-paths="true"',
+        'data-learn-search-results="true"',
+        "<LessonRow",
     ):
         assert marker in learn
+    assert 'page.set_viewport_size({"width": 390, "height": 844})' in browserGate
+    assert '"horizontalOverflow"' in browserGate
+    assert 'mobileLayout["firstResultVisiblePixels"] < 96' in browserGate
     assert "scroll-margin-top: 120px;" in learnStyles
     assert ".lessonProductImage img {" in lessonStyles
     assert "height: 100%;" in lessonStyles

@@ -463,6 +463,37 @@
   background: var(--color-background-body);
 }
 
+.learnSearchResults {
+  padding-block: 32px 64px;
+}
+
+.learnSearchResultsHead {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.learnSearchResultsHead > div {
+  display: grid;
+  gap: 6px;
+}
+
+.learnSearchResultsHead h2 {
+  color: var(--color-text-primary);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 32px;
+}
+
+.learnSearchResultsHead > span {
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-code);
+  font-size: 12px;
+  line-height: 18px;
+}
+
 .learnDomainSection {
   padding-block: 56px 64px;
   border-bottom: 1px solid var(--color-border);
@@ -677,6 +708,10 @@
     margin-top: 24px;
   }
 
+  .learnWorkspace[data-learn-discovery-active="true"] .learnResumeBand {
+    display: none;
+  }
+
   .learnSearchBar {
     grid-template-columns: 22px minmax(0, 1fr);
   }
@@ -738,8 +773,27 @@
     padding-block: 40px 32px;
   }
 
+  .learnExplorerBand[data-learn-discovery-active="true"] {
+    padding-block: 20px 16px;
+  }
+
+  .learnExplorerBand[data-learn-discovery-active="true"] .learnExplorerLead {
+    display: none;
+  }
+
   .learnExplorerControls {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .learnExplorerBand[data-learn-discovery-active="true"] .learnExplorerControls {
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .learnExplorerBand[data-learn-discovery-active="true"] .learnRuntimeSegments,
+  .learnExplorerBand[data-learn-discovery-active="true"] .learnPathSelect,
+  .learnExplorerBand[data-learn-discovery-active="true"] .learnPathSelect select {
+    min-width: 0;
   }
 
   .learnRuntimeSegments,
@@ -757,6 +811,19 @@
 
   .learnDomainSection {
     padding-block: 44px 48px;
+  }
+
+  .learnSearchResults {
+    padding-block: 16px 48px;
+  }
+
+  .learnSearchResultsHead {
+    margin-bottom: 10px;
+  }
+
+  .learnSearchResultsHead h2 {
+    font-size: 22px;
+    line-height: 28px;
   }
 
   .learnDomainHead {

@@ -232,7 +232,11 @@ export function LearnPage({ search = "" }) {
 
   return (
     <main className="homeAstryx learnPage learnStudio">
-      <section className="learnWorkspace" aria-labelledby="learn-title">
+      <section
+        className="learnWorkspace"
+        aria-labelledby="learn-title"
+        data-learn-discovery-active={discoveryActive ? "true" : "false"}
+      >
         <div className="homeShell">
           <header className="learnUtilityHead">
             <div>
@@ -304,38 +308,50 @@ export function LearnPage({ search = "" }) {
         </div>
       </section>
 
-      <section className="learnGuideBand" aria-labelledby="guided-path-title">
-        <div className="homeShell">
-          <div className="learnSectionLead">
-            <span className="learnKicker">OUTCOME PATHS</span>
-            <Heading id="guided-path-title" level={2}>여섯 개의 결과 경로</Heading>
-            <Text color="secondary">문법 목차가 아니라 실제로 남길 결과를 기준으로 필요한 개념을 연결합니다.</Text>
-          </div>
-          <div className="learnPathRail">
-            {guidedPaths.map((item) =>
-              item.lesson ? (
-                <a className="learnPathStep" href={interactiveLessonHref(item.lesson, item.pathId)} key={item.pathId}>
-                  <ProductVisual assetId={item.assetId} className="learnPathVisual" width={420} />
-                  <span className="learnPathNumber">{item.step}</span>
-                  <span className="learnPathCopy">
-                    <small>{item.result}</small>
-                    <strong>{item.label}</strong>
-                    <span>{item.detail}</span>
-                    <span className="learnPathMeta">
-                      <span><Globe2 size={13} aria-hidden="true" /> Web {item.webCount}</span>
-                      {item.localCount ? <span><Laptop size={13} aria-hidden="true" /> Local {item.localCount}</span> : null}
-                      <span>{item.count}개 레슨</span>
+      {!discoveryActive ? (
+        <section
+          className="learnGuideBand"
+          aria-labelledby="guided-path-title"
+          data-learn-outcome-paths="true"
+          data-route-query-sensitive="true"
+        >
+          <div className="homeShell">
+            <div className="learnSectionLead">
+              <span className="learnKicker">OUTCOME PATHS</span>
+              <Heading id="guided-path-title" level={2}>여섯 개의 결과 경로</Heading>
+              <Text color="secondary">문법 목차가 아니라 실제로 남길 결과를 기준으로 필요한 개념을 연결합니다.</Text>
+            </div>
+            <div className="learnPathRail">
+              {guidedPaths.map((item) =>
+                item.lesson ? (
+                  <a className="learnPathStep" href={interactiveLessonHref(item.lesson, item.pathId)} key={item.pathId}>
+                    <ProductVisual assetId={item.assetId} className="learnPathVisual" width={420} />
+                    <span className="learnPathNumber">{item.step}</span>
+                    <span className="learnPathCopy">
+                      <small>{item.result}</small>
+                      <strong>{item.label}</strong>
+                      <span>{item.detail}</span>
+                      <span className="learnPathMeta">
+                        <span><Globe2 size={13} aria-hidden="true" /> Web {item.webCount}</span>
+                        {item.localCount ? <span><Laptop size={13} aria-hidden="true" /> Local {item.localCount}</span> : null}
+                        <span>{item.count}개 레슨</span>
+                      </span>
                     </span>
-                  </span>
-                  <ArrowRight size={19} aria-hidden="true" />
-                </a>
-              ) : null,
-            )}
+                    <ArrowRight size={19} aria-hidden="true" />
+                  </a>
+                ) : null,
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
-      <section className="learnExplorerBand" aria-labelledby="learn-explorer-title">
+      <section
+        className="learnExplorerBand"
+        aria-labelledby="learn-explorer-title"
+        data-learn-discovery-active={discoveryActive ? "true" : "false"}
+        data-route-query-sensitive="true"
+      >
         <div className="homeShell learnExplorerInner">
           <div className="learnExplorerLead">
             <span className="learnKicker"><Filter size={14} aria-hidden="true" /> LESSON FINDER</span>
@@ -386,76 +402,88 @@ export function LearnPage({ search = "" }) {
         </div>
       </section>
 
-      <nav className="learnDomainNav" aria-label="검색 결과 도메인" data-route-query-sensitive="true">
-        <div className="homeShell learnDomainNavInner">
-          {curriculumTree.map((domain) => {
-            const hasVisibleLesson = domain.tracks.some((track) =>
-              track.lessons.some((lesson) => visibleLessonRefs.has(`${lesson.track}/${lesson.id}`)));
-            return hasVisibleLesson ? (
-              <a key={domain.domain} className="learnDomainTab" href={`#domain-${domain.domain}`}>
-                {domain.label}
-              </a>
-            ) : null;
-          })}
-        </div>
-      </nav>
+      {!discoveryActive ? (
+        <nav className="learnDomainNav" aria-label="추천 레슨 도메인" data-route-query-sensitive="true">
+          <div className="homeShell learnDomainNavInner">
+            {curriculumTree.map((domain) => {
+              const hasVisibleLesson = domain.tracks.some((track) =>
+                track.lessons.some((lesson) => visibleLessonRefs.has(`${lesson.track}/${lesson.id}`)));
+              return hasVisibleLesson ? (
+                <a key={domain.domain} className="learnDomainTab" href={`#domain-${domain.domain}`}>
+                  {domain.label}
+                </a>
+              ) : null;
+            })}
+          </div>
+        </nav>
+      ) : null}
 
       <div className="learnCatalog" id="learn-catalog" data-route-query-sensitive="true">
-        {curriculumTree.map((domain, domainIndex) => {
-          const lessons = domain.tracks
-            .flatMap((track) => track.lessons)
-            .filter((lesson) => visibleLessonRefs.has(`${lesson.track}/${lesson.id}`));
-          if (!lessons.length) return null;
-          return (
-            <section className="learnDomainSection" id={`domain-${domain.domain}`} key={domain.domain}>
-              <div className="homeShell">
-                <div className="learnDomainHead">
-                  <div>
-                    <span className="learnDomainIndex">{String(domainIndex + 1).padStart(2, "0")}</span>
-                    <Heading level={2}>{domain.label}</Heading>
-                    <Text color="secondary">{domainCopy[domain.domain]}</Text>
-                  </div>
-                  <span className="learnDomainCount">{lessons.length}개</span>
+        {discoveryActive ? (
+          <section
+            className="learnSearchResults"
+            aria-labelledby="learn-search-results-title"
+            data-learn-search-results="true"
+          >
+            <div className="homeShell">
+              <div className="learnSearchResultsHead">
+                <div>
+                  <span className="learnKicker">MATCHING LESSONS</span>
+                  <Heading id="learn-search-results-title" level={2}>찾은 레슨</Heading>
                 </div>
+                <span>{matchingLessons.length}개</span>
+              </div>
+              {visibleLessons.length ? (
                 <div className="learnLessonList">
-                  {lessons.map((lesson, lessonIndex) => (
-                    <a
-                      className="learnLessonRow"
-                      data-public-lesson-link="true"
-                      data-runtime-tier={lesson.runtimeTier}
-                      href={lessonHref(lesson, selectedPath === "all" ? null : selectedPath)}
+                  {visibleLessons.map((lesson, lessonIndex) => (
+                    <LessonRow
                       key={lesson.slug}
-                    >
-                      <span className="learnLessonIndex">{String(lessonIndex + 1).padStart(2, "0")}</span>
-                      <span className="learnLessonBody">
-                        <span className="learnLessonTrack">{trackLabel(lesson.track)} · {lesson.estimatedMinutes}분</span>
-                        <strong>{lesson.title}</strong>
-                        <span className="learnLessonDirection">{lesson.direction}</span>
-                        <span className="learnLessonOutcomes">
-                          {lesson.outcome.slice(0, 2).map((outcome) => <span key={outcome}>{outcome}</span>)}
-                        </span>
-                      </span>
-                      <span className="learnLessonRuntime">
-                        {lesson.runtimeTier === "browser"
-                          ? <><Globe2 size={14} aria-hidden="true" /> Web 실행 · 강검증</>
-                          : <><Laptop size={14} aria-hidden="true" /> Local 필요</>}
-                      </span>
-                      {lesson.runtimeTier === "browser"
-                        ? <Code2 className="learnLessonOpenIcon" size={18} aria-hidden="true" />
-                        : <BookOpen className="learnLessonOpenIcon" size={18} aria-hidden="true" />}
-                    </a>
+                      lesson={lesson}
+                      lessonIndex={lessonIndex}
+                      selectedPath={selectedPath}
+                    />
                   ))}
                 </div>
-              </div>
-            </section>
-          );
-        })}
-        {!visibleLessons.length ? (
-          <div className="homeShell learnEmptyState">
-            <Heading level={2}>조건에 맞는 레슨이 없습니다.</Heading>
-            <Text color="secondary">검색어 또는 실행 환경을 바꾸면 결과가 즉시 갱신됩니다.</Text>
-          </div>
-        ) : null}
+              ) : (
+                <div className="learnEmptyState">
+                  <Heading level={2}>조건에 맞는 레슨이 없습니다.</Heading>
+                  <Text color="secondary">검색어 또는 실행 환경을 바꾸면 결과가 즉시 갱신됩니다.</Text>
+                </div>
+              )}
+            </div>
+          </section>
+        ) : (
+          curriculumTree.map((domain, domainIndex) => {
+            const lessons = domain.tracks
+              .flatMap((track) => track.lessons)
+              .filter((lesson) => visibleLessonRefs.has(`${lesson.track}/${lesson.id}`));
+            if (!lessons.length) return null;
+            return (
+              <section className="learnDomainSection" id={`domain-${domain.domain}`} key={domain.domain}>
+                <div className="homeShell">
+                  <div className="learnDomainHead">
+                    <div>
+                      <span className="learnDomainIndex">{String(domainIndex + 1).padStart(2, "0")}</span>
+                      <Heading level={2}>{domain.label}</Heading>
+                      <Text color="secondary">{domainCopy[domain.domain]}</Text>
+                    </div>
+                    <span className="learnDomainCount">{lessons.length}개</span>
+                  </div>
+                  <div className="learnLessonList">
+                    {lessons.map((lesson, lessonIndex) => (
+                      <LessonRow
+                        key={lesson.slug}
+                        lesson={lesson}
+                        lessonIndex={lessonIndex}
+                        selectedPath={selectedPath}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </section>
+            );
+          })
+        )}
       </div>
 
       <section className="learnLocalBand">
@@ -469,5 +497,34 @@ export function LearnPage({ search = "" }) {
         </div>
       </section>
     </main>
+  );
+}
+
+function LessonRow({ lesson, lessonIndex, selectedPath }) {
+  return (
+    <a
+      className="learnLessonRow"
+      data-public-lesson-link="true"
+      data-runtime-tier={lesson.runtimeTier}
+      href={lessonHref(lesson, selectedPath === "all" ? null : selectedPath)}
+    >
+      <span className="learnLessonIndex">{String(lessonIndex + 1).padStart(2, "0")}</span>
+      <span className="learnLessonBody">
+        <span className="learnLessonTrack">{trackLabel(lesson.track)} · {lesson.estimatedMinutes}분</span>
+        <strong>{lesson.title}</strong>
+        <span className="learnLessonDirection">{lesson.direction}</span>
+        <span className="learnLessonOutcomes">
+          {lesson.outcome.slice(0, 2).map((outcome) => <span key={outcome}>{outcome}</span>)}
+        </span>
+      </span>
+      <span className="learnLessonRuntime">
+        {lesson.runtimeTier === "browser"
+          ? <><Globe2 size={14} aria-hidden="true" /> Web 실행 · 강검증</>
+          : <><Laptop size={14} aria-hidden="true" /> Local 필요</>}
+      </span>
+      {lesson.runtimeTier === "browser"
+        ? <Code2 className="learnLessonOpenIcon" size={18} aria-hidden="true" />
+        : <BookOpen className="learnLessonOpenIcon" size={18} aria-hidden="true" />}
+    </a>
   );
 }
