@@ -6,7 +6,7 @@
 
 Local의 파일, Notebook, task, schedule, audit, failure recovery, E-Stop이 실제 운영 표면임을 증명하는 캡처를 만든다.
 
-현재 Local notebook desktop과 새 automation operational UI desktop capture가 manifest에 등록되고 responsive variant로 Landing에 연결됐다. `visual-assets` gate는 green이다. 실제 WebView2 state matrix, redaction 사람 검수와 current Git head completion evidence가 남아 있어 `_done`은 아니다.
+현재 Local notebook desktop과 automation operational UI desktop capture를 `main@c5618bf6`의 Chromium 제품 화면으로 다시 캡처해 manifest와 Landing에 연결했다. Local notebook은 Web Run과 동일한 한 셀 중심 캔버스를 증명하고, automation capture는 운영 화면의 현재 상태를 사용한다. 두 capture가 참조하는 editor·token source path 집합과 hash를 manifest에 고정해 UI source가 바뀌면 stale 캡처가 gate를 통과하지 못하게 했다. 실제 WebView2 state matrix, light/dark 쌍, redaction 사람 검수와 completion evidence가 남아 있어 `_done`은 아니다.
 
 ## 구현 순서
 
@@ -30,7 +30,7 @@ Local의 파일, Notebook, task, schedule, audit, failure recovery, E-Stop이 �
 
 ## 테스트
 
-- 신규 `tests/assets/verifyLocalVisualFreshness.py`
+- 구현 `assets/brand/tools/buildVisualAssets.py --check`의 Local source set freshness
 - 신규 `tests/assets/verifyLocalCaptureRedaction.py`
 - `uv run python -X utf8 tests/run.py gate local-studio-browser`
 

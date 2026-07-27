@@ -2,7 +2,7 @@
 
 상태: 진행
 
-현재 공용 manifest와 source/AVIF/WebP variant pipeline을 만들고 실제 Web Run desktop, mobile lesson, Run learning detail, Local notebook과 새 automation operational UI capture를 Landing과 Run/Local에서 함께 소비하도록 연결했다. 8개 학습 domain의 `generatedRaster` instructional asset은 learning question, decision, lesson context와 함께 manifest에 등록됐다. `learningVisualAssets.ts`가 8개 domain과 lesson category를 연결하고 `LearningDomainVisual`이 `CurriculumHome`의 domain band와 `CurriculumOverview`의 lesson overview에서 이미지, 질문, 판단 기준을 자동 렌더한다. checksum, provenance, dimension, safe text region, 생성 variant 동기화와 budget은 `visual-assets`로 검사하며 현재 gate는 green이다. 390px와 1440px 실제 화면 감사에서 Home·Learn의 image/text overlap, lesson row 가독성, Local automation active state를 교정했다. 그러나 instructional asset의 lesson anchor 사람 승인, outcome proof, 사람 자산 검수와 전체 shot list가 남아 있으므로 상태는 `진행`이며 `_done`이 아니다.
+현재 공용 manifest와 source/AVIF/WebP variant pipeline을 만들고 실제 Web Run desktop, mobile lesson, Run learning detail, Local notebook과 automation operational UI capture를 Landing과 Run/Local에서 함께 소비하도록 연결했다. Landing hero가 실제 제품 화면이라고 표시하면서도 현재 제품과 다른 과거의 3열 편집기 화면을 보여 주던 결함을 확인했고, `main@c5618bf6`의 Chromium 제품 화면 5종으로 source와 파생 variant를 교체했다. 각 capture는 UI·token·학습 콘텐츠 source 목록과 `sourceSetHash`를 가지며, source가 달라진 뒤 캡처를 갱신하지 않으면 `buildVisualAssets.py --check`와 `visual-assets` gate가 실패한다. 8개 학습 domain의 `generatedRaster` instructional asset은 learning question, decision, lesson context와 함께 manifest에 등록됐다. `learningVisualAssets.ts`가 8개 domain과 lesson category를 연결하고 `LearningDomainVisual`이 `CurriculumHome`의 domain band와 `CurriculumOverview`의 lesson overview에서 이미지, 질문, 판단 기준을 자동 렌더한다. 그러나 instructional asset의 lesson anchor 사람 승인, outcome proof, light/dark 쌍 캡처, 사람 자산 검수와 전체 shot list가 남아 있으므로 상태는 `진행`이며 `_done`이 아니다.
 
 ## 목표
 
@@ -126,7 +126,7 @@ hero와 제품 증명을 한 이미지에 맡기지 않는다. `runLearningHero`
 - 00-manifest-pipeline 생성 owner `tests/assets/testVisualAssetManifest.py`: source 존재, alt/caption, dimension, duplicate ID, license 필드
 - 01-instructional-assets 잔여 계획 `tests/assets/verifyInstructionalVisualPurpose.py`: learningQuestion, decisionShown, lesson anchor와 장식 quota 금지
 - 00-manifest-pipeline 생성 owner `tests/assets/verifyVisualAssetBudget.py`: hero 240KB 이하, lesson image 180KB 이하, OG 규격
-- 잔여 계획 `tests/assets/verifyProductVisualFreshness.py`: screenshot fixture와 git head metadata
+- 구현 `assets/brand/tools/buildVisualAssets.py --check`: screenshot source path 집합과 `sourceSetHash` freshness
 - 수정 `tests/curriculum/verifyCardContract.py`: media 필수키
 - 구현 `tests/surface/testProductSurfaceContract.py`: 8개 asset/category mapping과 Home·Overview 렌더 계약
 - 구현 `tests/surface/verifyProductExperiencePlaywright.py`: 학습 홈 8개 visual과 lesson overview visual의 image/question/decision 렌더

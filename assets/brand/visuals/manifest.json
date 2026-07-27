@@ -6,13 +6,13 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-detail.png",
-      "sourceHash": "sha256-5f004b2afa8f2b997f710c5b64c4ab25a93dce5b8c1680db2016848f5c1bf762",
-      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "sourceHash": "sha256-2d625aa4eda5c54df34b0a811a7d88af7bab847cde473f781c0df3988195687c",
+      "sourceGitHead": "c5618bf681887293295682b2c759952ce18dd849",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
         "licenseUrl": null,
-        "fixtureId": "local-strong-learning-desktop",
+        "fixtureId": "web-day1-transfer-desktop",
         "promptHash": null,
         "lessonContentHash": null
       },
@@ -34,10 +34,10 @@
         "offlineIncluded": true
       },
       "learning": {
-        "alt": "Codaro 로컬 학습 화면에서 헬로월드 설명, 코드 예제, 강한 검증 상태가 한 흐름에 표시된 모습",
-        "caption": "설명, 실행 가능한 코드, 자동 검증이 같은 레슨 화면에서 이어집니다.",
-        "learningQuestion": "학습자는 설명을 읽은 뒤 어느 코드 영역을 바꾸고 실행해야 하는가?",
-        "decisionShown": "레슨 설명과 실행 및 검증 위치의 관계",
+        "alt": "Codaro 웹 학습 화면에서 헬로월드 목표, 개념 이미지, 학습 순서와 첫 실습이 한 문서 흐름에 표시된 모습",
+        "caption": "목표와 개념 이미지를 읽고 같은 화면 아래의 첫 실습으로 이어집니다.",
+        "learningQuestion": "학습자는 어떤 개념을 익힌 뒤 첫 실습으로 이동하는가?",
+        "decisionShown": "학습 목표, 개념 시각 자료, 학습 순서와 첫 실습의 연결",
         "lessonRefs": ["30일완성/헬로월드"]
       },
       "capture": {
@@ -45,7 +45,27 @@
         "browserVersion": "149.0.7827.55",
         "viewport": { "width": 900, "height": 760 },
         "theme": "dark",
-        "locale": "ko-KR"
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/visuals/learning/python-fundamentals-v1.png",
+          "curricula/python/basics/30days",
+          "editor/src/App.tsx",
+          "editor/src/components/app/curriculumSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/curriculum",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/curriculaRegistry.ts",
+          "editor/src/lib/learningVisualAssets.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles"
+        ],
+        "sourceSetHash": "sha256-5b94da72c8c8e2a78592230cbe260a84ec4cdd6bfb3713adb0105482c81718ee"
       }
     },
     {
@@ -53,8 +73,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-mobile.png",
-      "sourceHash": "sha256-bc3c80e69c771493171151988e1d095589fa9dce06aa97b531fa7a251f5fbc09",
-      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "sourceHash": "sha256-7f57fbbe546eed374b2f8b4ce0463557e44373814a0581c6533ab67fedee00ec",
+      "sourceGitHead": "c5618bf681887293295682b2c759952ce18dd849",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -81,10 +101,10 @@
         "offlineIncluded": true
       },
       "learning": {
-        "alt": "390픽셀 너비의 Codaro 웹 레슨에서 학습 개요와 첫 학습 섹션이 열린 읽기 흐름으로 이어지는 모습",
-        "caption": "모바일에서도 별도 확인 단계 없이 학습 목표 다음에 실습이 이어집니다.",
-        "learningQuestion": "작은 화면에서도 현재 학습 목표와 다음 실습을 동시에 찾을 수 있는가?",
-        "decisionShown": "모바일 레슨의 정보 우선순위",
+        "alt": "390픽셀 너비의 Codaro 웹 레슨에서 헬로월드 목표, 개념 이미지와 오늘 배울 순서가 이어지는 모습",
+        "caption": "모바일에서도 목표와 개념 자료를 읽고 오늘 배울 순서를 한 흐름에서 확인합니다.",
+        "learningQuestion": "작은 화면에서도 현재 학습 목표와 오늘 배울 순서를 찾을 수 있는가?",
+        "decisionShown": "모바일 레슨에서 목표, 개념 자료, 학습 순서의 우선순위",
         "lessonRefs": ["30일완성/헬로월드"]
       },
       "capture": {
@@ -92,7 +112,27 @@
         "browserVersion": "149.0.7827.55",
         "viewport": { "width": 390, "height": 844 },
         "theme": "dark",
-        "locale": "ko-KR"
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/visuals/learning/python-fundamentals-v1.png",
+          "curricula/python/basics/30days",
+          "editor/src/App.tsx",
+          "editor/src/components/app/curriculumSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/curriculum",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/curriculaRegistry.ts",
+          "editor/src/lib/learningVisualAssets.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles"
+        ],
+        "sourceSetHash": "sha256-5b94da72c8c8e2a78592230cbe260a84ec4cdd6bfb3713adb0105482c81718ee"
       }
     },
     {
@@ -100,8 +140,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/web-run-desktop.png",
-      "sourceHash": "sha256-24a3746e0ef831559d1f62b1f579b677d032c7d85708842a424943f9e51cd355",
-      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "sourceHash": "sha256-7131d2830a8785fc89fa6bc049193ec99336c41a3e1836fb206c5889cc0cfdc6",
+      "sourceGitHead": "c5618bf681887293295682b2c759952ce18dd849",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -128,10 +168,10 @@
         "offlineIncluded": true
       },
       "learning": {
-        "alt": "설치 없이 브라우저 Python 셀을 실행하는 Codaro Web Run 전체 화면",
-        "caption": "Web Run은 브라우저 파일과 지원 패키지를 사용해 설치 없이 Python 셀을 실행합니다.",
-        "learningQuestion": "웹 실행 환경과 로컬 실행 환경의 권한 차이는 어디에 표시되는가?",
-        "decisionShown": "Web Run의 실행 계층과 지원 범위",
+        "alt": "한 개의 빈 Python 셀과 셀 추가 및 실행 컨트롤만 보이는 현재 Codaro Web Run 노트북",
+        "caption": "Web Run은 한 개의 빈 셀에서 시작하고 필요한 셀과 노트북 도구만 사용자가 직접 엽니다.",
+        "learningQuestion": "처음 진입한 사용자는 어디에 코드를 입력하고 어떻게 실행하는가?",
+        "decisionShown": "빈 셀, 셀 추가, reactive 실행과 전체 실행의 최소 노트북 흐름",
         "lessonRefs": []
       },
       "capture": {
@@ -139,7 +179,23 @@
         "browserVersion": "149.0.7827.55",
         "viewport": { "width": 1440, "height": 900 },
         "theme": "dark",
-        "locale": "ko-KR"
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "editor/src/App.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/notebookSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/notebook",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/main.tsx",
+          "editor/src/styles"
+        ],
+        "sourceSetHash": "sha256-daf514e896faf1f7c7dad384c804676a89ef0291285bc86c16233db1e9e6e90b"
       }
     },
     {
@@ -147,8 +203,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/local-notebook-desktop.png",
-      "sourceHash": "sha256-f63d588e284f23c6ca9615344f5d90498a2b61fbf9cf3c43c94504cf001ee3a1",
-      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "sourceHash": "sha256-46f7467a4677d07f3dfc6c9e8df01356f902311536cad86bd27671b34bf8cfb5",
+      "sourceGitHead": "c5618bf681887293295682b2c759952ce18dd849",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -175,10 +231,10 @@
         "offlineIncluded": true
       },
       "learning": {
-        "alt": "Codaro Local Studio에서 시스템 Python과 프로젝트 파일 및 터미널이 연결된 빈 노트북 화면",
-        "caption": "Local Studio는 같은 셀 모델에 실제 프로젝트 파일과 시스템 Python을 연결합니다.",
-        "learningQuestion": "웹에서 검증한 코드를 실제 프로젝트 파일로 옮길 때 어떤 실행 계층이 바뀌는가?",
-        "decisionShown": "Local Studio의 런타임 및 파일 권한 확장",
+        "alt": "한 개의 빈 Python 셀과 셀 추가 및 실행 컨트롤만 보이는 현재 Codaro Local 노트북",
+        "caption": "Local도 Web Run과 같은 한 셀 노트북에서 시작하고 운영체제 기능은 필요한 표면에서 확장합니다.",
+        "learningQuestion": "같은 노트북 문서 구조가 Local에서도 유지되는가?",
+        "decisionShown": "Web Run과 Local이 공유하는 최소 노트북 캔버스",
         "lessonRefs": []
       },
       "capture": {
@@ -186,7 +242,23 @@
         "browserVersion": "149.0.7827.55",
         "viewport": { "width": 900, "height": 640 },
         "theme": "dark",
-        "locale": "ko-KR"
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "editor/src/App.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/notebookSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/notebook",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/main.tsx",
+          "editor/src/styles"
+        ],
+        "sourceSetHash": "sha256-daf514e896faf1f7c7dad384c804676a89ef0291285bc86c16233db1e9e6e90b"
       }
     },
     {
@@ -194,8 +266,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/local-automation-desktop.png",
-      "sourceHash": "sha256-f64373a73e1cfab14fe888463eff3984241684d23c23570c3c1858068b71c48d",
-      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "sourceHash": "sha256-3967fecf894021fe88934c24df4c93c346b2b1ea4defd4adaa9a0b114e2604d4",
+      "sourceGitHead": "c5618bf681887293295682b2c759952ce18dd849",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -233,7 +305,24 @@
         "browserVersion": "149.0.7827.55",
         "viewport": { "width": 1440, "height": 900 },
         "theme": "dark",
-        "locale": "ko-KR"
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "editor/src/App.tsx",
+          "editor/src/components/app/automationSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/automation",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/automationState.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles"
+        ],
+        "sourceSetHash": "sha256-1a3e3bf88dd96acfb20bd6d145e182e9532589ae0d5304d26d20243706ea3c04"
       }
     },
     {

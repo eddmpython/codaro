@@ -6,7 +6,7 @@
 
 완성된 Web 학습과 Notebook 표면을 실제 fixture로 캡처해 Landing과 docs의 제품 proof로 사용한다.
 
-현재 Web Run desktop, 390px mobile lesson과 learning detail source가 manifest에 등록되고 responsive variant로 Landing에 연결됐다. 전체 상태 shot, light/dark 눈검수와 current Git head completion evidence가 남아 있어 `_done`은 아니다.
+현재 Web Run desktop, 390px mobile lesson과 learning detail source를 `main@c5618bf6`의 Chromium 제품 화면으로 다시 캡처해 manifest와 Landing에 연결했다. 특히 Landing hero에서 과거의 runtime rail·assistant panel이 붙은 3열 편집기 캡처를 제거하고, 현재 제품과 동일한 한 개의 빈 셀·셀 추가·실행 컨트롤 중심 화면으로 교체했다. 세 capture가 참조하는 editor·token·curriculum source path 집합과 hash를 manifest에 고정해 UI source가 바뀌면 캡처도 반드시 갱신되게 했다. 전체 상태 shot, light/dark 쌍 눈검수와 completion evidence가 남아 있어 `_done`은 아니다.
 
 ## 구현 순서
 
@@ -30,7 +30,7 @@
 
 ## 테스트
 
-- 신규 `tests/assets/verifyRunVisualFreshness.py`
+- 구현 `assets/brand/tools/buildVisualAssets.py --check`의 Run source set freshness
 - 신규 `tests/assets/verifyRunCaptureIntegrity.py`
 - `uv run python -X utf8 tests/run.py gate editor-build`
 

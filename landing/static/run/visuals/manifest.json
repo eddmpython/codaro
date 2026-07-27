@@ -1,19 +1,19 @@
 {
   "schemaVersion": 1,
-  "sourceManifestHash": "sha256-618b6ef931e0b93e5ba8851b0a47c1b7c6ff8588b0d1b6305c1d101d1b31e414",
+  "sourceManifestHash": "sha256-dc50c6b21d8257f79ff9d8004d025aefdf7bc84bbfdd35fd55ed2e4fd2961046",
   "assets": [
     {
       "id": "runLearningDetail",
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-detail.png",
-      "sourceHash": "sha256-5f004b2afa8f2b997f710c5b64c4ab25a93dce5b8c1680db2016848f5c1bf762",
-      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "sourceHash": "sha256-2d625aa4eda5c54df34b0a811a7d88af7bab847cde473f781c0df3988195687c",
+      "sourceGitHead": "c5618bf681887293295682b2c759952ce18dd849",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
         "licenseUrl": null,
-        "fixtureId": "local-strong-learning-desktop",
+        "fixtureId": "web-day1-transfer-desktop",
         "promptHash": null,
         "lessonContentHash": null
       },
@@ -51,10 +51,10 @@
         "offlineIncluded": true
       },
       "learning": {
-        "alt": "Codaro 로컬 학습 화면에서 헬로월드 설명, 코드 예제, 강한 검증 상태가 한 흐름에 표시된 모습",
-        "caption": "설명, 실행 가능한 코드, 자동 검증이 같은 레슨 화면에서 이어집니다.",
-        "learningQuestion": "학습자는 설명을 읽은 뒤 어느 코드 영역을 바꾸고 실행해야 하는가?",
-        "decisionShown": "레슨 설명과 실행 및 검증 위치의 관계",
+        "alt": "Codaro 웹 학습 화면에서 헬로월드 목표, 개념 이미지, 학습 순서와 첫 실습이 한 문서 흐름에 표시된 모습",
+        "caption": "목표와 개념 이미지를 읽고 같은 화면 아래의 첫 실습으로 이어집니다.",
+        "learningQuestion": "학습자는 어떤 개념을 익힌 뒤 첫 실습으로 이동하는가?",
+        "decisionShown": "학습 목표, 개념 시각 자료, 학습 순서와 첫 실습의 연결",
         "lessonRefs": [
           "30일완성/헬로월드"
         ]
@@ -67,55 +67,75 @@
           "height": 760
         },
         "theme": "dark",
-        "locale": "ko-KR"
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/visuals/learning/python-fundamentals-v1.png",
+          "curricula/python/basics/30days",
+          "editor/src/App.tsx",
+          "editor/src/components/app/curriculumSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/curriculum",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/curriculaRegistry.ts",
+          "editor/src/lib/learningVisualAssets.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles"
+        ],
+        "sourceSetHash": "sha256-5b94da72c8c8e2a78592230cbe260a84ec4cdd6bfb3713adb0105482c81718ee"
       },
       "outputs": [
         {
-          "byteLength": 14079,
+          "byteLength": 12357,
           "format": "avif",
           "height": 405,
-          "integrity": "sha256-7cb6c5ee515dea55c437f5f39ac611e0cbaed4e2b59ba2a46c861de50c40308a",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-5f004b2afa8f.avif",
+          "integrity": "sha256-0bba809a3323dd64bb4440519ecfb2ae27b04b6a002f389caf3245a321108b06",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-2d625aa4eda5.avif",
           "width": 480
         },
         {
-          "byteLength": 15120,
+          "byteLength": 13864,
           "format": "webp",
           "height": 405,
-          "integrity": "sha256-c5f6c012f2645e6e3467c5ffc522d08f41e5129df48ee9d17ccfe74d628d2984",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-5f004b2afa8f.webp",
+          "integrity": "sha256-5403ccd5212816fced1d02a9c290ebbfcdfaa68520a679961cb34e0be7d23896",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-2d625aa4eda5.webp",
           "width": 480
         },
         {
-          "byteLength": 27324,
+          "byteLength": 24710,
           "format": "avif",
           "height": 608,
-          "integrity": "sha256-e3af74fd161bf76961af6fdcf7275284727249e4dd1e48931b3936f9bfda8e66",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-5f004b2afa8f.avif",
+          "integrity": "sha256-6b8d5d47cea540c83801084445b7fe79bd2810bbd43f30fa500bb4832edbb60b",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-2d625aa4eda5.avif",
           "width": 720
         },
         {
-          "byteLength": 30980,
+          "byteLength": 27468,
           "format": "webp",
           "height": 608,
-          "integrity": "sha256-c1ce5e8c4b82aef97f91cdabc46211762793f5441b3d54fafc7b3ac5408560ef",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-5f004b2afa8f.webp",
+          "integrity": "sha256-cf958ebf12852c947fd753b89136a6fdeb8bdc223b6f0a2e54545689ec45efdc",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-2d625aa4eda5.webp",
           "width": 720
         },
         {
-          "byteLength": 30133,
+          "byteLength": 26716,
           "format": "avif",
           "height": 760,
-          "integrity": "sha256-ee60fa0d932480acfb29e094d74bb2f0e81f6e0146848c3b79fe4c47a57d5ed2",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-5f004b2afa8f.avif",
+          "integrity": "sha256-4b318f0b357c1017ecc2251845bf320bc3a037e81901c845a0895968f82d0b68",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-2d625aa4eda5.avif",
           "width": 900
         },
         {
-          "byteLength": 42934,
+          "byteLength": 39008,
           "format": "webp",
           "height": 760,
-          "integrity": "sha256-749ce4ee27fba44ca0c5a0e91f067efcd69042516e99971ea8a2a9fa8a06ca5b",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-5f004b2afa8f.webp",
+          "integrity": "sha256-675bbc7ce6f9ce31fc7de7551f6029c263e2a2a675bff8b781ef779c9522a9d9",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-2d625aa4eda5.webp",
           "width": 900
         }
       ]
@@ -125,8 +145,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-mobile.png",
-      "sourceHash": "sha256-bc3c80e69c771493171151988e1d095589fa9dce06aa97b531fa7a251f5fbc09",
-      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "sourceHash": "sha256-7f57fbbe546eed374b2f8b4ce0463557e44373814a0581c6533ab67fedee00ec",
+      "sourceGitHead": "c5618bf681887293295682b2c759952ce18dd849",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -166,10 +186,10 @@
         "offlineIncluded": true
       },
       "learning": {
-        "alt": "390픽셀 너비의 Codaro 웹 레슨에서 학습 개요와 첫 학습 섹션이 열린 읽기 흐름으로 이어지는 모습",
-        "caption": "모바일에서도 별도 확인 단계 없이 학습 목표 다음에 실습이 이어집니다.",
-        "learningQuestion": "작은 화면에서도 현재 학습 목표와 다음 실습을 동시에 찾을 수 있는가?",
-        "decisionShown": "모바일 레슨의 정보 우선순위",
+        "alt": "390픽셀 너비의 Codaro 웹 레슨에서 헬로월드 목표, 개념 이미지와 오늘 배울 순서가 이어지는 모습",
+        "caption": "모바일에서도 목표와 개념 자료를 읽고 오늘 배울 순서를 한 흐름에서 확인합니다.",
+        "learningQuestion": "작은 화면에서도 현재 학습 목표와 오늘 배울 순서를 찾을 수 있는가?",
+        "decisionShown": "모바일 레슨에서 목표, 개념 자료, 학습 순서의 우선순위",
         "lessonRefs": [
           "30일완성/헬로월드"
         ]
@@ -182,23 +202,43 @@
           "height": 844
         },
         "theme": "dark",
-        "locale": "ko-KR"
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/visuals/learning/python-fundamentals-v1.png",
+          "curricula/python/basics/30days",
+          "editor/src/App.tsx",
+          "editor/src/components/app/curriculumSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/curriculum",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/curriculaRegistry.ts",
+          "editor/src/lib/learningVisualAssets.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles"
+        ],
+        "sourceSetHash": "sha256-5b94da72c8c8e2a78592230cbe260a84ec4cdd6bfb3713adb0105482c81718ee"
       },
       "outputs": [
         {
-          "byteLength": 22715,
+          "byteLength": 20167,
           "format": "avif",
           "height": 844,
-          "integrity": "sha256-5b0c6fe249862423ff2c4496657c6739584e980048cb05539a5357c5c41cdc27",
-          "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-bc3c80e69c77.avif",
+          "integrity": "sha256-a1699553d31d1e9abbf17205dad2d061bd5747ccc1577a62ddd1f316e2ebc860",
+          "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-7f57fbbe546e.avif",
           "width": 390
         },
         {
-          "byteLength": 31978,
+          "byteLength": 27906,
           "format": "webp",
           "height": 844,
-          "integrity": "sha256-9448e6bbde2d4bb54ceb994682b7a8ef5e8a3b4862977bce85b9ab63b9310572",
-          "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-bc3c80e69c77.webp",
+          "integrity": "sha256-2361fbde8258bd873500ed811bf0bbdf3f9099bede0437f2b20beb7bc2f1ab91",
+          "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-7f57fbbe546e.webp",
           "width": 390
         }
       ]
@@ -208,8 +248,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/web-run-desktop.png",
-      "sourceHash": "sha256-24a3746e0ef831559d1f62b1f579b677d032c7d85708842a424943f9e51cd355",
-      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "sourceHash": "sha256-7131d2830a8785fc89fa6bc049193ec99336c41a3e1836fb206c5889cc0cfdc6",
+      "sourceGitHead": "c5618bf681887293295682b2c759952ce18dd849",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -256,10 +296,10 @@
         "offlineIncluded": true
       },
       "learning": {
-        "alt": "설치 없이 브라우저 Python 셀을 실행하는 Codaro Web Run 전체 화면",
-        "caption": "Web Run은 브라우저 파일과 지원 패키지를 사용해 설치 없이 Python 셀을 실행합니다.",
-        "learningQuestion": "웹 실행 환경과 로컬 실행 환경의 권한 차이는 어디에 표시되는가?",
-        "decisionShown": "Web Run의 실행 계층과 지원 범위",
+        "alt": "한 개의 빈 Python 셀과 셀 추가 및 실행 컨트롤만 보이는 현재 Codaro Web Run 노트북",
+        "caption": "Web Run은 한 개의 빈 셀에서 시작하고 필요한 셀과 노트북 도구만 사용자가 직접 엽니다.",
+        "learningQuestion": "처음 진입한 사용자는 어디에 코드를 입력하고 어떻게 실행하는가?",
+        "decisionShown": "빈 셀, 셀 추가, reactive 실행과 전체 실행의 최소 노트북 흐름",
         "lessonRefs": []
       },
       "capture": {
@@ -270,55 +310,71 @@
           "height": 900
         },
         "theme": "dark",
-        "locale": "ko-KR"
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "editor/src/App.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/notebookSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/notebook",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/main.tsx",
+          "editor/src/styles"
+        ],
+        "sourceSetHash": "sha256-daf514e896faf1f7c7dad384c804676a89ef0291285bc86c16233db1e9e6e90b"
       },
       "outputs": [
         {
-          "byteLength": 6473,
+          "byteLength": 2802,
           "format": "avif",
           "height": 450,
-          "integrity": "sha256-847f9d99477da8acf874622d51accd617fdc17bd51c554d7c6851dae11807f25",
-          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-720-24a3746e0ef8.avif",
+          "integrity": "sha256-df52d97346cf450d02abe281bed1112ffe4f4757e44e9bcabf40af825f5741ad",
+          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-720-7131d2830a87.avif",
           "width": 720
         },
         {
-          "byteLength": 7020,
+          "byteLength": 2840,
           "format": "webp",
           "height": 450,
-          "integrity": "sha256-f646abb2355bc166d1c86332ed6f16ff79b34d2915d72e98cdbe269cf7b18dd0",
-          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-720-24a3746e0ef8.webp",
+          "integrity": "sha256-2a9affd65469ed2852cb74316785f4721ee9a0237c3f0a350495661224455684",
+          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-720-7131d2830a87.webp",
           "width": 720
         },
         {
-          "byteLength": 11642,
+          "byteLength": 4635,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-49e437dcf59fe166c10eb0e35697fe4338e315beb48cec62142cdd1664bc5416",
-          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-1080-24a3746e0ef8.avif",
+          "integrity": "sha256-24549a5ffd44606f05721ba16cbef54c5c9e7cb4164e0ef3c172a73ec85528af",
+          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-1080-7131d2830a87.avif",
           "width": 1080
         },
         {
-          "byteLength": 12910,
+          "byteLength": 5306,
           "format": "webp",
           "height": 675,
-          "integrity": "sha256-e304c04cd6a619c647412bc1b2087ba4182c5c2eb53395eca373b048d9f8d912",
-          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-1080-24a3746e0ef8.webp",
+          "integrity": "sha256-93db23ff0b0858ac81884672816fc2c08343cbd85e8739845dc02d2642ed63e1",
+          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-1080-7131d2830a87.webp",
           "width": 1080
         },
         {
-          "byteLength": 14060,
+          "byteLength": 6628,
           "format": "avif",
           "height": 900,
-          "integrity": "sha256-275485043b84d3445a3b4bbd69d0268a6d5f6678afda51ff26784fcb24856d2d",
-          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-1440-24a3746e0ef8.avif",
+          "integrity": "sha256-d50e184361e497c3e0323ebd1d967b0662e3212541ca8ea8a7bca9de732397df",
+          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-1440-7131d2830a87.avif",
           "width": 1440
         },
         {
-          "byteLength": 20014,
+          "byteLength": 7996,
           "format": "webp",
           "height": 900,
-          "integrity": "sha256-90b84bd6ff6a0a3793dc109e3a203e98b729a65b5bf2a41dfd735f5795214563",
-          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-1440-24a3746e0ef8.webp",
+          "integrity": "sha256-6bccc5c81a554daeefcb479aeed42154f2aada9dbdfc6217b44e05cd3877c4fe",
+          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-1440-7131d2830a87.webp",
           "width": 1440
         }
       ]
@@ -328,8 +384,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/local-notebook-desktop.png",
-      "sourceHash": "sha256-f63d588e284f23c6ca9615344f5d90498a2b61fbf9cf3c43c94504cf001ee3a1",
-      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "sourceHash": "sha256-46f7467a4677d07f3dfc6c9e8df01356f902311536cad86bd27671b34bf8cfb5",
+      "sourceGitHead": "c5618bf681887293295682b2c759952ce18dd849",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -370,10 +426,10 @@
         "offlineIncluded": true
       },
       "learning": {
-        "alt": "Codaro Local Studio에서 시스템 Python과 프로젝트 파일 및 터미널이 연결된 빈 노트북 화면",
-        "caption": "Local Studio는 같은 셀 모델에 실제 프로젝트 파일과 시스템 Python을 연결합니다.",
-        "learningQuestion": "웹에서 검증한 코드를 실제 프로젝트 파일로 옮길 때 어떤 실행 계층이 바뀌는가?",
-        "decisionShown": "Local Studio의 런타임 및 파일 권한 확장",
+        "alt": "한 개의 빈 Python 셀과 셀 추가 및 실행 컨트롤만 보이는 현재 Codaro Local 노트북",
+        "caption": "Local도 Web Run과 같은 한 셀 노트북에서 시작하고 운영체제 기능은 필요한 표면에서 확장합니다.",
+        "learningQuestion": "같은 노트북 문서 구조가 Local에서도 유지되는가?",
+        "decisionShown": "Web Run과 Local이 공유하는 최소 노트북 캔버스",
         "lessonRefs": []
       },
       "capture": {
@@ -384,39 +440,55 @@
           "height": 640
         },
         "theme": "dark",
-        "locale": "ko-KR"
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "editor/src/App.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/notebookSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/notebook",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/main.tsx",
+          "editor/src/styles"
+        ],
+        "sourceSetHash": "sha256-daf514e896faf1f7c7dad384c804676a89ef0291285bc86c16233db1e9e6e90b"
       },
       "outputs": [
         {
-          "byteLength": 4958,
+          "byteLength": 3868,
           "format": "avif",
           "height": 427,
-          "integrity": "sha256-e41f9b3ab2c76078917033aa18b2e52c3c8da0f1f019a4338caf86e27909973a",
-          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-600-f63d588e284f.avif",
+          "integrity": "sha256-ec695528e8715cd8f844f08451a21358878ed114af57916603a49b3e16bff11e",
+          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-600-46f7467a4677.avif",
           "width": 600
         },
         {
-          "byteLength": 5682,
+          "byteLength": 3754,
           "format": "webp",
           "height": 427,
-          "integrity": "sha256-dd86c158e076a220f6fc4b4b0de94ec12aadf7ebd5dc31212b37cf2a4ddbef0f",
-          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-600-f63d588e284f.webp",
+          "integrity": "sha256-59516ef526d382e66eebe614c676c3364aeb3fd8d190788dc55a82adae6b20ef",
+          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-600-46f7467a4677.webp",
           "width": 600
         },
         {
-          "byteLength": 7479,
+          "byteLength": 4817,
           "format": "avif",
           "height": 640,
-          "integrity": "sha256-2210abb3c67efd2dd89feab78ca7becce47eba5523a2281987496e6b8c9bee77",
-          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-900-f63d588e284f.avif",
+          "integrity": "sha256-b53fd128d8c2643d6807f0d1d0caeab27dfb15a74786fdd5e0e7970fef31fd3e",
+          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-900-46f7467a4677.avif",
           "width": 900
         },
         {
-          "byteLength": 10086,
+          "byteLength": 6524,
           "format": "webp",
           "height": 640,
-          "integrity": "sha256-0fb52d52e70c5ab437b636bb1732a3eeee35c469a1ddf051ead8f4b15fe8252d",
-          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-900-f63d588e284f.webp",
+          "integrity": "sha256-00cef552561e7e4ee711aa7a922573f871f09bcfe57e193df5b419975857153f",
+          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-900-46f7467a4677.webp",
           "width": 900
         }
       ]
@@ -426,8 +498,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/local-automation-desktop.png",
-      "sourceHash": "sha256-f64373a73e1cfab14fe888463eff3984241684d23c23570c3c1858068b71c48d",
-      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "sourceHash": "sha256-3967fecf894021fe88934c24df4c93c346b2b1ea4defd4adaa9a0b114e2604d4",
+      "sourceGitHead": "c5618bf681887293295682b2c759952ce18dd849",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -483,55 +555,72 @@
           "height": 900
         },
         "theme": "dark",
-        "locale": "ko-KR"
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "editor/src/App.tsx",
+          "editor/src/components/app/automationSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/automation",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/automationState.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles"
+        ],
+        "sourceSetHash": "sha256-1a3e3bf88dd96acfb20bd6d145e182e9532589ae0d5304d26d20243706ea3c04"
       },
       "outputs": [
         {
-          "byteLength": 17079,
+          "byteLength": 16770,
           "format": "avif",
           "height": 450,
-          "integrity": "sha256-e44c0bd252977fbe76001dfb9d4029d88172235333549d1d7eae48f58a7a6817",
-          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-720-f64373a73e1c.avif",
+          "integrity": "sha256-e0350a95d56512fc34cedd5877c73db7b6e97432d503b2f889d24768d4560836",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-720-3967fecf8940.avif",
           "width": 720
         },
         {
-          "byteLength": 18044,
+          "byteLength": 17354,
           "format": "webp",
           "height": 450,
-          "integrity": "sha256-db92b37b863523ea7da5455c66d35ccb349d306b3167701c8250adfba7eb8bda",
-          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-720-f64373a73e1c.webp",
+          "integrity": "sha256-82438bec590abbf3b0b2dfebcd64c841e648c12bce698917631e2b61385a157f",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-720-3967fecf8940.webp",
           "width": 720
         },
         {
-          "byteLength": 33269,
+          "byteLength": 32488,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-45726ae2a51c1535d777a7187682e5f03d718b2a0451b246726f42f192ece318",
-          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-f64373a73e1c.avif",
+          "integrity": "sha256-d91a204b9dba760f1a842294e26b861d197ffd6d2ef53be7c81e905f564c12e1",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-3967fecf8940.avif",
           "width": 1080
         },
         {
-          "byteLength": 35764,
+          "byteLength": 34298,
           "format": "webp",
           "height": 675,
-          "integrity": "sha256-9da997a43e83692ca8b6e6c2f2c81a3a85725bc39f408d5d1f9443de40ed61cf",
-          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-f64373a73e1c.webp",
+          "integrity": "sha256-68221b38e4bfa7a24d809c8f3e8230d7dbf77a9a29df1cc191b63645d43a93dc",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-3967fecf8940.webp",
           "width": 1080
         },
         {
-          "byteLength": 38551,
+          "byteLength": 38155,
           "format": "avif",
           "height": 900,
-          "integrity": "sha256-7782dc1914ef6d876ddea2684da96b9dd5baf494a80bbfa262ac8e56c943928a",
-          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-f64373a73e1c.avif",
+          "integrity": "sha256-4ef675907509e43fa4ea0eca6a7da4621f7e2cf9f0f1849f2a8a76b2f3573ad9",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-3967fecf8940.avif",
           "width": 1440
         },
         {
-          "byteLength": 55136,
+          "byteLength": 54286,
           "format": "webp",
           "height": 900,
-          "integrity": "sha256-9d3bec946d60a5af8807140fb5baeffc87aff09cded45bb3c81dbd619c9a7b0f",
-          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-f64373a73e1c.webp",
+          "integrity": "sha256-b532c956f74c7bd86ae98f9c5551f244c0e23d66210f90da9efb2e362d5bd730",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-3967fecf8940.webp",
           "width": 1440
         }
       ]

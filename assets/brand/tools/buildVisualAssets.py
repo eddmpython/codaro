@@ -49,6 +49,27 @@ def sha256Bytes(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
 
 
+def captureSourceSetHash(sourcePaths: list[str]) -> str:
+    files: set[Path] = set()
+    for relativeValue in sourcePaths:
+        sourcePath = resolveCaptureSourcePath(relativeValue)
+        if sourcePath.is_file():
+            files.add(sourcePath)
+            continue
+        files.update(path for path in sourcePath.rglob("*") if path.is_file())
+    if not files:
+        raise VisualAssetError("capture sourcePaths resolved to no files")
+
+    digest = hashlib.sha256()
+    for path in sorted(files, key=lambda item: item.relative_to(ROOT).as_posix()):
+        relativePath = path.relative_to(ROOT).as_posix()
+        digest.update(relativePath.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+    return f"sha256-{digest.hexdigest()}"
+
+
 def loadManifest(path: Path = MANIFEST_PATH) -> dict[str, Any]:
     value = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(value, dict):
@@ -158,6 +179,20 @@ def validateVisualManifest(manifest: dict[str, Any]) -> None:
             capture = requiredObject(asset, "capture", assetId)
             for field in ("browser", "browserVersion", "theme", "locale"):
                 requiredText(capture, field, f"{assetId}.capture")
+            sourcePaths = capture.get("sourcePaths")
+            if (
+                not isTextList(sourcePaths)
+                or sourcePaths != sorted(set(sourcePaths))
+            ):
+                raise VisualAssetError(
+                    f"{assetId}: capture sourcePaths must be sorted unique repository paths"
+                )
+            expectedSourceSetHash = requiredText(capture, "sourceSetHash", f"{assetId}.capture")
+            if not expectedSourceSetHash.startswith("sha256-") or len(expectedSourceSetHash) != 71:
+                raise VisualAssetError(f"{assetId}: capture sourceSetHash must be a SHA-256 value")
+            actualSourceSetHash = captureSourceSetHash(sourcePaths)
+            if expectedSourceSetHash != actualSourceSetHash:
+                raise VisualAssetError(f"{assetId}: capture source set hash drift")
             viewport = requiredObject(capture, "viewport", f"{assetId}.capture")
             if (
                 requiredPositiveInt(viewport, "width", f"{assetId}.capture.viewport") != width
@@ -302,6 +337,23 @@ def resolveSourcePath(relativeValue: str) -> Path:
     sourceRoot = VISUAL_ROOT.resolve()
     if not resolved.is_relative_to(sourceRoot) or GENERATED_ROOT.resolve() in resolved.parents:
         raise VisualAssetError(f"visual source escapes source root: {relativeValue}")
+    return resolved
+
+
+def resolveCaptureSourcePath(relativeValue: str) -> Path:
+    relativePath = Path(relativeValue)
+    if relativePath.is_absolute():
+        raise VisualAssetError(f"capture source must be repository-relative: {relativeValue}")
+    resolved = (ROOT / relativePath).resolve()
+    if not resolved.is_relative_to(ROOT) or not resolved.exists():
+        raise VisualAssetError(f"capture source path is missing or escapes repository: {relativeValue}")
+    forbiddenRoots = {
+        (ROOT / ".git").resolve(),
+        (ROOT / "output").resolve(),
+        GENERATED_ROOT.resolve(),
+    }
+    if any(resolved == forbidden or forbidden in resolved.parents for forbidden in forbiddenRoots):
+        raise VisualAssetError(f"capture source path cannot use generated or runtime output: {relativeValue}")
     return resolved
 
 

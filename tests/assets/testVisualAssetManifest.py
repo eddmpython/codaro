@@ -60,6 +60,15 @@ class VisualAssetManifestTest(unittest.TestCase):
         with self.assertRaisesRegex(BUILDER.VisualAssetError, "source hash drift"):
             BUILDER.validateVisualManifest(invalid)
 
+    def testCaptureSourceSetHashDriftIsRejected(self) -> None:
+        invalid = deepcopy(self.manifest)
+        captureAsset = next(
+            asset for asset in invalid["assets"] if asset["sourceType"] == "playwrightCapture"
+        )
+        captureAsset["capture"]["sourceSetHash"] = "sha256-" + "0" * 64
+        with self.assertRaisesRegex(BUILDER.VisualAssetError, "capture source set hash drift"):
+            BUILDER.validateVisualManifest(invalid)
+
     def testInstructionalPurposeCannotBeEmpty(self) -> None:
         invalid = deepcopy(self.manifest)
         invalid["assets"][0]["learning"]["decisionShown"] = ""
