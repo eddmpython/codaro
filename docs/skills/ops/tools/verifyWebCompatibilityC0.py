@@ -50,7 +50,10 @@ def loadContract(path: Path) -> dict[str, Any]:
 def treeFacts(root: Path) -> tuple[list[Path], dict[str, Any]]:
     if not root.is_dir():
         raise WebCompatibilityC0Error(f"C0 tree does not exist: {root}")
-    files = sorted(path for path in root.rglob("*") if path.is_file())
+    files = sorted(
+        (path for path in root.rglob("*") if path.is_file()),
+        key=lambda path: path.relative_to(root).as_posix().encode("utf-8"),
+    )
     digest = hashlib.sha256()
     byteCount = 0
     for path in files:

@@ -1045,7 +1045,10 @@ def treeContentFingerprint(root: Path) -> dict[str, object] | None:
     fileCount = 0
     byteCount = 0
     try:
-        paths = sorted(path for path in root.rglob("*") if path.is_file())
+        paths = sorted(
+            (path for path in root.rglob("*") if path.is_file()),
+            key=lambda path: path.relative_to(root).as_posix().encode("utf-8"),
+        )
         for path in paths:
             relativePath = path.relative_to(root).as_posix()
             contentHash = hashFile(path)

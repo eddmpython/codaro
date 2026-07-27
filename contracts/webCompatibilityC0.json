@@ -22,10 +22,10 @@
     "workflowArtifactExpiresAt": "2026-07-28T12:36:19Z"
   },
   "tree": {
-    "digestAlgorithm": "sha256(length(relativePath),relativePath,length(content),content)",
+    "digestAlgorithm": "sha256 over UTF-8 POSIX relative paths sorted by UTF-8 bytes: length(relativePath),relativePath,length(content),content",
     "fileCount": 632,
     "byteCount": 23761225,
-    "sha256": "87108db4ddbe27211989cac5c32cbf2fd451aac8a580acfe1a2e83ddb4a92457"
+    "sha256": "5c421c1bc35b28d722c4258ef946915ae6a24a39df383ec9a30b4f084b515dee"
   },
   "entrypoints": {
     "index.html": {

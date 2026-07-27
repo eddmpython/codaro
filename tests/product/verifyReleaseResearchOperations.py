@@ -114,7 +114,10 @@ def runBuild(command: tuple[str, ...], *, cwd: Path, environment: dict[str, str]
 
 def treeDigest(root: Path) -> tuple[int, str]:
     digest = hashlib.sha256()
-    files = sorted(path for path in root.rglob("*") if path.is_file())
+    files = sorted(
+        (path for path in root.rglob("*") if path.is_file()),
+        key=lambda path: path.relative_to(root).as_posix().encode("utf-8"),
+    )
     for path in files:
         relative = path.relative_to(root).as_posix().encode("utf-8")
         digest.update(len(relative).to_bytes(4, "big"))
