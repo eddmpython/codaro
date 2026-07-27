@@ -3,7 +3,7 @@ import { resolveVisualAsset } from "../lib/visualAssets.js";
 export function ProductVisual({ assetId, className, eager = false, width }) {
   const asset = resolveVisualAsset(assetId, { format: "webp", width });
   return (
-    <picture className={className}>
+    <picture className={className} data-visual-asset={asset.id} data-visual-kind={asset.kind}>
       {asset.sources.map((source) => (
         <source key={source.format} srcSet={source.srcSet} type={source.type} />
       ))}

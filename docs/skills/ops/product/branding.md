@@ -67,6 +67,8 @@ whenToUse: 새 UI 컴포넌트 추가, 색/반지름/그림자 변경, 랜딩/�
 - 제품 section을 떠 있는 card로 만들거나 card 안에 card를 넣지 않는다. card는 반복 항목, modal, 실제 도구 frame에만 사용한다.
 - 실제 제품 screenshot과 학습 결과 이미지를 mascot보다 우선하는 product proof로 사용한다. fake terminal, fake editor, emoji primary icon을 새로 만들지 않는다.
 - 제품 screenshot은 `assets/brand/visuals/manifest.json`의 `fixtureId`, viewport, theme가 캡처 입력의 SSOT다. `tests/assets/captureProductVisuals.py --check`는 각 fixture를 격리 실행해 canonical PNG와 fresh pixels가 같은지, 사용자 home path·email·credential 신호가 보이지 않는지 검사한다. 제품 UI를 바꾼 뒤에는 구현 commit이 clean한 상태에서 `--update`로 원본, source hash·git head·source-set hash, AVIF/WebP와 Landing·Editor mirror를 함께 갱신한다. 브라우저 output을 수동 복사하거나 generated variant만 교체하지 않는다.
+- 학습 결과 증명은 `assets/brand/visuals/outcomes/fixtures.json`의 고정 입력과 `assets/brand/tools/captureOutcomeProofs.py`가 소유한다. outcome proof는 입력, 실행 결과, 검증 영수증을 한 프레임에서 비교하고 색만으로 성공을 표현하지 않는다. `--check`는 canonical PNG와 fresh fixture pixels를 대조하며 `--update`는 clean 구현 commit을 sourceGitHead로 결속한 뒤 AVIF/WebP와 Landing·Editor mirror를 함께 갱신한다.
+- Landing의 목표 경로와 Editor의 해당 레슨은 outcome asset ID를 `assets/brand/visuals/manifest.json`에서 해석한다. 제품 화면이나 장식 illustration을 실제 결과 증명 대신 사용하지 않는다.
 - 예측 카드는 학습 경험에 다시 도입하지 않는다. 학습 흐름은 설명, 직접 수정, 실행, 오류 수정, 강한 검증, 실무 변주다.
 - 학습 본문 정리 과정은 `#`, 괄호, 대괄호, 연산자처럼 코드 학습에 필요한 문자를 삭제하지 않는다. 인라인 코드는 semantic code element로 남기고 조각 경계 공백을 보존한다.
 

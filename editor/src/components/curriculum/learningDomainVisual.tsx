@@ -1,5 +1,6 @@
 import {
   learningVisualDomainForCategory,
+  resolveLearningOutcomeVisual,
   resolveLearningVisual,
   type LearningVisualDomainId,
 } from "@/lib/learningVisualAssets";
@@ -27,9 +28,13 @@ export function LearningDomainVisual({
 }: LearningDomainVisualProps) {
   const resolvedDomainId = domainId
     ?? learningVisualDomainForCategory(category, track, path)?.id;
-  if (!resolvedDomainId) return children ? <>{children}</> : null;
+  const outcomeVisual = variant === "lesson"
+    ? resolveLearningOutcomeVisual(category, 840)
+    : null;
+  if (!resolvedDomainId && !outcomeVisual) return children ? <>{children}</> : null;
 
-  const visual = resolveLearningVisual(resolvedDomainId, variant === "home" ? 480 : 840);
+  const visual = outcomeVisual
+    ?? (resolvedDomainId ? resolveLearningVisual(resolvedDomainId, variant === "home" ? 480 : 840) : null);
   if (!visual) return children ? <>{children}</> : null;
 
   return (
@@ -40,10 +45,10 @@ export function LearningDomainVisual({
           && "grid gap-3 sm:grid-cols-[minmax(240px,0.95fr)_minmax(0,1.05fr)] sm:items-start sm:gap-4",
         className,
       )}
-      data-learning-domain={visual.domainId}
+      data-learning-domain={resolvedDomainId}
       data-learning-domain-visual="true"
       data-learning-visual-asset={visual.id}
-      data-learning-visual-kind="instructional"
+      data-learning-visual-kind={visual.kind}
     >
       <picture className="block min-w-0 overflow-hidden rounded-lg border border-border bg-card">
         {visual.sources.map((source) => (
@@ -56,7 +61,10 @@ export function LearningDomainVisual({
         ))}
         <img
           alt={visual.alt}
-          className="aspect-video h-auto w-full object-cover"
+          className={cn(
+            "aspect-video h-auto w-full",
+            visual.kind === "outcomeProof" ? "object-contain" : "object-cover",
+          )}
           decoding="async"
           height={visual.height}
           loading={variant === "home" ? "lazy" : "eager"}
@@ -67,7 +75,9 @@ export function LearningDomainVisual({
       </picture>
 
       <figcaption className={cn("min-w-0", variant === "home" && "mt-3")}>
-        <div className="text-xs font-bold text-accent-brand">{visual.domainLabel}</div>
+        <div className="text-xs font-bold text-accent-brand">
+          {"domainLabel" in visual ? visual.domainLabel : ""}
+        </div>
         <p className="mt-1 text-sm font-normal leading-5 text-foreground sm:leading-6">{visual.caption}</p>
         <dl className="mt-2 space-y-2 sm:mt-3 sm:space-y-2.5">
           <div

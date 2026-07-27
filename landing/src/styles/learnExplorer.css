@@ -273,6 +273,10 @@
   object-fit: cover;
 }
 
+.learnPathVisual[data-visual-kind="outcomeProof"] img {
+  object-fit: contain;
+}
+
 .learnPathNumber,
 .learnDomainIndex,
 .learnLessonIndex {

@@ -116,6 +116,33 @@ def testLearningVisualsUseOneManifestBackedDomainMapping() -> None:
         assert learningVisuals.count(f'assetId: "{assetId}"') == 1
     for categoryKey in ("30days", "pandas", "matplotlib", "sklearn", "opencv", "playwright", "devTools", "llmBasics"):
         assert f'"{categoryKey}"' in learningVisuals
+    for assetId in (
+        "dataReportOutcome",
+        "fileAutomationOutcome",
+        "officeAutomationOutcome",
+        "webMonitoringOutcome",
+    ):
+        assert learningVisuals.count(f'assetId: "{assetId}"') == 1
+    assert "resolveLearningOutcomeVisual(category, 840)" in _read(
+        "editor/src/components/curriculum/learningDomainVisual.tsx"
+    )
+
+
+def testLandingOutcomePathsUseActualOutcomeProofAssets() -> None:
+    home = _read("landing/src/pages/home.jsx")
+    learn = _read("landing/src/pages/learn.jsx")
+    productVisual = _read("landing/src/components/productVisual.jsx")
+
+    for assetId in (
+        "dataReportOutcome",
+        "fileAutomationOutcome",
+        "officeAutomationOutcome",
+        "webMonitoringOutcome",
+    ):
+        assert f'assetId: "{assetId}"' in learn
+    assert 'assetId: "dataReportOutcome"' in home
+    assert 'assetId: "fileAutomationOutcome"' in home
+    assert "data-visual-kind={asset.kind}" in productVisual
 
 
 def testLearningHomeAndLessonRenderInstructionalVisualsWithoutRevealControls() -> None:
@@ -130,7 +157,7 @@ def testLearningHomeAndLessonRenderInstructionalVisualsWithoutRevealControls() -
     assert "category={selectedCategory}" in overview
     for marker in (
         'data-learning-domain-visual="true"',
-        'data-learning-visual-kind="instructional"',
+        "data-learning-visual-kind={visual.kind}",
         'data-learning-visual-question="true"',
         'data-learning-visual-decision="true"',
         "visual.learning.learningQuestion",
@@ -143,6 +170,7 @@ def testLearningHomeAndLessonRenderInstructionalVisualsWithoutRevealControls() -
     assert '"name": "web-learning-home-desktop"' in browserGate
     assert '"viewport": {"width": 1440, "height": 900}' in browserGate
     assert "all 8 instructional learning-domain visuals must render" in browserGate
+    assert "learningOutcomeVisualCount" in browserGate
 
 
 def testPublicLearningExplorerPersistsFiltersAndLessonVisualFillsItsFrame() -> None:

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sourceManifestHash": "sha256-01d8be8eb6f0e8111e4cbaed2ea675cfbf78c261e6ee180ee72b1e1efec5a2a1",
+  "sourceManifestHash": "sha256-df0c5751a63cd14f9c914af3370c3547ff93b5bc79ba1d8bdf941a7e8e93888a",
   "assets": [
     {
       "id": "runLearningDetail",
@@ -91,7 +91,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-c61b36b08cd276d9cc859bb0012844576db93f6078958413126792cc5855640e"
+        "sourceSetHash": "sha256-967da03e946b53a43301e8086320a83f58443939f95bef6349b7912fab6289d6"
       },
       "outputs": [
         {
@@ -230,7 +230,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-c61b36b08cd276d9cc859bb0012844576db93f6078958413126792cc5855640e"
+        "sourceSetHash": "sha256-967da03e946b53a43301e8086320a83f58443939f95bef6349b7912fab6289d6"
       },
       "outputs": [
         {
@@ -338,7 +338,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-ee0cda39964e096beab8cf5ae0d05a333b178a707a7a0f4bf722d20553662a1c"
+        "sourceSetHash": "sha256-9552ce0915a1b73e89d73dc362edc7791165191fb24cd272d14f94d63c6dfe5b"
       },
       "outputs": [
         {
@@ -472,7 +472,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-ee0cda39964e096beab8cf5ae0d05a333b178a707a7a0f4bf722d20553662a1c"
+        "sourceSetHash": "sha256-9552ce0915a1b73e89d73dc362edc7791165191fb24cd272d14f94d63c6dfe5b"
       },
       "outputs": [
         {
@@ -592,7 +592,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-d17cfb951e065429ac700325ad00a8234e3d06683a64edea66fbbaed600f3df5"
+        "sourceSetHash": "sha256-99097f31f125c5caeda4201626e3f8c7933974cf5b43abb9281010aee0629b1e"
       },
       "outputs": [
         {
@@ -642,6 +642,506 @@
           "integrity": "sha256-e1202d6c0f85212063a352f8955c7573c355c4601fa0a5f962ee75ec5e833d26",
           "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-49cedaaade40.webp",
           "width": 1440
+        }
+      ]
+    },
+    {
+      "id": "dataReportOutcome",
+      "kind": "outcomeProof",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/outcomes/dataReportOutcome.png",
+      "sourceHash": "sha256-ec957d18c47b7601355a4ae34fa065f024becf24178692e66a8055663ddc3ff7",
+      "sourceGitHead": "83ac90dafc9d261e519ac6d2116ff2248ad268b8",
+      "provenance": {
+        "author": "Codaro outcome capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "data-report-monthly-channel-v1",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1200,
+        "height": 675,
+        "aspectRatio": 1.777778,
+        "focalPoint": {
+          "x": 0.62,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-outcome",
+          "path-dataReporting",
+          "learn-outcome"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "orders.csv의 채널별 주문과 매출 행이 총 주문, 총 매출, 채널별 막대와 검증 영수증이 있는 월간 보고서로 바뀐 결과",
+        "caption": "원본 CSV 네 행을 집계해 합계와 채널 비교가 읽히는 보고서를 만들고 행 수와 합계를 다시 검산합니다.",
+        "learningQuestion": "원본 행은 어떤 집계와 검증을 거쳐 의사결정 가능한 보고서가 되는가?",
+        "decisionShown": "원본 표, 집계 지표, 채널 비교 차트와 합계 검증의 전후 관계",
+        "lessonRefs": [
+          "pandas/10_실전종합프로젝트"
+        ]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1200,
+          "height": 675
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/fonts",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/tools/captureOutcomeProofs.py",
+          "assets/brand/visuals/outcomes/fixtures.json"
+        ],
+        "sourceSetHash": "sha256-3acf2e960c447aa4c2274f6838fdc0d63184590519cc413da0a76f60fea40e95"
+      },
+      "outputs": [
+        {
+          "byteLength": 4384,
+          "format": "avif",
+          "height": 270,
+          "integrity": "sha256-ad4cfd2da09c0937368b52fe592e541f3ff8abbbf99dc767872271bf6945ead0",
+          "publicPath": "/visuals/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 4352,
+          "format": "webp",
+          "height": 270,
+          "integrity": "sha256-9cbeebb6c112489b64f30c54c7c2f399d55efa241dcd51939b508e0261bb1e62",
+          "publicPath": "/visuals/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 7581,
+          "format": "avif",
+          "height": 405,
+          "integrity": "sha256-3fd5b0b2ad1c37bf60dcb394522ddefe58c2e6e04839e7583f25e15de2d7adec",
+          "publicPath": "/visuals/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 7648,
+          "format": "webp",
+          "height": 405,
+          "integrity": "sha256-efdfabe6fe5b4ac2ad1a94ffe0a7a91e82083426c19f4fac2381451627dd65ca",
+          "publicPath": "/visuals/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 12151,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-45dbbdd22708a81ce366c4d4dd245959e94c0002accc47fdc33f1619af22baa8",
+          "publicPath": "/visuals/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 17602,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-97d666ec9432909bedd088ae1eda0afd0ad3810e9beabf5661bd419fead54595",
+          "publicPath": "/visuals/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.webp",
+          "width": 1200
+        }
+      ]
+    },
+    {
+      "id": "fileAutomationOutcome",
+      "kind": "outcomeProof",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/outcomes/fileAutomationOutcome.png",
+      "sourceHash": "sha256-ce17121e083ea0e261de403e19eaefb5c5ed9e59b493d57dd40c13974468d728",
+      "sourceGitHead": "83ac90dafc9d261e519ac6d2116ff2248ad268b8",
+      "provenance": {
+        "author": "Codaro outcome capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "file-automation-downloads-v1",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1200,
+        "height": 675,
+        "aspectRatio": 1.777778,
+        "focalPoint": {
+          "x": 0.62,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-outcome",
+          "path-fileAutomation",
+          "learn-outcome"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "Downloads의 CSV, PDF, PNG, TXT, Markdown 파일 다섯 개가 데이터, 문서, 이미지 폴더로 분류되고 원본 보존 검증을 통과한 결과",
+        "caption": "정리 전 파일 목록을 확장자 규칙으로 세 폴더에 배치하고 dry-run, 충돌, 원본 보존을 함께 확인합니다.",
+        "learningQuestion": "실제 파일을 옮기기 전에 분류 결과와 충돌 위험을 어떻게 확인하는가?",
+        "decisionShown": "정리 전 파일, 정리 후 폴더 구조와 안전한 dry-run 영수증",
+        "lessonRefs": [
+          "fileOps/10_종합다운로드폴더정리"
+        ]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1200,
+          "height": 675
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/fonts",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/tools/captureOutcomeProofs.py",
+          "assets/brand/visuals/outcomes/fixtures.json"
+        ],
+        "sourceSetHash": "sha256-3acf2e960c447aa4c2274f6838fdc0d63184590519cc413da0a76f60fea40e95"
+      },
+      "outputs": [
+        {
+          "byteLength": 3966,
+          "format": "avif",
+          "height": 270,
+          "integrity": "sha256-2afd0380e6d521d0b45e28e4b927e566e1ab485b31f1236d781c6079d7f8547c",
+          "publicPath": "/visuals/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 3874,
+          "format": "webp",
+          "height": 270,
+          "integrity": "sha256-667359fb4bdcfe73b3b42762e550f29c1344451b537b6e5ceca35bcfda720dd9",
+          "publicPath": "/visuals/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 6698,
+          "format": "avif",
+          "height": 405,
+          "integrity": "sha256-9eb0c6a6494dd8f70c34db0adb78000815213842a3db6011f05e272e324dbcd4",
+          "publicPath": "/visuals/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 6872,
+          "format": "webp",
+          "height": 405,
+          "integrity": "sha256-e8bc9e3f5304b950c082fadc01ddb6249b45cb536562ddb64a2d9c51f7972510",
+          "publicPath": "/visuals/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 11598,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-94eb73ae689d6e1db7f20bf345b1115508ae71b1b85f9c8811bd4e85bc526a6b",
+          "publicPath": "/visuals/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 15630,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-47f3123bd0ba66f59551cb9f3a8b05d445c1c54754f037d99b78f4e3fc536087",
+          "publicPath": "/visuals/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.webp",
+          "width": 1200
+        }
+      ]
+    },
+    {
+      "id": "officeAutomationOutcome",
+      "kind": "outcomeProof",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/outcomes/officeAutomationOutcome.png",
+      "sourceHash": "sha256-f1c770d50406d59749e42c04c5a24c4359cca201c38290ffb904981423a98197",
+      "sourceGitHead": "83ac90dafc9d261e519ac6d2116ff2248ad268b8",
+      "provenance": {
+        "author": "Codaro outcome capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "office-automation-monthly-sales-v1",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1200,
+        "height": 675,
+        "aspectRatio": 1.777778,
+        "focalPoint": {
+          "x": 0.62,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-outcome",
+          "path-officeAutomation",
+          "learn-outcome"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "sales.xlsx의 4월부터 7월 목표와 실적 표가 목표, 실적, 달성률과 월별 차이를 가진 월간 보고서 sheet로 바뀐 결과",
+        "caption": "원본 workbook의 월별 값을 보고서 sheet로 집계하고 수식 결과와 합계를 재검산합니다.",
+        "learningQuestion": "보이는 workbook 결과와 다시 열어 검증할 구조 정보는 어떻게 함께 남는가?",
+        "decisionShown": "입력 sheet, 보고서 sheet, 수식 집계와 재검산 영수증",
+        "lessonRefs": [
+          "openpyxl/10_월간매출리포트생성기"
+        ]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1200,
+          "height": 675
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/fonts",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/tools/captureOutcomeProofs.py",
+          "assets/brand/visuals/outcomes/fixtures.json"
+        ],
+        "sourceSetHash": "sha256-3acf2e960c447aa4c2274f6838fdc0d63184590519cc413da0a76f60fea40e95"
+      },
+      "outputs": [
+        {
+          "byteLength": 5322,
+          "format": "avif",
+          "height": 270,
+          "integrity": "sha256-44c9bed4b2cf597c90182b63aa2d231de0d48a897dcd0f36f0a43ba5327b5881",
+          "publicPath": "/visuals/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 5274,
+          "format": "webp",
+          "height": 270,
+          "integrity": "sha256-ede776527e99aece692cd97982d2104d51fbb584e7d2f850a0bcd1ac973fe2bc",
+          "publicPath": "/visuals/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 9103,
+          "format": "avif",
+          "height": 405,
+          "integrity": "sha256-a755d1f1aac03b7847bb4adbd920fd336e17337fc451b1bfb161247e03c5c488",
+          "publicPath": "/visuals/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 9322,
+          "format": "webp",
+          "height": 405,
+          "integrity": "sha256-0002c7a17aa74c1047ed2401e4010c03b7eed33e4de9473605c801aa0107c66c",
+          "publicPath": "/visuals/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 15691,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-e1c1747baa5415975d0cb3cbfb3623c7d56be54a03b351e9bfb2af72ea5e49b2",
+          "publicPath": "/visuals/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 20968,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-74eb34130edb28daec5cf8399bc022a4aca905c4d894153580978278fa22cba7",
+          "publicPath": "/visuals/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.webp",
+          "width": 1200
+        }
+      ]
+    },
+    {
+      "id": "webMonitoringOutcome",
+      "kind": "outcomeProof",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/outcomes/webMonitoringOutcome.png",
+      "sourceHash": "sha256-9fc0240d4f0ffd145d15c4d013fd0a73d2237078791806bc8f924458a6d5d00d",
+      "sourceGitHead": "83ac90dafc9d261e519ac6d2116ff2248ad268b8",
+      "provenance": {
+        "author": "Codaro outcome capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-monitoring-checkout-v1",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1200,
+        "height": 675,
+        "aspectRatio": 1.777778,
+        "focalPoint": {
+          "x": 0.62,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-outcome",
+          "path-webMonitoring",
+          "learn-outcome"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "결제 fixture의 응답, 버튼, 접근성 이름, 네트워크 요청 네 항목이 모두 통과하고 화면 증거 파일과 해시가 남은 점검 결과",
+        "caption": "페이지 상태 네 항목을 검사하고 실행 시간, 화면 증거와 검증 범위를 하나의 감사 결과로 묶습니다.",
+        "learningQuestion": "브라우저 자동화가 성공했다는 주장을 어떤 상태와 증거로 재현하는가?",
+        "decisionShown": "상태 점검, 성공·실패 집계, screenshot 해시와 감사 범위",
+        "lessonRefs": [
+          "playwright/10_종합브라우저점검프로젝트"
+        ]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1200,
+          "height": 675
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/fonts",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/tools/captureOutcomeProofs.py",
+          "assets/brand/visuals/outcomes/fixtures.json"
+        ],
+        "sourceSetHash": "sha256-3acf2e960c447aa4c2274f6838fdc0d63184590519cc413da0a76f60fea40e95"
+      },
+      "outputs": [
+        {
+          "byteLength": 3970,
+          "format": "avif",
+          "height": 270,
+          "integrity": "sha256-3fcbe8f5d1b392a04cc508d9d188582ef75cf18cf739cc31bf59793c9a3007ba",
+          "publicPath": "/visuals/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 3904,
+          "format": "webp",
+          "height": 270,
+          "integrity": "sha256-db60bf3bb022ddc201eef5fc8b9422637cee14b5f1ecb3bc03bdb401f37b7e5a",
+          "publicPath": "/visuals/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 6866,
+          "format": "avif",
+          "height": 405,
+          "integrity": "sha256-4feaed9dbba456df71745dcb3ab0986c39c9e74b86963b6799ab718e338540e7",
+          "publicPath": "/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 6882,
+          "format": "webp",
+          "height": 405,
+          "integrity": "sha256-1e19a8dbb1d5e568f8139404b5307e391393acfc80af173d2b6bfa8cc9ca57ee",
+          "publicPath": "/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 11895,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-32d5c78b289a61e9f5c4cfce017064cf9f20698eb5009a4b112539b6000432ac",
+          "publicPath": "/visuals/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 15896,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-cd8a308afee85e345cd7c964d988da1177891aa09c7d0aa1f047cf625e805509",
+          "publicPath": "/visuals/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.webp",
+          "width": 1200
         }
       ]
     },

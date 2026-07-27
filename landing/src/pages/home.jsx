@@ -55,7 +55,7 @@ const outcomeStories = [
     eyebrow: "DATA REPORT",
     title: "흩어진 표를 읽히는 보고서로",
     copy: "정리, 비교, 시각화, 해석을 하나의 재현 가능한 Python 흐름으로 만듭니다.",
-    assetId: "runLearningDetail",
+    assetId: "dataReportOutcome",
     href: `${appPath("/learn")}?path=dataReporting`,
   },
   {
@@ -63,7 +63,7 @@ const outcomeStories = [
     eyebrow: "SAFE AUTOMATION",
     title: "반복 작업을 검증 가능한 자동화로",
     copy: "웹에서 로직을 익힌 뒤 Local에서 파일, 일정, 실제 업무 환경까지 연결합니다.",
-    assetId: "localAutomationDesktop",
+    assetId: "fileAutomationOutcome",
     href: `${appPath("/learn")}?path=fileAutomation`,
   },
 ];

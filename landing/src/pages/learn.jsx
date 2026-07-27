@@ -62,7 +62,7 @@ const pathDefinitions = [
     label: "데이터 분석 보고서",
     result: "근거가 보이는 보고서",
     detail: "표를 정리하고 비교해 질문에 답하는 분석을 만듭니다.",
-    assetId: "dataAnalysis",
+    assetId: "dataReportOutcome",
   },
   {
     pathId: "dataVisualization",
@@ -78,7 +78,7 @@ const pathDefinitions = [
     label: "파일 자동화",
     result: "반복 가능한 파일 작업",
     detail: "브라우저에서 로직을 익힌 뒤 실제 파일로 확장합니다.",
-    assetId: "learningAutomation",
+    assetId: "fileAutomationOutcome",
   },
   {
     pathId: "officeAutomation",
@@ -86,7 +86,7 @@ const pathDefinitions = [
     label: "오피스 자동화",
     result: "다시 실행 가능한 산출물",
     detail: "표와 문서를 매번 같은 품질로 만드는 흐름을 설계합니다.",
-    assetId: "dataAnalysis",
+    assetId: "officeAutomationOutcome",
   },
   {
     pathId: "webMonitoring",
@@ -94,7 +94,7 @@ const pathDefinitions = [
     label: "웹 모니터링",
     result: "실패를 기록하는 감시 작업",
     detail: "요청, 점검, 알림, 복구를 안전한 작업으로 운영합니다.",
-    assetId: "learningAutomation",
+    assetId: "webMonitoringOutcome",
   },
 ];
 

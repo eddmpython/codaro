@@ -77,6 +77,33 @@ export const LEARNING_VISUAL_DOMAINS = [
 
 export type LearningVisualDomainId = (typeof LEARNING_VISUAL_DOMAINS)[number]["id"];
 
+export const LEARNING_OUTCOME_VISUALS = [
+  {
+    id: "dataReporting",
+    label: "데이터 보고서 결과",
+    assetId: "dataReportOutcome",
+    categoryKeys: ["pandas"],
+  },
+  {
+    id: "fileAutomation",
+    label: "파일 자동화 결과",
+    assetId: "fileAutomationOutcome",
+    categoryKeys: ["fileOps", "watchSched"],
+  },
+  {
+    id: "officeAutomation",
+    label: "오피스 자동화 결과",
+    assetId: "officeAutomationOutcome",
+    categoryKeys: ["excel", "openpyxl", "xlwings"],
+  },
+  {
+    id: "webMonitoring",
+    label: "웹 모니터링 결과",
+    assetId: "webMonitoringOutcome",
+    categoryKeys: ["playwright"],
+  },
+] as const;
+
 export function learningVisualDomainForCategory(
   categoryKey: string,
   track = "",
@@ -93,6 +120,12 @@ export function learningVisualDomainById(domainId: LearningVisualDomainId) {
   return LEARNING_VISUAL_DOMAINS.find((domain) => domain.id === domainId) ?? null;
 }
 
+export function learningOutcomeVisualForCategory(categoryKey: string) {
+  return LEARNING_OUTCOME_VISUALS.find((outcome) => (
+    (outcome.categoryKeys as readonly string[]).includes(categoryKey)
+  )) ?? null;
+}
+
 export function resolveLearningVisual(
   domainId: LearningVisualDomainId,
   width: number,
@@ -106,3 +139,12 @@ export function resolveLearningVisual(
   };
 }
 
+export function resolveLearningOutcomeVisual(categoryKey: string, width: number) {
+  const outcome = learningOutcomeVisualForCategory(categoryKey);
+  if (!outcome) return null;
+  return {
+    ...resolveVisualAsset(outcome.assetId, { width }),
+    domainLabel: outcome.label,
+    outcomeId: outcome.id,
+  };
+}

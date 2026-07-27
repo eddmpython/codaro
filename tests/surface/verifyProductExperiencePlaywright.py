@@ -2749,7 +2749,13 @@ async ({ surface, expectedTier }) => {
       'button[data-curriculum-home-category][data-learning-control-intent="navigation"]'
     ).length,
     learningDomainVisualCount: document.querySelectorAll(
+      '[data-learning-domain-visual="true"]'
+    ).length,
+    learningInstructionalVisualCount: document.querySelectorAll(
       '[data-learning-domain-visual="true"][data-learning-visual-kind="instructional"]'
+    ).length,
+    learningOutcomeVisualCount: document.querySelectorAll(
+      '[data-learning-domain-visual="true"][data-learning-visual-kind="outcomeProof"]'
     ).length,
     learningVisualQuestionCount: document.querySelectorAll(
       '[data-learning-domain-visual="true"] [data-learning-visual-question="true"]'
@@ -2901,10 +2907,10 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
             failures.append(f"{name}: empty custom curriculum promotion leaked into learning navigation")
         if audit["learningGoalMapCount"] != 1 or audit["learningGoalRouteCount"] < 1:
             failures.append(f"{name}: outcome-first goal navigation did not render")
-        if audit["learningDomainVisualCount"] < 8:
+        if audit["learningInstructionalVisualCount"] < 8:
             failures.append(
                 f"{name}: all 8 instructional learning-domain visuals must render, "
-                f"got {audit['learningDomainVisualCount']}"
+                f"got {audit['learningInstructionalVisualCount']}"
             )
         if (
             audit["learningVisualQuestionCount"] != audit["learningDomainVisualCount"]

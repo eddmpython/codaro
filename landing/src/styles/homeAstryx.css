@@ -421,6 +421,10 @@
   object-fit: cover;
 }
 
+.homeOutcomeImage[data-visual-kind="outcomeProof"] img {
+  object-fit: contain;
+}
+
 .homeOutcomeCopy {
   display: grid;
   min-width: 0;

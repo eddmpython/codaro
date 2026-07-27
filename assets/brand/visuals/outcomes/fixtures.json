@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "dataReportOutcome": {
+    "title": "월간 채널 보고서",
+    "inputName": "orders.csv",
+    "rows": [
+      {"channel": "검색", "orders": 42, "revenue": 1260000},
+      {"channel": "콘텐츠", "orders": 31, "revenue": 1085000},
+      {"channel": "추천", "orders": 24, "revenue": 840000},
+      {"channel": "이메일", "orders": 18, "revenue": 540000}
+    ]
+  },
+  "fileAutomationOutcome": {
+    "title": "다운로드 폴더 정리",
+    "inputName": "Downloads",
+    "files": [
+      {"name": "7월_매출.csv", "category": "데이터", "bytes": 18240},
+      {"name": "거래처_계약서.pdf", "category": "문서", "bytes": 248300},
+      {"name": "제품_사진.png", "category": "이미지", "bytes": 862140},
+      {"name": "회의_메모.txt", "category": "문서", "bytes": 4280},
+      {"name": "읽어주세요.md", "category": "문서", "bytes": 1960}
+    ]
+  },
+  "officeAutomationOutcome": {
+    "title": "월간 매출 workbook",
+    "inputName": "sales.xlsx",
+    "rows": [
+      {"month": "4월", "target": 2200000, "actual": 2140000},
+      {"month": "5월", "target": 2400000, "actual": 2520000},
+      {"month": "6월", "target": 2600000, "actual": 2730000},
+      {"month": "7월", "target": 2800000, "actual": 3010000}
+    ]
+  },
+  "webMonitoringOutcome": {
+    "title": "결제 흐름 점검",
+    "inputName": "checkout.fixture",
+    "checks": [
+      {"label": "페이지 응답", "value": "200", "passed": true},
+      {"label": "결제 버튼", "value": "visible", "passed": true},
+      {"label": "접근성 이름", "value": "결제하기", "passed": true},
+      {"label": "네트워크 요청", "value": "3 / 3", "passed": true}
+    ],
+    "evidence": "checkout-ready.png"
+  }
+}

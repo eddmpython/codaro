@@ -2,7 +2,7 @@
 
 상태: 진행
 
-남은 종료 조건은 instructional asset의 lesson anchor 사람 승인, outcome proof, light/dark 쌍 캡처, 사람 자산 검수와 전체 shot list다.
+남은 종료 조건은 instructional asset의 lesson anchor 사람 승인, `pythonFoundation`·`dataVisualization` 결과 증명, light/dark 쌍 캡처, 사람 자산 검수와 나머지 shot list다.
 
 ## 목표
 
@@ -36,14 +36,10 @@
 | `runLearningMobile` | 390px에서 학습과 실행 action | mobile landing, docs |
 | `localAutomationDesktop` | task 목록, schedule, 최근 run, audit, E-Stop | landing capability, Local empty state |
 | `localNotebookDesktop` | 파일 기반 notebook과 변수 결과 | landing, docs |
-| `dataReportOutcome` | 원본 CSV에서 요약 표와 차트가 만들어진 전후 | dataReporting path |
-| `fileAutomationOutcome` | inbox 파일이 규칙대로 정리된 전후 | fileAutomation path |
-| `officeAutomationOutcome` | workbook 입력에서 보고서 sheet가 생성된 결과 | officeAutomation path |
-| `webMonitoringOutcome` | 페이지 검사와 evidence screenshot 결과 | webMonitoring path |
 
 ## 교육 시각 자산 기준
 
-- 대표 6경로 `pythonFoundation`, `dataReporting`, `dataVisualization`, `fileAutomation`, `officeAutomation`, `webMonitoring`에 path cover와 outcome image를 각각 만든다.
+- `pythonFoundation`, `dataVisualization`의 path cover와 outcome image를 실제 artifact에서 만든다.
 - concept visual은 수량 quota로 결정하지 않는다. 학습자가 관계, 순서, shape, state 변화, before/after 중 하나를 판단해야 하고 prose/code만으로 오해 가능성이 큰 section에만 배치한다.
 - tool workflow 레슨은 fake illustration보다 실제 결과 screenshot을 우선한다.
 - 이미지는 본문에서 설명하는 판단이나 변화를 보여 줘야 한다. 분위기용 배경, blur stock, 장식용 orb는 금지한다.
@@ -92,7 +88,6 @@ hero와 제품 증명을 한 이미지에 맡기지 않는다. `runLearningHero`
 
 ## 영향 파일
 
-- 01-instructional-assets 잔여 계획 `assets/brand/visuals/outcomes/`
 - 잔여 계획 `assets/brand/visuals/social/`
 - `editor/src/lib/curriculaRegistry.ts`
 - `src/codaro/curriculum/cardContract.py`
@@ -104,7 +99,7 @@ hero와 제품 증명을 한 이미지에 맡기지 않는다. `runLearningHero`
 
 ## 테스트
 
-- 01-instructional-assets 잔여 계획 `tests/assets/verifyInstructionalVisualPurpose.py`: learningQuestion, decisionShown, lesson anchor와 장식 quota 금지
+- 잔여 계획 `tests/assets/verifyInstructionalVisualPurpose.py`: learningQuestion, decisionShown, lesson anchor와 장식 quota 금지
 - 브라우저 screenshot 검토: 390x844, 1440x900에서 crop과 확대 동작
 
 ## 롤백
