@@ -1,5 +1,28 @@
 {
   "schemaVersion": 1,
+  "pythonFoundationOutcome": {
+    "title": "두 CSV를 JSON 보고서로",
+    "inputName": "sales-a.csv + sales-b.csv",
+    "files": [
+      {
+        "name": "sales-a.csv",
+        "outputName": "report-a.json",
+        "rows": [
+          {"item": "pen", "amount": 1000},
+          {"item": "book", "amount": 2500}
+        ]
+      },
+      {
+        "name": "sales-b.csv",
+        "outputName": "report-b.json",
+        "rows": [
+          {"item": "a", "amount": 100},
+          {"item": "b", "amount": 200},
+          {"item": "c", "amount": 300}
+        ]
+      }
+    ]
+  },
   "dataReportOutcome": {
     "title": "월간 채널 보고서",
     "inputName": "orders.csv",
@@ -8,6 +31,15 @@
       {"channel": "콘텐츠", "orders": 31, "revenue": 1085000},
       {"channel": "추천", "orders": 24, "revenue": 840000},
       {"channel": "이메일", "orders": 18, "revenue": 540000}
+    ]
+  },
+  "dataVisualizationOutcome": {
+    "title": "EDA 증거 리포트",
+    "inputName": "eda_rows.json",
+    "rows": [
+      {"feature": "age", "metric": 0.1, "panel": "missing"},
+      {"feature": "fare", "metric": 0.7, "panel": "correlation"},
+      {"feature": "score", "metric": null, "panel": "distribution"}
     ]
   },
   "fileAutomationOutcome": {

@@ -54,7 +54,7 @@ const pathDefinitions = [
     label: "Python 기초 완주",
     result: "작은 프로그램",
     detail: "값, 흐름, 함수, 객체를 직접 실행하며 연결합니다.",
-    assetId: "pythonFundamentals",
+    assetId: "pythonFoundationOutcome",
   },
   {
     pathId: "dataReporting",
@@ -70,7 +70,7 @@ const pathDefinitions = [
     label: "데이터 시각화",
     result: "읽히는 차트",
     detail: "차트 선택부터 해석과 의사결정까지 이어갑니다.",
-    assetId: "dataVisualization",
+    assetId: "dataVisualizationOutcome",
   },
   {
     pathId: "fileAutomation",

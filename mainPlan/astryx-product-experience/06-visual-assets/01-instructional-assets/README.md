@@ -2,7 +2,7 @@
 
 상태: 진행
 
-현재 8개 학습 domain의 `generatedRaster` 자산이 learning question, decision, lesson context와 함께 공용 manifest에 등록됐다. `learningVisualAssets.ts`의 8-domain/category mapping과 `LearningDomainVisual`을 통해 `CurriculumHome`은 8개 domain visual band를, `CurriculumOverview`는 현재 lesson에 맞는 visual, 질문, 판단 기준을 별도 reveal 클릭 없이 자동 렌더한다. `visual-assets` gate는 green이지만 이는 asset과 현재 surface integration의 기계 계약만 증명한다. lesson anchor author review, 사람 자산 승인, `pythonFoundation`·`dataVisualization` 결과 증명과 접근성 눈검수가 남아 있어 TODO가 남아 있다.
+남은 종료 조건은 lesson anchor author review, 사람 자산 승인과 접근성 눈검수다.
 
 ## 목표
 
@@ -10,28 +10,19 @@
 
 ## 구현 순서
 
-1. `pythonFoundation`, `dataVisualization`의 path outcome과 오개념 위험을 검토한다.
-2. 두 path cover와 최종 outcome proof를 실제 artifact에서 만든다.
-3. relation, sequence, shape, state, before/after 판단이 필요한 section만 instructional visual 대상으로 승인한다.
-4. `learningQuestion`, `decisionShown`, lesson anchor와 alt/caption을 작성한다.
-5. 320px, 400% zoom, light/dark와 긴 한국어 caption을 검수한다.
+1. relation, sequence, shape, state, before/after 판단이 필요한 section만 instructional visual 대상으로 승인한다.
+2. `learningQuestion`, `decisionShown`, lesson anchor와 alt/caption을 작성한다.
+3. 320px, 400% zoom, light/dark와 긴 한국어 caption을 검수한다.
 
 ## 영향 파일
 
-- 잔여 계획 `assets/brand/visuals/outcomes/`
 - 신규 `assets/brand/visuals/learning/`
 - 잔여 author review 대상 `curricula/python/**/*.yaml`
-- `editor/src/lib/learningVisualAssets.ts`
-- `editor/src/components/curriculum/learningDomainVisual.tsx`
-- `editor/src/components/curriculum/curriculumHome.tsx`
-- `editor/src/components/curriculum/curriculumOverview.tsx`
 - 잔여 lesson-specific anchor 통합 `editor/src/components/curriculum/curriculumMarkdownBody.tsx`
 - `src/codaro/curriculum/cardContract.py`
 
 ## 영향 함수·심볼
 
-- `resolveVisualAsset`
-- `learningVisualDomainForCategory`, `learningVisualDomainById`, `LearningDomainVisual`
 - 잔여 lesson-specific `CurriculumMarkdownBody` media branch
 - `validateCardBlock`
 
@@ -39,8 +30,6 @@
 
 - 잔여 계획 `tests/assets/verifyInstructionalVisualPurpose.py`
 - 수정 `tests/curriculum/verifyCardContract.py`
-- 구현 `tests/surface/testProductSurfaceContract.py`
-- 구현 `tests/surface/verifyProductExperiencePlaywright.py`
 - 잔여 계획 `tests/learning/verifyInstructionalVisualPlaywright.py`
 
 ## 롤백

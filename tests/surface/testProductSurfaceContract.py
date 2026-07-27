@@ -117,7 +117,9 @@ def testLearningVisualsUseOneManifestBackedDomainMapping() -> None:
     for categoryKey in ("30days", "pandas", "matplotlib", "sklearn", "opencv", "playwright", "devTools", "llmBasics"):
         assert f'"{categoryKey}"' in learningVisuals
     for assetId in (
+        "pythonFoundationOutcome",
         "dataReportOutcome",
+        "dataVisualizationOutcome",
         "fileAutomationOutcome",
         "officeAutomationOutcome",
         "webMonitoringOutcome",
@@ -134,7 +136,9 @@ def testLandingOutcomePathsUseActualOutcomeProofAssets() -> None:
     productVisual = _read("landing/src/components/productVisual.jsx")
 
     for assetId in (
+        "pythonFoundationOutcome",
         "dataReportOutcome",
+        "dataVisualizationOutcome",
         "fileAutomationOutcome",
         "officeAutomationOutcome",
         "webMonitoringOutcome",
@@ -171,6 +175,8 @@ def testLearningHomeAndLessonRenderInstructionalVisualsWithoutRevealControls() -
     assert '"viewport": {"width": 1440, "height": 900}' in browserGate
     assert "all 8 instructional learning-domain visuals must render" in browserGate
     assert "learningOutcomeVisualCount" in browserGate
+    assert '"expectedLearningVisualAssetId": "pythonFoundationOutcome"' in browserGate
+    assert '"expectedLearningVisualAssetId": "dataVisualizationOutcome"' in browserGate
 
 
 def testPublicLearningExplorerPersistsFiltersAndLessonVisualFillsItsFrame() -> None:
@@ -204,6 +210,7 @@ def testPublicLearningExplorerPersistsFiltersAndLessonVisualFillsItsFrame() -> N
     assert "object-fit: cover;" in lessonStyles
     assert '"verifyLearnSearch": "pandas"' in browserGate
     assert "Learn search state drifted across reload" in browserGate
+    assert '"expectedVisualAssetIds": [' in browserGate
 
 
 def testNotebookAutosaveUsesLocaleIndependentActiveCellMarker() -> None:

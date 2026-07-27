@@ -1263,6 +1263,14 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "viewport": {"width": 1440, "height": 900},
             "surface": "landing-learn",
             "verifyLearnSearch": "pandas",
+            "expectedVisualAssetIds": [
+                "pythonFoundationOutcome",
+                "dataReportOutcome",
+                "dataVisualizationOutcome",
+                "fileAutomationOutcome",
+                "officeAutomationOutcome",
+                "webMonitoringOutcome",
+            ],
         },
         {
             "name": "landing-public-lesson-desktop",
@@ -1392,6 +1400,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "expectCanonicalLesson": "day02_변수와데이터타입",
             "expectTransferSection": True,
             "initialCheckState": "mismatch",
+            "expectedLearningVisualAssetId": "pythonFoundationOutcome",
             "solutionCode": (
                 "def describe_value(value):\n"
                 "    return f'{type(value).__name__}:{value}'"
@@ -1546,6 +1555,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "expectTransferSection": True,
             "initialCheckState": "mismatch",
             "verifySemanticArtifactEvidence": True,
+            "expectedLearningVisualAssetId": "dataVisualizationOutcome",
             "solutionCode": authoredAssessmentSolution(
                 "curricula/python/visualization/seaborn/10_종합EDA리포트.yaml",
                 "mastery",
@@ -2757,6 +2767,12 @@ async ({ surface, expectedTier }) => {
     learningOutcomeVisualCount: document.querySelectorAll(
       '[data-learning-domain-visual="true"][data-learning-visual-kind="outcomeProof"]'
     ).length,
+    learningVisualAssetIds: Array.from(
+      document.querySelectorAll('[data-learning-domain-visual="true"][data-learning-visual-asset]')
+    ).map((element) => element.getAttribute("data-learning-visual-asset")),
+    visualAssetIds: Array.from(
+      document.querySelectorAll('[data-visual-asset]')
+    ).map((element) => element.getAttribute("data-visual-asset")),
     learningVisualQuestionCount: document.querySelectorAll(
       '[data-learning-domain-visual="true"] [data-learning-visual-question="true"]'
     ).length,
@@ -2823,6 +2839,11 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
         )
     if not audit["socialLinksSourceCount"] or not audit["socialLinksInTopLane"]:
         failures.append(f"{name}: shared SNS rail is not visible in the upper control lane")
+    expectedVisualAssetIds = case.get("expectedVisualAssetIds")
+    if expectedVisualAssetIds and audit["visualAssetIds"] != expectedVisualAssetIds:
+        failures.append(
+            f"{name}: manifest-backed visual path order drifted: {audit['visualAssetIds']}"
+        )
     if case.get("expectMobileProductNav"):
         expectedDestinations = ["curriculum", "editor", "automation", "chat"]
         if audit["visibleMobileProductDestinationIds"] != expectedDestinations:
@@ -2939,6 +2960,15 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
             or audit["learningVisualDecisionCount"] != 1
         ):
             failures.append(f"{name}: lesson domain visual must render with question and decision context")
+        expectedLearningVisualAssetId = case.get("expectedLearningVisualAssetId")
+        if (
+            expectedLearningVisualAssetId
+            and audit["learningVisualAssetIds"] != [expectedLearningVisualAssetId]
+        ):
+            failures.append(
+                f"{name}: expected lesson outcome visual {expectedLearningVisualAssetId}, "
+                f"got {audit['learningVisualAssetIds']}"
+            )
         expectedTransferCount = 0 if case.get("runDelayedRetrieval") else 1
         if case.get("expectTransferSection") and audit["transferSectionCount"] != expectedTransferCount:
             failures.append(

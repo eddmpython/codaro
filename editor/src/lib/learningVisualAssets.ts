@@ -79,10 +79,22 @@ export type LearningVisualDomainId = (typeof LEARNING_VISUAL_DOMAINS)[number]["i
 
 export const LEARNING_OUTCOME_VISUALS = [
   {
+    id: "pythonFoundation",
+    label: "Python 기초 결과",
+    assetId: "pythonFoundationOutcome",
+    categoryKeys: ["30days"],
+  },
+  {
     id: "dataReporting",
     label: "데이터 보고서 결과",
     assetId: "dataReportOutcome",
     categoryKeys: ["pandas"],
+  },
+  {
+    id: "dataVisualization",
+    label: "데이터 시각화 결과",
+    assetId: "dataVisualizationOutcome",
+    categoryKeys: ["matplotlib", "seaborn", "plotly", "altair", "folium"],
   },
   {
     id: "fileAutomation",

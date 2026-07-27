@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sourceManifestHash": "sha256-4e836c5b1e74aa2363a5a8f5f6e259aba28a754a59433bfcfee83e283e15bebc",
+  "sourceManifestHash": "sha256-02c1e2741bbb0acbed9257ee1c2903ee608be696c6318b5c72bff6877aef7ddc",
   "assets": [
     {
       "id": "runLearningDetail",
@@ -91,7 +91,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-967da03e946b53a43301e8086320a83f58443939f95bef6349b7912fab6289d6"
+        "sourceSetHash": "sha256-bc3656f1acb1d00b5b9f8fc8cdc2ee6dd567d2ade1976a51a9e7ee6210c2f77f"
       },
       "outputs": [
         {
@@ -230,7 +230,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-967da03e946b53a43301e8086320a83f58443939f95bef6349b7912fab6289d6"
+        "sourceSetHash": "sha256-bc3656f1acb1d00b5b9f8fc8cdc2ee6dd567d2ade1976a51a9e7ee6210c2f77f"
       },
       "outputs": [
         {
@@ -338,7 +338,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-9552ce0915a1b73e89d73dc362edc7791165191fb24cd272d14f94d63c6dfe5b"
+        "sourceSetHash": "sha256-951848234ed7af5ca3a380b939b6dfc5faf1b66f3f11d6f7144bdf1e2635a64e"
       },
       "outputs": [
         {
@@ -472,7 +472,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-9552ce0915a1b73e89d73dc362edc7791165191fb24cd272d14f94d63c6dfe5b"
+        "sourceSetHash": "sha256-951848234ed7af5ca3a380b939b6dfc5faf1b66f3f11d6f7144bdf1e2635a64e"
       },
       "outputs": [
         {
@@ -592,7 +592,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-99097f31f125c5caeda4201626e3f8c7933974cf5b43abb9281010aee0629b1e"
+        "sourceSetHash": "sha256-3e160af895ba4edcbb5b56d8044bebbcf39254f2bb3f4934140c04b9475b5178"
       },
       "outputs": [
         {
@@ -717,7 +717,7 @@
           "assets/brand/tools/captureOutcomeProofs.py",
           "assets/brand/visuals/outcomes/fixtures.json"
         ],
-        "sourceSetHash": "sha256-3acf2e960c447aa4c2274f6838fdc0d63184590519cc413da0a76f60fea40e95"
+        "sourceSetHash": "sha256-8c92ba3676a0f0826f094330f171b2960964add612bbbb585e62d62a938a2197"
       },
       "outputs": [
         {
@@ -842,7 +842,7 @@
           "assets/brand/tools/captureOutcomeProofs.py",
           "assets/brand/visuals/outcomes/fixtures.json"
         ],
-        "sourceSetHash": "sha256-3acf2e960c447aa4c2274f6838fdc0d63184590519cc413da0a76f60fea40e95"
+        "sourceSetHash": "sha256-8c92ba3676a0f0826f094330f171b2960964add612bbbb585e62d62a938a2197"
       },
       "outputs": [
         {
@@ -967,7 +967,7 @@
           "assets/brand/tools/captureOutcomeProofs.py",
           "assets/brand/visuals/outcomes/fixtures.json"
         ],
-        "sourceSetHash": "sha256-3acf2e960c447aa4c2274f6838fdc0d63184590519cc413da0a76f60fea40e95"
+        "sourceSetHash": "sha256-8c92ba3676a0f0826f094330f171b2960964add612bbbb585e62d62a938a2197"
       },
       "outputs": [
         {
@@ -1092,7 +1092,7 @@
           "assets/brand/tools/captureOutcomeProofs.py",
           "assets/brand/visuals/outcomes/fixtures.json"
         ],
-        "sourceSetHash": "sha256-3acf2e960c447aa4c2274f6838fdc0d63184590519cc413da0a76f60fea40e95"
+        "sourceSetHash": "sha256-8c92ba3676a0f0826f094330f171b2960964add612bbbb585e62d62a938a2197"
       },
       "outputs": [
         {
@@ -1141,6 +1141,256 @@
           "height": 675,
           "integrity": "sha256-cd8a308afee85e345cd7c964d988da1177891aa09c7d0aa1f047cf625e805509",
           "publicPath": "/visuals/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.webp",
+          "width": 1200
+        }
+      ]
+    },
+    {
+      "id": "pythonFoundationOutcome",
+      "kind": "outcomeProof",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/outcomes/pythonFoundationOutcome.png",
+      "sourceHash": "sha256-f6dc75e2fa349545a7a1d399f3121af390d3307bd09478ce628283999244c1d3",
+      "sourceGitHead": "751e43f7032bb43ef3898fddc9cec9173f98c852",
+      "provenance": {
+        "author": "Codaro outcome capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "python-foundation-sales-reports-v1",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1200,
+        "height": 675,
+        "aspectRatio": 1.777778,
+        "focalPoint": {
+          "x": 0.62,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-outcome",
+          "path-pythonFoundation",
+          "learn-outcome"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "sales-a.csv와 sales-b.csv의 품목별 금액 다섯 행이 count, total, average를 가진 report-a.json과 report-b.json으로 바뀌고 반환값과 저장값 검증을 통과한 결과",
+        "caption": "서로 다른 두 CSV를 같은 함수로 처리해 JSON 보고서 두 개를 만들고 반환값과 저장된 값을 다시 대조합니다.",
+        "learningQuestion": "하나의 Python 함수가 서로 다른 입력에서도 같은 산출물 계약을 지키는지 어떻게 확인하는가?",
+        "decisionShown": "두 CSV 입력, 집계 결과, JSON 파일과 숨은 입력 검증의 전후 관계",
+        "lessonRefs": [
+          "30days/day30_최종프로젝트"
+        ]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1200,
+          "height": 675
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/fonts",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/tools/captureOutcomeProofs.py",
+          "assets/brand/visuals/outcomes/fixtures.json"
+        ],
+        "sourceSetHash": "sha256-8c92ba3676a0f0826f094330f171b2960964add612bbbb585e62d62a938a2197"
+      },
+      "outputs": [
+        {
+          "byteLength": 4909,
+          "format": "avif",
+          "height": 270,
+          "integrity": "sha256-d58c81a2efd8710fa1f250fb14a856128754a4d85d2f707227223dc40a04a41b",
+          "publicPath": "/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 5044,
+          "format": "webp",
+          "height": 270,
+          "integrity": "sha256-a4c6f89562ca1761ee02db21c310f079f8c35643c868523538b363b301ab97a5",
+          "publicPath": "/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 8415,
+          "format": "avif",
+          "height": 405,
+          "integrity": "sha256-df3e6a090930b2f16abe391e9bb2337c6e56cc56a2912e6635c576b60ed9c69f",
+          "publicPath": "/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 8566,
+          "format": "webp",
+          "height": 405,
+          "integrity": "sha256-4dd060319a5fc02b785becedf06962997c156e128b96d671499c3da3bc80f61a",
+          "publicPath": "/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 14760,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-458bd6022191cd84cf00c6d4b6ed0aff8e4abbf0729a3b25e38c2486dc7578be",
+          "publicPath": "/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 19632,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-19ed667ce49b03d158cbfd78a8f70b837d063f9b9995ee126dc672844ce4c366",
+          "publicPath": "/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.webp",
+          "width": 1200
+        }
+      ]
+    },
+    {
+      "id": "dataVisualizationOutcome",
+      "kind": "outcomeProof",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/outcomes/dataVisualizationOutcome.png",
+      "sourceHash": "sha256-3e10f67c139c1d2d0866588d82e31db62fb59f4128f874235fbd55ee2794e61f",
+      "sourceGitHead": "751e43f7032bb43ef3898fddc9cec9173f98c852",
+      "provenance": {
+        "author": "Codaro outcome capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "data-visualization-eda-evidence-v1",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1200,
+        "height": 675,
+        "aspectRatio": 1.777778,
+        "focalPoint": {
+          "x": 0.62,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-outcome",
+          "path-dataVisualization",
+          "learn-outcome"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "EDA 입력 세 행에서 metric이 있는 두 행과 NULL 한 행을 분리해 panel별 막대 PNG와 CSV 증거를 만들고 320×180 크기를 재검산한 결과",
+        "caption": "차트에 들어간 행과 제외된 행을 숨기지 않고 CSV 증거, 실제 PNG preview와 함께 남깁니다.",
+        "learningQuestion": "차트가 보여 주는 패턴과 차트에서 제외된 행을 어떻게 함께 검증하는가?",
+        "decisionShown": "원본 행, usable·excluded 분모, panel별 chart와 PNG·CSV 산출물 계약",
+        "lessonRefs": [
+          "seaborn/10_종합EDA리포트"
+        ]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1200,
+          "height": 675
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/fonts",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/tools/captureOutcomeProofs.py",
+          "assets/brand/visuals/outcomes/fixtures.json"
+        ],
+        "sourceSetHash": "sha256-8c92ba3676a0f0826f094330f171b2960964add612bbbb585e62d62a938a2197"
+      },
+      "outputs": [
+        {
+          "byteLength": 4115,
+          "format": "avif",
+          "height": 270,
+          "integrity": "sha256-8de5cb1f7bb344fff9c57316e28442315b414a39220ea82e6ec8a2c16be3831a",
+          "publicPath": "/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 4112,
+          "format": "webp",
+          "height": 270,
+          "integrity": "sha256-35a6793c204eb0555aece4b9dc7bdf645590264b09b9d92190737d67d18c70f4",
+          "publicPath": "/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 7133,
+          "format": "avif",
+          "height": 405,
+          "integrity": "sha256-dce23a4c47832f5b517bdf7a65bc4e103f522ffa7ba93520cb103987ea43f133",
+          "publicPath": "/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 7286,
+          "format": "webp",
+          "height": 405,
+          "integrity": "sha256-288b3a7aef168041839c5db50fd90895faae68a4fa5ce6ecd7c3c2d9f5166420",
+          "publicPath": "/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 12185,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-1709289a37ee0049f4cb502cd3b0a9f0c484e0fdb448c34793386f9827ededbf",
+          "publicPath": "/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 16062,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-dede08af71f14bb0db124f91f0c48b28524a5ce86201829c012364ebc800e6c6",
+          "publicPath": "/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.webp",
           "width": 1200
         }
       ]

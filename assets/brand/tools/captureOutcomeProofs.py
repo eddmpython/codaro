@@ -7,10 +7,12 @@ import importlib.util
 import json
 from pathlib import Path
 import shutil
+import struct
 import subprocess
 import sys
 import tempfile
 from typing import Any
+import zlib
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -20,7 +22,9 @@ TOKENS_PATH = ROOT / "assets" / "brand" / "designSystem" / "tokens.json"
 MANIFEST_PATH = VISUAL_ROOT / "manifest.json"
 BUILDER_PATH = ROOT / "assets" / "brand" / "tools" / "buildVisualAssets.py"
 OUTCOME_IDS = (
+    "pythonFoundationOutcome",
     "dataReportOutcome",
+    "dataVisualizationOutcome",
     "fileAutomationOutcome",
     "officeAutomationOutcome",
     "webMonitoringOutcome",
@@ -151,11 +155,73 @@ def commonCss() -> str:
       .evidence small{{display:block;color:var(--color-text-accent);font-size:10px}}
       .evidence strong{{display:block;margin-top:4px;font-size:13px}}
       .evidence code{{color:var(--color-text-secondary);font-size:10px}}
+      .sourceStack{{display:grid;gap:12px}}
+      .miniSheet{{border:1px solid var(--color-border);background:var(--color-background-muted)}}
+      .miniSheet strong{{display:block;padding:8px 10px;border-bottom:1px solid var(--color-border);color:var(--color-text-accent);font:600 10px/14px "JetBrains Mono"}}
+      .miniSheet table th,.miniSheet table td{{padding:6px 8px}}
+      .artifactGrid{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}}
+      .jsonArtifact{{min-width:0;border:1px solid var(--color-border);background:var(--color-background-muted)}}
+      .jsonArtifact strong{{display:block;padding:9px 10px;border-bottom:1px solid var(--color-border);color:var(--color-text-accent);font:600 10px/14px "JetBrains Mono"}}
+      .jsonArtifact pre{{margin:0;padding:11px 12px;color:var(--color-text-secondary);font:400 10px/17px "JetBrains Mono";white-space:pre-wrap}}
+      .null{{color:var(--color-warning);font:600 10px/1 "JetBrains Mono"}}
+      .previewWrap{{display:grid;grid-template-columns:320px 1fr;align-items:center;gap:16px}}
+      .previewImage{{display:block;width:320px;height:180px;border:1px solid var(--color-border);image-rendering:auto}}
+      .previewLegend{{display:grid;gap:10px}}
+      .previewLegend div{{display:grid;gap:2px}}
+      .previewLegend span{{color:var(--color-text-secondary);font-size:10px}}
+      .previewLegend strong{{font:600 12px/16px "JetBrains Mono"}}
     """
 
 
 def formatWon(value: int) -> str:
     return f"{value:,}원"
+
+
+def summarizeSales(rows: list[dict[str, Any]]) -> dict[str, int | float]:
+    amounts = [int(row["amount"]) for row in rows]
+    return {
+        "count": len(amounts),
+        "total": sum(amounts),
+        "average": sum(amounts) / len(amounts) if amounts else 0,
+    }
+
+
+def renderPythonFoundation(fixture: dict[str, Any]) -> str:
+    files = fixture["files"]
+    sourceSheets = []
+    artifacts = []
+    summaries = []
+    for item in files:
+        rows = item["rows"]
+        report = summarizeSales(rows)
+        summaries.append(report)
+        tableRows = "".join(
+            f"<tr><td>{row['item']}</td><td class='num'>{row['amount']:,}</td></tr>"
+            for row in rows
+        )
+        sourceSheets.append(
+            f"<div class='miniSheet'><strong>{item['name']}</strong><table>"
+            f"<thead><tr><th>item</th><th class='num'>amount</th></tr></thead>"
+            f"<tbody>{tableRows}</tbody></table></div>"
+        )
+        artifacts.append(
+            f"<div class='jsonArtifact'><strong>{item['outputName']}</strong>"
+            f"<pre>{json.dumps(report, ensure_ascii=False, indent=2)}</pre></div>"
+        )
+    return proofHtml(
+        "PYTHON FOUNDATION",
+        fixture["title"],
+        fixture["inputName"],
+        f"<div class='sourceStack'>{''.join(sourceSheets)}</div>",
+        (
+            "<div class='resultGrid'><div class='metrics'>"
+            f"<div class='metric'><small>입력 행</small><strong>{sum(int(report['count']) for report in summaries)}</strong></div>"
+            f"<div class='metric'><small>총 금액</small><strong>{sum(int(report['total']) for report in summaries):,}</strong></div>"
+            f"<div class='metric'><small>JSON</small><strong>{len(artifacts)}</strong></div></div>"
+            f"<div class='artifactGrid'>{''.join(artifacts)}</div>"
+            f"{audit('숨은 입력 2개 · JSON 2개 · 반환값과 저장값 일치')}</div>"
+        ),
+    )
 
 
 def renderDataReport(fixture: dict[str, Any]) -> str:
@@ -185,6 +251,98 @@ def renderDataReport(fixture: dict[str, Any]) -> str:
             f"<div class='metric'><small>총 매출</small><strong>{totalRevenue // 10000}만원</strong></div>"
             f"<div class='metric'><small>채널 수</small><strong>{len(rows)}</strong></div></div>"
             f"<div class='barList'>{bars}</div>{audit('행 4개 · 합계 일치 · 누락 0개')}</div>"
+        ),
+    )
+
+
+def darkTokenRgb(name: str) -> tuple[int, int, int]:
+    tokens = loadJson(TOKENS_PATH).get("astryxTokens")
+    if not isinstance(tokens, dict):
+        raise OutcomeProofError("design tokens are missing astryxTokens")
+    value = tokens.get(name)
+    resolved = value[1] if isinstance(value, list) else value
+    if not isinstance(resolved, str) or len(resolved) != 7 or not resolved.startswith("#"):
+        raise OutcomeProofError(f"dark token must be a hex color: {name}")
+    try:
+        return tuple(int(resolved[index:index + 2], 16) for index in (1, 3, 5))
+    except ValueError as exc:
+        raise OutcomeProofError(f"dark token must be a hex color: {name}") from exc
+
+
+def pngChunk(kind: bytes, data: bytes) -> bytes:
+    checksum = zlib.crc32(kind + data) & 0xFFFFFFFF
+    return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", checksum)
+
+
+def buildDataVisualizationPreview(rows: list[dict[str, Any]]) -> bytes:
+    width, height = 320, 180
+    body = darkTokenRgb("--color-background-body")
+    card = darkTokenRgb("--color-background-card")
+    border = darkTokenRgb("--color-border")
+    accent = darkTokenRgb("--color-accent")
+    success = darkTokenRgb("--color-success")
+    pixels = [bytearray(body * width) for _ in range(height)]
+
+    def fillRect(left: int, top: int, right: int, bottom: int, color: tuple[int, int, int]) -> None:
+        for y in range(max(0, top), min(height, bottom)):
+            for x in range(max(0, left), min(width, right)):
+                offset = x * 3
+                pixels[y][offset:offset + 3] = bytes(color)
+
+    fillRect(12, 12, 308, 168, card)
+    fillRect(38, 24, 40, 148, border)
+    fillRect(38, 146, 294, 148, border)
+    maximum = max((float(row["metric"]) for row in rows), default=1.0)
+    slot = 220 // max(1, len(rows))
+    for index, row in enumerate(rows):
+        barHeight = max(2, round(104 * float(row["metric"]) / maximum))
+        barWidth = min(52, max(18, slot - 18))
+        left = 48 + index * slot + (slot - barWidth) // 2
+        fillRect(left, 146 - barHeight, left + barWidth, 146, accent if index % 2 == 0 else success)
+
+    raw = b"".join(b"\x00" + bytes(row) for row in pixels)
+    return (
+        b"\x89PNG\r\n\x1a\n"
+        + pngChunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0))
+        + pngChunk(b"IDAT", zlib.compress(raw, 9))
+        + pngChunk(b"IEND", b"")
+    )
+
+
+def renderDataVisualization(fixture: dict[str, Any]) -> str:
+    rows = fixture["rows"]
+    required = ("feature", "metric", "panel")
+    usable = [row for row in rows if all(row.get(field) is not None for field in required)]
+    excluded = len(rows) - len(usable)
+    panels = sorted({str(row["panel"]) for row in usable})
+    tableRows = "".join(
+        f"<tr><td>{row['feature']}</td>"
+        f"<td class='num'>{row['metric'] if row['metric'] is not None else '<span class=\"null\">NULL</span>'}</td>"
+        f"<td>{row['panel']}</td></tr>"
+        for row in rows
+    )
+    preview = base64.b64encode(buildDataVisualizationPreview(usable)).decode("ascii")
+    legend = "".join(
+        f"<div><span>{row['panel']} panel</span><strong>{row['feature']} · {float(row['metric']):.2f}</strong></div>"
+        for row in usable
+    )
+    return proofHtml(
+        "DATA VISUALIZATION",
+        fixture["title"],
+        fixture["inputName"],
+        (
+            "<table><thead><tr><th>feature</th><th class='num'>metric</th><th>panel</th></tr></thead>"
+            f"<tbody>{tableRows}</tbody></table>"
+        ),
+        (
+            "<div class='resultGrid'><div class='metrics'>"
+            f"<div class='metric'><small>사용 행</small><strong>{len(usable)}</strong></div>"
+            f"<div class='metric'><small>제외 행</small><strong>{excluded}</strong></div>"
+            f"<div class='metric'><small>패널</small><strong>{len(panels)}</strong></div></div>"
+            f"<div class='previewWrap'><img class='previewImage' src='data:image/png;base64,{preview}' "
+            "alt='사용 가능한 metric 두 개를 panel별 막대로 그린 EDA preview'>"
+            f"<div class='previewLegend'>{legend}</div></div>"
+            f"{audit('eda-report.csv · eda-preview.png · 320×180 PNG 재검산')}</div>"
         ),
     )
 
@@ -278,7 +436,9 @@ def proofHtml(eyebrow: str, title: str, inputName: str, inputBody: str, resultBo
 
 def renderers() -> dict[str, Any]:
     return {
+        "pythonFoundationOutcome": renderPythonFoundation,
         "dataReportOutcome": renderDataReport,
+        "dataVisualizationOutcome": renderDataVisualization,
         "fileAutomationOutcome": renderFileAutomation,
         "officeAutomationOutcome": renderOfficeAutomation,
         "webMonitoringOutcome": renderWebMonitoring,

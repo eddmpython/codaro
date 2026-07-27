@@ -31,7 +31,9 @@ class CaptureOutcomeProofsTest(unittest.TestCase):
     def testAllRequiredOutcomeProofsUseDeterministicCaptureContract(self) -> None:
         self.assertEqual(set(self.assets), set(CAPTURE.OUTCOME_IDS))
         pathUsage = {
+            "pythonFoundationOutcome": "path-pythonFoundation",
             "dataReportOutcome": "path-dataReporting",
+            "dataVisualizationOutcome": "path-dataVisualization",
             "fileAutomationOutcome": "path-fileAutomation",
             "officeAutomationOutcome": "path-officeAutomation",
             "webMonitoringOutcome": "path-webMonitoring",
@@ -46,6 +48,17 @@ class CaptureOutcomeProofsTest(unittest.TestCase):
                 self.assertIn(pathUsage[assetId], asset["rendering"]["proofUsage"])
                 self.assertTrue(asset["learning"]["learningQuestion"])
                 self.assertTrue(asset["learning"]["decisionShown"])
+
+    def testFeaturedPathProofsMatchCapstoneArtifacts(self) -> None:
+        fixtures = CAPTURE.loadJson(CAPTURE.FIXTURE_PATH)
+        pythonHtml = CAPTURE.renderPythonFoundation(fixtures["pythonFoundationOutcome"])
+        visualizationHtml = CAPTURE.renderDataVisualization(fixtures["dataVisualizationOutcome"])
+
+        for artifact in ("report-a.json", "report-b.json", "count", "total", "average"):
+            self.assertIn(artifact, pythonHtml)
+        for artifact in ("eda-report.csv", "eda-preview.png", "320×180", "제외 행"):
+            self.assertIn(artifact, visualizationHtml)
+        self.assertIn("data:image/png;base64,", visualizationHtml)
 
     def testFixtureRenderersShowInputResultAndVerificationReceipt(self) -> None:
         fixtures = CAPTURE.loadJson(CAPTURE.FIXTURE_PATH)

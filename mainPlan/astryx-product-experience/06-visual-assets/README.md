@@ -2,7 +2,7 @@
 
 상태: 진행
 
-남은 종료 조건은 instructional asset의 lesson anchor 사람 승인, `pythonFoundation`·`dataVisualization` 결과 증명, light/dark 쌍 캡처, 사람 자산 검수와 나머지 shot list다.
+남은 종료 조건은 instructional asset의 lesson anchor 사람 승인, light/dark 쌍 캡처, 사람 자산 검수와 나머지 shot list다.
 
 ## 목표
 
@@ -39,7 +39,6 @@
 
 ## 교육 시각 자산 기준
 
-- `pythonFoundation`, `dataVisualization`의 path cover와 outcome image를 실제 artifact에서 만든다.
 - concept visual은 수량 quota로 결정하지 않는다. 학습자가 관계, 순서, shape, state 변화, before/after 중 하나를 판단해야 하고 prose/code만으로 오해 가능성이 큰 section에만 배치한다.
 - tool workflow 레슨은 fake illustration보다 실제 결과 screenshot을 우선한다.
 - 이미지는 본문에서 설명하는 판단이나 변화를 보여 줘야 한다. 분위기용 배경, blur stock, 장식용 orb는 금지한다.
@@ -88,7 +87,6 @@ hero와 제품 증명을 한 이미지에 맡기지 않는다. `runLearningHero`
 
 ## 영향 파일
 
-- 잔여 계획 `assets/brand/visuals/social/`
 - `editor/src/lib/curriculaRegistry.ts`
 - `src/codaro/curriculum/cardContract.py`
 - `docs/skills/ops/product/branding.md`
