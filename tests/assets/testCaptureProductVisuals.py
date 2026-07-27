@@ -110,6 +110,10 @@ class CaptureProductVisualsTest(unittest.TestCase):
             "accessCredential",
         ):
             self.assertIn(signal, PRODUCT_RUNNER.AUDIT_SCRIPT)
+        self.assertIn(
+            '"example.com", "example.org", "example.net"',
+            PRODUCT_RUNNER.AUDIT_SCRIPT,
+        )
         source = PRODUCT_RUNNER_PATH.read_text(encoding="utf-8")
         self.assertIn("visible capture contains sensitive text signals", source)
 

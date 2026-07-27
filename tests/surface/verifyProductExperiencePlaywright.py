@@ -2229,11 +2229,18 @@ async ({ surface, expectedTier }) => {
     .filter((label) => forbiddenLearningLabels.has(label));
   const missingImageAlt = visibleImages.filter((image) => !image.hasAttribute("alt")).length;
   const visibleText = document.body.innerText || "";
+  const visibleEmailAddresses = visibleText.match(
+    /\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b/gi
+  ) || [];
+  const nonExampleEmailAddresses = visibleEmailAddresses.filter((address) => {
+    const domain = address.split("@").at(-1)?.toLowerCase();
+    return !["example.com", "example.org", "example.net"].includes(domain || "");
+  });
   const captureRedactionSignals = {
     windowsUserPath: /[A-Za-z]:\\\\Users\\\\[^\\s\\\\]+/i.test(visibleText),
     macUserPath: /\\/Users\\/[^\\s/]+/i.test(visibleText),
     linuxUserPath: /\\/home\\/[^\\s/]+/i.test(visibleText),
-    emailAddress: /\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b/i.test(visibleText),
+    emailAddress: nonExampleEmailAddresses.length > 0,
     accessCredential: /\\b(?:sk-[A-Za-z0-9_-]{12,}|ghp_[A-Za-z0-9]{12,}|github_pat_[A-Za-z0-9_]{12,}|Bearer\\s+[A-Za-z0-9._~-]{12,})\\b/i.test(visibleText),
   };
   const visibleSocialLinks = [...document.querySelectorAll('[data-social-link="codaro"]')]
