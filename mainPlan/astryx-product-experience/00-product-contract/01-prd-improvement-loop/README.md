@@ -33,7 +33,7 @@ Product evidence maturity는 `E0 없음`, `E1 synthetic`, `E2 vertical slice`, `
 
 | 순서 | packet | 닫는 결함 |
 | --- | --- | --- |
-| 00 | [evaluation-contract](00-evaluation-contract/) | 목표 점수, 동일 평가자, 비재현 report |
+| 00 | [evaluation-contract](_done/00-evaluation-contract/) | 목표 점수, 동일 평가자, 비재현 report |
 | 01 | [r9-baseline](01-r9-baseline/) | 과거 판정 무효화와 원본을 보존한 기준선 |
 | 02 | [completion-and-gate-bootstrap](_done/02-completion-and-gate-bootstrap/) | 없는 tool을 모든 packet이 요구하는 순서 모순, self-score gate |
 | 03 | [learning-vertical-slice](03-learning-vertical-slice/) | ID뿐인 check, 472 일괄 범위, 확인 클릭 마찰 |

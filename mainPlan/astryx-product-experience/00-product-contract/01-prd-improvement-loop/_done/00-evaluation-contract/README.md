@@ -1,5 +1,12 @@
 # 00 Evaluation Contract
 
+<!-- completion-record:v1 -->
+> 완료일: 2026-07-27T02:58:31+00:00
+> 구현 커밋: `f2eb8539b1047703b271fc4309bc5147270725a3`
+> 통과 게이트: evaluation-contract
+> 남은 위험: evaluator roster, sealed scope, raw report와 finding ledger는 08-r10-independent-review가 계속 소유한다.; 이 전이는 평가 계약만 봉인하며 R10 통과, 제품 점수 또는 product evidence maturity 승격을 뜻하지 않는다.
+> 증거: [`completion-evidence.yml`](completion-evidence.yml)
+
 상태: 진행
 
 ## 목표
