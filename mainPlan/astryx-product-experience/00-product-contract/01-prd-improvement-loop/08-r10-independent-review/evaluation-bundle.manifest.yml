@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: 2c202cd347112a395885d0e5a03d2ef086efbaa1
+  gitCommit: 6d96ce834756bc852f6572522b90a9e69d819ea0
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: 2986cbbdf6df21552564aaddb35b292f39a0ec908268bcb6c1043ea2a4bc9204
-  fileCount: 2681
-  totalBytes: 88214416
+  manifestHash: 4ae21516fc6074b838346ebc96f958be80223750fe79639f182dc9b2f9ba13e8
+  fileCount: 2682
+  totalBytes: 88314760
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: da3e383695c35e04010238afafe40a440ec37a8488c0822b4081ab4b7c43ab6d
-  bytes: 88730228
+  sha256: 8e64fc99291430ded7ec80160046031a01eb49cef06f9bdda1704d369c26e027
+  bytes: 88830718
   format: zip
   compression: stored
   compressionMethod: 0
@@ -484,36 +484,36 @@ files:
   bytes: 26626
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/learningAutomation/learningAutomation-840-a21d2e976646.webp
-- path: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-1080-1279043ef894.avif
-  sha256: f7fe2a9ba38ab169d11f55610829a227f65437fbbb91b70f2b0b2403cd709e07
-  bytes: 32409
+- path: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-1080-49cedaaade40.avif
+  sha256: 87907df8ae5f0a07d5da3124283be421fdf55daba4dcea8e6e2a99a0f3063fa3
+  bytes: 34559
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-1080-1279043ef894.avif
-- path: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-1080-1279043ef894.webp
-  sha256: c486603993639d68dd3349d44155e5e3cbd5dc4e9d958c03dadbf396754be706
-  bytes: 33402
+  sourcePath: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-1080-49cedaaade40.avif
+- path: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-1080-49cedaaade40.webp
+  sha256: 6229a385101ccb4c4e385aafa0b03547e253d8599df6a11b8615bdc921b3dcbc
+  bytes: 36264
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-1080-1279043ef894.webp
-- path: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-1440-1279043ef894.avif
-  sha256: 7713164e48476ecdf45fa9f963b33ba8911d8a541d059173c7b83b3fc5215548
-  bytes: 37631
+  sourcePath: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-1080-49cedaaade40.webp
+- path: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-1440-49cedaaade40.avif
+  sha256: 6f3f827521190cb678bbacd125e809ffac2982ddc203abdfbefe0396031b0f5c
+  bytes: 41095
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-1440-1279043ef894.avif
-- path: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-1440-1279043ef894.webp
-  sha256: 33ef4683143c10339499ca187c2c25338e11b20a89d5fe79ac7e27a2ff2b392b
-  bytes: 53500
+  sourcePath: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-1440-49cedaaade40.avif
+- path: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-1440-49cedaaade40.webp
+  sha256: e1202d6c0f85212063a352f8955c7573c355c4601fa0a5f962ee75ec5e833d26
+  bytes: 58502
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-1440-1279043ef894.webp
-- path: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-720-1279043ef894.avif
-  sha256: fcd7241bc7fd1c1f4cba4a763046008521fcbaea1437e57a5c7a8754246b2a71
-  bytes: 16547
+  sourcePath: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-1440-49cedaaade40.webp
+- path: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-720-49cedaaade40.avif
+  sha256: bfa0734a0be063c2b9928a29f03722dce0213c6f051eab68af9a42125986fb87
+  bytes: 17604
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-720-1279043ef894.avif
-- path: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-720-1279043ef894.webp
-  sha256: 81215b63f13dddcd843977a1e89941aa0c7dd912fa73b8a51ac33b9a5f2a54ad
-  bytes: 16784
+  sourcePath: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-720-49cedaaade40.avif
+- path: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-720-49cedaaade40.webp
+  sha256: 78587b4dc14709042158f3c7473fba3efb41a5d386267b5a6711abb7ca14f4dc
+  bytes: 18552
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-720-1279043ef894.webp
+  sourcePath: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-720-49cedaaade40.webp
 - path: assets/brand/visuals/generated/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.avif
   sha256: 133ebd556ccea1933b7c64032bfa375dd3d647c5bbcf063557bd44d78b7eb2ad
   bytes: 3742
@@ -685,7 +685,7 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/webRunDesktop/webRunDesktop-720-ec95ae8add82.webp
 - path: assets/brand/visuals/generated/manifest.json
-  sha256: 7e633cd96829adefd461021115dbfb7a2a8ee4270bbf5f6b607079dcb7a94878
+  sha256: 1f185d02632be4badfcc22147c7e64cdbb7c82ae737c558aaf2d8f8131b76232
   bytes: 60312
   kind: repository
   sourcePath: assets/brand/visuals/generated/manifest.json
@@ -730,7 +730,7 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/learning/statistics-ml-v1.png
 - path: assets/brand/visuals/manifest.json
-  sha256: c629db55ca7396ad71a5a78e0718b64257668e844b2272dd5ff461960dec6a14
+  sha256: 3811743e165e3cea4354bc5d37ec0848f9ff9b9cbfed2aecbdca2dcf3b72569e
   bytes: 31150
   kind: repository
   sourcePath: assets/brand/visuals/manifest.json
@@ -740,8 +740,8 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/manifest.schema.json
 - path: assets/brand/visuals/product/local-automation-desktop.png
-  sha256: 1279043ef8946334c5b6750d3d8de8baaa90385e34533487fb97bd871011eb11
-  bytes: 133351
+  sha256: 49cedaaade407224a83a59e6f6809351d9cb162fcb32192bbb6fbc3a36d2b2ec
+  bytes: 145196
   kind: repository
   sourcePath: assets/brand/visuals/product/local-automation-desktop.png
 - path: assets/brand/visuals/product/local-notebook-desktop.png
@@ -3630,8 +3630,8 @@ files:
   kind: repository
   sourcePath: docs/skills/architecture/share-pack-distribution.md
 - path: docs/skills/architecture/ssot-map.md
-  sha256: 94976c61543a05f62f3fe6d7a586faf2d8267e879d80e8c640b2c8e50b1de532
-  bytes: 24296
+  sha256: ab78acdfab5f498b245e1a3803ac233f89273df974b818749369205721cbafc6
+  bytes: 24454
   kind: repository
   sourcePath: docs/skills/architecture/ssot-map.md
 - path: docs/skills/architecture/teacher-tool-loop.md
@@ -3655,8 +3655,8 @@ files:
   kind: repository
   sourcePath: docs/skills/identity/ai-sensory-system.md
 - path: docs/skills/identity/automation-tasks-reports.md
-  sha256: e5c256780aa643eb972f19c351f16c52733ff5cf82d84892c007b257055cfa4f
-  bytes: 2593
+  sha256: 1ae653c4803519f50c7c12291711b93515ef9d478b635abb20ba9d631467d064
+  bytes: 3471
   kind: repository
   sourcePath: docs/skills/identity/automation-tasks-reports.md
 - path: docs/skills/identity/external-channels-mobile.md
@@ -4589,36 +4589,36 @@ files:
   bytes: 26626
   kind: repository
   sourcePath: editor/public/visuals/files/learningAutomation/learningAutomation-840-a21d2e976646.webp
-- path: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-1279043ef894.avif
-  sha256: f7fe2a9ba38ab169d11f55610829a227f65437fbbb91b70f2b0b2403cd709e07
-  bytes: 32409
+- path: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-49cedaaade40.avif
+  sha256: 87907df8ae5f0a07d5da3124283be421fdf55daba4dcea8e6e2a99a0f3063fa3
+  bytes: 34559
   kind: repository
-  sourcePath: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-1279043ef894.avif
-- path: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-1279043ef894.webp
-  sha256: c486603993639d68dd3349d44155e5e3cbd5dc4e9d958c03dadbf396754be706
-  bytes: 33402
+  sourcePath: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-49cedaaade40.avif
+- path: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-49cedaaade40.webp
+  sha256: 6229a385101ccb4c4e385aafa0b03547e253d8599df6a11b8615bdc921b3dcbc
+  bytes: 36264
   kind: repository
-  sourcePath: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-1279043ef894.webp
-- path: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-1279043ef894.avif
-  sha256: 7713164e48476ecdf45fa9f963b33ba8911d8a541d059173c7b83b3fc5215548
-  bytes: 37631
+  sourcePath: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-49cedaaade40.webp
+- path: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-49cedaaade40.avif
+  sha256: 6f3f827521190cb678bbacd125e809ffac2982ddc203abdfbefe0396031b0f5c
+  bytes: 41095
   kind: repository
-  sourcePath: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-1279043ef894.avif
-- path: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-1279043ef894.webp
-  sha256: 33ef4683143c10339499ca187c2c25338e11b20a89d5fe79ac7e27a2ff2b392b
-  bytes: 53500
+  sourcePath: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-49cedaaade40.avif
+- path: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-49cedaaade40.webp
+  sha256: e1202d6c0f85212063a352f8955c7573c355c4601fa0a5f962ee75ec5e833d26
+  bytes: 58502
   kind: repository
-  sourcePath: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-1279043ef894.webp
-- path: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-720-1279043ef894.avif
-  sha256: fcd7241bc7fd1c1f4cba4a763046008521fcbaea1437e57a5c7a8754246b2a71
-  bytes: 16547
+  sourcePath: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-49cedaaade40.webp
+- path: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-720-49cedaaade40.avif
+  sha256: bfa0734a0be063c2b9928a29f03722dce0213c6f051eab68af9a42125986fb87
+  bytes: 17604
   kind: repository
-  sourcePath: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-720-1279043ef894.avif
-- path: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-720-1279043ef894.webp
-  sha256: 81215b63f13dddcd843977a1e89941aa0c7dd912fa73b8a51ac33b9a5f2a54ad
-  bytes: 16784
+  sourcePath: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-720-49cedaaade40.avif
+- path: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-720-49cedaaade40.webp
+  sha256: 78587b4dc14709042158f3c7473fba3efb41a5d386267b5a6711abb7ca14f4dc
+  bytes: 18552
   kind: repository
-  sourcePath: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-720-1279043ef894.webp
+  sourcePath: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-720-49cedaaade40.webp
 - path: editor/public/visuals/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.avif
   sha256: 133ebd556ccea1933b7c64032bfa375dd3d647c5bbcf063557bd44d78b7eb2ad
   bytes: 3742
@@ -4790,7 +4790,7 @@ files:
   kind: repository
   sourcePath: editor/public/visuals/files/webRunDesktop/webRunDesktop-720-ec95ae8add82.webp
 - path: editor/public/visuals/manifest.json
-  sha256: 7e633cd96829adefd461021115dbfb7a2a8ee4270bbf5f6b607079dcb7a94878
+  sha256: 1f185d02632be4badfcc22147c7e64cdbb7c82ae737c558aaf2d8f8131b76232
   bytes: 60312
   kind: repository
   sourcePath: editor/public/visuals/manifest.json
@@ -4835,8 +4835,8 @@ files:
   kind: repository
   sourcePath: editor/scripts/verifyRunRouteState.mjs
 - path: editor/src/App.tsx
-  sha256: c37798f45681bfd490cf097954adee55da9969990760104c9f87314299b343e8
-  bytes: 26410
+  sha256: 62fb21416bf331f03efba3a94c3880d5c3fbc00d650d1d30e492a88b96e6682d
+  bytes: 26487
   kind: repository
   sourcePath: editor/src/App.tsx
 - path: editor/src/components/app/appErrorBoundary.tsx
@@ -4885,8 +4885,8 @@ files:
   kind: repository
   sourcePath: editor/src/components/app/localHomeSurface.tsx
 - path: editor/src/components/app/mainSurface.tsx
-  sha256: 2de0edcc5dced328af185360e947888453c19758fa0b894d2a7b038f2bbc13c5
-  bytes: 9529
+  sha256: 3c47a3e34686b052cd7b6043bd26129c598597d74e4a4ea86d9b87c37f44db41
+  bytes: 9638
   kind: repository
   sourcePath: editor/src/components/app/mainSurface.tsx
 - path: editor/src/components/app/notebookSurface.tsx
@@ -4960,13 +4960,13 @@ files:
   kind: repository
   sourcePath: editor/src/components/automation/automationOperationStrip.tsx
 - path: editor/src/components/automation/automationRunInspector.tsx
-  sha256: 4ff5ee80340173f6722d474011b3e0cb3ddf72c21f1d2f508bad0565a5c7b8a0
-  bytes: 7796
+  sha256: f3e7a75a061e6f49b5ef8dd5c6eab9cd3f0f30fb36c76ff20aaf07a051f9cc12
+  bytes: 11425
   kind: repository
   sourcePath: editor/src/components/automation/automationRunInspector.tsx
 - path: editor/src/components/automation/automationSurface.tsx
-  sha256: ebbbafac0a02afb05f8a665d48afd586f68972a922db43f83cbd40067df4dfaa
-  bytes: 16890
+  sha256: 34b9529259823be260dff6d82029c0a76f68815be008b959d8a8f829743afd8b
+  bytes: 17026
   kind: repository
   sourcePath: editor/src/components/automation/automationSurface.tsx
 - path: editor/src/components/automation/liveAutomationView.tsx
@@ -5210,8 +5210,8 @@ files:
   kind: repository
   sourcePath: editor/src/hooks/useAssistantTurnState.ts
 - path: editor/src/hooks/useAutomationState.ts
-  sha256: b79e5d18d133c5e48f373382f3be5a92e2d6a6e2b7b9d492eebe98bd1f2041f2
-  bytes: 3334
+  sha256: 0e8d67e2ddb38bd79b31b5ae41b146d64917e82be4f6fae5e30599184b4c8135
+  bytes: 3889
   kind: repository
   sourcePath: editor/src/hooks/useAutomationState.ts
 - path: editor/src/hooks/useConnectionStatus.ts
@@ -5325,8 +5325,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/api.ts
 - path: editor/src/lib/api/automationApi.ts
-  sha256: c07b7679e9af8ebc209d631fc41ce7cc65ae704f533867079b0e1d2691dcd9a4
-  bytes: 2437
+  sha256: 7e1c06b4f67e710d3f87cffa5a3853027cd6e7000b7174083bb993dd02bbea15
+  bytes: 2602
   kind: repository
   sourcePath: editor/src/lib/api/automationApi.ts
 - path: editor/src/lib/api/curriculumApi.ts
@@ -5420,8 +5420,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/automationPresentation.ts
 - path: editor/src/lib/automationState.ts
-  sha256: d224a011e25c39cddd9867804bb3c4de29cd3d87c51810a08d6760dd51fc93d2
-  bytes: 3496
+  sha256: 5aee36e88ee5a038082cc589ff2e0eb27c347726aa23eacb744d981f5fccb975
+  bytes: 3949
   kind: repository
   sourcePath: editor/src/lib/automationState.ts
 - path: editor/src/lib/browserLearningArchive.ts
@@ -5560,8 +5560,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/externalLinks.ts
 - path: editor/src/lib/fallbackData.ts
-  sha256: 56ab641f3b8c5f86590e6f08cff0cc2d263ba19d513d5c44c1e9a8e527ab7b8f
-  bytes: 10770
+  sha256: 449b37e24277fb4ff9c2a3c03d04ee6595f903cb0025f3bd613be1c78b5c8baa
+  bytes: 12017
   kind: repository
   sourcePath: editor/src/lib/fallbackData.ts
 - path: editor/src/lib/generatedContracts/artifactOwnership.ts
@@ -5635,8 +5635,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/localeContext.tsx
 - path: editor/src/lib/localeCopy.ts
-  sha256: 7f696689e31ff4a13bba0cd8b36af829c6b1631405ff57cffa8b00f33279a543
-  bytes: 46705
+  sha256: 45c26b6b266d924c4957446be879c7f4f106ba3b79c320a78addc9f1f2d74e3f
+  bytes: 49627
   kind: repository
   sourcePath: editor/src/lib/localeCopy.ts
 - path: editor/src/lib/masteryPolicy.ts
@@ -5825,8 +5825,8 @@ files:
   kind: repository
   sourcePath: editor/src/types/app.ts
 - path: editor/src/types/automation.ts
-  sha256: 01f67c0680b04b156f3d2e27dc20b634008fac294fc0ec37072c7193b01b6f16
-  bytes: 2007
+  sha256: 60086965c8e82c0a537bb0feaf2e2c10a6644c5ac4449a198d083f79832ad34b
+  bytes: 2462
   kind: repository
   sourcePath: editor/src/types/automation.ts
 - path: editor/src/types/curriculum.ts
@@ -9773,36 +9773,36 @@ files:
   bytes: 26626
   kind: repository
   sourcePath: landing/static/visuals/files/learningAutomation/learningAutomation-840-a21d2e976646.webp
-- path: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-1279043ef894.avif
-  sha256: f7fe2a9ba38ab169d11f55610829a227f65437fbbb91b70f2b0b2403cd709e07
-  bytes: 32409
+- path: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-49cedaaade40.avif
+  sha256: 87907df8ae5f0a07d5da3124283be421fdf55daba4dcea8e6e2a99a0f3063fa3
+  bytes: 34559
   kind: repository
-  sourcePath: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-1279043ef894.avif
-- path: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-1279043ef894.webp
-  sha256: c486603993639d68dd3349d44155e5e3cbd5dc4e9d958c03dadbf396754be706
-  bytes: 33402
+  sourcePath: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-49cedaaade40.avif
+- path: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-49cedaaade40.webp
+  sha256: 6229a385101ccb4c4e385aafa0b03547e253d8599df6a11b8615bdc921b3dcbc
+  bytes: 36264
   kind: repository
-  sourcePath: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-1279043ef894.webp
-- path: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-1279043ef894.avif
-  sha256: 7713164e48476ecdf45fa9f963b33ba8911d8a541d059173c7b83b3fc5215548
-  bytes: 37631
+  sourcePath: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-49cedaaade40.webp
+- path: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-49cedaaade40.avif
+  sha256: 6f3f827521190cb678bbacd125e809ffac2982ddc203abdfbefe0396031b0f5c
+  bytes: 41095
   kind: repository
-  sourcePath: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-1279043ef894.avif
-- path: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-1279043ef894.webp
-  sha256: 33ef4683143c10339499ca187c2c25338e11b20a89d5fe79ac7e27a2ff2b392b
-  bytes: 53500
+  sourcePath: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-49cedaaade40.avif
+- path: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-49cedaaade40.webp
+  sha256: e1202d6c0f85212063a352f8955c7573c355c4601fa0a5f962ee75ec5e833d26
+  bytes: 58502
   kind: repository
-  sourcePath: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-1279043ef894.webp
-- path: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-720-1279043ef894.avif
-  sha256: fcd7241bc7fd1c1f4cba4a763046008521fcbaea1437e57a5c7a8754246b2a71
-  bytes: 16547
+  sourcePath: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-49cedaaade40.webp
+- path: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-720-49cedaaade40.avif
+  sha256: bfa0734a0be063c2b9928a29f03722dce0213c6f051eab68af9a42125986fb87
+  bytes: 17604
   kind: repository
-  sourcePath: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-720-1279043ef894.avif
-- path: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-720-1279043ef894.webp
-  sha256: 81215b63f13dddcd843977a1e89941aa0c7dd912fa73b8a51ac33b9a5f2a54ad
-  bytes: 16784
+  sourcePath: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-720-49cedaaade40.avif
+- path: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-720-49cedaaade40.webp
+  sha256: 78587b4dc14709042158f3c7473fba3efb41a5d386267b5a6711abb7ca14f4dc
+  bytes: 18552
   kind: repository
-  sourcePath: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-720-1279043ef894.webp
+  sourcePath: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-720-49cedaaade40.webp
 - path: landing/static/visuals/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.avif
   sha256: 133ebd556ccea1933b7c64032bfa375dd3d647c5bbcf063557bd44d78b7eb2ad
   bytes: 3742
@@ -9974,7 +9974,7 @@ files:
   kind: repository
   sourcePath: landing/static/visuals/files/webRunDesktop/webRunDesktop-720-ec95ae8add82.webp
 - path: landing/static/visuals/manifest.json
-  sha256: 7e633cd96829adefd461021115dbfb7a2a8ee4270bbf5f6b607079dcb7a94878
+  sha256: 1f185d02632be4badfcc22147c7e64cdbb7c82ae737c558aaf2d8f8131b76232
   bytes: 60312
   kind: repository
   sourcePath: landing/static/visuals/manifest.json
@@ -10144,8 +10144,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/04-web-learning/README.md
 - path: mainPlan/astryx-product-experience/05-local-studio/README.md
-  sha256: 5f8f1b1aebe5bbedef80d8cbf36b1623043f852c5b2a5bbb675106828cbd7c8f
-  bytes: 7849
+  sha256: 3d691a696c09da009bb55a0e80f3e93c16e59d0d7e336ba4735157683e2e4378
+  bytes: 7752
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/05-local-studio/README.md
 - path: mainPlan/astryx-product-experience/06-visual-assets/00-manifest-pipeline/README.md
@@ -11299,8 +11299,8 @@ files:
   kind: repository
   sourcePath: src/codaro/api/appState.py
 - path: src/codaro/api/automationRouter.py
-  sha256: cb46c2460ef20de55ebed58fc426d593ccec1cff5a87a55665d2e5d6cd16cb87
-  bytes: 21025
+  sha256: 2100fb0d88fa73506fa9ab22c39b3acc3fa80c18afa7233259e904764976b104
+  bytes: 21909
   kind: repository
   sourcePath: src/codaro/api/automationRouter.py
 - path: src/codaro/api/bootstrapRouter.py
@@ -11624,25 +11624,30 @@ files:
   kind: repository
   sourcePath: src/codaro/automation/shared.py
 - path: src/codaro/automation/taskFlow.py
-  sha256: d43dbf4a8803c9f1a754bcde203bde5689c3f5871753b6a26ef63aad2b31c3c9
-  bytes: 13484
+  sha256: 6df01bff81a9043308eb65f8bec710ffbeab4db1cba3c4c95c0682cf3863aa9d
+  bytes: 18492
   kind: repository
   sourcePath: src/codaro/automation/taskFlow.py
 - path: src/codaro/automation/taskModel.py
-  sha256: 74e96a034deca9e14fb6be595d20d2bcfe8f67fdf826138c75133c81a5d3b05b
-  bytes: 2697
+  sha256: 98a597749a55312511fc5df15e47e48a5461c71a08ca6c04cd71db6790e0c5a1
+  bytes: 3155
   kind: repository
   sourcePath: src/codaro/automation/taskModel.py
 - path: src/codaro/automation/taskRegistry.py
-  sha256: df13baada8b8593ff1376974cd39082761e53b7fdfb0564aedf905d168b87d72
-  bytes: 5336
+  sha256: 90cfbbf7af92171ad5cc089594bb229890871e1d69f0d352967d57bc5ddb5070
+  bytes: 6068
   kind: repository
   sourcePath: src/codaro/automation/taskRegistry.py
 - path: src/codaro/automation/taskRunner.py
-  sha256: 38d32ba605ad926ff655f756f3147178c10b617ce08a4f4fa4eac1cb8a3bd764
-  bytes: 2748
+  sha256: ff4d9747577b3ddd1259d1b579274da766723ba442f80e721792031d968eaa79
+  bytes: 2955
   kind: repository
   sourcePath: src/codaro/automation/taskRunner.py
+- path: src/codaro/automation/taskSafety.py
+  sha256: 1752b6b5aa439ea1d8bfb23610e4adfa3538f56e245ac5e1efef4321062a685a
+  bytes: 5113
+  kind: repository
+  sourcePath: src/codaro/automation/taskSafety.py
 - path: src/codaro/automation/vision/__init__.py
   sha256: 1338a65492f917521117f2d2ef4eab447c6f063dae3ce44465f3d4e727bd009b
   bytes: 358
@@ -11724,8 +11729,8 @@ files:
   kind: repository
   sourcePath: src/codaro/automation/voiceFlow.py
 - path: src/codaro/automation/workflow.py
-  sha256: 6fc77b51fd900f6554898563a5b2663a056635665b9837580e859ec8db461dff
-  bytes: 5620
+  sha256: 7891aadb1e0566d43d001f1f054c5b3558d27b861e47089fd807b90e808a59e6
+  bytes: 6116
   kind: repository
   sourcePath: src/codaro/automation/workflow.py
 - path: src/codaro/automation/workflowFlow.py
@@ -12304,8 +12309,8 @@ files:
   kind: repository
   sourcePath: tests/assets/testBuildVisualAssets.py
 - path: tests/assets/testCaptureProductVisuals.py
-  sha256: 900037ec47832659207fa3582abd8917d1ca4b0e23b0ab9bbc25d6e9d1f95179
-  bytes: 6927
+  sha256: c054812d5ebe01ed816aa209cd73b9b3736e45311fadbdd0f7338f79b6d7b165
+  bytes: 6978
   kind: repository
   sourcePath: tests/assets/testCaptureProductVisuals.py
 - path: tests/assets/testVisualAssetManifest.py
@@ -12334,8 +12339,8 @@ files:
   kind: repository
   sourcePath: tests/automation/testAuditTrail.py
 - path: tests/automation/testAutomation.py
-  sha256: 0c894529b87935e5acef4273ddb8f07df556def33c83a35f50c9007b2b90d381
-  bytes: 9326
+  sha256: 26a60a4f22538a6853d6f1bcef7747f4ed5d9e671d644ab4e63ffb8f11bfa012
+  bytes: 10722
   kind: repository
   sourcePath: tests/automation/testAutomation.py
 - path: tests/automation/testAutomationAgentLoop.py
@@ -12394,8 +12399,8 @@ files:
   kind: repository
   sourcePath: tests/automation/testAutomationSessionCellFlow.py
 - path: tests/automation/testAutomationTaskFlow.py
-  sha256: 9ef9ca45f5ea83309578c0484f85022136fab57ad006bf65ed30513bb17e1d8f
-  bytes: 11252
+  sha256: ccf835772f8aa3e79434f82dc6deb2c7d83ea57cfa7d609424207cf80940a9b6
+  bytes: 17878
   kind: repository
   sourcePath: tests/automation/testAutomationTaskFlow.py
 - path: tests/automation/testAutomationTools.py
@@ -12484,8 +12489,8 @@ files:
   kind: repository
   sourcePath: tests/automation/testVoiceSpeaker.py
 - path: tests/automation/verifyAutomationIdeAudit.py
-  sha256: 1e940f36030dc0d34007792d6cfa66db550ebf1e3c2cd11b3e3c6238eefacf5e
-  bytes: 27317
+  sha256: 587b7d4fb01c5e2cce87c6e0b9cdd186ab33deac835c18aba58d8edda0f3c164
+  bytes: 29580
   kind: repository
   sourcePath: tests/automation/verifyAutomationIdeAudit.py
 - path: tests/automation/verifyAutomationStudioPlaywright.py
@@ -13324,8 +13329,8 @@ files:
   kind: repository
   sourcePath: tests/surface/verifyPlaywrightMobile.py
 - path: tests/surface/verifyProductExperiencePlaywright.py
-  sha256: a381dfd6b9f3d5d6cc3f136886b8deedfc24173656fa4f23a8f314f222f0ee25
-  bytes: 263782
+  sha256: 675ffd94b211ad0f58d0aceeffaf18eaa93b2a9a0b34626bd20b63e1c62631f5
+  bytes: 269451
   kind: repository
   sourcePath: tests/surface/verifyProductExperiencePlaywright.py
 - path: tests/surface/verifyProductModuleBoundaries.py
