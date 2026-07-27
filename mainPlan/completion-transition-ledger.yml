@@ -65,3 +65,16 @@ transitions:
   evidencePath: mainPlan/astryx-product-experience/01-design-foundation/_done/03-run-and-local-migration/completion-evidence.yml
   evidenceHash: c1f4c7266ba026c5899529f1276ac8747e886eac994a665303c6df5d4764f790
   preparedAt: '2026-07-26T19:52:23+00:00'
+- schemaVersion: 1
+  transitionKind: complete
+  nonce: bc9ec80e-23cc-4df0-8e4e-bc4802fe33b4
+  transitionId: 57b8298aec79bcfd647c9dfc23ca9ab3cc4e63db8f91572c45ca49531923eef6
+  initiativeId: astryx-product-experience
+  packetId: visual-accessibility-gates
+  implementationCommit: 3371c7385a3c70e350e015cbb3bd8d61b95b5b07
+  evidenceCommit: 111dcb454f46cb5a2287c8d2d4b3133f50505464
+  fromPath: mainPlan/astryx-product-experience/01-design-foundation/04-visual-accessibility-gates
+  toPath: mainPlan/astryx-product-experience/01-design-foundation/_done/04-visual-accessibility-gates
+  evidencePath: mainPlan/astryx-product-experience/01-design-foundation/_done/04-visual-accessibility-gates/completion-evidence.yml
+  evidenceHash: e435ce07d5f7145ab28f05a153fe793f13d1413ad208967eca6fc9e35b694d6f
+  preparedAt: '2026-07-27T00:03:17+00:00'
