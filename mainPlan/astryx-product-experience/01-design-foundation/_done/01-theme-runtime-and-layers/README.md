@@ -7,7 +7,7 @@
 > 남은 위험: 전체 viewport·font·contrast·keyboard·screen-reader와 Firefox/WebKit/WebView2 검수는 04-visual-accessibility-gates에서 계속 차단한다.; 이 전이는 공용 theme runtime 계약만 봉인하며 Landing·Learning, Run·Local migration이나 design foundation workstream 완료를 뜻하지 않는다.
 > 증거: [`completion-evidence.yml`](completion-evidence.yml)
 
-상태: 진행
+상태: 완료
 
 ## 목표
 

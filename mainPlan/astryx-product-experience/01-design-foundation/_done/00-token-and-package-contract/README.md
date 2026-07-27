@@ -7,7 +7,7 @@
 > 남은 위험: 실제 light/dark/system·viewport·보조기술 검수는 04-visual-accessibility-gates에서 계속 차단한다.; 이 전이는 token·package source 계약만 봉인하며 design foundation workstream 완료를 뜻하지 않는다.
 > 증거: [`completion-evidence.yml`](completion-evidence.yml)
 
-상태: 진행
+상태: 완료
 
 ## 목표
 

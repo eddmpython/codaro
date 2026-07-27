@@ -27,7 +27,7 @@ Landing, Learn, Run, Local이 같은 Astryx 토큰, 테마 상태, 폰트, 밀�
 | 01 | [theme-runtime-and-layers](_done/01-theme-runtime-and-layers/) | 완료 | shared theme storage, density/accent runtime, layer order, light/dark/system |
 | 02 | [landing-and-learning-migration](_done/02-landing-and-learning-migration/) | 완료 | 웹 우선 홈과 읽히는 학습 카탈로그, 실제 제품 이미지, direct lesson |
 | 03 | [run-and-local-migration](_done/03-run-and-local-migration/) | 완료 | Run/Local 대표 surface가 같은 token과 각 density로 시각 검증 |
-| 04 | [visual-accessibility-gates](_done/04-visual-accessibility-gates/) | 진행 | desktop/mobile, reduced motion, font, overflow, contrast, browser tier gate |
+| 04 | [visual-accessibility-gates](_done/04-visual-accessibility-gates/) | 완료 | desktop/mobile, reduced motion, font, overflow, contrast, browser tier gate |
 
 ## 테스트
 
@@ -37,13 +37,13 @@ Landing, Learn, Run, Local이 같은 Astryx 토큰, 테마 상태, 폰트, 밀�
 - `uv run python -X utf8 tests/run.py gate landing-public`: 같은 A에서 Chromium 5/5, failure 0과 SEO·hydration을 봉인하고 Pages run `30213073075`, CI run `30213073100`, E `7a78861a` → B `d1c82d75` 정식 전이 완료
 - `uv run python -X utf8 tests/run.py gate run-local-state-browser`: clean implementation `f33b9d2a`에서 Web·Local 6/6, failure 0, 320px·900×640 overflow 0, 실제 실행 상태 전이를 봉인
 - `uv run python -X utf8 tests/run.py gate product-experience-browser`: 같은 A에서 Chromium 68/68, failure 0을 봉인하고 Pages run `30217071291`, Security run `30217071274`, CI run `30217071352`, E `b0627a22` → B `a3536a0f` 정식 전이 완료
-- `uv run python -X utf8 tests/run.py gate visual-accessibility-browser`: locked Playwright 1.61.0의 Chromium·Firefox·WebKit 대표 12/12, failure 0. 320·390·900·1440px, light/dark, forced-colors, reduced-motion, font·contrast·keyboard 후원 dialog를 검사하며 clean A evidence와 transition은 진행 중
+- `uv run python -X utf8 tests/run.py gate visual-accessibility-browser`: clean implementation `3371c738`에서 locked Playwright 1.61.0의 Chromium·Firefox·WebKit 대표 12/12, failure 0을 봉인했다. 320·390·900·1440px, light/dark, forced-colors, reduced-motion, font·contrast·keyboard 후원 dialog를 검사하고 Pages run `30225778724`, Security run `30225778744`, CI run `30225778727`, E `111dcb45` → B `3ad2f8e2` 정식 전이를 완료했다.
 - `uv run python -X utf8 tests/run.py gate learning-card-browser`: 통과
 - `uv run python -X utf8 tests/learning/verifyLearningSystemReadiness.py`: `14/14`, `passed: true`. 이는 readiness 계약 만점이지 전체 제품 완료나 학습 효과 점수가 아니다.
 - Landing과 Editor production build: 통과
 - Home·Learn 390px/1440px와 Local automation 대표 시각 감사: image/text overlap 0, lesson row 가독성·mobile next-band framing·active state 교정. 전체 수동 AT matrix는 미완료
 
-00의 token·package contract, 01의 theme runtime contract, 02의 Landing·Learning migration, 03의 Run·Local migration은 각각 clean implementation commit, evidence commit과 completion transition을 마쳤다. 04의 대표 3-engine machine matrix와 키보드 후원 dialog 검사는 구현됐지만 clean implementation commit, 원격 required check, evidence commit과 completion transition 전이다. 실제 WebView2·사람 보조기술·OS zoom·IME 검수는 10 Quality Release의 수동 evidence 범위이며 04 machine gate의 통과로 대신 주장하지 않는다.
+00의 token·package contract, 01의 theme runtime contract, 02의 Landing·Learning migration, 03의 Run·Local migration, 04의 visual accessibility gate가 각각 clean implementation commit, evidence commit과 completion transition을 마쳤다. 내부 packet은 5/5 완료이며 Design Foundation의 machine 구현 범위가 봉인됐다. 실제 WebView2·사람 보조기술·OS zoom·IME 검수는 10 Quality Release의 수동 evidence 범위이고 B3 전 top-level workstream `_done` 이동은 차단되므로 이 상위 폴더는 계속 active tree에 둔다.
 
 ## 롤백
 
@@ -55,4 +55,4 @@ source token과 generated mirror를 같은 변경 단위로 되돌리고, runtim
 
 ## 평가
 
-모든 활성 packet이 구현·테스트·문서와 각 packet이 명시한 검토를 마치고 completion evidence와 함께 `_done/`으로 이동해야 이 workstream을 완료로 본다. 04의 전체 접근성·browser tier 검토를 00~03의 완료와 혼합하지 않는다.
+00~04의 내부 packet은 모두 구현·테스트·문서와 각 packet이 명시한 machine 검토를 마치고 completion evidence와 함께 `_done/`으로 이동했다. 이는 Design Foundation의 machine 구현 봉인이며 독립 사람 접근성 승인이나 제품 release 판정이 아니다. top-level 전이는 B3와 10 Quality Release의 수동 evidence를 기다린다.

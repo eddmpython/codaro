@@ -7,7 +7,7 @@
 > 남은 위험: 실제 설치된 Windows WebView2, 화면 읽기 프로그램, IME 조합과 운영체제 확대는 이 machine packet이 통과했다고 주장하지 않으며 Quality Release의 수동 증거로 남긴다.; 독립 사람 접근성 검수는 수행되지 않았고 현재 visual review는 제품 배치와 시각 일관성만 승인한다.; 원격 push가 보고한 기본 브랜치 Dependabot 경고 16건은 13 high, 3 moderate이며 Security workflow 성공과 별도로 후속 보안 범위에서 해결해야 한다.; 공개 문서 최대 chunk는 99,470바이트로 100KiB 상한보다 2,930바이트 작으므로 이후 계약 문서 증가는 같은 landing gate로 계속 감시한다.
 > 증거: [`completion-evidence.yml`](completion-evidence.yml)
 
-상태: 진행
+상태: 완료
 
 ## 목표
 
