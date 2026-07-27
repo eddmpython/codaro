@@ -10,29 +10,24 @@ Local의 파일, Notebook, task, schedule, audit, failure recovery, E-Stop이 �
 
 ## 구현 순서
 
-1. `05-local-studio`의 scheduled, running, succeeded, failed, paused, disconnected fixture를 고정한다.
-2. Local Home, Notebook, Automation detail, Run Inspector를 1024x768과 1440x900에서 캡처한다.
-3. 실제 사용자 path, token, email, credential이 없는지 검사한다.
-4. Landing proof와 Local empty state variant를 manifest에 등록한다.
-5. E-Stop, failed-first status, artifact 결과가 crop 안에서 읽히는지 눈검수한다.
+1. 실제 WebView2에서 scheduled, running, succeeded, failed, paused, disconnected 상태를 캡처한다.
+2. Local Home, Notebook, Automation detail, Run Inspector를 1024x768과 1440x900에서 눈검수한다.
+3. light/dark 쌍에서 실제 사용자 path, token, email, credential 노출이 없는지 사람이 대조한다.
+4. E-Stop, failed-first status, artifact 결과가 crop 안에서 읽히는지 눈검수한다.
 
 ## 영향 파일
 
-- 신규 `assets/brand/visuals/product/local/`
-- 신규 `tests/assets/captureLocalVisuals.py`
-- `mainPlan/astryx-product-experience/05-local-studio/README.md`
 - `assets/brand/visuals/manifest.json`
+- `assets/brand/visuals/product/local/`
 
 ## 영향 함수·심볼
 
-- 신규 `captureLocalVisuals`, `seedLocalCaptureFixture`
-- `buildResponsiveVariants`
+- 없음. 남은 작업은 실제 WebView2 상태 matrix와 light/dark 쌍의 사람 검수다.
 
 ## 테스트
 
-- 구현 `assets/brand/tools/buildVisualAssets.py --check`의 Local source set freshness
-- 신규 `tests/assets/verifyLocalCaptureRedaction.py`
-- `uv run python -X utf8 tests/run.py gate local-studio-browser`
+- 실제 WebView2 전체 상태 matrix 사람 검수
+- 1024x768, 1440x900 light/dark와 redaction 대조
 
 ## 롤백
 

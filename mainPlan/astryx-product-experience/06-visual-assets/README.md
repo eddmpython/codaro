@@ -92,47 +92,20 @@ hero와 제품 증명을 한 이미지에 맡기지 않는다. `runLearningHero`
 
 ## 영향 파일
 
-- 00-manifest-pipeline 생성 owner `assets/brand/visuals/manifest.json`
-- 신규 `assets/brand/visuals/product/`
 - 01-instructional-assets 잔여 계획 `assets/brand/visuals/outcomes/`
-- 01-instructional-assets 생성 owner `assets/brand/visuals/learning/`
 - 잔여 계획 `assets/brand/visuals/social/`
-- 00-manifest-pipeline 생성 owner `assets/brand/tools/buildVisualAssets.py`
-- 잔여 계획 `tests/assets/captureProductVisuals.py`
-- `assets/brand/tools/buildBrandAssets.py`
-- `landing/scripts/syncBrand.js`
-- 00-manifest-pipeline 생성 owner `landing/scripts/syncVisualAssets.js`
-- 00-manifest-pipeline 생성 owner `editor/scripts/syncVisualAssets.mjs`
-- `landing/src/lib/brand.js`
 - `editor/src/lib/curriculaRegistry.ts`
-- `editor/src/lib/learningVisualAssets.ts`
-- `editor/src/components/curriculum/learningDomainVisual.tsx`
-- `editor/src/components/curriculum/curriculumHome.tsx`
-- `editor/src/components/curriculum/curriculumOverview.tsx`
 - `src/codaro/curriculum/cardContract.py`
 - `docs/skills/ops/product/branding.md`
 
 ## 영향 함수·심볼
 
-- 신규 `VisualAssetManifest`, `validateVisualManifest`, `buildResponsiveVariants`
-- 잔여 계획 `captureProductVisuals`, `seedProductVisualFixture`
-- 신규 `resolveVisualAsset`
-- `learningVisualDomainForCategory`, `learningVisualDomainById`, `LearningDomainVisual`
-- `landing/scripts/syncBrand.js`의 top-level sync flow
 - 잔여 lesson-specific anchor 통합 `CurriculumMarkdownBody`의 media branch
 
 ## 테스트
 
-- 00-manifest-pipeline 생성 owner `tests/assets/testVisualAssetManifest.py`: source 존재, alt/caption, dimension, duplicate ID, license 필드
 - 01-instructional-assets 잔여 계획 `tests/assets/verifyInstructionalVisualPurpose.py`: learningQuestion, decisionShown, lesson anchor와 장식 quota 금지
-- 00-manifest-pipeline 생성 owner `tests/assets/verifyVisualAssetBudget.py`: hero 240KB 이하, lesson image 180KB 이하, OG 규격
-- 구현 `assets/brand/tools/buildVisualAssets.py --check`: screenshot source path 집합과 `sourceSetHash` freshness
-- 수정 `tests/curriculum/verifyCardContract.py`: media 필수키
-- 구현 `tests/surface/testProductSurfaceContract.py`: 8개 asset/category mapping과 Home·Overview 렌더 계약
-- 구현 `tests/surface/verifyProductExperiencePlaywright.py`: 학습 홈 8개 visual과 lesson overview visual의 image/question/decision 렌더
 - 브라우저 screenshot 검토: 390x844, 1440x900에서 crop과 확대 동작
-- 실행: `uv run python -X utf8 tests/run.py gate docs`
-- 실행: `uv run python -X utf8 tests/run.py gate editor-build`
 
 ## 롤백
 

@@ -10,29 +10,24 @@
 
 ## 구현 순서
 
-1. `04-web-learning`의 ready, running, checkFail, checkPass, localRequired fixture를 고정한다.
-2. 390x844, 768x1024, 1440x900에서 screenshot을 캡처한다.
-3. text clipping, fake data, credential, stale git head를 검사한다.
-4. hero, path proof, docs crop을 manifest variant로 만든다.
-5. light/dark variant와 focal point를 눈검수한다.
+1. ready, running, checkFail, checkPass, localRequired 전체 상태 shot을 채운다.
+2. 390x844, 768x1024, 1440x900에서 text clipping과 action 가시성을 눈검수한다.
+3. light/dark 쌍에서 focal point, 작은 한국어, 확대 동작을 눈검수한다.
+4. 현재 제품 source와 proof가 일치하는지 사람이 최종 승인한다.
 
 ## 영향 파일
 
-- 신규 `assets/brand/visuals/product/run/`
-- 신규 `tests/assets/captureRunVisuals.py`
-- `mainPlan/astryx-product-experience/04-web-learning/README.md`
 - `assets/brand/visuals/manifest.json`
+- `assets/brand/visuals/product/run/`
 
 ## 영향 함수·심볼
 
-- 신규 `captureRunVisuals`, `seedRunCaptureFixture`
-- `buildResponsiveVariants`
+- 없음. 남은 작업은 전체 상태 shot과 light/dark 쌍의 사람 검수다.
 
 ## 테스트
 
-- 구현 `assets/brand/tools/buildVisualAssets.py --check`의 Run source set freshness
-- 신규 `tests/assets/verifyRunCaptureIntegrity.py`
-- `uv run python -X utf8 tests/run.py gate editor-build`
+- 전체 상태 shot 사람 검수
+- 390x844, 768x1024, 1440x900 light/dark 비교
 
 ## 롤백
 
