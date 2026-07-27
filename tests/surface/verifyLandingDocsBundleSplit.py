@@ -62,9 +62,26 @@ def verifyDocsPageContentModules() -> dict[str, Any]:
     files = sorted(path.glob("page*.js")) if path.exists() else []
     if len(files) < MIN_DOC_PAGE_MODULES:
         missing.append(f"expected at least {MIN_DOC_PAGE_MODULES} docs page modules, found {len(files)}")
-    if files and "export const pageContent" not in files[0].read_text(encoding="utf-8"):
-        missing.append("docs page modules do not export pageContent")
-    return result("docs-page-content-modules", missing, {"moduleCount": len(files)})
+    largest = 0
+    for file in files:
+        largest = max(largest, file.stat().st_size)
+        prefix = "export const pageContent = "
+        text = file.read_text(encoding="utf-8")
+        if not text.startswith(prefix) or not text.endswith(";\n"):
+            missing.append(f"{file.name} does not export the canonical pageContent object")
+            continue
+        try:
+            content = json.loads(text[len(prefix):-2])
+        except json.JSONDecodeError as exc:
+            missing.append(f"{file.name} contains invalid pageContent JSON: {exc.msg}")
+            continue
+        if set(content) != {"html"}:
+            missing.append(f"{file.name} must contain html only, found {sorted(content)}")
+    return result(
+        "docs-page-content-modules",
+        missing,
+        {"moduleCount": len(files), "largestBytes": largest, "contentKeys": ["html"]},
+    )
 
 
 def verifyGeneratedDocsFreshness() -> dict[str, Any]:

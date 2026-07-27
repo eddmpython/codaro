@@ -306,7 +306,6 @@ function writeDocsPageModules(pages) {
   for (const page of pages) {
     const content = {
       html: page.html,
-      text: page.text,
     };
     writeFileSync(
       resolve(generatedDocsPageRoot, `${docsContentModuleName(page.path)}.js`),
