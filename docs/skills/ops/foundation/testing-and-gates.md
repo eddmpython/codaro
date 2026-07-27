@@ -128,7 +128,7 @@ uv run python -X utf8 tests/run.py gate attempts
 | `design-system-contract` | surface | Astryx exact pin, shared token/font provenance, theme scope, accent collision 방지, Landing/Learn 딥링크, Web Run/Local capability rail과 compact top-control 계약을 확인한다. |
 | `theme-runtime-browser` | surface | Landing·Learn·Run·Local의 저장 light/dark 우선순위, system 실시간 전환, 토글 후 재로드, surface density, accent, reduced-motion token을 Chromium 8-case matrix로 확인한다. |
 | `visual-accessibility-browser` | surface | Landing·Learn·Run·Local을 Chromium·Firefox·WebKit 12-case에서 열어 320/390/900/1440 반응형, font, token contrast, 키보드 상단 control, 후원 모달 포커스 트랩, forced-colors와 reduced-motion을 확인한다. |
-| `visual-assets` | surface | 공용 manifest provenance, checksum, source/variant 동기화, 실제 제품 캡처의 Landing/Run/Local 소비 계약을 확인한다. |
+| `visual-assets` | surface | 공용 manifest provenance, checksum, source/variant 동기화, 실제 제품 캡처의 fixture 픽셀·redaction과 Landing/Run/Local 소비 계약을 확인한다. |
 | `learning-method` | surface | 실행 뒤 자동 검증·inline feedback/hint, 목표 중심 학습 홈, navigation control intent, 확인 전용 클릭과 classroom 도구의 핵심 학습 경로 재유입을 확인한다. |
 | `learning-evidence-contract` | fast | Web/Local append-only 학습 증거의 event hash, archive dedup, tamper rejection, artifact descriptor 계약을 확인한다. |
 | `learning-efficacy-report` | fast | E0-E3 경로별 효능 보고서 state machine과 stale content, 표본, privacy, causal-claim negative fixture를 확인한다. 실제 참가자 근거를 대신하지 않는다. |

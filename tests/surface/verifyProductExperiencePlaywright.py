@@ -702,9 +702,77 @@ def startStaticServer(directory: Path, *, landing: bool = False) -> tuple[Thread
     return server, thread, int(server.server_address[1])
 
 
+def seedLocalAutomationFixture(storageRoot: Path) -> None:
+    taskRoot = storageRoot / "tasks"
+    runsRoot = taskRoot / "runs"
+    runsRoot.mkdir(parents=True, exist_ok=True)
+    tasks = [
+        {
+            "id": "task-daily-summary",
+            "name": "일일 학습 요약",
+            "description": "학습 기록을 모아 매일 확인할 요약을 만듭니다.",
+            "documentPath": "automation/daily_learning_digest.py",
+            "schedule": None,
+            "inputs": {"period": "today", "format": "markdown"},
+            "outputs": ["stdout", "variables"],
+            "createdAt": "2026-07-23T08:00:00+00:00",
+            "updatedAt": "2026-07-23T08:00:00+00:00",
+            "enabled": True,
+        },
+        {
+            "id": "task-workbook-cleanup",
+            "name": "워크북 정리",
+            "description": "워크북 표 구조를 검사하고 정리 결과를 기록합니다.",
+            "documentPath": "automation/workbook_cleanup.py",
+            "schedule": None,
+            "inputs": {"workbook": "weekly_report.xlsx"},
+            "outputs": ["stderr"],
+            "createdAt": "2026-07-22T08:00:00+00:00",
+            "updatedAt": "2026-07-22T08:00:00+00:00",
+            "enabled": False,
+        },
+    ]
+    runs = {
+        "task-daily-summary": [
+            {
+                "id": "run-daily-summary",
+                "taskId": "task-daily-summary",
+                "status": "success",
+                "startedAt": "2026-07-23T08:00:00+00:00",
+                "finishedAt": "2026-07-23T08:00:01+00:00",
+                "durationMs": 846,
+                "output": "3개 레슨의 학습 기록을 요약했습니다.",
+                "error": None,
+                "variables": {"lessons": 3, "verifiedChecks": 5},
+            }
+        ],
+        "task-workbook-cleanup": [
+            {
+                "id": "run-workbook-cleanup",
+                "taskId": "task-workbook-cleanup",
+                "status": "failed",
+                "startedAt": "2026-07-22T08:00:00+00:00",
+                "finishedAt": "2026-07-22T08:00:00+00:00",
+                "durationMs": 219,
+                "output": "",
+                "error": "입력 워크북을 찾지 못했습니다.",
+                "variables": {"workbook": "weekly_report.xlsx"},
+            }
+        ],
+    }
+    (taskRoot / "index.json").write_text(
+        json.dumps({"tasks": tasks}, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    for taskId, taskRuns in runs.items():
+        (runsRoot / f"{taskId}.json").write_text(
+            json.dumps({"runs": taskRuns}, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+
+
 def startLocalServer() -> tuple[Any, threading.Thread, int, tempfile.TemporaryDirectory[str], Path]:
     import uvicorn
-    from codaro.automation.taskModel import TaskRun, TaskStatus
     from codaro.automation.taskRegistry import getTaskRegistry
     from codaro.server import createServerApp, createServerEventLoop
 
@@ -716,42 +784,14 @@ def startLocalServer() -> tuple[Any, threading.Thread, int, tempfile.TemporaryDi
     previousCodaroHome = os.environ.get("CODARO_HOME")
     os.environ["CODARO_HOME"] = localState.name
     try:
+        seedLocalAutomationFixture(Path(localState.name))
         app = createServerApp(mode="edit", workspaceRoot=localWorkspace)
         registry = getTaskRegistry()
-        if not registry.listTasks():
-            digestTask = registry.create(
-                name="일일 학습 요약",
-                documentPath="automation/daily_learning_digest.py",
-                description="학습 기록을 모아 매일 확인할 요약을 만듭니다.",
-                inputs={"period": "today", "format": "markdown"},
-            )
-            registry.update(digestTask.id, outputs=["stdout", "variables"])
-            registry.addRun(TaskRun(
-                taskId=digestTask.id,
-                status=TaskStatus.SUCCESS,
-                startedAt="2026-07-23T08:00:00+00:00",
-                finishedAt="2026-07-23T08:00:01+00:00",
-                durationMs=846,
-                output="3개 레슨의 학습 기록을 요약했습니다.",
-                variables={"lessons": 3, "verifiedChecks": 5},
-            ))
-            cleanupTask = registry.create(
-                name="워크북 정리",
-                documentPath="automation/workbook_cleanup.py",
-                description="워크북 표 구조를 검사하고 정리 결과를 기록합니다.",
-                inputs={"workbook": "weekly_report.xlsx"},
-                enabled=False,
-            )
-            registry.update(cleanupTask.id, outputs=["stderr"])
-            registry.addRun(TaskRun(
-                taskId=cleanupTask.id,
-                status=TaskStatus.FAILED,
-                startedAt="2026-07-22T08:00:00+00:00",
-                finishedAt="2026-07-22T08:00:00+00:00",
-                durationMs=219,
-                error="입력 워크북을 찾지 못했습니다.",
-                variables={"workbook": "weekly_report.xlsx"},
-            ))
+        if [task.id for task in registry.listTasks()] != [
+            "task-daily-summary",
+            "task-workbook-cleanup",
+        ]:
+            raise RuntimeError("Local automation fixture did not load deterministically")
     except Exception:
         localState.cleanup()
         raise
@@ -2188,6 +2228,14 @@ async ({ surface, expectedTier }) => {
     .map(actionName)
     .filter((label) => forbiddenLearningLabels.has(label));
   const missingImageAlt = visibleImages.filter((image) => !image.hasAttribute("alt")).length;
+  const visibleText = document.body.innerText || "";
+  const captureRedactionSignals = {
+    windowsUserPath: /[A-Za-z]:\\\\Users\\\\[^\\s\\\\]+/i.test(visibleText),
+    macUserPath: /\\/Users\\/[^\\s/]+/i.test(visibleText),
+    linuxUserPath: /\\/home\\/[^\\s/]+/i.test(visibleText),
+    emailAddress: /\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b/i.test(visibleText),
+    accessCredential: /\\b(?:sk-[A-Za-z0-9_-]{12,}|ghp_[A-Za-z0-9]{12,}|github_pat_[A-Za-z0-9_]{12,}|Bearer\\s+[A-Za-z0-9._~-]{12,})\\b/i.test(visibleText),
+  };
   const visibleSocialLinks = [...document.querySelectorAll('[data-social-link="codaro"]')]
     .filter(inViewport);
   const visibleSocialLinkIds = visibleSocialLinks
@@ -2469,6 +2517,7 @@ async ({ surface, expectedTier }) => {
     visibleImageCount: visibleImages.length,
     brokenImages,
     missingImageAlt,
+    captureRedactionSignals,
     socialLinksSourceCount: document.querySelectorAll(
       '[data-social-links="codaro"][data-social-links-source="design-system"]'
     ).length,
@@ -2641,6 +2690,13 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
         failures.append(f"{name}: broken images {audit['brokenImages'][:3]}")
     if audit["missingImageAlt"]:
         failures.append(f"{name}: {audit['missingImageAlt']} visible image(s) have no alt attribute")
+    redactionSignals = [
+        signal
+        for signal, detected in audit["captureRedactionSignals"].items()
+        if detected
+    ]
+    if redactionSignals:
+        failures.append(f"{name}: visible capture contains sensitive text signals {redactionSignals}")
     if audit["rootTheme"] != "codaro":
         failures.append(f"{name}: Codaro Astryx theme scope is missing")
     if audit["cascadeLayerOrderCount"] != 1:
@@ -3172,7 +3228,11 @@ def runBrowserMatrix(
                     raise ValueError(f"unknown CODARO_PRODUCT_CASE: {selectedCase}")
             for case in cases:
                 print(f"[product-experience-browser] case {case['name']}", flush=True)
-                context = browser.new_context(viewport=case["viewport"], color_scheme=colorScheme)
+                context = browser.new_context(
+                    viewport=case["viewport"],
+                    color_scheme=colorScheme,
+                    reduced_motion="reduce",
+                )
                 if case.get("verifyLegacyProgressMigration"):
                     context.add_init_script(
                         """
@@ -4612,6 +4672,17 @@ def runBrowserMatrix(
                             arg=webLearningArchiveDraftSource,
                             timeout=20_000,
                         )
+                    page.add_style_tag(
+                        content="""
+                        *, *::before, *::after {
+                          animation-delay: 0s !important;
+                          animation-duration: 0s !important;
+                          caret-color: transparent !important;
+                          transition-delay: 0s !important;
+                          transition-duration: 0s !important;
+                        }
+                        """
+                    )
                     page.wait_for_timeout(800)
                     audit = page.evaluate(
                         AUDIT_SCRIPT,

@@ -600,13 +600,24 @@ GATES: dict[str, Gate] = {
     ),
     "visual-assets": Gate(
         tier="surface",
-        description="공용 visual manifest, source provenance, AVIF/WebP 파생물, 앱 mirror, 용량 예산을 확인한다.",
+        description="공용 visual manifest, fresh 제품 fixture, redaction, source provenance, AVIF/WebP 파생물, 앱 mirror, 용량 예산을 확인한다.",
         commands=(
-            command(("uv", "run", "--with", "pillow", "python", "-X", "utf8", "-m", "pytest", "tests/assets/testVisualAssetManifest.py", "tests/assets/testBuildVisualAssets.py", "-q", "--tb=short")),
+            command(("uv", "run", "--with", "pillow", "python", "-X", "utf8", "-m", "pytest", "tests/assets/testVisualAssetManifest.py", "tests/assets/testBuildVisualAssets.py", "tests/assets/testCaptureProductVisuals.py", "-q", "--tb=short")),
             command(("uv", "run", "--with", "pillow", "python", "-X", "utf8", "assets/brand/tools/buildVisualAssets.py", "--check")),
             command(("node", "scripts/syncVisualAssets.js", "--check"), cwd="landing"),
             command(("node", "scripts/syncVisualAssets.mjs", "--check"), cwd="editor"),
             command(("uv", "run", "python", "-X", "utf8", "tests/assets/verifyVisualAssetBudget.py")),
+            command(("npm", "run", "build"), cwd="landing"),
+            command(("npm", "run", "build"), cwd="editor"),
+            command((
+                "uv",
+                "run",
+                "python",
+                "-X",
+                "utf8",
+                "tests/assets/captureProductVisuals.py",
+                "--check",
+            ), timeoutSeconds=900),
         ),
     ),
     "learning-method": Gate(
