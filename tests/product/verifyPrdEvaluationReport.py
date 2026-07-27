@@ -21,7 +21,7 @@ ROUND_ROOT = (
     / "01-prd-improvement-loop"
     / "08-r10-independent-review"
 )
-CONTRACT_ROOT = ROUND_ROOT.parent / "00-evaluation-contract"
+CONTRACT_ROOT = ROUND_ROOT.parent / "_done" / "00-evaluation-contract"
 RUBRIC_PATH = CONTRACT_ROOT / "rubric.yml"
 SCHEMA_PATH = CONTRACT_ROOT / "evaluation-report.schema.yml"
 INPUT_PATH = ROUND_ROOT / "r10-input-manifest.yml"

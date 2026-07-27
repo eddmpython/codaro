@@ -277,6 +277,9 @@ def testSealTransitionBindsAllScopeHashes() -> None:
 
     assert sealed["roundState"] == "ready"
     assert sealed["sealed"] is True
+    assert sealed["rubric"]["path"].endswith(
+        "01-prd-improvement-loop/_done/00-evaluation-contract/rubric.yml"
+    )
     assert sealed["scope"] == {
         "sealState": "sealed",
         "gitCommit": "1" * 40,
@@ -307,6 +310,9 @@ def testDraftTransitionRefreshesBundleFactsWithoutSealing() -> None:
 
     assert draft["roundState"] == "blocked"
     assert draft["sealed"] is False
+    assert draft["rubric"]["path"].endswith(
+        "01-prd-improvement-loop/_done/00-evaluation-contract/rubric.yml"
+    )
     assert draft["draftBundle"] == {
         "manifestPath": builder.relativePath(builder.MANIFEST_PATH),
         "archivePath": "output/bundle.zip",

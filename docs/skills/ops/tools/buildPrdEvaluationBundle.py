@@ -24,8 +24,8 @@ ROUND_ROOT = ROOT / LOOP / "08-r10-independent-review"
 INPUT_PATH = ROUND_ROOT / "r10-input-manifest.yml"
 ROSTER_PATH = ROUND_ROOT / "evaluator-roster.yml"
 MANIFEST_PATH = ROUND_ROOT / "evaluation-bundle.manifest.yml"
-RUBRIC_SOURCE = ROOT / LOOP / "00-evaluation-contract/rubric.yml"
-SCHEMA_SOURCE = ROOT / LOOP / "00-evaluation-contract/evaluation-report.schema.yml"
+RUBRIC_SOURCE = ROOT / LOOP / "_done/00-evaluation-contract/rubric.yml"
+SCHEMA_SOURCE = ROOT / LOOP / "_done/00-evaluation-contract/evaluation-report.schema.yml"
 ARCHIVE_PATH = ROOT / "output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip"
 
 ROOT_FILES = {
@@ -624,13 +624,21 @@ def verifyWrittenManifest(expected: dict[str, Any]) -> None:
         )
 
 
+def bindRubricSource(inputManifest: dict[str, Any]) -> dict[str, Any]:
+    updated = dict(inputManifest)
+    rubric = dict(updated.get("rubric") or {})
+    rubric["path"] = relativePath(RUBRIC_SOURCE)
+    updated["rubric"] = rubric
+    return updated
+
+
 def sealedInputManifest(inputManifest: dict[str, Any], bundleManifest: dict[str, Any]) -> dict[str, Any]:
     if bundleManifest["roundReadiness"]["sealEligible"] is not True:
         reasons = bundleManifest["roundReadiness"]["sealBlockingReasons"]
         raise BundleError("R10 scope cannot be sealed: " + "; ".join(reasons))
     scope = bundleManifest["scope"]
     archive = bundleManifest["archive"]
-    updated = dict(inputManifest)
+    updated = bindRubricSource(inputManifest)
     updated["roundState"] = "ready"
     updated["sealed"] = True
     updated["scope"] = {
@@ -660,7 +668,7 @@ def sealedInputManifest(inputManifest: dict[str, Any], bundleManifest: dict[str,
 def draftInputManifest(inputManifest: dict[str, Any], bundleManifest: dict[str, Any]) -> dict[str, Any]:
     scope = bundleManifest["scope"]
     archive = bundleManifest["archive"]
-    updated = dict(inputManifest)
+    updated = bindRubricSource(inputManifest)
     draftBundle = dict(updated.get("draftBundle") or {})
     draftBundle.update({
         "manifestPath": relativePath(MANIFEST_PATH),

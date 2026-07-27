@@ -17,8 +17,8 @@ import yaml
 ROOT = Path(__file__).resolve().parents[2]
 INITIATIVE = ROOT / "mainPlan" / "astryx-product-experience"
 LOOP = INITIATIVE / "00-product-contract" / "01-prd-improvement-loop"
-RUBRIC_PATH = LOOP / "00-evaluation-contract" / "rubric.yml"
-EVALUATION_SCHEMA_PATH = LOOP / "00-evaluation-contract" / "evaluation-report.schema.yml"
+RUBRIC_PATH = LOOP / "_done" / "00-evaluation-contract" / "rubric.yml"
+EVALUATION_SCHEMA_PATH = LOOP / "_done" / "00-evaluation-contract" / "evaluation-report.schema.yml"
 R10_MANIFEST_PATH = LOOP / "08-r10-independent-review" / "r10-input-manifest.yml"
 NEGATIVE_FIXTURE_PATH = ROOT / "tests" / "product" / "bootstrapAfterUse.fixture.yml"
 REPORT_PATH = ROOT / "output" / "test-runner" / "plan-quality" / "plan-fact-audit.json"

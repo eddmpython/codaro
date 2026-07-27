@@ -20,6 +20,7 @@ CONTRACT_ROOT = (
     / "astryx-product-experience"
     / "00-product-contract"
     / "01-prd-improvement-loop"
+    / "_done"
     / "00-evaluation-contract"
 )
 RUBRIC_PATH = CONTRACT_ROOT / "rubric.yml"

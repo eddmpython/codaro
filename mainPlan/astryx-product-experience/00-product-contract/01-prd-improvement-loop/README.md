@@ -25,7 +25,7 @@ R8처럼 평가자가 목표 점수에 맞춰 문서를 수렴시키는 루프�
 - 이전 round를 덮어쓰지 않는다. 다음 round가 더 낮아도 그대로 기록한다.
 - 점수와 무관하게 P0는 착수를 막고, plan-internal P1은 해당 dependency 착수를 막는다.
 
-PRD integrity의 versioned SSOT는 [rubric.yml](00-evaluation-contract/rubric.yml)이다. 총점 scale은 100이지만 목표 점수와 통과 threshold는 없다. 점수는 항목별 근거를 손실 없이 요약하는 값이고, P0·P1 dependency 차단과 product evidence maturity는 총점과 별도로 판정한다. 현재 R10 raw report가 없으므로 현 PRD의 유효한 독립 점수도 없으며, 역사 R8 100점을 현재 점수로 재사용하지 않는다.
+PRD integrity의 versioned SSOT는 [rubric.yml](_done/00-evaluation-contract/rubric.yml)이다. 총점 scale은 100이지만 목표 점수와 통과 threshold는 없다. 점수는 항목별 근거를 손실 없이 요약하는 값이고, P0·P1 dependency 차단과 product evidence maturity는 총점과 별도로 판정한다. 현재 R10 raw report가 없으므로 현 PRD의 유효한 독립 점수도 없으며, 역사 R8 100점을 현재 점수로 재사용하지 않는다.
 
 Product evidence maturity는 `E0 없음`, `E1 synthetic`, `E2 vertical slice`, `E3 대표 경로`, `E4 전수·실사용` 단계로만 기록한다. PRD 점수와 평균내지 않는다.
 

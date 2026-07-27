@@ -106,7 +106,7 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 
 ### 계획 품질
 
-- [evaluation contract](../00-product-contract/01-prd-improvement-loop/00-evaluation-contract/)에 따라 신규 전문 평가자가 목표 점수와 이전 round 결론 없이 PRD integrity와 product evidence maturity를 분리 평가한다.
+- [evaluation contract](../00-product-contract/01-prd-improvement-loop/_done/00-evaluation-contract/)에 따라 신규 전문 평가자가 목표 점수와 이전 round 결론 없이 PRD integrity와 product evidence maturity를 분리 평가한다.
 - 평가자는 실제 경로, 심볼, gate registry, dependency peer, 레슨 수와 identity를 다시 대조하고 raw report·rubric hash·fact audit를 남긴다.
 - 숫자 threshold는 착수 조건이 아니다. 현재 코드와 충돌하는 P0와 해당 dependency의 plan-internal P1이 0이고 bootstrap·vertical slice feasibility가 자기충족적일 때만 착수한다.
 - 계획 평가 통과는 제품 완료가 아니다. 구현·검수·효능 gate가 끝난 작업만 `_done`으로 이동한다.
