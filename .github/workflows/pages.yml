@@ -132,6 +132,7 @@ jobs:
           path: |
             output/test-runner/product-browser-webview2-evergreen/webview2-product-smoke-report.json
             output/test-runner/product-browser-webview2-evergreen/deployed-web-learning-archive.json
+            output/test-runner/product-browser-webview2-evergreen/deployed-local-reexport-learning-archive.json
             output/test-runner/product-browser-webview2-evergreen/screenshots/
             output/test-runner/product-browser-webview2-evergreen/logs/
           if-no-files-found: error

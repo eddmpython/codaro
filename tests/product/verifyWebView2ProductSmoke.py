@@ -30,6 +30,7 @@ SCREENSHOT_ROOT = WORK_ROOT / "screenshots"
 REPORT_PATH = WORK_ROOT / "webview2-product-smoke-report.json"
 WEB_ARCHIVE_PATH = WORK_ROOT / "web-origin-learning-archive.json"
 DEPLOYED_WEB_ARCHIVE_PATH = WORK_ROOT / "deployed-web-learning-archive.json"
+DEPLOYED_LOCAL_REEXPORT_PATH = WORK_ROOT / "deployed-local-reexport-learning-archive.json"
 CARGO_TARGET_ROOT = WORK_ROOT / "cargo-target"
 LAUNCHER_EXE = CARGO_TARGET_ROOT / "debug" / "codaro-launcher.exe"
 PYTHON_EXE = ROOT / ".venv" / "Scripts" / "python.exe"
@@ -115,6 +116,12 @@ def main() -> int:
                             deployed_archive=deployed_archive,
                         )
                     )
+                    cases.append(
+                        verify_local_reexport_to_deployed_web_roundtrip(
+                            playwright,
+                            deployed_archive=deployed_archive,
+                        )
+                    )
                 if console_errors:
                     failures.extend(f"WebView2 console: {message}" for message in console_errors)
             finally:
@@ -174,6 +181,7 @@ def main() -> int:
                 "Web-origin learning archive Local import, reload, re-export, and disabled automation adoption",
             ] + ([
                 "public deployed Web edit, strong verification, archive export, and installed Local roundtrip",
+                "installed Local re-export imported back into a clean public Web workspace",
             ] if deployed_archive is not None else []),
             "notCovered": [
                 "Windows 10 22H2 self-hosted image",
@@ -855,7 +863,8 @@ def verify_deployed_web_to_local_roundtrip(
     download_path = download_info.value.path()
     if download_path is None:
         raise VerificationError("deployed Web archive Local re-export has no path")
-    reexported = json.loads(Path(download_path).read_text(encoding="utf-8"))
+    shutil.copy2(download_path, DEPLOYED_LOCAL_REEXPORT_PATH)
+    reexported = json.loads(DEPLOYED_LOCAL_REEXPORT_PATH.read_text(encoding="utf-8"))
     reexport_materialized = materializeLearningArchive(reexported)
     source_events = {
         str(event.get("eventId")): event
@@ -899,6 +908,7 @@ def verify_deployed_web_to_local_roundtrip(
         "publicScreenshot": deployed_archive["screenshot"],
         "publicSourceUrl": deployed_archive["sourceUrl"],
         "reexportEvidenceEvents": len(reexport_events),
+        "reexportPath": display_path(DEPLOYED_LOCAL_REEXPORT_PATH),
         "reexportRuntimeTier": reexported.get("manifest", {}).get("runtimeTier"),
     }
     checks = {
@@ -923,6 +933,122 @@ def verify_deployed_web_to_local_roundtrip(
         "passed": not failures,
         "failures": failures,
     }
+
+
+def verify_local_reexport_to_deployed_web_roundtrip(
+    playwright: Any,
+    *,
+    deployed_archive: dict[str, Any],
+) -> dict[str, Any]:
+    from codaro.curriculum.learningArchive import materializeLearningArchive
+
+    if not DEPLOYED_LOCAL_REEXPORT_PATH.is_file():
+        raise VerificationError("installed Local re-export was not saved for the public Web return trip")
+    source_archive = json.loads(DEPLOYED_LOCAL_REEXPORT_PATH.read_text(encoding="utf-8"))
+    source_materialized = materializeLearningArchive(source_archive)
+    lesson_ref = str(deployed_archive["lessonRef"])
+    draft_source = str(deployed_archive["draftSource"])
+    browser = playwright.chromium.launch(channel="msedge", headless=True)
+    console_errors: list[str] = []
+    try:
+        context = browser.new_context(
+            accept_downloads=True,
+            color_scheme="light",
+            viewport={"width": 1440, "height": 900},
+        )
+        page = context.new_page()
+        page.on("console", lambda message: console_errors.append(message.text) if message.type == "error" else None)
+        page.on("pageerror", lambda error: console_errors.append(str(error)))
+        run_url = f"{DEPLOYED_WEB_URL}/run/?surface=editor"
+        response = page.goto(run_url, wait_until="domcontentloaded", timeout=45_000)
+        if response is not None and response.status >= 400:
+            raise VerificationError(f"public Web return workspace returned HTTP {response.status}: {run_url}")
+        page.locator("[data-product-surface-view='editor']:visible").wait_for(
+            state="visible",
+            timeout=45_000,
+        )
+        learning_data = open_learning_data_settings(page)
+        learning_data.locator("[data-learning-archive-import-input='true']").set_input_files(
+            str(DEPLOYED_LOCAL_REEXPORT_PATH)
+        )
+        page.wait_for_selector(
+            f"[data-learning-lesson-ref='{lesson_ref}']",
+            state="visible",
+            timeout=45_000,
+        )
+        wait_for_editor_source(page, draft_source)
+        page.reload(wait_until="domcontentloaded", timeout=45_000)
+        page.wait_for_selector(
+            f"[data-learning-lesson-ref='{lesson_ref}']",
+            state="visible",
+            timeout=45_000,
+        )
+        wait_for_editor_source(page, draft_source)
+
+        page.locator("[data-product-brand='escape']:visible").click(timeout=20_000)
+        page.locator("[data-product-surface-view='editor']:visible").wait_for(
+            state="visible",
+            timeout=20_000,
+        )
+        learning_data = open_learning_data_settings(page)
+        workspace_summary = learning_data.locator("[data-learning-archive-workspace-summary='true']")
+        workspace_summary.wait_for(state="visible", timeout=20_000)
+        with page.expect_download(timeout=20_000) as download_info:
+            learning_archive_export_control(learning_data).click()
+        download_path = download_info.value.path()
+        if download_path is None:
+            raise VerificationError("public Web return-trip archive export has no path")
+        returned_archive = json.loads(Path(download_path).read_text(encoding="utf-8"))
+        returned_materialized = materializeLearningArchive(returned_archive)
+        source_events = {
+            str(event.get("eventId")): event
+            for event in source_materialized.evidenceArchive.get("events", [])
+            if isinstance(event, dict) and event.get("eventId")
+        }
+        returned_events = {
+            str(event.get("eventId")): event
+            for event in returned_materialized.evidenceArchive.get("events", [])
+            if isinstance(event, dict) and event.get("eventId")
+        }
+        portable_payload = (
+            source_materialized.document == returned_materialized.document
+            and source_materialized.drafts == returned_materialized.drafts
+            and source_materialized.virtualDirectories == returned_materialized.virtualDirectories
+            and source_materialized.virtualFiles == returned_materialized.virtualFiles
+            and source_materialized.packages == returned_materialized.packages
+            and source_materialized.automationDrafts == returned_materialized.automationDrafts
+            and all(returned_events.get(event_id) == event for event_id, event in source_events.items())
+        )
+        summary_text = workspace_summary.inner_text()
+        screenshot_path = SCREENSHOT_ROOT / "deployed-local-reexport-to-web-learning-roundtrip.png"
+        page.screenshot(path=str(screenshot_path))
+        checks = {
+            "draftReload": draft_source in returned_materialized.drafts.values(),
+            "portablePayload": portable_payload,
+            "runtimeIdentity": returned_archive.get("manifest", {}).get("runtimeTier") == "web",
+            "workspaceSummary": "원본" in summary_text and "Web" in summary_text,
+            "consoleClean": not console_errors,
+        }
+        failures = [f"{check} check failed" for check, passed in checks.items() if not passed]
+        return {
+            "id": "deployed-local-reexport-to-web-learning-roundtrip",
+            "surface": "curriculum",
+            "snapshot": {
+                "lessonRef": lesson_ref,
+                "portablePayload": portable_payload,
+                "returnedEvidenceEvents": len(returned_events),
+                "returnedRuntimeTier": returned_archive.get("manifest", {}).get("runtimeTier"),
+                "sourceEvidenceEvents": len(source_events),
+                "sourcePath": display_path(DEPLOYED_LOCAL_REEXPORT_PATH),
+                "workspaceSummary": summary_text,
+            },
+            "screenshot": display_path(screenshot_path),
+            "checks": checks,
+            "passed": not failures,
+            "failures": failures,
+        }
+    finally:
+        browser.close()
 
 
 def build_web_origin_learning_archive(app_port: int) -> dict[str, str]:

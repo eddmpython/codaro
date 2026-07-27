@@ -45,6 +45,7 @@ export function LearningArchiveMenu({
   const [summary, setSummary] = useState<WebLearningEvidenceSummary>({ conflicts: 0, events: 0 });
   const [notice, setNotice] = useState("");
   const [noticeTone, setNoticeTone] = useState<"error" | "status">("status");
+  const [workspaceArchive, setWorkspaceArchive] = useState<LearningArchiveMaterialization | null>(null);
   const [automationDrafts, setAutomationDrafts] = useState<LearningArchiveMaterialization["automationDrafts"]>([]);
   const [adoptedAutomationDraftIds, setAdoptedAutomationDraftIds] = useState<Set<string>>(new Set());
   const showStatus = (message: string) => {
@@ -56,8 +57,9 @@ export function LearningArchiveMenu({
     setNotice(message);
   };
 
-  const refreshAutomationDrafts = useCallback(async (archive?: LearningArchiveMaterialization | null) => {
-    if (!localRuntime || !lessonRef) {
+  const refreshLearningArchiveState = useCallback(async (archive?: LearningArchiveMaterialization | null) => {
+    if (!lessonRef) {
+      setWorkspaceArchive(null);
       setAutomationDrafts([]);
       setAdoptedAutomationDraftIds(new Set());
       return;
@@ -65,6 +67,12 @@ export function LearningArchiveMenu({
     const materialized = archive === undefined
       ? await readPersistedLearningArchive(lessonRef)
       : archive;
+    setWorkspaceArchive(materialized);
+    if (!localRuntime) {
+      setAutomationDrafts([]);
+      setAdoptedAutomationDraftIds(new Set());
+      return;
+    }
     const nextDrafts = materialized?.automationDrafts ?? [];
     setAutomationDrafts(nextDrafts);
     if (!nextDrafts.length) {
@@ -97,11 +105,11 @@ export function LearningArchiveMenu({
   }, [localRuntime]);
 
   useEffect(() => {
-    void refreshAutomationDrafts().catch((error: unknown) => {
-      console.error("학습 데이터의 자동화 초안을 읽지 못했습니다.", error);
-      showError("저장된 자동화 초안을 읽지 못했습니다. 브라우저 저장 공간을 확인해 주세요.");
+    void refreshLearningArchiveState().catch((error: unknown) => {
+      console.error("저장된 학습 작업을 읽지 못했습니다.", error);
+      showError("저장된 학습 작업을 읽지 못했습니다. 브라우저 저장 공간을 확인해 주세요.");
     });
-  }, [refreshAutomationDrafts]);
+  }, [refreshLearningArchiveState]);
 
   const exportArchive = async () => {
     if (!document || !lessonRef) return;
@@ -144,13 +152,18 @@ export function LearningArchiveMenu({
       } else {
         const receipt = await importBrowserLearningArchive(rawArchive);
         await onImportArchive(receipt.materialized);
-        await refreshAutomationDrafts(receipt.materialized);
+        await refreshLearningArchiveState(receipt.materialized);
+        const restoredFileCount = receipt.materialized.virtualFiles.length;
+        const restoredPackageCount = receipt.materialized.packages.length;
         const automationCount = receipt.materialized.automationDrafts.length;
+        const payloadNotice = restoredFileCount || restoredPackageCount
+          ? ` 파일 ${restoredFileCount}개와 패키지 ${restoredPackageCount}개도 함께 복원했습니다.`
+          : "";
         const automationNotice = automationCount
           ? ` 자동화 초안 ${automationCount}개는 자동으로 실행하지 않고 작업 메뉴에 보관했습니다.`
           : "";
         showStatus(
-          `"${receipt.materialized.document.title}" 작업과 학습 기록 ${receipt.evidence.inserted}건을 복원했습니다.${automationNotice}`,
+          `"${receipt.materialized.document.title}" 작업과 학습 기록 ${receipt.evidence.inserted}건을 복원했습니다.${payloadNotice}${automationNotice}`,
         );
       }
       const next = await readLearningEvidenceSummary();
@@ -249,6 +262,41 @@ export function LearningArchiveMenu({
               />
             </div>
           </div>
+          {workspaceArchive ? (
+            <div
+              className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 border-t border-border pt-3 text-xs text-muted-foreground"
+              data-learning-archive-workspace-summary="true"
+            >
+              <span>
+                원본
+                <strong className="ml-1 font-medium text-foreground">
+                  {workspaceArchive.archive.manifest.runtimeTier === "web"
+                    ? "Web"
+                    : workspaceArchive.archive.manifest.runtimeTier === "local"
+                      ? "Local"
+                      : "Web + Local"}
+                </strong>
+              </span>
+              <span>
+                초안
+                <strong className="ml-1 font-medium tabular-nums text-foreground">
+                  {workspaceArchive.archive.manifest.draftCount}
+                </strong>
+              </span>
+              <span>
+                파일
+                <strong className="ml-1 font-medium tabular-nums text-foreground">
+                  {workspaceArchive.virtualFiles.length}
+                </strong>
+              </span>
+              <span>
+                패키지
+                <strong className="ml-1 font-medium tabular-nums text-foreground">
+                  {workspaceArchive.packages.length}
+                </strong>
+              </span>
+            </div>
+          ) : null}
           {localRuntime && automationDrafts.length ? (
             <section className="mt-3 border-t border-border pt-3" data-learning-automation-drafts="true">
               <div className="mb-2 flex items-center gap-2 text-xs font-medium text-muted-foreground">

@@ -3555,6 +3555,17 @@ def runBrowserMatrix(
                                 timeout=20_000,
                             )
                             archiveSummary = openLearningDataSettings(page)
+                            workspace_summary_text = page.locator(
+                                '[data-learning-archive-workspace-summary="true"]:visible'
+                            ).inner_text(timeout=20_000)
+                            if (
+                                "원본" not in workspace_summary_text
+                                or "Web" not in workspace_summary_text
+                                or "초안" not in workspace_summary_text
+                            ):
+                                raise AssertionError(
+                                    f"Web archive workspace summary is incomplete: {workspace_summary_text!r}"
+                                )
                             try:
                                 with page.expect_download(timeout=20_000) as restored_download_info:
                                     page.get_by_role("button", name="학습 작업 내보내기").click()
@@ -4111,6 +4122,20 @@ def runBrowserMatrix(
                                 f"httpFailures={httpFailures[-3:]}"
                             ) from error
                         openLearningDataSettings(page)
+                        workspace_summary = page.locator(
+                            '[data-learning-archive-workspace-summary="true"]'
+                        )
+                        workspace_summary.wait_for(state="visible", timeout=20_000)
+                        workspace_summary_text = workspace_summary.inner_text()
+                        if (
+                            "원본" not in workspace_summary_text
+                            or "Web" not in workspace_summary_text
+                            or "파일" not in workspace_summary_text
+                            or "패키지" not in workspace_summary_text
+                        ):
+                            raise AssertionError(
+                                f"Local archive workspace summary is incomplete: {workspace_summary_text!r}"
+                            )
                         automation_drafts = web_learning_archive.get("automationDrafts", [])
                         if automation_drafts:
                             expected_draft_id = str(automation_drafts[0].get("draftId", ""))

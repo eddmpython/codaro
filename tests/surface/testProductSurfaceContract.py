@@ -265,10 +265,12 @@ def testPagesDeploymentVerifiesThePublicWebToInstalledLocalPath() -> None:
         assert marker in workflow
     assert "capture_deployed_web_learning_archive(playwright)" in verifier
     assert '"deployed-web-to-local-learning-roundtrip"' in verifier
+    assert '"deployed-local-reexport-to-web-learning-roundtrip"' in verifier
     assert "public deployed Web edit, strong verification, archive export" in verifier
     evidence_upload = workflow.split("- name: Upload deployed product evidence", 1)[1]
     assert "cargo-target/" not in evidence_upload
     assert "deployed-web-learning-archive.json" in evidence_upload
+    assert "deployed-local-reexport-learning-archive.json" in evidence_upload
     assert "screenshots/" in evidence_upload
 
 
