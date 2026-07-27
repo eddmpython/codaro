@@ -2,7 +2,7 @@
 
 상태: 진행
 
-2026-07-22 source와 machine composition 기준으로 Landing의 primary Web 학습·Run 링크는 `/codaro/run/`을 사용하고 Pages workflow는 `/run/` primary tree와 `/app/` compatibility tree를 각각 빌드한다. 두 tree는 base-bound pyproc asset manifest와 scope별 service-worker cache를 가지며 실제 이중 editor build와 Landing build를 통과했다. 학습 효과는 `E0`~`E3` 경로별 state machine이 현재 content hash, 역할, 표본, unseen measure, 연구 운영 필드를 검사하고 한 경로 실패를 aggregate로 숨기지 않는다. deployed C0 archive·C2 두 release·C3 telemetry와 실제 연구 owner·참가자 report가 없으므로 `completionEligible=false`이며 `_done`이 아니다.
+2026-07-27 source와 machine composition 기준으로 Landing의 primary Web 학습·Run 링크는 `/codaro/run/`을 사용한다. `/codaro/app/`은 더 이상 current editor의 두 번째 build가 아니며 `contracts/webCompatibilityC0.json`이 고정한 `eb3176e0c691920c3c4244fdafc47c490af8749f`의 LF build다. Pages는 pinned source를 별도 checkout하고 632개 파일·23,761,225 byte·tree SHA-256 `87108db4ddbe27211989cac5c32cbf2fd451aac8a580acfe1a2e83ddb4a92457`을 검증한 뒤 current `/run/`과 조립한다. captured Pages artifact와 공개 `/app/` 632개 파일의 byte·response type crawl도 일치한다. 정식 release asset URL·archive SHA-256은 명시적 release 전까지 비어 있으므로 C0/C1 완료를 과장하지 않는다. C2 두 release·C3 telemetry와 실제 연구 owner·참가자 report도 없으므로 `completionEligible=false`이며 `_done`이 아니다.
 
 ## 목표
 
@@ -44,6 +44,8 @@ research operations는 모집 전에 `researchOwner`, `privacyOwner`, 모집 채
 - `tests/product/testLearningEfficacyStage.py`
 - `tests/product/verifyReleaseResearchOperations.py`
 - `tests/product/fixtures/releaseResearch/missing-research-owner.yml`
+- `contracts/webCompatibilityC0.json`
+- `docs/skills/ops/tools/verifyWebCompatibilityC0.py`
 - `.github/workflows/pages.yml`, `.github/workflows/ci.yml`
 
 ## 영향 함수·심볼

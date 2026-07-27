@@ -48,7 +48,9 @@ codaro/
 └── tests/            # 도메인 트리(tests/<domain>/): pytest suites + 같은 도메인 verify/audit 드라이버 + gate runner(run.py) + root enforcer(verifyRootClean.py) + 공유 인프라 + _attempts 샌드박스(git 미추적·로컬 전용)
 ```
 
-Root files are limited to package metadata and public project documents. Examples are `README.md`, `pyproject.toml`, `uv.lock`, `SECURITY.md`, `PRIVACY.md`, `SUPPORT.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md`, `CLAUDE.md`, and `AGENTS.md`.
+Root files are limited to package metadata, repository behavior contracts, and public project documents. Required repository behavior files include `.gitignore`, `.gitattributes`, and `.python-version`. Public examples are `README.md`, `pyproject.toml`, `uv.lock`, `SECURITY.md`, `PRIVACY.md`, `SUPPORT.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md`, `CLAUDE.md`, and `AGENTS.md`.
+
+`.gitattributes`는 Web bundle에 원문으로 포함되는 curriculum YAML과 TypeScript source를 운영체제와 무관하게 LF로 checkout하게 한다. 이 파일을 제거하거나 `core.autocrlf`에 맡기면 Windows build의 byte 수와 chunk hash가 Pages build에서 달라지므로 build reproducibility 계약으로 취급한다.
 
 ## Local And Generated Roots
 

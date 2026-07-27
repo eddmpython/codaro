@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "milestone": "C0",
+  "status": "deployed-tree-pinned-release-archive-pending",
+  "source": {
+    "repository": "https://github.com/eddmpython/codaro",
+    "commit": "eb3176e0c691920c3c4244fdafc47c490af8749f",
+    "basePath": "/codaro/app/"
+  },
+  "build": {
+    "runner": "ubuntu-latest",
+    "nodeVersion": "22",
+    "installCommand": "npm ci",
+    "buildCommand": "npm run build",
+    "lineEndings": "LF"
+  },
+  "deployedCapture": {
+    "url": "https://eddmpython.github.io/codaro/app/",
+    "capturedAt": "2026-07-27T12:39:35Z",
+    "workflowRunUrl": "https://github.com/eddmpython/codaro/actions/runs/30266534040",
+    "workflowArtifactId": 8653019510,
+    "workflowArtifactExpiresAt": "2026-07-28T12:36:19Z"
+  },
+  "tree": {
+    "digestAlgorithm": "sha256(length(relativePath),relativePath,length(content),content)",
+    "fileCount": 632,
+    "byteCount": 23761225,
+    "sha256": "87108db4ddbe27211989cac5c32cbf2fd451aac8a580acfe1a2e83ddb4a92457"
+  },
+  "entrypoints": {
+    "index.html": {
+      "bytes": 4065,
+      "sha256": "4c155a3f0e34a1fde8541b4e04d666d84a61898c0a7a06532851bbfac6672980",
+      "contentType": "text/html; charset=utf-8"
+    },
+    "serviceWorker.js": {
+      "bytes": 4145,
+      "sha256": "a7d0b91dcebede06da9deccf9a3c8dda9d69c2dfcb7c8e89f080d505c33f6516",
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    "pyproc-assets.json": {
+      "bytes": 10891,
+      "sha256": "7aca3f2a86f6a87ff4048fcd1e11d8edfbc15ccbe0822e45fb18ef891bb166c7",
+      "contentType": "application/json; charset=utf-8"
+    },
+    "_app/index-DTkn0If5.js": {
+      "bytes": 197569,
+      "sha256": "7869e9a9794555142703800108d70ced74813c9b9c78c43f34beeb629b1415da",
+      "contentType": "application/javascript; charset=utf-8"
+    }
+  },
+  "releaseArchive": {
+    "requiredForC0Completion": true,
+    "status": "pending-explicit-release",
+    "url": null,
+    "sha256": null
+  }
+}

@@ -5,8 +5,10 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from typing import Any
 
@@ -23,6 +25,7 @@ LANDING_HOME_PATH = ROOT / "landing/src/pages/home.jsx"
 LANDING_LEARN_PATH = ROOT / "landing/src/pages/learn.jsx"
 EDITOR_INDEX_PATH = ROOT / "editor/index.html"
 SERVICE_WORKER_PATH = ROOT / "editor/public/serviceWorker.js"
+C0_CONTRACT_PATH = ROOT / "contracts/webCompatibilityC0.json"
 CONTENT_HASH = "sha256-" + ("a" * 64)
 NPM_COMMAND = "npm.cmd" if os.name == "nt" else "npm"
 
@@ -102,7 +105,11 @@ def runBuild(command: tuple[str, ...], *, cwd: Path, environment: dict[str, str]
     )
     if result.returncode != 0:
         detail = (result.stderr or result.stdout).strip()[-1_500:]
-        raise ValueError(f"build failed in {cwd.relative_to(ROOT).as_posix()}: {detail}")
+        try:
+            label = cwd.relative_to(ROOT).as_posix()
+        except ValueError:
+            label = str(cwd)
+        raise ValueError(f"build failed in {label}: {detail}")
 
 
 def treeDigest(root: Path) -> tuple[int, str]:
@@ -118,19 +125,97 @@ def treeDigest(root: Path) -> tuple[int, str]:
     return len(files), digest.hexdigest()
 
 
+def buildPinnedC0(contract: dict[str, Any], root: Path) -> Path:
+    suppliedTree = os.environ.get("CODARO_C0_TREE")
+    if suppliedTree:
+        return Path(suppliedTree).resolve()
+    source = root / "source"
+    output = root / "app"
+    runBuild(
+        (
+            "git",
+            "-c",
+            "core.autocrlf=false",
+            "-c",
+            "core.longpaths=true",
+            "clone",
+            "--no-local",
+            "--no-checkout",
+            str(ROOT),
+            str(source),
+        ),
+        cwd=ROOT,
+    )
+    runBuild(
+        (
+            "git",
+            "-c",
+            "core.autocrlf=false",
+            "-c",
+            "core.longpaths=true",
+            "checkout",
+            "--detach",
+            contract["source"]["commit"],
+        ),
+        cwd=source,
+    )
+    runBuild((NPM_COMMAND, "ci", "--no-audit", "--no-fund"), cwd=source / "editor")
+    environment = os.environ.copy()
+    environment["CODARO_WEB_BASE"] = "codaro/app"
+    environment["CODARO_WEB_OUT"] = str(output)
+    runBuild((NPM_COMMAND, "run", "build"), cwd=source / "editor", environment=environment)
+    return output
+
+
+def verifyC0Tree(tree: Path, contract: dict[str, Any]) -> dict[str, Any]:
+    indexPath = tree / "index.html"
+    workerPath = tree / "serviceWorker.js"
+    pyprocManifestPath = tree / "pyproc-assets.json"
+    if not indexPath.is_file() or not workerPath.is_file() or not pyprocManifestPath.is_file():
+        raise ValueError("pinned C0 /app/ tree is incomplete")
+    builtIndex = indexPath.read_text(encoding="utf-8")
+    builtWorker = workerPath.read_text(encoding="utf-8")
+    manifest = json.loads(pyprocManifestPath.read_text(encoding="utf-8"))
+    expectedBase = contract["source"]["basePath"]
+    entrypoints = manifest.get("entrypoints")
+    if expectedBase not in builtIndex or "SCOPE_PATH" not in builtWorker:
+        raise ValueError("pinned C0 /app/ tree lost its subpath scope")
+    if not isinstance(entrypoints, list) or not entrypoints or any(
+        not str(entry.get("url") or "").startswith(expectedBase)
+        for entry in entrypoints
+        if isinstance(entry, dict)
+    ):
+        raise ValueError("pinned C0 pyproc entrypoints use the wrong base")
+    fileCount, sha256 = treeDigest(tree)
+    byteCount = sum(path.stat().st_size for path in tree.rglob("*") if path.is_file())
+    facts = {"byteCount": byteCount, "fileCount": fileCount, "sha256": sha256}
+    expected = {key: contract["tree"][key] for key in facts}
+    if facts != expected:
+        raise ValueError(f"pinned C0 identity mismatch: actual={facts} expected={expected}")
+    return {**facts, "pyprocEntrypoints": len(entrypoints)}
+
+
 def verifyCompatibilityBuild() -> dict[str, Any]:
     workflow = PAGES_WORKFLOW_PATH.read_text(encoding="utf-8")
     home = LANDING_HOME_PATH.read_text(encoding="utf-8")
     learn = LANDING_LEARN_PATH.read_text(encoding="utf-8")
     index = EDITOR_INDEX_PATH.read_text(encoding="utf-8")
     serviceWorker = SERVICE_WORKER_PATH.read_text(encoding="utf-8")
+    contract = json.loads(C0_CONTRACT_PATH.read_text(encoding="utf-8"))
     requiredContracts = (
+        (workflow, "build-c0-compatibility:"),
+        (workflow, "contracts/webCompatibilityC0.json"),
+        (workflow, 'git config core.autocrlf false'),
+        (workflow, 'git checkout --detach "${{ steps.c0.outputs.source_commit }}"'),
+        (workflow, "name: web-compatibility-c0"),
+        (workflow, "Download pinned C0 app tree"),
+        (workflow, "--deployed-url"),
         (workflow, "CODARO_WEB_BASE: codaro/run"),
         (workflow, "CODARO_WEB_OUT: ../landing/static/run"),
         (workflow, "CODARO_WEB_BASE: codaro/app"),
         (workflow, "CODARO_WEB_OUT: ../landing/static/app"),
-        (home, 'appPath("/run/'),
-        (learn, 'brand.appPath("/run/")'),
+        (home, "const curriculumUrl = firstLessonHref()"),
+        (learn, "const href = brand.appPath(`${lesson.route.replace"),
         (index, 'scope: serviceWorkerBase'),
         (serviceWorker, 'const SCOPE_URL = new URL(self.registration.scope)'),
         (serviceWorker, 'codaro-shell-v3:${SCOPE_PATH}'),
@@ -140,46 +225,47 @@ def verifyCompatibilityBuild() -> dict[str, Any]:
     if missing:
         raise ValueError("compatibility build contract is incomplete: " + ", ".join(missing))
 
-    for base in ("run", "app"):
-        environment = os.environ.copy()
-        environment["CODARO_WEB_BASE"] = f"codaro/{base}"
-        environment["CODARO_WEB_OUT"] = f"../landing/static/{base}"
-        runBuild((NPM_COMMAND, "run", "build"), cwd=ROOT / "editor", environment=environment)
-    runBuild((NPM_COMMAND, "run", "build"), cwd=ROOT / "landing")
+    sourceCommit = str(contract.get("source", {}).get("commit", ""))
+    if len(sourceCommit) != 40:
+        raise ValueError("C0 source commit is invalid")
+    commitCheck = subprocess.run(
+        ("git", "cat-file", "-e", f"{sourceCommit}^{{commit}}"),
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if commitCheck.returncode != 0:
+        raise ValueError(f"C0 source commit is unavailable: {sourceCommit}")
 
-    facts: dict[str, Any] = {}
-    for base in ("run", "app"):
-        tree = ROOT / "landing/build" / base
-        indexPath = tree / "index.html"
-        workerPath = tree / "serviceWorker.js"
-        pyprocManifestPath = tree / "pyproc-assets.json"
-        if not indexPath.is_file() or not workerPath.is_file() or not pyprocManifestPath.is_file():
-            raise ValueError(f"built /{base}/ tree is incomplete")
-        builtIndex = indexPath.read_text(encoding="utf-8")
-        builtWorker = workerPath.read_text(encoding="utf-8")
-        manifest = json.loads(pyprocManifestPath.read_text(encoding="utf-8"))
-        expectedBase = f"/codaro/{base}/"
-        entrypoints = manifest.get("entrypoints")
-        if expectedBase not in builtIndex or "SCOPE_PATH" not in builtWorker:
-            raise ValueError(f"built /{base}/ tree does not own its subpath scope")
-        if not isinstance(entrypoints, list) or not entrypoints or any(
-            not str(entry.get("url") or "").startswith(expectedBase)
-            for entry in entrypoints
-            if isinstance(entry, dict)
-        ):
-            raise ValueError(f"built /{base}/ pyproc entrypoints use the wrong base")
-        fileCount, sha256 = treeDigest(tree)
-        facts[base] = {
-            "fileCount": fileCount,
-            "pyprocEntrypoints": len(entrypoints),
-            "sha256": sha256,
-        }
-    if facts["run"]["sha256"] == facts["app"]["sha256"]:
-        raise ValueError("primary and compatibility trees unexpectedly have the same path-bound bytes")
+    with tempfile.TemporaryDirectory(prefix="codaro-c0-") as temporary:
+        c0Tree = buildPinnedC0(contract, Path(temporary))
+        environment = os.environ.copy()
+        environment["CODARO_WEB_BASE"] = "codaro/run"
+        environment["CODARO_WEB_OUT"] = "../landing/static/run"
+        runBuild((NPM_COMMAND, "run", "build"), cwd=ROOT / "editor", environment=environment)
+        appStaticTree = ROOT / "landing/static/app"
+        if appStaticTree.is_dir():
+            shutil.rmtree(appStaticTree)
+        shutil.copytree(c0Tree, appStaticTree)
+        runBuild((NPM_COMMAND, "run", "build"), cwd=ROOT / "landing")
+        appFacts = verifyC0Tree(c0Tree, contract)
+
+    runTree = ROOT / "landing/build/run"
+    appTree = ROOT / "landing/build/app"
+    if not runTree.is_dir() or not appTree.is_dir():
+        raise ValueError("fresh site composition did not contain both /run/ and /app/")
+    runFileCount, runSha256 = treeDigest(runTree)
+    composedAppFacts = verifyC0Tree(appTree, contract)
+    if composedAppFacts != appFacts:
+        raise ValueError("Landing composition changed the pinned C0 tree")
+    if runSha256 == appFacts["sha256"]:
+        raise ValueError("current /run/ unexpectedly equals pinned C0 /app/")
     return {
-        "appCompatibilityTree": facts["app"],
+        "appCompatibilityTree": appFacts,
+        "c0SourceCommit": sourceCommit,
+        "releaseArchiveStatus": contract["releaseArchive"]["status"],
         "outputCollisionCount": 0,
-        "primaryRunTree": facts["run"],
+        "primaryRunTree": {"fileCount": runFileCount, "sha256": runSha256},
         "scopeIsolatedCaches": True,
     }
 
@@ -196,7 +282,7 @@ def main() -> int:
     except (OSError, ValueError, subprocess.SubprocessError, yaml.YAMLError) as error:
         failures.append(str(error))
     completionBlockers = [
-        "deployed C0 app archive URL, hash, and crawl receipt are absent",
+        "formal C0 release asset URL and archive SHA-256 require an explicit release",
         "two-release C2 compatibility tombstone and 28-day C3 telemetry are absent",
         "real research and privacy owners are unassigned",
         "E1, E2, and E3 participant reports are absent",

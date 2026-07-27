@@ -1,0 +1,285 @@
+var e=`meta:
+  id: devTools_githubIntro
+  title: GitHub 소개 - 깃헙이 무엇인지 그림으로 이해하기
+  order: 0
+  category: devTools
+  difficulty: ⭐
+  badge: 읽기
+  packages: []
+  tags:
+    - GitHub
+    - Git
+    - 버전관리
+    - 협업
+    - 개발교양
+  outcomes:
+    - devLiteracy.git
+    - devLiteracy.github
+  prerequisites: []
+  estimatedMinutes: 15
+  seo:
+    title: "GitHub 소개 - 깃헙이 무엇인지 그림과 비유로 이해하기"
+    description: "Git과 GitHub의 차이, 저장소·커밋·브랜치·풀 리퀘스트 같은 핵심 개념을 코드 없이 그림과 비유로 읽고 이해하는 한 파일 개발 교양 자료."
+    keywords:
+      - GitHub이란
+      - Git GitHub 차이
+      - 저장소 커밋 브랜치
+      - 풀 리퀘스트
+      - 버전 관리
+
+intro:
+  direction: "GitHub이 무엇이고 왜 거의 모든 개발자가 쓰는지, Git과 어떻게 다른지를 코드 실행 없이 그림과 비유로 읽고 이해한다. 마지막 핵심 정리 체크리스트로 스스로 설명할 수 있는지 확인한다."
+  benefits:
+    - "Git과 GitHub의 차이를 한 문장으로 설명할 수 있다 - 가장 흔한 입문 오개념을 먼저 푼다."
+    - "저장소·커밋·브랜치·풀 리퀘스트가 무엇인지 일상 비유로 구분할 수 있다."
+    - "코드를 한 줄도 치지 않고, 개념 지도만 머릿속에 그린 뒤 다음 실습 트랙으로 넘어간다."
+  diagram:
+    steps:
+      - label: "1. 버전 관리의 문제"
+        detail: "보고서_최종_진짜최종 처럼 파일명에 버전을 붙이던 방식이 협업에서 왜 무너지는지 본다."
+      - label: "2. Git이 푸는 것"
+        detail: "변경 이력을 스냅샷(커밋)으로 쌓고 갈래(브랜치)로 나누는 Git의 버전 관리 모델을 이해한다."
+      - label: "3. GitHub이 더하는 것"
+        detail: "로컬 Git을 인터넷의 원격 저장소로 올려 협업·리뷰·공개를 가능하게 하는 GitHub의 역할을 본다."
+      - label: "4. 협업 한 사이클"
+        detail: "clone·branch·commit·push·풀 리퀘스트·merge로 남의 코드에 기여하는 한 바퀴를 따라간다."
+    runtime:
+      - label: "읽기 전용 개념 카드"
+        detail: "이 자료는 코드 실행이 없는 개념 읽기 카드다. 그림·비교·비유로 GitHub의 큰 그림을 잡는다."
+      - label: "다음 행동 - git 실습"
+        detail: "개념을 잡았다면 이어지는 git 실습 트랙에서 로컬 터미널로 실제 commit·push를 쳐본다."
+
+sections:
+  - id: hook
+    title: "1. GitHub은 코드의 공유 플랫폼이다"
+    blocks:
+      - type: hero
+        title: "GitHub - 전 세계 개발자가 코드를 모으고 함께 고치는 곳"
+        subtitle: "코드용 구글 드라이브 + 협업 공간이라고 생각하면 가깝다"
+        points:
+          - emoji: "🌍"
+            title: "세계 최대 코드 저장소"
+            description: "수억 개의 프로젝트가 공개돼 있고, 회사 안팎의 협업이 여기서 일어난다."
+          - emoji: "🤝"
+            title: "혼자가 아니라 함께"
+            description: "남의 코드를 읽고, 고치고, 내 코드를 공개하고 기여받는 일이 표준이 됐다."
+          - emoji: "📜"
+            title: "모든 변경이 기록된다"
+            description: "누가 언제 무엇을 왜 바꿨는지가 전부 이력으로 남아 되돌릴 수 있다."
+      - type: stat
+        title: "GitHub의 규모 (왜 알아야 하나)"
+        items:
+          - { value: "1억+", label: "전 세계 개발자", accent: cyan }
+          - { value: "4억+", label: "공개·비공개 저장소", accent: emerald }
+          - { value: "사실상 표준", label: "오픈소스 협업의 중심", accent: sky }
+
+  - id: version_problem
+    title: "2. 왜 버전 관리인가"
+    blocks:
+      - type: codeCompare
+        title: "파일 버전을 관리하는 두 방식"
+        subtitle: "왼쪽처럼 해본 적 있다면, 그 문제를 Git이 푼다"
+        before:
+          label: "수동 - 파일명에 버전 붙이기"
+          code: |-
+            보고서.docx
+            보고서_최종.docx
+            보고서_최종_진짜최종.docx
+            보고서_최종_진짜최종_v2.docx
+            보고서_최종_진짜최종_v2_김대리수정.docx
+        after:
+          label: "Git - 한 파일 + 이력"
+          code: |-
+            보고서.docx        # 파일은 하나, 모든 버전은 이력에
+            $ git log --oneline
+            d4e5f6  오타 수정
+            a1b2c3  3분기 표 추가
+            9f8e7d  초안 작성
+      - type: text
+        content: "파일명에 버전을 붙이는 방식은 누가 무엇을 언제 왜 바꿨는지 알 수 없고, 협업하면 _김대리수정 _박과장수정 이 끝없이 늘어난다. Git은 파일을 하나로 두고 모든 변경을 '커밋' 이력으로 쌓아, 언제든 과거로 되돌리고 누가 무엇을 바꿨는지 추적한다."
+
+  - id: git_vs_github
+    title: "3. Git과 GitHub은 다르다 - 1순위 오개념"
+    blocks:
+      - type: compare
+        title: "Git ≠ GitHub"
+        subtitle: "이 둘을 섞으면 이후 모든 설명이 헷갈린다"
+        left:
+          title: "Git"
+          subtitle: "내 컴퓨터에서 도는 프로그램"
+          icon: "💻"
+          items:
+            - "버전 관리 도구 자체 - 설치해서 쓰는 소프트웨어"
+            - "인터넷이 없어도 로컬에서 커밋·브랜치가 된다"
+            - "리누스 토르발스가 만든 오픈소스 명령어 도구"
+        right:
+          title: "GitHub"
+          subtitle: "Git 결과물을 올리는 웹 서비스"
+          icon: "🌐"
+          items:
+            - "Git 저장소를 인터넷에 올려두는 호스팅 플랫폼"
+            - "협업·리뷰·이슈·공개 같은 기능을 얹은 회사 서비스"
+            - "GitLab·Bitbucket 같은 경쟁 서비스도 있다"
+      - type: note
+        style: info
+        title: "한 줄 정리"
+        content: "Git은 '버전 관리 도구'(내 PC의 프로그램), GitHub은 'Git 저장소를 올려 협업하는 웹 서비스'다. Git 없이도 GitHub 웹은 볼 수 있고, GitHub 없이도 Git은 혼자 쓸 수 있다."
+
+  - id: core_concepts
+    title: "4. 핵심 개념 4개"
+    blocks:
+      - type: featureCards
+        title: "이 네 단어만 알면 절반은 끝"
+        cards:
+          - emoji: "📦"
+            title: "저장소 (Repository)"
+            description: "프로젝트 하나가 통째로 담기는 폴더. 코드·문서·이력이 다 들어간다."
+          - emoji: "📸"
+            title: "커밋 (Commit)"
+            description: "그 순간의 변경을 메시지와 함께 찍는 스냅샷. 되돌릴 수 있는 저장 지점."
+          - emoji: "🌿"
+            title: "브랜치 (Branch)"
+            description: "본줄기를 건드리지 않고 따로 작업하는 갈래. 실험·기능 개발용 평행 사본."
+          - emoji: "🔀"
+            title: "풀 리퀘스트 (PR)"
+            description: "내 브랜치 변경을 본줄기에 합쳐 달라는 제안 + 리뷰 요청."
+
+  - id: definitions
+    title: "5. 정확한 정의로 못박기"
+    blocks:
+      - type: definition
+        title: "용어를 정확히"
+        items:
+          - term: 버전 관리
+            english: version control
+            meaning: 파일의 변경 이력을 시점별로 저장해 언제든 과거로 되돌리고 누가 무엇을 바꿨는지 추적하는 일.
+            example: Git이 가장 널리 쓰이는 버전 관리 도구다.
+            accent: cyan
+          - term: 커밋
+            english: commit
+            meaning: 그 순간의 변경 묶음을 한 줄 메시지와 함께 저장하는 행위(또는 그 저장 지점).
+            example: "git commit -m \\"3분기 표 추가\\" 가 커밋 하나를 만든다."
+            accent: emerald
+          - term: 원격 저장소
+            english: remote
+            meaning: 내 PC 밖(보통 GitHub)에 있는, 모두가 공유하는 기준 저장소.
+            example: push로 올리고 pull로 내려받는다.
+            accent: sky
+
+  - id: analogy
+    title: "6. 익숙한 것에 빗대 보기"
+    blocks:
+      - type: conceptRow
+        title: "GitHub 개념 ↔ 일상 비유"
+        description: "낯선 용어를 이미 아는 것에 붙이면 한 번에 잡힌다"
+        rows:
+          - emoji: "📦"
+            concept: "저장소(Repository)"
+            explain: "프로젝트 전용 폴더 한 개 - 그 안에 코드·문서·기록이 모두 들어 있는 작업 상자."
+            accent: cyan
+          - emoji: "📸"
+            concept: "커밋(Commit)"
+            explain: "게임의 세이브 포인트 - 언제든 그 지점으로 되돌아갈 수 있게 현재 상태를 저장한다."
+            accent: emerald
+          - emoji: "🌿"
+            concept: "브랜치(Branch)"
+            explain: "원본을 복사해 만든 평행 우주 - 마음껏 실험하다 좋으면 본 줄기에 합치고, 아니면 버린다."
+            accent: amber
+          - emoji: "☁️"
+            concept: "원격(Remote) / push·pull"
+            explain: "구글 드라이브에 올리고(push) 내려받기(pull) - 내 작업을 모두의 기준본과 맞춘다."
+            accent: sky
+
+  - id: flow
+    title: "7. 코드가 오가는 그림"
+    blocks:
+      - type: image
+        title: "내 PC ↔ GitHub ↔ 동료 PC"
+        src: "/curriculum/devTools/githubFlow.svg"
+        description: "각자 PC에서 작업한 뒤 GitHub에 올리면(push) 모두가 최신본을 받는다(pull). GitHub이 '모두의 기준본'을 보관하는 가운데 허브 역할을 한다."
+
+  - id: collab_cycle
+    title: "8. 오픈소스 기여 한 사이클"
+    blocks:
+      - type: timeline
+        title: "남의 프로젝트에 기여하는 흐름"
+        subtitle: "각 단계가 앞 단계의 결과 위에서 일어난다"
+        items:
+          - { step: 1, title: "fork", description: "남의 저장소를 내 계정으로 복사한다." }
+          - { step: 2, title: "clone", description: "내 사본을 로컬 PC로 내려받는다." }
+          - { step: 3, title: "branch", description: "작업용 갈래를 따로 만든다(본줄기 보호)." }
+          - { step: 4, title: "commit", description: "변경을 메시지와 함께 스냅샷으로 쌓는다." }
+          - { step: 5, title: "push", description: "내 사본(원격)에 올린다." }
+          - { step: 6, title: "pull request", description: "원본에 '합쳐 달라'고 제안하고 리뷰받는다." }
+          - { step: 7, title: "merge", description: "리뷰가 통과하면 본줄기에 합쳐진다 - 기여 완료." }
+
+  - id: commit_habits
+    title: "9. 좋은 커밋 메시지 습관"
+    blocks:
+      - type: doDont
+        title: "커밋 메시지 - 권장 vs 지양"
+        subtitle: "메시지는 미래의 나와 동료가 읽는 변경 이력이다"
+        do:
+          title: "권장 (Do)"
+          items:
+            - "무엇을 왜 바꿨는지 현재형 한 줄로 요약"
+            - "한 커밋 = 한 가지 논리적 변경"
+            - "예: '폐업 거래처 발행 차단 로직 추가'"
+        dont:
+          title: "지양 (Don't)"
+          items:
+            - "'수정', 'ㅁㄴㅇ', 'asdf' 같은 무의미한 메시지"
+            - "10개의 무관한 변경을 한 커밋에 몰아넣기"
+            - "무엇을 했는지 알 수 없는 'update' 한 단어"
+
+  - id: glossary
+    title: "10. 자주 보는 용어 8개"
+    blocks:
+      - type: table
+        title: "용어 → 뜻 → 비유"
+        headers: ["용어", "뜻", "한 줄 비유"]
+        rows:
+          - ["repository (repo)", "프로젝트가 담긴 저장소", "프로젝트 폴더"]
+          - ["commit", "변경을 기록한 스냅샷", "세이브 포인트"]
+          - ["branch", "독립 작업 갈래", "평행 우주 사본"]
+          - ["merge", "갈래를 본줄기에 합치기", "합본 만들기"]
+          - ["clone", "원격 저장소를 내 PC로 복제", "통째로 내려받기"]
+          - ["fork", "남의 저장소를 내 계정으로 복사", "내 사본 뜨기"]
+          - ["pull request (PR)", "변경을 합쳐 달라는 제안+리뷰", "수정 제안서"]
+          - ["issue", "할 일·버그·논의 기록표", "포스트잇 메모"]
+
+  - id: misconceptions
+    title: "11. 흔한 오해 바로잡기"
+    blocks:
+      - type: misconception
+        title: "초심자가 자주 하는 착각"
+        items:
+          - myth: "GitHub은 코드만 올리는 곳이다."
+            truth: "문서·이력서·블로그·발표자료도 많이 올린다. 텍스트 기반이면 무엇이든 버전 관리할 수 있다."
+          - myth: "공개하면 코드를 도둑맞는다."
+            truth: "비공개(private) 저장소가 기본 제공된다. 공개는 선택이고, 오픈소스는 라이선스로 보호된다."
+          - myth: "명령어를 다 외워야 쓸 수 있다."
+            truth: "GitHub Desktop·VS Code·웹 UI로 버튼만 눌러도 대부분 된다. 명령어는 익숙해지며 천천히."
+
+  - id: summary
+    title: "12. 핵심 정리"
+    blocks:
+      - type: summary
+        title: "이것만 기억하세요 (TL;DR)"
+        points:
+          - "Git은 내 PC의 버전 관리 도구, GitHub은 그 결과를 올려 협업하는 웹 서비스다."
+          - "저장소=프로젝트 폴더, 커밋=되돌릴 수 있는 저장 지점, 브랜치=평행 작업 사본."
+          - "push로 올리고 pull로 내려받아 모두의 기준본과 맞춘다."
+      - type: list
+        style: check
+        title: "스스로 설명할 수 있으면 충분하다"
+        items:
+          - "Git과 GitHub의 차이를 한 문장으로 말할 수 있다."
+          - "저장소·커밋·브랜치·풀 리퀘스트를 일상 비유로 설명할 수 있다."
+          - "fork→clone→branch→commit→push→PR→merge 흐름을 안다."
+          - "공식 문서는 [GitHub Docs](https://docs.github.com/ko)에서 한국어로 볼 수 있다."
+      - type: note
+        style: tip
+        title: "다음 단계"
+        content: "개념이 잡혔다면, 이어지는 git 실습 트랙에서 로컬 터미널로 실제 \`git init\`·\`commit\`·\`push\`를 직접 쳐보며 손에 익힌다. 읽기에서 멈추지 말고 한 번은 직접 해보는 게 가장 빠른 길이다."
+`;export{e as default};

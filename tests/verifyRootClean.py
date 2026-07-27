@@ -67,6 +67,7 @@ REQUIRED_ROOT_DIRS = {
     "tests",
 }
 REQUIRED_ROOT_FILES = {
+    ".gitattributes",
     ".gitignore",
     ".python-version",
     "CHANGELOG.md",

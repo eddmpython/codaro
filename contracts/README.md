@@ -21,9 +21,12 @@
 | `learningArchive.schema.json` | document·draft·virtual FS·package·evidence 실제 bytes와 lineage를 묶는 닫힌 archive v2 계약 | Web export와 Local atomic import |
 | `publicLearningCatalog.json` | 472개 canonical LessonRef의 browser/local tier, eligible path, strong CheckSpec 공개 계약 | Landing lesson generator와 공개 route |
 | `runRouteState.schema.json` | 공개 레슨, Web Run, Local 사이의 lesson identity, path, runtime, durable history 계약 | Landing handoff와 공용 editor route adapter |
+| `webCompatibilityC0.json` | 기존 `/codaro/app/` 제품 tree의 source·build·hash·response type 고정 계약 | Pages C0 build, C1 조립, deployed crawl |
 
 학습 실행 증거는 `learningArtifactDescriptor.schema.json`을 공용 진입점으로 사용한다. 일반 파일·폴더와 달리 표와 이미지는 전용 schema에서 내용 구조까지 검증한다.
 
 `learningArchive.schema.json`은 모든 payload를 SHA-256 content-addressed blob으로 봉인한다. Local import는 전체 검증과 staging 뒤 `HEAD.json`을 원자적으로 교체하며, automation은 명시적 확인 전까지 disabled·unscheduled draft로만 보존한다.
 
 `publicLearningCatalog.json`은 이동 가능한 `mainPlan/` 트리를 production build 입력으로 사용하지 않기 위한 안정 계약이다. `uv run python -X utf8 docs/skills/ops/tools/buildPublicLearningCatalog.py`가 현재 curriculum identity와 1:1인지 검사하며, ledger 승인 결과를 반영할 때만 `--write`로 갱신한다.
+
+`webCompatibilityC0.json`은 `/codaro/app/`의 source commit, LF build 조건, deployed tree hash와 response type을 고정한다. Pages는 이 commit만 별도 checkout해 `/app/`을 만들고 `verifyWebCompatibilityC0.py`가 632개 파일의 exact tree identity와 배포 crawl을 검사한다. 정식 release archive URL·SHA-256은 명시적 release가 실행될 때만 채운다.

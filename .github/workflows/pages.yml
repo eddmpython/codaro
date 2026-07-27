@@ -15,8 +15,75 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  build-c0-compatibility:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - name: Checkout contract source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read pinned C0 contract
+        id: c0
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          contract = json.loads(Path("contracts/webCompatibilityC0.json").read_text(encoding="utf-8"))
+          commit = contract["source"]["commit"]
+          if len(commit) != 40:
+              raise SystemExit("invalid C0 source commit")
+          with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as output:
+              output.write(f"source_commit={commit}\n")
+          PY
+          cp contracts/webCompatibilityC0.json "$RUNNER_TEMP/webCompatibilityC0.json"
+          cp docs/skills/ops/tools/verifyWebCompatibilityC0.py "$RUNNER_TEMP/verifyWebCompatibilityC0.py"
+
+      - name: Checkout pinned C0 source
+        run: |
+          git config core.autocrlf false
+          git checkout --detach "${{ steps.c0.outputs.source_commit }}"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: editor/package-lock.json
+
+      - name: Install pinned editor
+        working-directory: editor
+        run: npm ci
+
+      - name: Build pinned C0 app tree
+        working-directory: editor
+        env:
+          CODARO_WEB_BASE: codaro/app
+          CODARO_WEB_OUT: ../landing/static/app
+        run: npm run build
+
+      - name: Verify pinned C0 identity
+        run: >-
+          python -X utf8 "$RUNNER_TEMP/verifyWebCompatibilityC0.py"
+          --contract "$RUNNER_TEMP/webCompatibilityC0.json"
+          --tree landing/static/app
+
+      - name: Upload pinned C0 tree
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-compatibility-c0
+          path: landing/static/app
+          if-no-files-found: error
+          retention-days: 90
+
   build:
     runs-on: ubuntu-latest
+    needs: build-c0-compatibility
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
@@ -28,7 +95,9 @@ jobs:
         with:
           node-version: "22"
           cache: "npm"
-          cache-dependency-path: landing/package-lock.json
+          cache-dependency-path: |
+            editor/package-lock.json
+            landing/package-lock.json
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -44,12 +113,16 @@ jobs:
           CODARO_WEB_OUT: ../landing/static/run
         run: npm run build
 
-      - name: Build App Compatibility Tree
-        working-directory: editor
-        env:
-          CODARO_WEB_BASE: codaro/app
-          CODARO_WEB_OUT: ../landing/static/app
-        run: npm run build
+      - name: Download pinned C0 app tree
+        uses: actions/download-artifact@v4
+        with:
+          name: web-compatibility-c0
+          path: landing/static/app
+
+      - name: Verify composed C0 identity
+        run: >-
+          python -X utf8 docs/skills/ops/tools/verifyWebCompatibilityC0.py
+          --tree landing/static/app
 
       - name: Install
         working-directory: landing
@@ -85,6 +158,7 @@ jobs:
     timeout-minutes: 35
     env:
       CODARO_DEPLOYED_WEB_URL: ${{ needs.deploy.outputs.page_url }}
+      CODARO_C0_DEPLOYED_URL: ${{ needs.deploy.outputs.page_url }}app/
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: Checkout
@@ -112,6 +186,19 @@ jobs:
         working-directory: editor
         run: npm ci
 
+      - name: Download pinned C0 app tree
+        uses: actions/download-artifact@v4
+        with:
+          name: web-compatibility-c0
+          path: output/test-runner/web-compatibility-c0/app
+
+      - name: Crawl deployed C0 tree
+        run: >-
+          uv run python -X utf8 docs/skills/ops/tools/verifyWebCompatibilityC0.py
+          --tree output/test-runner/web-compatibility-c0/app
+          --deployed-url "$env:CODARO_C0_DEPLOYED_URL"
+          --report output/test-runner/web-compatibility-c0/deployed-report.json
+
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
@@ -135,4 +222,5 @@ jobs:
             output/test-runner/product-browser-webview2-evergreen/deployed-local-reexport-learning-archive.json
             output/test-runner/product-browser-webview2-evergreen/screenshots/
             output/test-runner/product-browser-webview2-evergreen/logs/
+            output/test-runner/web-compatibility-c0/deployed-report.json
           if-no-files-found: error
