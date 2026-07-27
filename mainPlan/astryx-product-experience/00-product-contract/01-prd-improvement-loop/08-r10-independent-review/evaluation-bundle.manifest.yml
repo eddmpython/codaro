@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: 0d7cd1241cc78c64b5dd0c878904da31dff65ba7
-  dirtyDiffHash: 69355f2d255e860e26cf4104753e7f7d4f03e2d58aabc5935141d0f0abcea3e8
-  manifestHash: a85fa6361b09dccb9d1d669dd3830c9f15a5693a51f11555c0611e13a9649c9a
+  gitCommit: 93cccb7d202db50f5b5ae21445f2559acac3fce5
+  dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
+  manifestHash: e52d6f712e7d9969dfb3aa7f5800d2c2b196ba5cc2cb6d0b8f30709b8ae77fd5
   fileCount: 2678
-  totalBytes: 88233624
+  totalBytes: 88232925
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: 05c155eb858e350efd53942b37e650cc2cb2ea05a36916462e266357dc32f44a
-  bytes: 88748972
+  sha256: 340592ad12a2fa1b05f5da49c884b32c3f66ab4fae1adb14ca6b53e0e1d8b8b3
+  bytes: 88748273
   format: zip
   compression: stored
   compressionMethod: 0
@@ -70,8 +70,8 @@ contracts:
   sha256: 3a7e5a28de2b81c7ee2b2f81c41f3bbedb8dd58efe3a6c23ee65b4cd57254dec
 files:
 - path: .github/workflows/ci.yml
-  sha256: f0d320e6499715620c6a09cbe26e8e56d623198f90d3e8a83901f3899b3ebea7
-  bytes: 9560
+  sha256: cb4eac241c7e2d26e73b22798fbde8ff46e35f6bfc54dce94f9c0e253a68e57f
+  bytes: 9477
   kind: repository
   sourcePath: .github/workflows/ci.yml
 - path: .github/workflows/launcher-release.yml
@@ -3620,8 +3620,8 @@ files:
   kind: repository
   sourcePath: docs/skills/architecture/overview.md
 - path: docs/skills/architecture/repository-structure.md
-  sha256: d60315265831db1eaac393190af7b487ba3597a588476b176d03e3affdb7beac
-  bytes: 8685
+  sha256: ec8f3cc77d07abee951337367fe92ea2090a411fb0cc5fcc64118fa2526e6194
+  bytes: 8594
   kind: repository
   sourcePath: docs/skills/architecture/repository-structure.md
 - path: docs/skills/architecture/share-pack-distribution.md
@@ -3750,8 +3750,8 @@ files:
   kind: repository
   sourcePath: docs/skills/ops/foundation/environment.md
 - path: docs/skills/ops/foundation/testing-and-gates.md
-  sha256: cfe87beac6ed11bc6fd38569133eea56b2882bcc81a16aaeaf3cf17f0302a26c
-  bytes: 57070
+  sha256: c04ca2d526770abb740819f70381b5dd4d3dfd2c8c0907dd706ba964131f36e3
+  bytes: 56927
   kind: repository
   sourcePath: docs/skills/ops/foundation/testing-and-gates.md
 - path: docs/skills/ops/product/branding.md
@@ -13099,8 +13099,8 @@ files:
   kind: repository
   sourcePath: tests/runtime/testReactiveMarkdown.py
 - path: tests/runtime/testRunEntrypoint.py
-  sha256: e71bb15ae6340c84dfb5530d42e54b77a3913aa058ba23be7d1e0935f63bdcea
-  bytes: 25912
+  sha256: d262142cfe0fb2a5e007684e5324270ef5f613eeb66232edbeb04e909103ca91
+  bytes: 25530
   kind: repository
   sourcePath: tests/runtime/testRunEntrypoint.py
 - path: tests/runtime/testRuntime.py

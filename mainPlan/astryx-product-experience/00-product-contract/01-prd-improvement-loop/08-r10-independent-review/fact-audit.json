@@ -8,16 +8,16 @@
   "productCompletionEligible": false,
   "roundSealEligible": false,
   "scope": {
-    "gitCommit": "0d7cd1241cc78c64b5dd0c878904da31dff65ba7",
-    "dirtyDiffHash": "69355f2d255e860e26cf4104753e7f7d4f03e2d58aabc5935141d0f0abcea3e8",
-    "manifestHash": "a85fa6361b09dccb9d1d669dd3830c9f15a5693a51f11555c0611e13a9649c9a",
-    "evaluationBundleHash": "05c155eb858e350efd53942b37e650cc2cb2ea05a36916462e266357dc32f44a"
+    "gitCommit": "93cccb7d202db50f5b5ae21445f2559acac3fce5",
+    "dirtyDiffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "manifestHash": "e52d6f712e7d9969dfb3aa7f5800d2c2b196ba5cc2cb6d0b8f30709b8ae77fd5",
+    "evaluationBundleHash": "340592ad12a2fa1b05f5da49c884b32c3f66ab4fae1adb14ca6b53e0e1d8b8b3"
   },
   "facts": {
     "bundleIntegrity": {
       "fileCount": 2678,
-      "totalSourceBytes": 88233624,
-      "archiveBytes": 88748972,
+      "totalSourceBytes": 88232925,
+      "archiveBytes": 88748273,
       "archiveEntriesReadOnly": true,
       "excludedHistoryPathCount": 0,
       "priorScoresIncluded": false,
