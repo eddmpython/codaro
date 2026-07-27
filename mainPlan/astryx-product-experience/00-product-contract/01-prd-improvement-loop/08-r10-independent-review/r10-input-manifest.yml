@@ -4,7 +4,7 @@ roundState: blocked
 sealed: false
 preparedAt: 2026-07-18 04:48:06+00:00
 rubric:
-  path: mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/00-evaluation-contract/rubric.yml
+  path: mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/_done/00-evaluation-contract/rubric.yml
   version: 1
   sha256: 0150ee794a4fd567e3462d059d46192e4f22d8fc56c0a452ce4e347c2582f08d
   targetScore: null
@@ -19,11 +19,11 @@ scope:
 draftBundle:
   manifestPath: mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/08-r10-independent-review/evaluation-bundle.manifest.yml
   archivePath: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  gitCommit: 0f0ee5e8725bbc8562d3eec3b0e2cbb8ce441f31
+  gitCommit: 09a9080a4fb74024673bb7857696786c46a6a5fc
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: abc0722a283144424ea3641206f3b8c584366d39b379e648dd2aecebe285ca7e
-  evaluationBundleHash: 8fb416c233bc1a709d3f81478a1eddd9889f3076b4bd3cbce8ab68ff9a2ebe94
-  fileCount: 2676
+  manifestHash: 6ec3e1186722b32d401193e0764ee34ec8ef093bf4dd94a0ced6e01ed10ea03f
+  evaluationBundleHash: a3d2e18b82756b5e718f524d6db0f55aee660486df1cb8eeb926a72730a8266e
+  fileCount: 2678
   bundleIntegrityState: passed
   sealEligible: false
 excludedEvaluatorInputs:
