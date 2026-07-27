@@ -1205,6 +1205,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "viewport": {"width": 390, "height": 844},
             "surface": "web-lesson",
             "waitFor": "[data-learning-section-card]",
+            "verifyFirstLearningSectionInViewport": True,
             "runLearningCell": True,
             "verifyEvidenceArchive": True,
             "verifyBrowserArtifactEvidence": True,
@@ -3203,6 +3204,7 @@ def runBrowserMatrix(
                     )
                 page = context.new_page()
                 webArtifactEvidence: dict[str, Any] | None = None
+                firstViewportEvidence: dict[str, Any] | None = None
                 learnSearchEvidence: dict[str, Any] | None = None
                 localArchiveWebRoundTripEvidence: dict[str, Any] | None = None
                 notebookRunAdvanceVerified = False
@@ -3265,6 +3267,82 @@ def runBrowserMatrix(
                     page.wait_for_selector("[data-astryx-theme='codaro']", timeout=20_000)
                     if case.get("waitFor"):
                         page.wait_for_selector(case["waitFor"], timeout=30_000)
+                    if case.get("verifyFirstLearningSectionInViewport"):
+                        page.wait_for_function(
+                            """
+                            () => Array.from(
+                              document.querySelectorAll('[data-learning-domain-visual="true"] img')
+                            ).every((image) => image.complete && image.naturalWidth > 0)
+                            """,
+                            timeout=20_000,
+                        )
+                        page.evaluate("() => document.fonts.ready")
+                        page.wait_for_timeout(120)
+                        firstViewportEvidence = page.evaluate(
+                            """
+                            () => {
+                              const overview = document.querySelector('[data-learning-overview="true"]');
+                              const section = document.querySelector('[data-learning-section-card]');
+                              const heading = section?.querySelector(':scope > header');
+                              const mobileList = document.querySelector(
+                                '[data-learning-overview-mobile-items]'
+                              );
+                              if (!overview || !section || !heading || !mobileList) {
+                                throw new Error('mobile lesson first viewport scope is incomplete');
+                              }
+                              const clippedHeight = (element) => {
+                                const rect = element.getBoundingClientRect();
+                                let top = Math.max(rect.top, 0);
+                                let bottom = Math.min(rect.bottom, window.innerHeight);
+                                let ancestor = element.parentElement;
+                                while (ancestor) {
+                                  const style = getComputedStyle(ancestor);
+                                  if (/(auto|scroll|hidden|clip)/.test(style.overflowY)) {
+                                    const ancestorRect = ancestor.getBoundingClientRect();
+                                    top = Math.max(top, ancestorRect.top);
+                                    bottom = Math.min(bottom, ancestorRect.bottom);
+                                  }
+                                  ancestor = ancestor.parentElement;
+                                }
+                                return Math.max(0, Math.round(bottom - top));
+                              };
+                              const overviewRect = overview.getBoundingClientRect();
+                              const sectionRect = section.getBoundingClientRect();
+                              const headingRect = heading.getBoundingClientRect();
+                              return {
+                                viewport: { width: window.innerWidth, height: window.innerHeight },
+                                mobileLearnItemCount: Number(
+                                  mobileList.getAttribute('data-learning-overview-mobile-items')
+                                ),
+                                visibleLearnItemCount: Array.from(mobileList.children)
+                                  .filter((item) => getComputedStyle(item).display !== 'none').length,
+                                overviewHeight: Math.round(overviewRect.height),
+                                overviewBottom: Math.round(overviewRect.bottom),
+                                firstSectionTop: Math.round(sectionRect.top),
+                                firstSectionVisiblePixels: clippedHeight(section),
+                                firstSectionHeadingHeight: Math.round(headingRect.height),
+                                firstSectionHeadingVisiblePixels: clippedHeight(heading),
+                                horizontalOverflow: Math.max(
+                                  0,
+                                  document.documentElement.scrollWidth - window.innerWidth
+                                ),
+                              };
+                            }
+                            """
+                        )
+                        if (
+                            firstViewportEvidence["viewport"] != {"width": 390, "height": 844}
+                            or firstViewportEvidence["mobileLearnItemCount"] != 2
+                            or firstViewportEvidence["visibleLearnItemCount"] != 3
+                            or firstViewportEvidence["firstSectionVisiblePixels"] < 96
+                            or firstViewportEvidence["firstSectionHeadingVisiblePixels"]
+                            < min(firstViewportEvidence["firstSectionHeadingHeight"], 64)
+                            or firstViewportEvidence["horizontalOverflow"] != 0
+                        ):
+                            raise AssertionError(
+                                "mobile lesson did not continue into the first learning section: "
+                                f"{firstViewportEvidence}"
+                            )
                     if case.get("verifyAutomationOperations"):
                         page.wait_for_selector("[data-automation-operation-strip='true']", timeout=20_000)
                         page.wait_for_selector("[data-automation-run-inspector='true']", timeout=20_000)
@@ -4697,6 +4775,7 @@ def runBrowserMatrix(
                             "consoleErrors": consoleErrorSnapshot,
                             "httpFailures": httpFailureSnapshot,
                             "assetFailures": assetFailureSnapshot,
+                            "firstViewportEvidence": firstViewportEvidence,
                             "learnSearchEvidence": learnSearchEvidence,
                             "localArchiveWebRoundTripEvidence": localArchiveWebRoundTripEvidence,
                             "webArtifactEvidence": webArtifactEvidence,

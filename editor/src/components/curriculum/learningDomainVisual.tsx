@@ -37,7 +37,7 @@ export function LearningDomainVisual({
       className={cn(
         "min-w-0",
         variant === "lesson"
-          && "grid gap-4 sm:grid-cols-[minmax(240px,0.95fr)_minmax(0,1.05fr)] sm:items-start",
+          && "grid gap-3 sm:grid-cols-[minmax(240px,0.95fr)_minmax(0,1.05fr)] sm:items-start sm:gap-4",
         className,
       )}
       data-learning-domain={visual.domainId}
@@ -68,8 +68,8 @@ export function LearningDomainVisual({
 
       <figcaption className={cn("min-w-0", variant === "home" && "mt-3")}>
         <div className="text-xs font-bold text-accent-brand">{visual.domainLabel}</div>
-        <p className="mt-1 text-sm font-normal leading-6 text-foreground">{visual.caption}</p>
-        <dl className="mt-3 space-y-2.5">
+        <p className="mt-1 text-sm font-normal leading-5 text-foreground sm:leading-6">{visual.caption}</p>
+        <dl className="mt-2 space-y-2 sm:mt-3 sm:space-y-2.5">
           <div
           data-learning-visual-question="true"
           >

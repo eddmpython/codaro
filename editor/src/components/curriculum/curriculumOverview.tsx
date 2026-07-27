@@ -363,6 +363,8 @@ export function LearningOverviewHeader({
     : sections.map((section) => ({ label: section.title, anchorBlockId: section.anchorBlockId }));
   const learnItems = declaredLearnItems.slice(0, 4);
   const overflowCount = Math.max(0, declaredLearnItems.length - learnItems.length);
+  const mobileVisibleLearnItemCount = Math.min(2, learnItems.length);
+  const mobileOverflowCount = Math.max(0, declaredLearnItems.length - mobileVisibleLearnItemCount);
   const categoryLabel = selectedCategoryLabel || selectedCategory;
   const contentLabel = selectedContentLabel || selectedContentId;
 
@@ -372,7 +374,7 @@ export function LearningOverviewHeader({
       data-learning-overview="true"
       id={introBlock ? cellDomId(introBlock.id) : undefined}
     >
-      <div className="px-4 py-5 sm:px-6">
+      <div className="px-4 py-4 sm:px-6 sm:py-5">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-muted-foreground">
           <span>{categoryLabel}</span>
           {contentLabel ? <span aria-hidden="true">·</span> : null}
@@ -391,17 +393,26 @@ export function LearningOverviewHeader({
           <p className="mt-1.5 max-w-3xl text-md font-normal text-foreground" data-learning-overview-part="direction">{overview.direction}</p>
         ) : null}
 
-        <div className="mt-5 border-y border-border py-4">
+        <div className="mt-4 border-y border-border py-3 sm:mt-5 sm:py-4">
           <LearningDomainVisual
             category={selectedCategory}
             variant="lesson"
           >
             {learnItems.length ? (
-              <div className="mt-4 border-t border-border pt-4" data-learning-overview-part="learn-list">
+              <div className="mt-3 border-t border-border pt-3 sm:mt-4 sm:pt-4" data-learning-overview-part="learn-list">
                 <div className="text-xs font-medium text-muted-foreground">오늘 배우는 것</div>
-                <ol className="mt-2 space-y-1.5">
+                <ol
+                  className="mt-1.5 space-y-1 sm:mt-2 sm:space-y-1.5"
+                  data-learning-overview-mobile-items={mobileVisibleLearnItemCount}
+                >
                   {learnItems.map((item, index) => (
-                    <li className="flex min-w-0 gap-2.5 text-sm font-normal leading-6 text-foreground" key={`${item.label}-${index}`}>
+                    <li
+                      className={cn(
+                        "min-w-0 gap-2.5 text-sm font-normal leading-5 text-foreground sm:leading-6",
+                        index < mobileVisibleLearnItemCount ? "flex" : "hidden sm:flex",
+                      )}
+                      key={`${item.label}-${index}`}
+                    >
                       <span className="w-5 shrink-0 font-mono text-xs tabular-nums text-accent-brand">
                         {String(index + 1).padStart(2, "0")}
                       </span>
@@ -418,8 +429,15 @@ export function LearningOverviewHeader({
                       )}
                     </li>
                   ))}
+                  {mobileOverflowCount > 0 ? (
+                    <li className="pl-7 text-xs font-normal text-muted-foreground sm:hidden">
+                      이어서 {mobileOverflowCount}개 섹션
+                    </li>
+                  ) : null}
                   {overflowCount > 0 ? (
-                    <li className="pl-7 text-xs font-normal text-muted-foreground">이어서 {overflowCount}개 섹션</li>
+                    <li className="hidden pl-7 text-xs font-normal text-muted-foreground sm:list-item">
+                      이어서 {overflowCount}개 섹션
+                    </li>
                   ) : null}
                 </ol>
               </div>
