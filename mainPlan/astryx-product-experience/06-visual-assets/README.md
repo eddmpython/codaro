@@ -2,7 +2,7 @@
 
 상태: 진행
 
-남은 종료 조건은 instructional asset의 lesson anchor 사람 승인, light/dark 쌍 캡처, 사람 자산 검수와 나머지 shot list다.
+남은 종료 조건은 instructional asset의 lesson anchor 사람 승인, 사람 자산 검수와 전체 상태 shot이다.
 
 ## 목표
 
@@ -26,16 +26,6 @@
 | 03 | [local-captures](03-local-captures/) | `05-local-studio` fixture green | automation/notebook 상태 proof를 캡처함 |
 
 각 packet은 구현, asset review, budget, accessibility 검사가 끝나면 해당 TODO를 삭제한다. 네 packet이 모두 삭제되기 전에는 `06-visual-assets` TODO를 유지한다.
-
-## 필수 shot list
-
-| 자산 | 내용 | 사용처 |
-| --- | --- | --- |
-| `runLearningHero` | safe text region을 비운 실제 Run fixture capture | landing full-bleed hero |
-| `runLearningDetail` | 레슨 본문, 편집 가능한 코드, 검증 결과를 가리지 않고 읽을 수 있는 Run | hero 다음 proof band, Learn |
-| `runLearningMobile` | 390px에서 학습과 실행 action | mobile landing, docs |
-| `localAutomationDesktop` | task 목록, schedule, 최근 run, audit, E-Stop | landing capability, Local empty state |
-| `localNotebookDesktop` | 파일 기반 notebook과 변수 결과 | landing, docs |
 
 ## 교육 시각 자산 기준
 

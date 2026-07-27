@@ -149,6 +149,24 @@ def testLandingOutcomePathsUseActualOutcomeProofAssets() -> None:
     assert "data-visual-kind={asset.kind}" in productVisual
 
 
+def testLandingProductProofsFollowTheResolvedThemePair() -> None:
+    home = _read("landing/src/pages/home.jsx")
+    productVisual = _read("landing/src/components/productVisual.jsx")
+    resolver = _read("landing/src/lib/visualAssets.js")
+    editorResolver = _read("editor/src/lib/visualAssets.ts")
+    browserGate = _read("tests/surface/verifyProductExperiencePlaywright.py")
+
+    assert 'assetId="runLearningHero"' in home
+    assert "webRunDesktop" not in home
+    assert "useCodaroTheme()" in productVisual
+    assert "theme: resolvedTheme" in productVisual
+    assert "data-visual-theme-asset={asset.themeAssetId}" in productVisual
+    assert 'data-visual-theme-paired={asset.variants.lightDark === "paired" ? "true" : undefined}' in productVisual
+    assert "requestedAsset.themePairId" in resolver
+    assert "requestedTheme !== options.theme" in editorResolver
+    assert "paired product visual theme drifted" in browserGate
+
+
 def testLearningHomeAndLessonRenderInstructionalVisualsWithoutRevealControls() -> None:
     home = _read("editor/src/components/curriculum/curriculumHome.tsx")
     overview = _read("editor/src/components/curriculum/curriculumOverview.tsx")

@@ -71,9 +71,20 @@ def productCaptureAssets(
         assets = [asset for asset in assets if asset.get("id") in selectedAssetIds]
     if not assets:
         raise ProductVisualCaptureError("visual manifest has no selected product captures")
-    fixtureIds = [str(asset.get("provenance", {}).get("fixtureId", "")) for asset in assets]
-    if len(fixtureIds) != len(set(fixtureIds)) or any(not fixtureId for fixtureId in fixtureIds):
-        raise ProductVisualCaptureError("product capture fixture IDs must be non-empty and unique")
+    fixtureThemes = [
+        (
+            str(asset.get("provenance", {}).get("fixtureId", "")),
+            str(asset.get("capture", {}).get("theme", "")),
+        )
+        for asset in assets
+    ]
+    if (
+        len(fixtureThemes) != len(set(fixtureThemes))
+        or any(not fixtureId or theme not in {"light", "dark"} for fixtureId, theme in fixtureThemes)
+    ):
+        raise ProductVisualCaptureError(
+            "product capture fixture and theme pairs must be non-empty and unique"
+        )
     return assets
 
 

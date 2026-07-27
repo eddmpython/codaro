@@ -126,7 +126,7 @@ export function HomePage() {
               <span>실제 제품 화면</span>
             </div>
             <ProductVisual
-              assetId="webRunDesktop"
+              assetId="runLearningHero"
               className="homeHeroProductVisual homeHeroProductVisualDesktop"
               eager
               width={1440}

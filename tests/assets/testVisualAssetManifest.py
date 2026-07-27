@@ -104,6 +104,41 @@ class VisualAssetManifestTest(unittest.TestCase):
             self.assertEqual({output["format"] for output in asset["outputs"]}, {"avif", "webp"})
             self.assertTrue(all(output["integrity"].startswith("sha256-") for output in asset["outputs"]))
 
+    def testProductScreenshotsHaveReciprocalLightAndDarkPairs(self) -> None:
+        assetsById = {asset["id"]: asset for asset in self.manifest["assets"]}
+        productAssets = [
+            asset for asset in self.manifest["assets"]
+            if asset["kind"] == "productScreenshot"
+        ]
+        self.assertGreaterEqual(len(productAssets), 2)
+        for asset in productAssets:
+            with self.subTest(asset=asset["id"]):
+                self.assertEqual(asset["variants"]["lightDark"], "paired")
+                pair = assetsById[asset["themePairId"]]
+                self.assertEqual(pair["themePairId"], asset["id"])
+                self.assertEqual(
+                    {asset["capture"]["theme"], pair["capture"]["theme"]},
+                    {"light", "dark"},
+                )
+                self.assertEqual(
+                    asset["provenance"]["fixtureId"],
+                    pair["provenance"]["fixtureId"],
+                )
+
+    def testProductScreenshotWithoutThemePairIsRejected(self) -> None:
+        invalid = deepcopy(self.manifest)
+        productAsset = next(
+            asset for asset in invalid["assets"]
+            if asset["kind"] == "productScreenshot"
+        )
+        productAsset.pop("themePairId")
+        productAsset["variants"]["lightDark"] = "single"
+        with self.assertRaisesRegex(
+            BUILDER.VisualAssetError,
+            "product screenshot requires a light and dark pair",
+        ):
+            BUILDER.validateVisualManifest(invalid)
+
     def testEveryLearningDomainUsesADistinctInstructionalVisual(self) -> None:
         source = CURRICULUM_GENERATOR_PATH.read_text(encoding="utf-8")
         match = re.search(r"const DOMAIN_VISUALS = \{(?P<body>.*?)\n\};", source, re.DOTALL)

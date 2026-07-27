@@ -225,7 +225,43 @@ def validateVisualManifest(manifest: dict[str, Any]) -> None:
             ):
                 raise VisualAssetError(f"{assetId}: capture viewport and source dimensions differ")
 
+    validateThemePairs(assets)
     validateRasterDimensions(assets)
+
+
+def validateThemePairs(assets: list[dict[str, Any]]) -> None:
+    assetsById = {asset["id"]: asset for asset in assets}
+    for asset in assets:
+        assetId = asset["id"]
+        pairId = asset.get("themePairId")
+        lightDarkMode = asset["variants"]["lightDark"]
+        if pairId is None:
+            if asset["kind"] == "productScreenshot":
+                raise VisualAssetError(f"{assetId}: product screenshot requires a light and dark pair")
+            if lightDarkMode == "paired":
+                raise VisualAssetError(f"{assetId}: paired visual requires themePairId")
+            continue
+        if asset["kind"] != "productScreenshot" or asset["sourceType"] != "playwrightCapture":
+            raise VisualAssetError(f"{assetId}: themePairId is limited to product screenshots")
+        if lightDarkMode != "paired":
+            raise VisualAssetError(f"{assetId}: themePairId requires paired lightDark mode")
+        pair = assetsById.get(pairId)
+        if pair is None:
+            raise VisualAssetError(f"{assetId}: missing theme pair {pairId}")
+        if pair.get("themePairId") != assetId:
+            raise VisualAssetError(f"{assetId}: theme pair must be reciprocal")
+        if pair["kind"] != asset["kind"] or pair["sourceType"] != asset["sourceType"]:
+            raise VisualAssetError(f"{assetId}: theme pair kind or source type differs")
+        if pair["provenance"]["fixtureId"] != asset["provenance"]["fixtureId"]:
+            raise VisualAssetError(f"{assetId}: theme pair fixture differs")
+        if pair["capture"]["theme"] == asset["capture"]["theme"]:
+            raise VisualAssetError(f"{assetId}: theme pair must cover light and dark")
+        if pair["capture"]["viewport"] != asset["capture"]["viewport"]:
+            raise VisualAssetError(f"{assetId}: theme pair viewport differs")
+        if pair["rendering"] != asset["rendering"]:
+            raise VisualAssetError(f"{assetId}: theme pair rendering contract differs")
+        if pair["learning"] != asset["learning"]:
+            raise VisualAssetError(f"{assetId}: theme pair learning contract differs")
 
 
 def buildResponsiveVariants(manifest: dict[str, Any], outputRoot: Path) -> dict[str, Any]:

@@ -1,8 +1,14 @@
 import { visualAssetManifest } from "./generated/visualAssetManifest.js";
 
 export function resolveVisualAsset(assetId, options = {}) {
-  const asset = visualAssetManifest.assets.find((candidate) => candidate.id === assetId);
-  if (!asset) throw new Error(`Unknown visual asset: ${assetId}`);
+  const requestedAsset = visualAssetManifest.assets.find((candidate) => candidate.id === assetId);
+  if (!requestedAsset) throw new Error(`Unknown visual asset: ${assetId}`);
+  const pairedAsset = requestedAsset.themePairId
+    ? visualAssetManifest.assets.find((candidate) => candidate.id === requestedAsset.themePairId)
+    : null;
+  const asset = options.theme && pairedAsset && requestedAsset.capture?.theme !== options.theme
+    ? pairedAsset
+    : requestedAsset;
   const basePath = options.basePath ?? import.meta.env.BASE_URL.replace(/\/$/, "");
   const preferredWidth = options.width ?? asset.rendering.width;
   const outputs = [...asset.outputs].sort((left, right) => left.width - right.width);
@@ -13,6 +19,8 @@ export function resolveVisualAsset(assetId, options = {}) {
   const url = (path) => `${basePath}${path}`;
   return {
     ...asset,
+    logicalId: assetId,
+    themeAssetId: asset.id,
     alt: asset.learning.alt,
     caption: asset.learning.caption,
     height: selected.height,

@@ -56,6 +56,16 @@ class CaptureProductVisualsTest(unittest.TestCase):
                 self.assertEqual(sourcePaths, sorted(set(sourcePaths)))
                 self.assertTrue(set(CAPTURE_TOOL.CAPTURE_OWNER_PATHS).issubset(sourcePaths))
 
+    def testEveryFixtureHasOneLightAndOneDarkCapture(self) -> None:
+        themesByFixture: dict[str, set[str]] = {}
+        for asset in self.assets:
+            fixtureId = asset["provenance"]["fixtureId"]
+            themesByFixture.setdefault(fixtureId, set()).add(asset["capture"]["theme"])
+        self.assertTrue(themesByFixture)
+        self.assertTrue(
+            all(themes == {"light", "dark"} for themes in themesByFixture.values())
+        )
+
     def testCanonicalProductPngDimensionsMatchManifest(self) -> None:
         for asset in self.assets:
             with self.subTest(asset=asset["id"]):

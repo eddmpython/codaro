@@ -1244,12 +1244,29 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "url": f"http://127.0.0.1:{landingPort}/codaro/",
             "viewport": {"width": 390, "height": 844},
             "surface": "landing-home",
+            "expectedVisualAssetIds": [
+                "runLearningHero",
+                "runLearningMobile",
+                "runLearningDetail",
+                "dataReportOutcome",
+                "fileAutomationOutcome",
+                "localNotebookDesktop",
+            ],
+            "verifyProductVisualThemeToggle": True,
         },
         {
             "name": "landing-home-desktop",
             "url": f"http://127.0.0.1:{landingPort}/codaro/",
             "viewport": {"width": 1440, "height": 900},
             "surface": "landing-home",
+            "expectedVisualAssetIds": [
+                "runLearningHero",
+                "runLearningMobile",
+                "runLearningDetail",
+                "dataReportOutcome",
+                "fileAutomationOutcome",
+                "localNotebookDesktop",
+            ],
         },
         {
             "name": "landing-learn-mobile",
@@ -2773,6 +2790,23 @@ async ({ surface, expectedTier }) => {
     visualAssetIds: Array.from(
       document.querySelectorAll('[data-visual-asset]')
     ).map((element) => element.getAttribute("data-visual-asset")),
+    pairedVisualCount: document.querySelectorAll(
+      '[data-visual-theme-paired="true"]'
+    ).length,
+    pairedVisualThemeDrift: Array.from(
+      document.querySelectorAll('[data-visual-theme-paired="true"]')
+    ).filter((element) => (
+      element.getAttribute("data-visual-capture-theme") !==
+        element.getAttribute("data-visual-theme") ||
+      element.getAttribute("data-visual-theme") !==
+        document.documentElement.dataset.theme
+    )).map((element) => ({
+      assetId: element.getAttribute("data-visual-asset"),
+      captureTheme: element.getAttribute("data-visual-capture-theme"),
+      resolvedTheme: element.getAttribute("data-visual-theme"),
+      rootTheme: document.documentElement.dataset.theme || null,
+      themeAssetId: element.getAttribute("data-visual-theme-asset"),
+    })),
     learningVisualQuestionCount: document.querySelectorAll(
       '[data-learning-domain-visual="true"] [data-learning-visual-question="true"]'
     ).length,
@@ -2839,6 +2873,11 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
         )
     if not audit["socialLinksSourceCount"] or not audit["socialLinksInTopLane"]:
         failures.append(f"{name}: shared SNS rail is not visible in the upper control lane")
+    if audit["pairedVisualThemeDrift"]:
+        failures.append(
+            f"{name}: paired product visual theme drifted: "
+            f"{audit['pairedVisualThemeDrift'][:3]}"
+        )
     expectedVisualAssetIds = case.get("expectedVisualAssetIds")
     if expectedVisualAssetIds and audit["visualAssetIds"] != expectedVisualAssetIds:
         failures.append(
@@ -2897,6 +2936,11 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
     if surface == "landing-home":
         if audit["visibleImageCount"] < 1 or audit["webLearningLinkCount"] < 1:
             failures.append(f"{name}: home needs product media and direct web-learning CTA")
+        if audit["pairedVisualCount"] != 4:
+            failures.append(
+                f"{name}: home needs four theme-paired product proofs, "
+                f"got {audit['pairedVisualCount']}"
+            )
     elif surface == "landing-learn":
         if audit["learnLessonRowCount"] < 1 or audit["publicLessonLinkCount"] < 1:
             failures.append(f"{name}: Learn lesson rows must open canonical public lesson documents")
@@ -3418,6 +3462,7 @@ def runBrowserMatrix(
                 localArchiveWebRoundTripEvidence: dict[str, Any] | None = None
                 notebookRunAdvanceVerified = False
                 notebookToolsVerified = False
+                productVisualThemeToggleVerified = False
                 notebookStateEvidence: dict[str, Any] | None = None
                 notebookKeyboardNavigationEvidence: dict[str, Any] | None = None
                 localCheckTransport = {"aborted": 0, "expectedConsoleErrors": 0, "requests": 0}
@@ -4964,6 +5009,33 @@ def runBrowserMatrix(
                             timeout=5_000,
                         )
                         notebookToolsVerified = True
+                    if case.get("verifyProductVisualThemeToggle"):
+                        beforeTheme = page.locator("html").get_attribute("data-theme")
+                        nextTheme = "light" if beforeTheme == "dark" else "dark"
+                        page.get_by_role(
+                            "button",
+                            name="라이트 모드로" if beforeTheme == "dark" else "다크 모드로",
+                        ).click()
+                        page.wait_for_function(
+                            """
+                            (expectedTheme) => {
+                              const paired = Array.from(
+                                document.querySelectorAll('[data-visual-theme-paired="true"]')
+                              );
+                              return (
+                                document.documentElement.dataset.theme === expectedTheme &&
+                                paired.length === 4 &&
+                                paired.every((element) => (
+                                  element.getAttribute("data-visual-theme") === expectedTheme &&
+                                  element.getAttribute("data-visual-capture-theme") === expectedTheme
+                                ))
+                              );
+                            }
+                            """,
+                            arg=nextTheme,
+                            timeout=5_000,
+                        )
+                        productVisualThemeToggleVerified = True
                     if case.get("verifyNotebookRunAdvance"):
                         page.get_by_role("button", name="후원·기여").click()
                         page.wait_for_selector('[data-support-dialog="codaro"]', timeout=5_000)
@@ -5104,6 +5176,7 @@ def runBrowserMatrix(
                             "webArtifactEvidence": webArtifactEvidence,
                             "notebookRunAdvanceVerified": notebookRunAdvanceVerified,
                             "notebookToolsVerified": notebookToolsVerified,
+                            "productVisualThemeToggleVerified": productVisualThemeToggleVerified,
                             "notebookStateEvidence": notebookStateEvidence,
                             "notebookKeyboardNavigationEvidence": (
                                 notebookKeyboardNavigationEvidence

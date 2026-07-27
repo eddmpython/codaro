@@ -5,7 +5,7 @@
       "id": "runLearningDetail",
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
-      "sourcePath": "assets/brand/visuals/product/run-learning-detail.png",
+      "sourcePath": "assets/brand/visuals/product/run-learning-detail-dark.png",
       "sourceHash": "sha256-2f441656b1ecd410c05d8110b9b9c7ca6c98916eaba5e815a3f4bfa86e5b0e13",
       "sourceGitHead": "fd699e46d9112cd4165e3d0730628863d900a3d4",
       "provenance": {
@@ -43,7 +43,7 @@
           720,
           900
         ],
-        "lightDark": "single",
+        "lightDark": "paired",
         "locales": [
           "ko-KR"
         ],
@@ -90,14 +90,108 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-9deb6f9a994f665294ad611d9f72eb690ebb722e00e3b505df9d80fd2110da73"
-      }
+        "sourceSetHash": "sha256-adbb76da332acb51abc5830af0b6e31e6aab316e695503bf2774df2cfa59ecbd"
+      },
+      "themePairId": "runLearningDetailLight"
+    },
+    {
+      "id": "runLearningDetailLight",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run-learning-detail-light.png",
+      "sourceHash": "sha256-a8b0684b04d41b384daad8445a57ad528eda1d3c27400495f6cdde1c3cf61893",
+      "sourceGitHead": "c07d72f9b276173b60c4464ad6044bc245ecf617",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-day1-transfer-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 900,
+        "height": 760,
+        "aspectRatio": 1.184211,
+        "focalPoint": {
+          "x": 0.66,
+          "y": 0.45
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-proof",
+          "learn-proof",
+          "documentation"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          900
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "Codaro 웹 학습 화면에서 헬로월드 목표, 개념 이미지, 학습 순서와 첫 실습이 한 문서 흐름에 표시된 모습",
+        "caption": "목표와 개념 이미지를 읽고 같은 화면 아래의 첫 실습으로 이어집니다.",
+        "learningQuestion": "학습자는 어떤 개념을 익힌 뒤 첫 실습으로 이동하는가?",
+        "decisionShown": "학습 목표, 개념 시각 자료, 학습 순서와 첫 실습의 연결",
+        "lessonRefs": [
+          "30일완성/헬로월드"
+        ]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 900,
+          "height": 760
+        },
+        "theme": "light",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "assets/brand/visuals/learning/python-fundamentals-v1.png",
+          "curricula/python/basics/30days",
+          "editor/src/App.tsx",
+          "editor/src/components/app/curriculumSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/curriculum",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/curriculaRegistry.ts",
+          "editor/src/lib/learningVisualAssets.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-adbb76da332acb51abc5830af0b6e31e6aab316e695503bf2774df2cfa59ecbd"
+      },
+      "themePairId": "runLearningDetail"
     },
     {
       "id": "runLearningMobile",
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
-      "sourcePath": "assets/brand/visuals/product/run-learning-mobile.png",
+      "sourcePath": "assets/brand/visuals/product/run-learning-mobile-dark.png",
       "sourceHash": "sha256-b0d6b9b74eb79963a7a0c5611744be2fd779405e799d2206f0a6f996b005ac5c",
       "sourceGitHead": "fd699e46d9112cd4165e3d0730628863d900a3d4",
       "provenance": {
@@ -132,7 +226,7 @@
         "responsiveWidths": [
           390
         ],
-        "lightDark": "single",
+        "lightDark": "paired",
         "locales": [
           "ko-KR"
         ],
@@ -179,14 +273,105 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-9deb6f9a994f665294ad611d9f72eb690ebb722e00e3b505df9d80fd2110da73"
-      }
+        "sourceSetHash": "sha256-adbb76da332acb51abc5830af0b6e31e6aab316e695503bf2774df2cfa59ecbd"
+      },
+      "themePairId": "runLearningMobileLight"
     },
     {
-      "id": "webRunDesktop",
+      "id": "runLearningMobileLight",
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
-      "sourcePath": "assets/brand/visuals/product/web-run-desktop.png",
+      "sourcePath": "assets/brand/visuals/product/run-learning-mobile-light.png",
+      "sourceHash": "sha256-f24ed6bbc5d42a403698c8a9d37545e11399f251f053165bac96fac933b07ab2",
+      "sourceGitHead": "c07d72f9b276173b60c4464ad6044bc245ecf617",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-lesson-mobile",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 390,
+        "height": 844,
+        "aspectRatio": 0.462085,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.42
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-mobile-proof",
+          "learn-mobile-proof"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          390
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "390픽셀 너비의 Codaro 웹 레슨에서 헬로월드 목표, 개념 이미지와 오늘 배울 순서가 이어지는 모습",
+        "caption": "모바일에서도 목표와 개념 자료를 읽고 오늘 배울 순서를 한 흐름에서 확인합니다.",
+        "learningQuestion": "작은 화면에서도 현재 학습 목표와 오늘 배울 순서를 찾을 수 있는가?",
+        "decisionShown": "모바일 레슨에서 목표, 개념 자료, 학습 순서의 우선순위",
+        "lessonRefs": [
+          "30일완성/헬로월드"
+        ]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "assets/brand/visuals/learning/python-fundamentals-v1.png",
+          "curricula/python/basics/30days",
+          "editor/src/App.tsx",
+          "editor/src/components/app/curriculumSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/curriculum",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/curriculaRegistry.ts",
+          "editor/src/lib/learningVisualAssets.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-adbb76da332acb51abc5830af0b6e31e6aab316e695503bf2774df2cfa59ecbd"
+      },
+      "themePairId": "runLearningMobile"
+    },
+    {
+      "id": "runLearningHero",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run-learning-hero-dark.png",
       "sourceHash": "sha256-ec95ae8add825b0270e09dea84157a9809c72f5e3c175e2217efb8fae3529b62",
       "sourceGitHead": "fd699e46d9112cd4165e3d0730628863d900a3d4",
       "provenance": {
@@ -228,7 +413,7 @@
           1080,
           1440
         ],
-        "lightDark": "single",
+        "lightDark": "paired",
         "locales": [
           "ko-KR"
         ],
@@ -269,14 +454,106 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-547e0c742da4950953f47c7955586a8b1ff928944603a752cb924fa14f85d5ba"
-      }
+        "sourceSetHash": "sha256-93132ee760bbf1ee412e24fac2e7878042cc8ecd9c7e909559aafba6827e0ce5"
+      },
+      "themePairId": "runLearningHeroLight"
+    },
+    {
+      "id": "runLearningHeroLight",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run-learning-hero-light.png",
+      "sourceHash": "sha256-5b95612f02ef08633a78380ba7af10a578dcb4ed78bcef95a36043438777e94d",
+      "sourceGitHead": "c07d72f9b276173b60c4464ad6044bc245ecf617",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-run-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1440,
+        "height": 900,
+        "aspectRatio": 1.6,
+        "focalPoint": {
+          "x": 0.52,
+          "y": 0.34
+        },
+        "safeTextRegion": {
+          "x": 0.2,
+          "y": 0.32,
+          "width": 0.48,
+          "height": 0.48
+        },
+        "fit": "cover",
+        "background": "surface",
+        "proofUsage": [
+          "landing-hero-background",
+          "web-run-proof"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          720,
+          1080,
+          1440
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "한 개의 빈 Python 셀과 셀 추가 및 실행 컨트롤만 보이는 현재 Codaro Web Run 노트북",
+        "caption": "Web Run은 한 개의 빈 셀에서 시작하고 필요한 셀과 노트북 도구만 사용자가 직접 엽니다.",
+        "learningQuestion": "처음 진입한 사용자는 어디에 코드를 입력하고 어떻게 실행하는가?",
+        "decisionShown": "빈 셀, 셀 추가, reactive 실행과 전체 실행의 최소 노트북 흐름",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "theme": "light",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/src/App.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/notebookSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/notebook",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-93132ee760bbf1ee412e24fac2e7878042cc8ecd9c7e909559aafba6827e0ce5"
+      },
+      "themePairId": "runLearningHero"
     },
     {
       "id": "localNotebookDesktop",
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
-      "sourcePath": "assets/brand/visuals/product/local-notebook-desktop.png",
+      "sourcePath": "assets/brand/visuals/product/local-notebook-desktop-dark.png",
       "sourceHash": "sha256-c059e045cf19c3b1e261e4cf925db74d0f36c05c087ca3bf86ac9032b372f3cb",
       "sourceGitHead": "fd699e46d9112cd4165e3d0730628863d900a3d4",
       "provenance": {
@@ -312,7 +589,7 @@
           600,
           900
         ],
-        "lightDark": "single",
+        "lightDark": "paired",
         "locales": [
           "ko-KR"
         ],
@@ -353,14 +630,100 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-547e0c742da4950953f47c7955586a8b1ff928944603a752cb924fa14f85d5ba"
-      }
+        "sourceSetHash": "sha256-93132ee760bbf1ee412e24fac2e7878042cc8ecd9c7e909559aafba6827e0ce5"
+      },
+      "themePairId": "localNotebookDesktopLight"
+    },
+    {
+      "id": "localNotebookDesktopLight",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/local-notebook-desktop-light.png",
+      "sourceHash": "sha256-0f7e9e1a96767bd6fd2482518e780e14ffe255f6a57454a7374a42641f2a92d2",
+      "sourceGitHead": "c07d72f9b276173b60c4464ad6044bc245ecf617",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "local-run-minimum",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 900,
+        "height": 640,
+        "aspectRatio": 1.40625,
+        "focalPoint": {
+          "x": 0.66,
+          "y": 0.3
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-local-proof",
+          "local-empty-state"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          600,
+          900
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "한 개의 빈 Python 셀과 셀 추가 및 실행 컨트롤만 보이는 현재 Codaro Local 노트북",
+        "caption": "Local도 Web Run과 같은 한 셀 노트북에서 시작하고 운영체제 기능은 필요한 표면에서 확장합니다.",
+        "learningQuestion": "같은 노트북 문서 구조가 Local에서도 유지되는가?",
+        "decisionShown": "Web Run과 Local이 공유하는 최소 노트북 캔버스",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 900,
+          "height": 640
+        },
+        "theme": "light",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/src/App.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/notebookSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/notebook",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-93132ee760bbf1ee412e24fac2e7878042cc8ecd9c7e909559aafba6827e0ce5"
+      },
+      "themePairId": "localNotebookDesktop"
     },
     {
       "id": "localAutomationDesktop",
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
-      "sourcePath": "assets/brand/visuals/product/local-automation-desktop.png",
+      "sourcePath": "assets/brand/visuals/product/local-automation-desktop-dark.png",
       "sourceHash": "sha256-49cedaaade407224a83a59e6f6809351d9cb162fcb32192bbb6fbc3a36d2b2ec",
       "sourceGitHead": "fd699e46d9112cd4165e3d0730628863d900a3d4",
       "provenance": {
@@ -397,7 +760,7 @@
           1080,
           1440
         ],
-        "lightDark": "single",
+        "lightDark": "paired",
         "locales": [
           "ko-KR"
         ],
@@ -439,8 +802,96 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-9e4c8785f927297965a9c8d534d378dc4189f211b1bef3ea87cf891637734329"
-      }
+        "sourceSetHash": "sha256-195f75b50b04019a36cb04d88c391ae5cfbc59008b8f5cf516980e2068ac57e0"
+      },
+      "themePairId": "localAutomationDesktopLight"
+    },
+    {
+      "id": "localAutomationDesktopLight",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/local-automation-desktop-light.png",
+      "sourceHash": "sha256-fb735be65cf844b660676f4d36a804f264dc0f09a02505b9ad1cc3fb3895f4d3",
+      "sourceGitHead": "c07d72f9b276173b60c4464ad6044bc245ecf617",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "local-automation-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1440,
+        "height": 900,
+        "aspectRatio": 1.6,
+        "focalPoint": {
+          "x": 0.62,
+          "y": 0.45
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-automation-proof",
+          "local-automation-operational-state"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          720,
+          1080,
+          1440
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "Codaro Local 자동화 화면에서 브라우저 루틴, 파일 정리, 엑셀 반복 작업과 예약 태스크 상태가 보이는 모습",
+        "caption": "검증된 셀과 recipe는 로컬에서 파일 작업과 예약 실행으로 확장됩니다.",
+        "learningQuestion": "반복 실행할 수 있는 코드와 아직 학습 중인 코드를 어떻게 구분하는가?",
+        "decisionShown": "검증된 코드가 자동화 recipe와 task로 승격되는 경계",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "theme": "light",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/src/App.tsx",
+          "editor/src/components/app/automationSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/automation",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/automationState.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-195f75b50b04019a36cb04d88c391ae5cfbc59008b8f5cf516980e2068ac57e0"
+      },
+      "themePairId": "localAutomationDesktop"
     },
     {
       "id": "dataReportOutcome",

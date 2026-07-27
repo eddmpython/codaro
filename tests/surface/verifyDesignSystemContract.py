@@ -322,7 +322,7 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
         all(
             sourceHasAssetId(home, assetId)
             for assetId in (
-                "webRunDesktop",
+                "runLearningHero",
                 "runLearningDetail",
                 "localNotebookDesktop",
                 "localAutomationDesktop",

@@ -1,9 +1,19 @@
 import { resolveVisualAsset } from "../lib/visualAssets.js";
+import { useCodaroTheme } from "./codaroThemeProvider.jsx";
 
 export function ProductVisual({ assetId, className, eager = false, width }) {
-  const asset = resolveVisualAsset(assetId, { format: "webp", width });
+  const { resolvedTheme } = useCodaroTheme();
+  const asset = resolveVisualAsset(assetId, { format: "webp", theme: resolvedTheme, width });
   return (
-    <picture className={className} data-visual-asset={asset.id} data-visual-kind={asset.kind}>
+    <picture
+      className={className}
+      data-visual-asset={asset.logicalId}
+      data-visual-capture-theme={asset.capture?.theme}
+      data-visual-kind={asset.kind}
+      data-visual-theme={resolvedTheme}
+      data-visual-theme-asset={asset.themeAssetId}
+      data-visual-theme-paired={asset.variants.lightDark === "paired" ? "true" : undefined}
+    >
       {asset.sources.map((source) => (
         <source key={source.format} srcSet={source.srcSet} type={source.type} />
       ))}

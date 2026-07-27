@@ -2,13 +2,22 @@ import { visualAssetManifest } from "@/lib/generated/visualAssetManifest";
 
 type VisualAssetId = (typeof visualAssetManifest.assets)[number]["id"];
 type VisualAssetFormat = "avif" | "webp";
+type VisualAssetTheme = "light" | "dark";
 
 export function resolveVisualAsset(
   assetId: VisualAssetId,
-  options: { format?: VisualAssetFormat; width?: number } = {},
+  options: { format?: VisualAssetFormat; theme?: VisualAssetTheme; width?: number } = {},
 ) {
-  const asset = visualAssetManifest.assets.find((candidate) => candidate.id === assetId);
-  if (!asset) throw new Error(`Unknown visual asset: ${assetId}`);
+  const requestedAsset = visualAssetManifest.assets.find((candidate) => candidate.id === assetId);
+  if (!requestedAsset) throw new Error(`Unknown visual asset: ${assetId}`);
+  const themePairId = "themePairId" in requestedAsset ? requestedAsset.themePairId : null;
+  const requestedTheme = "capture" in requestedAsset ? requestedAsset.capture.theme : null;
+  const pairedAsset = themePairId
+    ? visualAssetManifest.assets.find((candidate) => candidate.id === themePairId)
+    : null;
+  const asset = options.theme && pairedAsset && requestedTheme !== options.theme
+    ? pairedAsset
+    : requestedAsset;
   const preferredWidth = options.width ?? asset.rendering.width;
   const preferredFormat = options.format ?? "avif";
   const outputs = [...asset.outputs].sort((left, right) => left.width - right.width);
@@ -19,6 +28,8 @@ export function resolveVisualAsset(
   const url = (path: string) => `${basePath}${path}`;
   return {
     ...asset,
+    logicalId: assetId,
+    themeAssetId: asset.id,
     alt: asset.learning.alt,
     caption: asset.learning.caption,
     height: selected.height,

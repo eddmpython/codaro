@@ -6,13 +6,13 @@
 
 Local의 파일, Notebook, task, schedule, audit, failure recovery, E-Stop이 실제 운영 표면임을 증명하는 캡처를 만든다.
 
-남은 종료 조건은 실제 WebView2 state matrix, light/dark 쌍과 redaction 사람 검수다.
+남은 종료 조건은 실제 WebView2 state matrix와 redaction 사람 검수다.
 
 ## 구현 순서
 
 1. 실제 WebView2에서 scheduled, running, succeeded, failed, paused, disconnected 상태를 캡처한다.
 2. Local Home, Notebook, Automation detail, Run Inspector를 1024x768과 1440x900에서 눈검수한다.
-3. light/dark 쌍에서 실제 사용자 path, token, email, credential 노출이 없는지 사람이 대조한다.
+3. 실제 사용자 path, token, email, credential 노출이 없는지 사람이 대조한다.
 4. E-Stop, failed-first status, artifact 결과가 crop 안에서 읽히는지 눈검수한다.
 
 ## 영향 파일
@@ -22,12 +22,12 @@ Local의 파일, Notebook, task, schedule, audit, failure recovery, E-Stop이 �
 
 ## 영향 함수·심볼
 
-- 없음. 남은 작업은 실제 WebView2 상태 matrix와 light/dark 쌍의 사람 검수다.
+- 없음. 남은 작업은 실제 WebView2 상태 matrix와 redaction 사람 검수다.
 
 ## 테스트
 
 - 실제 WebView2 전체 상태 matrix 사람 검수
-- 1024x768, 1440x900 light/dark와 redaction 대조
+- 1024x768, 1440x900 redaction 대조
 
 ## 롤백
 

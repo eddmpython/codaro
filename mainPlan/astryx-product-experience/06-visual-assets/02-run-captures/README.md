@@ -6,14 +6,13 @@
 
 완성된 Web 학습과 Notebook 표면을 실제 fixture로 캡처해 Landing과 docs의 제품 proof로 사용한다.
 
-남은 종료 조건은 전체 상태 shot, light/dark 쌍 눈검수와 현재 제품 source를 기준으로 한 사람 검수다.
+남은 종료 조건은 전체 상태 shot과 현재 제품 source를 기준으로 한 사람 검수다.
 
 ## 구현 순서
 
 1. ready, running, checkFail, checkPass, localRequired 전체 상태 shot을 채운다.
 2. 390x844, 768x1024, 1440x900에서 text clipping과 action 가시성을 눈검수한다.
-3. light/dark 쌍에서 focal point, 작은 한국어, 확대 동작을 눈검수한다.
-4. 현재 제품 source와 proof가 일치하는지 사람이 최종 승인한다.
+3. 현재 제품 source와 proof가 일치하는지 사람이 최종 승인한다.
 
 ## 영향 파일
 
@@ -22,12 +21,12 @@
 
 ## 영향 함수·심볼
 
-- 없음. 남은 작업은 전체 상태 shot과 light/dark 쌍의 사람 검수다.
+- 없음. 남은 작업은 전체 상태 shot과 현재 source의 사람 검수다.
 
 ## 테스트
 
 - 전체 상태 shot 사람 검수
-- 390x844, 768x1024, 1440x900 light/dark 비교
+- 390x844, 768x1024, 1440x900 비교
 
 ## 롤백
 

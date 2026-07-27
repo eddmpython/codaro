@@ -40,6 +40,10 @@
         "sourcePath": { "type": "string", "minLength": 1 },
         "sourceHash": { "type": "string", "pattern": "^sha256-[0-9a-f]{64}$" },
         "sourceGitHead": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "themePairId": {
+          "type": ["string", "null"],
+          "pattern": "^[a-z][A-Za-z0-9]+$"
+        },
         "provenance": { "$ref": "#/$defs/provenance" },
         "rendering": { "$ref": "#/$defs/rendering" },
         "variants": { "$ref": "#/$defs/variants" },
