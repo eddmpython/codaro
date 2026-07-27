@@ -448,7 +448,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/outcomes/dataReportOutcome.png",
       "sourceHash": "sha256-ec957d18c47b7601355a4ae34fa065f024becf24178692e66a8055663ddc3ff7",
-      "sourceGitHead": "83ac90dafc9d261e519ac6d2116ff2248ad268b8",
+      "sourceGitHead": "ff030c0c418812c18c3aadac4c7757112bbe0676",
       "provenance": {
         "author": "Codaro outcome capture pipeline",
         "license": "proprietary-project",
@@ -461,17 +461,33 @@
         "width": 1200,
         "height": 675,
         "aspectRatio": 1.777778,
-        "focalPoint": {"x": 0.62, "y": 0.5},
+        "focalPoint": {
+          "x": 0.62,
+          "y": 0.5
+        },
         "safeTextRegion": null,
         "fit": "contain",
         "background": "surface",
-        "proofUsage": ["landing-outcome", "path-dataReporting", "learn-outcome"]
+        "proofUsage": [
+          "landing-outcome",
+          "path-dataReporting",
+          "learn-outcome"
+        ]
       },
       "variants": {
-        "formats": ["avif", "webp"],
-        "responsiveWidths": [480, 720, 1200],
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200
+        ],
         "lightDark": "single",
-        "locales": ["ko-KR"],
+        "locales": [
+          "ko-KR"
+        ],
         "offlineIncluded": true
       },
       "learning": {
@@ -479,12 +495,17 @@
         "caption": "원본 CSV 네 행을 집계해 합계와 채널 비교가 읽히는 보고서를 만들고 행 수와 합계를 다시 검산합니다.",
         "learningQuestion": "원본 행은 어떤 집계와 검증을 거쳐 의사결정 가능한 보고서가 되는가?",
         "decisionShown": "원본 표, 집계 지표, 채널 비교 차트와 합계 검증의 전후 관계",
-        "lessonRefs": ["pandas/10_실전종합프로젝트"]
+        "lessonRefs": [
+          "pandas/10_실전종합프로젝트"
+        ]
       },
       "capture": {
         "browser": "chromium",
         "browserVersion": "149.0.7827.55",
-        "viewport": {"width": 1200, "height": 675},
+        "viewport": {
+          "width": 1200,
+          "height": 675
+        },
         "theme": "dark",
         "locale": "ko-KR",
         "sourcePaths": [
@@ -502,7 +523,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/outcomes/fileAutomationOutcome.png",
       "sourceHash": "sha256-ce17121e083ea0e261de403e19eaefb5c5ed9e59b493d57dd40c13974468d728",
-      "sourceGitHead": "83ac90dafc9d261e519ac6d2116ff2248ad268b8",
+      "sourceGitHead": "ff030c0c418812c18c3aadac4c7757112bbe0676",
       "provenance": {
         "author": "Codaro outcome capture pipeline",
         "license": "proprietary-project",
@@ -515,17 +536,33 @@
         "width": 1200,
         "height": 675,
         "aspectRatio": 1.777778,
-        "focalPoint": {"x": 0.62, "y": 0.5},
+        "focalPoint": {
+          "x": 0.62,
+          "y": 0.5
+        },
         "safeTextRegion": null,
         "fit": "contain",
         "background": "surface",
-        "proofUsage": ["landing-outcome", "path-fileAutomation", "learn-outcome"]
+        "proofUsage": [
+          "landing-outcome",
+          "path-fileAutomation",
+          "learn-outcome"
+        ]
       },
       "variants": {
-        "formats": ["avif", "webp"],
-        "responsiveWidths": [480, 720, 1200],
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200
+        ],
         "lightDark": "single",
-        "locales": ["ko-KR"],
+        "locales": [
+          "ko-KR"
+        ],
         "offlineIncluded": true
       },
       "learning": {
@@ -533,12 +570,17 @@
         "caption": "정리 전 파일 목록을 확장자 규칙으로 세 폴더에 배치하고 dry-run, 충돌, 원본 보존을 함께 확인합니다.",
         "learningQuestion": "실제 파일을 옮기기 전에 분류 결과와 충돌 위험을 어떻게 확인하는가?",
         "decisionShown": "정리 전 파일, 정리 후 폴더 구조와 안전한 dry-run 영수증",
-        "lessonRefs": ["fileOps/10_종합다운로드폴더정리"]
+        "lessonRefs": [
+          "fileOps/10_종합다운로드폴더정리"
+        ]
       },
       "capture": {
         "browser": "chromium",
         "browserVersion": "149.0.7827.55",
-        "viewport": {"width": 1200, "height": 675},
+        "viewport": {
+          "width": 1200,
+          "height": 675
+        },
         "theme": "dark",
         "locale": "ko-KR",
         "sourcePaths": [
@@ -556,7 +598,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/outcomes/officeAutomationOutcome.png",
       "sourceHash": "sha256-f1c770d50406d59749e42c04c5a24c4359cca201c38290ffb904981423a98197",
-      "sourceGitHead": "83ac90dafc9d261e519ac6d2116ff2248ad268b8",
+      "sourceGitHead": "ff030c0c418812c18c3aadac4c7757112bbe0676",
       "provenance": {
         "author": "Codaro outcome capture pipeline",
         "license": "proprietary-project",
@@ -569,17 +611,33 @@
         "width": 1200,
         "height": 675,
         "aspectRatio": 1.777778,
-        "focalPoint": {"x": 0.62, "y": 0.5},
+        "focalPoint": {
+          "x": 0.62,
+          "y": 0.5
+        },
         "safeTextRegion": null,
         "fit": "contain",
         "background": "surface",
-        "proofUsage": ["landing-outcome", "path-officeAutomation", "learn-outcome"]
+        "proofUsage": [
+          "landing-outcome",
+          "path-officeAutomation",
+          "learn-outcome"
+        ]
       },
       "variants": {
-        "formats": ["avif", "webp"],
-        "responsiveWidths": [480, 720, 1200],
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200
+        ],
         "lightDark": "single",
-        "locales": ["ko-KR"],
+        "locales": [
+          "ko-KR"
+        ],
         "offlineIncluded": true
       },
       "learning": {
@@ -587,12 +645,17 @@
         "caption": "원본 workbook의 월별 값을 보고서 sheet로 집계하고 수식 결과와 합계를 재검산합니다.",
         "learningQuestion": "보이는 workbook 결과와 다시 열어 검증할 구조 정보는 어떻게 함께 남는가?",
         "decisionShown": "입력 sheet, 보고서 sheet, 수식 집계와 재검산 영수증",
-        "lessonRefs": ["openpyxl/10_월간매출리포트생성기"]
+        "lessonRefs": [
+          "openpyxl/10_월간매출리포트생성기"
+        ]
       },
       "capture": {
         "browser": "chromium",
         "browserVersion": "149.0.7827.55",
-        "viewport": {"width": 1200, "height": 675},
+        "viewport": {
+          "width": 1200,
+          "height": 675
+        },
         "theme": "dark",
         "locale": "ko-KR",
         "sourcePaths": [
@@ -610,7 +673,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/outcomes/webMonitoringOutcome.png",
       "sourceHash": "sha256-9fc0240d4f0ffd145d15c4d013fd0a73d2237078791806bc8f924458a6d5d00d",
-      "sourceGitHead": "83ac90dafc9d261e519ac6d2116ff2248ad268b8",
+      "sourceGitHead": "ff030c0c418812c18c3aadac4c7757112bbe0676",
       "provenance": {
         "author": "Codaro outcome capture pipeline",
         "license": "proprietary-project",
@@ -623,17 +686,33 @@
         "width": 1200,
         "height": 675,
         "aspectRatio": 1.777778,
-        "focalPoint": {"x": 0.62, "y": 0.5},
+        "focalPoint": {
+          "x": 0.62,
+          "y": 0.5
+        },
         "safeTextRegion": null,
         "fit": "contain",
         "background": "surface",
-        "proofUsage": ["landing-outcome", "path-webMonitoring", "learn-outcome"]
+        "proofUsage": [
+          "landing-outcome",
+          "path-webMonitoring",
+          "learn-outcome"
+        ]
       },
       "variants": {
-        "formats": ["avif", "webp"],
-        "responsiveWidths": [480, 720, 1200],
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200
+        ],
         "lightDark": "single",
-        "locales": ["ko-KR"],
+        "locales": [
+          "ko-KR"
+        ],
         "offlineIncluded": true
       },
       "learning": {
@@ -641,12 +720,17 @@
         "caption": "페이지 상태 네 항목을 검사하고 실행 시간, 화면 증거와 검증 범위를 하나의 감사 결과로 묶습니다.",
         "learningQuestion": "브라우저 자동화가 성공했다는 주장을 어떤 상태와 증거로 재현하는가?",
         "decisionShown": "상태 점검, 성공·실패 집계, screenshot 해시와 감사 범위",
-        "lessonRefs": ["playwright/10_종합브라우저점검프로젝트"]
+        "lessonRefs": [
+          "playwright/10_종합브라우저점검프로젝트"
+        ]
       },
       "capture": {
         "browser": "chromium",
         "browserVersion": "149.0.7827.55",
-        "viewport": {"width": 1200, "height": 675},
+        "viewport": {
+          "width": 1200,
+          "height": 675
+        },
         "theme": "dark",
         "locale": "ko-KR",
         "sourcePaths": [

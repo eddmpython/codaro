@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sourceManifestHash": "sha256-df0c5751a63cd14f9c914af3370c3547ff93b5bc79ba1d8bdf941a7e8e93888a",
+  "sourceManifestHash": "sha256-f60f30ccc9096364547f2f01d4a456d21fe5b3958f3abfa56ea2e1fcb1970c49",
   "assets": [
     {
       "id": "runLearningDetail",
@@ -651,7 +651,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/outcomes/dataReportOutcome.png",
       "sourceHash": "sha256-ec957d18c47b7601355a4ae34fa065f024becf24178692e66a8055663ddc3ff7",
-      "sourceGitHead": "83ac90dafc9d261e519ac6d2116ff2248ad268b8",
+      "sourceGitHead": "ff030c0c418812c18c3aadac4c7757112bbe0676",
       "provenance": {
         "author": "Codaro outcome capture pipeline",
         "license": "proprietary-project",
@@ -776,7 +776,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/outcomes/fileAutomationOutcome.png",
       "sourceHash": "sha256-ce17121e083ea0e261de403e19eaefb5c5ed9e59b493d57dd40c13974468d728",
-      "sourceGitHead": "83ac90dafc9d261e519ac6d2116ff2248ad268b8",
+      "sourceGitHead": "ff030c0c418812c18c3aadac4c7757112bbe0676",
       "provenance": {
         "author": "Codaro outcome capture pipeline",
         "license": "proprietary-project",
@@ -901,7 +901,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/outcomes/officeAutomationOutcome.png",
       "sourceHash": "sha256-f1c770d50406d59749e42c04c5a24c4359cca201c38290ffb904981423a98197",
-      "sourceGitHead": "83ac90dafc9d261e519ac6d2116ff2248ad268b8",
+      "sourceGitHead": "ff030c0c418812c18c3aadac4c7757112bbe0676",
       "provenance": {
         "author": "Codaro outcome capture pipeline",
         "license": "proprietary-project",
@@ -1026,7 +1026,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/outcomes/webMonitoringOutcome.png",
       "sourceHash": "sha256-9fc0240d4f0ffd145d15c4d013fd0a73d2237078791806bc8f924458a6d5d00d",
-      "sourceGitHead": "83ac90dafc9d261e519ac6d2116ff2248ad268b8",
+      "sourceGitHead": "ff030c0c418812c18c3aadac4c7757112bbe0676",
       "provenance": {
         "author": "Codaro outcome capture pipeline",
         "license": "proprietary-project",
