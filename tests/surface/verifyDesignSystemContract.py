@@ -148,12 +148,31 @@ def verifySemanticCssReferences(tokens: dict[str, object], failures: list[str]) 
 
 
 def verifyEntryPoints(failures: list[str]) -> None:
+    layerPlugin = (
+        ROOT / "assets/brand/tools/viteLayerOrder.mjs"
+    ).read_text(encoding="utf-8")
+    require(
+        LAYER_ORDER in layerPlugin
+        and 'data-codaro-layer-order="true"' in layerPlugin
+        and 'html.replace(/\\r\\n/g, "\\n")' in layerPlugin
+        and 'normalizedHtml.replace("<head>"' in layerPlugin,
+        "shared Vite layer-order plugin must inject the canonical order before split CSS",
+        failures,
+    )
     for app, entryName in (("landing", "src/main.jsx"), ("editor", "src/main.tsx")):
-        layerText = (ROOT / app / "src" / "styles" / "layers.css").read_text(encoding="utf-8").strip()
-        require(layerText == LAYER_ORDER, f"{app} layer order drift", failures)
         entry = (ROOT / app / entryName).read_text(encoding="utf-8")
+        viteConfigName = "vite.config.js" if app == "landing" else "vite.config.ts"
+        viteConfig = (ROOT / app / viteConfigName).read_text(encoding="utf-8")
+        require(
+            'import { codaroLayerOrderPlugin } from "../assets/brand/tools/viteLayerOrder.mjs";'
+            in viteConfig
+            and 0
+            <= viteConfig.find("codaroLayerOrderPlugin()")
+            < viteConfig.find("react()"),
+            f"{app} must inject the shared cascade order before route CSS",
+            failures,
+        )
         imports = (
-            '"./styles/layers.css"',
             '"@astryxdesign/core/reset.css"',
             '"@astryxdesign/theme-neutral/theme.css"',
             '"./styles/generated/fonts.css"',

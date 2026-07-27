@@ -1,10 +1,12 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
+import { codaroLayerOrderPlugin } from "../assets/brand/tools/viteLayerOrder.mjs";
+
 export default defineConfig({
   base: "/codaro/",
   publicDir: "static",
-  plugins: [react()],
+  plugins: [codaroLayerOrderPlugin(), react()],
   ssr: {
     noExternal: ["@astryxdesign/theme-neutral"],
   },

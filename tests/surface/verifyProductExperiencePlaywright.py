@@ -1994,6 +1994,15 @@ async ({ surface, expectedTier }) => {
   const notebookDocument = document.querySelector(".notebookDocument");
   const notebookDocumentRect = notebookDocument?.getBoundingClientRect();
   const notebookDocumentStyle = notebookDocument ? getComputedStyle(notebookDocument) : null;
+  const notebookWidthControls = [...document.querySelectorAll("[data-notebook-width-option]")];
+  const selectedNotebookWidthControls = notebookWidthControls.filter(
+    (control) => control.getAttribute("aria-pressed") === "true"
+  );
+  const selectedNotebookWidthControl = selectedNotebookWidthControls[0] || null;
+  const unselectedNotebookWidthControl = notebookWidthControls.find(
+    (control) => control.getAttribute("aria-pressed") !== "true"
+  ) || null;
+  const reactiveNotebookControl = document.querySelector('[data-notebook-reactive-toggle="true"]');
   const notebookTitle = document.querySelector('[data-notebook-title="topbar"]');
   const notebookCellMenus = [...document.querySelectorAll('[data-notebook-cell-menu="true"]')];
   const notebookCellMenuTargets = notebookCellMenus.map((menu) => {
@@ -2172,6 +2181,9 @@ async ({ surface, expectedTier }) => {
     runtimeText: rail?.textContent?.replace(/\\s+/g, " ").trim() || "",
     rootTheme: document.documentElement.getAttribute("data-astryx-theme"),
     density: document.documentElement.getAttribute("data-density"),
+    cascadeLayerOrderCount: document.querySelectorAll(
+      'style[data-codaro-layer-order="true"]'
+    ).length,
     bodyTextLength: document.body.innerText.trim().length,
     viewportWidth: window.innerWidth,
     documentWidth: document.documentElement.scrollWidth,
@@ -2224,8 +2236,22 @@ async ({ surface, expectedTier }) => {
     visibleNotebookNoticeCount: [...document.querySelectorAll('[data-topbar-status-notice="editor"]')]
       .filter(visible).length,
     notebookTopLaneOverlaps,
-    notebookWidthControlCount: document.querySelectorAll("[data-notebook-width-option]").length,
+    notebookWidthControlCount: notebookWidthControls.length,
+    selectedNotebookWidthControlCount: selectedNotebookWidthControls.length,
+    selectedNotebookWidthControlId: selectedNotebookWidthControl?.getAttribute(
+      "data-notebook-width-option"
+    ) || null,
+    selectedNotebookWidthBackground: selectedNotebookWidthControl
+      ? getComputedStyle(selectedNotebookWidthControl).backgroundColor
+      : null,
+    unselectedNotebookWidthBackground: unselectedNotebookWidthControl
+      ? getComputedStyle(unselectedNotebookWidthControl).backgroundColor
+      : null,
     notebookReactiveToggleCount: document.querySelectorAll('[data-notebook-reactive-toggle="true"]').length,
+    notebookReactiveTogglePressed: reactiveNotebookControl?.getAttribute("aria-pressed") || null,
+    notebookReactiveToggleBackground: reactiveNotebookControl
+      ? getComputedStyle(reactiveNotebookControl).backgroundColor
+      : null,
     notebookAppendLabels: [...document.querySelectorAll(".notebookAppendButton")]
       .map((button) => actionName(button)),
     visibleNotebookCellToolCount: [...document.querySelectorAll(".notebookCellMeta")]
@@ -2337,6 +2363,10 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
         failures.append(f"{name}: {audit['missingImageAlt']} visible image(s) have no alt attribute")
     if audit["rootTheme"] != "codaro":
         failures.append(f"{name}: Codaro Astryx theme scope is missing")
+    if audit["cascadeLayerOrderCount"] != 1:
+        failures.append(
+            f"{name}: canonical cascade layer order was not injected before split CSS"
+        )
     if audit["visibleSocialLinkIds"] != ["github", "support", "youtube", "threads"]:
         failures.append(
             f"{name}: shared SNS rail is missing or reordered: {audit['visibleSocialLinkIds']}"
@@ -2596,8 +2626,31 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
                     f"{name}: expected three DartLab-compatible width controls, "
                     f"got {audit['notebookWidthControlCount']}"
                 )
+            if (
+                audit["selectedNotebookWidthControlCount"] != 1
+                or audit["selectedNotebookWidthControlId"] != "medium"
+                or audit["selectedNotebookWidthBackground"]
+                == audit["unselectedNotebookWidthBackground"]
+            ):
+                failures.append(
+                    f"{name}: selected notebook width is not visually distinct: "
+                    f"count={audit['selectedNotebookWidthControlCount']}, "
+                    f"id={audit['selectedNotebookWidthControlId']}, "
+                    f"selected={audit['selectedNotebookWidthBackground']}, "
+                    f"unselected={audit['unselectedNotebookWidthBackground']}"
+                )
             if audit["notebookReactiveToggleCount"] != 1:
                 failures.append(f"{name}: reactive notebook control is missing")
+            if (
+                audit["notebookReactiveTogglePressed"] == "true"
+                and audit["notebookReactiveToggleBackground"] in {
+                    "rgba(0, 0, 0, 0)",
+                    "transparent",
+                }
+            ):
+                failures.append(
+                    f"{name}: active reactive control lost its visible selected state"
+                )
             if audit["notebookAppendLabels"] != ["+ Code", "+ Markdown"]:
                 failures.append(
                     f"{name}: notebook append controls drifted: {audit['notebookAppendLabels']}"

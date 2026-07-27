@@ -3,7 +3,6 @@ import { createRoot, hydrateRoot } from "react-dom/client";
 import App from "./App.jsx";
 import { CodaroThemeProvider } from "./components/codaroThemeProvider.jsx";
 import { designSurfaceForPath, getBrowserPath } from "./lib/publicRouting.js";
-import "./styles/layers.css";
 import "@astryxdesign/core/reset.css";
 import "@astryxdesign/core/astryx.css";
 import "@astryxdesign/theme-neutral/theme.css";

@@ -5,6 +5,8 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
+import { codaroLayerOrderPlugin } from "../assets/brand/tools/viteLayerOrder.mjs";
+
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const apiProxyTarget = process.env.CODARO_DEV_API_PROXY?.replace(/\/$/, "");
 
@@ -63,6 +65,7 @@ const webOutDir = process.env.CODARO_WEB_OUT;
 export default defineConfig({
   base: webBase ? `/${webBase.replace(/^\/+|\/+$/g, "")}/` : "/",
   plugins: [
+    codaroLayerOrderPlugin(),
     react(),
     tailwindcss(),
   ],

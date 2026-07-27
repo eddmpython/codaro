@@ -35,6 +35,24 @@ SOURCE_TYPES = {
 FORMATS = {"avif", "webp"}
 FITS = {"contain", "cover", "natural"}
 LIGHT_DARK = {"single", "paired", "adaptive"}
+CAPTURE_TEXT_SUFFIXES = {
+    ".css",
+    ".html",
+    ".js",
+    ".jsx",
+    ".json",
+    ".md",
+    ".mjs",
+    ".py",
+    ".svg",
+    ".toml",
+    ".ts",
+    ".tsx",
+    ".txt",
+    ".xml",
+    ".yaml",
+    ".yml",
+}
 
 
 class VisualAssetError(RuntimeError):
@@ -47,6 +65,13 @@ def canonicalJson(value: object) -> str:
 
 def sha256Bytes(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
+
+
+def canonicalCaptureSourceBytes(path: Path) -> bytes:
+    payload = path.read_bytes()
+    if path.suffix.lower() in CAPTURE_TEXT_SUFFIXES:
+        return payload.replace(b"\r\n", b"\n")
+    return payload
 
 
 def captureSourceSetHash(sourcePaths: list[str]) -> str:
@@ -65,7 +90,7 @@ def captureSourceSetHash(sourcePaths: list[str]) -> str:
         relativePath = path.relative_to(ROOT).as_posix()
         digest.update(relativePath.encode("utf-8"))
         digest.update(b"\0")
-        digest.update(path.read_bytes())
+        digest.update(canonicalCaptureSourceBytes(path))
         digest.update(b"\0")
     return f"sha256-{digest.hexdigest()}"
 

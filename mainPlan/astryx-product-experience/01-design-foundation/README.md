@@ -43,7 +43,7 @@ Landing, Learn, Run, Local이 같은 Astryx 토큰, 테마 상태, 폰트, 밀�
 - Landing과 Editor production build: 통과
 - Home·Learn 390px/1440px와 Local automation 대표 시각 감사: image/text overlap 0, lesson row 가독성·mobile next-band framing·active state 교정. 전체 수동 AT matrix는 미완료
 
-00의 token·package contract, 01의 theme runtime contract, 02의 Landing·Learning migration, 03의 Run·Local migration, 04의 visual accessibility gate가 각각 clean implementation commit, evidence commit과 completion transition을 마쳤다. 내부 packet은 5/5 완료이며 Design Foundation의 machine 구현 범위가 봉인됐다. current Evergreen 실제 WebView2는 Home 900x640·Notebook 1024x768·Automation 1440x900에서 공용 테마·SNS·후원 dialog와 접힌 노트북 레일의 text fragment 0을 자동 검증한다. Windows 10 Fixed Version·사람 보조기술·OS zoom·IME 검수는 10 Quality Release의 남은 evidence 범위이고 B3 전 top-level workstream `_done` 이동은 차단되므로 이 상위 폴더는 계속 active tree에 둔다.
+00의 token·package contract, 01의 theme runtime contract, 02의 Landing·Learning migration, 03의 Run·Local migration, 04의 visual accessibility gate가 각각 clean implementation commit, evidence commit과 completion transition을 마쳤다. 내부 packet은 5/5 완료이며 Design Foundation의 machine 구현 범위가 봉인됐다. 2026-07-27 production 점검에서는 Vite가 side-effect 전용 layer-order CSS를 최종 산출물에서 제거해 dynamic component CSS의 `components` layer가 reset보다 먼저 정의되는 결함을 발견했다. `assets/brand/tools/viteLayerOrder.mjs`가 두 앱의 `<head>`에 canonical layer 순서를 split CSS보다 먼저 한 번만 주입하도록 복구했고, Notebook 폭 선택과 reactive 활성 상태가 실제 build에서도 token 색으로 구분되는 browser assertion을 추가했다. current Evergreen 실제 WebView2는 Home 900x640·Notebook 1024x768·Automation 1440x900에서 공용 테마·SNS·후원 dialog와 접힌 노트북 레일의 text fragment 0을 자동 검증한다. Windows 10 Fixed Version·사람 보조기술·OS zoom·IME 검수는 10 Quality Release의 남은 evidence 범위이고 B3 전 top-level workstream `_done` 이동은 차단되므로 이 상위 폴더는 계속 active tree에 둔다.
 
 ## 롤백
 

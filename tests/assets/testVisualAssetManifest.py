@@ -69,6 +69,26 @@ class VisualAssetManifestTest(unittest.TestCase):
         with self.assertRaisesRegex(BUILDER.VisualAssetError, "capture source set hash drift"):
             BUILDER.validateVisualManifest(invalid)
 
+    def testCaptureSourceHashNormalizesTextLineEndings(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="codaro-capture-hash-") as temporary:
+            root = Path(temporary)
+            windowsText = root / "windows.tsx"
+            linuxText = root / "linux.tsx"
+            windowsText.write_bytes(b"const value = 1;\r\nexport { value };\r\n")
+            linuxText.write_bytes(b"const value = 1;\nexport { value };\n")
+            self.assertEqual(
+                BUILDER.canonicalCaptureSourceBytes(windowsText),
+                BUILDER.canonicalCaptureSourceBytes(linuxText),
+            )
+
+            binary = root / "capture.png"
+            binaryPayload = b"\x89PNG\r\n\x1a\n\r\nbinary"
+            binary.write_bytes(binaryPayload)
+            self.assertEqual(
+                BUILDER.canonicalCaptureSourceBytes(binary),
+                binaryPayload,
+            )
+
     def testInstructionalPurposeCannotBeEmpty(self) -> None:
         invalid = deepcopy(self.manifest)
         invalid["assets"][0]["learning"]["decisionShown"] = ""

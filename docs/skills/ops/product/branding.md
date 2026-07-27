@@ -45,6 +45,7 @@ whenToUse: 새 UI 컴포넌트 추가, 색/반지름/그림자 변경, 랜딩/�
 - 목표 공용 source는 `assets/brand/designSystem/tokens.json`이며 landing과 editor는 생성된 mirror를 사용한다. 한 제품 표면이 다른 표면의 내부 CSS나 컴포넌트를 직접 import하지 않는다.
 - landing, Learn, Web Run, Local은 Astryx Theme와 같은 semantic token을 사용한다. Web Run과 Local은 같은 editor component tree를 쓰고 capability만 분리한다.
 - 두 앱의 root provider는 `data-astryx-theme="codaro"` 경계를 소유한다. generated density/accent override는 이 경계 안의 `:scope[data-density]`, `:scope[data-accent]`에서 현재 root에도 적용되어야 한다.
+- CSS cascade 순서는 `assets/brand/tools/viteLayerOrder.mjs`가 소유한다. Landing과 Editor의 Vite config는 이 공용 plugin을 React plugin보다 먼저 등록해 `reset, theme, base, astryx-base, astryx-theme, components, utilities` 순서를 `<head>`의 split CSS보다 앞에 한 번만 주입한다. side-effect 전용 CSS import로 layer 순서를 선언하면 production chunk 분할에서 제거될 수 있으므로 사용하지 않는다.
 - landing은 Astryx `Button`, `Badge`, typography, `IconButton` component를 렌더링하므로 전체 `@astryxdesign/core/astryx.css`를 Theme와 neutral theme 사이에 불러온다. editor도 공용 SNS rail에서 Astryx `IconButton`을 실제 렌더링하지만 전체 component CSS는 불러오지 않는다. SNS에 필요한 28px ghost-button 시각 계약은 공용 생성 CSS로 제한해 editor 성능 예산을 지킨다.
 - Astryx brand accent는 `--color-accent`다. shadcn/Tailwind의 subdued hover surface는 `--color-accent-surface`를 쓰며 `--color-accent: var(--accent)`로 brand token을 덮어쓰지 않는다.
 - compact editor에서는 파일명, 테마 전환, 공용 SNS가 먼저다. 노트북 제목은 상단 중앙 한 곳에서만 편집하며 진단 알림은 제목과 겹치지 않는다. 진단 복사와 desktop assistant toggle은 `xl` 미만에서 숨기지만 공용 SNS rail은 320px 이상 모든 표면의 우상단에 유지한다.

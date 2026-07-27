@@ -15,6 +15,8 @@
 
 2026-07-27 점검에서 접힌 48px 제품 레일이 제품 설정 trigger까지 숨겨 사용자 커리큘럼 삭제와 학습 데이터 관리에 다시 진입할 수 없는 결함을 확인했다. 비학습 surface에서는 레일의 두 번째 아이콘으로 제품 설정을 열도록 복구했고, 학습 focus mode에서는 계속 렌더하지 않는다. 삭제 확인창은 열린 동안 `#root`를 `aria-hidden=true`로 격리하고 닫힐 때 이전 값을 복원한다. 저장 항목이 있는 학습 카드 브라우저 흐름은 설정 진입, 삭제 확인창 focus trap, 배경 격리, 취소 뒤 저장 유지까지 통과했다. 전체 WebView2와 수동 보조기술 matrix는 다시 실행하지 않았으므로 상태는 `진행`이다.
 
+같은 날 production CSS 감사에서 자유 Notebook의 `medium` 폭 선택과 reactive 활성 상태가 DOM에서는 선택되어도 최종 build 화면에서는 투명하게 보이는 결함을 확인했다. 공용 cascade layer 순서를 HTML 선두에서 고정하고 Web Run 1440x900, Local 900x640에서 빈 code cell 1개, 중앙 추가 control, 좌하단 폭 선택, 우하단 reactive·실행 control을 다시 캡처했다. browser gate는 layer 선언이 정확히 1개인지, `medium`만 선택되었는지, 선택 배경이 미선택 배경과 실제 계산값으로 다른지, reactive 활성 배경이 투명하지 않은지 검사한다. Web과 Local은 계속 같은 `NotebookSurface → NotebookPanel` component tree를 사용한다.
+
 ## 목표
 
 웹 Run과 Local이 하나의 Astryx AppShell, TopNav, SideNav, command/search, settings 구조를 사용하게 한다. 기존 React state, hooks, runtime, route 조립은 보존하고 지속 셸부터 점진적으로 옮긴다.

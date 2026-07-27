@@ -7,7 +7,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-detail.png",
       "sourceHash": "sha256-2d625aa4eda5c54df34b0a811a7d88af7bab847cde473f781c0df3988195687c",
-      "sourceGitHead": "fd65c259cd7c53fe03a3d3dac1e50b1709c0264a",
+      "sourceGitHead": "271c34e422bfe1210f00108322778fafdc0db810",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -50,6 +50,7 @@
           "assets/brand/designSystem/socialLinks.json",
           "assets/brand/designSystem/tokens.json",
           "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
           "assets/brand/visuals/learning/python-fundamentals-v1.png",
           "curricula/python/basics/30days",
           "editor/src/App.tsx",
@@ -63,9 +64,10 @@
           "editor/src/lib/curriculaRegistry.ts",
           "editor/src/lib/learningVisualAssets.ts",
           "editor/src/main.tsx",
-          "editor/src/styles"
+          "editor/src/styles",
+          "editor/vite.config.ts"
         ],
-        "sourceSetHash": "sha256-200fdc73a42d6e658f55aca279417e4fa0a2040f16c1bc3e9c3192a4f84fb461"
+        "sourceSetHash": "sha256-ee57917eb90341a482e2a0671ceefa1167481ec525b7565320e3bac4cb9f4431"
       }
     },
     {
@@ -74,7 +76,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-mobile.png",
       "sourceHash": "sha256-7f57fbbe546eed374b2f8b4ce0463557e44373814a0581c6533ab67fedee00ec",
-      "sourceGitHead": "fd65c259cd7c53fe03a3d3dac1e50b1709c0264a",
+      "sourceGitHead": "271c34e422bfe1210f00108322778fafdc0db810",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -117,6 +119,7 @@
           "assets/brand/designSystem/socialLinks.json",
           "assets/brand/designSystem/tokens.json",
           "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
           "assets/brand/visuals/learning/python-fundamentals-v1.png",
           "curricula/python/basics/30days",
           "editor/src/App.tsx",
@@ -130,9 +133,10 @@
           "editor/src/lib/curriculaRegistry.ts",
           "editor/src/lib/learningVisualAssets.ts",
           "editor/src/main.tsx",
-          "editor/src/styles"
+          "editor/src/styles",
+          "editor/vite.config.ts"
         ],
-        "sourceSetHash": "sha256-200fdc73a42d6e658f55aca279417e4fa0a2040f16c1bc3e9c3192a4f84fb461"
+        "sourceSetHash": "sha256-ee57917eb90341a482e2a0671ceefa1167481ec525b7565320e3bac4cb9f4431"
       }
     },
     {
@@ -140,8 +144,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/web-run-desktop.png",
-      "sourceHash": "sha256-1f2e51e12ffcc09e162e69f42827ce2bafa3274dd76ed2971ec7ccdd1a9519b1",
-      "sourceGitHead": "fd65c259cd7c53fe03a3d3dac1e50b1709c0264a",
+      "sourceHash": "sha256-1ec465145bcb7ece0279e8cd1e28b22264fbbf84a42db3b1133d6d5cde2dc83e",
+      "sourceGitHead": "271c34e422bfe1210f00108322778fafdc0db810",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -184,6 +188,7 @@
           "assets/brand/designSystem/socialLinks.json",
           "assets/brand/designSystem/tokens.json",
           "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/mainSurface.tsx",
           "editor/src/components/app/notebookSurface.tsx",
@@ -193,9 +198,10 @@
           "editor/src/components/ui",
           "editor/src/index.css",
           "editor/src/main.tsx",
-          "editor/src/styles"
+          "editor/src/styles",
+          "editor/vite.config.ts"
         ],
-        "sourceSetHash": "sha256-c47f6ef08b5579271665ce6c91089193fe764ba54475c6fb206fb38e41d6584f"
+        "sourceSetHash": "sha256-2bd7ac90bb1c5376452e2c883e06f8788fa74553bf656a5d8df99c51e3f69209"
       }
     },
     {
@@ -203,8 +209,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/local-notebook-desktop.png",
-      "sourceHash": "sha256-5d97c7cb415f8c5075a7bffcd59fa2ca887b6651164d40cd6993d62f54ed7f97",
-      "sourceGitHead": "fd65c259cd7c53fe03a3d3dac1e50b1709c0264a",
+      "sourceHash": "sha256-ac92b1d8707c6f2e02f9758b930fbb68a7fb6284b30dbbe80bc500c5e0402341",
+      "sourceGitHead": "271c34e422bfe1210f00108322778fafdc0db810",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -247,6 +253,7 @@
           "assets/brand/designSystem/socialLinks.json",
           "assets/brand/designSystem/tokens.json",
           "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/mainSurface.tsx",
           "editor/src/components/app/notebookSurface.tsx",
@@ -256,9 +263,10 @@
           "editor/src/components/ui",
           "editor/src/index.css",
           "editor/src/main.tsx",
-          "editor/src/styles"
+          "editor/src/styles",
+          "editor/vite.config.ts"
         ],
-        "sourceSetHash": "sha256-c47f6ef08b5579271665ce6c91089193fe764ba54475c6fb206fb38e41d6584f"
+        "sourceSetHash": "sha256-2bd7ac90bb1c5376452e2c883e06f8788fa74553bf656a5d8df99c51e3f69209"
       }
     },
     {
@@ -266,8 +274,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/local-automation-desktop.png",
-      "sourceHash": "sha256-eb66fcec52f4da178273d7b00d0697709e748e1e268d8ac778ad71821d478297",
-      "sourceGitHead": "fd65c259cd7c53fe03a3d3dac1e50b1709c0264a",
+      "sourceHash": "sha256-1d7fdf9b67aadc82144e6f4529c1280a1e3e9eae14a98b49cfa5ae78e67bdebb",
+      "sourceGitHead": "271c34e422bfe1210f00108322778fafdc0db810",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -310,6 +318,7 @@
           "assets/brand/designSystem/socialLinks.json",
           "assets/brand/designSystem/tokens.json",
           "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/automationSidebarTree.tsx",
           "editor/src/components/app/mainSurface.tsx",
@@ -320,9 +329,10 @@
           "editor/src/index.css",
           "editor/src/lib/automationState.ts",
           "editor/src/main.tsx",
-          "editor/src/styles"
+          "editor/src/styles",
+          "editor/vite.config.ts"
         ],
-        "sourceSetHash": "sha256-2f094d7c73fa5bdcca7fd3abd463c1064863769e29f38c949d145b35c742b015"
+        "sourceSetHash": "sha256-59b11d991aba7fb6a5960c84f9fd4d51a50e1e709941b175c9c8744c10835b0b"
       }
     },
     {
