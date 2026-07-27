@@ -1256,13 +1256,6 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "url": f"http://127.0.0.1:{landingPort}/codaro/learn/",
             "viewport": {"width": 390, "height": 844},
             "surface": "landing-learn",
-        },
-        {
-            "name": "landing-learn-desktop",
-            "url": f"http://127.0.0.1:{landingPort}/codaro/learn/",
-            "viewport": {"width": 1440, "height": 900},
-            "surface": "landing-learn",
-            "verifyLearnSearch": "pandas",
             "expectedVisualAssetIds": [
                 "pythonFoundationOutcome",
                 "dataReportOutcome",
@@ -1271,6 +1264,13 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
                 "officeAutomationOutcome",
                 "webMonitoringOutcome",
             ],
+        },
+        {
+            "name": "landing-learn-desktop",
+            "url": f"http://127.0.0.1:{landingPort}/codaro/learn/",
+            "viewport": {"width": 1440, "height": 900},
+            "surface": "landing-learn",
+            "verifyLearnSearch": "pandas",
         },
         {
             "name": "landing-public-lesson-desktop",

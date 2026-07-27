@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sourceManifestHash": "sha256-0ea62c5fac86ecea145ffdffb4ab13aaaa5da1c112c01a22ee2b1888d6750ff8",
+  "sourceManifestHash": "sha256-76a856553a50a78ce2133bbc5ccf8bf4f4484248780f182e385d600bf2c28c61",
   "assets": [
     {
       "id": "runLearningDetail",
@@ -91,7 +91,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-bc3656f1acb1d00b5b9f8fc8cdc2ee6dd567d2ade1976a51a9e7ee6210c2f77f"
+        "sourceSetHash": "sha256-9deb6f9a994f665294ad611d9f72eb690ebb722e00e3b505df9d80fd2110da73"
       },
       "outputs": [
         {
@@ -230,7 +230,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-bc3656f1acb1d00b5b9f8fc8cdc2ee6dd567d2ade1976a51a9e7ee6210c2f77f"
+        "sourceSetHash": "sha256-9deb6f9a994f665294ad611d9f72eb690ebb722e00e3b505df9d80fd2110da73"
       },
       "outputs": [
         {
@@ -338,7 +338,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-951848234ed7af5ca3a380b939b6dfc5faf1b66f3f11d6f7144bdf1e2635a64e"
+        "sourceSetHash": "sha256-547e0c742da4950953f47c7955586a8b1ff928944603a752cb924fa14f85d5ba"
       },
       "outputs": [
         {
@@ -472,7 +472,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-951848234ed7af5ca3a380b939b6dfc5faf1b66f3f11d6f7144bdf1e2635a64e"
+        "sourceSetHash": "sha256-547e0c742da4950953f47c7955586a8b1ff928944603a752cb924fa14f85d5ba"
       },
       "outputs": [
         {
@@ -592,7 +592,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-3e160af895ba4edcbb5b56d8044bebbcf39254f2bb3f4934140c04b9475b5178"
+        "sourceSetHash": "sha256-9e4c8785f927297965a9c8d534d378dc4189f211b1bef3ea87cf891637734329"
       },
       "outputs": [
         {
