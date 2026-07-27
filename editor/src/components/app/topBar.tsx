@@ -57,10 +57,7 @@ export function TopControls({
     <>
       {showSidebarTrigger ? (
         <div
-          className={cn(
-            "absolute left-1.5 top-1.5 z-30",
-            surface === "editor" && "sm:hidden",
-          )}
+          className="absolute left-1.5 top-1.5 z-30"
           data-topbar-sidebar-trigger={surface}
         >
           <SidebarTrigger />
@@ -81,7 +78,7 @@ export function TopControls({
 
       {surface === "editor" ? (
         <div
-          className="absolute left-2 top-1/2 z-20 hidden -translate-y-1/2 items-baseline gap-1.5 sm:flex"
+          className="absolute left-11 top-1/2 z-20 hidden -translate-y-1/2 items-baseline gap-1.5 sm:flex"
           data-notebook-brand="codaro"
         >
           <span className="text-[13px] font-semibold tracking-tight text-foreground">Codaro</span>

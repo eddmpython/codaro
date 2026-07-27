@@ -200,6 +200,9 @@ def testNotebookKeepsMobileTitleAndCollapsesSecondaryCellActions() -> None:
     productGate = _read("tests/surface/verifyProductExperiencePlaywright.py")
 
     assert 'left-11 right-[9.5rem]' in topBar
+    assert 'className="absolute left-1.5 top-1.5 z-30"' in topBar
+    assert 'className="absolute left-11 top-1/2 z-20 hidden' in topBar
+    assert 'surface === "editor" && "sm:hidden"' not in topBar
     assert 'data-notebook-title="topbar"' in topBar
     assert 'data-notebook-cell-menu="true"' in notebookPanel
     assert 'aria-label="셀 작업 더보기"' in notebookPanel
