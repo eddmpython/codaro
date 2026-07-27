@@ -1696,7 +1696,11 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
         },
         {
             "name": "web-run-desktop",
-            "url": f"http://127.0.0.1:{webPort}/?surface=editor#editor",
+            "url": (
+                f"http://127.0.0.1:{webPort}/?surface=editor"
+                f"&category=30days&lesson={quote('day01_헬로월드')}"
+                "&path=pythonFoundation&runtime=web&section=py-1axs#editor"
+            ),
             "viewport": {"width": 1440, "height": 900},
             "surface": "web-run",
             "expectedTier": "web",
@@ -2185,6 +2189,8 @@ async ({ surface, expectedTier }) => {
       .filter((editor) => !editorText(editor)).length,
     notebookBrandCount: document.querySelectorAll('[data-notebook-brand="codaro"]').length,
     notebookTitleVisible: Boolean(notebookTitle && inViewport(notebookTitle)),
+    visibleNotebookNoticeCount: [...document.querySelectorAll('[data-topbar-status-notice="editor"]')]
+      .filter(visible).length,
     notebookTopLaneOverlaps,
     notebookWidthControlCount: document.querySelectorAll("[data-notebook-width-option]").length,
     notebookReactiveToggleCount: document.querySelectorAll('[data-notebook-reactive-toggle="true"]').length,
@@ -2508,6 +2514,10 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
                 )
             if audit["notebookBrandCount"] != 1:
                 failures.append(f"{name}: Codaro notebook identity is missing from the top lane")
+            if audit["visibleNotebookNoticeCount"]:
+                failures.append(
+                    f"{name}: background curriculum notice leaked into the free notebook top lane"
+                )
             if audit["notebookTopLaneOverlaps"]:
                 failures.append(
                     f"{name}: notebook top lane controls overlap: {audit['notebookTopLaneOverlaps']}"

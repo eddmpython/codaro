@@ -50,6 +50,7 @@
 - Run·Local·자동화 6-case 모두 공용 우상단 SNS `github`, `support`, `youtube`, `threads`와 같은 theme runtime을 사용한다. 최소 노트북 case는 `Codaro notebook`, 세 폭 control, reactive control, `+ Code`, `+ Markdown`을 함께 검사한다. Web 자동화의 Local 전용 template은 `Local 필요`, Local 연결 뒤 같은 template은 가용 상태다.
 - Chromium, Firefox, WebKit 12-case 시각 접근성 검사에서 theme control, SNS 순서, 키보드 focus, 후원 팝업 focus trap, 정확한 계좌번호 `1002-0421-4626`, Dark·Light 대비와 320px 이상 가로 overflow 0px를 확인했다.
 - 2026-07-27 프로덕션 산출물 기준 `web-run-compact` Dark, `web-run-mobile` Light, `web-run-desktop` Dark, `local-run-minimum` Dark가 Chromium 149에서 각각 통과했다. 모바일 case는 제목 노출, 닫힌 셀 보조 메뉴, 44px trigger의 셀 내부 배치까지 검사한다.
+- 레슨의 category, lesson, path, section query를 가진 URL에서 자유 노트북으로 전환해도 bundled curriculum 로드를 경고로 표시하지 않는다. `web-run-desktop`은 이 실제 전환 URL에서 상단 배경 알림 0개, 빈 code cell 1개와 노트북 control lane을 확인한다.
 - 시각 증거는 `output/test-runner/product-experience-browser/screenshots/{dark,light}/web-run-{desktop,mobile}.png`, Local 증거는 `output/test-runner/product-experience-browser/screenshots/dark/local-run-minimum.png`에 남겼다.
 - 기계 판정은 `output/test-runner/notebook-redesign/`의 Web Dark·Light와 Local report, `output/test-runner/run-local-state-browser/run-local-state-report.json`에 남겼다.
 
@@ -61,6 +62,7 @@
 ## 영향 파일
 
 - `editor/src/components/app/topBar.tsx`: 왼쪽 `Codaro notebook`, 가운데 `Untitled` 제목, 오른쪽 테마와 공용 SNS
+- `editor/src/lib/curriculumSelection.ts`: Web bundled lesson 로드를 정상 배경 상태로 분류해 자유 노트북의 진짜 경고와 분리
 - `editor/src/components/notebook/notebookCommandBar.tsx`: 점진적 실행·저장 상태, 세 문서 폭 control, reactive 전환, floating 전체 실행
 - `editor/src/components/notebook/notebookPanel.tsx`: 빈 code cell, `Shift+Enter` 이동, code/Markdown cell과 output·error 렌더링
 - `editor/src/components/notebook/notebookPanel.css`: 조용한 기본 화면, 문맥형 cell action, compact code/output 계층, mobile control

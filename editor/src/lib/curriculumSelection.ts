@@ -122,7 +122,7 @@ export async function loadCurriculumLessonState(
       emptySnippetDraft: true,
     }),
     notice: {
-      tone: result.online ? "success" : "warning",
+      tone: "success",
       title: translate("curriculum.opened"),
       detail: result.data.document.title,
     },

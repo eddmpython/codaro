@@ -189,7 +189,9 @@ def testNotebookKeepsMobileTitleAndCollapsesSecondaryCellActions() -> None:
     topBar = _read("editor/src/components/app/topBar.tsx")
     notebookPanel = _read("editor/src/components/notebook/notebookPanel.tsx")
     notebookStyles = _read("editor/src/components/notebook/notebookPanel.css")
+    curriculumSelection = _read("editor/src/lib/curriculumSelection.ts")
     autosaveGate = _read("tests/surface/verifyNotebookAutosavePlaywright.py")
+    productGate = _read("tests/surface/verifyProductExperiencePlaywright.py")
 
     assert 'left-11 right-[9.5rem]' in topBar
     assert 'data-notebook-title="topbar"' in topBar
@@ -203,6 +205,9 @@ def testNotebookKeepsMobileTitleAndCollapsesSecondaryCellActions() -> None:
     assert autosaveGate.count('state="attached"') >= 4
     assert 'page.locator("[data-notebook-cell]").first.hover' in autosaveGate
     assert 'page.get_by_label("셀 작업 더보기").first.click' in autosaveGate
+    assert 'tone: "success"' in curriculumSelection
+    assert "visibleNotebookNoticeCount" in productGate
+    assert "background curriculum notice leaked into the free notebook top lane" in productGate
 
 
 def testAppDelegatesProductSurfaceSelectionPolicy() -> None:
