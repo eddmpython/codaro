@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sourceManifestHash": "sha256-30364d991679f1f04ff28030c9d37bfef844b47545b8ca049ad4c30b2ebc95d5",
+  "sourceManifestHash": "sha256-3cd62172b8598f0e8eda067304ef01b85701785ef1c8f060b3f507c628fff42e",
   "assets": [
     {
       "id": "runLearningDetail",
@@ -253,7 +253,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/web-run-desktop.png",
       "sourceHash": "sha256-1ec465145bcb7ece0279e8cd1e28b22264fbbf84a42db3b1133d6d5cde2dc83e",
-      "sourceGitHead": "7caa124d0a08b6ebbe3ec5ad59205a010d55b3eb",
+      "sourceGitHead": "8be681b74fb7ca6d62dd215670e2bf76a8b6b026",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -332,7 +332,7 @@
           "editor/src/styles",
           "editor/vite.config.ts"
         ],
-        "sourceSetHash": "sha256-257de15e216a7e1e80ea039fe4e937d8746b015d444cd5418790ce29e7034326"
+        "sourceSetHash": "sha256-22898a73379828816e3bc77417e5cb75a919b022dff0cc73e78078128fd3af4f"
       },
       "outputs": [
         {
@@ -391,7 +391,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/local-notebook-desktop.png",
       "sourceHash": "sha256-ac92b1d8707c6f2e02f9758b930fbb68a7fb6284b30dbbe80bc500c5e0402341",
-      "sourceGitHead": "7caa124d0a08b6ebbe3ec5ad59205a010d55b3eb",
+      "sourceGitHead": "8be681b74fb7ca6d62dd215670e2bf76a8b6b026",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -464,7 +464,7 @@
           "editor/src/styles",
           "editor/vite.config.ts"
         ],
-        "sourceSetHash": "sha256-257de15e216a7e1e80ea039fe4e937d8746b015d444cd5418790ce29e7034326"
+        "sourceSetHash": "sha256-22898a73379828816e3bc77417e5cb75a919b022dff0cc73e78078128fd3af4f"
       },
       "outputs": [
         {
