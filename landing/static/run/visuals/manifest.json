@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "sourceManifestHash": "sha256-8e82333d0be94402d5a20eb3b36097eb822b7ecc5565af17b28662b357da04fc",
+  "sourceManifestHash": "sha256-da8634e098ebc154fbde128c1bf4d3eabea46b26fb1b2ab2cfa63082ad65ca40",
   "assets": [
     {
       "id": "runLearningDetail",
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
-      "sourcePath": "assets/brand/visuals/product/run-learning-detail.png",
-      "sourceHash": "sha256-2d625aa4eda5c54df34b0a811a7d88af7bab847cde473f781c0df3988195687c",
-      "sourceGitHead": "271c34e422bfe1210f00108322778fafdc0db810",
+      "sourcePath": "assets/brand/visuals/product/run-learning-detail-dark.png",
+      "sourceHash": "sha256-0e062b11ca1e500ee6d5e4227767fae9a3db8b719082febf2ec23e91f642fc77",
+      "sourceGitHead": "5f849c8e45180d96b3bac58443277d57d60b4e8f",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -44,7 +44,7 @@
           720,
           900
         ],
-        "lightDark": "single",
+        "lightDark": "paired",
         "locales": [
           "ko-KR"
         ],
@@ -87,57 +87,203 @@
           "editor/src/lib/learningVisualAssets.ts",
           "editor/src/main.tsx",
           "editor/src/styles",
-          "editor/vite.config.ts"
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-8f7065d59320e857743379094e93f8b49d4224a1e7f9b78407262cbd202407fc"
+        "sourceSetHash": "sha256-8d92fe71d89caac86b637d0b04d35823d7a4b1311c7811563e83a73ad16c6527"
       },
+      "themePairId": "runLearningDetailLight",
       "outputs": [
         {
-          "byteLength": 12357,
+          "byteLength": 12477,
           "format": "avif",
           "height": 405,
-          "integrity": "sha256-0bba809a3323dd64bb4440519ecfb2ae27b04b6a002f389caf3245a321108b06",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-2d625aa4eda5.avif",
+          "integrity": "sha256-e784d11616529de37bf4d528d3acda0df2d3f8a11f24fe735170749e1fe26719",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-0e062b11ca1e.avif",
           "width": 480
         },
         {
-          "byteLength": 13864,
+          "byteLength": 13480,
           "format": "webp",
           "height": 405,
-          "integrity": "sha256-5403ccd5212816fced1d02a9c290ebbfcdfaa68520a679961cb34e0be7d23896",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-2d625aa4eda5.webp",
+          "integrity": "sha256-7aed62b017739997895e5729b44c2fd2e1304df557df7e94acce5bb8deb43562",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-0e062b11ca1e.webp",
           "width": 480
         },
         {
-          "byteLength": 24710,
+          "byteLength": 23370,
           "format": "avif",
           "height": 608,
-          "integrity": "sha256-6b8d5d47cea540c83801084445b7fe79bd2810bbd43f30fa500bb4832edbb60b",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-2d625aa4eda5.avif",
+          "integrity": "sha256-5d5fde6ccfac425de44f80c9171509685e4f78602f6f062e2fb2daa9c54b17b2",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-0e062b11ca1e.avif",
           "width": 720
         },
         {
-          "byteLength": 27468,
+          "byteLength": 25438,
           "format": "webp",
           "height": 608,
-          "integrity": "sha256-cf958ebf12852c947fd753b89136a6fdeb8bdc223b6f0a2e54545689ec45efdc",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-2d625aa4eda5.webp",
+          "integrity": "sha256-c1babe4a0fad9939eb37e755ea98bb8cea6d70997631a5dc4ee6f9f71d17682f",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-0e062b11ca1e.webp",
           "width": 720
         },
         {
-          "byteLength": 26716,
+          "byteLength": 25692,
           "format": "avif",
           "height": 760,
-          "integrity": "sha256-4b318f0b357c1017ecc2251845bf320bc3a037e81901c845a0895968f82d0b68",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-2d625aa4eda5.avif",
+          "integrity": "sha256-abf8806b02f1b40cf5c062db10c175d7d46fb30114298d1755f28e185addc882",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-0e062b11ca1e.avif",
           "width": 900
         },
         {
-          "byteLength": 39008,
+          "byteLength": 37422,
           "format": "webp",
           "height": 760,
-          "integrity": "sha256-675bbc7ce6f9ce31fc7de7551f6029c263e2a2a675bff8b781ef779c9522a9d9",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-2d625aa4eda5.webp",
+          "integrity": "sha256-c3b2c3b9d987060ea084962868e220f161f567ef089a9205de92ac9e480207a1",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-0e062b11ca1e.webp",
+          "width": 900
+        }
+      ]
+    },
+    {
+      "id": "runLearningDetailLight",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run-learning-detail-light.png",
+      "sourceHash": "sha256-45aa6e33dd61c5cd13907584dc37c1885f0ccea0b89569b83127015088cb411f",
+      "sourceGitHead": "5f849c8e45180d96b3bac58443277d57d60b4e8f",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-day1-transfer-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 900,
+        "height": 760,
+        "aspectRatio": 1.184211,
+        "focalPoint": {
+          "x": 0.66,
+          "y": 0.45
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-proof",
+          "learn-proof",
+          "documentation"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          900
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "Codaro 웹 학습 화면에서 헬로월드 목표, 개념 이미지, 학습 순서와 첫 실습이 한 문서 흐름에 표시된 모습",
+        "caption": "목표와 개념 이미지를 읽고 같은 화면 아래의 첫 실습으로 이어집니다.",
+        "learningQuestion": "학습자는 어떤 개념을 익힌 뒤 첫 실습으로 이동하는가?",
+        "decisionShown": "학습 목표, 개념 시각 자료, 학습 순서와 첫 실습의 연결",
+        "lessonRefs": [
+          "30일완성/헬로월드"
+        ]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 900,
+          "height": 760
+        },
+        "theme": "light",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "assets/brand/visuals/learning/python-fundamentals-v1.png",
+          "curricula/python/basics/30days",
+          "editor/src/App.tsx",
+          "editor/src/components/app/curriculumSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/curriculum",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/curriculaRegistry.ts",
+          "editor/src/lib/learningVisualAssets.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-8d92fe71d89caac86b637d0b04d35823d7a4b1311c7811563e83a73ad16c6527"
+      },
+      "themePairId": "runLearningDetail",
+      "outputs": [
+        {
+          "byteLength": 11000,
+          "format": "avif",
+          "height": 405,
+          "integrity": "sha256-1c2676261d6e40b1501cf94021db1a42ad58cf2d11f9debc600f6ffe43d062a4",
+          "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-480-45aa6e33dd61.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 11888,
+          "format": "webp",
+          "height": 405,
+          "integrity": "sha256-cf498ecfb751f8c01d2274e94f215748d95fe581867cfea18a7d5a872a2c588e",
+          "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-480-45aa6e33dd61.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 20998,
+          "format": "avif",
+          "height": 608,
+          "integrity": "sha256-ae587a34885aaa367e74f62c9af219ecdd676947a2855a642a0cecc6975632de",
+          "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-720-45aa6e33dd61.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 23068,
+          "format": "webp",
+          "height": 608,
+          "integrity": "sha256-7d6394442b1b67bb2bac969e2d2511fbaab122e7e71e1ac22937fec871b9ff68",
+          "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-720-45aa6e33dd61.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 24059,
+          "format": "avif",
+          "height": 760,
+          "integrity": "sha256-446d6c0eef8370ed45ac59173ad635fcebf72d3dad652849b712e7cc0391aa0c",
+          "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-900-45aa6e33dd61.avif",
+          "width": 900
+        },
+        {
+          "byteLength": 34386,
+          "format": "webp",
+          "height": 760,
+          "integrity": "sha256-701b9c08b712bdbe9462c14ec032a4fd98c186f8e5d6dc3c9f1a5ef47c2ebfd9",
+          "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-900-45aa6e33dd61.webp",
           "width": 900
         }
       ]
@@ -146,9 +292,9 @@
       "id": "runLearningMobile",
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
-      "sourcePath": "assets/brand/visuals/product/run-learning-mobile.png",
-      "sourceHash": "sha256-7f57fbbe546eed374b2f8b4ce0463557e44373814a0581c6533ab67fedee00ec",
-      "sourceGitHead": "271c34e422bfe1210f00108322778fafdc0db810",
+      "sourcePath": "assets/brand/visuals/product/run-learning-mobile-dark.png",
+      "sourceHash": "sha256-b5f24da57bf66868a6096beaa38c118c909a6edd2e6d59ae016600019a75fec1",
+      "sourceGitHead": "5f849c8e45180d96b3bac58443277d57d60b4e8f",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -181,7 +327,7 @@
         "responsiveWidths": [
           390
         ],
-        "lightDark": "single",
+        "lightDark": "paired",
         "locales": [
           "ko-KR"
         ],
@@ -224,36 +370,147 @@
           "editor/src/lib/learningVisualAssets.ts",
           "editor/src/main.tsx",
           "editor/src/styles",
-          "editor/vite.config.ts"
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-8f7065d59320e857743379094e93f8b49d4224a1e7f9b78407262cbd202407fc"
+        "sourceSetHash": "sha256-8d92fe71d89caac86b637d0b04d35823d7a4b1311c7811563e83a73ad16c6527"
       },
+      "themePairId": "runLearningMobileLight",
       "outputs": [
         {
-          "byteLength": 20167,
+          "byteLength": 18776,
           "format": "avif",
           "height": 844,
-          "integrity": "sha256-a1699553d31d1e9abbf17205dad2d061bd5747ccc1577a62ddd1f316e2ebc860",
-          "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-7f57fbbe546e.avif",
+          "integrity": "sha256-b86a3ab9119e0ed6455bb14cb55ffa395f302af3885d684d2e599a60fad80d71",
+          "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-b5f24da57bf6.avif",
           "width": 390
         },
         {
-          "byteLength": 27906,
+          "byteLength": 24750,
           "format": "webp",
           "height": 844,
-          "integrity": "sha256-2361fbde8258bd873500ed811bf0bbdf3f9099bede0437f2b20beb7bc2f1ab91",
-          "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-7f57fbbe546e.webp",
+          "integrity": "sha256-fa90bc011a0b0066049d0f6c1f710fe2ab188b4cd44d719b380630ada5271b2d",
+          "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-b5f24da57bf6.webp",
           "width": 390
         }
       ]
     },
     {
-      "id": "webRunDesktop",
+      "id": "runLearningMobileLight",
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
-      "sourcePath": "assets/brand/visuals/product/web-run-desktop.png",
-      "sourceHash": "sha256-1ec465145bcb7ece0279e8cd1e28b22264fbbf84a42db3b1133d6d5cde2dc83e",
-      "sourceGitHead": "271c34e422bfe1210f00108322778fafdc0db810",
+      "sourcePath": "assets/brand/visuals/product/run-learning-mobile-light.png",
+      "sourceHash": "sha256-e6084381de822da82b3515af3d1ee653f76cd43bcaddfe5e80d0657589d618e5",
+      "sourceGitHead": "5f849c8e45180d96b3bac58443277d57d60b4e8f",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-lesson-mobile",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 390,
+        "height": 844,
+        "aspectRatio": 0.462085,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.42
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-mobile-proof",
+          "learn-mobile-proof"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          390
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "390픽셀 너비의 Codaro 웹 레슨에서 헬로월드 목표, 개념 이미지와 오늘 배울 순서가 이어지는 모습",
+        "caption": "모바일에서도 목표와 개념 자료를 읽고 오늘 배울 순서를 한 흐름에서 확인합니다.",
+        "learningQuestion": "작은 화면에서도 현재 학습 목표와 오늘 배울 순서를 찾을 수 있는가?",
+        "decisionShown": "모바일 레슨에서 목표, 개념 자료, 학습 순서의 우선순위",
+        "lessonRefs": [
+          "30일완성/헬로월드"
+        ]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "assets/brand/visuals/learning/python-fundamentals-v1.png",
+          "curricula/python/basics/30days",
+          "editor/src/App.tsx",
+          "editor/src/components/app/curriculumSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/curriculum",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/curriculaRegistry.ts",
+          "editor/src/lib/learningVisualAssets.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-8d92fe71d89caac86b637d0b04d35823d7a4b1311c7811563e83a73ad16c6527"
+      },
+      "themePairId": "runLearningMobile",
+      "outputs": [
+        {
+          "byteLength": 16833,
+          "format": "avif",
+          "height": 844,
+          "integrity": "sha256-c138335059c53683d32f1b24959fb6d5d87f0cf8a60db812837297cb9d0f7a24",
+          "publicPath": "/visuals/files/runLearningMobileLight/runLearningMobileLight-390-e6084381de82.avif",
+          "width": 390
+        },
+        {
+          "byteLength": 22832,
+          "format": "webp",
+          "height": 844,
+          "integrity": "sha256-03c74aa084a77ef40fa316ef3ae9d60895e80c454ee5b9a44e7b72135a441450",
+          "publicPath": "/visuals/files/runLearningMobileLight/runLearningMobileLight-390-e6084381de82.webp",
+          "width": 390
+        }
+      ]
+    },
+    {
+      "id": "runLearningHero",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run-learning-hero-dark.png",
+      "sourceHash": "sha256-ec95ae8add825b0270e09dea84157a9809c72f5e3c175e2217efb8fae3529b62",
+      "sourceGitHead": "5f849c8e45180d96b3bac58443277d57d60b4e8f",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -293,7 +550,7 @@
           1080,
           1440
         ],
-        "lightDark": "single",
+        "lightDark": "paired",
         "locales": [
           "ko-KR"
         ],
@@ -330,57 +587,201 @@
           "editor/src/index.css",
           "editor/src/main.tsx",
           "editor/src/styles",
-          "editor/vite.config.ts"
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-2bd7ac90bb1c5376452e2c883e06f8788fa74553bf656a5d8df99c51e3f69209"
+        "sourceSetHash": "sha256-329d0f827e407e9563c3c688f985e07f741a2aac53464a18f56bd3955f6a438c"
       },
+      "themePairId": "runLearningHeroLight",
       "outputs": [
         {
-          "byteLength": 3098,
+          "byteLength": 3042,
           "format": "avif",
           "height": 450,
-          "integrity": "sha256-d9701b3d6e3273abf3e8a53f981d1ba498ffbd397592c00cf9ecc8e8b122c28c",
-          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-720-1ec465145bcb.avif",
+          "integrity": "sha256-adc00f412b363cd2aefbfdc07fa078469ab0cbd4949efa5fd380059787ddf44d",
+          "publicPath": "/visuals/files/runLearningHero/runLearningHero-720-ec95ae8add82.avif",
           "width": 720
         },
         {
-          "byteLength": 2954,
+          "byteLength": 2848,
           "format": "webp",
           "height": 450,
-          "integrity": "sha256-5f1bc8f4b6d8f92bded70c3c71f8327a8a5a3d37e9df92eaf9acead7c242d257",
-          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-720-1ec465145bcb.webp",
+          "integrity": "sha256-3ff3f50696210543603634cc4bdb5b8d1142b151336f702bdc57c3650fa82aa0",
+          "publicPath": "/visuals/files/runLearningHero/runLearningHero-720-ec95ae8add82.webp",
           "width": 720
         },
         {
-          "byteLength": 4941,
+          "byteLength": 4877,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-b1849a55d530719da83b918a8a0185137697b294ac26de127d0edbff72560e8f",
-          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-1080-1ec465145bcb.avif",
+          "integrity": "sha256-75704e0d16ea2ab837897aa67eedc05cf53f999da262e31bfc118fe85fcdf6eb",
+          "publicPath": "/visuals/files/runLearningHero/runLearningHero-1080-ec95ae8add82.avif",
           "width": 1080
         },
         {
-          "byteLength": 5934,
+          "byteLength": 5780,
           "format": "webp",
           "height": 675,
-          "integrity": "sha256-49fd8219d0ff6b58ba8994c5b7d9ee0700251ec1bfc58093a9031f30f8166322",
-          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-1080-1ec465145bcb.webp",
+          "integrity": "sha256-d2032c3b67557bdf3864a5ab280807c12571604f194f2cd53073e8fbd1154e25",
+          "publicPath": "/visuals/files/runLearningHero/runLearningHero-1080-ec95ae8add82.webp",
           "width": 1080
         },
         {
-          "byteLength": 6830,
+          "byteLength": 6876,
           "format": "avif",
           "height": 900,
-          "integrity": "sha256-a48d7dc745c34f5a77f5a4e6fb884205f9d0714bed37cae850f717db7330e3c1",
-          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-1440-1ec465145bcb.avif",
+          "integrity": "sha256-d2665e0a819ae2482c4cd4fcaa8742aa13e0126b9d4093c520ae5e10ae4e2a8f",
+          "publicPath": "/visuals/files/runLearningHero/runLearningHero-1440-ec95ae8add82.avif",
           "width": 1440
         },
         {
-          "byteLength": 8986,
+          "byteLength": 8792,
           "format": "webp",
           "height": 900,
-          "integrity": "sha256-1e76f27a92155549a4d9b66015a546fe238a82ff91f99ad7c51f1fc6f8b0ba4e",
-          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-1440-1ec465145bcb.webp",
+          "integrity": "sha256-6644048a076b43e89c637ed8d04ede38647130cc4a1a4c05dda654ea4731e5eb",
+          "publicPath": "/visuals/files/runLearningHero/runLearningHero-1440-ec95ae8add82.webp",
+          "width": 1440
+        }
+      ]
+    },
+    {
+      "id": "runLearningHeroLight",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run-learning-hero-light.png",
+      "sourceHash": "sha256-5b95612f02ef08633a78380ba7af10a578dcb4ed78bcef95a36043438777e94d",
+      "sourceGitHead": "5f849c8e45180d96b3bac58443277d57d60b4e8f",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-run-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1440,
+        "height": 900,
+        "aspectRatio": 1.6,
+        "focalPoint": {
+          "x": 0.52,
+          "y": 0.34
+        },
+        "safeTextRegion": {
+          "x": 0.2,
+          "y": 0.32,
+          "width": 0.48,
+          "height": 0.48
+        },
+        "fit": "cover",
+        "background": "surface",
+        "proofUsage": [
+          "landing-hero-background",
+          "web-run-proof"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          720,
+          1080,
+          1440
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "한 개의 빈 Python 셀과 셀 추가 및 실행 컨트롤만 보이는 현재 Codaro Web Run 노트북",
+        "caption": "Web Run은 한 개의 빈 셀에서 시작하고 필요한 셀과 노트북 도구만 사용자가 직접 엽니다.",
+        "learningQuestion": "처음 진입한 사용자는 어디에 코드를 입력하고 어떻게 실행하는가?",
+        "decisionShown": "빈 셀, 셀 추가, reactive 실행과 전체 실행의 최소 노트북 흐름",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "theme": "light",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/src/App.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/notebookSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/notebook",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-329d0f827e407e9563c3c688f985e07f741a2aac53464a18f56bd3955f6a438c"
+      },
+      "themePairId": "runLearningHero",
+      "outputs": [
+        {
+          "byteLength": 2955,
+          "format": "avif",
+          "height": 450,
+          "integrity": "sha256-05e1668b67230e063d910acb0068960824c1bd01b1f06bc238258d2e13278ceb",
+          "publicPath": "/visuals/files/runLearningHeroLight/runLearningHeroLight-720-5b95612f02ef.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 2894,
+          "format": "webp",
+          "height": 450,
+          "integrity": "sha256-e9744890f36547a885e6ebe4607f0081011e05f60099c9252ff77210ea81c8b5",
+          "publicPath": "/visuals/files/runLearningHeroLight/runLearningHeroLight-720-5b95612f02ef.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 4787,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-a8410e1f5386266f2bf83892046fb1a296ded74545dc08f844babe9d9bbd269a",
+          "publicPath": "/visuals/files/runLearningHeroLight/runLearningHeroLight-1080-5b95612f02ef.avif",
+          "width": 1080
+        },
+        {
+          "byteLength": 5690,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-499fecd9bb5d5510e3d20d4a28d19345f37c0dce64c928618c5078c68e9a66e5",
+          "publicPath": "/visuals/files/runLearningHeroLight/runLearningHeroLight-1080-5b95612f02ef.webp",
+          "width": 1080
+        },
+        {
+          "byteLength": 6883,
+          "format": "avif",
+          "height": 900,
+          "integrity": "sha256-5242ef4bd83b15074ec1c06c47c4165b0e0677cfe6ed9f73789be2ed4b779a03",
+          "publicPath": "/visuals/files/runLearningHeroLight/runLearningHeroLight-1440-5b95612f02ef.avif",
+          "width": 1440
+        },
+        {
+          "byteLength": 8546,
+          "format": "webp",
+          "height": 900,
+          "integrity": "sha256-4cf52c51b0a81db1d18d1b1b4ce0f3040805c5a3b3ebf8f997031fd579769e62",
+          "publicPath": "/visuals/files/runLearningHeroLight/runLearningHeroLight-1440-5b95612f02ef.webp",
           "width": 1440
         }
       ]
@@ -389,9 +790,9 @@
       "id": "localNotebookDesktop",
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
-      "sourcePath": "assets/brand/visuals/product/local-notebook-desktop.png",
-      "sourceHash": "sha256-ac92b1d8707c6f2e02f9758b930fbb68a7fb6284b30dbbe80bc500c5e0402341",
-      "sourceGitHead": "271c34e422bfe1210f00108322778fafdc0db810",
+      "sourcePath": "assets/brand/visuals/product/local-notebook-desktop-dark.png",
+      "sourceHash": "sha256-4193c65fda8b6f17727e124ddc645f5e35d1d2cd9f764d54dfc3db2f2f06cce7",
+      "sourceGitHead": "5f849c8e45180d96b3bac58443277d57d60b4e8f",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -425,7 +826,7 @@
           600,
           900
         ],
-        "lightDark": "single",
+        "lightDark": "paired",
         "locales": [
           "ko-KR"
         ],
@@ -462,41 +863,163 @@
           "editor/src/index.css",
           "editor/src/main.tsx",
           "editor/src/styles",
-          "editor/vite.config.ts"
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-2bd7ac90bb1c5376452e2c883e06f8788fa74553bf656a5d8df99c51e3f69209"
+        "sourceSetHash": "sha256-329d0f827e407e9563c3c688f985e07f741a2aac53464a18f56bd3955f6a438c"
       },
+      "themePairId": "localNotebookDesktopLight",
       "outputs": [
         {
-          "byteLength": 3935,
+          "byteLength": 3742,
           "format": "avif",
           "height": 427,
-          "integrity": "sha256-3d445fb6a0774a9335ca6340d96700f04903ada69504ce7071b5e1d63427808c",
-          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-600-ac92b1d8707c.avif",
+          "integrity": "sha256-133ebd556ccea1933b7c64032bfa375dd3d647c5bbcf063557bd44d78b7eb2ad",
+          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.avif",
           "width": 600
         },
         {
-          "byteLength": 4190,
+          "byteLength": 4118,
           "format": "webp",
           "height": 427,
-          "integrity": "sha256-d1aaea461f80e8b206555f57fa0f420744949ff7cfd4f6a41f789beb4672bcb0",
-          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-600-ac92b1d8707c.webp",
+          "integrity": "sha256-1fdc00e3d0227c4cc57ebbfee266eb6f3d6daf66d5ccfe3872bd5c1877143e11",
+          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.webp",
           "width": 600
         },
         {
-          "byteLength": 5298,
+          "byteLength": 5239,
           "format": "avif",
           "height": 640,
-          "integrity": "sha256-3d1cdc908f4c75202c4553cfaa55b72d56e30d6352b4d5922dee9c33b90ebbba",
-          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-900-ac92b1d8707c.avif",
+          "integrity": "sha256-28a51ebf9343d3007ec3b95113fd6829456e35556a6776ded27c53d7113ae15b",
+          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.avif",
           "width": 900
         },
         {
-          "byteLength": 7520,
+          "byteLength": 7312,
           "format": "webp",
           "height": 640,
-          "integrity": "sha256-02d9af2cd83af03572104e4ae47ce5f1f56ff5302e0e0aee0014a124a4ca9f7f",
-          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-900-ac92b1d8707c.webp",
+          "integrity": "sha256-cc7e967dd2ddbe81d2eef0bb3490e37e32b68dd1c4aa439b63fdf879dac1b992",
+          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.webp",
+          "width": 900
+        }
+      ]
+    },
+    {
+      "id": "localNotebookDesktopLight",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/local-notebook-desktop-light.png",
+      "sourceHash": "sha256-0f7e9e1a96767bd6fd2482518e780e14ffe255f6a57454a7374a42641f2a92d2",
+      "sourceGitHead": "5f849c8e45180d96b3bac58443277d57d60b4e8f",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "local-run-minimum",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 900,
+        "height": 640,
+        "aspectRatio": 1.40625,
+        "focalPoint": {
+          "x": 0.66,
+          "y": 0.3
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-local-proof",
+          "local-empty-state"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          600,
+          900
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "한 개의 빈 Python 셀과 셀 추가 및 실행 컨트롤만 보이는 현재 Codaro Local 노트북",
+        "caption": "Local도 Web Run과 같은 한 셀 노트북에서 시작하고 운영체제 기능은 필요한 표면에서 확장합니다.",
+        "learningQuestion": "같은 노트북 문서 구조가 Local에서도 유지되는가?",
+        "decisionShown": "Web Run과 Local이 공유하는 최소 노트북 캔버스",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 900,
+          "height": 640
+        },
+        "theme": "light",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/src/App.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/notebookSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/notebook",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-329d0f827e407e9563c3c688f985e07f741a2aac53464a18f56bd3955f6a438c"
+      },
+      "themePairId": "localNotebookDesktop",
+      "outputs": [
+        {
+          "byteLength": 3666,
+          "format": "avif",
+          "height": 427,
+          "integrity": "sha256-482614fe0f44ffb39500c86b55600a92b22b5add6771f54f1c742715975f9f60",
+          "publicPath": "/visuals/files/localNotebookDesktopLight/localNotebookDesktopLight-600-0f7e9e1a9676.avif",
+          "width": 600
+        },
+        {
+          "byteLength": 4204,
+          "format": "webp",
+          "height": 427,
+          "integrity": "sha256-99ee728d074a1832f80af31709d6deb939a20ae0229a67c942836b851a38f586",
+          "publicPath": "/visuals/files/localNotebookDesktopLight/localNotebookDesktopLight-600-0f7e9e1a9676.webp",
+          "width": 600
+        },
+        {
+          "byteLength": 5055,
+          "format": "avif",
+          "height": 640,
+          "integrity": "sha256-e96eec8281858743d73c12631da6654685312db90904be82523b5611b1a61ca5",
+          "publicPath": "/visuals/files/localNotebookDesktopLight/localNotebookDesktopLight-900-0f7e9e1a9676.avif",
+          "width": 900
+        },
+        {
+          "byteLength": 7254,
+          "format": "webp",
+          "height": 640,
+          "integrity": "sha256-7924a99f32c59987448462bf0b9b9e90c106632bc10bc1c8a2248d8b4b1bf9ab",
+          "publicPath": "/visuals/files/localNotebookDesktopLight/localNotebookDesktopLight-900-0f7e9e1a9676.webp",
           "width": 900
         }
       ]
@@ -505,9 +1028,9 @@
       "id": "localAutomationDesktop",
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
-      "sourcePath": "assets/brand/visuals/product/local-automation-desktop.png",
-      "sourceHash": "sha256-1d7fdf9b67aadc82144e6f4529c1280a1e3e9eae14a98b49cfa5ae78e67bdebb",
-      "sourceGitHead": "271c34e422bfe1210f00108322778fafdc0db810",
+      "sourcePath": "assets/brand/visuals/product/local-automation-desktop-dark.png",
+      "sourceHash": "sha256-7b8a0ff9efc302167968e3477454d765f7969cba21ab5c923cc7495e18aa07a8",
+      "sourceGitHead": "5f849c8e45180d96b3bac58443277d57d60b4e8f",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -542,7 +1065,7 @@
           1080,
           1440
         ],
-        "lightDark": "single",
+        "lightDark": "paired",
         "locales": [
           "ko-KR"
         ],
@@ -580,58 +1103,948 @@
           "editor/src/lib/automationState.ts",
           "editor/src/main.tsx",
           "editor/src/styles",
-          "editor/vite.config.ts"
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-59b11d991aba7fb6a5960c84f9fd4d51a50e1e709941b175c9c8744c10835b0b"
+        "sourceSetHash": "sha256-5519c78cc1647200328b765ce6fb550e869f729a2a606ebe26e83468ae032b39"
+      },
+      "themePairId": "localAutomationDesktopLight",
+      "outputs": [
+        {
+          "byteLength": 17604,
+          "format": "avif",
+          "height": 450,
+          "integrity": "sha256-e25c7429ea97efd315be906f4cc10ad9e1bc7473ddfdd197a9ea6b6cb5b2d723",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-720-7b8a0ff9efc3.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 18552,
+          "format": "webp",
+          "height": 450,
+          "integrity": "sha256-78587b4dc14709042158f3c7473fba3efb41a5d386267b5a6711abb7ca14f4dc",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-720-7b8a0ff9efc3.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 34621,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-942fcc7e22eb77ba47879b477af898e114165b779ab31a9b5e22fb1a8016331b",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-7b8a0ff9efc3.avif",
+          "width": 1080
+        },
+        {
+          "byteLength": 36264,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-6229a385101ccb4c4e385aafa0b03547e253d8599df6a11b8615bdc921b3dcbc",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-7b8a0ff9efc3.webp",
+          "width": 1080
+        },
+        {
+          "byteLength": 41076,
+          "format": "avif",
+          "height": 900,
+          "integrity": "sha256-f34a363848e20b35a7c7b449e0587c6f9c17ae557d5e6d89ee54e2bf86997f80",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-7b8a0ff9efc3.avif",
+          "width": 1440
+        },
+        {
+          "byteLength": 58502,
+          "format": "webp",
+          "height": 900,
+          "integrity": "sha256-e1202d6c0f85212063a352f8955c7573c355c4601fa0a5f962ee75ec5e833d26",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-7b8a0ff9efc3.webp",
+          "width": 1440
+        }
+      ]
+    },
+    {
+      "id": "localAutomationDesktopLight",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/local-automation-desktop-light.png",
+      "sourceHash": "sha256-721ed30622b6dd2944ba1c5827276bdf8c032df9441beca21e92b05816c87d53",
+      "sourceGitHead": "5f849c8e45180d96b3bac58443277d57d60b4e8f",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "local-automation-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1440,
+        "height": 900,
+        "aspectRatio": 1.6,
+        "focalPoint": {
+          "x": 0.62,
+          "y": 0.45
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-automation-proof",
+          "local-automation-operational-state"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          720,
+          1080,
+          1440
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "Codaro Local 자동화 화면에서 브라우저 루틴, 파일 정리, 엑셀 반복 작업과 예약 태스크 상태가 보이는 모습",
+        "caption": "검증된 셀과 recipe는 로컬에서 파일 작업과 예약 실행으로 확장됩니다.",
+        "learningQuestion": "반복 실행할 수 있는 코드와 아직 학습 중인 코드를 어떻게 구분하는가?",
+        "decisionShown": "검증된 코드가 자동화 recipe와 task로 승격되는 경계",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "theme": "light",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/src/App.tsx",
+          "editor/src/components/app/automationSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/automation",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/automationState.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-5519c78cc1647200328b765ce6fb550e869f729a2a606ebe26e83468ae032b39"
+      },
+      "themePairId": "localAutomationDesktop",
+      "outputs": [
+        {
+          "byteLength": 16523,
+          "format": "avif",
+          "height": 450,
+          "integrity": "sha256-51590674cbc152db3e788e95c5dc72b9547b004437fe82f996d5ca79fb298dbe",
+          "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-720-721ed30622b6.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 17160,
+          "format": "webp",
+          "height": 450,
+          "integrity": "sha256-b1a37fc767d5ac1a688cf26075d5686cc1074b3a6c8bfbcfd24822d1b4fa50c8",
+          "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-720-721ed30622b6.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 32194,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-b6d22a5d36685c4359976bf8f7f23dfc2b19ef0d8f0cf5872ebbd037319d5e21",
+          "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1080-721ed30622b6.avif",
+          "width": 1080
+        },
+        {
+          "byteLength": 34000,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-c0234441df15112af2a32e2d10ce10605395ef22973205a66769fd600e8324f8",
+          "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1080-721ed30622b6.webp",
+          "width": 1080
+        },
+        {
+          "byteLength": 39967,
+          "format": "avif",
+          "height": 900,
+          "integrity": "sha256-3a2d1d247fd08b4677a97a502de296696624357ffcb7c15da5b9f773c2c43f3a",
+          "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1440-721ed30622b6.avif",
+          "width": 1440
+        },
+        {
+          "byteLength": 56132,
+          "format": "webp",
+          "height": 900,
+          "integrity": "sha256-9ac46dc40e0b5786b8f5eba7439df1df4ae01b0172307b2e629effbdd654539b",
+          "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1440-721ed30622b6.webp",
+          "width": 1440
+        }
+      ]
+    },
+    {
+      "id": "dataReportOutcome",
+      "kind": "outcomeProof",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/outcomes/dataReportOutcome.png",
+      "sourceHash": "sha256-ec957d18c47b7601355a4ae34fa065f024becf24178692e66a8055663ddc3ff7",
+      "sourceGitHead": "ff476a02f52a1875273252a251dff7047896ded6",
+      "provenance": {
+        "author": "Codaro outcome capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "data-report-monthly-channel-v1",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1200,
+        "height": 675,
+        "aspectRatio": 1.777778,
+        "focalPoint": {
+          "x": 0.62,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-outcome",
+          "path-dataReporting",
+          "learn-outcome"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "orders.csv의 채널별 주문과 매출 행이 총 주문, 총 매출, 채널별 막대와 검증 영수증이 있는 월간 보고서로 바뀐 결과",
+        "caption": "원본 CSV 네 행을 집계해 합계와 채널 비교가 읽히는 보고서를 만들고 행 수와 합계를 다시 검산합니다.",
+        "learningQuestion": "원본 행은 어떤 집계와 검증을 거쳐 의사결정 가능한 보고서가 되는가?",
+        "decisionShown": "원본 표, 집계 지표, 채널 비교 차트와 합계 검증의 전후 관계",
+        "lessonRefs": [
+          "pandas/10_실전종합프로젝트"
+        ]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1200,
+          "height": 675
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/fonts",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/tools/captureOutcomeProofs.py",
+          "assets/brand/visuals/outcomes/fixtures.json"
+        ],
+        "sourceSetHash": "sha256-8c92ba3676a0f0826f094330f171b2960964add612bbbb585e62d62a938a2197"
       },
       "outputs": [
         {
-          "byteLength": 16422,
+          "byteLength": 4384,
           "format": "avif",
-          "height": 450,
-          "integrity": "sha256-7aa2200f05c099e9c65d4b2a05d9870095e4e1dfe73ce67c87aeba92a905dafd",
-          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-720-1d7fdf9b67aa.avif",
+          "height": 270,
+          "integrity": "sha256-ad4cfd2da09c0937368b52fe592e541f3ff8abbbf99dc767872271bf6945ead0",
+          "publicPath": "/visuals/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 4352,
+          "format": "webp",
+          "height": 270,
+          "integrity": "sha256-9cbeebb6c112489b64f30c54c7c2f399d55efa241dcd51939b508e0261bb1e62",
+          "publicPath": "/visuals/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 7581,
+          "format": "avif",
+          "height": 405,
+          "integrity": "sha256-3fd5b0b2ad1c37bf60dcb394522ddefe58c2e6e04839e7583f25e15de2d7adec",
+          "publicPath": "/visuals/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.avif",
           "width": 720
         },
         {
-          "byteLength": 16766,
+          "byteLength": 7648,
           "format": "webp",
-          "height": 450,
-          "integrity": "sha256-20d73ba8aeb425a47bb622e217be1c93c45dafe7495e70014b3844e92037a6fb",
-          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-720-1d7fdf9b67aa.webp",
+          "height": 405,
+          "integrity": "sha256-efdfabe6fe5b4ac2ad1a94ffe0a7a91e82083426c19f4fac2381451627dd65ca",
+          "publicPath": "/visuals/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.webp",
           "width": 720
         },
         {
-          "byteLength": 31672,
+          "byteLength": 12151,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-5248aef1fea61e1db69551b1cd1141ae6dfd1615b243bd025f7d13e905b6d1a8",
-          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-1d7fdf9b67aa.avif",
-          "width": 1080
+          "integrity": "sha256-45dbbdd22708a81ce366c4d4dd245959e94c0002accc47fdc33f1619af22baa8",
+          "publicPath": "/visuals/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.avif",
+          "width": 1200
         },
         {
-          "byteLength": 33240,
+          "byteLength": 17602,
           "format": "webp",
           "height": 675,
-          "integrity": "sha256-a38a3e53b4c374f48c3bfc0ad3087731edc8fdf689f82cd91f07863e67261fb0",
-          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-1d7fdf9b67aa.webp",
-          "width": 1080
+          "integrity": "sha256-97d666ec9432909bedd088ae1eda0afd0ad3810e9beabf5661bd419fead54595",
+          "publicPath": "/visuals/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.webp",
+          "width": 1200
+        }
+      ]
+    },
+    {
+      "id": "fileAutomationOutcome",
+      "kind": "outcomeProof",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/outcomes/fileAutomationOutcome.png",
+      "sourceHash": "sha256-ce17121e083ea0e261de403e19eaefb5c5ed9e59b493d57dd40c13974468d728",
+      "sourceGitHead": "ff476a02f52a1875273252a251dff7047896ded6",
+      "provenance": {
+        "author": "Codaro outcome capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "file-automation-downloads-v1",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1200,
+        "height": 675,
+        "aspectRatio": 1.777778,
+        "focalPoint": {
+          "x": 0.62,
+          "y": 0.5
         },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-outcome",
+          "path-fileAutomation",
+          "learn-outcome"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "Downloads의 CSV, PDF, PNG, TXT, Markdown 파일 다섯 개가 데이터, 문서, 이미지 폴더로 분류되고 원본 보존 검증을 통과한 결과",
+        "caption": "정리 전 파일 목록을 확장자 규칙으로 세 폴더에 배치하고 dry-run, 충돌, 원본 보존을 함께 확인합니다.",
+        "learningQuestion": "실제 파일을 옮기기 전에 분류 결과와 충돌 위험을 어떻게 확인하는가?",
+        "decisionShown": "정리 전 파일, 정리 후 폴더 구조와 안전한 dry-run 영수증",
+        "lessonRefs": [
+          "fileOps/10_종합다운로드폴더정리"
+        ]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1200,
+          "height": 675
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/fonts",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/tools/captureOutcomeProofs.py",
+          "assets/brand/visuals/outcomes/fixtures.json"
+        ],
+        "sourceSetHash": "sha256-8c92ba3676a0f0826f094330f171b2960964add612bbbb585e62d62a938a2197"
+      },
+      "outputs": [
         {
-          "byteLength": 37367,
+          "byteLength": 3966,
           "format": "avif",
-          "height": 900,
-          "integrity": "sha256-534de13bb2fb19a61a15e37367cc724c014b0c450ae604706d22a9735ff6f671",
-          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-1d7fdf9b67aa.avif",
-          "width": 1440
+          "height": 270,
+          "integrity": "sha256-2afd0380e6d521d0b45e28e4b927e566e1ab485b31f1236d781c6079d7f8547c",
+          "publicPath": "/visuals/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.avif",
+          "width": 480
         },
         {
-          "byteLength": 52584,
+          "byteLength": 3874,
           "format": "webp",
-          "height": 900,
-          "integrity": "sha256-f547815f10bde82a9779c8c82f4d3cd58c458c28c1617b2b3917fb7f279af555",
-          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-1d7fdf9b67aa.webp",
-          "width": 1440
+          "height": 270,
+          "integrity": "sha256-667359fb4bdcfe73b3b42762e550f29c1344451b537b6e5ceca35bcfda720dd9",
+          "publicPath": "/visuals/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 6698,
+          "format": "avif",
+          "height": 405,
+          "integrity": "sha256-9eb0c6a6494dd8f70c34db0adb78000815213842a3db6011f05e272e324dbcd4",
+          "publicPath": "/visuals/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 6872,
+          "format": "webp",
+          "height": 405,
+          "integrity": "sha256-e8bc9e3f5304b950c082fadc01ddb6249b45cb536562ddb64a2d9c51f7972510",
+          "publicPath": "/visuals/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 11598,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-94eb73ae689d6e1db7f20bf345b1115508ae71b1b85f9c8811bd4e85bc526a6b",
+          "publicPath": "/visuals/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 15630,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-47f3123bd0ba66f59551cb9f3a8b05d445c1c54754f037d99b78f4e3fc536087",
+          "publicPath": "/visuals/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.webp",
+          "width": 1200
+        }
+      ]
+    },
+    {
+      "id": "officeAutomationOutcome",
+      "kind": "outcomeProof",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/outcomes/officeAutomationOutcome.png",
+      "sourceHash": "sha256-f1c770d50406d59749e42c04c5a24c4359cca201c38290ffb904981423a98197",
+      "sourceGitHead": "ff476a02f52a1875273252a251dff7047896ded6",
+      "provenance": {
+        "author": "Codaro outcome capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "office-automation-monthly-sales-v1",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1200,
+        "height": 675,
+        "aspectRatio": 1.777778,
+        "focalPoint": {
+          "x": 0.62,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-outcome",
+          "path-officeAutomation",
+          "learn-outcome"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "sales.xlsx의 4월부터 7월 목표와 실적 표가 목표, 실적, 달성률과 월별 차이를 가진 월간 보고서 sheet로 바뀐 결과",
+        "caption": "원본 workbook의 월별 값을 보고서 sheet로 집계하고 수식 결과와 합계를 재검산합니다.",
+        "learningQuestion": "보이는 workbook 결과와 다시 열어 검증할 구조 정보는 어떻게 함께 남는가?",
+        "decisionShown": "입력 sheet, 보고서 sheet, 수식 집계와 재검산 영수증",
+        "lessonRefs": [
+          "openpyxl/10_월간매출리포트생성기"
+        ]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1200,
+          "height": 675
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/fonts",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/tools/captureOutcomeProofs.py",
+          "assets/brand/visuals/outcomes/fixtures.json"
+        ],
+        "sourceSetHash": "sha256-8c92ba3676a0f0826f094330f171b2960964add612bbbb585e62d62a938a2197"
+      },
+      "outputs": [
+        {
+          "byteLength": 5322,
+          "format": "avif",
+          "height": 270,
+          "integrity": "sha256-44c9bed4b2cf597c90182b63aa2d231de0d48a897dcd0f36f0a43ba5327b5881",
+          "publicPath": "/visuals/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 5274,
+          "format": "webp",
+          "height": 270,
+          "integrity": "sha256-ede776527e99aece692cd97982d2104d51fbb584e7d2f850a0bcd1ac973fe2bc",
+          "publicPath": "/visuals/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 9103,
+          "format": "avif",
+          "height": 405,
+          "integrity": "sha256-a755d1f1aac03b7847bb4adbd920fd336e17337fc451b1bfb161247e03c5c488",
+          "publicPath": "/visuals/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 9322,
+          "format": "webp",
+          "height": 405,
+          "integrity": "sha256-0002c7a17aa74c1047ed2401e4010c03b7eed33e4de9473605c801aa0107c66c",
+          "publicPath": "/visuals/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 15691,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-e1c1747baa5415975d0cb3cbfb3623c7d56be54a03b351e9bfb2af72ea5e49b2",
+          "publicPath": "/visuals/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 20968,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-74eb34130edb28daec5cf8399bc022a4aca905c4d894153580978278fa22cba7",
+          "publicPath": "/visuals/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.webp",
+          "width": 1200
+        }
+      ]
+    },
+    {
+      "id": "webMonitoringOutcome",
+      "kind": "outcomeProof",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/outcomes/webMonitoringOutcome.png",
+      "sourceHash": "sha256-9fc0240d4f0ffd145d15c4d013fd0a73d2237078791806bc8f924458a6d5d00d",
+      "sourceGitHead": "ff476a02f52a1875273252a251dff7047896ded6",
+      "provenance": {
+        "author": "Codaro outcome capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-monitoring-checkout-v1",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1200,
+        "height": 675,
+        "aspectRatio": 1.777778,
+        "focalPoint": {
+          "x": 0.62,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-outcome",
+          "path-webMonitoring",
+          "learn-outcome"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "결제 fixture의 응답, 버튼, 접근성 이름, 네트워크 요청 네 항목이 모두 통과하고 화면 증거 파일과 해시가 남은 점검 결과",
+        "caption": "페이지 상태 네 항목을 검사하고 실행 시간, 화면 증거와 검증 범위를 하나의 감사 결과로 묶습니다.",
+        "learningQuestion": "브라우저 자동화가 성공했다는 주장을 어떤 상태와 증거로 재현하는가?",
+        "decisionShown": "상태 점검, 성공·실패 집계, screenshot 해시와 감사 범위",
+        "lessonRefs": [
+          "playwright/10_종합브라우저점검프로젝트"
+        ]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1200,
+          "height": 675
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/fonts",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/tools/captureOutcomeProofs.py",
+          "assets/brand/visuals/outcomes/fixtures.json"
+        ],
+        "sourceSetHash": "sha256-8c92ba3676a0f0826f094330f171b2960964add612bbbb585e62d62a938a2197"
+      },
+      "outputs": [
+        {
+          "byteLength": 3970,
+          "format": "avif",
+          "height": 270,
+          "integrity": "sha256-3fcbe8f5d1b392a04cc508d9d188582ef75cf18cf739cc31bf59793c9a3007ba",
+          "publicPath": "/visuals/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 3904,
+          "format": "webp",
+          "height": 270,
+          "integrity": "sha256-db60bf3bb022ddc201eef5fc8b9422637cee14b5f1ecb3bc03bdb401f37b7e5a",
+          "publicPath": "/visuals/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 6866,
+          "format": "avif",
+          "height": 405,
+          "integrity": "sha256-4feaed9dbba456df71745dcb3ab0986c39c9e74b86963b6799ab718e338540e7",
+          "publicPath": "/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 6882,
+          "format": "webp",
+          "height": 405,
+          "integrity": "sha256-1e19a8dbb1d5e568f8139404b5307e391393acfc80af173d2b6bfa8cc9ca57ee",
+          "publicPath": "/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 11895,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-32d5c78b289a61e9f5c4cfce017064cf9f20698eb5009a4b112539b6000432ac",
+          "publicPath": "/visuals/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 15896,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-cd8a308afee85e345cd7c964d988da1177891aa09c7d0aa1f047cf625e805509",
+          "publicPath": "/visuals/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.webp",
+          "width": 1200
+        }
+      ]
+    },
+    {
+      "id": "pythonFoundationOutcome",
+      "kind": "outcomeProof",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/outcomes/pythonFoundationOutcome.png",
+      "sourceHash": "sha256-f6dc75e2fa349545a7a1d399f3121af390d3307bd09478ce628283999244c1d3",
+      "sourceGitHead": "ff476a02f52a1875273252a251dff7047896ded6",
+      "provenance": {
+        "author": "Codaro outcome capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "python-foundation-sales-reports-v1",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1200,
+        "height": 675,
+        "aspectRatio": 1.777778,
+        "focalPoint": {
+          "x": 0.62,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-outcome",
+          "path-pythonFoundation",
+          "learn-outcome"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "sales-a.csv와 sales-b.csv의 품목별 금액 다섯 행이 count, total, average를 가진 report-a.json과 report-b.json으로 바뀌고 반환값과 저장값 검증을 통과한 결과",
+        "caption": "서로 다른 두 CSV를 같은 함수로 처리해 JSON 보고서 두 개를 만들고 반환값과 저장된 값을 다시 대조합니다.",
+        "learningQuestion": "하나의 Python 함수가 서로 다른 입력에서도 같은 산출물 계약을 지키는지 어떻게 확인하는가?",
+        "decisionShown": "두 CSV 입력, 집계 결과, JSON 파일과 숨은 입력 검증의 전후 관계",
+        "lessonRefs": [
+          "30days/day30_최종프로젝트"
+        ]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1200,
+          "height": 675
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/fonts",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/tools/captureOutcomeProofs.py",
+          "assets/brand/visuals/outcomes/fixtures.json"
+        ],
+        "sourceSetHash": "sha256-8c92ba3676a0f0826f094330f171b2960964add612bbbb585e62d62a938a2197"
+      },
+      "outputs": [
+        {
+          "byteLength": 4909,
+          "format": "avif",
+          "height": 270,
+          "integrity": "sha256-d58c81a2efd8710fa1f250fb14a856128754a4d85d2f707227223dc40a04a41b",
+          "publicPath": "/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 5044,
+          "format": "webp",
+          "height": 270,
+          "integrity": "sha256-a4c6f89562ca1761ee02db21c310f079f8c35643c868523538b363b301ab97a5",
+          "publicPath": "/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 8415,
+          "format": "avif",
+          "height": 405,
+          "integrity": "sha256-df3e6a090930b2f16abe391e9bb2337c6e56cc56a2912e6635c576b60ed9c69f",
+          "publicPath": "/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 8566,
+          "format": "webp",
+          "height": 405,
+          "integrity": "sha256-4dd060319a5fc02b785becedf06962997c156e128b96d671499c3da3bc80f61a",
+          "publicPath": "/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 14760,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-458bd6022191cd84cf00c6d4b6ed0aff8e4abbf0729a3b25e38c2486dc7578be",
+          "publicPath": "/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 19632,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-19ed667ce49b03d158cbfd78a8f70b837d063f9b9995ee126dc672844ce4c366",
+          "publicPath": "/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.webp",
+          "width": 1200
+        }
+      ]
+    },
+    {
+      "id": "dataVisualizationOutcome",
+      "kind": "outcomeProof",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/outcomes/dataVisualizationOutcome.png",
+      "sourceHash": "sha256-3e10f67c139c1d2d0866588d82e31db62fb59f4128f874235fbd55ee2794e61f",
+      "sourceGitHead": "ff476a02f52a1875273252a251dff7047896ded6",
+      "provenance": {
+        "author": "Codaro outcome capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "data-visualization-eda-evidence-v1",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1200,
+        "height": 675,
+        "aspectRatio": 1.777778,
+        "focalPoint": {
+          "x": 0.62,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-outcome",
+          "path-dataVisualization",
+          "learn-outcome"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "EDA 입력 세 행에서 metric이 있는 두 행과 NULL 한 행을 분리해 panel별 막대 PNG와 CSV 증거를 만들고 320×180 크기를 재검산한 결과",
+        "caption": "차트에 들어간 행과 제외된 행을 숨기지 않고 CSV 증거, 실제 PNG preview와 함께 남깁니다.",
+        "learningQuestion": "차트가 보여 주는 패턴과 차트에서 제외된 행을 어떻게 함께 검증하는가?",
+        "decisionShown": "원본 행, usable·excluded 분모, panel별 chart와 PNG·CSV 산출물 계약",
+        "lessonRefs": [
+          "seaborn/10_종합EDA리포트"
+        ]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1200,
+          "height": 675
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/fonts",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/tools/captureOutcomeProofs.py",
+          "assets/brand/visuals/outcomes/fixtures.json"
+        ],
+        "sourceSetHash": "sha256-8c92ba3676a0f0826f094330f171b2960964add612bbbb585e62d62a938a2197"
+      },
+      "outputs": [
+        {
+          "byteLength": 4115,
+          "format": "avif",
+          "height": 270,
+          "integrity": "sha256-8de5cb1f7bb344fff9c57316e28442315b414a39220ea82e6ec8a2c16be3831a",
+          "publicPath": "/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 4112,
+          "format": "webp",
+          "height": 270,
+          "integrity": "sha256-35a6793c204eb0555aece4b9dc7bdf645590264b09b9d92190737d67d18c70f4",
+          "publicPath": "/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 7133,
+          "format": "avif",
+          "height": 405,
+          "integrity": "sha256-dce23a4c47832f5b517bdf7a65bc4e103f522ffa7ba93520cb103987ea43f133",
+          "publicPath": "/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 7286,
+          "format": "webp",
+          "height": 405,
+          "integrity": "sha256-288b3a7aef168041839c5db50fd90895faae68a4fa5ce6ecd7c3c2d9f5166420",
+          "publicPath": "/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 12185,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-1709289a37ee0049f4cb502cd3b0a9f0c484e0fdb448c34793386f9827ededbf",
+          "publicPath": "/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 16062,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-dede08af71f14bb0db124f91f0c48b28524a5ce86201829c012364ebc800e6c6",
+          "publicPath": "/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.webp",
+          "width": 1200
         }
       ]
     },

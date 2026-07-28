@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import subprocess
 
 ROOT = Path(__file__).resolve().parents[2]
 PUBLIC = ROOT / "editor" / "public"
@@ -28,6 +29,39 @@ def testServiceWorkerImplementsBothStrategies() -> None:
     assert 'url.pathname.startsWith(scopedPath("_app/"))' in source
     assert "codaro-shell-v3:${SCOPE_PATH}" in source
     assert "codaro-runtime-v3:${SCOPE_PATH}" in source
+    assert "serviceWorkerLegacyCaches.json" in source
+    assert "migrateOwnedLegacyCaches" in source
+    assert "writeMigrationReceipt" in source
+    assert "ownedCacheKeys.has(key)" in source
+    assert "LEGACY_CACHE_PREFIXES" not in source
+    assert "startsWith(prefix)" not in source
+
+
+def testServiceWorkerLegacyCacheManifestUsesExactOwnedKeys() -> None:
+    manifest = json.loads((PUBLIC / "serviceWorkerLegacyCaches.json").read_text(encoding="utf-8"))
+    assert manifest == {
+        "schemaVersion": 1,
+        "migrationId": "codaro-owned-cache-v1-to-scope-v3",
+        "ownedCacheKeys": [
+            "codaro-curriculum",
+            "codaro-runtime-v1",
+            "codaro-runtime-v2",
+            "codaro-shell-v2",
+            "codaro-static-v1",
+        ],
+    }
+
+
+def testServiceWorkerMigrationExecutesAgainstExactOwnedKeys() -> None:
+    result = subprocess.run(
+        ("node", "tests/surface/verifyServiceWorkerMigration.mjs"),
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    assert result.returncode == 0, result.stderr or result.stdout
+    assert "retained 3 foreign caches" in result.stdout
 
 
 def testIndexHasMobileMetaTags() -> None:

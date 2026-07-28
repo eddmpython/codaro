@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "migrationId": "codaro-owned-cache-v1-to-scope-v3",
+  "ownedCacheKeys": [
+    "codaro-curriculum",
+    "codaro-runtime-v1",
+    "codaro-runtime-v2",
+    "codaro-shell-v2",
+    "codaro-static-v1"
+  ]
+}

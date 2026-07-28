@@ -7,10 +7,15 @@ const SCOPE_URL = new URL(self.registration.scope);
 const SCOPE_PATH = SCOPE_URL.pathname.endsWith("/") ? SCOPE_URL.pathname : `${SCOPE_URL.pathname}/`;
 const SHELL_CACHE = `codaro-shell-v3:${SCOPE_PATH}`;
 const RUNTIME_CACHE = `codaro-runtime-v3:${SCOPE_PATH}`;
-const LEGACY_CACHE_KEYS = new Set(["codaro-shell-v2", "codaro-runtime-v2"]);
-const LEGACY_CACHE_PREFIXES = ["codaro-static-", "workbox-"];
 const scopedPath = (path) => new URL(path.replace(/^\/+/, ""), SCOPE_URL).pathname;
-const SHELL_ASSETS = [scopedPath("manifest.json"), scopedPath("favicon.png"), scopedPath("favicon.svg")];
+const LEGACY_CACHE_MANIFEST_PATH = scopedPath("serviceWorkerLegacyCaches.json");
+const MIGRATION_RECEIPT_PATH = scopedPath(".codaro/service-worker-migration-receipt.json");
+const SHELL_ASSETS = [
+  scopedPath("manifest.json"),
+  scopedPath("favicon.png"),
+  scopedPath("favicon.svg"),
+  LEGACY_CACHE_MANIFEST_PATH,
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -20,19 +25,7 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((keys) =>
-        Promise.all(
-          keys
-            .filter((key) => key !== SHELL_CACHE && key !== RUNTIME_CACHE)
-            .filter((key) => (
-              LEGACY_CACHE_KEYS.has(key)
-              || LEGACY_CACHE_PREFIXES.some((prefix) => key.startsWith(prefix))
-            ))
-            .map((key) => caches.delete(key)),
-        ),
-      )
+    migrateOwnedLegacyCaches()
       .then(() => self.clients.claim())
       .then(() => refreshWindows()),
   );
@@ -113,6 +106,83 @@ async function networkFirst(request) {
     if (cached) return cached;
     throw error;
   }
+}
+
+async function migrateOwnedLegacyCaches() {
+  const availableCacheKeys = await caches.keys();
+  try {
+    const manifest = await loadLegacyCacheManifest();
+    const ownedCacheKeys = new Set(manifest.ownedCacheKeys);
+    const matchedCacheKeys = availableCacheKeys.filter((key) => ownedCacheKeys.has(key));
+    const deletionResults = await Promise.all(
+      matchedCacheKeys.map(async (cacheKey) => ({
+        cacheKey,
+        deleted: await caches.delete(cacheKey),
+      })),
+    );
+    const deletedCacheKeys = deletionResults
+      .filter((result) => result.deleted)
+      .map((result) => result.cacheKey);
+    await writeMigrationReceipt({
+      schemaVersion: 1,
+      migrationId: manifest.migrationId,
+      scopePath: SCOPE_PATH,
+      status: deletedCacheKeys.length === matchedCacheKeys.length ? "completed" : "partial",
+      examinedCacheCount: availableCacheKeys.length,
+      unmatchedCacheCount: availableCacheKeys.length - matchedCacheKeys.length,
+      matchedCacheKeys,
+      deletedCacheKeys,
+      completedAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    await writeMigrationReceipt({
+      schemaVersion: 1,
+      migrationId: "unavailable",
+      scopePath: SCOPE_PATH,
+      status: "skipped",
+      examinedCacheCount: availableCacheKeys.length,
+      unmatchedCacheCount: availableCacheKeys.length,
+      matchedCacheKeys: [],
+      deletedCacheKeys: [],
+      completedAt: new Date().toISOString(),
+      failure: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
+
+async function loadLegacyCacheManifest() {
+  const shellCache = await caches.open(SHELL_CACHE);
+  const response = await shellCache.match(LEGACY_CACHE_MANIFEST_PATH);
+  if (!response) throw new Error("legacy cache manifest is unavailable");
+  const manifest = await response.json();
+  if (
+    !manifest
+    || manifest.schemaVersion !== 1
+    || typeof manifest.migrationId !== "string"
+    || !manifest.migrationId
+    || !Array.isArray(manifest.ownedCacheKeys)
+    || !manifest.ownedCacheKeys.length
+    || manifest.ownedCacheKeys.some((key) => typeof key !== "string" || !key)
+    || new Set(manifest.ownedCacheKeys).size !== manifest.ownedCacheKeys.length
+    || manifest.ownedCacheKeys.includes(SHELL_CACHE)
+    || manifest.ownedCacheKeys.includes(RUNTIME_CACHE)
+  ) {
+    throw new Error("legacy cache manifest is invalid");
+  }
+  return manifest;
+}
+
+async function writeMigrationReceipt(receipt) {
+  const shellCache = await caches.open(SHELL_CACHE);
+  await shellCache.put(
+    MIGRATION_RECEIPT_PATH,
+    new Response(JSON.stringify(receipt), {
+      headers: {
+        "Cache-Control": "no-store",
+        "Content-Type": "application/json; charset=utf-8",
+      },
+    }),
+  );
 }
 
 async function refreshWindows() {

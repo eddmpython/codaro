@@ -56,12 +56,16 @@ def main() -> int:
 
     if swCandidates:
         swText = swCandidates[0].read_text(encoding="utf-8", errors="replace")
+        legacyManifestPath = BUILD / "serviceWorkerLegacyCaches.json"
         required = (
             "navigationNetworkFirst",
             "assetCacheFirst",
             "networkFirst",
             'pathname.startsWith(scopedPath("_app/"))',
             "SCOPE_PATH",
+            "migrateOwnedLegacyCaches",
+            "writeMigrationReceipt",
+            "ownedCacheKeys.has(key)",
         )
         for token in required:
             if token not in swText:
@@ -74,6 +78,24 @@ def main() -> int:
                 failures.append(f"serviceWorker.js missing {fnName} function body")
             elif 'caches.match(scopedPath("index.html"))' in fnMatch.group("body"):
                 failures.append(f"serviceWorker.js must not use index.html fallback in {fnName}")
+        if "LEGACY_CACHE_PREFIXES" in swText or "startsWith(prefix)" in swText:
+            failures.append("serviceWorker.js must not delete origin-wide cache prefixes")
+        if not legacyManifestPath.is_file():
+            failures.append("serviceWorkerLegacyCaches.json missing in build output")
+        else:
+            legacyManifest = json.loads(legacyManifestPath.read_text(encoding="utf-8"))
+            if legacyManifest != {
+                "schemaVersion": 1,
+                "migrationId": "codaro-owned-cache-v1-to-scope-v3",
+                "ownedCacheKeys": [
+                    "codaro-curriculum",
+                    "codaro-runtime-v1",
+                    "codaro-runtime-v2",
+                    "codaro-shell-v2",
+                    "codaro-static-v1",
+                ],
+            }:
+                failures.append("serviceWorkerLegacyCaches.json exact-owned-cache contract is invalid")
 
     if failures:
         for failure in failures:

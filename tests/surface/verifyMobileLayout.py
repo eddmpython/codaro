@@ -90,6 +90,7 @@ def checkManifest() -> CheckResult:
 
 def checkServiceWorker() -> CheckResult:
     sw = (PUBLIC / "serviceWorker.js").read_text(encoding="utf-8")
+    legacyManifest = json.loads((PUBLIC / "serviceWorkerLegacyCaches.json").read_text(encoding="utf-8"))
     keywords = (
         "navigationNetworkFirst",
         "assetCacheFirst",
@@ -99,12 +100,31 @@ def checkServiceWorker() -> CheckResult:
         "SHELL_CACHE",
         "RUNTIME_CACHE",
         "SCOPE_PATH",
+        "migrateOwnedLegacyCaches",
+        "writeMigrationReceipt",
+        "ownedCacheKeys.has(key)",
     )
     missing = [keyword for keyword in keywords if keyword not in sw]
+    if "LEGACY_CACHE_PREFIXES" in sw or "startsWith(prefix)" in sw:
+        missing.append("exact owned-cache deletion")
+    expectedLegacyKeys = {
+        "codaro-curriculum",
+        "codaro-runtime-v1",
+        "codaro-runtime-v2",
+        "codaro-shell-v2",
+        "codaro-static-v1",
+    }
+    if (
+        legacyManifest.get("schemaVersion") != 1
+        or set(legacyManifest.get("ownedCacheKeys", [])) != expectedLegacyKeys
+    ):
+        missing.append("legacy cache manifest")
     return CheckResult(
         name="service-worker-strategies",
         ok=not missing,
-        detail="navigation, asset, and API strategies separated" if not missing else f"missing: {', '.join(missing)}",
+        detail="navigation, asset, API, and exact owned-cache migration strategies separated"
+        if not missing
+        else f"missing: {', '.join(missing)}",
     )
 
 
