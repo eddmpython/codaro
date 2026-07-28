@@ -177,6 +177,8 @@ export function LearnPage({ search = "" }) {
   const firstPublicLesson = curriculumLessons.find((lesson) => lesson.runtimeTier === "browser") || curriculumLessons[0];
   const initialExplorerState = explorerStateFromSearch(search);
   const [query, setQuery] = useState(initialExplorerState.query);
+  const [queryDraft, setQueryDraft] = useState(initialExplorerState.query);
+  const [searchComposing, setSearchComposing] = useState(false);
   const [runtime, setRuntime] = useState(initialExplorerState.runtime);
   const [selectedPath, setSelectedPath] = useState(initialExplorerState.selectedPath);
   const [resumeLesson, setResumeLesson] = useState(null);
@@ -196,6 +198,12 @@ export function LearnPage({ search = "" }) {
 
   const discoveryActive = Boolean(query.trim()) || runtime !== "all" || selectedPath !== "all";
   const visibleLessons = discoveryActive ? matchingLessons.slice(0, 30) : featuredLessons;
+  const selectedPathLabel = guidedPaths.find((item) => item.pathId === selectedPath)?.label;
+  const resultContext = [
+    query.trim() ? `"${query.trim()}"` : null,
+    runtime === "browser" ? "Web" : runtime === "local" ? "Local" : null,
+    selectedPathLabel,
+  ].filter(Boolean).join(" · ");
   const visibleLessonRefs = useMemo(
     () => new Set(visibleLessons.map((lesson) => `${lesson.track}/${lesson.id}`)),
     [visibleLessons],
@@ -204,6 +212,8 @@ export function LearnPage({ search = "" }) {
   useBrowserLayoutEffect(() => {
     const nextState = explorerStateFromSearch(search);
     setQuery(nextState.query);
+    setQueryDraft(nextState.query);
+    setSearchComposing(false);
     setRuntime(nextState.runtime);
     setSelectedPath(nextState.selectedPath);
   }, [search]);
@@ -289,18 +299,29 @@ export function LearnPage({ search = "" }) {
               <input
                 aria-controls="learn-catalog"
                 aria-describedby="learn-result-count"
+                aria-busy={searchComposing}
                 autoComplete="off"
+                data-learn-search-committed-query={query}
+                data-learn-search-composing={searchComposing ? "true" : "false"}
                 data-learn-search-input="true"
                 enterKeyHint="search"
                 type="search"
-                value={query}
+                value={queryDraft}
                 placeholder="예: pandas 보고서, 파일 정리"
                 onChange={(event) => {
                   const nextQuery = event.currentTarget.value;
-                  setQuery(nextQuery);
-                  if (!event.nativeEvent.isComposing) updateExplorer({ query: nextQuery });
+                  setQueryDraft(nextQuery);
+                  if (!event.nativeEvent.isComposing && !searchComposing) {
+                    updateExplorer({ query: nextQuery });
+                  }
                 }}
-                onCompositionEnd={(event) => updateExplorer({ query: event.currentTarget.value })}
+                onCompositionStart={() => setSearchComposing(true)}
+                onCompositionEnd={(event) => {
+                  const nextQuery = event.currentTarget.value;
+                  setSearchComposing(false);
+                  setQueryDraft(nextQuery);
+                  updateExplorer({ query: nextQuery });
+                }}
               />
             </label>
             <span className="learnSearchHint">제목 · 결과 · 주제 검색</span>
@@ -361,7 +382,7 @@ export function LearnPage({ search = "" }) {
             </Text>
           </div>
           <div className="learnExplorerControls" data-route-query-sensitive="true">
-            <fieldset className="learnRuntimeSegments">
+            <fieldset className="learnRuntimeSegments" aria-describedby="learn-result-count">
               <legend>실행 환경</legend>
               {[
                 ["all", "전체"],
@@ -370,6 +391,7 @@ export function LearnPage({ search = "" }) {
               ].map(([value, label]) => (
                 <button
                   aria-pressed={runtime === value}
+                  data-learn-runtime-filter={value}
                   key={value}
                   type="button"
                   onClick={() => updateExplorer({ runtime: value })}
@@ -381,6 +403,8 @@ export function LearnPage({ search = "" }) {
             <label className="learnPathSelect">
               <span>목표 경로</span>
               <select
+                aria-describedby="learn-result-count"
+                data-learn-path-filter="true"
                 value={selectedPath}
                 onChange={(event) => updateExplorer({ selectedPath: event.currentTarget.value })}
               >
@@ -396,7 +420,7 @@ export function LearnPage({ search = "" }) {
             data-route-query-sensitive="true"
           >
             {discoveryActive
-              ? `${matchingLessons.length}개 중 ${visibleLessons.length}개 표시`
+              ? `${resultContext} · ${matchingLessons.length}개 중 ${visibleLessons.length}개 표시`
               : `추천 시작점 ${visibleLessons.length}개`}
           </p>
         </div>
@@ -422,6 +446,7 @@ export function LearnPage({ search = "" }) {
         {discoveryActive ? (
           <section
             className="learnSearchResults"
+            aria-describedby="learn-result-count"
             aria-labelledby="learn-search-results-title"
             data-learn-search-results="true"
           >

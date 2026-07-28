@@ -9,14 +9,13 @@
 ## 남은 조건
 
 - 실제 검색 유입 URL에서 query와 filter 상태가 이해 가능한지 검수한다.
-- keyboard만으로 검색, runtime filter, path filter와 lesson 진입을 수행한다.
 - screen reader에서 검색 입력, 결과 수, 결과 목록과 현재 filter 관계가 순서대로 전달되는지 검수한다.
 - 한국어 IME 조합 중 query나 결과가 불안정하게 갱신되지 않는지 실제 입력기로 확인한다.
 - 여섯 결과 경로의 이름, 결과물 설명, Web·Local 범위와 추천 레슨을 사람 콘텐츠 검수한다.
 
 ## 구현 순서
 
-1. 대표 검색 유입과 filter deep link를 keyboard, screen reader, 한국어 IME로 검수한다.
+1. 대표 검색 유입과 filter deep link를 screen reader와 한국어 IME로 검수한다.
 2. 여섯 결과 경로를 콘텐츠 owner가 검수한다.
 3. 발견한 결함을 explorer와 공용 lesson metadata owner에서 수정한다.
 4. 관련 browser gate와 사람 검수를 다시 통과한 뒤 이 packet과 parent index 링크를 삭제한다.
@@ -43,7 +42,7 @@
 - `uv run python -X utf8 tests/run.py gate landing-public`
 - `uv run python -X utf8 tests/run.py gate web-learning`
 - `CODARO_PRODUCT_CASE=landing-public uv run python -X utf8 tests/surface/verifyProductExperiencePlaywright.py`
-- 실제 검색 유입, keyboard, screen reader, 한국어 IME와 경로별 콘텐츠 사람 검수
+- 실제 검색 유입, screen reader, 한국어 IME와 경로별 콘텐츠 사람 검수
 
 ## 롤백
 

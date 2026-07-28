@@ -1378,10 +1378,16 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
         },
         {
             "name": "landing-learn-desktop",
-            "url": f"http://127.0.0.1:{landingPort}/codaro/learn/",
+            "url": (
+                f"http://127.0.0.1:{landingPort}/codaro/learn/"
+                "?q=pandas&runtime=web&path=dataReporting"
+            ),
             "viewport": {"width": 1440, "height": 900},
             "surface": "landing-learn",
             "verifyLearnSearch": "pandas",
+            "expectedLearnRuntime": "browser",
+            "expectedLearnPath": "dataReporting",
+            "verifyLearnKeyboardAndIme": True,
         },
         {
             "name": "landing-public-lesson-desktop",
@@ -3808,9 +3814,25 @@ def runBrowserMatrix(
                         page.wait_for_selector('[data-curriculum-home-goals="true"]', timeout=30_000)
                     if case.get("verifyLearnSearch"):
                         expectedQuery = str(case["verifyLearnSearch"])
+                        expectedRuntime = str(case.get("expectedLearnRuntime", "all"))
+                        expectedPath = str(case.get("expectedLearnPath", "all"))
                         searchInput = page.locator('[data-learn-search-input="true"]')
                         if searchInput.count() != 1:
                             raise AssertionError("Learn search input is missing or duplicated")
+                        page.wait_for_function(
+                            """
+                            ([query, runtime, path]) => (
+                              document.querySelector('[data-learn-search-input="true"]')?.value === query
+                              && document.querySelector(
+                                `[data-learn-runtime-filter="${runtime}"]`
+                              )?.getAttribute("aria-pressed") === "true"
+                              && document.querySelector('[data-learn-path-filter="true"]')?.value === path
+                              && document.querySelectorAll(".learnLessonRow").length > 0
+                            )
+                            """,
+                            arg=[expectedQuery, expectedRuntime, expectedPath],
+                            timeout=20_000,
+                        )
                         searchInput.fill(expectedQuery)
                         page.wait_for_function(
                             """
@@ -3832,9 +3854,16 @@ def runBrowserMatrix(
                               const firstResultRect = firstResult?.getBoundingClientRect();
                               return {
                                 query: document.querySelector('[data-learn-search-input="true"]')?.value || "",
+                                committedQuery: document.querySelector(
+                                  '[data-learn-search-input="true"]'
+                                )?.getAttribute("data-learn-search-committed-query") || "",
                                 resultCount: document.querySelector("#learn-result-count")?.textContent?.trim() || "",
                                 rowCount: document.querySelectorAll(".learnLessonRow").length,
                                 search: window.location.search,
+                                runtime: document.querySelector(
+                                  '[data-learn-runtime-filter][aria-pressed="true"]'
+                                )?.getAttribute("data-learn-runtime-filter") || "",
+                                path: document.querySelector('[data-learn-path-filter="true"]')?.value || "",
                                 outcomePathCount: document.querySelectorAll(
                                   '[data-learn-outcome-paths="true"]'
                                 ).length,
@@ -3881,9 +3910,16 @@ def runBrowserMatrix(
                               const firstResultRect = firstResult?.getBoundingClientRect();
                               return {
                                 query: document.querySelector('[data-learn-search-input="true"]')?.value || "",
+                                committedQuery: document.querySelector(
+                                  '[data-learn-search-input="true"]'
+                                )?.getAttribute("data-learn-search-committed-query") || "",
                                 resultCount: document.querySelector("#learn-result-count")?.textContent?.trim() || "",
                                 rowCount: document.querySelectorAll(".learnLessonRow").length,
                                 search: window.location.search,
+                                runtime: document.querySelector(
+                                  '[data-learn-runtime-filter][aria-pressed="true"]'
+                                )?.getAttribute("data-learn-runtime-filter") || "",
+                                path: document.querySelector('[data-learn-path-filter="true"]')?.value || "",
                                 outcomePathCount: document.querySelectorAll(
                                   '[data-learn-outcome-paths="true"]'
                                 ).length,
@@ -3960,7 +3996,262 @@ def runBrowserMatrix(
                         if originalViewport is not None:
                             page.set_viewport_size(originalViewport)
                             page.wait_for_timeout(120)
-                        learnSearchEvidence = {**afterReload, "mobileLayout": mobileLayout}
+                        keyboardEvidence: dict[str, Any] | None = None
+                        imeEvidence: dict[str, Any] | None = None
+                        if case.get("verifyLearnKeyboardAndIme"):
+                            searchInput = page.locator('[data-learn-search-input="true"]')
+                            searchInput.focus()
+                            page.keyboard.press("Tab")
+                            if page.evaluate(
+                                "() => document.activeElement?.getAttribute('data-learn-runtime-filter')"
+                            ) != "all":
+                                raise AssertionError("Learn keyboard order did not reach the first runtime filter")
+                            page.keyboard.press("Tab")
+                            if page.evaluate(
+                                "() => document.activeElement?.getAttribute('data-learn-runtime-filter')"
+                            ) != "browser":
+                                raise AssertionError("Learn keyboard order did not reach the Web runtime filter")
+                            page.keyboard.press("Enter")
+                            page.wait_for_function(
+                                """
+                                () => document.querySelector(
+                                  '[data-learn-runtime-filter="browser"]'
+                                )?.getAttribute("aria-pressed") === "true"
+                                """
+                            )
+                            page.keyboard.press("Tab")
+                            page.keyboard.press("Tab")
+                            if page.evaluate(
+                                "() => document.activeElement?.getAttribute('data-learn-path-filter')"
+                            ) != "true":
+                                raise AssertionError("Learn keyboard order did not reach the path filter")
+                            page.keyboard.press("Home")
+                            page.keyboard.press("ArrowDown")
+                            page.keyboard.press("ArrowDown")
+                            page.wait_for_function(
+                                """
+                                () => document.querySelector(
+                                  '[data-learn-path-filter="true"]'
+                                )?.value === "dataReporting"
+                                """
+                            )
+                            page.keyboard.press("Tab")
+                            focusedLessonHref = page.evaluate(
+                                """
+                                () => document.activeElement?.matches(
+                                  '[data-public-lesson-link="true"]'
+                                )
+                                  ? document.activeElement.getAttribute("href")
+                                  : ""
+                                """
+                            )
+                            if not focusedLessonHref:
+                                raise AssertionError("Learn keyboard order did not reach the first lesson")
+                            page.keyboard.press("Enter")
+                            page.wait_for_url("**/learn/lesson/**", timeout=20_000)
+                            enteredLessonUrl = page.url
+                            page.go_back(wait_until="domcontentloaded", timeout=30_000)
+                            page.wait_for_selector('[data-learn-search-input="true"]', timeout=20_000)
+                            page.wait_for_function(
+                                """
+                                () => (
+                                  document.querySelector('[data-learn-search-input="true"]')
+                                    ?.getAttribute("data-learn-search-committed-query") === "pandas"
+                                  && document.querySelector('[data-learn-path-filter="true"]')
+                                    ?.value === "dataReporting"
+                                )
+                                """,
+                                timeout=20_000,
+                            )
+                            keyboardEvidence = {
+                                "focusedLessonHref": focusedLessonHref,
+                                "enteredLessonUrl": enteredLessonUrl,
+                                "runtime": expectedRuntime,
+                                "path": expectedPath,
+                            }
+
+                            compositionBaseline = page.evaluate(
+                                """
+                                () => ({
+                                  committedQuery: document.querySelector(
+                                    '[data-learn-search-input="true"]'
+                                  )?.getAttribute("data-learn-search-committed-query") || "",
+                                  resultCount: document.querySelector("#learn-result-count")
+                                    ?.textContent?.trim() || "",
+                                  rowCount: document.querySelectorAll(".learnLessonRow").length,
+                                  search: window.location.search,
+                                })
+                                """
+                            )
+                            page.evaluate(
+                                """
+                                () => {
+                                  const input = document.querySelector(
+                                    '[data-learn-search-input="true"]'
+                                  );
+                                  const valueSetter = Object.getOwnPropertyDescriptor(
+                                    HTMLInputElement.prototype,
+                                    "value"
+                                  ).set;
+                                  input.dispatchEvent(new CompositionEvent(
+                                    "compositionstart",
+                                    { bubbles: true, data: "" }
+                                  ));
+                                  valueSetter.call(input, "데");
+                                  input.dispatchEvent(new InputEvent("input", {
+                                    bubbles: true,
+                                    data: "데",
+                                    inputType: "insertCompositionText",
+                                    isComposing: true,
+                                  }));
+                                }
+                                """
+                            )
+                            page.wait_for_function(
+                                """
+                                () => {
+                                  const input = document.querySelector(
+                                    '[data-learn-search-input="true"]'
+                                  );
+                                  return input?.value === "데"
+                                    && input.getAttribute("data-learn-search-composing") === "true"
+                                    && input.getAttribute("aria-busy") === "true";
+                                }
+                                """
+                            )
+                            duringComposition = page.evaluate(
+                                """
+                                () => ({
+                                  draftQuery: document.querySelector(
+                                    '[data-learn-search-input="true"]'
+                                  )?.value || "",
+                                  committedQuery: document.querySelector(
+                                    '[data-learn-search-input="true"]'
+                                  )?.getAttribute("data-learn-search-committed-query") || "",
+                                  resultCount: document.querySelector("#learn-result-count")
+                                    ?.textContent?.trim() || "",
+                                  rowCount: document.querySelectorAll(".learnLessonRow").length,
+                                  search: window.location.search,
+                                })
+                                """
+                            )
+                            for key in ("committedQuery", "resultCount", "rowCount", "search"):
+                                if duringComposition[key] != compositionBaseline[key]:
+                                    raise AssertionError(
+                                        "Learn IME composition changed committed results before "
+                                        f"compositionend: {key}={duringComposition[key]!r} "
+                                        f"!= {compositionBaseline[key]!r}"
+                                    )
+                            page.evaluate(
+                                """
+                                () => {
+                                  const input = document.querySelector(
+                                    '[data-learn-search-input="true"]'
+                                  );
+                                  const valueSetter = Object.getOwnPropertyDescriptor(
+                                    HTMLInputElement.prototype,
+                                    "value"
+                                  ).set;
+                                  valueSetter.call(input, "데이터");
+                                  input.dispatchEvent(new InputEvent("input", {
+                                    bubbles: true,
+                                    data: "이터",
+                                    inputType: "insertCompositionText",
+                                    isComposing: true,
+                                  }));
+                                  input.dispatchEvent(new CompositionEvent(
+                                    "compositionend",
+                                    { bubbles: true, data: "데이터" }
+                                  ));
+                                }
+                                """
+                            )
+                            page.wait_for_function(
+                                """
+                                () => {
+                                  const input = document.querySelector(
+                                    '[data-learn-search-input="true"]'
+                                  );
+                                  return input?.value === "데이터"
+                                    && input.getAttribute(
+                                      "data-learn-search-committed-query"
+                                    ) === "데이터"
+                                    && input.getAttribute(
+                                      "data-learn-search-composing"
+                                    ) === "false"
+                                    && new URL(window.location.href).searchParams.get("q") === "데이터"
+                                    && document.querySelectorAll(".learnLessonRow").length > 0;
+                                }
+                                """,
+                                timeout=20_000,
+                            )
+                            afterComposition = page.evaluate(
+                                """
+                                () => ({
+                                  query: document.querySelector(
+                                    '[data-learn-search-input="true"]'
+                                  )?.value || "",
+                                  committedQuery: document.querySelector(
+                                    '[data-learn-search-input="true"]'
+                                  )?.getAttribute("data-learn-search-committed-query") || "",
+                                  resultCount: document.querySelector("#learn-result-count")
+                                    ?.textContent?.trim() || "",
+                                  rowCount: document.querySelectorAll(".learnLessonRow").length,
+                                  search: window.location.search,
+                                })
+                                """
+                            )
+                            page.reload(wait_until="domcontentloaded", timeout=30_000)
+                            page.wait_for_function(
+                                """
+                                () => {
+                                  const input = document.querySelector(
+                                    '[data-learn-search-input="true"]'
+                                  );
+                                  return input?.value === "데이터"
+                                    && input.getAttribute(
+                                      "data-learn-search-committed-query"
+                                    ) === "데이터"
+                                    && document.querySelectorAll(".learnLessonRow").length > 0;
+                                }
+                                """,
+                                timeout=20_000,
+                            )
+                            afterCompositionReload = page.evaluate(
+                                """
+                                () => ({
+                                  query: document.querySelector(
+                                    '[data-learn-search-input="true"]'
+                                  )?.value || "",
+                                  committedQuery: document.querySelector(
+                                    '[data-learn-search-input="true"]'
+                                  )?.getAttribute("data-learn-search-committed-query") || "",
+                                  resultCount: document.querySelector("#learn-result-count")
+                                    ?.textContent?.trim() || "",
+                                  rowCount: document.querySelectorAll(".learnLessonRow").length,
+                                  search: window.location.search,
+                                })
+                                """
+                            )
+                            if afterCompositionReload != afterComposition:
+                                raise AssertionError(
+                                    "Learn IME committed state drifted across reload: "
+                                    f"{afterComposition} != {afterCompositionReload}"
+                                )
+                            page.evaluate("() => window.scrollTo({ top: 0, behavior: 'instant' })")
+                            page.wait_for_timeout(120)
+                            imeEvidence = {
+                                "baseline": compositionBaseline,
+                                "duringComposition": duringComposition,
+                                "afterComposition": afterComposition,
+                                "afterReload": afterCompositionReload,
+                            }
+                        learnSearchEvidence = {
+                            **afterReload,
+                            "mobileLayout": mobileLayout,
+                            "keyboard": keyboardEvidence,
+                            "ime": imeEvidence,
+                        }
                     if case.get("scrollTo"):
                         page.locator(case["scrollTo"]).scroll_into_view_if_needed(timeout=20_000)
                     if case.get("expectCanonicalLesson"):

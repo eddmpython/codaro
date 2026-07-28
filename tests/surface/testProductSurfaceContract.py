@@ -212,8 +212,15 @@ def testPublicLearningExplorerPersistsFiltersAndLessonVisualFillsItsFrame() -> N
         'data-learn-search-input="true"',
         'aria-controls="learn-catalog"',
         'aria-describedby="learn-result-count"',
+        "queryDraft",
+        "searchComposing",
+        'data-learn-search-committed-query={query}',
+        'data-learn-search-composing={searchComposing ? "true" : "false"}',
         "event.nativeEvent.isComposing",
+        "onCompositionStart",
         "onCompositionEnd",
+        'data-learn-runtime-filter={value}',
+        'data-learn-path-filter="true"',
         'data-learn-outcome-paths="true"',
         'data-learn-search-results="true"',
         "<LessonRow",
@@ -227,6 +234,9 @@ def testPublicLearningExplorerPersistsFiltersAndLessonVisualFillsItsFrame() -> N
     assert "height: 100%;" in lessonStyles
     assert "object-fit: cover;" in lessonStyles
     assert '"verifyLearnSearch": "pandas"' in browserGate
+    assert '"verifyLearnKeyboardAndIme": True' in browserGate
+    assert "Learn IME composition changed committed results before" in browserGate
+    assert "Learn keyboard order did not reach the first lesson" in browserGate
     assert "Learn search state drifted across reload" in browserGate
     assert '"expectedVisualAssetIds": [' in browserGate
 
