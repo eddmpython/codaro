@@ -1398,7 +1398,10 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "url": f"http://127.0.0.1:{localPort}/m/chat",
             "viewport": {"width": 390, "height": 844},
             "surface": "mobile-chat",
-            "waitFor": "[data-product-surface-view='chat']",
+            "waitFor": (
+                "[data-product-surface-view='chat'] "
+                "[data-product-surface-state='ready']"
+            ),
             "expectMobileProductNav": True,
             "expectedMobileSurface": "chat",
         },
@@ -2135,7 +2138,10 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "viewport": {"width": 390, "height": 844},
             "surface": "web-chat",
             "expectedTier": "web",
-            "waitFor": "[data-product-surface-view='chat']",
+            "waitFor": (
+                "[data-product-surface-view='chat'] "
+                "[data-product-surface-state='ready']"
+            ),
             "expectMobileProductNav": True,
             "expectedMobileSurface": "chat",
         },
@@ -2145,7 +2151,10 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "viewport": {"width": 390, "height": 844},
             "surface": "web-automation",
             "expectedTier": "web",
-            "waitFor": "[data-product-surface-view='automation']",
+            "waitFor": (
+                "[data-product-surface-view='automation'] "
+                "[data-product-surface-state='ready']"
+            ),
             "expectMobileProductNav": True,
             "expectedMobileSurface": "automation",
         },
@@ -2155,7 +2164,10 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "viewport": {"width": 320, "height": 720},
             "surface": "web-automation",
             "expectedTier": "web",
-            "waitFor": "[data-product-surface-view='automation']",
+            "waitFor": (
+                "[data-product-surface-view='automation'] "
+                "[data-product-surface-state='ready']"
+            ),
             "expectLocalRequiredTemplates": True,
             "expectMobileProductNav": True,
             "expectedMobileSurface": "automation",
@@ -2641,6 +2653,9 @@ async ({ surface, expectedTier }) => {
   const activeProductSurfaceView = document.querySelector(
     "[data-product-surface-view]"
   )?.getAttribute("data-product-surface-view") || null;
+  const activeProductSurfaceState = document.querySelector(
+    "[data-product-surface-view] [data-product-surface-state]"
+  )?.getAttribute("data-product-surface-state") || null;
   try {
     const evidenceStore = await new Promise((resolve, reject) => {
       const request = indexedDB.open("codaro-learning-evidence-v1", 3);
@@ -2749,6 +2764,7 @@ async ({ surface, expectedTier }) => {
     activeMobileProductDestinationIds,
     minimumMobileProductTargetHeight,
     activeProductSurfaceView,
+    activeProductSurfaceState,
     chatTextareaCount: document.querySelectorAll(
       "[data-product-surface-view='chat'] textarea"
     ).length,
@@ -3053,6 +3069,7 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
     elif surface in {"mobile-chat", "web-chat"}:
         if (
             audit["activeProductSurfaceView"] != "chat"
+            or audit["activeProductSurfaceState"] != "ready"
             or audit["chatTextareaCount"] != 1
             or audit["chatSendCount"] != 1
         ):
@@ -3060,6 +3077,7 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
     elif surface == "web-automation":
         if (
             audit["activeProductSurfaceView"] != "automation"
+            or audit["activeProductSurfaceState"] != "ready"
             or audit["automationSurfaceCount"] != 1
         ):
             failures.append(f"{name}: shared automation surface wiring is incomplete")

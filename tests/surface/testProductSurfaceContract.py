@@ -521,6 +521,12 @@ def testAppMountsOneResponsiveProductShellForEveryRouteAlias() -> None:
     assert "onSurfaceChange={selectSurface}" in app
     assert "data-active-product-surface={surface}" in app
     assert "data-product-surface-view={props.surface}" in mainSurface
+    assert 'data-product-surface-state="ready"' in mainSurface
+    assert "data-product-surface-ready={props.surface}" in mainSurface
+    assert 'data-product-surface-state="loading"' in mainSurface
+    assert "data-product-surface-loading={surface}" in mainSurface
+    assert 'role="status"' in mainSurface
+    assert 'aria-live="polite"' in mainSurface
     assert "tabIndex={-1}" in mainSurface
     assert "MobileChat" not in main
     assert "<App />" in main
@@ -675,6 +681,8 @@ def testRunLocalStateBrowserOwnsCompactAndExecutionStateEvidence() -> None:
     assert '"expectMinimalNotebook": True' in verifier
     assert '"expectLocalRequiredTemplates": True' in verifier
     assert '"expectAvailableLocalTemplates": True' in verifier
+    assert "[data-product-surface-state='ready']" in verifier
+    assert 'audit["activeProductSurfaceState"] != "ready"' in verifier
     assert 'selectedCase == "run-local-state"' in verifier
     assert "verifyNotebookExecutionStates(" in verifier
     assert 'STATE_CASES = {"web-run-desktop", "local-run-minimum"}' in wrapper

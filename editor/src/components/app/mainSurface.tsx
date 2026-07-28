@@ -101,8 +101,14 @@ export function MainSurface(props: MainSurfaceProps) {
       data-product-surface-view={props.surface}
       tabIndex={-1}
     >
-      <Suspense fallback={<SurfaceLoading />}>
-        <MainSurfaceContent {...props} />
+      <Suspense fallback={<SurfaceLoading surface={props.surface} />}>
+        <div
+          className="h-full min-h-0 min-w-0"
+          data-product-surface-ready={props.surface}
+          data-product-surface-state="ready"
+        >
+          <MainSurfaceContent {...props} />
+        </div>
       </Suspense>
     </div>
   );
@@ -253,10 +259,17 @@ function MainSurfaceContent(props: MainSurfaceProps) {
   );
 }
 
-function SurfaceLoading() {
+function SurfaceLoading({ surface }: { surface: SurfaceMode }) {
   const { t } = useLocale();
   return (
-    <div className="grid h-full min-h-0 place-items-center px-4 text-sm text-muted-foreground sm:px-6">
+    <div
+      aria-busy="true"
+      aria-live="polite"
+      className="grid h-full min-h-0 place-items-center px-4 text-sm text-muted-foreground sm:px-6"
+      data-product-surface-loading={surface}
+      data-product-surface-state="loading"
+      role="status"
+    >
       {t("surface.loading")}
     </div>
   );
