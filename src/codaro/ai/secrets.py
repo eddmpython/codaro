@@ -7,6 +7,7 @@ import os
 import tempfile
 import time
 from dataclasses import dataclass
+from functools import cache
 from pathlib import Path
 from typing import Any
 
@@ -151,28 +152,38 @@ def _replaceSecretFile(tmp: Path, target: Path) -> None:
             time.sleep(SECRET_STORE_REPLACE_RETRY_SECONDS * (attempt + 1))
 
 
-def _protectWindows(data: bytes) -> bytes:
+@cache
+def _windowsDataBlobType():
     import ctypes
     from ctypes import wintypes
 
     class DATA_BLOB(ctypes.Structure):
         _fields_ = [("cbData", wintypes.DWORD), ("pbData", ctypes.POINTER(ctypes.c_char))]
 
+    return DATA_BLOB
+
+
+def _protectWindows(data: bytes) -> bytes:
+    import ctypes
+    from ctypes import wintypes
+
+    dataBlob = _windowsDataBlobType()
+
     crypt32 = ctypes.windll.crypt32
     kernel32 = ctypes.windll.kernel32
 
     crypt32.CryptProtectData.argtypes = [
-        ctypes.POINTER(DATA_BLOB), wintypes.LPCWSTR,
+        ctypes.POINTER(dataBlob), wintypes.LPCWSTR,
         ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p,
-        wintypes.DWORD, ctypes.POINTER(DATA_BLOB),
+        wintypes.DWORD, ctypes.POINTER(dataBlob),
     ]
     crypt32.CryptProtectData.restype = wintypes.BOOL
     kernel32.LocalFree.argtypes = [wintypes.HLOCAL]
     kernel32.LocalFree.restype = wintypes.HLOCAL
 
     buffer = ctypes.create_string_buffer(data, len(data))
-    dataIn = DATA_BLOB(len(data), ctypes.cast(buffer, ctypes.POINTER(ctypes.c_char)))
-    dataOut = DATA_BLOB()
+    dataIn = dataBlob(len(data), ctypes.cast(buffer, ctypes.POINTER(ctypes.c_char)))
+    dataOut = dataBlob()
     if not crypt32.CryptProtectData(ctypes.byref(dataIn), "codaro", None, None, None, 0, ctypes.byref(dataOut)):
         raise ctypes.WinError()
     try:
@@ -185,24 +196,23 @@ def _unprotectWindows(data: bytes) -> bytes:
     import ctypes
     from ctypes import wintypes
 
-    class DATA_BLOB(ctypes.Structure):
-        _fields_ = [("cbData", wintypes.DWORD), ("pbData", ctypes.POINTER(ctypes.c_char))]
+    dataBlob = _windowsDataBlobType()
 
     crypt32 = ctypes.windll.crypt32
     kernel32 = ctypes.windll.kernel32
 
     crypt32.CryptUnprotectData.argtypes = [
-        ctypes.POINTER(DATA_BLOB), ctypes.POINTER(wintypes.LPWSTR),
+        ctypes.POINTER(dataBlob), ctypes.POINTER(wintypes.LPWSTR),
         ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p,
-        wintypes.DWORD, ctypes.POINTER(DATA_BLOB),
+        wintypes.DWORD, ctypes.POINTER(dataBlob),
     ]
     crypt32.CryptUnprotectData.restype = wintypes.BOOL
     kernel32.LocalFree.argtypes = [wintypes.HLOCAL]
     kernel32.LocalFree.restype = wintypes.HLOCAL
 
     buffer = ctypes.create_string_buffer(data, len(data))
-    dataIn = DATA_BLOB(len(data), ctypes.cast(buffer, ctypes.POINTER(ctypes.c_char)))
-    dataOut = DATA_BLOB()
+    dataIn = dataBlob(len(data), ctypes.cast(buffer, ctypes.POINTER(ctypes.c_char)))
+    dataOut = dataBlob()
     description = wintypes.LPWSTR()
     if not crypt32.CryptUnprotectData(
         ctypes.byref(dataIn), ctypes.byref(description),

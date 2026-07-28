@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import base64
 import json
+import os
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pytest
@@ -90,6 +92,16 @@ class TestSecretStore:
 
         store2 = SecretStore(path=path)
         assert store2.get("persistent") == "value"
+
+    @pytest.mark.skipif(os.name != "nt", reason="Windows DPAPI regression")
+    def test_concurrent_dpapi_reads_share_one_blob_type(self, tmpStore):
+        tmpStore.set("parallel", "동시 진단 조회")
+
+        with ThreadPoolExecutor(max_workers=16) as executor:
+            results = list(executor.map(lambda _index: tmpStore.get("parallel"), range(64)))
+
+        assert results == ["동시 진단 조회"] * 64
+        assert secretsModule._windowsDataBlobType() is secretsModule._windowsDataBlobType()
 
     def test_corrupt_json_raises(self, tmp_path):
         path = tmp_path / "secrets.json"
