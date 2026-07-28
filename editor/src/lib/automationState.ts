@@ -1,9 +1,5 @@
 import { codaroApi, optional, shouldUseApi } from "@/lib/api";
-import {
-  fallbackEStop,
-  fallbackScheduler,
-  fallbackTasks,
-} from "@/lib/fallbackData";
+import { fallbackEStop } from "@/lib/fallbackData";
 import { statusLabel } from "@/lib/displayFormat";
 import { translate } from "@/lib/localeCopy";
 import type {
@@ -27,13 +23,15 @@ export type AutomationActionResult = {
 };
 
 export const AUTOMATION_UPDATED_EVENT = "codaro:automation-updated";
+const emptyTasks: TaskListPayload = { tasks: [], total: 0 };
+const emptyScheduler: SchedulerStatus = { activeJobs: [], jobCount: 0 };
 
 export function fallbackAutomationSnapshot(): AutomationSnapshot {
   return {
     auditCount: 0,
     eStop: fallbackEStop,
-    scheduler: fallbackScheduler,
-    tasks: fallbackTasks,
+    scheduler: emptyScheduler,
+    tasks: emptyTasks,
   };
 }
 
@@ -41,8 +39,8 @@ export async function loadAutomationSnapshot(): Promise<AutomationSnapshot> {
   if (!shouldUseApi()) return fallbackAutomationSnapshot();
 
   const [taskResult, schedulerResult, eStopResult, auditResult] = await Promise.all([
-    optional(codaroApi.tasks, fallbackTasks),
-    optional(codaroApi.schedulerStatus, fallbackScheduler),
+    optional(codaroApi.tasks, emptyTasks),
+    optional(codaroApi.schedulerStatus, emptyScheduler),
     optional(codaroApi.eStop, fallbackEStop),
     optional(codaroApi.audit, { entries: [], count: 0 }),
   ]);
@@ -56,18 +54,17 @@ export async function loadAutomationSnapshot(): Promise<AutomationSnapshot> {
 }
 
 export async function toggleAutomationStop(current: EStopStatus, apiOnline: boolean): Promise<AutomationActionResult & { eStop: EStopStatus }> {
+  if (!apiOnline) {
+    throw new Error(translate("automation.localConnectionRequired"));
+  }
   const manualStopReason = translate("automation.manualStopReason");
-  const next = apiOnline
-    ? current.active
-      ? await codaroApi.clearEStop()
-      : await codaroApi.triggerEStop(manualStopReason)
-    : current.active
-      ? { active: false, reason: "", triggeredAt: null }
-      : { active: true, reason: manualStopReason, triggeredAt: Date.now() };
+  const next = current.active
+    ? await codaroApi.clearEStop()
+    : await codaroApi.triggerEStop(manualStopReason);
 
   return {
     eStop: next,
-    refresh: apiOnline,
+    refresh: true,
     notice: {
       tone: next.active ? "warning" : "success",
       title: next.active ? translate("automation.eStopActive.title") : translate("automation.eStopCleared.title"),
@@ -78,14 +75,7 @@ export async function toggleAutomationStop(current: EStopStatus, apiOnline: bool
 
 export async function runAutomationTask(task: TaskDefinition, apiOnline: boolean): Promise<AutomationActionResult> {
   if (!apiOnline) {
-    return {
-      refresh: false,
-      notice: {
-        tone: "success",
-        title: translate("automation.taskSuccess.title"),
-        detail: translate("automation.taskSuccess.detail", { name: task.name }),
-      },
-    };
+    throw new Error(translate("automation.localConnectionRequired"));
   }
 
   const run = await codaroApi.runTask(task.id);

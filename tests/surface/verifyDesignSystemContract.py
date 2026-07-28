@@ -406,7 +406,7 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
     )
     require(
         'data-runtime-capability-rail={surface}' in runtimeRail
-        and 'data-runtime-tier={tier}' in runtimeRail
+        and 'data-runtime-tier={runtimeTier}' in runtimeRail
         and 'title: "Web Run"' in runtimeRail
         and 'title: "Local Studio"' in runtimeRail,
         "Run and Local capability rail contract is incomplete",
@@ -414,7 +414,9 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
     )
     require(
         'data-runtime-requirement={template.runtime}' in automationSurface
-        and 'RuntimeCapabilityRail apiOnline={apiOnline} surface="automation"' in automationSurface
+        and 'RuntimeCapabilityRail runtimeTier={runtimeTier} surface="automation"' in automationSurface
+        and 'data-automation-capability-state=' in automationSurface
+        and 'data-automation-runtime={runtimeTier}' in automationSurface
         and 'data-automation-studio-layout="true"' in automationSurface
         and 'data-automation-operation-strip="true"' in automationOperationStrip
         and 'data-automation-estop-control="true"' in automationOperationStrip
@@ -435,8 +437,10 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
         failures,
     )
     require(
-        "<AutomationView" in mainSurface and "apiOnline={props.apiOnline}" in mainSurface,
-        "main surface must pass runtime availability into automation",
+        "<AutomationView" in mainSurface
+        and "apiOnline={props.apiOnline}" in mainSurface
+        and "runtimeTier={props.runtimeTier}" in mainSurface,
+        "main surface must pass runtime tier and connection availability into automation",
         failures,
     )
     require(

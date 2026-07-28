@@ -748,7 +748,7 @@ def testAutomationSurfaceFramesAutomationAsSecondLoop() -> None:
     assert "md:grid-cols-[minmax(220px,280px)_minmax(0,1fr)]" in source
     assert "xl:grid-cols-[280px_minmax(380px,1fr)_360px]" in source
     assert '<AutomationOperationStrip' in source
-    assert 'className="flex min-h-12 min-w-0 items-start gap-3 pl-9"' in source
+    assert 'className="flex min-h-12 min-w-0 flex-wrap items-start gap-3 pl-9"' in source
     assert '<AutomationRunInspector' in source
     assert "automation.codaro.description" in source
     assert "automation.custom.description" in source

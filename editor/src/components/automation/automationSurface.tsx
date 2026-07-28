@@ -57,6 +57,7 @@ export function AutomationView({
   apiOnline,
   auditCount,
   eStop,
+  runtimeTier,
   scheduler,
   tasks,
   onRefresh,
@@ -69,6 +70,7 @@ export function AutomationView({
   apiOnline: boolean;
   auditCount: number;
   eStop: EStopStatus;
+  runtimeTier: "local" | "web";
   scheduler: SchedulerStatus;
   tasks: TaskDefinition[];
   onRefresh: () => void;
@@ -78,35 +80,42 @@ export function AutomationView({
   onToggleEStop: () => void;
 }) {
   const { locale, t } = useLocale();
+  const localRuntime = runtimeTier === "local";
+  const effectiveSection = !localRuntime && (activeSection === "tasks" || isLiveAutomationSection(activeSection))
+    ? "codaro"
+    : activeSection;
+  const visibleTasks = localRuntime ? tasks : [];
+  const visibleScheduler = localRuntime ? scheduler : { activeJobs: [], jobCount: 0 };
+  const visibleAuditCount = localRuntime ? auditCount : 0;
   const hasMounted = useRef(false);
   const detailHeadingRef = useRef<HTMLHeadingElement>(null);
-  const [selectedTaskId, setSelectedTaskId] = useState(tasks[0]?.id ?? "");
+  const [selectedTaskId, setSelectedTaskId] = useState(visibleTasks[0]?.id ?? "");
   const selectedTask = useMemo(
-    () => tasks.find((task) => task.id === selectedTaskId) ?? tasks[0] ?? null,
-    [selectedTaskId, tasks],
+    () => visibleTasks.find((task) => task.id === selectedTaskId) ?? visibleTasks[0] ?? null,
+    [selectedTaskId, visibleTasks],
   );
 
   useEffect(() => {
-    if (!tasks.length) {
+    if (!visibleTasks.length) {
       setSelectedTaskId("");
       return;
     }
-    if (!tasks.some((task) => task.id === selectedTaskId)) setSelectedTaskId(tasks[0].id);
-  }, [selectedTaskId, tasks]);
+    if (!visibleTasks.some((task) => task.id === selectedTaskId)) setSelectedTaskId(visibleTasks[0].id);
+  }, [selectedTaskId, visibleTasks]);
 
   useEffect(() => {
     if (!hasMounted.current) {
       hasMounted.current = true;
       return;
     }
-    if (isLiveAutomationSection(activeSection)) return;
+    if (isLiveAutomationSection(effectiveSection)) return;
     window.document
-      .getElementById(automationSectionId(activeSection))
+      .getElementById(automationSectionId(effectiveSection))
       ?.scrollIntoView({ block: "start", behavior: "smooth" });
-  }, [activeSection]);
+  }, [effectiveSection]);
 
-  if (isLiveAutomationSection(activeSection)) {
-    return <LiveAutomationView agentKind={activeSection as "browserUse" | "computerUse"} eStop={eStop} />;
+  if (localRuntime && isLiveAutomationSection(effectiveSection)) {
+    return <LiveAutomationView agentKind={effectiveSection as "browserUse" | "computerUse"} eStop={eStop} />;
   }
 
   const selectTask = (taskId: string) => {
@@ -116,154 +125,227 @@ export function AutomationView({
 
   return (
     <ScrollArea className="h-full min-h-0">
-      <div className="p-3 sm:p-4 xl:pt-12" data-automation-loop="second-loop" data-automation-source="validated-cell-recipe">
+      <div
+        className="p-3 sm:p-4 xl:pt-12"
+        data-automation-capability-state={localRuntime ? (apiOnline ? "operational" : "connection-required") : "design-only"}
+        data-automation-loop="second-loop"
+        data-automation-runtime={runtimeTier}
+        data-automation-source="validated-cell-recipe"
+      >
         <div className="mx-auto max-w-[1500px] space-y-3">
-          <header className="flex min-h-12 min-w-0 items-start gap-3 pl-9">
+          <header className="flex min-h-12 min-w-0 flex-wrap items-start gap-3 pl-9">
             <div className="min-w-0 flex-1">
               <h1 className="text-lg font-semibold tracking-normal">{t("automation.section.title")}</h1>
               <p className="mt-1 max-w-4xl text-xs leading-5 text-muted-foreground">
-                {t("automation.section.description")}
+                {t(localRuntime ? "automation.section.description" : "automation.web.description")}
               </p>
             </div>
             <Badge variant={eStop.active ? "destructive" : "outline"}>
-              {eStop.active ? t("automation.stopped") : t("automation.ready")}
+              {localRuntime
+                ? eStop.active
+                  ? t("automation.stopped")
+                  : apiOnline
+                    ? t("automation.ready")
+                    : t("automation.localConnectionRequired")
+                : t("automation.web.status")}
             </Badge>
           </header>
 
-          <RuntimeCapabilityRail apiOnline={apiOnline} surface="automation" />
+          <RuntimeCapabilityRail runtimeTier={runtimeTier} surface="automation" />
 
-          <AutomationOperationStrip
-            apiOnline={apiOnline}
-            auditCount={auditCount}
-            eStop={eStop}
-            scheduler={scheduler}
-            tasks={tasks}
-            onRefresh={onRefresh}
-            onToggleEStop={onToggleEStop}
-          />
-
-          <div
-            className="grid min-w-0 border-y border-border md:grid-cols-[minmax(220px,280px)_minmax(0,1fr)] xl:grid-cols-[280px_minmax(380px,1fr)_360px]"
-            data-automation-studio-layout="true"
-          >
-            <aside className="min-w-0 border-b border-border md:border-b-0 md:border-r">
-              <section
-                className={sectionClass(activeSection, "custom")}
-                data-automation-artifact="validated-cell-recipe"
-                id={automationSectionId("custom")}
-              >
-                <SectionHeading
-                  count={tasks.length}
-                  description={t("automation.custom.description")}
-                  title={t("automation.custom.title")}
-                />
-                <div className="mt-2 divide-y divide-border border-y border-border" data-automation-task-list="true">
-                  {tasks.length ? tasks.map((task) => {
-                    const selected = task.id === selectedTask?.id;
-                    return (
-                      <button
-                        aria-pressed={selected}
-                        className={cn(
-                          "grid w-full min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-2 px-2 py-2.5 text-left outline-none transition-colors hover:bg-muted/45 focus-visible:bg-muted/55 focus-visible:ring-2 focus-visible:ring-ring/50",
-                          selected && "border-l-2 border-l-accent-brand bg-muted/40 pl-1.5",
-                        )}
-                        data-automation-task-selected={selected ? "true" : "false"}
-                        data-automation-task-selector={task.id}
-                        key={task.id}
-                        type="button"
-                        onClick={() => selectTask(task.id)}
-                      >
-                        <FileCode2 className="mt-0.5 size-3.5 text-muted-foreground" />
-                        <span className="min-w-0">
-                          <span className="block truncate text-xs font-semibold">{task.name || task.documentPath}</span>
-                          <span className="mt-1 flex min-w-0 items-center gap-1.5 text-[10px] text-muted-foreground">
-                            <span className="truncate">{scheduleLabel(task, t)}</span>
-                            <span aria-hidden="true">·</span>
-                            <span className="shrink-0">{lastRunLabel(task, t, locale)}</span>
-                          </span>
-                        </span>
-                        <ChevronRight className={cn("mt-0.5 size-3.5 text-muted-foreground", selected && "text-accent-brand")} />
-                      </button>
-                    );
-                  }) : (
-                    <p className="px-2 py-5 text-xs leading-5 text-muted-foreground">
-                      {t("automation.empty.detail")}
-                    </p>
-                  )}
-                </div>
-              </section>
-
-              <section className={sectionClass(activeSection, "codaro")} id={automationSectionId("codaro")}>
-                <SectionHeading
-                  count={codaroAutomationTemplates.length}
-                  description={t("automation.codaro.description")}
-                  title={t("automation.task.referenceTemplates")}
-                />
-                <div className="mt-2 divide-y divide-border border-y border-border">
-                  {codaroAutomationTemplates.map((template) => (
-                    <div
-                      className={cn(
-                        "grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-2 px-2 py-2.5",
-                        template.runtime === "local" && !apiOnline && "opacity-60",
-                      )}
-                      data-runtime-availability={
-                        template.runtime === "local" && !apiOnline ? "local-required" : "available"
-                      }
-                      data-runtime-requirement={template.runtime}
-                      key={template.titleKey}
-                    >
-                      <Workflow className="mt-0.5 size-3.5 text-muted-foreground" />
-                      <div className="min-w-0">
-                        <div className="flex min-w-0 items-center gap-1.5">
-                          <span className="truncate text-xs font-medium">{t(template.titleKey)}</span>
-                          <Badge
-                            className="ml-auto"
-                            data-runtime-requirement-label={template.runtime}
-                            variant="outline"
-                          >
-                            {template.runtime === "local" && !apiOnline
-                              ? t("automation.template.localRequired")
-                              : t(template.tagKey)}
-                          </Badge>
-                        </div>
-                        <p className="mt-1 line-clamp-2 text-[10px] leading-4 text-muted-foreground">
-                          {t(template.descriptionKey)}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            </aside>
-
-            <main
-              className={cn("min-w-0 scroll-mt-3", activeSection === "tasks" && "bg-muted/15")}
-              id={automationSectionId("tasks")}
-            >
-              <TaskDetail headingRef={detailHeadingRef} task={selectedTask} />
-            </main>
-
-            <div className="min-w-0 md:col-span-2 xl:col-span-1">
-              <AutomationRunInspector
+          {localRuntime ? (
+            <>
+              <AutomationOperationStrip
                 apiOnline={apiOnline}
+                auditCount={visibleAuditCount}
                 eStop={eStop}
-                task={selectedTask}
-                onConfirmTaskSafety={onConfirmTaskSafety}
-                onRunTask={onRunTask}
-                onToggleTask={onToggleTask}
+                scheduler={visibleScheduler}
+                tasks={visibleTasks}
+                onRefresh={onRefresh}
+                onToggleEStop={onToggleEStop}
               />
-            </div>
-          </div>
+
+              <div
+                className="grid min-w-0 border-y border-border md:grid-cols-[minmax(220px,280px)_minmax(0,1fr)] xl:grid-cols-[280px_minmax(380px,1fr)_360px]"
+                data-automation-studio-layout="true"
+              >
+                <aside className="min-w-0 border-b border-border md:border-b-0 md:border-r">
+                  <section
+                    className={sectionClass(effectiveSection, "custom")}
+                    data-automation-artifact="validated-cell-recipe"
+                    id={automationSectionId("custom")}
+                  >
+                    <SectionHeading
+                      count={visibleTasks.length}
+                      description={t("automation.custom.description")}
+                      title={t("automation.custom.title")}
+                    />
+                    <div className="mt-2 divide-y divide-border border-y border-border" data-automation-task-list="true">
+                      {visibleTasks.length ? visibleTasks.map((task) => {
+                        const selected = task.id === selectedTask?.id;
+                        return (
+                          <button
+                            aria-pressed={selected}
+                            className={cn(
+                              "grid w-full min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-2 px-2 py-2.5 text-left outline-none transition-colors hover:bg-muted/45 focus-visible:bg-muted/55 focus-visible:ring-2 focus-visible:ring-ring/50",
+                              selected && "border-l-2 border-l-accent-brand bg-muted/40 pl-1.5",
+                            )}
+                            data-automation-task-selected={selected ? "true" : "false"}
+                            data-automation-task-selector={task.id}
+                            key={task.id}
+                            type="button"
+                            onClick={() => selectTask(task.id)}
+                          >
+                            <FileCode2 className="mt-0.5 size-3.5 text-muted-foreground" />
+                            <span className="min-w-0">
+                              <span className="block truncate text-xs font-semibold">{task.name || task.documentPath}</span>
+                              <span className="mt-1 flex min-w-0 items-center gap-1.5 text-[10px] text-muted-foreground">
+                                <span className="truncate">{scheduleLabel(task, t)}</span>
+                                <span aria-hidden="true">·</span>
+                                <span className="shrink-0">{lastRunLabel(task, t, locale)}</span>
+                              </span>
+                            </span>
+                            <ChevronRight className={cn("mt-0.5 size-3.5 text-muted-foreground", selected && "text-accent-brand")} />
+                          </button>
+                        );
+                      }) : (
+                        <p className="px-2 py-5 text-xs leading-5 text-muted-foreground">
+                          {t("automation.empty.detail")}
+                        </p>
+                      )}
+                    </div>
+                  </section>
+
+                  <section className={sectionClass(effectiveSection, "codaro")} id={automationSectionId("codaro")}>
+                    <SectionHeading
+                      count={codaroAutomationTemplates.length}
+                      description={t("automation.codaro.description")}
+                      title={t("automation.task.referenceTemplates")}
+                    />
+                    <AutomationTemplateList localRuntime />
+                  </section>
+                </aside>
+
+                <main
+                  className={cn("min-w-0 scroll-mt-3", effectiveSection === "tasks" && "bg-muted/15")}
+                  id={automationSectionId("tasks")}
+                >
+                  <TaskDetail
+                    emptyDetail={t("automation.task.notSelectedDetail")}
+                    headingRef={detailHeadingRef}
+                    task={selectedTask}
+                  />
+                </main>
+
+                <div className="min-w-0 md:col-span-2 xl:col-span-1">
+                  <AutomationRunInspector
+                    apiOnline={apiOnline}
+                    eStop={eStop}
+                    task={selectedTask}
+                    onConfirmTaskSafety={onConfirmTaskSafety}
+                    onRunTask={onRunTask}
+                    onToggleTask={onToggleTask}
+                  />
+                </div>
+              </div>
+            </>
+          ) : (
+            <WebAutomationGuide />
+          )}
         </div>
       </div>
     </ScrollArea>
   );
 }
 
+function WebAutomationGuide() {
+  const { t } = useLocale();
+  const steps = [
+    ["01", "automation.web.stepValidate", "automation.web.stepValidateDetail"],
+    ["02", "automation.web.stepRecipe", "automation.web.stepRecipeDetail"],
+    ["03", "automation.web.stepLocal", "automation.web.stepLocalDetail"],
+  ] as const;
+
+  return (
+    <section
+      className="grid min-w-0 border-y border-border md:grid-cols-[minmax(0,1fr)_minmax(260px,0.8fr)]"
+      data-web-automation-guide="true"
+    >
+      <div className="min-w-0 px-3 py-4 sm:px-4">
+        <h2 className="text-sm font-semibold">{t("automation.web.guideTitle")}</h2>
+        <p className="mt-1 max-w-2xl text-xs leading-5 text-muted-foreground">
+          {t("automation.web.guideDetail")}
+        </p>
+        <ol className="mt-4 divide-y divide-border border-y border-border">
+          {steps.map(([number, titleKey, detailKey]) => (
+            <li className="grid min-w-0 grid-cols-[2rem_minmax(0,1fr)] gap-2 py-3" key={number}>
+              <span className="font-mono text-[10px] font-semibold text-accent-brand">{number}</span>
+              <span className="min-w-0">
+                <strong className="block text-xs">{t(titleKey)}</strong>
+                <span className="mt-1 block text-[11px] leading-5 text-muted-foreground">{t(detailKey)}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <div className="min-w-0 border-t border-border px-3 py-4 sm:px-4 md:border-l md:border-t-0">
+        <SectionHeading
+          count={codaroAutomationTemplates.length}
+          description={t("automation.web.templateDetail")}
+          title={t("automation.task.referenceTemplates")}
+        />
+        <AutomationTemplateList localRuntime={false} />
+      </div>
+    </section>
+  );
+}
+
+function AutomationTemplateList({ localRuntime }: { localRuntime: boolean }) {
+  const { t } = useLocale();
+  return (
+    <div className="mt-2 divide-y divide-border border-y border-border">
+      {codaroAutomationTemplates.map((template) => (
+        <div
+          className={cn(
+            "grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-2 px-2 py-2.5",
+            template.runtime === "local" && !localRuntime && "opacity-60",
+          )}
+          data-runtime-availability={
+            template.runtime === "local" && !localRuntime ? "local-required" : "available"
+          }
+          data-runtime-requirement={template.runtime}
+          key={template.titleKey}
+        >
+          <Workflow className="mt-0.5 size-3.5 text-muted-foreground" />
+          <div className="min-w-0">
+            <div className="flex min-w-0 items-center gap-1.5">
+              <span className="truncate text-xs font-medium">{t(template.titleKey)}</span>
+              <Badge
+                className="ml-auto"
+                data-runtime-requirement-label={template.runtime}
+                variant="outline"
+              >
+                {template.runtime === "local" && !localRuntime
+                  ? t("automation.template.localRequired")
+                  : t(template.tagKey)}
+              </Badge>
+            </div>
+            <p className="mt-1 line-clamp-2 text-[10px] leading-4 text-muted-foreground">
+              {t(template.descriptionKey)}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function TaskDetail({
+  emptyDetail,
   headingRef,
   task,
 }: {
+  emptyDetail: string;
   headingRef: RefObject<HTMLHeadingElement | null>;
   task: TaskDefinition | null;
 }) {
@@ -274,7 +356,7 @@ function TaskDetail({
         <div>
           <FileCode2 className="mx-auto size-5 text-muted-foreground" />
           <p className="mt-2 text-sm font-medium">{t("automation.task.notSelected")}</p>
-          <p className="mt-1 text-xs text-muted-foreground">{t("automation.task.notSelectedDetail")}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{emptyDetail}</p>
         </div>
       </div>
     );

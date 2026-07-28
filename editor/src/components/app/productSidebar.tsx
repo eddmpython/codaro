@@ -356,6 +356,7 @@ export function ProductSidebar({
 
             {surface === "automation" ? (
               <AutomationSidebarTree
+                runtimeTier={runtimeTier}
                 selectedSection={selectedAutomationSection}
                 text={{
                   automation: t("sidebar.automation"),

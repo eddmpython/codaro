@@ -57,6 +57,7 @@ type MainSurfaceProps = {
   reactiveEnabled: boolean;
   referenceLoading: boolean;
   results: ResultMap;
+  runtimeTier: "local" | "web";
   runningBlockId: string | null;
   scheduler: SchedulerStatus;
   selectedBlockId: string;
@@ -249,6 +250,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
       apiOnline={props.apiOnline}
       auditCount={props.auditCount}
       eStop={props.eStop}
+      runtimeTier={props.runtimeTier}
       scheduler={props.scheduler}
       tasks={props.tasks.tasks}
       onRefresh={props.onRefreshAutomation}

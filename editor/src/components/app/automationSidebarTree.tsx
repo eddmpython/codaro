@@ -18,6 +18,7 @@ import {
 import type { AutomationSection } from "@/lib/surfaceModel";
 
 type AutomationSidebarTreeProps = {
+  runtimeTier: "local" | "web";
   selectedSection: AutomationSection;
   text: {
     automation: string;
@@ -31,17 +32,21 @@ type AutomationSidebarTreeProps = {
 };
 
 export function AutomationSidebarTree({
+  runtimeTier,
   selectedSection,
   text,
   onSelectSection,
 }: AutomationSidebarTreeProps) {
-  const items: Array<{ section: AutomationSection; label: string; Icon: ComponentType<{ className?: string }> }> = [
+  const localItems: Array<{ section: AutomationSection; label: string; Icon: ComponentType<{ className?: string }> }> = [
     { section: "browserUse", label: text.browserUse, Icon: Globe },
     { section: "computerUse", label: text.computerUse, Icon: MonitorCog },
     { section: "codaro", label: text.codaro, Icon: Workflow },
     { section: "custom", label: text.custom, Icon: TerminalSquare },
     { section: "tasks", label: text.tasks, Icon: Clock3 },
   ];
+  const items = runtimeTier === "local"
+    ? localItems
+    : localItems.filter(({ section }) => section === "codaro" || section === "custom");
 
   return (
     <SidebarGroup className="py-0.5">

@@ -65,6 +65,7 @@ export function AutomationOperationStrip({
         <div className="flex items-center gap-2 border-l border-border px-3 py-2">
           <IconButton
             className="size-8"
+            disabled={!apiOnline}
             label={t("automation.refresh")}
             onClick={onRefresh}
           >

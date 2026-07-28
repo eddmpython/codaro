@@ -284,10 +284,11 @@ AUTOMATION_REQUIREMENTS = (
             )),
             ("editor/src/lib/automationState.ts", (
                 "Promise.all",
-                "optional(codaroApi.tasks, fallbackTasks)",
-                "optional(codaroApi.schedulerStatus, fallbackScheduler)",
+                "optional(codaroApi.tasks, emptyTasks)",
+                "optional(codaroApi.schedulerStatus, emptyScheduler)",
                 "optional(codaroApi.eStop, fallbackEStop)",
                 "optional(codaroApi.audit, { entries: [], count: 0 })",
+                "throw new Error(translate(\"automation.localConnectionRequired\"))",
                 "toggleAutomationStop",
                 "runAutomationTask",
                 "confirmAutomationTaskSafety",

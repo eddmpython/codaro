@@ -24,23 +24,22 @@ type RuntimeCapabilityCopy = {
 };
 
 export function RuntimeCapabilityRail({
-  apiOnline,
+  runtimeTier,
   surface,
 }: {
-  apiOnline: boolean;
+  runtimeTier: "local" | "web";
   surface: RuntimeSurface;
 }) {
   const { locale } = useLocale();
-  const tier = apiOnline ? "local" : "web";
-  const copy = runtimeCapabilityCopy(locale, surface, tier);
-  const RuntimeIcon = tier === "local" ? HardDrive : Globe2;
+  const copy = runtimeCapabilityCopy(locale, surface, runtimeTier);
+  const RuntimeIcon = runtimeTier === "local" ? HardDrive : Globe2;
 
   return (
     <section
       aria-label={copy.aria}
       className="grid min-h-14 grid-cols-3 border-y border-border bg-muted/25 xl:grid-cols-[minmax(260px,1.55fr)_repeat(3,minmax(0,0.8fr))]"
       data-runtime-capability-rail={surface}
-      data-runtime-tier={tier}
+      data-runtime-tier={runtimeTier}
     >
       <div className="col-span-3 flex min-w-0 items-center gap-3 px-3 py-2.5 xl:col-span-1">
         <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-accent-surface text-accent-brand">

@@ -597,6 +597,7 @@ function App() {
               reactiveEnabled={reactiveEnabled}
               referenceLoading={referenceLoading}
               results={results}
+              runtimeTier={runRouteState.runtimeTier}
               runningBlockId={runningBlockId}
               scheduler={scheduler}
               selectedCategory={selectedCategory}

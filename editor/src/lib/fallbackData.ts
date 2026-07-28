@@ -6,8 +6,6 @@ import type {
   CurriculumLessonPayload,
   EStopStatus,
   ProgressSummary,
-  SchedulerStatus,
-  TaskListPayload,
 } from "@/types";
 
 export const categoryMeta: Record<string, { title: string; subtitle: string; track: string }> = {
@@ -321,77 +319,6 @@ export const fallbackProgress: ProgressSummary = {
   totalAccessed: 1,
   totalCompleted: 0,
   updatedAt: new Date().toISOString(),
-};
-
-export const fallbackTasks: TaskListPayload = {
-  total: 2,
-  tasks: [
-    {
-      id: "task-fallback-1",
-      name: "일일 학습 요약",
-      description: "Python 문서를 실행하고 최신 진행 요약을 만듭니다.",
-      documentPath: "daily_summary.py",
-      schedule: "@daily",
-      enabled: true,
-      outputs: ["stdout", "variables"],
-      permissionScopes: ["filesystem.read", "filesystem.write", "network", "process.execute"],
-      riskLevel: "destructive",
-      safetyApproval: {
-        schemaVersion: 1,
-        fingerprint: "sha256-fallback-daily-summary",
-        confirmedAt: new Date(Date.now() - 86400 * 1000).toISOString(),
-        riskLevel: "destructive",
-        permissionScopes: ["filesystem.read", "filesystem.write", "network", "process.execute"],
-      },
-      safety: {
-        status: "approved",
-        reason: "approved",
-        riskLevel: "destructive",
-        permissionScopes: ["filesystem.read", "filesystem.write", "network", "process.execute"],
-        fingerprint: "sha256-fallback-daily-summary",
-        approvedAt: new Date(Date.now() - 86400 * 1000).toISOString(),
-      },
-      createdAt: new Date(Date.now() - 86400 * 1000).toISOString(),
-      updatedAt: new Date().toISOString(),
-      lastRun: {
-        id: "run-fallback-1",
-        taskId: "task-fallback-1",
-        status: "success",
-        startedAt: new Date(Date.now() - 3600 * 1000).toISOString(),
-        finishedAt: new Date(Date.now() - 3590 * 1000).toISOString(),
-        durationMs: 998,
-        output: "요약 준비됨",
-        variables: { lessons: 1 },
-      },
-    },
-    {
-      id: "task-fallback-2",
-      name: "워크북 정리",
-      description: "Python 레슨에서 생성된 자동화 태스크 예시입니다.",
-      documentPath: "automation/workbook_cleanup.py",
-      schedule: null,
-      enabled: false,
-      outputs: [],
-      permissionScopes: ["filesystem.read", "filesystem.write", "network", "process.execute"],
-      riskLevel: "destructive",
-      safetyApproval: null,
-      safety: {
-        status: "confirmationRequired",
-        reason: "not-confirmed",
-        riskLevel: "destructive",
-        permissionScopes: ["filesystem.read", "filesystem.write", "network", "process.execute"],
-        fingerprint: "sha256-fallback-workbook-cleanup",
-        approvedAt: null,
-      },
-      createdAt: new Date(Date.now() - 2 * 86400 * 1000).toISOString(),
-      updatedAt: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
-    },
-  ],
-};
-
-export const fallbackScheduler: SchedulerStatus = {
-  activeJobs: ["task-fallback-1"],
-  jobCount: 1,
 };
 
 export const fallbackEStop: EStopStatus = {

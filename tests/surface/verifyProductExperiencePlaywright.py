@@ -3041,6 +3041,11 @@ async ({ surface, expectedTier }) => {
     visibleNotebookStatusCount: [...document.querySelectorAll(".notebookStatusItem")]
       .filter(visible).length,
     automationSurfaceCount: document.querySelectorAll("[data-automation-loop='second-loop']").length,
+    automationCapabilityState:
+      document.querySelector("[data-automation-capability-state]")?.getAttribute("data-automation-capability-state") || null,
+    automationRuntime:
+      document.querySelector("[data-automation-runtime]")?.getAttribute("data-automation-runtime") || null,
+    webAutomationGuideCount: document.querySelectorAll("[data-web-automation-guide='true']").length,
     automationOperationStripCount: document.querySelectorAll("[data-automation-operation-strip='true']").length,
     automationRunInspectorCount: document.querySelectorAll("[data-automation-run-inspector='true']").length,
     automationTaskSelectorCount: document.querySelectorAll("[data-automation-task-selector]").length,
@@ -3287,6 +3292,33 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
             or audit["automationSurfaceCount"] != 1
         ):
             failures.append(f"{name}: shared automation surface wiring is incomplete")
+        if (
+            audit["automationCapabilityState"] != "design-only"
+            or audit["automationRuntime"] != "web"
+            or audit["webAutomationGuideCount"] != 1
+            or audit["automationOperationStripCount"] != 0
+            or audit["automationRunInspectorCount"] != 0
+            or audit["automationTaskSelectorCount"] != 0
+            or audit["automationSelectedTaskCount"] != 0
+            or audit["automationTaskDetailCount"] != 0
+            or audit["automationEStopControlCount"] != 0
+            or audit["automationRunCommandCount"] != 0
+            or audit["localRequiredTemplateCount"] != 3
+        ):
+            failures.append(
+                f"{name}: Web automation exposed false Local operations: "
+                f"state={audit['automationCapabilityState']}, "
+                f"runtime={audit['automationRuntime']}, "
+                f"guide={audit['webAutomationGuideCount']}, "
+                f"operations={audit['automationOperationStripCount']}, "
+                f"inspector={audit['automationRunInspectorCount']}, "
+                f"tasks={audit['automationTaskSelectorCount']}, "
+                f"selected={audit['automationSelectedTaskCount']}, "
+                f"detail={audit['automationTaskDetailCount']}, "
+                f"eStop={audit['automationEStopControlCount']}, "
+                f"run={audit['automationRunCommandCount']}, "
+                f"localRequired={audit['localRequiredTemplateCount']}"
+            )
     elif surface == "learning-home":
         if audit["customCurriculumGroupCount"]:
             failures.append(f"{name}: empty custom curriculum promotion leaked into learning navigation")
@@ -3643,6 +3675,15 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
                 f"got {audit['localHomeVisibleCommandCount']}"
             )
     elif surface == "local-automation":
+        if (
+            audit["automationCapabilityState"] != "operational"
+            or audit["automationRuntime"] != "local"
+        ):
+            failures.append(
+                f"{name}: Local automation capability state drifted: "
+                f"state={audit['automationCapabilityState']}, "
+                f"runtime={audit['automationRuntime']}"
+            )
         requiredCounts = {
             "surface": audit["automationSurfaceCount"],
             "operation strip": audit["automationOperationStripCount"],
