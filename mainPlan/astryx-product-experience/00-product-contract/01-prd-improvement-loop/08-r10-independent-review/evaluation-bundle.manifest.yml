@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: 121402cdff8dda9fea741c5c67d201b6e081a0ae
+  gitCommit: 1f6fa62c45b2990c9cae91302355707fa2e8ad58
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: 56452febca77d54c6f71cc844f082ea200ded8f14acfd62f714efdec25e14b37
+  manifestHash: b0411de84268ca7f3bf8a36660bd780a75fa1a4697ef268898f42c525a6aabf7
   fileCount: 2876
-  totalBytes: 91300647
+  totalBytes: 91318387
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: 793be662b40b85c39b67e0696a2c84e106cab944dcef943b4f0d34fd6af58a12
-  bytes: 91868645
+  sha256: 8e8c715c858c1d57b5420741f81400c68704799411f83f723103d141b226dafa
+  bytes: 91886385
   format: zip
   compression: stored
   compressionMethod: 0
@@ -5510,8 +5510,8 @@ files:
   kind: repository
   sourcePath: editor/src/components/app/appErrorBoundary.tsx
 - path: editor/src/components/app/appPrimitives.tsx
-  sha256: 7fd28317978dcfa8bd5f74f37daef15914558cc44217c4e3b6c6b55caa1f4ef2
-  bytes: 12093
+  sha256: 3637a4988527d064c30ed765a1519d51672d32cd1e4852532614a23503f1ea16
+  bytes: 12141
   kind: repository
   sourcePath: editor/src/components/app/appPrimitives.tsx
 - path: editor/src/components/app/automationSidebarTree.tsx
@@ -5750,8 +5750,8 @@ files:
   kind: repository
   sourcePath: editor/src/components/notebook/notebookPanel.css
 - path: editor/src/components/notebook/notebookPanel.tsx
-  sha256: f0970f16e5b94f17e255c49dab009deb82ad9b223557474a774c4843869f7d75
-  bytes: 38799
+  sha256: cd0c1347c82e5ea022031f371b9fef02c09d8be4e356a230ed54795a4f10fdc1
+  bytes: 40151
   kind: repository
   sourcePath: editor/src/components/notebook/notebookPanel.tsx
 - path: editor/src/components/notebook/variableExplorerPanel.tsx
@@ -6789,8 +6789,8 @@ files:
   kind: repository
   sourcePath: landing/src/main.jsx
 - path: landing/src/pages/home.jsx
-  sha256: ca33d740641d9d78d85d1c3b98a304f65cda0cea3d18b0701322b076ed00e368
-  bytes: 10887
+  sha256: 5a6aaf51d65920796ca79145e931a077c345e1c4b2ba110eefa550ac920a282e
+  bytes: 11391
   kind: repository
   sourcePath: landing/src/pages/home.jsx
 - path: landing/src/pages/learn.jsx
@@ -6879,8 +6879,8 @@ files:
   kind: repository
   sourcePath: landing/src/styles/generated/socialLinks.tsx
 - path: landing/src/styles/homeAstryx.css
-  sha256: a6b3e59151b14a397c2951d3662d920e4b8208fc5cf852ea086bdfebe36f7d05
-  bytes: 14680
+  sha256: faae85edae86c3142d3fc7e5796f1a6ec645fe5af759b3b9afd42f412f5b4bbb
+  bytes: 15226
   kind: repository
   sourcePath: landing/src/styles/homeAstryx.css
 - path: landing/src/styles/learnExplorer.css
@@ -14029,8 +14029,8 @@ files:
   kind: repository
   sourcePath: tests/product/verifyReleaseResearchOperations.py
 - path: tests/product/verifyWebView2ProductSmoke.py
-  sha256: df156241da3b31b1f295ce820c2d82c85698c29b0cc76fafab0c433c73375a08
-  bytes: 73850
+  sha256: a00f9dbe4fe933e693257e03e15abc23657974fd23c63e4a8499d7a53e1adf73
+  bytes: 81396
   kind: repository
   sourcePath: tests/product/verifyWebView2ProductSmoke.py
 - path: tests/run.py
@@ -14204,8 +14204,8 @@ files:
   kind: repository
   sourcePath: tests/surface/testNotebookPersistence.py
 - path: tests/surface/testProductSurfaceContract.py
-  sha256: 84f73a6fb064275c0bc43ca4f6ed1860e82f3956fa59b83cbb82f48a11cead02
-  bytes: 45286
+  sha256: 869eb65239b54b7fc4676c1e3629ca6756267d7e8be2358bd743e6c3e9588e35
+  bytes: 46098
   kind: repository
   sourcePath: tests/surface/testProductSurfaceContract.py
 - path: tests/surface/testProviderSettingsContract.py
@@ -14284,8 +14284,8 @@ files:
   kind: repository
   sourcePath: tests/surface/verifyMobileLayout.py
 - path: tests/surface/verifyNotebookAutosavePlaywright.py
-  sha256: 79dc8dbbea5e6146874b608569e5f1252c922aa4cb08be3d6c504ba38b10229b
-  bytes: 21663
+  sha256: 8f0ae6928ef85b4d3b88be51397139e1ebe94921c27a3f6a0966954d5830c1ef
+  bytes: 21797
   kind: repository
   sourcePath: tests/surface/verifyNotebookAutosavePlaywright.py
 - path: tests/surface/verifyOnboardingPlaywright.py
@@ -14299,8 +14299,8 @@ files:
   kind: repository
   sourcePath: tests/surface/verifyPlaywrightMobile.py
 - path: tests/surface/verifyProductExperiencePlaywright.py
-  sha256: ad1a222f10ac8d857ee1df84a158186334625b8c56e63bdcbd9d50935995bc5c
-  bytes: 308194
+  sha256: ef9e6de359d4733ad71581bb07bcd7fa8d5ec111da185eb57e5587695e91e516
+  bytes: 314992
   kind: repository
   sourcePath: tests/surface/verifyProductExperiencePlaywright.py
 - path: tests/surface/verifyProductModuleBoundaries.py
