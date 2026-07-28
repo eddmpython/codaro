@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: bacbd45465d5435ab5cc044955c56721b4e13d05
+  gitCommit: 0fab205be5289a13821a039acb2d05bf14b27ce8
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: f208ec0249ebdf308bc38997dd4027d3894ad4a47fbd823ba68d876f119cea76
-  fileCount: 2876
-  totalBytes: 91318387
+  manifestHash: 6e3ea9fdadc2b73b3e71841698dfc7f50eec50f5bc8f9b3ae1d546fff118a235
+  fileCount: 2877
+  totalBytes: 91343496
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: ad6778b0c037110c57b5138c4ae27720c4c66fa2e4bdae437617ea049468292f
-  bytes: 91886385
+  sha256: 81079940d1e7885da5ba161f48d07c82545e3691c7ef8f63e3f20a9cdf660da7
+  bytes: 91911654
   format: zip
   compression: stored
   compressionMethod: 0
@@ -6778,6 +6778,11 @@ files:
   bytes: 156
   kind: repository
   sourcePath: landing/src/lib/useBrowserLayoutEffect.js
+- path: landing/src/lib/useCommittedSearchInput.js
+  sha256: 442f23520f1f4129d01252f46b687f974a6182aecce663351bb756c0d66ecacd
+  bytes: 1560
+  kind: repository
+  sourcePath: landing/src/lib/useCommittedSearchInput.js
 - path: landing/src/lib/visualAssets.js
   sha256: d30fcda1503d799592462da40eb489c77a0d16b668738207750280bf2b6c420c
   bytes: 1839
@@ -6794,8 +6799,8 @@ files:
   kind: repository
   sourcePath: landing/src/pages/home.jsx
 - path: landing/src/pages/learn.jsx
-  sha256: 2fff9a8ed26d48668b06fd16bd246247c40e3216d261bb05f7e9dfaf03bd7ad2
-  bytes: 22985
+  sha256: dcad51ec1d82f3c032253ee19bfd5d8bbf6478cd5ccf8511df343dba49dbdaba
+  bytes: 22365
   kind: repository
   sourcePath: landing/src/pages/learn.jsx
 - path: landing/src/pages/lesson.jsx
@@ -6829,8 +6834,8 @@ files:
   kind: repository
   sourcePath: landing/src/routes/routePrimitives.jsx
 - path: landing/src/routes/searchRoutes.jsx
-  sha256: c18918aa98859a0b6551fb9fb3fe2d71bc082ce94d4dcbb19adbd9bbd01b118b
-  bytes: 3897
+  sha256: 5d68b415795b7ff7a97afe88ed7d8fa64100caf266181894f356b8f673415dfe
+  bytes: 6363
   kind: repository
   sourcePath: landing/src/routes/searchRoutes.jsx
 - path: landing/src/routes/toolRoutes.jsx
@@ -6839,8 +6844,8 @@ files:
   kind: repository
   sourcePath: landing/src/routes/toolRoutes.jsx
 - path: landing/src/styles.css
-  sha256: 0c2bcaac54c7ecf375b8112a939952e6da5825595e83795258ec913f0cf2b13f
-  bytes: 23237
+  sha256: 7af09f1ff2faa2e3438c396b70bd40fba6b31a158a4ba163e29233a117652523
+  bytes: 23746
   kind: repository
   sourcePath: landing/src/styles.css
 - path: landing/src/styles/generated/codaro.d.ts
@@ -14204,8 +14209,8 @@ files:
   kind: repository
   sourcePath: tests/surface/testNotebookPersistence.py
 - path: tests/surface/testProductSurfaceContract.py
-  sha256: 869eb65239b54b7fc4676c1e3629ca6756267d7e8be2358bd743e6c3e9588e35
-  bytes: 46098
+  sha256: bc0c9eb92679eb7a7a3c9b416d1cba1977c41fc2f7dc5b176a74290d13db9f0a
+  bytes: 47914
   kind: repository
   sourcePath: tests/surface/testProductSurfaceContract.py
 - path: tests/surface/testProviderSettingsContract.py
@@ -14299,8 +14304,8 @@ files:
   kind: repository
   sourcePath: tests/surface/verifyPlaywrightMobile.py
 - path: tests/surface/verifyProductExperiencePlaywright.py
-  sha256: ef9e6de359d4733ad71581bb07bcd7fa8d5ec111da185eb57e5587695e91e516
-  bytes: 314992
+  sha256: c0cf00ffc80f70e9b6cd3bf3f59c16a7a0cd356d110b61e1b83da7e11c9831d2
+  bytes: 334370
   kind: repository
   sourcePath: tests/surface/verifyProductExperiencePlaywright.py
 - path: tests/surface/verifyProductModuleBoundaries.py
