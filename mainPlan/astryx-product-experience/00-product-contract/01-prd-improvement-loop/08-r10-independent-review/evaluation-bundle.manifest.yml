@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: 7b20024c1c0fd72a1b811f7dd0b278a16c9707ec
+  gitCommit: ea7e95c1aaf5485bf25dfe5e4e670501bb692dcc
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: 38255932163303b0e9a1a921807924e711dc01cc0aea0a5955bec4a4e04a7ffa
-  fileCount: 2877
-  totalBytes: 91343496
+  manifestHash: de6b75f6ab83c34f995dcb1e1e16d3c2a85439ef1f091b458935dad937110edc
+  fileCount: 2940
+  totalBytes: 92217502
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: 0f13f5e47abf32a4ba0d5edaeb0a60e1e302502c17710fb10a86282bd3c0c78d
-  bytes: 91911654
+  sha256: d44d07288a565d8b1297f0ab351c3f74f97e44df8b2bf21184f4e7df597dea80
+  bytes: 92802838
   format: zip
   compression: stored
   compressionMethod: 0
@@ -4710,10 +4710,15 @@ files:
   kind: repository
   sourcePath: editor/public/manifest.json
 - path: editor/public/serviceWorker.js
-  sha256: a7d0b91dcebede06da9deccf9a3c8dda9d69c2dfcb7c8e89f080d505c33f6516
-  bytes: 4145
+  sha256: 70323abae27b53803f1f46466d4dc4ffd10ca105299aaa847d22f5238895ba3b
+  bytes: 6582
   kind: repository
   sourcePath: editor/public/serviceWorker.js
+- path: editor/public/serviceWorkerLegacyCaches.json
+  sha256: 22afb70c7ab05b4a682c542836e84eaf760cc54ab050fa96aa012867e0f2b3d8
+  bytes: 227
+  kind: repository
+  sourcePath: editor/public/serviceWorkerLegacyCaches.json
 - path: editor/public/visuals/files/aiIntegration/aiIntegration-1200-37e84d22dbb9.avif
   sha256: 3e66bb9877bdb37e9ec300aff4053d1d628afb324ea2fbaf4e297f1d997a383b
   bytes: 30314
@@ -7073,11 +7078,11 @@ files:
   bytes: 38723
   kind: repository
   sourcePath: landing/static/run/_app/00_Seaborn소개-DyMXxZeL.js
-- path: landing/static/run/_app/00_email소개-DbS3pGM7.js
-  sha256: 7d3370420e3a8db0917ae4be9276bb4e37dbfd4ed539d479fd729c45acdd9bb9
-  bytes: 9042
+- path: landing/static/run/_app/00_email소개-C8dZNW6U.js
+  sha256: 68e83577d4df28c92b6fdac3480b435aac733ecec2e34ce54c87eaeae6328a9a
+  bytes: 9324
   kind: repository
-  sourcePath: landing/static/run/_app/00_email소개-DbS3pGM7.js
+  sourcePath: landing/static/run/_app/00_email소개-C8dZNW6U.js
 - path: landing/static/run/_app/00_folium소개-7i9PBiVg.js
   sha256: d48144ba64e4d264e35f37ea127c6974c7b74adadc9ff2eba7e09f538c2f79a0
   bytes: 26737
@@ -7133,11 +7138,11 @@ files:
   bytes: 23782
   kind: repository
   sourcePath: landing/static/run/_app/00_sympy소개-DluwovHJ.js
-- path: landing/static/run/_app/00_word소개-D8BPmWK5.js
-  sha256: ba888e68a1a4e093f169cc18b82d5ab74773f5502d49c2de5b63cd6d2d5f592e
-  bytes: 7841
+- path: landing/static/run/_app/00_word소개-CMvZNTEn.js
+  sha256: 44bb3fa523b526bb25cab483dd53027ab9224aee1c74f7bbaead76400e348129
+  bytes: 8133
   kind: repository
-  sourcePath: landing/static/run/_app/00_word소개-D8BPmWK5.js
+  sourcePath: landing/static/run/_app/00_word소개-CMvZNTEn.js
 - path: landing/static/run/_app/00_xlwings소개-CXrGK5Oh.js
   sha256: 321915da2c584fecf90853eafd4bfe79db4f2558fedaf069bb57d8801103ba25
   bytes: 28636
@@ -9213,66 +9218,66 @@ files:
   bytes: 28153
   kind: repository
   sourcePath: landing/static/run/_app/35_동시성-C3qd4xIE.js
-- path: landing/static/run/_app/_taxonomy-J6hGAN28.js
-  sha256: f69f4d201dc029721fa880222e820f83424786c1d367a8ef83ff59a286361533
-  bytes: 112802
+- path: landing/static/run/_app/_taxonomy-DDgHWMkX.js
+  sha256: a5a1ad1b3d33bbb538ef219807178624282b2b6d45504358f8c5aa0a1bc48ae0
+  bytes: 118496
   kind: repository
-  sourcePath: landing/static/run/_app/_taxonomy-J6hGAN28.js
-- path: landing/static/run/_app/assistantPanel-O406COID.js
-  sha256: a1dbedeb352858d6d8ff83963200f9571ea806edd0714dae2b2b7b229daf8614
+  sourcePath: landing/static/run/_app/_taxonomy-DDgHWMkX.js
+- path: landing/static/run/_app/assistantPanel-l6WXhG43.js
+  sha256: c7cd9125c66d73302d6586851cb06b0a21f54cd0c2c8687806d9c75914d96dc1
   bytes: 15678
   kind: repository
-  sourcePath: landing/static/run/_app/assistantPanel-O406COID.js
-- path: landing/static/run/_app/automationOperationStrip-CLD8H5hZ.js
-  sha256: a6a88429da30b7b0a573a31f49f34cd234179bee24cca7b9c45b423b9e82082f
-  bytes: 2422
+  sourcePath: landing/static/run/_app/assistantPanel-l6WXhG43.js
+- path: landing/static/run/_app/automationOperationStrip-BSScr4pW.js
+  sha256: 36c6f5a17013fcd15c928c38fe46819b177c02babc2485dd59aa6f3408ca547f
+  bytes: 2411
   kind: repository
-  sourcePath: landing/static/run/_app/automationOperationStrip-CLD8H5hZ.js
-- path: landing/static/run/_app/automationSurface-i-MX_u4D.js
-  sha256: 2976a865c8309600d4a47df2b042d7dc39561ab7c2ae6ea0c67a87ec4439dd31
-  bytes: 23657
+  sourcePath: landing/static/run/_app/automationOperationStrip-BSScr4pW.js
+- path: landing/static/run/_app/automationSurface-BXSFX3Nt.js
+  sha256: 76a50b056e35214d8e5fb95016d4df0bf6b765f0ed0d95f37c8db411f733e5c1
+  bytes: 25749
   kind: repository
-  sourcePath: landing/static/run/_app/automationSurface-i-MX_u4D.js
-- path: landing/static/run/_app/chatSurface-DOA3oI_h.js
-  sha256: 7facffd78305bd8b7ef987f95cd20aa7d14592dc836656708aced29cfbdb0a96
+  sourcePath: landing/static/run/_app/automationSurface-BXSFX3Nt.js
+- path: landing/static/run/_app/chatSurface-CgS6T-4o.js
+  sha256: 1d3e27be1a0355f96e5cadf0d69ff6fc5d89e5f66e5759dc6c9e708516a6ae04
   bytes: 2814
   kind: repository
-  sourcePath: landing/static/run/_app/chatSurface-DOA3oI_h.js
-- path: landing/static/run/_app/codemirror-tHBIJIl9.js
-  sha256: dc3e8a85c462c2f27f99007abc1bc1b1527ccdb59eacc6af93ae6c55caa9e350
-  bytes: 388923
+  sourcePath: landing/static/run/_app/chatSurface-CgS6T-4o.js
+- path: landing/static/run/_app/codemirror-BPxJYtXh.js
+  sha256: 5ec6b0577fc6533c87f5ba857039a23c81b6bfc62bb250cf18bafd8f5778f336
+  bytes: 389074
   kind: repository
-  sourcePath: landing/static/run/_app/codemirror-tHBIJIl9.js
-- path: landing/static/run/_app/commandLineIntro-BJj_YgHu.js
-  sha256: 585d934e6d488b6641b482c68703d84bd0d554d617272fe387e49f7619196fe8
-  bytes: 12499
+  sourcePath: landing/static/run/_app/codemirror-BPxJYtXh.js
+- path: landing/static/run/_app/commandLineIntro-Ct6KJMkO.js
+  sha256: a883d9a10f4d6486372dd571ee43ed29262bd99eb53c646ab3a61418007e714e
+  bytes: 12917
   kind: repository
-  sourcePath: landing/static/run/_app/commandLineIntro-BJj_YgHu.js
-- path: landing/static/run/_app/currentLearningSurface-J1i7Zf-J.js
-  sha256: 20022d8bd9891c23f924f4cd7e10c7a339cf7c90c71cc4531b9e72b34b21e587
-  bytes: 3814
+  sourcePath: landing/static/run/_app/commandLineIntro-Ct6KJMkO.js
+- path: landing/static/run/_app/currentLearningSurface-DgvQZTDU.js
+  sha256: afaa0b1087ec5adcd6e4f59eb52ae0d74b88444bf03c983e06fa2e39b0153892
+  bytes: 4400
   kind: repository
-  sourcePath: landing/static/run/_app/currentLearningSurface-J1i7Zf-J.js
-- path: landing/static/run/_app/curriculumHome-D_Ys3uah.js
-  sha256: e0575b90fafd6e141369e3c566b2fece957a5521b25d31edfbdf87ad21d23ad6
+  sourcePath: landing/static/run/_app/currentLearningSurface-DgvQZTDU.js
+- path: landing/static/run/_app/curriculumHome-CN7N_FvX.js
+  sha256: f33cc8500dde3ddf36f8a8c34589a303fb0005b3c4daef121762f4ee7d9c69a8
   bytes: 8228
   kind: repository
-  sourcePath: landing/static/run/_app/curriculumHome-D_Ys3uah.js
-- path: landing/static/run/_app/curriculumMarkdown-DcPGmSt5.js
-  sha256: 65c9064ce72b8d5e14a6a2df3e092e4bdd91e3a269c38c87f48b02f043600149
-  bytes: 140957
+  sourcePath: landing/static/run/_app/curriculumHome-CN7N_FvX.js
+- path: landing/static/run/_app/curriculumMarkdown-wnbLQtE4.js
+  sha256: 7ff3fdcf7b0ecba8a8b757d65afdab8ef934ed3df7a69c70d4e09fa6b34863d2
+  bytes: 143675
   kind: repository
-  sourcePath: landing/static/run/_app/curriculumMarkdown-DcPGmSt5.js
-- path: landing/static/run/_app/curriculumSurface-BNnege81.js
-  sha256: 5a5d728ecccb8905738297c1a8c0e894e3e6d5a97de9c8dc74d18e458c944356
-  bytes: 306011
+  sourcePath: landing/static/run/_app/curriculumMarkdown-wnbLQtE4.js
+- path: landing/static/run/_app/curriculumSurface-C4PvWPvJ.css
+  sha256: cc132c76145bb0db44febdee0d7f84678877c63823d94c3cec4468337d1fc6ae
+  bytes: 1899
   kind: repository
-  sourcePath: landing/static/run/_app/curriculumSurface-BNnege81.js
-- path: landing/static/run/_app/curriculumSurface-Cy-8Uqlk.css
-  sha256: 4158c910bd22261895b07ff6b84c3b955773b4c3aa9d7edcfdd2ec5864e5cdb6
-  bytes: 2011
+  sourcePath: landing/static/run/_app/curriculumSurface-C4PvWPvJ.css
+- path: landing/static/run/_app/curriculumSurface-WMNhJmno.js
+  sha256: b73190cf3ecca5a42029fc26f652eed829850797097854ff081d24a1a258c41a
+  bytes: 347812
   kind: repository
-  sourcePath: landing/static/run/_app/curriculumSurface-Cy-8Uqlk.css
+  sourcePath: landing/static/run/_app/curriculumSurface-WMNhJmno.js
 - path: landing/static/run/_app/day01_헬로월드-C0ii4jTz.js
   sha256: ca3b8893a943cf26714073cfb30d02d4a30a97f2dd0500a3752395f4448325dd
   bytes: 21883
@@ -9423,61 +9428,61 @@ files:
   bytes: 37086
   kind: repository
   sourcePath: landing/static/run/_app/day30_최종프로젝트-B1NzhN1r.js
-- path: landing/static/run/_app/gitFirstSteps-BSodZM0Y.js
-  sha256: f00895fba3021c1204329079195be5527a86a0f78289f6f02c0db5fa6923c695
-  bytes: 13000
+- path: landing/static/run/_app/gitFirstSteps-D4w-2TdW.js
+  sha256: 79a142faa614649841d8c6670b325671a1895dcee067c61f4bf5f618c4ff5ce2
+  bytes: 13414
   kind: repository
-  sourcePath: landing/static/run/_app/gitFirstSteps-BSodZM0Y.js
-- path: landing/static/run/_app/githubIntro-DfvtMkx8.js
-  sha256: cbc8777425d244864f6aa6244761170a8757b3b51a544c0ee8a0d0f4cca252bc
-  bytes: 14695
+  sourcePath: landing/static/run/_app/gitFirstSteps-D4w-2TdW.js
+- path: landing/static/run/_app/githubIntro-BrIR9T7s.js
+  sha256: a97bdd772702ba476e038f730d291c7f4a8b9ec8c36cf9b3b7092bd8207736fa
+  bytes: 15263
   kind: repository
-  sourcePath: landing/static/run/_app/githubIntro-DfvtMkx8.js
-- path: landing/static/run/_app/icons-CteiBGNz.js
-  sha256: 979c7e3e38da2af2c179daef1eeafbd4b99d7e44b4e7792f6f7ced2704956513
-  bytes: 16424
+  sourcePath: landing/static/run/_app/githubIntro-BrIR9T7s.js
+- path: landing/static/run/_app/icons-B9BZImRG.js
+  sha256: d8a4549972a302394201216cc3843248c7bbb4a387d82bb8956e870e2b5a4079
+  bytes: 16274
   kind: repository
-  sourcePath: landing/static/run/_app/icons-CteiBGNz.js
-- path: landing/static/run/_app/index-CfBJ05mT.css
-  sha256: 5730d68d05f5974bff152278d92ff45ba2c3c1b2b98673e4b7fc36f7378ce2a9
-  bytes: 107298
+  sourcePath: landing/static/run/_app/icons-B9BZImRG.js
+- path: landing/static/run/_app/index-BoXwwGAz.css
+  sha256: 72f3baf3ad78b463398ac3ab0b377569c3535e5c988766a1373b4363933a18ff
+  bytes: 108415
   kind: repository
-  sourcePath: landing/static/run/_app/index-CfBJ05mT.css
-- path: landing/static/run/_app/index-Cqc4JFIB.js
-  sha256: 8f30b2d3293a6f19b3aeefb2945479a5975123c34e9b0ee82e643d251e7f838f
-  bytes: 197569
+  sourcePath: landing/static/run/_app/index-BoXwwGAz.css
+- path: landing/static/run/_app/index-CXOrpA8k.js
+  sha256: 61f766e9e868a8a52e9b0657047b7f856d9a89df98028cdff670174c91806aff
+  bytes: 198226
   kind: repository
-  sourcePath: landing/static/run/_app/index-Cqc4JFIB.js
-- path: landing/static/run/_app/localHomeSurface-QjRJv3sL.js
-  sha256: fb70a84c316238d3369517446c2baa0bc7df31d07227568c6addd8e160b57c74
+  sourcePath: landing/static/run/_app/index-CXOrpA8k.js
+- path: landing/static/run/_app/localHomeSurface-BCvAK9Sj.js
+  sha256: aa355811fe5ba4aa3d65c23f5f42ba297007c42d9c7e9192bd609f8bbafb4ddc
   bytes: 6860
   kind: repository
-  sourcePath: landing/static/run/_app/localHomeSurface-QjRJv3sL.js
+  sourcePath: landing/static/run/_app/localHomeSurface-BCvAK9Sj.js
 - path: landing/static/run/_app/machineWorker-DTHx9gcb.js
   sha256: 1904eb4c3d7518d27c1fa3bd8303f016946aa01e035126cd1ec2e53ed99c968c
   bytes: 47105
   kind: repository
   sourcePath: landing/static/run/_app/machineWorker-DTHx9gcb.js
-- path: landing/static/run/_app/notebookPanel-JKatM3Ik.js
-  sha256: 60c58a106d92d67f8d9206ad294c38f1d80927c64546b76c000798763f65e062
-  bytes: 22723
+- path: landing/static/run/_app/notebookPanel-CGX6aqYh.css
+  sha256: 591d057f141d98411182f108c2793020910a3523ef7509682759289edd6d30fc
+  bytes: 12537
   kind: repository
-  sourcePath: landing/static/run/_app/notebookPanel-JKatM3Ik.js
-- path: landing/static/run/_app/notebookPanel-UGyKNbZx.css
-  sha256: e60cac4021a9bbb0bb6dda1f87d0b7ae5863fa0af011e92d197d2091f9571d57
-  bytes: 12465
+  sourcePath: landing/static/run/_app/notebookPanel-CGX6aqYh.css
+- path: landing/static/run/_app/notebookPanel-y9j9Se9T.js
+  sha256: b135e7af708cdd2ca1b0192090d96a763bcd4b3a25fe4d489598bfe6e72f42f8
+  bytes: 25948
   kind: repository
-  sourcePath: landing/static/run/_app/notebookPanel-UGyKNbZx.css
-- path: landing/static/run/_app/notebookSurface-BOhBKcrq.js
-  sha256: 34fe9c8216615734a5233d5ee9b47b284976839641afdb019e92d110898be9c1
+  sourcePath: landing/static/run/_app/notebookPanel-y9j9Se9T.js
+- path: landing/static/run/_app/notebookSurface-Bm_chdCk.js
+  sha256: ebc3565e3f80227596b84f5a40f73cd47037307bc42064fa96374d392085e991
   bytes: 8998
   kind: repository
-  sourcePath: landing/static/run/_app/notebookSurface-BOhBKcrq.js
-- path: landing/static/run/_app/radix-Dz6TPyYv.js
-  sha256: 39c380036404e0efee2307d37aeeb8819fb26456418ae528a5cf80c1a266d65e
-  bytes: 29889
+  sourcePath: landing/static/run/_app/notebookSurface-Bm_chdCk.js
+- path: landing/static/run/_app/radix-CNYGNleh.js
+  sha256: c7fec3c07a7ddbd03d8ac97bdd1084873a5f4744536a7b4ff1c9ccde09b193d6
+  bytes: 29890
   kind: repository
-  sourcePath: landing/static/run/_app/radix-Dz6TPyYv.js
+  sourcePath: landing/static/run/_app/radix-CNYGNleh.js
 - path: landing/static/run/_app/rolldown-runtime-QTnfLwEv.js
   sha256: 5db5ba82eef00d1dee7e86e663098c9427d01183a88d357437daff295aec3e75
   bytes: 694
@@ -9488,21 +9493,21 @@ files:
   bytes: 9719
   kind: repository
   sourcePath: landing/static/run/_app/schema-43LlYS0G.js
-- path: landing/static/run/_app/sharePackSurface-CtcON9yY.js
-  sha256: 354dacfd907ad278bb98d124e6753071a0171ae7a8f038bf8c721b19a83f18e5
+- path: landing/static/run/_app/sharePackSurface-BPX_jS0Q.js
+  sha256: 6311b2f7616d3adfb365911c946a6edde801555b6387f76702bd4f4dbec0e1b2
   bytes: 12166
   kind: repository
-  sourcePath: landing/static/run/_app/sharePackSurface-CtcON9yY.js
+  sourcePath: landing/static/run/_app/sharePackSurface-BPX_jS0Q.js
+- path: landing/static/run/_app/vendor-BDhq2wRZ.js
+  sha256: 8066b9c9d5fd9b6fefdcc1b649e5586e3056bdb24529117bb9473be741eeb39e
+  bytes: 331941
+  kind: repository
+  sourcePath: landing/static/run/_app/vendor-BDhq2wRZ.js
 - path: landing/static/run/_app/vendor-BylNkWiU.css
   sha256: 1ffe19fb45c3578391d2a51b2016aef363cad33a265d8526e650b053e8d89bbc
   bytes: 22017
   kind: repository
   sourcePath: landing/static/run/_app/vendor-BylNkWiU.css
-- path: landing/static/run/_app/vendor-CbwbdVg7.js
-  sha256: 489e4af0258c02631db1ba23d75e5a970131a21bc6dd5ce472789774376c2234
-  bytes: 331941
-  kind: repository
-  sourcePath: landing/static/run/_app/vendor-CbwbdVg7.js
 - path: landing/static/run/_app/wasiWorker-CYncMEu_.js
   sha256: c9aa363379d9cb8d18cd0cec33b825d85436e612df6b61d601979291d71ababc
   bytes: 29663
@@ -9523,11 +9528,11 @@ files:
   bytes: 2853
   kind: repository
   sourcePath: landing/static/run/_app/xterm-kHJ-D0s7.css
-- path: landing/static/run/_app/yaml-BfbZSfEO.js
-  sha256: e52e69d166f9db1e922182316ee99cd6ecd57c7f204cd0d600c377444c9829f6
+- path: landing/static/run/_app/yaml-C_cwo_2m.js
+  sha256: 9b66637cdf17f59a0e35a7334a97ac1d68301f0304859e200aea491f44b08508
   bytes: 207790
   kind: repository
-  sourcePath: landing/static/run/_app/yaml-BfbZSfEO.js
+  sourcePath: landing/static/run/_app/yaml-C_cwo_2m.js
 - path: landing/static/run/brand/avatar-small.png
   sha256: c39fffeed90c82d83e652738586a3b71a97e287770abb85ea82fe95d95b8f94a
   bytes: 32416
@@ -9589,7 +9594,7 @@ files:
   kind: repository
   sourcePath: landing/static/run/fonts/SpaceGrotesk-700.woff2
 - path: landing/static/run/index.html
-  sha256: bb5b19a5ec3db4a909a04ab1823048f9f7f101c10bf47da47dd2a13bda540605
+  sha256: 3b9005686daed776cecfc6abed28f0f1cc267666745ae5d05b5a60f30043fec7
   bytes: 4065
   kind: repository
   sourcePath: landing/static/run/index.html
@@ -9604,10 +9609,15 @@ files:
   kind: repository
   sourcePath: landing/static/run/pyproc-assets.json
 - path: landing/static/run/serviceWorker.js
-  sha256: a7d0b91dcebede06da9deccf9a3c8dda9d69c2dfcb7c8e89f080d505c33f6516
-  bytes: 4145
+  sha256: 70323abae27b53803f1f46466d4dc4ffd10ca105299aaa847d22f5238895ba3b
+  bytes: 6582
   kind: repository
   sourcePath: landing/static/run/serviceWorker.js
+- path: landing/static/run/serviceWorkerLegacyCaches.json
+  sha256: 22afb70c7ab05b4a682c542836e84eaf760cc54ab050fa96aa012867e0f2b3d8
+  bytes: 227
+  kind: repository
+  sourcePath: landing/static/run/serviceWorkerLegacyCaches.json
 - path: landing/static/run/vendor/pyproc/src/capabilities/asgiServer.js
   sha256: 1968d8c183975f4b3997954e61011cb9a57bcb654802315081c85537180242c5
   bytes: 4740
@@ -9813,6 +9823,36 @@ files:
   bytes: 31002
   kind: repository
   sourcePath: landing/static/run/visuals/files/dataAnalysis/dataAnalysis-840-b0ac8b2e6692.webp
+- path: landing/static/run/visuals/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.avif
+  sha256: 45dbbdd22708a81ce366c4d4dd245959e94c0002accc47fdc33f1619af22baa8
+  bytes: 12151
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.avif
+- path: landing/static/run/visuals/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.webp
+  sha256: 97d666ec9432909bedd088ae1eda0afd0ad3810e9beabf5661bd419fead54595
+  bytes: 17602
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.webp
+- path: landing/static/run/visuals/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.avif
+  sha256: ad4cfd2da09c0937368b52fe592e541f3ff8abbbf99dc767872271bf6945ead0
+  bytes: 4384
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.avif
+- path: landing/static/run/visuals/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.webp
+  sha256: 9cbeebb6c112489b64f30c54c7c2f399d55efa241dcd51939b508e0261bb1e62
+  bytes: 4352
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.webp
+- path: landing/static/run/visuals/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.avif
+  sha256: 3fd5b0b2ad1c37bf60dcb394522ddefe58c2e6e04839e7583f25e15de2d7adec
+  bytes: 7581
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.avif
+- path: landing/static/run/visuals/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.webp
+  sha256: efdfabe6fe5b4ac2ad1a94ffe0a7a91e82083426c19f4fac2381451627dd65ca
+  bytes: 7648
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.webp
 - path: landing/static/run/visuals/files/dataVisualization/dataVisualization-1200-5248dc1b6fb1.avif
   sha256: e2ce17f156b4c4d4440d77bad6413f2c063cede019ccf08a5877d3e66ff978ba
   bytes: 32610
@@ -9853,6 +9893,36 @@ files:
   bytes: 22296
   kind: repository
   sourcePath: landing/static/run/visuals/files/dataVisualization/dataVisualization-840-5248dc1b6fb1.webp
+- path: landing/static/run/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.avif
+  sha256: 1709289a37ee0049f4cb502cd3b0a9f0c484e0fdb448c34793386f9827ededbf
+  bytes: 12185
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.avif
+- path: landing/static/run/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.webp
+  sha256: dede08af71f14bb0db124f91f0c48b28524a5ce86201829c012364ebc800e6c6
+  bytes: 16062
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.webp
+- path: landing/static/run/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.avif
+  sha256: 8de5cb1f7bb344fff9c57316e28442315b414a39220ea82e6ec8a2c16be3831a
+  bytes: 4115
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.avif
+- path: landing/static/run/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.webp
+  sha256: 35a6793c204eb0555aece4b9dc7bdf645590264b09b9d92190737d67d18c70f4
+  bytes: 4112
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.webp
+- path: landing/static/run/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.avif
+  sha256: dce23a4c47832f5b517bdf7a65bc4e103f522ffa7ba93520cb103987ea43f133
+  bytes: 7133
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.avif
+- path: landing/static/run/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.webp
+  sha256: 288b3a7aef168041839c5db50fd90895faae68a4fa5ce6ecd7c3c2d9f5166420
+  bytes: 7286
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.webp
 - path: landing/static/run/visuals/files/developerLiteracy/developerLiteracy-1200-9990255713da.avif
   sha256: eb3d7a35d4976f5abf5d20b126ccb2fa41014dc0c53495e20cb70c197de305f4
   bytes: 32719
@@ -9893,6 +9963,36 @@ files:
   bytes: 25048
   kind: repository
   sourcePath: landing/static/run/visuals/files/developerLiteracy/developerLiteracy-840-9990255713da.webp
+- path: landing/static/run/visuals/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.avif
+  sha256: 94eb73ae689d6e1db7f20bf345b1115508ae71b1b85f9c8811bd4e85bc526a6b
+  bytes: 11598
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.avif
+- path: landing/static/run/visuals/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.webp
+  sha256: 47f3123bd0ba66f59551cb9f3a8b05d445c1c54754f037d99b78f4e3fc536087
+  bytes: 15630
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.webp
+- path: landing/static/run/visuals/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.avif
+  sha256: 2afd0380e6d521d0b45e28e4b927e566e1ab485b31f1236d781c6079d7f8547c
+  bytes: 3966
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.avif
+- path: landing/static/run/visuals/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.webp
+  sha256: 667359fb4bdcfe73b3b42762e550f29c1344451b537b6e5ceca35bcfda720dd9
+  bytes: 3874
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.webp
+- path: landing/static/run/visuals/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.avif
+  sha256: 9eb0c6a6494dd8f70c34db0adb78000815213842a3db6011f05e272e324dbcd4
+  bytes: 6698
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.avif
+- path: landing/static/run/visuals/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.webp
+  sha256: e8bc9e3f5304b950c082fadc01ddb6249b45cb536562ddb64a2d9c51f7972510
+  bytes: 6872
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.webp
 - path: landing/static/run/visuals/files/imageVision/imageVision-1200-1b1922d95f3d.avif
   sha256: 1d40c9fb17521e19cdf91c0f13941aafedb12e0cb35fb9f6d3931519f528cfa5
   bytes: 56217
@@ -9973,56 +10073,166 @@ files:
   bytes: 26626
   kind: repository
   sourcePath: landing/static/run/visuals/files/learningAutomation/learningAutomation-840-a21d2e976646.webp
-- path: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-1d7fdf9b67aa.avif
-  sha256: 5248aef1fea61e1db69551b1cd1141ae6dfd1615b243bd025f7d13e905b6d1a8
-  bytes: 31672
+- path: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-7b8a0ff9efc3.avif
+  sha256: 942fcc7e22eb77ba47879b477af898e114165b779ab31a9b5e22fb1a8016331b
+  bytes: 34621
   kind: repository
-  sourcePath: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-1d7fdf9b67aa.avif
-- path: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-1d7fdf9b67aa.webp
-  sha256: a38a3e53b4c374f48c3bfc0ad3087731edc8fdf689f82cd91f07863e67261fb0
-  bytes: 33240
+  sourcePath: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-7b8a0ff9efc3.avif
+- path: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-7b8a0ff9efc3.webp
+  sha256: 6229a385101ccb4c4e385aafa0b03547e253d8599df6a11b8615bdc921b3dcbc
+  bytes: 36264
   kind: repository
-  sourcePath: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-1d7fdf9b67aa.webp
-- path: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-1d7fdf9b67aa.avif
-  sha256: 534de13bb2fb19a61a15e37367cc724c014b0c450ae604706d22a9735ff6f671
-  bytes: 37367
+  sourcePath: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-7b8a0ff9efc3.webp
+- path: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-7b8a0ff9efc3.avif
+  sha256: f34a363848e20b35a7c7b449e0587c6f9c17ae557d5e6d89ee54e2bf86997f80
+  bytes: 41076
   kind: repository
-  sourcePath: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-1d7fdf9b67aa.avif
-- path: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-1d7fdf9b67aa.webp
-  sha256: f547815f10bde82a9779c8c82f4d3cd58c458c28c1617b2b3917fb7f279af555
-  bytes: 52584
+  sourcePath: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-7b8a0ff9efc3.avif
+- path: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-7b8a0ff9efc3.webp
+  sha256: e1202d6c0f85212063a352f8955c7573c355c4601fa0a5f962ee75ec5e833d26
+  bytes: 58502
   kind: repository
-  sourcePath: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-1d7fdf9b67aa.webp
-- path: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-720-1d7fdf9b67aa.avif
-  sha256: 7aa2200f05c099e9c65d4b2a05d9870095e4e1dfe73ce67c87aeba92a905dafd
-  bytes: 16422
+  sourcePath: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-7b8a0ff9efc3.webp
+- path: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-720-7b8a0ff9efc3.avif
+  sha256: e25c7429ea97efd315be906f4cc10ad9e1bc7473ddfdd197a9ea6b6cb5b2d723
+  bytes: 17604
   kind: repository
-  sourcePath: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-720-1d7fdf9b67aa.avif
-- path: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-720-1d7fdf9b67aa.webp
-  sha256: 20d73ba8aeb425a47bb622e217be1c93c45dafe7495e70014b3844e92037a6fb
-  bytes: 16766
+  sourcePath: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-720-7b8a0ff9efc3.avif
+- path: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-720-7b8a0ff9efc3.webp
+  sha256: 78587b4dc14709042158f3c7473fba3efb41a5d386267b5a6711abb7ca14f4dc
+  bytes: 18552
   kind: repository
-  sourcePath: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-720-1d7fdf9b67aa.webp
-- path: landing/static/run/visuals/files/localNotebookDesktop/localNotebookDesktop-600-ac92b1d8707c.avif
-  sha256: 3d445fb6a0774a9335ca6340d96700f04903ada69504ce7071b5e1d63427808c
-  bytes: 3935
+  sourcePath: landing/static/run/visuals/files/localAutomationDesktop/localAutomationDesktop-720-7b8a0ff9efc3.webp
+- path: landing/static/run/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1080-721ed30622b6.avif
+  sha256: b6d22a5d36685c4359976bf8f7f23dfc2b19ef0d8f0cf5872ebbd037319d5e21
+  bytes: 32194
   kind: repository
-  sourcePath: landing/static/run/visuals/files/localNotebookDesktop/localNotebookDesktop-600-ac92b1d8707c.avif
-- path: landing/static/run/visuals/files/localNotebookDesktop/localNotebookDesktop-600-ac92b1d8707c.webp
-  sha256: d1aaea461f80e8b206555f57fa0f420744949ff7cfd4f6a41f789beb4672bcb0
-  bytes: 4190
+  sourcePath: landing/static/run/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1080-721ed30622b6.avif
+- path: landing/static/run/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1080-721ed30622b6.webp
+  sha256: c0234441df15112af2a32e2d10ce10605395ef22973205a66769fd600e8324f8
+  bytes: 34000
   kind: repository
-  sourcePath: landing/static/run/visuals/files/localNotebookDesktop/localNotebookDesktop-600-ac92b1d8707c.webp
-- path: landing/static/run/visuals/files/localNotebookDesktop/localNotebookDesktop-900-ac92b1d8707c.avif
-  sha256: 3d1cdc908f4c75202c4553cfaa55b72d56e30d6352b4d5922dee9c33b90ebbba
-  bytes: 5298
+  sourcePath: landing/static/run/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1080-721ed30622b6.webp
+- path: landing/static/run/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1440-721ed30622b6.avif
+  sha256: 3a2d1d247fd08b4677a97a502de296696624357ffcb7c15da5b9f773c2c43f3a
+  bytes: 39967
   kind: repository
-  sourcePath: landing/static/run/visuals/files/localNotebookDesktop/localNotebookDesktop-900-ac92b1d8707c.avif
-- path: landing/static/run/visuals/files/localNotebookDesktop/localNotebookDesktop-900-ac92b1d8707c.webp
-  sha256: 02d9af2cd83af03572104e4ae47ce5f1f56ff5302e0e0aee0014a124a4ca9f7f
-  bytes: 7520
+  sourcePath: landing/static/run/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1440-721ed30622b6.avif
+- path: landing/static/run/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1440-721ed30622b6.webp
+  sha256: 9ac46dc40e0b5786b8f5eba7439df1df4ae01b0172307b2e629effbdd654539b
+  bytes: 56132
   kind: repository
-  sourcePath: landing/static/run/visuals/files/localNotebookDesktop/localNotebookDesktop-900-ac92b1d8707c.webp
+  sourcePath: landing/static/run/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1440-721ed30622b6.webp
+- path: landing/static/run/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-720-721ed30622b6.avif
+  sha256: 51590674cbc152db3e788e95c5dc72b9547b004437fe82f996d5ca79fb298dbe
+  bytes: 16523
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-720-721ed30622b6.avif
+- path: landing/static/run/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-720-721ed30622b6.webp
+  sha256: b1a37fc767d5ac1a688cf26075d5686cc1074b3a6c8bfbcfd24822d1b4fa50c8
+  bytes: 17160
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-720-721ed30622b6.webp
+- path: landing/static/run/visuals/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.avif
+  sha256: 133ebd556ccea1933b7c64032bfa375dd3d647c5bbcf063557bd44d78b7eb2ad
+  bytes: 3742
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.avif
+- path: landing/static/run/visuals/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.webp
+  sha256: 1fdc00e3d0227c4cc57ebbfee266eb6f3d6daf66d5ccfe3872bd5c1877143e11
+  bytes: 4118
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.webp
+- path: landing/static/run/visuals/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.avif
+  sha256: 28a51ebf9343d3007ec3b95113fd6829456e35556a6776ded27c53d7113ae15b
+  bytes: 5239
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.avif
+- path: landing/static/run/visuals/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.webp
+  sha256: cc7e967dd2ddbe81d2eef0bb3490e37e32b68dd1c4aa439b63fdf879dac1b992
+  bytes: 7312
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.webp
+- path: landing/static/run/visuals/files/localNotebookDesktopLight/localNotebookDesktopLight-600-0f7e9e1a9676.avif
+  sha256: 482614fe0f44ffb39500c86b55600a92b22b5add6771f54f1c742715975f9f60
+  bytes: 3666
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/localNotebookDesktopLight/localNotebookDesktopLight-600-0f7e9e1a9676.avif
+- path: landing/static/run/visuals/files/localNotebookDesktopLight/localNotebookDesktopLight-600-0f7e9e1a9676.webp
+  sha256: 99ee728d074a1832f80af31709d6deb939a20ae0229a67c942836b851a38f586
+  bytes: 4204
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/localNotebookDesktopLight/localNotebookDesktopLight-600-0f7e9e1a9676.webp
+- path: landing/static/run/visuals/files/localNotebookDesktopLight/localNotebookDesktopLight-900-0f7e9e1a9676.avif
+  sha256: e96eec8281858743d73c12631da6654685312db90904be82523b5611b1a61ca5
+  bytes: 5055
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/localNotebookDesktopLight/localNotebookDesktopLight-900-0f7e9e1a9676.avif
+- path: landing/static/run/visuals/files/localNotebookDesktopLight/localNotebookDesktopLight-900-0f7e9e1a9676.webp
+  sha256: 7924a99f32c59987448462bf0b9b9e90c106632bc10bc1c8a2248d8b4b1bf9ab
+  bytes: 7254
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/localNotebookDesktopLight/localNotebookDesktopLight-900-0f7e9e1a9676.webp
+- path: landing/static/run/visuals/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.avif
+  sha256: e1c1747baa5415975d0cb3cbfb3623c7d56be54a03b351e9bfb2af72ea5e49b2
+  bytes: 15691
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.avif
+- path: landing/static/run/visuals/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.webp
+  sha256: 74eb34130edb28daec5cf8399bc022a4aca905c4d894153580978278fa22cba7
+  bytes: 20968
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.webp
+- path: landing/static/run/visuals/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.avif
+  sha256: 44c9bed4b2cf597c90182b63aa2d231de0d48a897dcd0f36f0a43ba5327b5881
+  bytes: 5322
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.avif
+- path: landing/static/run/visuals/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.webp
+  sha256: ede776527e99aece692cd97982d2104d51fbb584e7d2f850a0bcd1ac973fe2bc
+  bytes: 5274
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.webp
+- path: landing/static/run/visuals/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.avif
+  sha256: a755d1f1aac03b7847bb4adbd920fd336e17337fc451b1bfb161247e03c5c488
+  bytes: 9103
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.avif
+- path: landing/static/run/visuals/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.webp
+  sha256: 0002c7a17aa74c1047ed2401e4010c03b7eed33e4de9473605c801aa0107c66c
+  bytes: 9322
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.webp
+- path: landing/static/run/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.avif
+  sha256: 458bd6022191cd84cf00c6d4b6ed0aff8e4abbf0729a3b25e38c2486dc7578be
+  bytes: 14760
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.avif
+- path: landing/static/run/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.webp
+  sha256: 19ed667ce49b03d158cbfd78a8f70b837d063f9b9995ee126dc672844ce4c366
+  bytes: 19632
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.webp
+- path: landing/static/run/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.avif
+  sha256: d58c81a2efd8710fa1f250fb14a856128754a4d85d2f707227223dc40a04a41b
+  bytes: 4909
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.avif
+- path: landing/static/run/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.webp
+  sha256: a4c6f89562ca1761ee02db21c310f079f8c35643c868523538b363b301ab97a5
+  bytes: 5044
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.webp
+- path: landing/static/run/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.avif
+  sha256: df3e6a090930b2f16abe391e9bb2337c6e56cc56a2912e6635c576b60ed9c69f
+  bytes: 8415
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.avif
+- path: landing/static/run/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.webp
+  sha256: 4dd060319a5fc02b785becedf06962997c156e128b96d671499c3da3bc80f61a
+  bytes: 8566
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.webp
 - path: landing/static/run/visuals/files/pythonFundamentals/pythonFundamentals-1200-209adca76258.avif
   sha256: 628cc31e5e6cf5c0cdf9329e8c058b3aa0f428bb4779fb39138550a9cd0667b9
   bytes: 46892
@@ -10063,46 +10273,146 @@ files:
   bytes: 35382
   kind: repository
   sourcePath: landing/static/run/visuals/files/pythonFundamentals/pythonFundamentals-840-209adca76258.webp
-- path: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-480-2d625aa4eda5.avif
-  sha256: 0bba809a3323dd64bb4440519ecfb2ae27b04b6a002f389caf3245a321108b06
-  bytes: 12357
+- path: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-480-0e062b11ca1e.avif
+  sha256: e784d11616529de37bf4d528d3acda0df2d3f8a11f24fe735170749e1fe26719
+  bytes: 12477
   kind: repository
-  sourcePath: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-480-2d625aa4eda5.avif
-- path: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-480-2d625aa4eda5.webp
-  sha256: 5403ccd5212816fced1d02a9c290ebbfcdfaa68520a679961cb34e0be7d23896
-  bytes: 13864
+  sourcePath: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-480-0e062b11ca1e.avif
+- path: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-480-0e062b11ca1e.webp
+  sha256: 7aed62b017739997895e5729b44c2fd2e1304df557df7e94acce5bb8deb43562
+  bytes: 13480
   kind: repository
-  sourcePath: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-480-2d625aa4eda5.webp
-- path: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-720-2d625aa4eda5.avif
-  sha256: 6b8d5d47cea540c83801084445b7fe79bd2810bbd43f30fa500bb4832edbb60b
-  bytes: 24710
+  sourcePath: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-480-0e062b11ca1e.webp
+- path: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-720-0e062b11ca1e.avif
+  sha256: 5d5fde6ccfac425de44f80c9171509685e4f78602f6f062e2fb2daa9c54b17b2
+  bytes: 23370
   kind: repository
-  sourcePath: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-720-2d625aa4eda5.avif
-- path: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-720-2d625aa4eda5.webp
-  sha256: cf958ebf12852c947fd753b89136a6fdeb8bdc223b6f0a2e54545689ec45efdc
-  bytes: 27468
+  sourcePath: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-720-0e062b11ca1e.avif
+- path: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-720-0e062b11ca1e.webp
+  sha256: c1babe4a0fad9939eb37e755ea98bb8cea6d70997631a5dc4ee6f9f71d17682f
+  bytes: 25438
   kind: repository
-  sourcePath: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-720-2d625aa4eda5.webp
-- path: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-900-2d625aa4eda5.avif
-  sha256: 4b318f0b357c1017ecc2251845bf320bc3a037e81901c845a0895968f82d0b68
-  bytes: 26716
+  sourcePath: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-720-0e062b11ca1e.webp
+- path: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-900-0e062b11ca1e.avif
+  sha256: abf8806b02f1b40cf5c062db10c175d7d46fb30114298d1755f28e185addc882
+  bytes: 25692
   kind: repository
-  sourcePath: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-900-2d625aa4eda5.avif
-- path: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-900-2d625aa4eda5.webp
-  sha256: 675bbc7ce6f9ce31fc7de7551f6029c263e2a2a675bff8b781ef779c9522a9d9
-  bytes: 39008
+  sourcePath: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-900-0e062b11ca1e.avif
+- path: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-900-0e062b11ca1e.webp
+  sha256: c3b2c3b9d987060ea084962868e220f161f567ef089a9205de92ac9e480207a1
+  bytes: 37422
   kind: repository
-  sourcePath: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-900-2d625aa4eda5.webp
-- path: landing/static/run/visuals/files/runLearningMobile/runLearningMobile-390-7f57fbbe546e.avif
-  sha256: a1699553d31d1e9abbf17205dad2d061bd5747ccc1577a62ddd1f316e2ebc860
-  bytes: 20167
+  sourcePath: landing/static/run/visuals/files/runLearningDetail/runLearningDetail-900-0e062b11ca1e.webp
+- path: landing/static/run/visuals/files/runLearningDetailLight/runLearningDetailLight-480-45aa6e33dd61.avif
+  sha256: 1c2676261d6e40b1501cf94021db1a42ad58cf2d11f9debc600f6ffe43d062a4
+  bytes: 11000
   kind: repository
-  sourcePath: landing/static/run/visuals/files/runLearningMobile/runLearningMobile-390-7f57fbbe546e.avif
-- path: landing/static/run/visuals/files/runLearningMobile/runLearningMobile-390-7f57fbbe546e.webp
-  sha256: 2361fbde8258bd873500ed811bf0bbdf3f9099bede0437f2b20beb7bc2f1ab91
-  bytes: 27906
+  sourcePath: landing/static/run/visuals/files/runLearningDetailLight/runLearningDetailLight-480-45aa6e33dd61.avif
+- path: landing/static/run/visuals/files/runLearningDetailLight/runLearningDetailLight-480-45aa6e33dd61.webp
+  sha256: cf498ecfb751f8c01d2274e94f215748d95fe581867cfea18a7d5a872a2c588e
+  bytes: 11888
   kind: repository
-  sourcePath: landing/static/run/visuals/files/runLearningMobile/runLearningMobile-390-7f57fbbe546e.webp
+  sourcePath: landing/static/run/visuals/files/runLearningDetailLight/runLearningDetailLight-480-45aa6e33dd61.webp
+- path: landing/static/run/visuals/files/runLearningDetailLight/runLearningDetailLight-720-45aa6e33dd61.avif
+  sha256: ae587a34885aaa367e74f62c9af219ecdd676947a2855a642a0cecc6975632de
+  bytes: 20998
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/runLearningDetailLight/runLearningDetailLight-720-45aa6e33dd61.avif
+- path: landing/static/run/visuals/files/runLearningDetailLight/runLearningDetailLight-720-45aa6e33dd61.webp
+  sha256: 7d6394442b1b67bb2bac969e2d2511fbaab122e7e71e1ac22937fec871b9ff68
+  bytes: 23068
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/runLearningDetailLight/runLearningDetailLight-720-45aa6e33dd61.webp
+- path: landing/static/run/visuals/files/runLearningDetailLight/runLearningDetailLight-900-45aa6e33dd61.avif
+  sha256: 446d6c0eef8370ed45ac59173ad635fcebf72d3dad652849b712e7cc0391aa0c
+  bytes: 24059
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/runLearningDetailLight/runLearningDetailLight-900-45aa6e33dd61.avif
+- path: landing/static/run/visuals/files/runLearningDetailLight/runLearningDetailLight-900-45aa6e33dd61.webp
+  sha256: 701b9c08b712bdbe9462c14ec032a4fd98c186f8e5d6dc3c9f1a5ef47c2ebfd9
+  bytes: 34386
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/runLearningDetailLight/runLearningDetailLight-900-45aa6e33dd61.webp
+- path: landing/static/run/visuals/files/runLearningHero/runLearningHero-1080-ec95ae8add82.avif
+  sha256: 75704e0d16ea2ab837897aa67eedc05cf53f999da262e31bfc118fe85fcdf6eb
+  bytes: 4877
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/runLearningHero/runLearningHero-1080-ec95ae8add82.avif
+- path: landing/static/run/visuals/files/runLearningHero/runLearningHero-1080-ec95ae8add82.webp
+  sha256: d2032c3b67557bdf3864a5ab280807c12571604f194f2cd53073e8fbd1154e25
+  bytes: 5780
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/runLearningHero/runLearningHero-1080-ec95ae8add82.webp
+- path: landing/static/run/visuals/files/runLearningHero/runLearningHero-1440-ec95ae8add82.avif
+  sha256: d2665e0a819ae2482c4cd4fcaa8742aa13e0126b9d4093c520ae5e10ae4e2a8f
+  bytes: 6876
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/runLearningHero/runLearningHero-1440-ec95ae8add82.avif
+- path: landing/static/run/visuals/files/runLearningHero/runLearningHero-1440-ec95ae8add82.webp
+  sha256: 6644048a076b43e89c637ed8d04ede38647130cc4a1a4c05dda654ea4731e5eb
+  bytes: 8792
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/runLearningHero/runLearningHero-1440-ec95ae8add82.webp
+- path: landing/static/run/visuals/files/runLearningHero/runLearningHero-720-ec95ae8add82.avif
+  sha256: adc00f412b363cd2aefbfdc07fa078469ab0cbd4949efa5fd380059787ddf44d
+  bytes: 3042
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/runLearningHero/runLearningHero-720-ec95ae8add82.avif
+- path: landing/static/run/visuals/files/runLearningHero/runLearningHero-720-ec95ae8add82.webp
+  sha256: 3ff3f50696210543603634cc4bdb5b8d1142b151336f702bdc57c3650fa82aa0
+  bytes: 2848
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/runLearningHero/runLearningHero-720-ec95ae8add82.webp
+- path: landing/static/run/visuals/files/runLearningHeroLight/runLearningHeroLight-1080-5b95612f02ef.avif
+  sha256: a8410e1f5386266f2bf83892046fb1a296ded74545dc08f844babe9d9bbd269a
+  bytes: 4787
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/runLearningHeroLight/runLearningHeroLight-1080-5b95612f02ef.avif
+- path: landing/static/run/visuals/files/runLearningHeroLight/runLearningHeroLight-1080-5b95612f02ef.webp
+  sha256: 499fecd9bb5d5510e3d20d4a28d19345f37c0dce64c928618c5078c68e9a66e5
+  bytes: 5690
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/runLearningHeroLight/runLearningHeroLight-1080-5b95612f02ef.webp
+- path: landing/static/run/visuals/files/runLearningHeroLight/runLearningHeroLight-1440-5b95612f02ef.avif
+  sha256: 5242ef4bd83b15074ec1c06c47c4165b0e0677cfe6ed9f73789be2ed4b779a03
+  bytes: 6883
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/runLearningHeroLight/runLearningHeroLight-1440-5b95612f02ef.avif
+- path: landing/static/run/visuals/files/runLearningHeroLight/runLearningHeroLight-1440-5b95612f02ef.webp
+  sha256: 4cf52c51b0a81db1d18d1b1b4ce0f3040805c5a3b3ebf8f997031fd579769e62
+  bytes: 8546
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/runLearningHeroLight/runLearningHeroLight-1440-5b95612f02ef.webp
+- path: landing/static/run/visuals/files/runLearningHeroLight/runLearningHeroLight-720-5b95612f02ef.avif
+  sha256: 05e1668b67230e063d910acb0068960824c1bd01b1f06bc238258d2e13278ceb
+  bytes: 2955
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/runLearningHeroLight/runLearningHeroLight-720-5b95612f02ef.avif
+- path: landing/static/run/visuals/files/runLearningHeroLight/runLearningHeroLight-720-5b95612f02ef.webp
+  sha256: e9744890f36547a885e6ebe4607f0081011e05f60099c9252ff77210ea81c8b5
+  bytes: 2894
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/runLearningHeroLight/runLearningHeroLight-720-5b95612f02ef.webp
+- path: landing/static/run/visuals/files/runLearningMobile/runLearningMobile-390-b5f24da57bf6.avif
+  sha256: b86a3ab9119e0ed6455bb14cb55ffa395f302af3885d684d2e599a60fad80d71
+  bytes: 18776
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/runLearningMobile/runLearningMobile-390-b5f24da57bf6.avif
+- path: landing/static/run/visuals/files/runLearningMobile/runLearningMobile-390-b5f24da57bf6.webp
+  sha256: fa90bc011a0b0066049d0f6c1f710fe2ab188b4cd44d719b380630ada5271b2d
+  bytes: 24750
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/runLearningMobile/runLearningMobile-390-b5f24da57bf6.webp
+- path: landing/static/run/visuals/files/runLearningMobileLight/runLearningMobileLight-390-e6084381de82.avif
+  sha256: c138335059c53683d32f1b24959fb6d5d87f0cf8a60db812837297cb9d0f7a24
+  bytes: 16833
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/runLearningMobileLight/runLearningMobileLight-390-e6084381de82.avif
+- path: landing/static/run/visuals/files/runLearningMobileLight/runLearningMobileLight-390-e6084381de82.webp
+  sha256: 03c74aa084a77ef40fa316ef3ae9d60895e80c454ee5b9a44e7b72135a441450
+  bytes: 22832
+  kind: repository
+  sourcePath: landing/static/run/visuals/files/runLearningMobileLight/runLearningMobileLight-390-e6084381de82.webp
 - path: landing/static/run/visuals/files/statisticsMachineLearning/statisticsMachineLearning-1200-d6e581dafc4f.avif
   sha256: 15b2d32c93f92023c2b208e56d91b4c12ce022c216af232b3616f0be5182dfbc
   bytes: 48588
@@ -10143,39 +10453,39 @@ files:
   bytes: 32676
   kind: repository
   sourcePath: landing/static/run/visuals/files/statisticsMachineLearning/statisticsMachineLearning-840-d6e581dafc4f.webp
-- path: landing/static/run/visuals/files/webRunDesktop/webRunDesktop-1080-1ec465145bcb.avif
-  sha256: b1849a55d530719da83b918a8a0185137697b294ac26de127d0edbff72560e8f
-  bytes: 4941
+- path: landing/static/run/visuals/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.avif
+  sha256: 32d5c78b289a61e9f5c4cfce017064cf9f20698eb5009a4b112539b6000432ac
+  bytes: 11895
   kind: repository
-  sourcePath: landing/static/run/visuals/files/webRunDesktop/webRunDesktop-1080-1ec465145bcb.avif
-- path: landing/static/run/visuals/files/webRunDesktop/webRunDesktop-1080-1ec465145bcb.webp
-  sha256: 49fd8219d0ff6b58ba8994c5b7d9ee0700251ec1bfc58093a9031f30f8166322
-  bytes: 5934
+  sourcePath: landing/static/run/visuals/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.avif
+- path: landing/static/run/visuals/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.webp
+  sha256: cd8a308afee85e345cd7c964d988da1177891aa09c7d0aa1f047cf625e805509
+  bytes: 15896
   kind: repository
-  sourcePath: landing/static/run/visuals/files/webRunDesktop/webRunDesktop-1080-1ec465145bcb.webp
-- path: landing/static/run/visuals/files/webRunDesktop/webRunDesktop-1440-1ec465145bcb.avif
-  sha256: a48d7dc745c34f5a77f5a4e6fb884205f9d0714bed37cae850f717db7330e3c1
-  bytes: 6830
+  sourcePath: landing/static/run/visuals/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.webp
+- path: landing/static/run/visuals/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.avif
+  sha256: 3fcbe8f5d1b392a04cc508d9d188582ef75cf18cf739cc31bf59793c9a3007ba
+  bytes: 3970
   kind: repository
-  sourcePath: landing/static/run/visuals/files/webRunDesktop/webRunDesktop-1440-1ec465145bcb.avif
-- path: landing/static/run/visuals/files/webRunDesktop/webRunDesktop-1440-1ec465145bcb.webp
-  sha256: 1e76f27a92155549a4d9b66015a546fe238a82ff91f99ad7c51f1fc6f8b0ba4e
-  bytes: 8986
+  sourcePath: landing/static/run/visuals/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.avif
+- path: landing/static/run/visuals/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.webp
+  sha256: db60bf3bb022ddc201eef5fc8b9422637cee14b5f1ecb3bc03bdb401f37b7e5a
+  bytes: 3904
   kind: repository
-  sourcePath: landing/static/run/visuals/files/webRunDesktop/webRunDesktop-1440-1ec465145bcb.webp
-- path: landing/static/run/visuals/files/webRunDesktop/webRunDesktop-720-1ec465145bcb.avif
-  sha256: d9701b3d6e3273abf3e8a53f981d1ba498ffbd397592c00cf9ecc8e8b122c28c
-  bytes: 3098
+  sourcePath: landing/static/run/visuals/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.webp
+- path: landing/static/run/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.avif
+  sha256: 4feaed9dbba456df71745dcb3ab0986c39c9e74b86963b6799ab718e338540e7
+  bytes: 6866
   kind: repository
-  sourcePath: landing/static/run/visuals/files/webRunDesktop/webRunDesktop-720-1ec465145bcb.avif
-- path: landing/static/run/visuals/files/webRunDesktop/webRunDesktop-720-1ec465145bcb.webp
-  sha256: 5f1bc8f4b6d8f92bded70c3c71f8327a8a5a3d37e9df92eaf9acead7c242d257
-  bytes: 2954
+  sourcePath: landing/static/run/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.avif
+- path: landing/static/run/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
+  sha256: 1e19a8dbb1d5e568f8139404b5307e391393acfc80af173d2b6bfa8cc9ca57ee
+  bytes: 6882
   kind: repository
-  sourcePath: landing/static/run/visuals/files/webRunDesktop/webRunDesktop-720-1ec465145bcb.webp
+  sourcePath: landing/static/run/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: landing/static/run/visuals/manifest.json
-  sha256: 629c3fe3ced48a99c479ae4900575fd44e50207d268702bb05a8f4554ebf1e9c
-  bytes: 59737
+  sha256: f9637f012cae46b3e68c170e5244100a4324f16029e20dd9fb05ce2ae7a7f303
+  bytes: 112540
   kind: repository
   sourcePath: landing/static/run/visuals/manifest.json
 - path: landing/static/share-packs/catalog.json
@@ -14199,8 +14509,8 @@ files:
   kind: repository
   sourcePath: tests/surface/testLearningEvidenceStatusContract.py
 - path: tests/surface/testMobileShell.py
-  sha256: 9e79e95fbb79877cc969b4e369685529928b5bd0f5be7e895226309073ee97ee
-  bytes: 2218
+  sha256: 979f63c62a8097c6941aa7f1e89e457e69aac9d8c4d087f0f3ab8b5dad60b31a
+  bytes: 3400
   kind: repository
   sourcePath: tests/surface/testMobileShell.py
 - path: tests/surface/testNotebookPersistence.py
@@ -14284,8 +14594,8 @@ files:
   kind: repository
   sourcePath: tests/surface/verifyLandingSeo.py
 - path: tests/surface/verifyMobileLayout.py
-  sha256: b5659610d724899bd1fe08c63ffa4f063d17309fb927e4fee0bde6d28504b098
-  bytes: 10386
+  sha256: 76123f9248b6e4051c6a63ea3b971f11a0b697302b765a832060be697d3b33d7
+  bytes: 11128
   kind: repository
   sourcePath: tests/surface/verifyMobileLayout.py
 - path: tests/surface/verifyNotebookAutosavePlaywright.py
@@ -14324,8 +14634,8 @@ files:
   kind: repository
   sourcePath: tests/surface/verifyPublicProductClaims.py
 - path: tests/surface/verifyPwaArtifacts.py
-  sha256: ec195ff92f7bceaa1bd0a0708b7330981cf5a4baedb9d8d6dd0a6e9985796f7c
-  bytes: 3927
+  sha256: bdc8d2a6f73e7242f623f64baceccb964d1c1215b2af54f8dd3752f453dad049
+  bytes: 5032
   kind: repository
   sourcePath: tests/surface/verifyPwaArtifacts.py
 - path: tests/surface/verifyPyprocAsgiPlaywright.py
@@ -14353,6 +14663,11 @@ files:
   bytes: 13818
   kind: repository
   sourcePath: tests/surface/verifyRunRouteStatePlaywright.py
+- path: tests/surface/verifyServiceWorkerMigration.mjs
+  sha256: 73181ee6acc64b82a225f93354b154fc684de3270ca2e364fbf0773e95fec8bd
+  bytes: 3672
+  kind: repository
+  sourcePath: tests/surface/verifyServiceWorkerMigration.mjs
 - path: tests/surface/verifyThemeRuntimePlaywright.py
   sha256: 1f0050fde99ea3346e03c09185a5b5ca17927a951b91d22a46e03c2eb3985e99
   bytes: 23315
