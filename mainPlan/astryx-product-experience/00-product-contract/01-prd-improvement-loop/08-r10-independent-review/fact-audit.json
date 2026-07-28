@@ -8,10 +8,10 @@
   "productCompletionEligible": false,
   "roundSealEligible": false,
   "scope": {
-    "gitCommit": "1f6fa62c45b2990c9cae91302355707fa2e8ad58",
+    "gitCommit": "bacbd45465d5435ab5cc044955c56721b4e13d05",
     "dirtyDiffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "manifestHash": "b0411de84268ca7f3bf8a36660bd780a75fa1a4697ef268898f42c525a6aabf7",
-    "evaluationBundleHash": "8e8c715c858c1d57b5420741f81400c68704799411f83f723103d141b226dafa"
+    "manifestHash": "f208ec0249ebdf308bc38997dd4027d3894ad4a47fbd823ba68d876f119cea76",
+    "evaluationBundleHash": "ad6778b0c037110c57b5138c4ae27720c4c66fa2e4bdae437617ea049468292f"
   },
   "facts": {
     "bundleIntegrity": {
