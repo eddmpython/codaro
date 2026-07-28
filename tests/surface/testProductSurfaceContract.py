@@ -199,10 +199,12 @@ def testLearningHomeAndLessonRenderInstructionalVisualsWithoutRevealControls() -
 
 def testPublicLearningExplorerPersistsFiltersAndLessonVisualFillsItsFrame() -> None:
     learn = _read("landing/src/pages/learn.jsx")
+    committedSearch = _read("landing/src/lib/useCommittedSearchInput.js")
     learnStyles = _read("landing/src/styles/learnExplorer.css")
     lessonStyles = _read("landing/src/styles/lessonAstryx.css")
     browserGate = _read("tests/surface/verifyProductExperiencePlaywright.py")
 
+    learnInputContract = f"{learn}\n{committedSearch}"
     for marker in (
         "explorerStateFromSearch(search)",
         "replaceExplorerSearch(resolvedState)",
@@ -212,11 +214,11 @@ def testPublicLearningExplorerPersistsFiltersAndLessonVisualFillsItsFrame() -> N
         'data-learn-search-input="true"',
         'aria-controls="learn-catalog"',
         'aria-describedby="learn-result-count"',
-        "queryDraft",
+        "draftValue",
         "searchComposing",
         'data-learn-search-committed-query={query}',
         'data-learn-search-composing={searchComposing ? "true" : "false"}',
-        "event.nativeEvent.isComposing",
+        "nativeEvent.isComposing",
         "onCompositionStart",
         "onCompositionEnd",
         'data-learn-runtime-filter={value}',
@@ -225,7 +227,7 @@ def testPublicLearningExplorerPersistsFiltersAndLessonVisualFillsItsFrame() -> N
         'data-learn-search-results="true"',
         "<LessonRow",
     ):
-        assert marker in learn
+        assert marker in learnInputContract
     assert 'page.set_viewport_size({"width": 390, "height": 844})' in browserGate
     assert '"horizontalOverflow"' in browserGate
     assert 'mobileLayout["firstResultVisiblePixels"] < 96' in browserGate
@@ -239,6 +241,46 @@ def testPublicLearningExplorerPersistsFiltersAndLessonVisualFillsItsFrame() -> N
     assert "Learn keyboard order did not reach the first lesson" in browserGate
     assert "Learn search state drifted across reload" in browserGate
     assert '"expectedVisualAssetIds": [' in browserGate
+
+
+def testPublicSearchCommitsImeInputToUrlAndExposesResultRelationships() -> None:
+    search = _read("landing/src/routes/searchRoutes.jsx")
+    committedSearch = _read("landing/src/lib/useCommittedSearchInput.js")
+    browserGate = _read("tests/surface/verifyProductExperiencePlaywright.py")
+
+    for marker in (
+        "useCommittedSearchInput(query, commitQuery)",
+        "replaceSearchQuery(nextQuery)",
+        'aria-label="전체 사이트 검색"',
+        'aria-controls="site-search-results"',
+        'aria-describedby="site-search-result-count"',
+        'data-site-search-committed-query={query}',
+        'data-site-search-composing={searchComposing ? "true" : "false"}',
+        'id="site-search-results"',
+        'role="region"',
+        'id="site-search-result-count"',
+        'aria-live="polite"',
+        'aria-atomic="true"',
+        '<ul className="searchResultList">',
+    ):
+        assert marker in search
+    for marker in (
+        "composingRef",
+        "lastCommittedValueRef",
+        "event.nativeEvent",
+        "nativeEvent.isComposing",
+        "nativeEvent.keyCode !== 229",
+        "onCompositionStart",
+        "onCompositionEnd",
+    ):
+        assert marker in committedSearch
+    assert '"name": "landing-search-desktop"' in browserGate
+    assert '"verifySiteSearch": True' in browserGate
+    assert '"name": "landing-search-mobile"' in browserGate
+    assert '"verifySiteSearchMobileLayout": True' in browserGate
+    assert "site search IME composition changed committed results" in browserGate
+    assert "site search committed state drifted across reload" in browserGate
+    assert "site search mobile layout drifted" in browserGate
 
 
 def testCanonicalLessonExposesKeyboardSectionAndAdjacentLessonNavigation() -> None:

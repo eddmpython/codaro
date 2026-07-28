@@ -20,6 +20,7 @@ import { ProductVisual } from "../components/productVisual.jsx";
 import { brand } from "../lib/brand.js";
 import { curriculumLessons, curriculumRuntimeCounts, curriculumTree } from "../lib/generated/curriculum.js";
 import { useBrowserLayoutEffect } from "../lib/useBrowserLayoutEffect.js";
+import { useCommittedSearchInput } from "../lib/useCommittedSearchInput.js";
 
 const domainCopy = {
   basics: "값을 만들고 바꾸며 Python의 실행 감각을 익힙니다.",
@@ -177,11 +178,13 @@ export function LearnPage({ search = "" }) {
   const firstPublicLesson = curriculumLessons.find((lesson) => lesson.runtimeTier === "browser") || curriculumLessons[0];
   const initialExplorerState = explorerStateFromSearch(search);
   const [query, setQuery] = useState(initialExplorerState.query);
-  const [queryDraft, setQueryDraft] = useState(initialExplorerState.query);
-  const [searchComposing, setSearchComposing] = useState(false);
   const [runtime, setRuntime] = useState(initialExplorerState.runtime);
   const [selectedPath, setSelectedPath] = useState(initialExplorerState.selectedPath);
   const [resumeLesson, setResumeLesson] = useState(null);
+  const {
+    inputProps: searchInputProps,
+    isComposing: searchComposing,
+  } = useCommittedSearchInput(query, (nextQuery) => updateExplorer({ query: nextQuery }));
 
   const matchingLessons = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase("ko");
@@ -212,8 +215,6 @@ export function LearnPage({ search = "" }) {
   useBrowserLayoutEffect(() => {
     const nextState = explorerStateFromSearch(search);
     setQuery(nextState.query);
-    setQueryDraft(nextState.query);
-    setSearchComposing(false);
     setRuntime(nextState.runtime);
     setSelectedPath(nextState.selectedPath);
   }, [search]);
@@ -306,22 +307,8 @@ export function LearnPage({ search = "" }) {
                 data-learn-search-input="true"
                 enterKeyHint="search"
                 type="search"
-                value={queryDraft}
+                {...searchInputProps}
                 placeholder="예: pandas 보고서, 파일 정리"
-                onChange={(event) => {
-                  const nextQuery = event.currentTarget.value;
-                  setQueryDraft(nextQuery);
-                  if (!event.nativeEvent.isComposing && !searchComposing) {
-                    updateExplorer({ query: nextQuery });
-                  }
-                }}
-                onCompositionStart={() => setSearchComposing(true)}
-                onCompositionEnd={(event) => {
-                  const nextQuery = event.currentTarget.value;
-                  setSearchComposing(false);
-                  setQueryDraft(nextQuery);
-                  updateExplorer({ query: nextQuery });
-                }}
               />
             </label>
             <span className="learnSearchHint">제목 · 결과 · 주제 검색</span>

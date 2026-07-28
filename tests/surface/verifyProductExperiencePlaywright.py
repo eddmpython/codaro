@@ -1549,6 +1549,20 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "waitFor": "[data-learning-lesson-ref='30days/day01_헬로월드']",
         },
         {
+            "name": "landing-search-desktop",
+            "url": f"http://127.0.0.1:{landingPort}/codaro/search?q=python",
+            "viewport": {"width": 1440, "height": 900},
+            "surface": "landing-search",
+            "verifySiteSearch": True,
+        },
+        {
+            "name": "landing-search-mobile",
+            "url": f"http://127.0.0.1:{landingPort}/codaro/search?q=data",
+            "viewport": {"width": 390, "height": 844},
+            "surface": "landing-search",
+            "verifySiteSearchMobileLayout": True,
+        },
+        {
             "name": "local-mobile-chat",
             "url": f"http://127.0.0.1:{localPort}/m/chat",
             "viewport": {"width": 390, "height": 844},
@@ -3720,6 +3734,8 @@ def runBrowserMatrix(
                         "landing-learn-mobile",
                         "landing-learn-desktop",
                         "landing-public-lesson-desktop",
+                        "landing-search-desktop",
+                        "landing-search-mobile",
                     }
                 elif selectedCase == "run-local-state":
                     selectedNames = {
@@ -3784,6 +3800,7 @@ def runBrowserMatrix(
                 webArtifactEvidence: dict[str, Any] | None = None
                 firstViewportEvidence: dict[str, Any] | None = None
                 learnSearchEvidence: dict[str, Any] | None = None
+                siteSearchEvidence: dict[str, Any] | None = None
                 canonicalKeyboardEvidence: dict[str, Any] | None = None
                 lessonNavigationEvidence: dict[str, Any] | None = None
                 localArchiveWebRoundTripEvidence: dict[str, Any] | None = None
@@ -4459,6 +4476,347 @@ def runBrowserMatrix(
                             "keyboard": keyboardEvidence,
                             "ime": imeEvidence,
                         }
+                    if case.get("verifySiteSearch"):
+                        searchInput = page.get_by_role("searchbox", name="전체 사이트 검색")
+                        page.wait_for_function(
+                            """
+                            () => (
+                              document.querySelector('[data-site-search-input="true"]')
+                                ?.getAttribute("data-site-search-committed-query") === "python"
+                              && document.querySelector('[data-search-state="results"]')
+                              && document.querySelectorAll(".searchResultList a").length > 0
+                            )
+                            """,
+                            timeout=20_000,
+                        )
+                        accessibility = page.evaluate(
+                            """
+                            () => {
+                              const input = document.querySelector(
+                                '[data-site-search-input="true"]'
+                              );
+                              const results = document.querySelector("#site-search-results");
+                              const count = document.querySelector("#site-search-result-count");
+                              return {
+                                controls: input?.getAttribute("aria-controls") || "",
+                                describedBy: input?.getAttribute("aria-describedby") || "",
+                                resultsLabelledBy: results?.getAttribute("aria-labelledby") || "",
+                                resultsDescribedBy: results?.getAttribute("aria-describedby") || "",
+                                countRole: count?.getAttribute("role") || "",
+                                countLive: count?.getAttribute("aria-live") || "",
+                                countAtomic: count?.getAttribute("aria-atomic") || "",
+                              };
+                            }
+                            """
+                        )
+                        expectedAccessibility = {
+                            "controls": "site-search-results",
+                            "describedBy": "site-search-result-count",
+                            "resultsLabelledBy": "site-search-results-title",
+                            "resultsDescribedBy": "site-search-result-count",
+                            "countRole": "status",
+                            "countLive": "polite",
+                            "countAtomic": "true",
+                        }
+                        if accessibility != expectedAccessibility:
+                            raise AssertionError(
+                                f"site search accessibility relationship drifted: {accessibility}"
+                            )
+                        searchInput.focus()
+                        page.keyboard.press("Tab")
+                        focusedResultHref = page.evaluate(
+                            """
+                            () => document.activeElement?.matches(".searchResultList a")
+                              ? document.activeElement.getAttribute("href")
+                              : ""
+                            """
+                        )
+                        if not focusedResultHref:
+                            raise AssertionError(
+                                "site search keyboard order did not reach the first result"
+                            )
+                        searchInput.focus()
+                        compositionBaseline = page.evaluate(
+                            """
+                            () => ({
+                              committedQuery: document.querySelector(
+                                '[data-site-search-input="true"]'
+                              )?.getAttribute("data-site-search-committed-query") || "",
+                              resultCount: document.querySelector(
+                                "#site-search-result-count"
+                              )?.textContent?.trim() || "",
+                              rowCount: document.querySelectorAll(
+                                ".searchResultList a"
+                              ).length,
+                              search: window.location.search,
+                              state: document.querySelector(
+                                ".searchResults"
+                              )?.getAttribute("data-search-state") || "",
+                            })
+                            """
+                        )
+                        page.evaluate(
+                            """
+                            () => {
+                              const input = document.querySelector(
+                                '[data-site-search-input="true"]'
+                              );
+                              const valueSetter = Object.getOwnPropertyDescriptor(
+                                HTMLInputElement.prototype,
+                                "value"
+                              ).set;
+                              input.dispatchEvent(new CompositionEvent(
+                                "compositionstart",
+                                { bubbles: true, data: "" }
+                              ));
+                              valueSetter.call(input, "데");
+                              input.dispatchEvent(new InputEvent("input", {
+                                bubbles: true,
+                                data: "데",
+                                inputType: "insertCompositionText",
+                                isComposing: true,
+                              }));
+                            }
+                            """
+                        )
+                        page.wait_for_function(
+                            """
+                            () => {
+                              const input = document.querySelector(
+                                '[data-site-search-input="true"]'
+                              );
+                              return input?.value === "데"
+                                && input.getAttribute(
+                                  "data-site-search-composing"
+                                ) === "true"
+                                && input.getAttribute("aria-busy") === "true";
+                            }
+                            """,
+                            timeout=20_000,
+                        )
+                        duringComposition = page.evaluate(
+                            """
+                            () => ({
+                              draftQuery: document.querySelector(
+                                '[data-site-search-input="true"]'
+                              )?.value || "",
+                              committedQuery: document.querySelector(
+                                '[data-site-search-input="true"]'
+                              )?.getAttribute("data-site-search-committed-query") || "",
+                              resultCount: document.querySelector(
+                                "#site-search-result-count"
+                              )?.textContent?.trim() || "",
+                              rowCount: document.querySelectorAll(
+                                ".searchResultList a"
+                              ).length,
+                              search: window.location.search,
+                              state: document.querySelector(
+                                ".searchResults"
+                              )?.getAttribute("data-search-state") || "",
+                            })
+                            """
+                        )
+                        for key in (
+                            "committedQuery",
+                            "resultCount",
+                            "rowCount",
+                            "search",
+                            "state",
+                        ):
+                            if duringComposition[key] != compositionBaseline[key]:
+                                raise AssertionError(
+                                    "site search IME composition changed committed results "
+                                    f"before compositionend: {key}="
+                                    f"{duringComposition[key]!r} != "
+                                    f"{compositionBaseline[key]!r}"
+                                )
+                        page.evaluate(
+                            """
+                            () => {
+                              const input = document.querySelector(
+                                '[data-site-search-input="true"]'
+                              );
+                              const valueSetter = Object.getOwnPropertyDescriptor(
+                                HTMLInputElement.prototype,
+                                "value"
+                              ).set;
+                              valueSetter.call(input, "데이터");
+                              input.dispatchEvent(new InputEvent("input", {
+                                bubbles: true,
+                                data: "이터",
+                                inputType: "insertCompositionText",
+                                isComposing: true,
+                              }));
+                              input.dispatchEvent(new CompositionEvent(
+                                "compositionend",
+                                { bubbles: true, data: "데이터" }
+                              ));
+                            }
+                            """
+                        )
+                        page.wait_for_function(
+                            """
+                            () => {
+                              const input = document.querySelector(
+                                '[data-site-search-input="true"]'
+                              );
+                              return input?.value === "데이터"
+                                && input.getAttribute(
+                                  "data-site-search-committed-query"
+                                ) === "데이터"
+                                && input.getAttribute(
+                                  "data-site-search-composing"
+                                ) === "false"
+                                && new URL(window.location.href).searchParams.get("q")
+                                  === "데이터"
+                                && document.querySelectorAll(
+                                  ".searchResultList a"
+                                ).length > 0;
+                            }
+                            """,
+                            timeout=20_000,
+                        )
+                        afterComposition = page.evaluate(
+                            """
+                            () => ({
+                              query: document.querySelector(
+                                '[data-site-search-input="true"]'
+                              )?.value || "",
+                              committedQuery: document.querySelector(
+                                '[data-site-search-input="true"]'
+                              )?.getAttribute("data-site-search-committed-query") || "",
+                              resultCount: document.querySelector(
+                                "#site-search-result-count"
+                              )?.textContent?.trim() || "",
+                              rowCount: document.querySelectorAll(
+                                ".searchResultList a"
+                              ).length,
+                              search: window.location.search,
+                              state: document.querySelector(
+                                ".searchResults"
+                              )?.getAttribute("data-search-state") || "",
+                            })
+                            """
+                        )
+                        page.reload(wait_until="domcontentloaded", timeout=30_000)
+                        page.wait_for_function(
+                            """
+                            () => (
+                              document.querySelector(
+                                '[data-site-search-input="true"]'
+                              )?.getAttribute(
+                                "data-site-search-committed-query"
+                              ) === "데이터"
+                              && document.querySelectorAll(
+                                ".searchResultList a"
+                              ).length > 0
+                            )
+                            """,
+                            timeout=20_000,
+                        )
+                        afterCompositionReload = page.evaluate(
+                            """
+                            () => ({
+                              query: document.querySelector(
+                                '[data-site-search-input="true"]'
+                              )?.value || "",
+                              committedQuery: document.querySelector(
+                                '[data-site-search-input="true"]'
+                              )?.getAttribute("data-site-search-committed-query") || "",
+                              resultCount: document.querySelector(
+                                "#site-search-result-count"
+                              )?.textContent?.trim() || "",
+                              rowCount: document.querySelectorAll(
+                                ".searchResultList a"
+                              ).length,
+                              search: window.location.search,
+                              state: document.querySelector(
+                                ".searchResults"
+                              )?.getAttribute("data-search-state") || "",
+                            })
+                            """
+                        )
+                        if afterCompositionReload != afterComposition:
+                            raise AssertionError(
+                                "site search committed state drifted across reload: "
+                                f"{afterComposition} != {afterCompositionReload}"
+                            )
+                        siteSearchEvidence = {
+                            "accessibility": accessibility,
+                            "focusedResultHref": focusedResultHref,
+                            "baseline": compositionBaseline,
+                            "duringComposition": duringComposition,
+                            "afterComposition": afterComposition,
+                            "afterReload": afterCompositionReload,
+                        }
+                    if case.get("verifySiteSearchMobileLayout"):
+                        page.wait_for_function(
+                            """
+                            () => (
+                              document.querySelector('[data-search-state="results"]')
+                              && document.querySelectorAll(".searchResultList a").length > 0
+                            )
+                            """,
+                            timeout=20_000,
+                        )
+                        mobileLayout = page.evaluate(
+                            """
+                            () => {
+                              const input = document.querySelector(
+                                '[data-site-search-input="true"]'
+                              );
+                              const header = document.querySelector(
+                                ".searchResultsHeader"
+                              );
+                              const firstResult = document.querySelector(
+                                ".searchResultList a"
+                              );
+                              const rect = (element) => {
+                                const value = element?.getBoundingClientRect();
+                                return value ? {
+                                  bottom: Math.round(value.bottom),
+                                  height: Math.round(value.height),
+                                  left: Math.round(value.left),
+                                  right: Math.round(value.right),
+                                  top: Math.round(value.top),
+                                  width: Math.round(value.width),
+                                } : null;
+                              };
+                              return {
+                                firstResult: rect(firstResult),
+                                header: rect(header),
+                                horizontalOverflow: Math.max(
+                                  0,
+                                  document.documentElement.scrollWidth - window.innerWidth
+                                ),
+                                input: rect(input),
+                                searchBox: rect(input?.closest(".searchBox")),
+                                viewport: {
+                                  height: window.innerHeight,
+                                  width: window.innerWidth,
+                                },
+                              };
+                            }
+                            """
+                        )
+                        inputRect = mobileLayout.get("input") or {}
+                        searchBoxRect = mobileLayout.get("searchBox") or {}
+                        headerRect = mobileLayout.get("header") or {}
+                        firstResultRect = mobileLayout.get("firstResult") or {}
+                        if (
+                            mobileLayout["viewport"] != {"height": 844, "width": 390}
+                            or mobileLayout["horizontalOverflow"] != 0
+                            or float(searchBoxRect.get("width") or 0) < 320
+                            or float(inputRect.get("width") or 0) < 280
+                            or float(headerRect.get("width") or 0) < 320
+                            or float(firstResultRect.get("width") or 0) < 320
+                            or float(firstResultRect.get("top") or 844) >= 844
+                            or float(firstResultRect.get("bottom") or 0) <= 0
+                        ):
+                            raise AssertionError(
+                                f"site search mobile layout drifted: {mobileLayout}"
+                            )
+                        siteSearchEvidence = {"mobileLayout": mobileLayout}
                     if case.get("scrollTo"):
                         page.locator(case["scrollTo"]).scroll_into_view_if_needed(timeout=20_000)
                     if case.get("expectCanonicalLesson"):
@@ -5943,6 +6301,7 @@ def runBrowserMatrix(
                             "assetFailures": assetFailureSnapshot,
                             "firstViewportEvidence": firstViewportEvidence,
                             "learnSearchEvidence": learnSearchEvidence,
+                            "siteSearchEvidence": siteSearchEvidence,
                             "canonicalKeyboardEvidence": canonicalKeyboardEvidence,
                             "lessonNavigationEvidence": lessonNavigationEvidence,
                             "localArchiveWebRoundTripEvidence": localArchiveWebRoundTripEvidence,
