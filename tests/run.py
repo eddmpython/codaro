@@ -320,7 +320,7 @@ GATES: dict[str, Gate] = {
     ),
     "plan-quality": Gate(
         tier="fast",
-        description="mainPlan TODO 정책, 현재 사실, 독립 평가 보고서 완전성을 점수 threshold 없이 검증한다.",
+        description="mainPlan TODO 정책, 현재 사실과 R10 draft의 무결성을 검증하고 외부 readiness blocker를 명시적으로 보존한다.",
         commands=(
             command((
                 "uv", "run", "python", "-X", "utf8",
@@ -343,9 +343,20 @@ GATES: dict[str, Gate] = {
                 "tests/product/testPrdEvaluationReport.py",
                 "-q", "--tb=short",
             )),
-            command(("uv", "run", "python", "-X", "utf8", "tests/product/verifyPrdEvaluationReport.py")),
+            command((
+                "uv", "run", "python", "-X", "utf8",
+                "tests/product/verifyPrdEvaluationReport.py", "--allow-readiness-blockers",
+            )),
         ),
         blocking=False,
+        ci_required=False,
+    ),
+    "r10-independent-review": Gate(
+        tier="release",
+        description="독립 R10 roster, sealed scope, 세 raw report와 finding ledger 완전성을 엄격하게 검증한다.",
+        commands=(command((
+            "uv", "run", "python", "-X", "utf8", "tests/product/verifyPrdEvaluationReport.py",
+        )),),
         ci_required=False,
     ),
     "automation-ide-audit": Gate(
@@ -885,6 +896,7 @@ PRODUCT_RELEASE_GATES = (
     "path-learning-signal",
     "evaluation-contract",
     "plan-quality",
+    "r10-independent-review",
 )
 TIER_ORDER = ("fast", "surface", "release", "experiment")
 
@@ -1867,8 +1879,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 60:
-        failures.append(f"expected 60 gates, found {len(GATES)}")
+    if len(GATES) != 61:
+        failures.append(f"expected 61 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

@@ -23,7 +23,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "devTools/gitFirstSteps"
     identityLedgerRef: "identity-ledger/devTools.yml"
-    lessonContentHash: "716df7196ba4a49e0a0cc4d0fb15bc477d6419d3a300e7eec40e9d537f37cfc4"
+    lessonContentHash: "6ef0264a42769047dab6cf43abc0cb93e5016c22ac256753baf3822315f4eb85"
     disposition: migrate
     ownerPacket: "07-remaining-domains/03-scripting-automation"
     eligiblePathIds: ["scriptingAutomation"]

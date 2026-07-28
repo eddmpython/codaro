@@ -14,16 +14,16 @@
 | explicit metadata | 대표 6경로가 선택하는 고유 49레슨의 outcome/prerequisite/time 49/49 | 이후 전체 472레슨 이관 |
 | weak evidence | weak-only 0, weak check 4,313개는 formative feedback으로 잔존 | 필수 mission과 capstone의 단독 사용 0개 |
 | deterministic practice | 1레슨, `outputExact` 9개 | 연습 feedback으로만 사용하고 completion·mastery와 분리 |
-| strong CheckSpec | 467레슨, 총 1,413개 | 대표 경로 필수 mission 100% strong check와 실제 실행 evidence |
-| mastery/transfer/retrieval assessment | 각각 467레슨, solution variant 1,400개 실행 실패 0 | 대표 경로의 세 단계 author review 100% |
-| assessment claim/review | performance claim·명시적 scope 467레슨, independent assessment 승인 0/467 | 독립 reviewer evidence 승인 |
+| strong CheckSpec | 468레슨, 총 1,419개 | 대표 경로 필수 mission 100% strong check와 실제 실행 evidence |
+| mastery/transfer/retrieval assessment | 각각 468레슨, solution variant 1,402개 실행 실패 0 | 대표 경로의 세 단계 author review 100% |
+| assessment claim/review | performance claim·명시적 scope 468레슨, independent assessment 승인 0/468 | 독립 reviewer evidence 승인 |
 | learner `predict:` | active schema·tool·frontend·YAML 0개 | negative removal gate로 0개 유지 |
 | media | YAML image block 5개·사용 파일 4개와 video block 1개가 있다. 별도로 공용 manifest의 8개 `generatedRaster` instructional asset을 `learningVisualAssets.ts`가 domain/category에 연결하고 학습 홈과 lesson overview에서 질문·판단 기준과 함께 자동 렌더한다 | 현재 surface integration과 별개로 대표 경로의 lesson anchor, 판단 정확성, 접근성을 사람이 검수하고 outcome proof를 승인 |
 | misconception | 34개 전부 draft | 대표 경로의 실제 code/error/check failure pattern만 approved |
 
-2026-07-22 `curriculum-top-tier-audit`는 현재 `scoreKind: audit-requirement-coverage`, `score: 9.69/10`, `curriculumQualityScore: null`, `topTierEligible: false`, `completionEligible: false`다. strong CheckSpec은 1,413개/467레슨, weak-only는 0, mastery·unseen transfer·delayed retrieval과 performance claim·명시적 scope는 각각 467/472이다. 유일한 실패 domain은 `assessment-claim-and-independent-review`이며 independent assessment 승인은 0/467이다. 이 감사 점수는 요구사항 항목 커버리지일 뿐 제품 품질 점수나 실제 학습 효과가 아니며 완료 근거로 사용할 수 없다.
+2026-07-28 `curriculum-top-tier-audit`는 현재 `scoreKind: audit-requirement-coverage`, `score: 9.69/10`, `curriculumQualityScore: null`, `topTierEligible: false`, `completionEligible: false`다. strong CheckSpec은 1,419개/468레슨, weak-only는 0, mastery·unseen transfer·delayed retrieval과 performance claim·명시적 scope는 각각 468/472이다. 유일한 실패 domain은 `assessment-claim-and-independent-review`이며 independent assessment 승인은 0/468이다. 이 감사 점수는 요구사항 항목 커버리지일 뿐 제품 품질 점수나 실제 학습 효과가 아니며 완료 근거로 사용할 수 없다.
 
-`buildLearningLedgers.py --check`는 현재 identity 472행, registry 472행, content owner·outcome·source hash, 31개 path의 canonical reference를 source에서 다시 계산한다. taxonomy transition draft는 baseline `b5e9...def2`에서 target `03d4...f6a5`, graph 469에서 472, 신규 outcome·lesson 각 6개, 변경 path 7개를 exact diff로 고정했다. 변경 경로에는 대표 6경로의 명시적 project capstone과 `standardLibraryMastery`가 포함된다. `learning-content` gate는 identity, canonical content, path membership, featured metadata, scored check strength, retrieval/transfer 분리, featured path, featured capstone, 1,400개 solution 실행, assessment authoring의 열 report를 현재 `gitHead`로 다시 만든다. machine audit 통과와 사람 승인 완료를 분리하며 identity review 0/472, content review 0/472, taxonomy transition approval 0/7, independent assessment review 0/467이므로 마지막 completion verifier가 네 blocker를 기록하고 실패한다.
+`buildLearningLedgers.py --check`는 현재 identity 472행, registry 472행, content owner·outcome·source hash, 31개 path의 canonical reference를 source에서 다시 계산한다. taxonomy transition draft는 baseline `b5e9...def2`에서 target `6792...fb84`, graph 469에서 472, 신규 outcome·lesson 각 6개, 변경 path 7개를 exact diff로 고정했다. 변경 경로에는 대표 6경로의 명시적 project capstone과 `standardLibraryMastery`가 포함된다. `learning-content` gate는 identity, canonical content, path membership, featured metadata, scored check strength, retrieval/transfer 분리, featured path, featured capstone, 1,402개 solution 실행, assessment authoring의 열 report를 현재 `gitHead`로 다시 만든다. assessed lesson 기준은 structured practice가 있는 canonical YAML에서 계산하며 현재 468개다. machine audit 통과와 사람 승인 완료를 분리하며 identity review 0/472, content review 0/472, taxonomy transition approval 0/7, independent assessment review 0/468이므로 마지막 completion verifier가 네 blocker를 기록하고 실패한다.
 
 실제 Day 1 desktop·mobile canonical lesson 감사에서 `prompt: 첫 줄은 # ...`의 `#` 뒤가 YAML 주석으로 해석되어 화면에 `첫 줄은`만 남는 결함을 확인했다. prompt 전체를 인용 scalar로 바꾸고 472개 curricula의 `title`, `subtitle`, `goal`, `why`, `explanation`, `prompt`, `description`, `resultCheck` plain scalar를 검사해 같은 의미 손실을 차단했다. 이 수정은 학습자 노출 결함과 source hash를 바로잡은 것이며 content review 0/472나 독립 평가 승인 상태를 올리지 않는다.
 
@@ -44,9 +44,9 @@ public catalog와 route generator는 472개 canonical `LessonRef`를 모두 공�
 | mathStatsMl | 55 | 0 | 55 | 55 | 55 | 55 |
 | visualization | 55 | 0 | 55 | 55 | 55 | 55 |
 | aiIntegration | 11 | 0 | 11 | 11 | 11 | 11 |
-| devLiteracy | 3 | 0 | 0 | 0 | 0 | 0 |
+| devLiteracy | 3 | 0 | 1 | 1 | 1 | 1 |
 
-세부 track 기준선은 `basics/30days` 30/30, `basics/builtins` 35/35, `basics/advancedPython` 35/35, automation 127/129, imageVision 62/62, dataAnalysis 57/57, visualization 55/55, mathStatsMl 55/55, aiIntegration 11/11 strong assessment 저작과 solution 검산이다. automation의 2개와 devLiteracy 3개는 orientation/legacy-only 분류이며 weak-only가 아니다. 이 source coverage는 전체 browser evidence나 독립 승인 완료가 아니다.
+세부 track 기준선은 `basics/30days` 30/30, `basics/builtins` 35/35, `basics/advancedPython` 35/35, automation 127/129, imageVision 62/62, dataAnalysis 57/57, visualization 55/55, mathStatsMl 55/55, aiIntegration 11/11, devLiteracy 1/3 strong assessment 저작과 solution 검산이다. automation의 2개와 devLiteracy의 commandLineIntro·githubIntro는 orientation/legacy-only 분류이며 weak-only가 아니다. 이 source coverage는 전체 browser evidence나 독립 승인 완료가 아니다.
 
 ## 학습자와 언어 계약
 
@@ -91,7 +91,7 @@ public catalog와 route generator는 472개 canonical `LessonRef`를 모두 공�
 
 ## 증분 출시선
 
-W1~W5는 이제 source 생성 순서가 아니라 사람 승인과 공개 승격 순서다. R10 전에 467레슨 assessment와 472개 public route가 이미 구현됐지만 identity review 0/472, content review 0/472, taxonomy approval 0/7, independent assessment approval 0/467이므로 어떤 후속 wave도 출시된 상태가 아니다. 기존 source는 provisional로 유지하고, wave 종료는 author review·실행 증거·사람 검수와 TODO 삭제으로만 판정한다.
+W1~W5는 이제 source 생성 순서가 아니라 사람 승인과 공개 승격 순서다. R10 전에 468레슨 assessment와 472개 public route가 이미 구현됐지만 identity review 0/472, content review 0/472, taxonomy approval 0/7, independent assessment approval 0/468이므로 어떤 후속 wave도 출시된 상태가 아니다. 기존 source는 provisional로 유지하고, wave 종료는 author review·실행 증거·사람 검수와 TODO 삭제으로만 판정한다.
 
 | Wave | 범위 | 종료 조건 |
 | --- | --- | --- |

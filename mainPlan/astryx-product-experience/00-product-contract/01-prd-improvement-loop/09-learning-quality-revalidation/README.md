@@ -8,15 +8,14 @@
 
 ## 현재 판정
 
-2026-07-22 `curriculum-top-tier-audit`는 실패다. 요구사항 커버리지 점수는 품질 점수가 아니며 `score: 9.69/10`, `curriculumQualityScore: null`, `topTierEligible: false`, `completionEligible: false`다. 472레슨 중 strong `CheckSpec` 레슨은 467개, strong spec은 1,413개, weak-only 레슨은 0이다. mastery·unseen transfer·delayed retrieval author 계약과 performance claim·명시적 claim scope는 각각 467레슨이며 independent assessment 승인은 0/467이다. 유일한 실패 requirement는 독립 평가 승인이다.
+2026-07-28 `curriculum-top-tier-audit`는 실패다. 요구사항 커버리지 점수는 품질 점수가 아니며 `score: 9.69/10`, `curriculumQualityScore: null`, `topTierEligible: false`, `completionEligible: false`다. 472레슨 중 strong `CheckSpec` 레슨은 468개, strong spec은 1,419개, weak-only 레슨은 0이다. mastery·unseen transfer·delayed retrieval author 계약과 performance claim·명시적 claim scope는 각각 468레슨이며 independent assessment 승인은 0/468이다. 유일한 실패 requirement는 독립 평가 승인이다.
 
-Day 1 Web vertical slice에서는 mastery strong evidence 뒤 전이 과제가 자동 제공되고, 검색 과제는 유효한 원천 증거로부터 24시간 뒤 자동 제공된다. 현재 467레슨의 1,400개 solution variant는 1,398개 behavior와 2개 output 검증으로 실행됐고 실패는 0이다. 공식 `product-experience-browser` 72/72와 `local-studio-browser` 26/26은 Day 2·11·15·19·20·22·27·30의 오답→수정→격리 검증→근거 저장→전이 자동 해제, Seaborn semantic artifact capstone, pathlib·zip·schedule base·assessment, canonical `MasteryPolicy@1`, durable `RunRouteState@1`, full learning archive v2, Day 19 artifact transfer와 lessonRef 기반 시각 자료 배선을 포함해 green이다. 최신 browser log의 `ConnectionReset`, `Proactor`, `Win10054`도 모두 0이다. 다만 identity/content 승인 각 0/472, taxonomy 승인 0/7, independent assessment 승인 0/467, 실제 WebView2와 독립 R10 raw report가 없으므로 완료는 아니다.
+Day 1 Web vertical slice에서는 mastery strong evidence 뒤 전이 과제가 자동 제공되고, 검색 과제는 유효한 원천 증거로부터 24시간 뒤 자동 제공된다. 현재 468레슨의 1,402개 solution variant는 1,400개 behavior와 2개 output 검증으로 실행됐고 실패는 0이다. 공식 `product-experience-browser` 72/72와 `local-studio-browser` 26/26은 Day 2·11·15·19·20·22·27·30의 오답→수정→격리 검증→근거 저장→전이 자동 해제, Seaborn semantic artifact capstone, pathlib·zip·schedule base·assessment, canonical `MasteryPolicy@1`, durable `RunRouteState@1`, full learning archive v2, Day 19 artifact transfer와 lessonRef 기반 시각 자료 배선을 포함해 green이다. Git 첫 사이클의 4개 실행 Lab과 첫 status 판독 Web strong check도 별도 브라우저 검증에서 통과했다. 최신 browser log의 `ConnectionReset`, `Proactor`, `Win10054`도 모두 0이다. 다만 identity/content 승인 각 0/472, taxonomy 승인 0/7, independent assessment 승인 0/468, 실제 WebView2와 독립 R10 raw report가 없으므로 완료는 아니다.
 
 ## 작업 패킷
 
 | 순서 | packet | 종료 조건 |
 | --- | --- | --- |
-| 00 | [current-baseline](00-current-baseline/) | 감사 수치와 실패 항목이 machine report·PRD에 동일하게 기록됨 |
 | 01 | [day1-evidence-loop](01-day1-evidence-loop/) | acquisition·unseen transfer·24h retrieval이 Web에서 자동 판정·저장·재방문을 통과 |
 | 02 | [w0-local-parity](02-w0-local-parity/) | Local strong check와 artifact archive가 같은 event 계약으로 동작 |
 | 03 | [independent-r10-input](03-independent-r10-input/) | current commit의 원본 증거만 blind evaluator 입력 manifest에 봉인됨 |
@@ -81,4 +80,4 @@ Python과 TypeScript materializer가 같은 YAML을 다르게 해석하지 않�
 
 ## TODO 삭제 조건
 
-각 하위 packet은 자체 증거가 모두 green일 때만 해당 TODO를 삭제한다. 00~05 TODO가 모두 삭제되고 독립 R10이 현재 commit을 승인하기 전에는 이 packet도, 상위 PRD loop도 완료가 아니다.
+각 하위 packet은 자체 증거가 모두 green일 때만 해당 TODO를 삭제한다. 남은 01~05 TODO가 모두 삭제되고 독립 R10이 현재 commit을 승인하기 전에는 이 packet도, 상위 PRD loop도 완료가 아니다.

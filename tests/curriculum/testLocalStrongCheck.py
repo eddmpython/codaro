@@ -337,6 +337,35 @@ def testLocalStrongCheckApiRejectsTamperedFixtureHash(tmp_path: Path) -> None:
     assert response.json()["error"]["code"] == "curriculum-local-strong-check-invalid"
 
 
+def testGitFirstStepsSolutionsPassNativeSandbox() -> None:
+    lessonPath = Path("curricula/python/devLiteracy/devTools/gitFirstSteps.yaml")
+    content = yaml.safe_load(lessonPath.read_text(encoding="utf-8"))
+    checkedSections: list[str] = []
+    behaviorCaseCount = 0
+
+    for section in content["sections"]:
+        check = section.get("check")
+        exercise = section.get("exercise")
+        if not isinstance(check, dict) or check.get("strength") != "strong":
+            continue
+        assert check["kind"] == "behavior"
+        assert check["executor"] == "browser-worker"
+        assert isinstance(exercise, dict)
+        result = runLocalStrongCheck(check, exercise["solution"])
+        assert result["passed"] is True, f"{section.get('id')}: {result}"
+        assert result["executor"] == "local-sandbox"
+        checkedSections.append(section["id"])
+        behaviorCaseCount += len(check["payload"]["cases"])
+
+    assert checkedSections == [
+        "classify-status",
+        "choose-command",
+        "commit-scope",
+        "read-log",
+    ]
+    assert behaviorCaseCount == 16
+
+
 @pytest.mark.parametrize(
     "relativePath",
     [

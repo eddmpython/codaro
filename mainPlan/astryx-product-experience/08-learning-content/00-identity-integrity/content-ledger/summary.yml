@@ -1,12 +1,12 @@
 schemaVersion: 1
-snapshotDate: "2026-07-27"
+snapshotDate: "2026-07-28"
 canonicalRows: 472
 uniqueLessonRefs: 472
 unownedRows: 0
 emptyOutcomeRows: 0
 reinforcementRows: 245
 dispositionCounts: {migrate: 472, merge: 0, archive: 0}
-sourceSetHash: "51aa6ffe280b2bef1afeb68b155675772fd3780bb0de6ea4590c1a4ad15da1a3"
+sourceSetHash: "3cda19d3e0d2c08964654fab04e7adb4d3eb837e7beca2de7875ff96a65756d4"
 baselineTaxonomyHash: "b5e9b0b9db4f6ecd89c7be10a5c795f9b991b3ce700d5b5cf044607fc835def2"
 composerVersionHash: "82c325cd14b0d6fc2767a2780e69f500d4496e444c3c2271b830179e70be6446"
 plannedTaxonomyOutcomeIds: ["builtins.tempFiles","builtins.hashing","builtins.archives","python.projectDelivery","viz.edaReport","automation.browser.audit"]

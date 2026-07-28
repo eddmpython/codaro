@@ -125,6 +125,24 @@ def isStrongCheckSpec(check: dict[str, Any]) -> bool:
     )
 
 
+def requiresStrongAssessment(payload: dict[str, Any]) -> bool:
+    sections = payload.get("sections")
+    if not isinstance(sections, list):
+        return False
+    for section in sections:
+        if not isinstance(section, dict):
+            continue
+        isStructured = section.get("structuredPrimary") is True or any(
+            key in section for key in ("goal", "snippet", "exercise", "check")
+        )
+        exercise = section.get("exercise")
+        if not isStructured or not isinstance(exercise, dict):
+            continue
+        if any(str(exercise.get(key) or "").strip() for key in ("prompt", "starterCode", "solution")):
+            return True
+    return False
+
+
 def validAssessmentVariants(payload: dict[str, Any], mode: str) -> list[dict[str, Any]]:
     assessment = payload.get("assessment") if isinstance(payload.get("assessment"), dict) else {}
     variants = assessment.get(f"{mode}Variants")

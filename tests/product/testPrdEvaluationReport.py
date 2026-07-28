@@ -223,3 +223,31 @@ def testDraftFactAuditIsRejectedWithoutChangingLearningFacts() -> None:
 
     assert any("not bound" in failure for failure in failures)
     assert factAudit["facts"]["learningCoverage"]["weakOnlyLessonCount"] == 353
+
+
+def testPlanQualityAcceptsOnlyIndependentReadinessBlockers() -> None:
+    verifier = loadVerifier()
+    result = {
+        "passed": False,
+        "failures": [
+            "R10 input manifest is not sealed and ready",
+            "learning evaluator is unassigned",
+            "raw ux report is absent: mainPlan/reports/ux.yml",
+            "finding ledger is absent: mainPlan/finding-ledger.yml",
+        ],
+    }
+
+    assert verifier.planQualityEligible(result) is True
+
+
+def testPlanQualityRejectsMalformedIndependentReport() -> None:
+    verifier = loadVerifier()
+    result = {
+        "passed": False,
+        "failures": [
+            "R10 input manifest is not sealed and ready",
+            "learning: totalScore must equal the untouched sum of dimension scores",
+        ],
+    }
+
+    assert verifier.planQualityEligible(result) is False

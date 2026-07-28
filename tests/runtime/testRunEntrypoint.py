@@ -57,6 +57,7 @@ def testGateNamesAreStable() -> None:
         "product-quality-audit",
         "evaluation-contract",
         "plan-quality",
+        "r10-independent-review",
         "automation-ide-audit",
         "service-readiness-audit",
         "diagnostic-summary-contract",
@@ -214,6 +215,7 @@ def testGateNamesAreStable() -> None:
         "path-learning-signal",
         "evaluation-contract",
         "plan-quality",
+        "r10-independent-review",
     )
 
 

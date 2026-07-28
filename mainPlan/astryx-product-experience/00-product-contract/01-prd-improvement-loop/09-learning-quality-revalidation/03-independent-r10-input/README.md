@@ -8,7 +8,7 @@
 
 00~02의 current commit 증거가 닫힌 뒤에만 입력 manifest를 만든다. 이전 평가 점수·결론·remediation은 blind evaluator에게 제공하지 않는다. machine report, 브라우저 결과, 사람 검수, source hash, commit hash의 원본만 봉인하고 신규 평가자 3명이 독립적으로 판단한다.
 
-현재 공식 `product-experience-browser` 72/72와 `local-studio-browser` 26/26은 green이고 Day 19 archive flow, canonical mastery 수정과 lessonRef 기반 시각 자료 배선도 이 matrix에 포함됐다. 그러나 실제 WebView2, identity/content 승인 각 0/472, taxonomy 승인 0/7, independent assessment 승인 0/467, 신규 평가자 3명의 독립 R10 raw report와 current sealed bundle이 없다. 따라서 차단 상태이며 TODO가 남아 있다.
+현재 공식 `product-experience-browser` 72/72와 `local-studio-browser` 26/26은 green이고 Day 19 archive flow, canonical mastery 수정과 lessonRef 기반 시각 자료 배선도 이 matrix에 포함됐다. 그러나 실제 WebView2, identity/content 승인 각 0/472, taxonomy 승인 0/7, independent assessment 승인 0/468, 신규 평가자 3명의 독립 R10 raw report와 current sealed bundle이 없다. 따라서 차단 상태이며 TODO가 남아 있다.
 
 ## 영향 파일
 

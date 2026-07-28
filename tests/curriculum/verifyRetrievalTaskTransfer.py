@@ -10,6 +10,7 @@ from learningLedgerAudit import (
     curriculumPayloads,
     currentGitHead,
     isStrongCheckSpec,
+    requiresStrongAssessment,
     utcTimestamp,
     validAssessmentVariants,
     writeReport,
@@ -57,6 +58,9 @@ def main() -> int:
     started = time.monotonic()
     failures: list[str] = []
     payloads = curriculumPayloads()
+    assessmentEligibleLessons = sum(
+        1 for payload in payloads.values() if requiresStrongAssessment(payload)
+    )
     assessedLessons = 0
     distinctLessons = 0
     for lessonRef, payload in sorted(payloads.items()):
@@ -89,7 +93,12 @@ def main() -> int:
             continue
         distinctLessons += 1
 
-    passed = not failures and assessedLessons == 467 and distinctLessons == assessedLessons
+    if assessedLessons != assessmentEligibleLessons:
+        failures.append(
+            "assessed lesson count differs from structured practice coverage: "
+            f"{assessedLessons} != {assessmentEligibleLessons}"
+        )
+    passed = not failures and distinctLessons == assessedLessons
     payload: dict[str, Any] = {
         "gate": "retrieval-task-transfer",
         "passed": passed,
@@ -101,6 +110,7 @@ def main() -> int:
         "gitHead": currentGitHead(),
         "summary": {
             "sourceLessonCount": len(payloads),
+            "assessmentEligibleLessonCount": assessmentEligibleLessons,
             "assessedLessonCount": assessedLessons,
             "distinctProgressionLessonCount": distinctLessons,
             "minimumRetrievalDelayHours": 24,

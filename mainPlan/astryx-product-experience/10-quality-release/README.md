@@ -121,7 +121,7 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 | `visual-accessibility-browser` | design system | yes | every change | 대표 3-engine responsive, font, contrast, forced-colors, keyboard dialog |
 | `learning-evidence-contract` | learning platform | yes | every change | 단일 evidence, dedup, mastery policy |
 | `learning-method` | learning product | yes | every change | 자동 feedback·hint·next, learning relevance와 control intent |
-| `learning-content` | curriculum | no | human approval completion | identity와 472개 ledger aggregate, 현재 identity/content 0/472·taxonomy 0/7·independent assessment 0/467 |
+| `learning-content` | curriculum | no | human approval completion | identity와 472개 ledger aggregate, 현재 identity/content 0/472·taxonomy 0/7·independent assessment 0/468 |
 | `curriculum-quality-matrix` | curriculum | yes | every change | path metadata·check·visual coverage |
 | `curriculum-top-tier-audit` | curriculum | no | human approval completion | 독립 assessment 승인과 top-tier completion eligibility |
 | `curriculum-executability` | runtime | no | curriculum audit | browser/local tier 실행 가능성 |

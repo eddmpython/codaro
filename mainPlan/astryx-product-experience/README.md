@@ -44,7 +44,7 @@ Codaro를 다운로드 중심 랜딩과 별도 로컬 앱의 조합으로 보지
 
 ## 작업 지도
 
-`의존`은 아래 00 milestone의 증거 경계를 뜻한다. 이 표의 원래 의도는 B3 전 W1+ source 확장까지 막는 것이었지만 실제 구현은 그 순서를 지키지 않았다. R10 전에 strong assessment 467레슨, public route 472개, 대표 visual과 legacy 제거가 source에 들어왔다. 이미 구현된 코드를 없던 일로 하거나 되돌려 순서를 가장하지 않는다.
+`의존`은 아래 00 milestone의 증거 경계를 뜻한다. 이 표의 원래 의도는 B3 전 W1+ source 확장까지 막는 것이었지만 실제 구현은 그 순서를 지키지 않았다. R10 전에 strong assessment 468레슨, public route 472개, 대표 visual과 legacy 제거가 source에 들어왔다. 이미 구현된 코드를 없던 일로 하거나 되돌려 순서를 가장하지 않는다.
 
 따라서 B0~B3는 지금부터 **승인과 TODO 삭제 gate**로 적용한다. 선행 구현은 모두 provisional machine coverage이며, B3 전에는 W1+ 사람 승인, 경로 공개 승격, 독립 품질 주장, top-level product workstream 삭제에 사용할 수 없다. 결함 수정과 machine 검증은 계속하되 새 일괄 변환으로 사람 검수 부채를 늘리지 않는다.
 
