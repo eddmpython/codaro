@@ -151,12 +151,32 @@ export function resolveLearningVisual(
   };
 }
 
-export function resolveLearningOutcomeVisual(categoryKey: string, width: number) {
+export function resolveLearningVisualForLesson(
+  domainId: LearningVisualDomainId,
+  categoryKey: string,
+  contentId: string,
+  width: number,
+) {
+  const visual = resolveLearningVisual(domainId, width);
+  if (!visual) return null;
+  const lessonRef = `${categoryKey}/${contentId}`;
+  if (!(visual.learning.lessonRefs as readonly string[]).includes(lessonRef)) return null;
+  return visual;
+}
+
+export function resolveLearningOutcomeVisual(
+  categoryKey: string,
+  contentId: string,
+  width: number,
+) {
   const outcome = learningOutcomeVisualForCategory(categoryKey);
   if (!outcome) return null;
-  return {
+  const visual = {
     ...resolveVisualAsset(outcome.assetId, { width }),
     domainLabel: outcome.label,
     outcomeId: outcome.id,
   };
+  const lessonRef = `${categoryKey}/${contentId}`;
+  if (!(visual.learning.lessonRefs as readonly string[]).includes(lessonRef)) return null;
+  return visual;
 }

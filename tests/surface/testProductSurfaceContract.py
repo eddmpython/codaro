@@ -125,7 +125,8 @@ def testLearningVisualsUseOneManifestBackedDomainMapping() -> None:
         "webMonitoringOutcome",
     ):
         assert learningVisuals.count(f'assetId: "{assetId}"') == 1
-    assert "resolveLearningOutcomeVisual(category, 840)" in _read(
+    assert "visual.learning.lessonRefs" in learningVisuals
+    assert "resolveLearningOutcomeVisual(category, contentId, 840)" in _read(
         "editor/src/components/curriculum/learningDomainVisual.tsx"
     )
 
@@ -177,6 +178,7 @@ def testLearningHomeAndLessonRenderInstructionalVisualsWithoutRevealControls() -
     assert "LEARNING_VISUAL_DOMAINS.map" in home
     assert "<LearningDomainVisual" in overview
     assert "category={selectedCategory}" in overview
+    assert "contentId={selectedContentId}" in overview
     for marker in (
         'data-learning-domain-visual="true"',
         "data-learning-visual-kind={visual.kind}",
@@ -193,6 +195,7 @@ def testLearningHomeAndLessonRenderInstructionalVisualsWithoutRevealControls() -
     assert '"viewport": {"width": 1440, "height": 900}' in browserGate
     assert "all 8 instructional learning-domain visuals must render" in browserGate
     assert "learningOutcomeVisualCount" in browserGate
+    assert '"expectedLearningVisualAssetId": "pythonFundamentals"' in browserGate
     assert '"expectedLearningVisualAssetId": "pythonFoundationOutcome"' in browserGate
     assert '"expectedLearningVisualAssetId": "dataVisualizationOutcome"' in browserGate
 

@@ -2,6 +2,7 @@ import {
   learningVisualDomainForCategory,
   resolveLearningOutcomeVisual,
   resolveLearningVisual,
+  resolveLearningVisualForLesson,
   type LearningVisualDomainId,
 } from "@/lib/learningVisualAssets";
 import { cn } from "@/lib/utils";
@@ -11,6 +12,7 @@ type LearningDomainVisualProps = {
   category?: string;
   children?: ReactNode;
   className?: string;
+  contentId?: string;
   domainId?: LearningVisualDomainId;
   path?: readonly string[];
   track?: string;
@@ -21,6 +23,7 @@ export function LearningDomainVisual({
   category = "",
   children,
   className,
+  contentId = "",
   domainId,
   path = [],
   track = "",
@@ -29,13 +32,17 @@ export function LearningDomainVisual({
   const resolvedDomainId = domainId
     ?? learningVisualDomainForCategory(category, track, path)?.id;
   const outcomeVisual = variant === "lesson"
-    ? resolveLearningOutcomeVisual(category, 840)
+    ? resolveLearningOutcomeVisual(category, contentId, 840)
     : null;
-  if (!resolvedDomainId && !outcomeVisual) return children ? <>{children}</> : null;
-
   const visual = outcomeVisual
-    ?? (resolvedDomainId ? resolveLearningVisual(resolvedDomainId, variant === "home" ? 480 : 840) : null);
-  if (!visual) return children ? <>{children}</> : null;
+    ?? (resolvedDomainId
+      ? variant === "lesson"
+        ? resolveLearningVisualForLesson(resolvedDomainId, category, contentId, 840)
+        : resolveLearningVisual(resolvedDomainId, 480)
+      : null);
+  if (!visual) {
+    return children ? <div className={cn("min-w-0", className)}>{children}</div> : null;
+  }
 
   return (
     <figure
@@ -95,7 +102,11 @@ export function LearningDomainVisual({
             </dd>
           </div>
         </dl>
-        {children}
+        {children ? (
+          <div className="mt-3 border-t border-border pt-3 sm:mt-4 sm:pt-4">
+            {children}
+          </div>
+        ) : null}
       </figcaption>
     </figure>
   );

@@ -1713,7 +1713,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "expectCanonicalLesson": "day02_변수와데이터타입",
             "expectTransferSection": True,
             "initialCheckState": "mismatch",
-            "expectedLearningVisualAssetId": "pythonFoundationOutcome",
+            "expectedLearningVisualAssetId": "pythonFundamentals",
             "solutionCode": (
                 "def describe_value(value):\n"
                 "    return f'{type(value).__name__}:{value}'"
@@ -1837,6 +1837,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "targetAssessmentMode": "mastery",
             "expectTransferSection": True,
             "initialCheckState": "mismatch",
+            "expectedLearningVisualAssetId": "pythonFoundationOutcome",
             "solutionCode": (
                 "def build_sales_report(source_path, output_name):\n"
                 "    import csv\n"
@@ -1867,8 +1868,8 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "targetAssessmentMode": "mastery",
             "expectTransferSection": True,
             "initialCheckState": "mismatch",
-            "verifySemanticArtifactEvidence": True,
             "expectedLearningVisualAssetId": "dataVisualizationOutcome",
+            "verifySemanticArtifactEvidence": True,
             "solutionCode": authoredAssessmentSolution(
                 "curricula/python/visualization/seaborn/10_종합EDA리포트.yaml",
                 "mastery",
@@ -3315,13 +3316,20 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
                 f"full={audit['dayOneCommentPromptCount']}, "
                 f"truncated={audit['truncatedDayOneCommentPromptCount']}"
             )
-        if (
-            audit["learningDomainVisualCount"] != 1
-            or audit["learningVisualQuestionCount"] != 1
-            or audit["learningVisualDecisionCount"] != 1
-        ):
-            failures.append(f"{name}: lesson domain visual must render with question and decision context")
         expectedLearningVisualAssetId = case.get("expectedLearningVisualAssetId")
+        expectedLearningVisualCount = 1 if expectedLearningVisualAssetId else 0
+        if (
+            audit["learningDomainVisualCount"] != expectedLearningVisualCount
+            or audit["learningVisualQuestionCount"] != expectedLearningVisualCount
+            or audit["learningVisualDecisionCount"] != expectedLearningVisualCount
+        ):
+            failures.append(
+                f"{name}: lesson visual count must follow its exact manifest lessonRef; "
+                f"expected={expectedLearningVisualCount}, "
+                f"visuals={audit['learningDomainVisualCount']}, "
+                f"questions={audit['learningVisualQuestionCount']}, "
+                f"decisions={audit['learningVisualDecisionCount']}"
+            )
         if (
             expectedLearningVisualAssetId
             and audit["learningVisualAssetIds"] != [expectedLearningVisualAssetId]

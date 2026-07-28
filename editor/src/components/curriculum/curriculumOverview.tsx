@@ -408,10 +408,11 @@ export function LearningOverviewHeader({
         <div className="mt-4 border-y border-border py-3 sm:mt-5 sm:py-4">
           <LearningDomainVisual
             category={selectedCategory}
+            contentId={selectedContentId}
             variant="lesson"
           >
             {learnItems.length ? (
-              <div className="mt-3 border-t border-border pt-3 sm:mt-4 sm:pt-4" data-learning-overview-part="learn-list">
+              <div data-learning-overview-part="learn-list">
                 <div className="text-xs font-medium text-muted-foreground">오늘 배우는 것</div>
                 <ol
                   className="mt-1.5 space-y-1 sm:mt-2 sm:space-y-1.5"
