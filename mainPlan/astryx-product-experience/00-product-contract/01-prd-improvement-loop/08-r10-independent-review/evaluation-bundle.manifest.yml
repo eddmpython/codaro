@@ -3,14 +3,14 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: 0fab205be5289a13821a039acb2d05bf14b27ce8
+  gitCommit: 7b20024c1c0fd72a1b811f7dd0b278a16c9707ec
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: 6e3ea9fdadc2b73b3e71841698dfc7f50eec50f5bc8f9b3ae1d546fff118a235
+  manifestHash: 38255932163303b0e9a1a921807924e711dc01cc0aea0a5955bec4a4e04a7ffa
   fileCount: 2877
   totalBytes: 91343496
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: 81079940d1e7885da5ba161f48d07c82545e3691c7ef8f63e3f20a9cdf660da7
+  sha256: 0f13f5e47abf32a4ba0d5edaeb0a60e1e302502c17710fb10a86282bd3c0c78d
   bytes: 91911654
   format: zip
   compression: stored
@@ -990,7 +990,7 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: assets/brand/visuals/generated/manifest.json
-  sha256: c2e128771cbbc99e7ebedd5d3c4afea1744f6ab846f68346c182e1403723b109
+  sha256: f9637f012cae46b3e68c170e5244100a4324f16029e20dd9fb05ce2ae7a7f303
   bytes: 112540
   kind: repository
   sourcePath: assets/brand/visuals/generated/manifest.json
@@ -1035,7 +1035,7 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/learning/statistics-ml-v1.png
 - path: assets/brand/visuals/manifest.json
-  sha256: 54d0596869895102e0770412630d030207d0392ba2a55cb45b6d568893948688
+  sha256: 021daf5082b72bebb0ce4b54221b0b78ec7f835caa5c282f5e78139b88aa86f3
   bytes: 62879
   kind: repository
   sourcePath: assets/brand/visuals/manifest.json
@@ -5455,7 +5455,7 @@ files:
   kind: repository
   sourcePath: editor/public/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: editor/public/visuals/manifest.json
-  sha256: c2e128771cbbc99e7ebedd5d3c4afea1744f6ab846f68346c182e1403723b109
+  sha256: f9637f012cae46b3e68c170e5244100a4324f16029e20dd9fb05ce2ae7a7f303
   bytes: 112540
   kind: repository
   sourcePath: editor/public/visuals/manifest.json
@@ -10944,7 +10944,7 @@ files:
   kind: repository
   sourcePath: landing/static/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: landing/static/visuals/manifest.json
-  sha256: c2e128771cbbc99e7ebedd5d3c4afea1744f6ab846f68346c182e1403723b109
+  sha256: f9637f012cae46b3e68c170e5244100a4324f16029e20dd9fb05ce2ae7a7f303
   bytes: 112540
   kind: repository
   sourcePath: landing/static/visuals/manifest.json
