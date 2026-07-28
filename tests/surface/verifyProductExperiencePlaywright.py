@@ -1575,6 +1575,19 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "expectedMobileSurface": "chat",
         },
         {
+            "name": "local-learning-home-minimum",
+            "url": (
+                f"http://127.0.0.1:{localPort}/?surface=curriculum"
+                "&category=30days&lesson=day01#curriculum"
+            ),
+            "viewport": {"width": 900, "height": 640},
+            "surface": "learning-home",
+            "expectedTier": "local",
+            "waitFor": "[data-learning-section-card]",
+            "openCurriculumHome": True,
+            "verifyLearningHomeMinimum": True,
+        },
+        {
             "name": "local-learning-home-desktop",
             "url": (
                 f"http://127.0.0.1:{localPort}/?surface=curriculum"
@@ -3855,6 +3868,7 @@ def runBrowserMatrix(
                 canonicalKeyboardEvidence: dict[str, Any] | None = None
                 lessonNavigationEvidence: dict[str, Any] | None = None
                 localArchiveWebRoundTripEvidence: dict[str, Any] | None = None
+                learningHomeMinimumEvidence: dict[str, Any] | None = None
                 notebookRunAdvanceVerified = False
                 notebookToolsVerified = False
                 productVisualThemeToggleVerified = False
@@ -4087,6 +4101,56 @@ def runBrowserMatrix(
                             homeEntry.wait_for(state="visible", timeout=20_000)
                         homeEntry.first.click(timeout=20_000)
                         page.wait_for_selector('[data-curriculum-home-goals="true"]', timeout=30_000)
+                        if case.get("verifyLearningHomeMinimum"):
+                            learningHomeMinimumEvidence = page.evaluate(
+                                """
+                                () => {
+                                  const rectFor = (selector) => {
+                                    const element = document.querySelector(selector);
+                                    if (!(element instanceof HTMLElement)) return null;
+                                    const rect = element.getBoundingClientRect();
+                                    return Object.fromEntries(
+                                      ['top', 'right', 'bottom', 'left', 'width', 'height'].map(
+                                        (key) => [key, Math.round(rect[key] * 1000) / 1000]
+                                      )
+                                    );
+                                  };
+                                  return {
+                                    viewportWidth: window.innerWidth,
+                                    viewportHeight: window.innerHeight,
+                                    documentWidth: document.documentElement.scrollWidth,
+                                    group: rectFor('[data-curriculum-home-goal-group]'),
+                                    visual: rectFor(
+                                      '[data-curriculum-home-goal-group] '
+                                      + '[data-learning-domain-visual="true"]'
+                                    ),
+                                    firstCategory: rectFor(
+                                      '[data-curriculum-home-goal-group] '
+                                      + '[data-curriculum-home-category]'
+                                    ),
+                                  };
+                                }
+                                """
+                            )
+                            evidence = learningHomeMinimumEvidence
+                            visual = evidence.get("visual") or {}
+                            firstCategory = evidence.get("firstCategory") or {}
+                            if (
+                                evidence.get("viewportWidth") != 900
+                                or evidence.get("viewportHeight") != 640
+                                or evidence.get("documentWidth", 0) > 901
+                                or not visual
+                                or not firstCategory
+                                or float(visual.get("width") or 0) > 280
+                                or float(firstCategory.get("top") or -1) < 0
+                                or float(firstCategory.get("bottom") or 641) > 640
+                                or float(firstCategory.get("left") or 0)
+                                < float(visual.get("right") or 0) + 12
+                            ):
+                                raise AssertionError(
+                                    "minimum Local learning home did not keep the first "
+                                    f"goal choice visible beside its visual: {evidence}"
+                                )
                     if case.get("verifyLearnSearch"):
                         expectedQuery = str(case["verifyLearnSearch"])
                         expectedRuntime = str(case.get("expectedLearnRuntime", "all"))
@@ -6356,6 +6420,7 @@ def runBrowserMatrix(
                             "canonicalKeyboardEvidence": canonicalKeyboardEvidence,
                             "lessonNavigationEvidence": lessonNavigationEvidence,
                             "localArchiveWebRoundTripEvidence": localArchiveWebRoundTripEvidence,
+                            "learningHomeMinimumEvidence": learningHomeMinimumEvidence,
                             "webArtifactEvidence": webArtifactEvidence,
                             "notebookRunAdvanceVerified": notebookRunAdvanceVerified,
                             "notebookToolsVerified": notebookToolsVerified,

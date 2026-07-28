@@ -193,6 +193,10 @@ def testLearningHomeAndLessonRenderInstructionalVisualsWithoutRevealControls() -
     assert "text-[11px]" not in home
     assert '"name": "web-learning-home-desktop"' in browserGate
     assert '"viewport": {"width": 1440, "height": 900}' in browserGate
+    assert '"name": "local-learning-home-minimum"' in browserGate
+    assert '"verifyLearningHomeMinimum": True' in browserGate
+    assert "minimum Local learning home did not keep the first " in browserGate
+    assert "goal choice visible beside its visual" in browserGate
     assert "all 8 instructional learning-domain visuals must render" in browserGate
     assert "learningOutcomeVisualCount" in browserGate
     assert '"expectedLearningVisualAssetId": "pythonFundamentals"' in browserGate

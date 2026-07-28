@@ -212,7 +212,7 @@ export function CurriculumHome({
             <div className="border-y border-border">
               {groups.map((group) => (
                 <section
-                  className="grid min-w-0 gap-5 border-b border-border py-7 last:border-b-0 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-8"
+                  className="grid min-w-0 gap-5 border-b border-border py-7 last:border-b-0 min-[860px]:grid-cols-[240px_minmax(0,1fr)] min-[860px]:gap-6 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-8"
                   key={group.track}
                   data-curriculum-home-domain={group.domainId}
                   data-curriculum-home-goal-group={group.track}
@@ -232,7 +232,7 @@ export function CurriculumHome({
                       />
                     ) : null}
                   </div>
-                  <div className="min-w-0 divide-y divide-border border-y border-border lg:border-y-0">
+                  <div className="min-w-0 divide-y divide-border border-y border-border min-[860px]:border-y-0">
                     {group.categories.map((category) => (
                       <button
                         className="group flex min-h-16 w-full min-w-0 items-center gap-3 px-2 py-3 text-left transition-colors hover:bg-muted/40 focus-visible:bg-muted/40"
