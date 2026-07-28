@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: 3b7f25abaac5a48ce7c81bbf85b144e2c9bbe46d
+  gitCommit: 31b08a461c2d1a701109b381d89cf5cfdd8940c4
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: 48c14aa62d49a8379892ba7f5e9f49ca0a07d1df00db42c9f922535f4d428d34
+  manifestHash: f0f59e2473aea4d102c30fa0351238912e25964b576261fd7d646bf8c2b5e2a9
   fileCount: 2876
-  totalBytes: 91234907
+  totalBytes: 91235086
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: 5b257bf9696019013db243939a7452bdac02d76f75f2a542152279d3968e8175
-  bytes: 91802905
+  sha256: 0fc87ef67c7271f1651e1cbde3bceff42fa3c7e8b9903415b7f1cd67bbd9f14f
+  bytes: 91803084
   format: zip
   compression: stored
   compressionMethod: 0
@@ -11914,8 +11914,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/09-repository-simplification/README.md
 - path: mainPlan/astryx-product-experience/10-quality-release/README.md
-  sha256: a279ce717f7ab4613bd10b46a487fdbf4eee6670912f896eb4acbaa30882b708
-  bytes: 28800
+  sha256: 7328f14b4416594d0007a973dcce5df8c95e53c4bd2ac159428dca09038d7aaa
+  bytes: 28837
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/10-quality-release/README.md
 - path: mainPlan/astryx-product-experience/README.md
@@ -13914,8 +13914,8 @@ files:
   kind: repository
   sourcePath: tests/migrations/testClassroomArchive.py
 - path: tests/plan/testMainPlanTodoPolicy.py
-  sha256: f5eeb33d74ad6bb101089033bf2ccc95899f45783a5f9898644574f329224263
-  bytes: 3256
+  sha256: 45183dc515fd8022dea4871b0c78a9e76b49090c689d98f2251716ec2a1bb435
+  bytes: 3398
   kind: repository
   sourcePath: tests/plan/testMainPlanTodoPolicy.py
 - path: tests/playwrightCli.py
