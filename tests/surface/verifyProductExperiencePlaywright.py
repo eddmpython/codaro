@@ -1669,6 +1669,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "solutionCode": "print('Hello Codaro')",
             "expectCompletedLessons": 1,
             "expectNextLesson": "day02_변수와데이터타입",
+            "expectedLearningVisualAssetId": "pythonFundamentals",
         },
         {
             "name": "web-canonical-navigation-mobile",
@@ -1683,6 +1684,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "verifyLessonNavigationLayout": True,
             "expectPreviousLesson": "day01_헬로월드",
             "expectNextLesson": "day03_연산자",
+            "expectedLearningVisualAssetId": "pythonFundamentals",
         },
         {
             "name": "web-day1-transfer-desktop",
