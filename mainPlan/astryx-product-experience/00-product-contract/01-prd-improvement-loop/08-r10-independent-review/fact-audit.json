@@ -8,16 +8,16 @@
   "productCompletionEligible": false,
   "roundSealEligible": false,
   "scope": {
-    "gitCommit": "479e9ae0ab7a8d533f679c04dbcdb63838d1c4d1",
+    "gitCommit": "fd28fc5a059f97dcad00f89836a61e581d10b83f",
     "dirtyDiffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "manifestHash": "a7ea8bdd7540d54f48ed700b20465f41270f4868bff75a329b7447c25a2b0008",
-    "evaluationBundleHash": "e1128dd58e4103c2112250f9be9c5fe355ed668afbccab4f740f57aa9cddb0e4"
+    "manifestHash": "b65d3c301cc4074e67454f62411e63882f450fef73afe7d813ca3b4171d7a238",
+    "evaluationBundleHash": "d011f93fb9f9658294e6f18227a27b49e425fa84c892b51af2e9e93bcaf793db"
   },
   "facts": {
     "bundleIntegrity": {
-      "fileCount": 2942,
-      "totalSourceBytes": 92400444,
-      "archiveBytes": 92986084,
+      "fileCount": 2945,
+      "totalSourceBytes": 92414410,
+      "archiveBytes": 93000554,
       "archiveEntriesReadOnly": true,
       "excludedHistoryPathCount": 0,
       "priorScoresIncluded": false,

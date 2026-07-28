@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: 479e9ae0ab7a8d533f679c04dbcdb63838d1c4d1
+  gitCommit: fd28fc5a059f97dcad00f89836a61e581d10b83f
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: a7ea8bdd7540d54f48ed700b20465f41270f4868bff75a329b7447c25a2b0008
-  fileCount: 2942
-  totalBytes: 92400444
+  manifestHash: b65d3c301cc4074e67454f62411e63882f450fef73afe7d813ca3b4171d7a238
+  fileCount: 2945
+  totalBytes: 92414410
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: e1128dd58e4103c2112250f9be9c5fe355ed668afbccab4f740f57aa9cddb0e4
-  bytes: 92986084
+  sha256: d011f93fb9f9658294e6f18227a27b49e425fa84c892b51af2e9e93bcaf793db
+  bytes: 93000554
   format: zip
   compression: stored
   compressionMethod: 0
@@ -22,7 +22,6 @@ roundReadiness:
   sealBlockingReasons:
   - 03-learning-vertical-slice is not eligible for R10
   - 04-evidence-migration is not eligible for R10
-  - 05-check-sandbox-feasibility is not eligible for R10
   - 06-astryx-journey-evidence is not eligible for R10
   - 07-release-research-operations is not eligible for R10
   - 09-learning-quality-revalidation is not eligible for R10
@@ -33,7 +32,6 @@ roundReadiness:
   blockingReasons:
   - 03-learning-vertical-slice is not eligible for R10
   - 04-evidence-migration is not eligible for R10
-  - 05-check-sandbox-feasibility is not eligible for R10
   - 06-astryx-journey-evidence is not eligible for R10
   - 07-release-research-operations is not eligible for R10
   - 09-learning-quality-revalidation is not eligible for R10
@@ -1175,8 +1173,8 @@ files:
   kind: repository
   sourcePath: contracts/README.md
 - path: contracts/artifactOwners.yml
-  sha256: 61dca3bfb4a3f454eb60e94656be43b240fc7722c23bdc7876e0bc9b658dbdee
-  bytes: 3690
+  sha256: 4bd5c45f4928736c6026a0770946a8fcf60ad8a5671e2e57ba1a72a5890e6857
+  bytes: 4047
   kind: repository
   sourcePath: contracts/artifactOwners.yml
 - path: contracts/artifactOwnership.schema.json
@@ -1184,6 +1182,11 @@ files:
   bytes: 1243
   kind: repository
   sourcePath: contracts/artifactOwnership.schema.json
+- path: contracts/checkSandboxFeasibilityDecision.json
+  sha256: d4ae3bf551ddb5b0d6136a7f6d576a25f8cecd2701cc9acb7381126006764549
+  bytes: 446
+  kind: repository
+  sourcePath: contracts/checkSandboxFeasibilityDecision.json
 - path: contracts/classroomArchive.schema.json
   sha256: c94bae31a71f0d5720df8515f24b3d42ee2ceb1b3e4d33d6f99015771da4d05b
   bytes: 1675
@@ -6235,7 +6238,7 @@ files:
   kind: repository
   sourcePath: editor/src/lib/fallbackData.ts
 - path: editor/src/lib/generatedContracts/artifactOwnership.ts
-  sha256: 4d3e692d5e29229601ed4c762742cbb0561f3b7789600c3594016513111fa9a9
+  sha256: 132208e2995064122143238f4d4e38566367a88e8ca118d048d3e4485a397607
   bytes: 703
   kind: repository
   sourcePath: editor/src/lib/generatedContracts/artifactOwnership.ts
@@ -11324,12 +11327,12 @@ files:
   kind: repository
   sourcePath: launcher/codaro-launcher/src/failure.rs
 - path: launcher/codaro-launcher/src/generated_contracts/artifact_ownership.rs
-  sha256: 8a3b835d7f51cb3f8f37ad876702218b049646fd204e68fc31cc70cfee819357
+  sha256: 1d1d2bd9832dc65024c5a380f0d5fac084b03fc885ec52002a025c5d3ff400a6
   bytes: 961
   kind: repository
   sourcePath: launcher/codaro-launcher/src/generated_contracts/artifact_ownership.rs
 - path: launcher/codaro-launcher/src/generated_contracts/mod.rs
-  sha256: 97da3324de378737b811086311baedc9dc248f07c21865f86e722f11cc5bb074
+  sha256: 9a8f7d6c484ab8b11c251946ddec2e3604d1e548991d7163efe7fd5c5b5076b4
   bytes: 258
   kind: repository
   sourcePath: launcher/codaro-launcher/src/generated_contracts/mod.rs
@@ -11389,8 +11392,8 @@ files:
   kind: repository
   sourcePath: launcher/codaro-launcher/src/webview.rs
 - path: mainPlan/astryx-product-experience/02-learning-method/README.md
-  sha256: bddae729e14776e00a714645992901eef6d3325695216a604eb82b1f9f1b392f
-  bytes: 34067
+  sha256: 284341d88d4e5008987d570d9eca2d68e11ae050334619ee566841452f1c019f
+  bytes: 34603
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/02-learning-method/README.md
 - path: mainPlan/astryx-product-experience/03-product-shell/00-astryx-proof-shell/README.md
@@ -13339,12 +13342,12 @@ files:
   kind: repository
   sourcePath: src/codaro/extensions/registry.py
 - path: src/codaro/generatedContracts/__init__.py
-  sha256: 3ecd40f5024278202380e73dd6d4cd0976350aaef347fa01927b17cf7e1acd06
+  sha256: e459473f0f119835a9f55d3d76a966cfbf1d72e7c4aea048aa6c9c7d2601e5e9
   bytes: 515
   kind: repository
   sourcePath: src/codaro/generatedContracts/__init__.py
 - path: src/codaro/generatedContracts/artifactOwnership.py
-  sha256: 5ace06805a7b7b810a23f0bdb4fcb97f759260b749d940282ee9c848b587414b
+  sha256: 000651a41ce60fcb2528c417bdbdd646e04d1b189666ff5fe0238fb756ef3f47
   bytes: 761
   kind: repository
   sourcePath: src/codaro/generatedContracts/artifactOwnership.py
@@ -14253,6 +14256,11 @@ files:
   bytes: 779
   kind: repository
   sourcePath: tests/product/astryxVerticalSlice.matrix.json
+- path: tests/product/checkSandboxCapabilityProbe.py
+  sha256: 6149ac75285945927e683f524ce1044a219eed10260bfda4cca96f5567d09ee1
+  bytes: 9253
+  kind: repository
+  sourcePath: tests/product/checkSandboxCapabilityProbe.py
 - path: tests/product/fixtures/astryxVerticalSlice/reveal-only-control.json
   sha256: d5ce4e6c30606905a3f41a04236ea56c7ae7cd95056e106d571b1c69824a53df
   bytes: 415
@@ -14273,6 +14281,11 @@ files:
   bytes: 3007
   kind: repository
   sourcePath: tests/product/testAstryxJourneyMatrix.py
+- path: tests/product/testCheckSandboxCapabilityProbe.py
+  sha256: 469fea54da94c14f35e81e1b0e4329a42da5d1767b64e111932a8ba98550e8ad
+  bytes: 1301
+  kind: repository
+  sourcePath: tests/product/testCheckSandboxCapabilityProbe.py
 - path: tests/product/testLearningEfficacyStage.py
   sha256: d4723c798af0b56c6455213d765a581e8e11815cd5b89372b91725f4b4b5a7cf
   bytes: 2029
@@ -14299,8 +14312,8 @@ files:
   kind: repository
   sourcePath: tests/product/verifyAstryxJourneyAudit.py
 - path: tests/product/verifyCheckSandboxFeasibility.py
-  sha256: b107bceb41e908f001d1d90f6916c404b98814559394d0d0e3e3aa8621d06483
-  bytes: 11538
+  sha256: b4a16a506bbfb72ac58c482a5c247abf40b9d6e1f6615b7834fe15d197ec1ba1
+  bytes: 13611
   kind: repository
   sourcePath: tests/product/verifyCheckSandboxFeasibility.py
 - path: tests/product/verifyDogfoodAlphaAudit.py
