@@ -8,16 +8,16 @@
   "productCompletionEligible": false,
   "roundSealEligible": false,
   "scope": {
-    "gitCommit": "f78684b6c30db2838ad01d3f74a0711f588fc52d",
+    "gitCommit": "479e9ae0ab7a8d533f679c04dbcdb63838d1c4d1",
     "dirtyDiffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "manifestHash": "b4f1e872d094515001ab9f121f2efec184125cb5ad483ab9bd741761d887af9b",
-    "evaluationBundleHash": "e5927c97cff12ea50ee4385648015f739ce0ed6344b2786598ff7fbe09aa3911"
+    "manifestHash": "a7ea8bdd7540d54f48ed700b20465f41270f4868bff75a329b7447c25a2b0008",
+    "evaluationBundleHash": "e1128dd58e4103c2112250f9be9c5fe355ed668afbccab4f740f57aa9cddb0e4"
   },
   "facts": {
     "bundleIntegrity": {
-      "fileCount": 2940,
-      "totalSourceBytes": 92345664,
-      "archiveBytes": 92931000,
+      "fileCount": 2942,
+      "totalSourceBytes": 92400444,
+      "archiveBytes": 92986084,
       "archiveEntriesReadOnly": true,
       "excludedHistoryPathCount": 0,
       "priorScoresIncluded": false,
@@ -90,12 +90,12 @@
     },
     "learningCoverage": {
       "lessonCount": 472,
-      "strongCheckSpecCount": 1413,
-      "strongCheckSpecLessonCount": 467,
+      "strongCheckSpecCount": 1419,
+      "strongCheckSpecLessonCount": 468,
       "weakOnlyLessonCount": 0,
-      "masteryAssessmentLessonCount": 467,
-      "transferAssessmentLessonCount": 467,
-      "retrievalAssessmentLessonCount": 467,
+      "masteryAssessmentLessonCount": 468,
+      "transferAssessmentLessonCount": 468,
+      "retrievalAssessmentLessonCount": 468,
       "failedDomains": [
         "assessment-claim-and-independent-review"
       ],
