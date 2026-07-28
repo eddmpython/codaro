@@ -228,7 +228,16 @@ export function HomePage() {
             </div>
           </div>
           <div className="homeRuntimeProof">
-            <ProductVisual assetId="localNotebookDesktop" className="homeRuntimeImage" width={900} />
+            <div className="homeRuntimeVisuals" aria-label="Local 노트북과 자동화 제품 화면">
+              <figure className="homeRuntimeFigure">
+                <figcaption>LOCAL NOTEBOOK</figcaption>
+                <ProductVisual assetId="localNotebookDesktop" className="homeRuntimeImage" width={900} />
+              </figure>
+              <figure className="homeRuntimeFigure">
+                <figcaption>LOCAL AUTOMATION</figcaption>
+                <ProductVisual assetId="localAutomationDesktop" className="homeRuntimeImage" width={900} />
+              </figure>
+            </div>
             <div>
               <Globe2 size={20} aria-hidden="true" />
               <span>Web</span>
