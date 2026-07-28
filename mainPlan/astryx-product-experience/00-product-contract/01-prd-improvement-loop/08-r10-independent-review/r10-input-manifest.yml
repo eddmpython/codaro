@@ -161,7 +161,7 @@ remediations:
     masteryLessons: 467
     transferLessons: 467
     retrievalLessons: 467
-    productExperienceBrowserCases: 54
+    productExperienceBrowserCases: 72
   eligibleForR10: false
 blockingReasons:
 - packet 02 completion bootstrap has a verified clean A/E/B transition; packets 03 through 07 and 09 have no independent closure
