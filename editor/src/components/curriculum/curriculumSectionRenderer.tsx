@@ -399,6 +399,7 @@ export function StructuredSectionLearningBody({
           className="astryxWorkCell"
           data-learning-execution-count={exerciseResult?.executionCount ?? 0}
           data-learning-execution-state={exerciseRunning ? "running" : "idle"}
+          data-learning-check-kind={readPayloadText(exercise.guide?.checkConfig?.kind) || "practice"}
           data-learning-section-part="exercise"
           data-work-cell-running={exerciseRunning ? "true" : "false"}
           data-work-cell-selected={exerciseSelected ? "true" : "false"}
@@ -495,6 +496,9 @@ export function StructuredSectionLearningBody({
                     : "다시 확인해 보세요"}
               </div>
               {!attemptCheck.passed ? (
+                <p className="mt-1 leading-6 text-muted-foreground">{attemptCheck.feedback}</p>
+              ) : null}
+              {attemptCheck.passed && attemptCheck.evidence !== "strong" ? (
                 <p className="mt-1 leading-6 text-muted-foreground">{attemptCheck.feedback}</p>
               ) : null}
               {attemptCheck.passed && attemptCheck.evidence === "strong" && evidenceSaveState === "error" ? (

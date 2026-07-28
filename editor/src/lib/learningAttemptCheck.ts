@@ -56,10 +56,14 @@ export async function evaluateLearningAttempt(
       actual: checked.actual,
       artifacts: checked.artifacts,
       checkId: strongSpec.id,
-      evidence: checked.passed ? "strong" : "none",
+      evidence: checked.passed
+        ? ("strongEligible" in checked && checked.strongEligible === false ? "practice" : "strong")
+        : "none",
       executor: checked.executor,
       expected: checked.expected,
-      feedback: learnerFeedback(checked.state, checked.detail),
+      feedback: "strongEligible" in checked && checked.strongEligible === false
+        ? checked.detail
+        : learnerFeedback(checked.state, checked.detail),
       fixtureHash: strongSpec.fixtureHash,
       packages: strongSpec.packageAssets.map((asset) => ({
         ...asset,
@@ -191,9 +195,7 @@ function learnerFeedback(
 ): string {
   if (state === "verified") return "목표대로 동작했습니다.";
   if (state === "mismatch") return detail;
-  if (state === "unsupported") {
-    return "이 브라우저에서는 자동 확인을 사용할 수 없습니다. 출력과 목표를 직접 비교해 보세요.";
-  }
+  if (state === "unsupported") return detail;
   return "자동 확인을 마치지 못했습니다. 잠시 뒤 셀을 다시 실행해 주세요.";
 }
 

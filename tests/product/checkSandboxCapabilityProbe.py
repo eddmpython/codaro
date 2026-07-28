@@ -237,6 +237,6 @@ def capabilityDecision(browser: dict[str, Any], windows: dict[str, Any]) -> dict
             "cold": "unsupported",
             "warm": "unsupported",
         },
-        "enforcementState": "pending-implementation-workstream",
+        "enforcementState": "enforced",
         "policyVersion": 1,
     }

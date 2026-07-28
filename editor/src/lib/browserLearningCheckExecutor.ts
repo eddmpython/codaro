@@ -1,5 +1,9 @@
 import { getBrowserPythonRuntimeInfo } from "@/lib/browserPythonRuntime";
 import {
+  checkSandboxCapabilityMessage,
+  resolveCheckSandboxCapability,
+} from "@/lib/checkSandboxPolicy";
+import {
   normalizeLearningOutput,
   type StrongLearningCheckSpecV1,
   verifyLearningFixtureHash,
@@ -340,6 +344,10 @@ export async function executeBrowserStrongCheck(
   source: string,
 ): Promise<BrowserStrongOutputCheckResult> {
   const expected = expectedDisplay(spec);
+  const capability = resolveCheckSandboxCapability("web", spec.kind);
+  if (capability !== "strong") {
+    return failed("unsupported", expected, "", checkSandboxCapabilityMessage(capability));
+  }
   if (!(await verifyLearningFixtureHash(spec))) {
     return failed("error", expected, "", "검증 fixture hash가 일치하지 않아 결과를 기록하지 않았습니다.");
   }

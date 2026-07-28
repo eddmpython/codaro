@@ -250,14 +250,24 @@ def verifyBrowserSandbox() -> dict[str, Any]:
     if not isinstance(cases, list) or len(cases) != 1 or cases[0].get("failures"):
         raise ValueError("browser sandbox report does not contain one passing progression case")
     audit = cases[0].get("audit")
-    if not isinstance(audit, dict) or audit.get("webStrongEvidenceEventCount") != 3:
-        raise ValueError("browser sandbox did not store base, mastery, and delayed retrieval evidence")
+    capabilityEvidence = cases[0].get("checkCapabilityEvidence")
+    if (
+        not isinstance(audit, dict)
+        or audit.get("webStrongEvidenceEventCount") != 0
+        or not isinstance(capabilityEvidence, dict)
+        or capabilityEvidence.get("checkKind") != "behavior"
+        or capabilityEvidence.get("evidence") != "none"
+        or capabilityEvidence.get("state") != "unsupported"
+        or "Local" not in str(capabilityEvidence.get("feedback"))
+    ):
+        raise ValueError("browser behavior check did not enforce Local-required without strong evidence")
     return {
         "browser": report.get("browser"),
         "case": cases[0].get("name"),
-        "freshWorkerPerCheck": True,
+        "freshWorkerPerCheck": False,
         "integrityCheckedModuleGraph": True,
-        "isolationModel": "fresh-integrity-checked-module-worker",
+        "isolationModel": "candidate-b-local-required",
+        "localRequiredEnforced": True,
         "opaqueOriginFrame": False,
         "studentExpectedPayloadSeparated": True,
     }

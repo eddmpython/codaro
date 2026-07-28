@@ -19,6 +19,10 @@ PACKAGED_SCHEMA_PATH = ROOT / "src" / "codaro" / "generatedContracts" / "artifac
 TYPESCRIPT_PATH = ROOT / "editor" / "src" / "lib" / "generatedContracts" / "artifactOwnership.ts"
 RUST_PATH = ROOT / "launcher" / "codaro-launcher" / "src" / "generated_contracts" / "artifact_ownership.rs"
 RUST_MOD_PATH = ROOT / "launcher" / "codaro-launcher" / "src" / "generated_contracts" / "mod.rs"
+CHECK_SANDBOX_DECISION_PATH = ROOT / "contracts" / "checkSandboxFeasibilityDecision.json"
+TYPESCRIPT_CHECK_SANDBOX_DECISION_PATH = (
+    ROOT / "editor" / "src" / "lib" / "generatedContracts" / "checkSandboxFeasibilityDecision.json"
+)
 ROLE_VALUES = ("source", "generated", "packaged", "evidence")
 
 
@@ -190,6 +194,7 @@ def expectedOutputs() -> dict[Path, str]:
         PYTHON_INIT_PATH: pythonInitSource(schemaHash, ownersHash),
         PACKAGED_SCHEMA_PATH: SCHEMA_PATH.read_text(encoding="utf-8"),
         TYPESCRIPT_PATH: typeScriptSource(schemaHash, ownersHash),
+        TYPESCRIPT_CHECK_SANDBOX_DECISION_PATH: CHECK_SANDBOX_DECISION_PATH.read_text(encoding="utf-8"),
         RUST_PATH: rustSource(schemaHash, ownersHash),
         RUST_MOD_PATH: rustModSource(schemaHash, ownersHash),
     }

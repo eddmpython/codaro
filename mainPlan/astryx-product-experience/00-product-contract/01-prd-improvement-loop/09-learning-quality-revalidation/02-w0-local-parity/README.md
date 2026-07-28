@@ -6,11 +6,11 @@
 
 Local이 Web evidence를 가져오기만 하는 소비자가 아니라 같은 strong check를 자체 실행하고 파일·패키지·artifact까지 보존하는 상위 runtime이 되게 한다.
 
-현재 Local 표면은 Local 커널 실행 뒤 같은 `CheckSpec`을 별도 native Python 자식 프로세스에서 자동 판정한다. fixture 전용 임시 디렉터리, fixture 밖 읽기·쓰기 차단, 네트워크·하위 프로세스·동적 코드 거부, timeout 종료를 적용한다. 18-case Local W0 선택군에서 Web Day 1, Local Day 1, pathlib·zip·schedule 12개 base와 3개 assessment behavior의 오답 event 0, `data-learning-check-executor=local-sandbox`, 성공 `runtimeTier=local` append 16을 확인했다. Web strong event와 non-credit legacy migration event archive import 뒤 `mixed` set union 18, Local 재내보내기와 reload 18도 실제 Chromium에서 통과했다. fileOps/zip Local-native event는 sandbox expectedPaths 산출물 descriptor를 path, origin, kind, byteLength, fileCount, SHA-256 contentHash로 봉인한다. pinned `schedule` wheel은 저장소 bytes의 SRI가 맞을 때 격리 프로세스에만 주입한다. 이 판정은 Pyodide core에 의존하지 않는다.
+현재 Local 표면은 Local 커널 실행 뒤 같은 `CheckSpec`을 별도 native Python 자식 프로세스에서 자동 판정한다. fixture 전용 임시 디렉터리, fixture 밖 읽기·쓰기 차단, 네트워크·하위 프로세스·동적 코드 거부, timeout 종료를 적용한다. 그러나 이 경계는 Windows AppContainer broker가 아니므로 `contracts/checkSandboxFeasibilityDecision.json`에 따라 release strong credit을 만들지 않는다. Local W0 Chromium matrix에서 Day 1 output과 pathlib·zip·schedule base·assessment solution은 `data-learning-check-executor=local-sandbox`, `data-learning-check-evidence=practice`로 성공 피드백을 제공하지만 Local event append는 0이다. Web behavior는 Worker boot 전에 `localRequired`로 끝나고 event append가 0이다. Web Day 1 strong event와 non-credit legacy migration event 2건을 Local로 가져와 다시 내보내고 Web에서 reload해도 runtime identity는 Web이며 Local evidence를 발명하지 않는다. fileOps/zip 산출물 descriptor와 pinned `schedule` wheel SRI 계산은 provisional 판정 내부에서 계속 검증하지만 AppContainer conformance 전에는 evidence payload로 승격하지 않는다.
 
 Python 자식 프로세스 한 경로만으로 W0 Local 동등성을 주장하지 않는다. Windows AppContainer check broker 또는 동등한 OS 격리 경계와 경합 없는 cold `schedule` 준비가 남아 있다. full learning archive v2는 document, drafts, 전체 virtual FS와 package bytes, evidence, lineage, disabled automation draft를 SHA-256 blob으로 내보내고 Local atomic import 실패 시 이전 `HEAD`를 복원한다. 아직 실제 설치본 Web-to-Local-to-Web round trip과 capstone automation dry-run·audit의 독립 검수가 없다.
 
-이 조건과 Web-to-Local-to-Web round trip, conflict quarantine, downgrade-safe migration이 모두 통과하기 전에는 TODO가 남아 있다.
+AppContainer broker, 실제 설치본 Web-to-Local-to-Web round trip, conflict quarantine, downgrade-safe migration과 독립 검수가 모두 통과하기 전에는 TODO가 남아 있다.
 
 ## 영향 파일
 

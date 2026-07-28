@@ -21,7 +21,7 @@
 | 상주 스케줄, 웹훅, GUI 자동화 | 미지원 | 지원 | Local의 핵심 가치로 전면 배치 |
 | 진행 이어하기 | 브라우저 저장소, 내보내기 가능 | 로컬 저장소 | 같은 schema와 merge 규칙 사용 |
 
-`browser-supported`는 lesson label이 아니라 check sandbox feasibility, package/runtime capability와 browser matrix를 통과한 `CheckSpec` 단위 판정이다. `contracts/checkSandboxFeasibilityDecision.json`의 현재 판정은 browser `output`·`variable`만 supported subset이고 `behavior`는 `localRequired`, Windows Local release strong completion은 `unsupported`다. runtime enforcement가 구현되기 전 provisional executor 성공을 release strong credit으로 승격하지 않는다. 미지원 check를 `noError`로 바꾸지 않고 정확한 이유와 Local handoff를 제공한다. 현재 Python core 공급망은 network-first이므로 첫 Run에 network가 필요하고 offline 학습을 출시 약속으로 쓰지 않는다.
+`browser-supported`는 lesson label이 아니라 check sandbox feasibility, package/runtime capability와 browser matrix를 통과한 `CheckSpec` 단위 판정이다. `contracts/checkSandboxFeasibilityDecision.json`의 현재 판정은 browser `output`·`variable`만 supported subset이고 `behavior`는 `localRequired`, Windows Local release strong completion은 `unsupported`다. 이 판정은 Web과 Local이 함께 쓰는 runtime policy로 적용한다. Web behavior는 실행 전에 Local handoff를 표시하고, Local provisional executor의 성공은 자동 피드백만 제공할 뿐 release strong credit으로 저장하지 않는다. 미지원 check를 `noError`로 바꾸지 않는다. 현재 Python core 공급망은 network-first이므로 첫 Run에 network가 필요하고 offline 학습을 출시 약속으로 쓰지 않는다.
 
 ## Lesson identity 계약
 

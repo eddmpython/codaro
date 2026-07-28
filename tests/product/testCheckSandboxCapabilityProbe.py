@@ -16,7 +16,7 @@ def testCapabilityDecisionFallsBackWithoutOpaqueFrameSupport() -> None:
     }
     assert decision["localWindows"]["decision"] == "unsupported"
     assert decision["localWindows"]["provisionalExecutorMayGrantStrongCredit"] is False
-    assert decision["enforcementState"] == "pending-implementation-workstream"
+    assert decision["enforcementState"] == "enforced"
 
 
 def testCapabilityDecisionDoesNotHideSupportedCandidate() -> None:

@@ -1,4 +1,8 @@
 import { CodaroApiError, codaroApi } from "@/lib/api";
+import {
+  checkSandboxCapabilityMessage,
+  resolveCheckSandboxCapability,
+} from "@/lib/checkSandboxPolicy";
 import type { StrongLearningCheckSpecV1 } from "@/lib/learningCheckSpec";
 
 const LOCAL_CHECK_TRANSPORT_ATTEMPTS = 2;
@@ -9,8 +13,16 @@ export async function executeLocalStrongCheck(
   spec: StrongLearningCheckSpecV1,
   source: string,
 ) {
+  const capability = resolveCheckSandboxCapability("local", spec.kind);
   try {
-    return await requestLocalStrongCheck(spec, source);
+    const result = await requestLocalStrongCheck(spec, source);
+    return {
+      ...result,
+      detail: capability === "strong"
+        ? result.detail
+        : checkSandboxCapabilityMessage(capability),
+      strongEligible: capability === "strong",
+    };
   } catch (error) {
     return {
       actual: "",
@@ -21,6 +33,7 @@ export async function executeLocalStrongCheck(
       expected: "",
       passed: false,
       state: "error" as const,
+      strongEligible: false,
     };
   }
 }

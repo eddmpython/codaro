@@ -599,9 +599,9 @@ def verifyLocalArchiveWebRoundTrip(
     workspaceSummary = page.locator('[data-learning-archive-workspace-summary="true"]:visible')
     workspaceSummary.wait_for(state="visible", timeout=20_000)
     workspaceSummaryText = workspaceSummary.inner_text()
-    if "Web + Local" not in workspaceSummaryText:
+    if "Web" not in workspaceSummaryText or "Web + Local" in workspaceSummaryText:
         raise AssertionError(
-            f"Web did not preserve the Local archive runtime identity: {workspaceSummaryText!r}"
+            f"Web-only archive gained a Local runtime identity: {workspaceSummaryText!r}"
         )
     with page.expect_download(timeout=20_000) as webDownloadInfo:
         page.get_by_role("button", name="학습 작업 내보내기").click()
@@ -1732,7 +1732,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "verifyFirstLearningSectionInViewport": True,
             "runLearningCell": True,
             "verifyEvidenceArchive": True,
-            "verifyBrowserArtifactEvidence": True,
+            "verifyBrowserLocalRequiredHandoff": True,
             "verifyLegacyProgressMigration": True,
             "verifyDayOneCommentPrompt": True,
             "expectTransferSection": True,
@@ -1740,7 +1740,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "requireInlineHint": True,
             "solutionCode": "print('Hello Codaro')",
             "expectCompletedLessons": 1,
-            "expectFinalCompletedLessons": 2,
+            "expectFinalCompletedLessons": 1,
         },
         {
             "name": "web-canonical-completion-mobile",
@@ -2532,8 +2532,8 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "exerciseIndex": 0,
             "initialCheckState": "mismatch",
             "solutionCode": "name = 'Codaro'\nprint('Hello', name)",
-            "expectedEvidenceCount": 1,
-            "expectCompletedLessons": 1,
+            "expectedEvidenceCount": 0,
+            "expectCompletedLessons": 0,
         },
         {
             "name": "local-learning-evidence-desktop",
@@ -2611,6 +2611,40 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
         },
     ]
 
+    browser_local_required_check_names = {
+        "web-day2-progression-desktop",
+        "web-day11-dictionary-progression-desktop",
+        "web-day15-function-progression-desktop",
+        "web-day19-file-fixture-progression-desktop",
+        "web-day20-exception-progression-desktop",
+        "web-day22-class-progression-desktop",
+        "web-day27-generator-progression-desktop",
+        "web-day30-capstone-progression-desktop",
+        "web-pathlib-assessment-progression-desktop",
+        "web-pathlib-identity-desktop",
+        "web-pathlib-lesson-desktop",
+        "web-pathlib-safety-desktop",
+        "web-pathlib-versions-desktop",
+        "web-schedule-assessment-progression-desktop",
+        "web-schedule-cycle-desktop",
+        "web-schedule-job-desktop",
+        "web-schedule-register-desktop",
+        "web-schedule-run-all-desktop",
+        "web-seaborn-capstone-artifacts-desktop",
+        "web-zip-assessment-progression-desktop",
+        "web-zip-compression-desktop",
+        "web-zip-create-desktop",
+        "web-zip-integrity-desktop",
+        "web-zip-roundtrip-desktop",
+    }
+    for case in cases:
+        if case["name"] not in browser_local_required_check_names:
+            continue
+        case["expectLocalRequiredCheck"] = True
+        case.pop("expectTransferSection", None)
+        case.pop("runDelayedRetrieval", None)
+        case.pop("verifySemanticArtifactEvidence", None)
+
     local_w0_source_names = {
         "web-pathlib-assessment-progression-desktop",
         "web-pathlib-lesson-desktop",
@@ -2641,6 +2675,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
         )
         local_case["surface"] = "local-lesson"
         local_case["expectedTier"] = "local"
+        local_case.pop("expectLocalRequiredCheck", None)
         local_case.pop("runLearningCell", None)
         local_case["runLocalLearningCell"] = True
         local_case["expectedCheckExecutor"] = "local-sandbox"
@@ -3210,6 +3245,12 @@ async ({ surface, expectedTier }) => {
     learningOutcomeVisualCount: document.querySelectorAll(
       '[data-learning-domain-visual="true"][data-learning-visual-kind="outcomeProof"]'
     ).length,
+    learningLocalRequiredBehaviorCount: document.querySelectorAll(
+      '[data-learning-check-kind="behavior"] [data-learning-check-result="unsupported"]'
+    ).length,
+    learningLocalRequiredBehaviorText: Array.from(document.querySelectorAll(
+      '[data-learning-check-kind="behavior"] [data-learning-check-result="unsupported"]'
+    )).map((element) => element.textContent || ""),
     learningVisualAssetIds: Array.from(
       document.querySelectorAll('[data-learning-domain-visual="true"][data-learning-visual-asset]')
     ).map((element) => element.getAttribute("data-learning-visual-asset")),
@@ -3491,6 +3532,11 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
             if audit["webEvidenceEventCount"] != 0 or audit["webStrongEvidenceEventCount"] != 0:
                 failures.append(
                     f"{name}: draft autosave created learning evidence before a verified check"
+                )
+        elif case.get("expectLocalRequiredCheck"):
+            if audit["webEvidenceEventCount"] or audit["webStrongEvidenceEventCount"]:
+                failures.append(
+                    f"{name}: Local-required browser behavior created learning evidence"
                 )
         elif case.get("runLearningCell") and audit["webStrongEvidenceEventCount"] < 1:
             failures.append(f"{name}: append-only strong-check event did not survive reload")
@@ -3952,6 +3998,7 @@ def runBrowserMatrix(
                     )
                 page = context.new_page()
                 webArtifactEvidence: dict[str, Any] | None = None
+                checkCapabilityEvidence: dict[str, Any] | None = None
                 firstViewportEvidence: dict[str, Any] | None = None
                 learnSearchEvidence: dict[str, Any] | None = None
                 siteSearchEvidence: dict[str, Any] | None = None
@@ -5108,11 +5155,42 @@ def runBrowserMatrix(
                         )
                         firstCheck = page.locator('[data-learning-check-result]').last
                         firstState = firstCheck.get_attribute("data-learning-check-result")
-                        if firstState != case["initialCheckState"]:
+                        expectedInitialState = (
+                            "unsupported"
+                            if case.get("expectLocalRequiredCheck")
+                            else case["initialCheckState"]
+                        )
+                        if firstState != expectedInitialState:
                             raise AssertionError(
-                                f"initial check expected {case['initialCheckState']}, got {firstState}: "
+                                f"initial check expected {expectedInitialState}, got {firstState}: "
                                 f"{firstCheck.inner_text()[:500]}"
                             )
+                        if case.get("expectLocalRequiredCheck"):
+                            checkKind = exerciseParts.nth(exerciseIndex).get_attribute(
+                                "data-learning-check-kind"
+                            )
+                            if checkKind != "behavior" or "Local" not in firstCheck.inner_text():
+                                raise AssertionError(
+                                    "browser behavior check did not expose an exact Local handoff: "
+                                    f"kind={checkKind}, feedback={firstCheck.inner_text()[:500]}"
+                                )
+                            checkCapabilityEvidence = {
+                                "checkKind": checkKind,
+                                "evidence": firstCheck.get_attribute(
+                                    "data-learning-check-evidence"
+                                ),
+                                "feedback": firstCheck.inner_text(),
+                                "state": firstState,
+                                "strongEventCount": 0,
+                            }
+                            capabilityScreenshot = (
+                                SCREENSHOT_ROOT / colorScheme
+                                / f"{case['name']}-local-required.png"
+                            )
+                            page.screenshot(path=str(capabilityScreenshot), full_page=False)
+                            checkCapabilityEvidence["screenshot"] = str(
+                                capabilityScreenshot.relative_to(ROOT)
+                            ).replace("\\", "/")
                         if case.get("requireInlineHint") and "다음 수정:" not in firstCheck.inner_text():
                             raise AssertionError("failed attempt did not reveal the next useful hint inline")
                         prematureProgress = page.evaluate(
@@ -5133,22 +5211,29 @@ def runBrowserMatrix(
                         else:
                             codeEditor.fill(case["solutionCode"], timeout=20_000)
                             runButton.click(timeout=20_000)
-                        try:
+                        if case.get("expectLocalRequiredCheck"):
                             page.wait_for_selector(
-                                '[data-learning-check-result="verified"]',
+                                '[data-learning-check-result="unsupported"]',
                                 timeout=120_000,
                             )
-                        except Exception as verificationError:
-                            lastCheck = page.locator('[data-learning-check-result]').last
-                            state = lastCheck.get_attribute("data-learning-check-result") if lastCheck.count() else "missing"
-                            detail = lastCheck.inner_text()[:5000] if lastCheck.count() else "no check feedback"
-                            raise AssertionError(
-                                f"solution did not verify; final state={state}: {detail}"
-                            ) from verificationError
-                        page.wait_for_selector(
-                            '[data-learning-evidence-state="stored"]',
-                            timeout=20_000,
-                        )
+                            waitForWebLearningEvidenceEventCount(page, 0, timeout=20_000)
+                        else:
+                            try:
+                                page.wait_for_selector(
+                                    '[data-learning-check-result="verified"]',
+                                    timeout=120_000,
+                                )
+                            except Exception as verificationError:
+                                lastCheck = page.locator('[data-learning-check-result]').last
+                                state = lastCheck.get_attribute("data-learning-check-result") if lastCheck.count() else "missing"
+                                detail = lastCheck.inner_text()[:5000] if lastCheck.count() else "no check feedback"
+                                raise AssertionError(
+                                    f"solution did not verify; final state={state}: {detail}"
+                                ) from verificationError
+                            page.wait_for_selector(
+                                '[data-learning-evidence-state="stored"]',
+                                timeout=20_000,
+                            )
                         if case.get("expectCompletedLessons") is not None:
                             page.wait_for_function(
                                 """
@@ -5726,6 +5811,47 @@ def runBrowserMatrix(
                             )
                             if not preserved:
                                 raise AssertionError("conflicting evidence overwrote the stored event")
+                        if case.get("verifyBrowserLocalRequiredHandoff"):
+                            pushLearningLessonRoute(page, "day19_파일입출력")
+                            mastery = page.locator('[data-learning-section-mode="mastery"]')
+                            mastery.wait_for(state="visible", timeout=30_000)
+                            beforeBehaviorEvidenceCount = readWebLearningEvidenceEventCount(page)
+                            mastery.locator('.cm-content').fill(
+                                (
+                                    "def read_nonempty_lines(path):\n"
+                                    "    from pathlib import Path\n"
+                                    "    return [line.strip() for line in "
+                                    "Path(path).read_text(encoding='utf-8').splitlines() if line.strip()]"
+                                ),
+                                timeout=20_000,
+                            )
+                            mastery.get_by_role("button", name="셀 실행").click(timeout=20_000)
+                            page.wait_for_function(
+                                """
+                                () => document.querySelector(
+                                  '[data-learning-section-mode="mastery"] '
+                                  + '[data-learning-check-result]'
+                                )?.getAttribute('data-learning-check-result') === 'unsupported'
+                                """,
+                                timeout=120_000,
+                            )
+                            masteryCheck = mastery.locator(
+                                '[data-learning-check-result="unsupported"]'
+                            )
+                            if (
+                                masteryCheck.get_attribute(
+                                    "data-learning-check-evidence"
+                                ) != "none"
+                                or "Local" not in masteryCheck.inner_text()
+                                or readWebLearningEvidenceEventCount(page)
+                                != beforeBehaviorEvidenceCount
+                            ):
+                                raise AssertionError(
+                                    "Web behavior Local handoff created strong evidence: "
+                                    f"{masteryCheck.inner_text()[:800]}"
+                                )
+                            releaseLocalKernelSessions(page, case, localPort)
+                            page.goto(case["url"], wait_until="domcontentloaded", timeout=30_000)
                         if case.get("verifyBrowserArtifactEvidence"):
                             pushLearningLessonRoute(page, "day19_파일입출력")
                             mastery = page.locator('[data-learning-section-mode="mastery"]')
@@ -5965,10 +6091,36 @@ def runBrowserMatrix(
                             raise AssertionError(
                                 f"Local strong-check transport retry was not exercised exactly once: {localCheckTransport}"
                             )
-                        page.wait_for_selector(
-                            '[data-learning-evidence-state="stored"]',
-                            timeout=20_000,
+                        verifiedEvidence = verifiedCheck.get_attribute(
+                            "data-learning-check-evidence"
                         )
+                        if (
+                            verifiedEvidence != "practice"
+                            or "강한 학습 증거" not in verifiedCheck.inner_text()
+                            or page.locator('[data-learning-evidence-state="stored"]').count()
+                        ):
+                            raise AssertionError(
+                                "Local provisional check was presented as strong evidence: "
+                                f"evidence={verifiedEvidence}, feedback={verifiedCheck.inner_text()[:500]}"
+                            )
+                        checkCapabilityEvidence = {
+                            "checkKind": localExercise.get_attribute(
+                                "data-learning-check-kind"
+                            ),
+                            "evidence": verifiedEvidence,
+                            "feedback": verifiedCheck.inner_text(),
+                            "state": "verified",
+                            "strongEventCount": beforeEvidenceCount,
+                        }
+                        verifiedCheck.scroll_into_view_if_needed(timeout=20_000)
+                        capabilityScreenshot = (
+                            SCREENSHOT_ROOT / colorScheme
+                            / f"{case['name']}-provisional.png"
+                        )
+                        page.screenshot(path=str(capabilityScreenshot), full_page=False)
+                        checkCapabilityEvidence["screenshot"] = str(
+                            capabilityScreenshot.relative_to(ROOT)
+                        ).replace("\\", "/")
                         if case.get("expectCompletedLessons") is not None:
                             page.wait_for_function(
                                 """
@@ -5980,7 +6132,6 @@ def runBrowserMatrix(
                                 arg=int(case["expectCompletedLessons"]),
                                 timeout=20_000,
                             )
-                        localEvidenceExpected += 1
                         case["expectedEvidenceCount"] = localEvidenceExpected
                         waitForLocalLearningEvidenceEventCount(page, localEvidenceExpected)
                         localEvidenceIdentity = page.evaluate(
@@ -6044,12 +6195,9 @@ def runBrowserMatrix(
                             }
                             """
                         )
-                        if case.get("expectedArtifactEvidence"):
-                            localArtifactEvidenceExpected += 1
-                        if case.get("expectedPackageEvidence"):
-                            localPackageEvidenceExpected += 1
+                        expectedArchiveTier = "local" if localEvidenceExpected else "web"
                         if (
-                            localEvidenceIdentity.get("archiveTier") != "local"
+                            localEvidenceIdentity.get("archiveTier") != expectedArchiveTier
                             or localEvidenceIdentity.get("allLocal") is not True
                             or localEvidenceIdentity.get("eventCount") != localEvidenceExpected
                             or localEvidenceIdentity.get("allArtifactsSealed") is not True
@@ -6171,8 +6319,10 @@ def runBrowserMatrix(
                             local_events.get(event["eventId"]) != event for event in web_events
                         ):
                             raise AssertionError("Local re-export did not preserve the Web evidence set union")
-                        if local_archive.get("manifest", {}).get("runtimeTier") != "mixed":
-                            raise AssertionError("Local re-export did not preserve mixed runtime identity")
+                        if local_archive.get("manifest", {}).get("runtimeTier") != "web":
+                            raise AssertionError(
+                                "Local re-export invented Local evidence for a Web-only archive"
+                            )
                         if portableLearningArchivePayloads(local_archive) != portableLearningArchivePayloads(web_learning_archive):
                             raise AssertionError("Local re-export did not preserve portable Web payload bytes")
                         releaseLocalKernelSessions(page, case, localPort)
@@ -6516,6 +6666,7 @@ def runBrowserMatrix(
                             "localArchiveWebRoundTripEvidence": localArchiveWebRoundTripEvidence,
                             "learningHomeMinimumEvidence": learningHomeMinimumEvidence,
                             "webArtifactEvidence": webArtifactEvidence,
+                            "checkCapabilityEvidence": checkCapabilityEvidence,
                             "notebookRunAdvanceVerified": notebookRunAdvanceVerified,
                             "notebookReactiveExecutionEvidence": notebookReactiveExecutionEvidence,
                             "notebookToolsVerified": notebookToolsVerified,

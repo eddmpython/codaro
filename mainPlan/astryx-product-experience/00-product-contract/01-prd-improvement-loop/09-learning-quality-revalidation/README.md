@@ -34,7 +34,7 @@ Day 1 Web vertical slice에서는 mastery strong evidence 뒤 전이 과제가 �
 ## 완료 금지 조건
 
 - `strong-evidence-transfer-and-retrieval` domain이 실패한다.
-- Local-native Python sandbox는 Day 1과 W0 filesystem·zip·schedule 12개 base 및 3개 assessment behavior, Local strong event 16건과 Web strong·legacy migration을 합친 mixed archive 18건을 통과했고 Local fileOps/zip artifact descriptor를 event payload hash에 봉인한다. 다만 경합 없는 cold package 준비와 Windows AppContainer conformance가 없다.
+- Local-native Python provisional sandbox는 Day 1과 W0 filesystem·zip·schedule base·assessment solution을 판정하지만 Windows AppContainer conformance가 없어 `practice` 피드백만 제공하고 Local strong event는 0건이다. Web behavior도 `localRequired`로 strong event 0을 유지한다. Web strong·legacy migration 2건의 archive를 Local이 가져오고 재내보내도 Web runtime identity와 exact event set이 보존된다.
 - schedule package asset descriptor와 document, drafts, 전체 virtual FS/package bytes는 full learning archive v2에 봉인된다. 다만 실제 설치본 Web-to-Local-to-Web round trip과 독립 보안 검수가 없다.
 - 독립 R10 원본 report와 fact audit가 없다.
 - 472개 확장이 내용 없는 자동 ID, 동일 문제 복제, weak check의 strong 재분류 방식이다.

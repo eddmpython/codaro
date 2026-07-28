@@ -51,6 +51,10 @@ artifacts:
     owner: learning-runtime
     sourcePath: contracts/checkSandboxFeasibilityDecision.json
     surfacePaths:
+      - editor/src/lib/generatedContracts/checkSandboxFeasibilityDecision.json
+      - editor/src/lib/checkSandboxPolicy.ts
+      - editor/src/lib/localLearningCheckExecutor.ts
+      - editor/src/lib/learningAttemptCheck.ts
       - tests/product/checkSandboxCapabilityProbe.py
       - tests/product/verifyCheckSandboxFeasibility.py
       - mainPlan/astryx-product-experience/02-learning-method/README.md
