@@ -241,6 +241,42 @@ def testPublicLearningExplorerPersistsFiltersAndLessonVisualFillsItsFrame() -> N
     assert '"expectedVisualAssetIds": [' in browserGate
 
 
+def testCanonicalLessonExposesKeyboardSectionAndAdjacentLessonNavigation() -> None:
+    overview = _read("editor/src/components/curriculum/curriculumOverview.tsx")
+    surface = _read("editor/src/components/curriculum/curriculumSurface.tsx")
+    currentLearningSurface = _read("editor/src/components/app/currentLearningSurface.tsx")
+    mainSurface = _read("editor/src/components/app/mainSurface.tsx")
+    browserGate = _read("tests/surface/verifyProductExperiencePlaywright.py")
+
+    for marker in (
+        "sections[index]?.anchorBlockId",
+        "data-learning-overview-section={item.anchorBlockId}",
+        "selectTocBlock(item.anchorBlockId, onNavigateBlock)",
+        'data-learning-lesson-focus-target="true"',
+        "tabIndex={-1}",
+    ):
+        assert marker in overview
+    for marker in (
+        'aria-label="레슨 이동"',
+        'data-learning-lesson-navigation="true"',
+        "data-learning-previous-lesson={previousLesson.contentId}",
+        "data-learning-next-lesson={nextLesson.contentId}",
+        'data-learning-control-intent="navigation"',
+        "onSelectLesson(nextLesson.contentId)",
+    ):
+        assert marker in surface
+    assert "pendingLessonFocusRef" in currentLearningSurface
+    assert "contents={props.contents}" in currentLearningSurface
+    assert "title.focus({ preventScroll: false })" in currentLearningSurface
+    assert "onSelectLesson={props.onSelectCurriculumLesson}" in mainSurface
+    assert '"name": "web-canonical-keyboard-desktop"' in browserGate
+    assert '"verifyCanonicalKeyboardJourney": True' in browserGate
+    assert '"name": "web-canonical-navigation-mobile"' in browserGate
+    assert '"verifyLessonNavigationLayout": True' in browserGate
+    assert 'page.keyboard.press("Shift+Enter")' in browserGate
+    assert "canonical lesson keyboard flow did not reach the next lesson" in browserGate
+
+
 def testNotebookAutosaveUsesLocaleIndependentActiveCellMarker() -> None:
     notebookPanel = _read("editor/src/components/notebook/notebookPanel.tsx")
     autosaveGate = _read("tests/surface/verifyNotebookAutosavePlaywright.py")

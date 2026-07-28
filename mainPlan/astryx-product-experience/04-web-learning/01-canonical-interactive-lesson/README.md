@@ -4,18 +4,17 @@
 
 ## 목표
 
-대표 학습자가 canonical lesson에서 설명, 코드 수정, 실행, 자동 feedback과 다음 학습을 이해 가능한 한 흐름으로 수행하는지 keyboard와 screen reader를 포함해 검수한 뒤 이 TODO를 삭제한다.
+대표 학습자가 canonical lesson에서 설명, 코드 수정, 실행, 자동 feedback과 다음 학습을 이해 가능한 한 흐름으로 수행하는지 screen reader와 초보 대표 학습자로 검수한 뒤 이 TODO를 삭제한다.
 
 ## 남은 조건
 
-- keyboard만으로 lesson 진입, section 이동, 코드 편집, 실행과 다음 학습 이동을 수행한다.
 - screen reader에서 제목, 목표, section, 편집기, 출력, 자동 feedback과 진행 상태가 맥락 순서대로 전달되는지 검수한다.
 - 초보 대표 학습자가 별도 시작·확인·해설 reveal 없이 첫 실습과 수정 방향을 이해하는지 검수한다.
 - 검수 중 발견한 focus 유실, 중복 announcement, 설명과 실습의 단절을 수정한다.
 
 ## 구현 순서
 
-1. 대표 browser lesson을 keyboard와 screen reader로 검수한다.
+1. 대표 browser lesson을 screen reader로 검수한다.
 2. 초보 대표 학습자가 설명부터 첫 strong check까지 수행하게 한다.
 3. 발견한 결함을 공용 curriculum renderer와 관련 lesson source에서 수정한다.
 4. 관련 gate와 같은 사람 검수를 다시 통과한 뒤 이 packet과 parent index 링크를 삭제한다.
@@ -40,8 +39,7 @@
 
 - `uv run python -X utf8 tests/run.py gate web-learning`
 - `uv run python -X utf8 tests/run.py gate learning-method`
-- `CODARO_PRODUCT_CASE=web-lesson-mobile uv run python -X utf8 tests/surface/verifyProductExperiencePlaywright.py`
-- keyboard, screen reader와 초보 대표 학습자의 사람 검수
+- screen reader와 초보 대표 학습자의 사람 검수
 
 ## 롤백
 

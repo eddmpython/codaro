@@ -41,11 +41,15 @@ export type CurrentLearningSurfaceProps = {
   onNavigateCurriculumBlock: (blockId: string) => void;
   onRunBlock: (block: BlockConfig, sourceOverride?: string) => void;
   onSelectCurriculumBlock: (blockId: string) => void;
+  onSelectLesson: (category: string, contentId: string) => void;
 };
 
 export function CurrentLearningSurface(props: CurrentLearningSurfaceProps) {
   const { t } = useLocale();
   const [tocExpanded, setTocExpanded] = useState(false);
+  const lessonRef = `${props.selectedCategory}/${props.selectedContentId}`;
+  const previousLessonRef = useRef(lessonRef);
+  const pendingLessonFocusRef = useRef("");
   const storageError = useBrowserLearningWorkspaceAutosave({
     document: props.curriculumDocument,
     drafts: props.drafts,
@@ -53,6 +57,25 @@ export function CurrentLearningSurface(props: CurrentLearningSurfaceProps) {
     selectedCategory: props.selectedCategory,
     selectedContentId: props.selectedContentId,
   });
+
+  useEffect(() => {
+    if (previousLessonRef.current !== lessonRef) {
+      previousLessonRef.current = lessonRef;
+      pendingLessonFocusRef.current = lessonRef;
+    }
+    if (
+      pendingLessonFocusRef.current !== lessonRef
+      || props.referenceLoading
+      || !props.curriculumDocument
+    ) return;
+    const frame = window.requestAnimationFrame(() => {
+      const title = document.querySelector<HTMLElement>('[data-learning-lesson-focus-target="true"]');
+      if (!title) return;
+      title.focus({ preventScroll: false });
+      pendingLessonFocusRef.current = "";
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [lessonRef, props.curriculumDocument, props.referenceLoading]);
 
   if (!props.curriculumDocument) {
     return (
@@ -96,6 +119,7 @@ export function CurrentLearningSurface(props: CurrentLearningSurfaceProps) {
         key={`${props.selectedCategory}/${props.selectedContentId}`}
         apiOnline={props.apiOnline}
         canRun={props.canRun}
+        contents={props.contents}
         document={curriculumDoc}
         drafts={props.drafts}
         referenceLoading={props.referenceLoading}
@@ -120,8 +144,10 @@ export function CurrentLearningSurface(props: CurrentLearningSurfaceProps) {
           />
         )}
         onDraftChange={props.onDraftChange}
+        onNavigateBlock={props.onNavigateCurriculumBlock}
         onRunBlock={props.onRunBlock}
         onSelectBlock={props.onSelectCurriculumBlock}
+        onSelectLesson={(contentId) => props.onSelectLesson(props.selectedCategory, contentId)}
       />
       {showToc ? (
         <CurriculumCellToc

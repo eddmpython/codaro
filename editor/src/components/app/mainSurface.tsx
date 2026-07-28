@@ -228,6 +228,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
         onNavigateCurriculumBlock={props.onNavigateCurriculumBlock}
         onRunBlock={props.onRunBlock}
         onSelectCurriculumBlock={props.onSelectCurriculumBlock}
+        onSelectLesson={props.onSelectCurriculumLesson}
       />
     );
   }

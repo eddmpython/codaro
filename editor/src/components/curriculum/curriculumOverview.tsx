@@ -22,7 +22,7 @@ import { useCurriculumProgress } from "@/hooks/useCurriculumProgress";
 import { CurriculumProgressBadge } from "./curriculumProgressBadge";
 import { isRecord, payloadTextList, readPayloadText, specificLearningCopy, textAfterHeading } from "./curriculumSurfaceHelpers";
 import type { CurriculumSectionContract, CurriculumSectionGroup } from "./curriculumSurfaceModels";
-import { cellDomId, scrollToCell } from "./curriculumNavigation";
+import { cellDomId, selectTocBlock } from "./curriculumNavigation";
 import { LearningDomainVisual } from "./learningDomainVisual";
 import { useLocale } from "@/lib/localeContext";
 
@@ -341,6 +341,7 @@ export function LearningOverviewHeader({
   introBlock,
   referenceLoading,
   sections,
+  onNavigateBlock,
   selectedCategory,
   selectedCategoryLabel,
   selectedContentId,
@@ -352,6 +353,7 @@ export function LearningOverviewHeader({
   introBlock?: BlockConfig;
   referenceLoading: boolean;
   sections: CurriculumSectionGroup[];
+  onNavigateBlock: (blockId: string) => void;
   selectedCategory: string;
   selectedCategoryLabel: string;
   selectedContentId: string;
@@ -359,7 +361,10 @@ export function LearningOverviewHeader({
 }) {
   const overview = curriculumOverview(document, introBlock);
   const declaredLearnItems = overview.points.length
-    ? overview.points.map((point) => ({ label: point, anchorBlockId: "" }))
+    ? overview.points.map((point, index) => ({
+        label: point,
+        anchorBlockId: sections[index]?.anchorBlockId ?? "",
+      }))
     : sections.map((section) => ({ label: section.title, anchorBlockId: section.anchorBlockId }));
   const learnItems = declaredLearnItems.slice(0, 4);
   const overflowCount = Math.max(0, declaredLearnItems.length - learnItems.length);
@@ -388,7 +393,14 @@ export function LearningOverviewHeader({
             {referenceLoading ? <LoadingInline label="레슨 불러오는 중" /> : null}
           </span>
         </div>
-        <h1 className="mt-2 text-2xl font-bold tracking-normal text-foreground" data-learning-overview-part="title">{overview.title}</h1>
+        <h1
+          className="mt-2 text-2xl font-bold tracking-normal text-foreground"
+          data-learning-lesson-focus-target="true"
+          data-learning-overview-part="title"
+          tabIndex={-1}
+        >
+          {overview.title}
+        </h1>
         {overview.direction ? (
           <p className="mt-1.5 max-w-3xl text-md font-normal text-foreground" data-learning-overview-part="direction">{overview.direction}</p>
         ) : null}
@@ -419,8 +431,9 @@ export function LearningOverviewHeader({
                       {item.anchorBlockId ? (
                         <button
                           className="min-w-0 text-left hover:underline hover:underline-offset-4"
+                          data-learning-overview-section={item.anchorBlockId}
                           type="button"
-                          onClick={() => scrollToCell(item.anchorBlockId)}
+                          onClick={() => selectTocBlock(item.anchorBlockId, onNavigateBlock)}
                         >
                           {item.label}
                         </button>

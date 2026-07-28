@@ -1,8 +1,11 @@
-import type { BlockConfig, CodaroDocument } from "@/types";
+import type { BlockConfig, CodaroDocument, CurriculumContentSummary } from "@/types";
 import { useEffect, useMemo, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { readLearningEvidenceEvents } from "@/lib/learningEvidenceOperations";
 import { PROGRESS_UPDATED_EVENT } from "@/lib/curriculumProgressEvent";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 import type { RenderCodeCellEditor, ResultMap } from "./curriculumSurfaceModels";
 
 export { CurriculumHeaderProgress } from "./curriculumOverview";
@@ -27,12 +30,14 @@ export function CurriculumView({
   selectedContentId,
   storageError,
   onDraftChange,
+  onNavigateBlock,
   onRunBlock,
   onSelectBlock,
+  onSelectLesson,
 }: {
   apiOnline: boolean;
   canRun: boolean;
-  contents?: Array<{ contentId: string; title: string }>;
+  contents?: CurriculumContentSummary[];
   document: CodaroDocument;
   drafts: Record<string, string>;
   referenceLoading: boolean;
@@ -46,13 +51,20 @@ export function CurriculumView({
   selectedContentId: string;
   storageError?: string;
   onDraftChange: (blockId: string, value: string) => void;
+  onNavigateBlock: (blockId: string) => void;
   onRunBlock: (block: BlockConfig, sourceOverride?: string) => void;
   onSelectBlock: (blockId: string) => void;
+  onSelectLesson: (contentId: string) => void;
 }) {
   const [assessmentBlocks, setAssessmentBlocks] = useState<BlockConfig[]>([]);
   const visibleBlocks = useMemo(() => [...document.blocks, ...assessmentBlocks], [assessmentBlocks, document.blocks]);
   const curriculumSections = useMemo(() => groupCurriculumSections(visibleBlocks), [visibleBlocks]);
   const introBlock = curriculumSections.introBlocks[0] ?? document.blocks.find((block) => block.displayKind === "hero" || block.sourceType === "intro");
+  const selectedContentIndex = contents.findIndex((content) => content.contentId === selectedContentId);
+  const previousLesson = selectedContentIndex > 0 ? contents[selectedContentIndex - 1] : null;
+  const nextLesson = selectedContentIndex >= 0 && selectedContentIndex < contents.length - 1
+    ? contents[selectedContentIndex + 1]
+    : null;
 
   useEffect(() => {
     let active = true;
@@ -90,6 +102,7 @@ export function CurriculumView({
             introBlock={introBlock}
             referenceLoading={referenceLoading}
             sections={curriculumSections.sections}
+            onNavigateBlock={onNavigateBlock}
             selectedCategory={selectedCategory}
             selectedCategoryLabel={selectedCategoryLabel}
             selectedContentId={selectedContentId}
@@ -106,7 +119,7 @@ export function CurriculumView({
             </div>
           ) : null}
 
-          <div className="space-y-8 pb-16 pt-5 sm:space-y-10 sm:pt-8" data-learning-section-stack="true">
+          <div className="space-y-8 pb-8 pt-5 sm:space-y-10 sm:pt-8" data-learning-section-stack="true">
             {curriculumSections.sections.map((section, index) => (
               <CurriculumSectionCard
                 canRun={canRun}
@@ -126,6 +139,54 @@ export function CurriculumView({
               />
             ))}
           </div>
+          {previousLesson || nextLesson ? (
+            <nav
+              aria-label="레슨 이동"
+              className="mb-16 grid border-y border-border sm:grid-cols-2"
+              data-learning-lesson-navigation="true"
+            >
+              {previousLesson ? (
+                <Button
+                  aria-label={`이전 레슨: ${previousLesson.title}`}
+                  className={cn(
+                    "h-auto min-h-16 justify-start rounded-none px-3 py-3 text-left sm:px-4",
+                    nextLesson && "border-b border-border sm:border-b-0 sm:border-r",
+                  )}
+                  data-learning-control-intent="navigation"
+                  data-learning-previous-lesson={previousLesson.contentId}
+                  type="button"
+                  variant="ghost"
+                  onClick={() => onSelectLesson(previousLesson.contentId)}
+                >
+                  <ChevronLeft aria-hidden="true" />
+                  <span className="min-w-0">
+                    <small className="block text-xs font-normal text-muted-foreground">이전 레슨</small>
+                    <strong className="block truncate text-sm text-foreground">{previousLesson.title}</strong>
+                  </span>
+                </Button>
+              ) : null}
+              {nextLesson ? (
+                <Button
+                  aria-label={`다음 레슨: ${nextLesson.title}`}
+                  className={cn(
+                    "h-auto min-h-16 justify-end rounded-none px-3 py-3 text-right sm:px-4",
+                    !previousLesson && "sm:col-start-2",
+                  )}
+                  data-learning-control-intent="navigation"
+                  data-learning-next-lesson={nextLesson.contentId}
+                  type="button"
+                  variant="ghost"
+                  onClick={() => onSelectLesson(nextLesson.contentId)}
+                >
+                  <span className="min-w-0">
+                    <small className="block text-xs font-normal text-muted-foreground">다음 레슨</small>
+                    <strong className="block truncate text-sm text-foreground">{nextLesson.title}</strong>
+                  </span>
+                  <ChevronRight aria-hidden="true" />
+                </Button>
+              ) : null}
+            </nav>
+          ) : null}
         </div>
       </div>
     </ScrollArea>

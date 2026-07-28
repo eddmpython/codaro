@@ -13,8 +13,8 @@
 
 ## 남은 조건
 
-- Learn Explorer의 실제 검색 유입, keyboard, screen reader, 한국어 IME와 여섯 결과 경로 콘텐츠 검수를 끝낸다.
-- Canonical Interactive Lesson의 keyboard, screen reader와 초보 대표 학습자 검수를 끝낸다.
+- Learn Explorer의 실제 검색 유입, screen reader, 한국어 IME와 여섯 결과 경로 콘텐츠 검수를 끝낸다.
+- Canonical Interactive Lesson의 screen reader와 초보 대표 학습자 검수를 끝낸다.
 - `/app/` 호환 경로의 정식 release archive, 두 release handoff와 소유 가능한 service worker tombstone 조건을 충족한다.
 - 학습 archive와 브라우저 check 경계의 독립 보안 검수를 끝낸다.
 - 하위 TODO와 공유 잔여 조건이 모두 사라지면 이 workstream과 상위 작업 지도 링크를 삭제한다.
@@ -53,7 +53,7 @@
 - `uv run python -X utf8 tests/run.py gate web-learning`
 - `uv run python -X utf8 tests/run.py gate learning-method`
 - `uv run python -X utf8 tests/run.py gate product-experience-browser`
-- 실제 검색 유입, keyboard, screen reader, 한국어 IME, 대표 학습자와 독립 보안 검수
+- 실제 검색 유입, screen reader, 한국어 IME, 대표 학습자와 독립 보안 검수
 
 ## 롤백
 

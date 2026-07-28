@@ -1492,6 +1492,36 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "expectCompletedLessons": 1,
         },
         {
+            "name": "web-canonical-keyboard-desktop",
+            "url": (
+                f"http://127.0.0.1:{webPort}/?surface=curriculum"
+                "&category=30days&lesson=day01#curriculum"
+            ),
+            "viewport": {"width": 900, "height": 760},
+            "surface": "web-lesson",
+            "waitFor": "[data-learning-section-card]",
+            "runLearningCell": True,
+            "verifyCanonicalKeyboardJourney": True,
+            "initialCheckState": "mismatch",
+            "solutionCode": "print('Hello Codaro')",
+            "expectCompletedLessons": 1,
+            "expectNextLesson": "day02_변수와데이터타입",
+        },
+        {
+            "name": "web-canonical-navigation-mobile",
+            "url": (
+                f"http://127.0.0.1:{webPort}/?surface=curriculum"
+                "&category=30days&lesson=day02#curriculum"
+            ),
+            "viewport": {"width": 390, "height": 844},
+            "surface": "web-lesson",
+            "waitFor": "[data-learning-lesson-navigation]",
+            "scrollTo": "[data-learning-lesson-navigation]",
+            "verifyLessonNavigationLayout": True,
+            "expectPreviousLesson": "day01_헬로월드",
+            "expectNextLesson": "day03_연산자",
+        },
+        {
             "name": "web-day1-transfer-desktop",
             "url": (
                 f"http://127.0.0.1:{webPort}/?surface=curriculum"
@@ -3150,7 +3180,7 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
                 failures.append(
                     f"{name}: draft autosave created learning evidence before a verified check"
                 )
-        elif audit["webStrongEvidenceEventCount"] < 1:
+        elif case.get("runLearningCell") and audit["webStrongEvidenceEventCount"] < 1:
             failures.append(f"{name}: append-only strong-check event did not survive reload")
         header = audit["webEvidenceStoreHeader"]
         if not (
@@ -3501,6 +3531,8 @@ def runBrowserMatrix(
                         "web-learning-home-desktop",
                         "web-zero-evidence-autosave-mobile",
                         "web-lesson-mobile",
+                        "web-canonical-keyboard-desktop",
+                        "web-canonical-navigation-mobile",
                         "web-day1-transfer-desktop",
                         "web-day1-retrieval-desktop",
                         "web-day30-capstone-progression-desktop",
@@ -3579,6 +3611,8 @@ def runBrowserMatrix(
                 webArtifactEvidence: dict[str, Any] | None = None
                 firstViewportEvidence: dict[str, Any] | None = None
                 learnSearchEvidence: dict[str, Any] | None = None
+                canonicalKeyboardEvidence: dict[str, Any] | None = None
+                lessonNavigationEvidence: dict[str, Any] | None = None
                 localArchiveWebRoundTripEvidence: dict[str, Any] | None = None
                 notebookRunAdvanceVerified = False
                 notebookToolsVerified = False
@@ -4306,7 +4340,25 @@ def runBrowserMatrix(
                             )
                         exerciseIndex = 0 if assessmentMode else int(case.get("exerciseIndex", 0))
                         runButton = exerciseParts.locator('button[aria-label="셀 실행"]').nth(exerciseIndex)
-                        runButton.click(timeout=20_000)
+                        codeEditor = exerciseParts.locator('.cm-content').nth(exerciseIndex)
+                        if case.get("verifyCanonicalKeyboardJourney"):
+                            overviewSection = page.locator(
+                                '[data-learning-overview-section]'
+                            ).first
+                            overviewSection.focus()
+                            page.keyboard.press("Enter")
+                            page.wait_for_function(
+                                """
+                                () => document.activeElement?.matches(
+                                  '[data-learning-section-card]'
+                                ) && new URL(window.location.href).searchParams.has("section")
+                                """,
+                                timeout=20_000,
+                            )
+                            codeEditor.focus()
+                            page.keyboard.press("Shift+Enter")
+                        else:
+                            runButton.click(timeout=20_000)
                         page.wait_for_function(
                             """
                             () => {
@@ -4336,9 +4388,14 @@ def runBrowserMatrix(
                         )
                         if prematureProgress:
                             raise AssertionError("failed learning attempt derived false completion")
-                        codeEditor = exerciseParts.locator('.cm-content').nth(exerciseIndex)
-                        codeEditor.fill(case["solutionCode"], timeout=20_000)
-                        runButton.click(timeout=20_000)
+                        if case.get("verifyCanonicalKeyboardJourney"):
+                            codeEditor.focus()
+                            page.keyboard.press("Control+A")
+                            page.keyboard.insert_text(case["solutionCode"])
+                            page.keyboard.press("Shift+Enter")
+                        else:
+                            codeEditor.fill(case["solutionCode"], timeout=20_000)
+                            runButton.click(timeout=20_000)
                         try:
                             page.wait_for_selector(
                                 '[data-learning-check-result="verified"]',
@@ -4366,6 +4423,79 @@ def runBrowserMatrix(
                                 arg=int(case["expectCompletedLessons"]),
                                 timeout=20_000,
                             )
+                        if case.get("verifyCanonicalKeyboardJourney"):
+                            expectedNextLesson = str(case["expectNextLesson"])
+                            focusedNextLesson = ""
+                            keyboardFocusSequence: list[dict[str, Any]] = []
+                            for _ in range(100):
+                                keyboardFocusSequence.append(
+                                    page.evaluate(
+                                        """
+                                        () => ({
+                                          ariaLabel: document.activeElement?.getAttribute("aria-label") || "",
+                                          className: String(document.activeElement?.className || "").slice(0, 120),
+                                          nextLesson: document.activeElement?.getAttribute(
+                                            "data-learning-next-lesson"
+                                          ) || "",
+                                          tag: document.activeElement?.tagName || "",
+                                        })
+                                        """
+                                    )
+                                )
+                                focusedNextLesson = str(
+                                    page.evaluate(
+                                        """
+                                        () => document.activeElement?.getAttribute(
+                                          "data-learning-next-lesson"
+                                        ) || ""
+                                        """
+                                    )
+                                )
+                                if focusedNextLesson:
+                                    break
+                                if page.evaluate(
+                                    "() => document.activeElement?.matches('.cm-content') === true"
+                                ):
+                                    page.keyboard.press("Escape")
+                                page.keyboard.press("Tab")
+                            if focusedNextLesson != expectedNextLesson:
+                                navigationState = page.evaluate(
+                                    """
+                                    () => ({
+                                      lessonRef: document.querySelector(
+                                        "[data-learning-lesson-ref]"
+                                      )?.getAttribute("data-learning-lesson-ref") || "",
+                                      nextLessons: Array.from(document.querySelectorAll(
+                                        "[data-learning-next-lesson]"
+                                      )).map((element) => element.getAttribute(
+                                        "data-learning-next-lesson"
+                                      )),
+                                    })
+                                    """
+                                )
+                                raise AssertionError(
+                                    "canonical lesson keyboard flow did not reach the next lesson "
+                                    f"control: {focusedNextLesson!r}; navigation={navigationState}; "
+                                    f"recentFocus={keyboardFocusSequence[-20:]}"
+                                )
+                            page.keyboard.press("Enter")
+                            waitForLearningLessonRoute(page, expectedNextLesson)
+                            page.wait_for_function(
+                                """
+                                () => document.activeElement?.getAttribute(
+                                  "data-learning-lesson-focus-target"
+                                ) === "true"
+                                """,
+                                timeout=20_000,
+                            )
+                            canonicalKeyboardEvidence = {
+                                "completedLesson": "day01_헬로월드",
+                                "focusedNextLesson": focusedNextLesson,
+                                "landedLesson": page.locator(
+                                    "[data-learning-lesson-ref]"
+                                ).get_attribute("data-learning-lesson-ref"),
+                                "titleFocused": True,
+                            }
                         if case.get("verifySemanticArtifactEvidence"):
                             semanticEvidence = page.evaluate(
                                 """
@@ -5354,6 +5484,69 @@ def runBrowserMatrix(
                         ))
                         """
                     )
+                    if case.get("verifyLessonNavigationLayout"):
+                        page.locator(
+                            '[data-learning-lesson-navigation="true"]'
+                        ).scroll_into_view_if_needed(timeout=20_000)
+                        lessonNavigationEvidence = page.evaluate(
+                            """
+                            () => {
+                              const nav = document.querySelector(
+                                '[data-learning-lesson-navigation="true"]'
+                              );
+                              const previous = nav?.querySelector(
+                                '[data-learning-previous-lesson]'
+                              );
+                              const next = nav?.querySelector(
+                                '[data-learning-next-lesson]'
+                              );
+                              const rect = (element) => {
+                                if (!element) return null;
+                                const value = element.getBoundingClientRect();
+                                return {
+                                  bottom: value.bottom,
+                                  height: value.height,
+                                  left: value.left,
+                                  right: value.right,
+                                  top: value.top,
+                                  width: value.width,
+                                };
+                              };
+                              return {
+                                nav: rect(nav),
+                                next: rect(next),
+                                nextLesson: next?.getAttribute(
+                                  "data-learning-next-lesson"
+                                ) || "",
+                                previous: rect(previous),
+                                previousLesson: previous?.getAttribute(
+                                  "data-learning-previous-lesson"
+                                ) || "",
+                                viewportWidth: window.innerWidth,
+                              };
+                            }
+                            """
+                        )
+                        navigationRect = lessonNavigationEvidence.get("nav") or {}
+                        previousRect = lessonNavigationEvidence.get("previous") or {}
+                        nextRect = lessonNavigationEvidence.get("next") or {}
+                        if (
+                            lessonNavigationEvidence.get("previousLesson")
+                            != case["expectPreviousLesson"]
+                            or lessonNavigationEvidence.get("nextLesson")
+                            != case["expectNextLesson"]
+                            or float(previousRect.get("height") or 0) < 64
+                            or float(nextRect.get("height") or 0) < 64
+                            or float(previousRect.get("bottom") or 0)
+                            > float(nextRect.get("top") or 0) + 1
+                            or float(navigationRect.get("left") or -1) < 0
+                            or float(navigationRect.get("right") or 0)
+                            > float(lessonNavigationEvidence.get("viewportWidth") or 0)
+                        ):
+                            raise AssertionError(
+                                "canonical lesson mobile navigation layout drifted: "
+                                f"{lessonNavigationEvidence}"
+                            )
                     proofLayoutEvidence = page.evaluate(
                         """
                         () => {
@@ -5577,6 +5770,8 @@ def runBrowserMatrix(
                             "assetFailures": assetFailureSnapshot,
                             "firstViewportEvidence": firstViewportEvidence,
                             "learnSearchEvidence": learnSearchEvidence,
+                            "canonicalKeyboardEvidence": canonicalKeyboardEvidence,
+                            "lessonNavigationEvidence": lessonNavigationEvidence,
                             "localArchiveWebRoundTripEvidence": localArchiveWebRoundTripEvidence,
                             "webArtifactEvidence": webArtifactEvidence,
                             "notebookRunAdvanceVerified": notebookRunAdvanceVerified,
