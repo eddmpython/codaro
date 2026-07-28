@@ -1492,6 +1492,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
                 "dataReportOutcome",
                 "fileAutomationOutcome",
                 "localNotebookDesktop",
+                "localAutomationDesktop",
             ],
             "verifyProductVisualThemeToggle": True,
         },
@@ -1507,6 +1508,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
                 "dataReportOutcome",
                 "fileAutomationOutcome",
                 "localNotebookDesktop",
+                "localAutomationDesktop",
             ],
         },
         {
@@ -3235,9 +3237,9 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
     if surface == "landing-home":
         if audit["visibleImageCount"] < 1 or audit["webLearningLinkCount"] < 1:
             failures.append(f"{name}: home needs product media and direct web-learning CTA")
-        if audit["pairedVisualCount"] != 4:
+        if audit["pairedVisualCount"] != 5:
             failures.append(
-                f"{name}: home needs four theme-paired product proofs, "
+                f"{name}: home needs five theme-paired product proofs, "
                 f"got {audit['pairedVisualCount']}"
             )
     elif surface == "landing-learn":
@@ -5793,7 +5795,7 @@ def runBrowserMatrix(
                               );
                               return (
                                 document.documentElement.dataset.theme === expectedTheme &&
-                                paired.length === 4 &&
+                                paired.length === 5 &&
                                 paired.every((element) => (
                                   element.getAttribute("data-visual-theme") === expectedTheme &&
                                   element.getAttribute("data-visual-capture-theme") === expectedTheme
