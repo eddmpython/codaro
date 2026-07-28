@@ -26,6 +26,7 @@ FORBIDDEN_COMPLETION_STATE = re.compile(
     re.IGNORECASE | re.MULTILINE,
 )
 CHECKED_TODO = re.compile(r"^\s*[-*]\s+\[[xX]\]\s+", re.MULTILINE)
+LEGACY_DONE_LABEL = re.compile(r"`\*?done`", re.IGNORECASE)
 
 
 def testMainPlanContainsOnlyUnfinishedTodoTree() -> None:
@@ -91,7 +92,11 @@ def testFinishedStateIsDeletedInsteadOfMarkedDone() -> None:
         if path == MAIN_PLAN / "README.md":
             continue
         text = path.read_text(encoding="utf-8")
-        if FORBIDDEN_COMPLETION_STATE.search(text) or CHECKED_TODO.search(text):
+        if (
+            FORBIDDEN_COMPLETION_STATE.search(text)
+            or CHECKED_TODO.search(text)
+            or LEGACY_DONE_LABEL.search(text)
+        ):
             offenders.append(path.relative_to(ROOT).as_posix())
 
     assert offenders == []
