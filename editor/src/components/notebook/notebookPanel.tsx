@@ -11,7 +11,14 @@ import {
 import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import { python } from "@codemirror/lang-python";
 import { bracketMatching, HighlightStyle, syntaxHighlighting } from "@codemirror/language";
-import { EditorState, Prec, RangeSet, StateEffect, StateField } from "@codemirror/state";
+import {
+  Compartment,
+  EditorState,
+  Prec,
+  RangeSet,
+  StateEffect,
+  StateField,
+} from "@codemirror/state";
 import {
   Decoration,
   type DecorationSet,
@@ -555,6 +562,7 @@ export function CodeCellEditor({
 }) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const viewRef = useRef<EditorView | null>(null);
+  const accessibilityAttributesRef = useRef(new Compartment());
   const onChangeRef = useRef(onChange);
   const onFocusRef = useRef(onFocus);
   const onBoundaryNavigateRef = useRef(onBoundaryNavigate);
@@ -608,10 +616,12 @@ export function CodeCellEditor({
         syntaxHighlighting(codaroSyntaxHighlightStyle, { fallback: true }),
         highlightActiveLine(),
         placeholder(placeholderText),
-        EditorView.contentAttributes.of({
-          "aria-label": ariaLabel,
-          "aria-multiline": "true",
-        }),
+        accessibilityAttributesRef.current.of(
+          EditorView.contentAttributes.of({
+            "aria-label": ariaLabel,
+            "aria-multiline": "true",
+          }),
+        ),
         EditorView.lineWrapping,
         autocompletion({
           override: [aiCompletionSource],
@@ -629,7 +639,7 @@ export function CodeCellEditor({
           {
             key: "ArrowUp",
             run: (view) => {
-              if (view.composing || completionStatus(view.state) !== null) return false;
+              if (view.compositionStarted || completionStatus(view.state) !== null) return false;
               const selection = view.state.selection.main;
               const direction = resolveNotebookCellBoundaryNavigation({
                 key: "ArrowUp",
@@ -645,7 +655,7 @@ export function CodeCellEditor({
           {
             key: "ArrowDown",
             run: (view) => {
-              if (view.composing || completionStatus(view.state) !== null) return false;
+              if (view.compositionStarted || completionStatus(view.state) !== null) return false;
               const selection = view.state.selection.main;
               const direction = resolveNotebookCellBoundaryNavigation({
                 key: "ArrowDown",
@@ -660,8 +670,9 @@ export function CodeCellEditor({
           },
           {
             key: "Shift-Enter",
-            run: () => {
-              const source = viewRef.current?.state.doc.toString() ?? "";
+            run: (view) => {
+              if (view.compositionStarted) return false;
+              const source = view.state.doc.toString();
               if (onRunAndAdvanceRef.current) {
                 onRunAndAdvanceRef.current(source);
               } else {
@@ -672,15 +683,17 @@ export function CodeCellEditor({
           },
           {
             key: "Mod-Enter",
-            run: () => {
-              onRunRef.current?.(viewRef.current?.state.doc.toString() ?? "");
+            run: (view) => {
+              if (view.compositionStarted) return false;
+              onRunRef.current?.(view.state.doc.toString());
               return true;
             },
           },
           {
             key: "Ctrl-Enter",
-            run: () => {
-              onRunRef.current?.(viewRef.current?.state.doc.toString() ?? "");
+            run: (view) => {
+              if (view.compositionStarted) return false;
+              onRunRef.current?.(view.state.doc.toString());
               return true;
             },
           },
@@ -709,6 +722,19 @@ export function CodeCellEditor({
       viewRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    const view = viewRef.current;
+    if (!view) return;
+    view.dispatch({
+      effects: accessibilityAttributesRef.current.reconfigure(
+        EditorView.contentAttributes.of({
+          "aria-label": ariaLabel,
+          "aria-multiline": "true",
+        }),
+      ),
+    });
+  }, [ariaLabel]);
 
   useEffect(() => {
     if (!autoFocus) return;
@@ -833,6 +859,7 @@ function DocumentBlock({
   const resultStatus = isRunning ? "running" : inCycle ? "conflict" : isStale ? "stale" : result?.status ?? "idle";
   const draftRef = useRef(draft);
   const markdownEditorRef = useRef<HTMLTextAreaElement | null>(null);
+  const markdownCompositionRef = useRef(false);
 
   useEffect(() => {
     draftRef.current = draft;
@@ -899,6 +926,7 @@ function DocumentBlock({
             />
           ) : (
             <Textarea
+              aria-label={`${cellAriaLabel} 편집기`}
               className={cn(
                 "astryxWorkCellFrame notebookMarkdownEditor",
                 isSelected && "notebookMarkdownEditorSelected",
@@ -906,11 +934,22 @@ function DocumentBlock({
               placeholder="Markdown을 입력하세요. {변수}로 값 보간."
               ref={markdownEditorRef}
               value={draft}
+              onBlur={() => {
+                markdownCompositionRef.current = false;
+              }}
               onChange={(event) => updateDraft(event.target.value)}
+              onCompositionEnd={() => {
+                markdownCompositionRef.current = false;
+              }}
+              onCompositionStart={() => {
+                markdownCompositionRef.current = true;
+              }}
               onFocus={onSelect}
               onKeyDown={(event) => {
                 if (
-                  event.nativeEvent.isComposing
+                  markdownCompositionRef.current
+                  || event.nativeEvent.isComposing
+                  || event.nativeEvent.keyCode === 229
                   || event.altKey
                   || event.ctrlKey
                   || event.metaKey
@@ -933,6 +972,7 @@ function DocumentBlock({
           )}
         </div>
         <CellMetaBar
+          cellLabel={cellAriaLabel}
           status={resultStatus}
           type="markdown"
           selected={isSelected}
@@ -972,7 +1012,7 @@ function DocumentBlock({
           data-notebook-input="code"
         >
           <CodeCellEditor
-            ariaLabel={`${cellTitle} 코드 편집기`}
+            ariaLabel={`${cellAriaLabel} 코드 편집기`}
             autoFocus={autoFocus}
             placeholderText="Python 코드를 입력하세요"
             value={draft}
@@ -992,7 +1032,7 @@ function DocumentBlock({
       </div>
       {result ? (
         <div className="astryxWorkCellOutput notebookCellOutput">
-          <ExecutionOutput result={result} />
+          <ExecutionOutput ariaLabel={`${cellAriaLabel} 실행 결과`} result={result} />
         </div>
       ) : null}
       {isRunning && !result ? (
@@ -1001,6 +1041,7 @@ function DocumentBlock({
         </div>
       ) : null}
       <CellMetaBar
+        cellLabel={cellAriaLabel}
         canRun={canRun}
         running={isRunning}
         status={resultStatus}
@@ -1017,6 +1058,7 @@ function DocumentBlock({
 }
 
 function CellMetaBar({
+  cellLabel,
   canRun = false,
   running = false,
   status,
@@ -1028,6 +1070,7 @@ function CellMetaBar({
   onDelete,
   onRun,
 }: {
+  cellLabel: string;
   canRun?: boolean;
   running?: boolean;
   status: string;
@@ -1072,7 +1115,7 @@ function CellMetaBar({
               selected && "notebookCellRunButtonSelected",
             )}
             disabled={!canRun}
-            label="셀 실행"
+            label={`${cellLabel} 실행`}
             variant="ghost"
             onClick={(event) => {
               event.stopPropagation();
@@ -1088,7 +1131,7 @@ function CellMetaBar({
           onClick={(event) => event.stopPropagation()}
         >
           <summary
-            aria-label="셀 작업 더보기"
+            aria-label={`${cellLabel} 작업 더보기`}
             className="notebookCellMoreTrigger"
             role="button"
             title="셀 작업 더보기"
@@ -1099,7 +1142,7 @@ function CellMetaBar({
             <CellAiActions compact helpState={cellHelp} selected={selected} onAsk={onCellAsk} />
             <IconButton
               className="notebookCellDeleteButton size-9 sm:size-8 [&_svg]:size-4"
-              label="셀 삭제"
+              label={`${cellLabel} 삭제`}
               variant="ghost"
               onClick={(event) => {
                 event.stopPropagation();

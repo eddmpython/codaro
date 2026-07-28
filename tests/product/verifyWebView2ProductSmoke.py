@@ -17,7 +17,7 @@ from urllib.error import URLError
 from urllib.parse import quote
 from urllib.request import Request, urlopen
 
-from playwright.sync_api import Page, sync_playwright
+from playwright.sync_api import Locator, Page, sync_playwright
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -215,6 +215,8 @@ def main() -> int:
                 "shared theme and social controls",
                 "shared support dialog account structure",
                 "12-cell Code and Markdown keyboard boundary navigation with focus scrolling",
+                "12-cell input and action names include the current cell position",
+                "Code and Markdown composition-event shortcut guards",
                 "isolated installed-product user data",
                 "Web-origin learning archive Local import, reload, re-export, and disabled automation adoption",
             ] + ([
@@ -623,6 +625,8 @@ def verify_long_notebook_keyboard_navigation(
             markdown_down = page.evaluate("document.activeElement?.tagName") == "TEXTAREA"
 
     bottom_state = notebook_navigation_viewport_state(page)
+    composition_evidence = verify_notebook_composition_guards(page, cells)
+    accessible_name_evidence = notebook_accessible_name_state(page)
     screenshot_path = SCREENSHOT_ROOT / f"{case_id}.png"
     page.screenshot(path=str(screenshot_path))
     checks = {
@@ -636,6 +640,7 @@ def verify_long_notebook_keyboard_navigation(
         "lastCellUnobscured": not bottom_state["controlOverlaps"],
         "markdownFocusedUp": markdown_up,
         "markdownFocusedDown": markdown_down,
+        "positionedAccessibleNames": accessible_name_evidence["valid"],
     }
     case_failures = [
         f"{check} check failed"
@@ -652,12 +657,193 @@ def verify_long_notebook_keyboard_navigation(
             "viewportHeight": initial_scroll["clientHeight"],
             "topScrollTop": top_state["scrollTop"],
             "bottomScrollTop": bottom_state["scrollTop"],
+            "accessibleNames": accessible_name_evidence,
+            "compositionGuards": composition_evidence,
         },
         "screenshot": display_path(screenshot_path),
         "checks": checks,
         "passed": not case_failures,
         "failures": case_failures,
     }
+
+
+def verify_notebook_composition_guards(page: Page, cells: Locator) -> dict[str, Any]:
+    cell_types = [
+        cells.nth(index).get_attribute("data-notebook-cell")
+        for index in range(cells.count())
+    ]
+    markdown_index = next(
+        (
+            index
+            for index, cell_type in enumerate(cell_types)
+            if cell_type == "markdown" and 0 < index < len(cell_types) - 1
+        ),
+        None,
+    )
+    if markdown_index is None or cell_types[markdown_index - 1] != "code":
+        raise VerificationError(
+            "notebook composition guard needs a code, Markdown, code sequence"
+        )
+
+    code_index = markdown_index - 1
+    code_editor = cells.nth(code_index).locator(".cm-content")
+    code_editor.click()
+    page.keyboard.press("Control+A")
+    page.keyboard.insert_text("# 한글 조합")
+    page.keyboard.press("Control+End")
+    code_editor.dispatch_event("compositionstart", {"data": ""})
+    code_editor.dispatch_event("compositionupdate", {"data": "한글"})
+    page.keyboard.press("ArrowDown")
+    page.evaluate(
+        """
+        (element) => {
+          const event = new KeyboardEvent('keydown', {
+            bubbles: true,
+            cancelable: true,
+            code: 'Enter',
+            composed: true,
+            key: 'Enter',
+            shiftKey: true,
+          });
+          Object.defineProperty(event, 'isComposing', { value: true });
+          element.dispatchEvent(event);
+        }
+        """,
+        code_editor.element_handle(),
+    )
+    code_during_composition = page.evaluate(
+        """
+        (expectedIndex) => {
+          const cells = [...document.querySelectorAll('[data-notebook-cell]')];
+          const selected = document.querySelector('[data-notebook-cell-selected="true"]');
+          return {
+            cellCount: cells.length,
+            focused: cells[expectedIndex]?.contains(document.activeElement) ?? false,
+            selectedIndex: cells.indexOf(selected),
+            status: cells[expectedIndex]?.getAttribute('data-notebook-cell-status'),
+          };
+        }
+        """,
+        code_index,
+    )
+    if (
+        code_during_composition["cellCount"] != len(cell_types)
+        or not code_during_composition["focused"]
+        or code_during_composition["selectedIndex"] != code_index
+        or code_during_composition["status"] != "idle"
+    ):
+        raise VerificationError(
+            "CodeMirror composition triggered cell execution or boundary navigation: "
+            f"{code_during_composition}"
+        )
+    code_editor.dispatch_event("compositionend", {"data": "한글"})
+    page.keyboard.press("Control+End")
+    page.keyboard.press("ArrowDown")
+    page.wait_for_function(
+        """
+        (expectedIndex) => {
+          const cells = [...document.querySelectorAll('[data-notebook-cell]')];
+          const selected = document.querySelector('[data-notebook-cell-selected="true"]');
+          return selected === cells[expectedIndex]
+            && selected?.contains(document.activeElement);
+        }
+        """,
+        arg=markdown_index,
+        timeout=20_000,
+    )
+
+    markdown_editor = cells.nth(markdown_index).locator(".notebookMarkdownEditor")
+    markdown_editor.fill("# 한글 조합")
+    markdown_editor.evaluate(
+        "(element) => element.setSelectionRange(element.value.length, element.value.length)"
+    )
+    markdown_editor.dispatch_event("compositionstart", {"data": ""})
+    markdown_editor.dispatch_event("compositionupdate", {"data": "한글"})
+    page.keyboard.press("ArrowDown")
+    markdown_during_composition = page.evaluate(
+        """
+        (expectedIndex) => {
+          const cells = [...document.querySelectorAll('[data-notebook-cell]')];
+          const selected = document.querySelector('[data-notebook-cell-selected="true"]');
+          const editor = cells[expectedIndex]?.querySelector('.notebookMarkdownEditor');
+          return {
+            focused: document.activeElement === editor,
+            selectedIndex: cells.indexOf(selected),
+            value: editor?.value ?? null,
+          };
+        }
+        """,
+        markdown_index,
+    )
+    if (
+        not markdown_during_composition["focused"]
+        or markdown_during_composition["selectedIndex"] != markdown_index
+        or markdown_during_composition["value"] != "# 한글 조합"
+    ):
+        raise VerificationError(
+            "Markdown composition triggered boundary navigation or text loss: "
+            f"{markdown_during_composition}"
+        )
+    markdown_editor.dispatch_event("compositionend", {"data": "한글"})
+    page.keyboard.press("ArrowDown")
+    page.wait_for_function(
+        """
+        (expectedIndex) => {
+          const cells = [...document.querySelectorAll('[data-notebook-cell]')];
+          const selected = document.querySelector('[data-notebook-cell-selected="true"]');
+          return selected === cells[expectedIndex]
+            && selected?.contains(document.activeElement);
+        }
+        """,
+        arg=markdown_index + 1,
+        timeout=20_000,
+    )
+    return {
+        "codeCellIndex": code_index,
+        "codeCompositionPreservedFocus": True,
+        "codeCompositionPreventedRunAndAdvance": True,
+        "codePostCompositionBoundaryMoved": True,
+        "markdownCellIndex": markdown_index,
+        "markdownCompositionPreservedTextAndFocus": True,
+        "markdownPostCompositionBoundaryMoved": True,
+    }
+
+
+def notebook_accessible_name_state(page: Page) -> dict[str, Any]:
+    return page.evaluate(
+        """() => {
+          const cells = [...document.querySelectorAll('[data-notebook-cell]')];
+          const items = cells.map((cell) => {
+            const position = cell.getAttribute('aria-posinset');
+            const setSize = cell.getAttribute('aria-setsize');
+            const positionLabel = `셀 ${position} / ${setSize}`;
+            const content = cell.querySelector(
+              "[data-notebook-input='code'] .cm-content, .notebookMarkdownEditor"
+            );
+            const menu = cell.querySelector('.notebookCellMoreTrigger');
+            const run = cell.querySelector('.notebookCellRunButton');
+            const output = cell.querySelector(
+              ".notebookCellOutput [data-execution-output='true']"
+            );
+            return {
+              contentLabel: content?.getAttribute('aria-label') || null,
+              menuLabel: menu?.getAttribute('aria-label') || null,
+              outputLabel: output?.getAttribute('aria-label') || null,
+              positionLabel,
+              runLabel: run?.getAttribute('aria-label') || null,
+            };
+          });
+          return {
+            items,
+            valid: items.every((item) => (
+              item.contentLabel?.includes(item.positionLabel)
+              && item.menuLabel?.includes(item.positionLabel)
+              && (!item.runLabel || item.runLabel.includes(item.positionLabel))
+              && (!item.outputLabel || item.outputLabel.includes(item.positionLabel))
+            )),
+          };
+        }"""
+    )
 
 
 def notebook_navigation_viewport_state(page: Page) -> dict[str, Any]:

@@ -310,7 +310,7 @@ def testNotebookKeepsMobileTitleAndCollapsesSecondaryCellActions() -> None:
     assert 'typeof tooltip === "string" ? tooltip' in sidebar
     assert "collapsedSidebarVisibleTextFragments" in productGate
     assert 'data-notebook-cell-menu="true"' in notebookPanel
-    assert 'aria-label="셀 작업 더보기"' in notebookPanel
+    assert 'aria-label={`${cellLabel} 작업 더보기`}' in notebookPanel
     assert 'role="button"' in notebookPanel
     assert ".notebookCellMoreMenu {" in notebookStyles
     assert ".notebookCodeFrame .cm-content {" in notebookStyles
@@ -323,7 +323,7 @@ def testNotebookKeepsMobileTitleAndCollapsesSecondaryCellActions() -> None:
     assert '"lineVisuals": lineVisualSnapshot' in productGate
     assert autosaveGate.count('state="attached"') >= 4
     assert 'page.locator("[data-notebook-cell]").first.hover' in autosaveGate
-    assert 'page.get_by_label("셀 작업 더보기").first.click' in autosaveGate
+    assert 're.compile(r"^Python 셀 1 / \\d+ 작업 더보기$")' in autosaveGate
     assert 'tone: "success"' in curriculumSelection
     assert "visibleNotebookNoticeCount" in productGate
     assert "background curriculum notice leaked into the free notebook top lane" in productGate
@@ -368,9 +368,17 @@ def testLongNotebookKeyboardNavigationSharesCodeAndMarkdownBoundaries() -> None:
     for marker in (
         'key: "ArrowUp"',
         'key: "ArrowDown"',
-        "view.composing",
+        "view.compositionStarted",
         "completionStatus(view.state)",
         "event.nativeEvent.isComposing",
+        "event.nativeEvent.keyCode === 229",
+        "markdownCompositionRef",
+        "accessibilityAttributesRef.current.reconfigure",
+        'aria-label={`${cellAriaLabel} 편집기`}',
+        'ariaLabel={`${cellAriaLabel} 코드 편집기`}',
+        'ariaLabel={`${cellAriaLabel} 실행 결과`}',
+        'label={`${cellLabel} 실행`}',
+        'aria-label={`${cellLabel} 작업 더보기`}',
         "markdownEditorRef",
         "onBoundaryNavigate={onMoveCell}",
     ):
@@ -383,8 +391,11 @@ def testLongNotebookKeyboardNavigationSharesCodeAndMarkdownBoundaries() -> None:
         assert marker in navigation
     for marker in (
         "verifyLongNotebookKeyboardNavigation",
+        "verifyNotebookCompositionGuards",
         "notebookKeyboardNavigationEvidence",
         "12-cell notebook did not create a long scrollable document",
+        "CodeMirror composition triggered cell execution or boundary navigation",
+        "Markdown composition triggered boundary navigation or text loss",
         "keyboard navigation did not focus the Markdown textarea",
         "keyboard navigation left the final notebook cell behind controls",
     ):
@@ -399,11 +410,15 @@ def testLongNotebookKeyboardNavigationSharesCodeAndMarkdownBoundaries() -> None:
         assert caseName in productGate
     for marker in (
         "verify_long_notebook_keyboard_navigation",
+        "verify_notebook_composition_guards",
+        "notebook_accessible_name_state",
         '"local-notebook-keyboard-12-cells"',
+        '"positionedAccessibleNames"',
         '"markdownFocusedUp"',
         '"markdownFocusedDown"',
         '"lastCellUnobscured"',
         "12-cell Code and Markdown keyboard boundary navigation with focus scrolling",
+        "Code and Markdown composition-event shortcut guards",
     ):
         assert marker in webviewGate
 

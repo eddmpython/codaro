@@ -1296,6 +1296,7 @@ def verifyLongNotebookKeyboardNavigation(
             f"{lineVisualSnapshot}"
         )
 
+    compositionEvidence = verifyNotebookCompositionGuards(page, cells)
     screenshotPath = (
         SCREENSHOT_ROOT / colorScheme / f"{case['name']}-long-notebook-keyboard.png"
     )
@@ -1310,8 +1311,154 @@ def verifyLongNotebookKeyboardNavigation(
         "viewportHeight": scrollSnapshot["clientHeight"],
         "topScrollTop": topSnapshot["scrollTop"],
         "bottomScrollTop": bottomSnapshot["scrollTop"],
+        "compositionGuards": compositionEvidence,
         "lineVisuals": lineVisualSnapshot,
         "screenshot": str(screenshotPath.relative_to(ROOT)).replace("\\", "/"),
+    }
+
+
+def verifyNotebookCompositionGuards(page: Any, cells: Any) -> dict[str, Any]:
+    cellTypes = [
+        cells.nth(index).get_attribute("data-notebook-cell")
+        for index in range(cells.count())
+    ]
+    markdownIndex = next(
+        (
+            index
+            for index, cellType in enumerate(cellTypes)
+            if cellType == "markdown" and 0 < index < len(cellTypes) - 1
+        ),
+        None,
+    )
+    if markdownIndex is None or cellTypes[markdownIndex - 1] != "code":
+        raise AssertionError(
+            "notebook composition guard needs a code, Markdown, code sequence"
+        )
+
+    codeIndex = markdownIndex - 1
+    codeCell = cells.nth(codeIndex)
+    codeEditor = codeCell.locator(".cm-content")
+    codeEditor.click()
+    page.keyboard.press("Control+A")
+    page.keyboard.insert_text("# 한글 조합")
+    page.keyboard.press("Control+End")
+    codeEditor.dispatch_event("compositionstart", {"data": ""})
+    codeEditor.dispatch_event("compositionupdate", {"data": "한글"})
+    page.keyboard.press("ArrowDown")
+    page.evaluate(
+        """
+        (element) => {
+          const event = new KeyboardEvent('keydown', {
+            bubbles: true,
+            cancelable: true,
+            code: 'Enter',
+            composed: true,
+            key: 'Enter',
+            shiftKey: true,
+          });
+          Object.defineProperty(event, 'isComposing', { value: true });
+          element.dispatchEvent(event);
+        }
+        """,
+        codeEditor.element_handle(),
+    )
+    codeDuringComposition = page.evaluate(
+        """
+        (expectedIndex) => {
+          const cells = [...document.querySelectorAll('[data-notebook-cell]')];
+          const selected = document.querySelector('[data-notebook-cell-selected="true"]');
+          return {
+            cellCount: cells.length,
+            focused: cells[expectedIndex]?.contains(document.activeElement) ?? false,
+            selectedIndex: cells.indexOf(selected),
+            status: cells[expectedIndex]?.getAttribute('data-notebook-cell-status'),
+          };
+        }
+        """,
+        codeIndex,
+    )
+    if (
+        codeDuringComposition["cellCount"] != len(cellTypes)
+        or not codeDuringComposition["focused"]
+        or codeDuringComposition["selectedIndex"] != codeIndex
+        or codeDuringComposition["status"] != "idle"
+    ):
+        raise AssertionError(
+            "CodeMirror composition triggered cell execution or boundary navigation: "
+            f"{codeDuringComposition}"
+        )
+    codeEditor.dispatch_event("compositionend", {"data": "한글"})
+    page.keyboard.press("Control+End")
+    page.keyboard.press("ArrowDown")
+    page.wait_for_function(
+        """
+        (expectedIndex) => {
+          const cells = [...document.querySelectorAll('[data-notebook-cell]')];
+          const selected = document.querySelector('[data-notebook-cell-selected="true"]');
+          return selected === cells[expectedIndex]
+            && selected?.contains(document.activeElement);
+        }
+        """,
+        arg=markdownIndex,
+        timeout=20_000,
+    )
+
+    markdownCell = cells.nth(markdownIndex)
+    markdownEditor = markdownCell.locator(".notebookMarkdownEditor")
+    markdownEditor.fill("# 한글 조합")
+    markdownEditor.evaluate(
+        "(element) => element.setSelectionRange(element.value.length, element.value.length)"
+    )
+    markdownEditor.dispatch_event("compositionstart", {"data": ""})
+    markdownEditor.dispatch_event("compositionupdate", {"data": "한글"})
+    page.keyboard.press("ArrowDown")
+    markdownDuringComposition = page.evaluate(
+        """
+        (expectedIndex) => {
+          const cells = [...document.querySelectorAll('[data-notebook-cell]')];
+          const selected = document.querySelector('[data-notebook-cell-selected="true"]');
+          const editor = cells[expectedIndex]?.querySelector('.notebookMarkdownEditor');
+          return {
+            focused: document.activeElement === editor,
+            selectedIndex: cells.indexOf(selected),
+            value: editor?.value ?? null,
+          };
+        }
+        """,
+        markdownIndex,
+    )
+    if (
+        not markdownDuringComposition["focused"]
+        or markdownDuringComposition["selectedIndex"] != markdownIndex
+        or markdownDuringComposition["value"] != "# 한글 조합"
+    ):
+        raise AssertionError(
+            "Markdown composition triggered boundary navigation or text loss: "
+            f"{markdownDuringComposition}"
+        )
+    markdownEditor.dispatch_event("compositionend", {"data": "한글"})
+    page.keyboard.press("ArrowDown")
+    page.wait_for_function(
+        """
+        (expectedIndex) => {
+          const cells = [...document.querySelectorAll('[data-notebook-cell]')];
+          const selected = document.querySelector('[data-notebook-cell-selected="true"]');
+          return selected === cells[expectedIndex]
+            && selected?.contains(document.activeElement);
+        }
+        """,
+        arg=markdownIndex + 1,
+        timeout=20_000,
+    )
+
+    return {
+        "codeCellIndex": codeIndex,
+        "codeCompositionPreservedFocus": True,
+        "codeCompositionPreventedRunAndAdvance": True,
+        "codePostCompositionBoundaryMoved": True,
+        "markdownCellIndex": markdownIndex,
+        "markdownCompositionPreservedTextAndFocus": True,
+        "markdownPostCompositionBoundaryMoved": True,
     }
 
 
@@ -2570,9 +2717,13 @@ async ({ surface, expectedTier }) => {
       left && right && (left.compareDocumentPosition(right) & Node.DOCUMENT_POSITION_FOLLOWING)
     );
     return {
+      contentLabel: content?.getAttribute("aria-label") || null,
       label: cell.getAttribute("aria-label"),
+      menuLabel: actions?.querySelector(".notebookCellMoreTrigger")?.getAttribute("aria-label") || null,
+      outputLabel: output?.querySelector('[data-execution-output="true"]')?.getAttribute("aria-label") || null,
       position: cell.getAttribute("aria-posinset"),
       role: cell.getAttribute("role"),
+      runLabel: actions?.querySelector(".notebookCellRunButton")?.getAttribute("aria-label") || null,
       setSize: cell.getAttribute("aria-setsize"),
       contentBeforeOutput: !output || follows(content, output),
       contentBeforeActions: follows(content, output || actions),
@@ -3346,8 +3497,28 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
                 if (
                     item["role"] != "listitem"
                     or not item["label"]
+                    or not item["contentLabel"]
                     or item["position"] is None
                     or item["setSize"] is None
+                    or (
+                        f"셀 {item['position']} / {item['setSize']}"
+                        not in item["contentLabel"]
+                    )
+                    or not item["menuLabel"]
+                    or (
+                        f"셀 {item['position']} / {item['setSize']}"
+                        not in item["menuLabel"]
+                    )
+                    or (
+                        item["runLabel"] is not None
+                        and f"셀 {item['position']} / {item['setSize']}"
+                        not in item["runLabel"]
+                    )
+                    or (
+                        item["outputLabel"] is not None
+                        and f"셀 {item['position']} / {item['setSize']}"
+                        not in item["outputLabel"]
+                    )
                     or not item["contentBeforeOutput"]
                     or not item["contentBeforeActions"]
                     or not item["outputBeforeActions"]

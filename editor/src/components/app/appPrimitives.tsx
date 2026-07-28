@@ -99,9 +99,11 @@ export function CodePayload({ label = "예제 스니펫", value }: { label?: str
 }
 
 export function ExecutionOutput({
+  ariaLabel,
   result,
   sessionId: sessionIdOverride,
 }: {
+  ariaLabel?: string;
   result: ExecutionResult;
   sessionId?: string | null;
 }) {
@@ -127,7 +129,7 @@ export function ExecutionOutput({
   return (
     <div
       aria-atomic="true"
-      aria-label={t("system.output")}
+      aria-label={ariaLabel ?? t("system.output")}
       aria-live={hasError ? "assertive" : "polite"}
       className={cn("min-w-0 max-w-full overflow-hidden rounded-md bg-muted/30 p-3", hasError && "bg-destructive/10")}
       data-automation-summary={

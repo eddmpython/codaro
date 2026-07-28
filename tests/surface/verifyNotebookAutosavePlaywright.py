@@ -6,6 +6,7 @@ import os
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+import re
 import subprocess
 import tempfile
 import threading
@@ -470,8 +471,12 @@ def main(argv: list[str] | None = None) -> int:
                     timeout=10_000,
                 )
                 page.locator("[data-notebook-cell]").first.hover(timeout=10_000)
-                page.get_by_label("셀 작업 더보기").first.click(timeout=10_000)
-                page.get_by_label("셀 삭제").first.click(timeout=10_000)
+                page.get_by_label(
+                    re.compile(r"^Python 셀 1 / \d+ 작업 더보기$")
+                ).click(timeout=10_000)
+                page.get_by_label(
+                    re.compile(r"^Python 셀 1 / \d+ 삭제$")
+                ).click(timeout=10_000)
                 page.wait_for_selector(
                     '[data-notebook-persistence="saved"][data-notebook-persistence-mode="web"]',
                     state="attached",
