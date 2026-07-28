@@ -53,6 +53,7 @@ def testCurrentSourceBuildsLandingBeforeEditor(
             ("editor", editorRoot, editorOutput),
         ),
     )
+    monkeypatch.delenv(audit.FRONTEND_BUILD_REUSE_ENV, raising=False)
     monkeypatch.setattr(audit.subprocess, "run", fakeRun)
 
     facts = audit.buildCurrentSources()

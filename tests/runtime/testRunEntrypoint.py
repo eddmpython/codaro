@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+from contextlib import contextmanager
 import importlib.util
 import json
 import os
+import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -377,7 +380,11 @@ def testFrontendBuildReceiptRequiresExactSourceAndOutput(
 
     monkeypatch.setattr(runner, "ROOT", tmp_path)
     monkeypatch.setattr(runner, "GATE_WORK_ROOT", tmp_path / "output" / "test-runner")
-    monkeypatch.setattr(runner, "repositoryStateFingerprint", lambda: source["sha256"])
+    monkeypatch.setattr(
+        runner,
+        "frontendBuildInputFingerprint",
+        lambda project: f"{project}-{source['sha256']}",
+    )
     monkeypatch.setattr(
         runner,
         "frontendRuntimeFingerprint",
@@ -413,7 +420,7 @@ def testFrontendBuildReceiptRejectsBuildEnvironmentDrift(
 
     monkeypatch.setattr(runner, "ROOT", tmp_path)
     monkeypatch.setattr(runner, "GATE_WORK_ROOT", tmp_path / "output" / "test-runner")
-    monkeypatch.setattr(runner, "repositoryStateFingerprint", lambda: "source")
+    monkeypatch.setattr(runner, "frontendBuildInputFingerprint", lambda project: f"{project}-source")
     monkeypatch.setattr(runner, "frontendRuntimeFingerprint", lambda project, args: {"runtime": "stable"})
     commandArgs = ("npm", "run", "build")
 
@@ -467,8 +474,110 @@ def testFrontendBuildRunCommandWritesFreshReuseLog(
     logs = sorted((tmp_path / "output" / "test-runner" / "editor-build" / "logs").glob("*.log"))
     assert len(logs) == 1
     logText = logs[0].read_text(encoding="utf-8")
-    assert "reused exact source/runtime/environment/output receipt for editor" in logText
+    assert "reused exact input/runtime/environment/output receipt for editor" in logText
     assert "exit: 0" in logText
+
+
+def testFrontendInputFingerprintIgnoresFilesOutsideProjectBuildInputs(
+    monkeypatch,
+    tmp_path,
+) -> None:
+    runner = loadRunner()
+    for relativePath, content in (
+        ("editor/src/main.tsx", "editor"),
+        ("assets/brand/designSystem/tokens.json", "{}"),
+        ("curricula/python/basics/example.yml", "meta: {}"),
+        ("mainPlan/README.md", "temporary todo"),
+        ("tests/runtime/example.py", "assert True"),
+    ):
+        path = tmp_path / relativePath
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content, encoding="utf-8")
+    subprocess.run(("git", "init", "-q"), cwd=tmp_path, check=True)
+    subprocess.run(("git", "add", "."), cwd=tmp_path, check=True)
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+
+    original = runner.frontendBuildInputFingerprint("editor")
+    assert original
+
+    (tmp_path / "mainPlan/README.md").write_text("changed todo", encoding="utf-8")
+    (tmp_path / "tests/runtime/example.py").write_text("assert False", encoding="utf-8")
+    assert runner.frontendBuildInputFingerprint("editor") == original
+
+    (tmp_path / "editor/src/main.tsx").write_text("changed editor", encoding="utf-8")
+    assert runner.frontendBuildInputFingerprint("editor") != original
+
+
+def testFrontendBuildLockSerializesSameProject(
+    monkeypatch,
+    tmp_path,
+) -> None:
+    runner = loadRunner()
+    monkeypatch.setattr(runner, "GATE_WORK_ROOT", tmp_path / "output" / "test-runner")
+    monkeypatch.setattr(runner, "FRONTEND_BUILD_LOCK_POLL_SECONDS", 0.01)
+    firstAcquired = threading.Event()
+    releaseFirst = threading.Event()
+    secondAcquired = threading.Event()
+    waited: list[bool] = []
+
+    def holdFirst() -> None:
+        with runner.frontendBuildLock("landing", 2):
+            firstAcquired.set()
+            releaseFirst.wait(timeout=2)
+
+    def acquireSecond() -> None:
+        with runner.frontendBuildLock("landing", 2) as didWait:
+            waited.append(didWait)
+            secondAcquired.set()
+
+    firstThread = threading.Thread(target=holdFirst)
+    secondThread = threading.Thread(target=acquireSecond)
+    firstThread.start()
+    assert firstAcquired.wait(timeout=1)
+    secondThread.start()
+    assert secondAcquired.wait(timeout=0.05) is False
+    releaseFirst.set()
+    firstThread.join(timeout=1)
+    secondThread.join(timeout=1)
+
+    assert firstThread.is_alive() is False
+    assert secondThread.is_alive() is False
+    assert secondAcquired.is_set()
+    assert waited == [True]
+    assert runner.frontendBuildLockPath("landing").exists() is False
+
+
+def testConcurrentFrontendBuildFollowerReusesFreshReceiptWithoutOptIn(
+    monkeypatch,
+    capsys,
+    tmp_path,
+) -> None:
+    runner = loadRunner()
+    (tmp_path / "landing").mkdir()
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    monkeypatch.setattr(runner, "GATE_WORK_ROOT", tmp_path / "output" / "test-runner")
+    monkeypatch.delenv(runner.FRONTEND_BUILD_REUSE_ENV, raising=False)
+    monkeypatch.setattr(runner, "_sequenceFrontendBuildReuse", False)
+    monkeypatch.setattr(runner, "canReuseFrontendBuild", lambda project, args, env: True)
+
+    @contextmanager
+    def waitedLock(project: str, timeoutSeconds: int):
+        assert project == "landing"
+        assert timeoutSeconds == 900
+        yield True
+
+    monkeypatch.setattr(runner, "frontendBuildLock", waitedLock)
+
+    assert runner.runCommand(
+        "landing-build",
+        runner.GateCommand(args=("npm", "run", "build"), cwd="landing"),
+    ) == 0
+
+    captured = capsys.readouterr()
+    assert "exact landing build reused" in captured.out
+    logs = sorted((tmp_path / "output" / "test-runner" / "landing-build" / "logs").glob("*.log"))
+    assert len(logs) == 1
+    assert "after waiting for the active build" in logs[0].read_text(encoding="utf-8")
 
 
 def testGateSequenceEnablesFrontendReuseAndRestoresDefault(

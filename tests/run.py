@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import argparse
+from collections.abc import Iterator
+from contextlib import contextmanager, nullcontext
 from datetime import UTC, datetime
 import hashlib
 import json
 import os
 import re
+import secrets
 import shutil
 import subprocess
 import sys
@@ -19,7 +22,7 @@ GATE_DOC = ROOT / "docs" / "skills" / "ops" / "foundation" / "testing-and-gates.
 CI_WORKFLOW = ROOT / ".github" / "workflows" / "ci.yml"
 GATE_WORK_ROOT = ROOT / "output" / "test-runner"
 FRONTEND_BUILD_REUSE_ENV = "CODARO_FRONTEND_BUILD_REUSE"
-FRONTEND_BUILD_RECEIPT_VERSION = 1
+FRONTEND_BUILD_RECEIPT_VERSION = 2
 FRONTEND_BUILD_ENV_KEYS = (
     "CI",
     "CODARO_PYPROC_ASSET_BASE",
@@ -28,6 +31,21 @@ FRONTEND_BUILD_ENV_KEYS = (
     "CODARO_WEB_OUT",
     "NODE_ENV",
 )
+FRONTEND_BUILD_INPUT_PATHS = {
+    "editor": (
+        "editor",
+        "assets/brand",
+        "curricula/python",
+    ),
+    "landing": (
+        "landing",
+        "assets/brand",
+        "curricula/python",
+        "docs",
+        "contracts/publicLearningCatalog.json",
+    ),
+}
+FRONTEND_BUILD_LOCK_POLL_SECONDS = 0.1
 _sequenceFrontendBuildReuse = False
 GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "ai-live-smoke": ("output/test-runner/ai-live-smoke/live-smoke-report.json",),
@@ -962,43 +980,51 @@ def hashFile(path: Path) -> str | None:
     return digest.hexdigest()
 
 
-def repositoryStateFingerprint() -> str | None:
+def frontendBuildInputFingerprint(project: str) -> str | None:
+    inputPaths = FRONTEND_BUILD_INPUT_PATHS.get(project)
+    if inputPaths is None:
+        return None
     digest = hashlib.sha256()
-    commands = (
-        ("git", "rev-parse", "HEAD"),
-        ("git", "diff", "--binary", "HEAD", "--"),
-        ("git", "-c", "core.quotepath=false", "ls-files", "-z", "--others", "--exclude-standard", "--"),
-    )
-    outputs: list[bytes] = []
-    for args in commands:
-        try:
-            result = subprocess.run(
-                args,
-                cwd=ROOT,
-                check=True,
-                capture_output=True,
-                timeout=120,
-            )
-        except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
-            return None
-        outputs.append(result.stdout)
-    digest.update(b"head\0")
-    digest.update(outputs[0])
-    digest.update(b"\0diff\0")
-    digest.update(outputs[1])
-    digest.update(b"\0untracked\0")
-    for rawPath in sorted(item for item in outputs[2].split(b"\0") if item):
+    try:
+        result = subprocess.run(
+            (
+                "git",
+                "-c",
+                "core.quotepath=false",
+                "ls-files",
+                "-z",
+                "--cached",
+                "--others",
+                "--exclude-standard",
+                "--",
+                *inputPaths,
+            ),
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            timeout=120,
+        )
+    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        return None
+    digest.update(f"frontend-build-inputs-v{FRONTEND_BUILD_RECEIPT_VERSION}\0".encode("ascii"))
+    for inputPath in inputPaths:
+        digest.update(inputPath.encode("utf-8"))
+        digest.update(b"\0")
+    for rawPath in sorted(item for item in result.stdout.split(b"\0") if item):
         try:
             relativePath = rawPath.decode("utf-8")
             path = ROOT / relativePath
-            contentHash = hashFile(path)
         except (OSError, UnicodeError):
-            return None
-        if contentHash is None:
             return None
         digest.update(rawPath)
         digest.update(b"\0")
-        digest.update(contentHash.encode("ascii"))
+        if path.is_file():
+            contentHash = hashFile(path)
+            if contentHash is None:
+                return None
+            digest.update(contentHash.encode("ascii"))
+        else:
+            digest.update(b"missing")
         digest.update(b"\0")
     return digest.hexdigest()
 
@@ -1086,18 +1112,21 @@ def frontendBuildSnapshot(
     commandArgs: tuple[str, ...],
     env: dict[str, str],
 ) -> dict[str, object] | None:
-    sourceFingerprint = repositoryStateFingerprint()
+    inputFingerprint = frontendBuildInputFingerprint(project)
     runtimeFingerprint = frontendRuntimeFingerprint(project, commandArgs)
     outputRoot = frontendBuildOutputRoot(project, env)
     outputFingerprint = treeContentFingerprint(outputRoot)
-    if sourceFingerprint is None or runtimeFingerprint is None or outputFingerprint is None:
+    if inputFingerprint is None or runtimeFingerprint is None or outputFingerprint is None:
         return None
     try:
         outputPath = outputRoot.resolve().relative_to(ROOT.resolve()).as_posix()
     except (OSError, ValueError):
         outputPath = str(outputRoot.resolve())
     return {
-        "sourceSha256": sourceFingerprint,
+        "inputs": {
+            "paths": list(FRONTEND_BUILD_INPUT_PATHS[project]),
+            "sha256": inputFingerprint,
+        },
         "runtime": runtimeFingerprint,
         "environment": {key: env.get(key) for key in FRONTEND_BUILD_ENV_KEYS},
         "output": {
@@ -1109,6 +1138,107 @@ def frontendBuildSnapshot(
 
 def frontendBuildReceiptPath(project: str) -> Path:
     return GATE_WORK_ROOT / "frontend-build-reuse" / f"{project}.json"
+
+
+def frontendBuildLockPath(project: str) -> Path:
+    return GATE_WORK_ROOT / "frontend-build-reuse" / f"{project}.lock"
+
+
+def processIdIsRunning(processId: int) -> bool:
+    if processId <= 0:
+        return False
+    if os.name == "nt":
+        try:
+            import ctypes
+
+            processQueryLimitedInformation = 0x1000
+            handle = ctypes.windll.kernel32.OpenProcess(
+                processQueryLimitedInformation,
+                False,
+                processId,
+            )
+            if not handle:
+                return False
+            ctypes.windll.kernel32.CloseHandle(handle)
+            return True
+        except (AttributeError, OSError):
+            return False
+    try:
+        os.kill(processId, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
+
+
+def frontendBuildLockIsActive(path: Path) -> bool:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        try:
+            return time.time_ns() - path.stat().st_mtime_ns < 5_000_000_000
+        except OSError:
+            return False
+    processId = payload.get("processId")
+    return isinstance(processId, int) and processIdIsRunning(processId)
+
+
+def retireFrontendBuildLock(path: Path) -> None:
+    retiredPath = path.with_name(f".{path.name}.{os.getpid()}.{time.time_ns()}.stale")
+    try:
+        path.replace(retiredPath)
+    except OSError:
+        return
+    try:
+        retiredPath.unlink(missing_ok=True)
+    except OSError:
+        return
+
+
+@contextmanager
+def frontendBuildLock(project: str, timeoutSeconds: int) -> Iterator[bool]:
+    path = frontendBuildLockPath(project)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    token = secrets.token_hex(16)
+    payload = json.dumps({
+        "schemaVersion": 1,
+        "project": project,
+        "processId": os.getpid(),
+        "token": token,
+        "createdAt": utcTimestamp(),
+    })
+    waited = False
+    deadline = time.monotonic() + max(timeoutSeconds + 60, 300)
+    while True:
+        try:
+            descriptor = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        except FileExistsError:
+            waited = True
+            if not frontendBuildLockIsActive(path):
+                retireFrontendBuildLock(path)
+                continue
+            if time.monotonic() >= deadline:
+                raise TimeoutError(f"timed out waiting for {project} frontend build lock")
+            time.sleep(FRONTEND_BUILD_LOCK_POLL_SECONDS)
+            continue
+        try:
+            os.write(descriptor, payload.encode("utf-8"))
+        finally:
+            os.close(descriptor)
+        break
+    try:
+        yield waited
+    finally:
+        try:
+            owner = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            owner = None
+        if isinstance(owner, dict) and owner.get("token") == token:
+            try:
+                path.unlink(missing_ok=True)
+            except OSError:
+                pass
 
 
 def loadFrontendBuildReceipt(project: str) -> dict[str, object] | None:
@@ -1186,48 +1316,63 @@ def runCommand(gateName: str, gateCommand: GateCommand) -> int:
         log.write(f"[{gateName}] {displayCwd}> {' '.join(commandArgs)}\n")
         log.write(f"cwd: {displayPath(cwd)}\n\n")
         log.flush()
-        if (
-            frontendProject is not None
-            and frontendBuildReuseEnabled()
-            and canReuseFrontendBuild(frontendProject, commandArgs, env)
-        ):
-            log.write(
-                "frontend build: reused exact source/runtime/environment/output receipt "
-                f"for {frontendProject}\n"
-            )
-            log.write("exit: 0\n")
-            log.flush()
-            print(f"[{gateName}] exact {frontendProject} build reused", flush=True)
-            return 0
         try:
-            process = subprocess.Popen(
-                args,
-                cwd=cwd,
-                env=env,
-                stdout=log,
-                stderr=subprocess.STDOUT,
+            lock = (
+                frontendBuildLock(frontendProject, gateCommand.timeoutSeconds)
+                if frontendProject is not None
+                else nullcontext(False)
             )
-        except OSError as exc:
-            log.write(f"failed to start command: {type(exc).__name__}: {exc}\n")
+            with lock as waitedForBuild:
+                if (
+                    frontendProject is not None
+                    and (frontendBuildReuseEnabled() or waitedForBuild)
+                    and canReuseFrontendBuild(frontendProject, commandArgs, env)
+                ):
+                    reason = "after waiting for the active build" if waitedForBuild else "from receipt"
+                    log.write(
+                        "frontend build: reused exact input/runtime/environment/output receipt "
+                        f"for {frontendProject} {reason}\n"
+                    )
+                    log.write("exit: 0\n")
+                    log.flush()
+                    print(f"[{gateName}] exact {frontendProject} build reused", flush=True)
+                    return 0
+                try:
+                    process = subprocess.Popen(
+                        args,
+                        cwd=cwd,
+                        env=env,
+                        stdout=log,
+                        stderr=subprocess.STDOUT,
+                    )
+                except OSError as exc:
+                    log.write(f"failed to start command: {type(exc).__name__}: {exc}\n")
+                    log.flush()
+                    print(
+                        f"[{gateName}] failed to start command; log: {displayPath(logPath)}",
+                        file=sys.stderr,
+                    )
+                    return 127
+                try:
+                    returnCode = process.wait(timeout=gateCommand.timeoutSeconds)
+                except subprocess.TimeoutExpired:
+                    log.write(f"\ntimeout: exceeded {gateCommand.timeoutSeconds}s\n")
+                    log.flush()
+                    terminateProcess(process)
+                    returnCode = 124
+                log.write(f"\nexit: {returnCode}\n")
+                log.flush()
+                if returnCode == 0 and frontendProject is not None:
+                    recorded = writeFrontendBuildReceipt(frontendProject, commandArgs, env)
+                    if not recorded:
+                        print(
+                            f"[{gateName}] build passed, but {frontendProject} reuse receipt was not recorded",
+                            file=sys.stderr,
+                        )
+        except TimeoutError as exc:
+            log.write(f"frontend build lock timeout: {exc}\n")
             log.flush()
-            print(f"[{gateName}] failed to start command; log: {displayPath(logPath)}", file=sys.stderr)
-            return 127
-        try:
-            returnCode = process.wait(timeout=gateCommand.timeoutSeconds)
-        except subprocess.TimeoutExpired:
-            log.write(f"\ntimeout: exceeded {gateCommand.timeoutSeconds}s\n")
-            log.flush()
-            terminateProcess(process)
             returnCode = 124
-        log.write(f"\nexit: {returnCode}\n")
-        log.flush()
-    if returnCode == 0 and frontendProject is not None:
-        recorded = writeFrontendBuildReceipt(frontendProject, commandArgs, env)
-        if not recorded:
-            print(
-                f"[{gateName}] build passed, but {frontendProject} reuse receipt was not recorded",
-                file=sys.stderr,
-            )
     if returnCode != 0:
         print(f"[{gateName}] command log: {displayPath(logPath)}", file=sys.stderr)
         printLogTail(logPath)

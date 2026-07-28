@@ -104,9 +104,11 @@ uv run python -X utf8 tests/run.py gate attempts
 
 개별 `gate editor-build`, `gate landing-build`는 기본적으로 매번 새 빌드를 실행한다. `change-cycle`, `quality-cycle`, `product-release`, `tier`처럼 한 runner가 여러 gate를 순서대로 실행할 때와 CI `experience` job에서는 같은 Landing/editor 빌드를 반복하지 않도록 `output/test-runner/frontend-build-reuse/`의 영수증을 사용할 수 있다.
 
-재사용은 폴더 존재나 수정 시각으로 결정하지 않는다. 현재 Git HEAD, HEAD 대비 staged·unstaged binary diff, ignore되지 않은 untracked 파일 내용, Node/npm 실행 파일과 버전, `package.json`·lockfile·설치된 `node_modules/.package-lock.json`, 빌드에 영향을 주는 `CODARO_WEB_*`·`CODARO_PYPROC_*`·`NODE_ENV`·`CI`, 실제 산출물 트리의 경로·크기·SHA-256이 영수증과 전부 같아야 한다. 하나라도 다르거나 `index.html`이 없으면 새 빌드를 실행하고 성공한 시점의 계약으로 영수증을 원자적으로 교체한다. 따라서 재사용은 검증 범위를 줄이지 않으며, 뒤따르는 browser·bundle·SEO 검사는 같은 산출물에 그대로 실행된다.
+재사용은 폴더 존재, 수정 시각 또는 저장소 전체 commit으로 결정하지 않는다. Editor 입력은 `editor/`, `assets/brand/`, `curricula/python/`이고 Landing 입력은 `landing/`, `assets/brand/`, `curricula/python/`, `docs/`, `contracts/publicLearningCatalog.json`이다. 각 입력 경로의 tracked 파일과 ignore되지 않은 untracked 파일 내용을 경로와 함께 SHA-256으로 계산한다. 따라서 `mainPlan/` fact audit이나 backend 전용 테스트처럼 프론트 산출물에 관여하지 않는 commit은 유효한 빌드를 폐기하지 않지만, 삭제·추가를 포함한 실제 프론트 입력 변경은 즉시 새 빌드를 요구한다.
 
-별도 프로세스로 gate를 연속 호출하는 CI job은 `CODARO_FRONTEND_BUILD_REUSE=1`을 job 범위에만 설정한다. 로컬에서 이 값을 직접 설정할 수도 있지만 일반 단일 gate의 기본값은 fresh build다. Astryx journey 안의 중첩 Landing/editor 확인도 같은 named gate를 다시 호출하므로 직접 `npm` 빌드로 이 계약을 우회하지 않는다.
+입력 해시와 함께 Node/npm 실행 파일·버전, `package.json`·lockfile·설치된 `node_modules/.package-lock.json`, 빌드에 영향을 주는 `CODARO_WEB_*`·`CODARO_PYPROC_*`·`NODE_ENV`·`CI`, 실제 산출물 트리의 경로·크기·SHA-256이 영수증과 전부 같아야 한다. 하나라도 다르거나 `index.html`이 없으면 새 빌드를 실행하고 성공한 시점의 계약으로 영수증을 원자적으로 교체한다. 따라서 재사용은 검증 범위를 줄이지 않으며, 뒤따르는 browser·bundle·SEO 검사는 같은 산출물에 그대로 실행된다.
+
+별도 프로세스로 gate를 연속 호출하는 CI job은 `CODARO_FRONTEND_BUILD_REUSE=1`을 job 범위에만 설정한다. 로컬에서 이 값을 직접 설정할 수도 있지만 일반 단일 gate의 기본값은 fresh build다. Astryx journey 안의 중첩 Landing/editor 확인도 같은 named gate를 다시 호출하므로 직접 `npm` 빌드로 이 계약을 우회하지 않는다. 같은 프로젝트 build가 여러 process에서 겹치면 project lock으로 직렬화하고, 기다린 process는 선행 build가 남긴 exact receipt를 다시 검증한 뒤 그 산출물을 사용한다. 이 경계는 Landing의 생성 자산 `.tmp` 충돌과 동일 output tree 동시 교체를 막는다.
 
 ## Gate 목록
 
