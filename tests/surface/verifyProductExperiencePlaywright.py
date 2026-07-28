@@ -1008,6 +1008,95 @@ def verifyNotebookExecutionStates(
     }
 
 
+def verifyNotebookReactiveExecution(page: Any) -> dict[str, Any]:
+    editors = page.locator("[data-notebook-input='code'] .cm-content")
+    cells = page.locator("[data-notebook-cell='code']")
+    appendCode = page.get_by_role("toolbar", name="노트북 셀 추가").get_by_role(
+        "button",
+        name="+ Code",
+    )
+    while cells.count() < 3:
+        appendCode.click()
+    if cells.count() != 3:
+        raise AssertionError(f"reactive notebook fixture expected three code cells: {cells.count()}")
+    reactiveToggle = page.locator('[data-notebook-reactive-toggle="true"]')
+    if reactiveToggle.get_attribute("aria-pressed") != "true":
+        reactiveToggle.click()
+
+    editors.nth(0).fill("value = 1", timeout=20_000)
+    editors.nth(1).fill("print(f'dependent:{value}')", timeout=20_000)
+    editors.nth(2).fill("print('unrelated:baseline')", timeout=20_000)
+    page.get_by_role("button", name="모든 셀 실행").click()
+    page.wait_for_function(
+        """
+        () => {
+          const cells = [...document.querySelectorAll('[data-notebook-cell="code"]')];
+          return cells.length === 3
+            && cells.every((cell) => (
+              ['success', 'done'].includes(
+                cell.getAttribute('data-notebook-cell-status')
+              )
+            ))
+            && cells[1].querySelector('[data-execution-output]')
+              ?.innerText.includes('dependent:1')
+            && cells[2].querySelector('[data-execution-output]')
+              ?.innerText.includes('unrelated:baseline');
+        }
+        """,
+        timeout=120_000,
+    )
+
+    editors.nth(2).fill("print('unrelated:changed')", timeout=20_000)
+    editors.nth(0).fill("value = 2", timeout=20_000)
+    editors.nth(0).press("Control+Enter", timeout=20_000)
+    page.wait_for_function(
+        """
+        () => {
+          const cells = [...document.querySelectorAll('[data-notebook-cell="code"]')];
+          return cells.length === 3
+            && ['success', 'done'].includes(
+              cells[0].getAttribute('data-notebook-cell-status')
+            )
+            && ['success', 'done'].includes(
+              cells[1].getAttribute('data-notebook-cell-status')
+            )
+            && cells[1].querySelector('[data-execution-output]')
+              ?.innerText.includes('dependent:2')
+            && cells[2].getAttribute('data-notebook-cell-status') === 'stale'
+            && cells[2].querySelector('[data-execution-output]')
+              ?.innerText.includes('unrelated:baseline')
+            && !cells[2].querySelector('[data-execution-output]')
+              ?.innerText.includes('unrelated:changed');
+        }
+        """,
+        timeout=120_000,
+    )
+
+    page.get_by_role("button", name="모든 셀 실행").click()
+    page.wait_for_function(
+        """
+        () => {
+          const cells = [...document.querySelectorAll('[data-notebook-cell="code"]')];
+          return cells.length === 3
+            && cells.every((cell) => (
+              ['success', 'done'].includes(
+                cell.getAttribute('data-notebook-cell-status')
+              )
+            ))
+            && cells[2].querySelector('[data-execution-output]')
+              ?.innerText.includes('unrelated:changed');
+        }
+        """,
+        timeout=120_000,
+    )
+    return {
+        "allExecutionOrder": ["cell-1", "cell-2", "cell-3"],
+        "dependentOutput": "dependent:2",
+        "independentOutputAfterReactiveRun": "unrelated:baseline",
+        "independentOutputAfterAllRun": "unrelated:changed",
+    }
+
+
 def verifyLongNotebookKeyboardNavigation(
     page: Any,
     case: dict[str, Any],
@@ -2467,6 +2556,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "expectedTier": "local",
             "waitFor": "[data-notebook-input='code']",
             "expectMinimalNotebook": True,
+            "verifyNotebookReactiveExecution": True,
             "verifyNotebookExecutionStates": True,
             "verifyNotebookKeyboardNavigation": True,
         },
@@ -3870,6 +3960,7 @@ def runBrowserMatrix(
                 localArchiveWebRoundTripEvidence: dict[str, Any] | None = None
                 learningHomeMinimumEvidence: dict[str, Any] | None = None
                 notebookRunAdvanceVerified = False
+                notebookReactiveExecutionEvidence: dict[str, Any] | None = None
                 notebookToolsVerified = False
                 productVisualThemeToggleVerified = False
                 notebookStateEvidence: dict[str, Any] | None = None
@@ -6367,7 +6458,10 @@ def runBrowserMatrix(
                             """,
                             timeout=120_000,
                         )
+                        notebookReactiveExecutionEvidence = verifyNotebookReactiveExecution(page)
                         notebookRunAdvanceVerified = True
+                    if case.get("verifyNotebookReactiveExecution"):
+                        notebookReactiveExecutionEvidence = verifyNotebookReactiveExecution(page)
                     if case.get("verifyNotebookExecutionStates"):
                         notebookStateEvidence = verifyNotebookExecutionStates(
                             page,
@@ -6423,6 +6517,7 @@ def runBrowserMatrix(
                             "learningHomeMinimumEvidence": learningHomeMinimumEvidence,
                             "webArtifactEvidence": webArtifactEvidence,
                             "notebookRunAdvanceVerified": notebookRunAdvanceVerified,
+                            "notebookReactiveExecutionEvidence": notebookReactiveExecutionEvidence,
                             "notebookToolsVerified": notebookToolsVerified,
                             "productVisualThemeToggleVerified": productVisualThemeToggleVerified,
                             "notebookStateEvidence": notebookStateEvidence,

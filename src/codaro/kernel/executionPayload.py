@@ -6,7 +6,15 @@ from dataclasses import dataclass
 from typing import Any
 
 from .protocol import ExecutionEvent, ExecutionOutput, WsResultMessage
-from .reactive import buildReactiveGraph, diagnosticsFromGraph, executeReactive, previewReactiveOrder
+from .reactive import (
+    ReactiveDiagnostics,
+    ReactiveGraph,
+    buildReactiveGraph,
+    diagnosticsFromGraph,
+    executeAll,
+    executeReactive,
+    previewReactiveOrder,
+)
 from .session import KernelSession
 
 
@@ -134,7 +142,37 @@ async def executeKernelReactive(
     results, executionOrder = await executeReactive(
         session, blockList, changedBlockId, eventHandler=eventHandler, includeSource=includeSource, graph=graph
     )
-    # early-stop(에러로 중단)으로 영향받았지만 실행 못 한 셀 = stale.
+    return _kernelReactivePayload(startedAt, graph, diagnostics, results, executionOrder)
+
+
+async def executeKernelAll(
+    session: KernelSession,
+    blocks: Sequence[dict[str, Any]],
+    *,
+    eventHandler: Callable[[ExecutionEvent], Awaitable[None]] | None = None,
+    notebookName: str | None = None,
+) -> KernelReactivePayload:
+    startedAt = time.perf_counter()
+    blockList = list(blocks)
+    graph = buildReactiveGraph(blockList)
+    diagnostics = diagnosticsFromGraph(graph, notebookName)
+    results, executionOrder = await executeAll(
+        session,
+        blockList,
+        eventHandler=eventHandler,
+        graph=graph,
+    )
+    return _kernelReactivePayload(startedAt, graph, diagnostics, results, executionOrder)
+
+
+def _kernelReactivePayload(
+    startedAt: float,
+    graph: ReactiveGraph,
+    diagnostics: ReactiveDiagnostics,
+    results: Sequence[ExecutionOutput],
+    executionOrder: Sequence[str],
+) -> KernelReactivePayload:
+    # 에러 가지 전파 중단으로 계획에는 있지만 실행하지 못한 셀은 stale이다.
     executed = {result.blockId for result in results}
     staleBlockIds = tuple(blockId for blockId in executionOrder if blockId not in executed)
     dependents = tuple(

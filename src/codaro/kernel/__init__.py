@@ -1,6 +1,7 @@
 from .executionPayload import (
     KernelExecutionPayload,
     KernelReactivePayload,
+    executeKernelAll,
     executeKernelBlock,
     executeKernelReactive,
     previewKernelReactiveOrder,
@@ -20,6 +21,7 @@ __all__ = [
     "SessionManager",
     "VariableDelta",
     "VariableInfo",
+    "executeKernelAll",
     "executeKernelBlock",
     "executeKernelReactive",
     "previewKernelReactiveOrder",

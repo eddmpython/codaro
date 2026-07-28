@@ -120,6 +120,8 @@ def sourceContractFailures() -> list[str]:
             "sessionPackageInstall",
             "executeCode",
             "executeReactive",
+            "executeAll",
+            "runAllNotebook",
             "runtime.libraryFailed",
             "runtime.uvPrepared",
         ),
@@ -138,6 +140,8 @@ def sourceContractFailures() -> list[str]:
             "verifyBrowserAsgiServer",
             "verifyAsgiServer",
             "installBrowserPythonRuntimeDiagnostics",
+            "planBrowserReactiveNotebook",
+            "runBrowserReactiveNotebook",
         ),
         AUTOMATION_CELL_RUNTIME: (
             "runAutomationCell",
@@ -510,6 +514,15 @@ const fakeApi = {{
     calls.push(["cell-call-reactive", sessionId, blockId, blocks.map((block) => block.id)]);
     return {{ results: [{{ ...fakeResult, blockId }}], executionOrder: [blockId] }};
   }},
+  executeAll: async (sessionId, blocks) => {{
+    calls.push(["cell-call-all", sessionId, blocks.map((block) => block.id)]);
+    return {{
+      results: blocks
+        .filter((item) => item.type === "code")
+        .map((item) => ({{ ...fakeResult, blockId: item.id }})),
+      executionOrder: blocks.map((item) => item.id),
+    }};
+  }},
   runAutomationCell: async (payload) => {{
     calls.push(["automation-cell", payload.blockId, payload.executionKind, payload.sessionId]);
     if (automationFixture === "cancelled") return cancelledBackendPayload;
@@ -793,7 +806,16 @@ const runtime = loadModule({runtimePath}, (specifier) => {{
       data: code,
       executionCount,
     }}),
-    runBrowserNotebook: async () => ({{ results: {{}}, variables: [] }}),
+    runBrowserNotebook: async () => ({{
+      results: {{ "cell-1": {{ ...fakeResult, blockId: "cell-1" }} }},
+      variables: [],
+      diagnostics: {{ executionOrder: ["cell-1"], dependents: {{}}, staleBlockIds: [] }},
+    }}),
+    runBrowserReactiveNotebook: async (_blocks, blockId) => ({{
+      results: {{ [blockId]: {{ ...fakeResult, blockId }} }},
+      variables: [],
+      diagnostics: {{ executionOrder: [blockId], dependents: {{}}, staleBlockIds: [] }},
+    }}),
   }};
   if (specifier === "@/lib/cellModel") return cellModel;
   if (specifier === "@/lib/localeCopy") return {{ translate }};
@@ -969,6 +991,41 @@ await runtime.runReactiveNotebook({{
 }});
 assert.deepEqual(calls.map((call) => call[0]), ["packages-check", "packages-install", "cell-call-reactive"]);
 assert.deepEqual(calls.at(-1)[3], ["cell-1"]);
+
+calls.length = 0;
+await runtime.runAllNotebook({{
+  apiOnline: true,
+  codeBlocks: [block],
+  document: {{
+    id: "doc-1",
+    title: "Doc",
+    runtime: {{ defaultEngine: "local", reactiveMode: "hybrid", packages: [] }},
+    blocks: [{{ ...block, content: "print('all')" }}],
+  }},
+  drafts: {{}},
+  firstBlock: block,
+  previousVariables: [],
+  sessionId: "session-1",
+}});
+assert.deepEqual(calls.map((call) => call[0]), ["cell-call-all"]);
+
+calls.length = 0;
+const browserReactive = await runtime.runReactiveNotebook({{
+  apiOnline: false,
+  codeBlocks: [block],
+  document: {{
+    id: "doc-web",
+    title: "Web",
+    runtime: {{ defaultEngine: "browser", reactiveMode: "hybrid", packages: [] }},
+    blocks: [{{ ...block, content: "value = 42" }}],
+  }},
+  drafts: {{}},
+  firstBlock: block,
+  previousVariables: [],
+  sessionId: null,
+}});
+assert.deepEqual(Object.keys(browserReactive.results), ["cell-1"]);
+assert.deepEqual(browserReactive.diagnostics.executionOrder, ["cell-1"]);
 
 const graphLayout = loadModule({layoutPath}, (specifier) => require(specifier));
 {{

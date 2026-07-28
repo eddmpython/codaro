@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 
-from codaro.kernel.reactive import buildReactiveGraph, executeReactive, getReactiveOrder
+from codaro.kernel.reactive import buildReactiveGraph, executeAll, executeReactive, getReactiveOrder
 from codaro.kernel.session import KernelSession
 
 
@@ -85,6 +85,25 @@ def testReactiveIsolation() -> None:
     assert "b3" not in order
     assert session._registry.get("y") == 101
     assert session._registry.get("w") == 99
+    session.dispose()
+
+
+def testExecuteAllRunsIndependentCellsAndPrunesFailedDependents() -> None:
+    session = KernelSession()
+    blocks = _blocks(
+        "x = 1",
+        "raise RuntimeError('failed branch')\ny = x + 1",
+        "z = y + 1",
+        "independent = 41 + 1",
+    )
+
+    results, order = _run(executeAll(session, blocks))
+
+    assert order == ["b1", "b2", "b3", "b4"]
+    assert [result.blockId for result in results] == ["b1", "b2", "b4"]
+    assert results[1].status == "error"
+    assert session._registry.get("z") is None
+    assert session._registry.get("independent") == 42
     session.dispose()
 
 

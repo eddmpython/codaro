@@ -53,6 +53,14 @@ export const runtimeApi = {
     `/api/kernel/${sessionId}/execute-reactive`,
     { blockId, blocks, notebookName: notebookName ?? null },
   ),
+  executeAll: (
+    sessionId: string,
+    blocks: Array<{ id: string; type: "code" | "markdown"; content: string }>,
+    notebookName?: string | null,
+  ) => postJson<ReactiveResponse>(
+    `/api/kernel/${sessionId}/execute-all`,
+    { blocks, notebookName: notebookName ?? null },
+  ),
   setUiValue: (
     sessionId: string,
     payload: {

@@ -7,6 +7,7 @@ import {
   releaseRuntimeSession,
   RUNTIME_SESSION_RELEASE_REQUEST_EVENT,
   resolveBlockRunCode,
+  runAllNotebook,
   runNotebookBlock,
   runReactiveNotebook,
   setNotebookUiValue,
@@ -111,6 +112,39 @@ export function useNotebookRuntimeState({
     onNotice({ tone: "default", title: translate("runtime.cellRunning"), detail: blockLabel(block) });
 
     try {
+      if (surface === "editor" && reactiveEnabled && isKernelExecutableBlock(block)) {
+        const executionDrafts = sourceOverride === undefined
+          ? drafts
+          : { ...drafts, [block.id]: sourceOverride };
+        const outcome = await runReactiveNotebook({
+          apiOnline,
+          codeBlocks,
+          document,
+          drafts: executionDrafts,
+          firstBlock: block,
+          previousVariables: variables,
+          sessionId,
+        });
+        if (outcome.sessionId && outcome.sessionId !== sessionId) setSessionId(outcome.sessionId);
+        if (outcome.results) {
+          setResults((current) => ({ ...current, ...outcome.results }));
+          setLastRunContent((current) => ({
+            ...current,
+            ...Object.fromEntries(
+              Object.keys(outcome.results ?? {}).map((blockId) => [
+                blockId,
+                executionDrafts[blockId]
+                  ?? document.blocks.find((candidate) => candidate.id === blockId)?.content
+                  ?? "",
+              ]),
+            ),
+          }));
+        }
+        if (outcome.variables) setVariables(outcome.variables);
+        if (outcome.diagnostics) setDiagnostics(outcome.diagnostics);
+        if (outcome.notice) onNotice(outcome.notice);
+        return;
+      }
       const outcome = await runNotebookBlock({
         apiOnline,
         block,
@@ -139,7 +173,21 @@ export function useNotebookRuntimeState({
     } finally {
       setRunningBlockId(null);
     }
-  }, [apiOnline, automationSessions, drafts, onNotice, results, selectCurriculumBlock, selectNotebookBlock, sessionId, surface]);
+  }, [
+    apiOnline,
+    automationSessions,
+    codeBlocks,
+    document,
+    drafts,
+    onNotice,
+    reactiveEnabled,
+    results,
+    selectCurriculumBlock,
+    selectNotebookBlock,
+    sessionId,
+    surface,
+    variables,
+  ]);
 
   const runNotebook = useCallback(async () => {
     const defaultBlock = codeBlocks.find(isKernelExecutableBlock) ?? codeBlocks[0];
@@ -149,7 +197,7 @@ export function useNotebookRuntimeState({
     setNotebookRunning(true);
 
     try {
-      const outcome = await runReactiveNotebook({
+      const outcome = await runAllNotebook({
         apiOnline,
         codeBlocks,
         document,
@@ -171,8 +219,19 @@ export function useNotebookRuntimeState({
       if (outcome.results) setResults((current) => ({ ...current, ...outcome.results }));
       if (outcome.variables) setVariables(outcome.variables);
       if (outcome.diagnostics) setDiagnostics(outcome.diagnostics);
-      // 실행에 사용한 draft를 스냅샷 → 이후 편집을 stale 판정의 기준선으로.
-      setLastRunContent(Object.fromEntries(codeBlocks.map((block) => [block.id, drafts[block.id] ?? block.content])));
+      if (outcome.results) {
+        setLastRunContent((current) => ({
+          ...current,
+          ...Object.fromEntries(
+            Object.keys(outcome.results ?? {}).map((blockId) => [
+              blockId,
+              drafts[blockId]
+                ?? document.blocks.find((candidate) => candidate.id === blockId)?.content
+                ?? "",
+            ]),
+          ),
+        }));
+      }
       if (outcome.notice) onNotice(outcome.notice);
     } finally {
       setNotebookRunning(false);

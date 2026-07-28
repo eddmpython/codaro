@@ -4,7 +4,7 @@ from typing import Any
 
 from fastapi import APIRouter, WebSocket
 
-from ..kernel.executionPayload import executeKernelBlock, executeKernelReactive, previewKernelReactiveOrder
+from ..kernel.executionPayload import executeKernelAll, executeKernelBlock, executeKernelReactive, previewKernelReactiveOrder
 from ..kernel.protocol import (
     CreateSessionRequest,
     CreateSessionResponse,
@@ -19,7 +19,7 @@ from ..system.packageOps import PackageEnvironmentError
 from ..system.serverState import ServerState
 from .errors import fail
 from .kernelWebSocket import handleKernelWebSocket
-from .requestModels import PackageRequest, PathRequest, ReactiveExecuteRequest, SetUiValueRequest
+from .requestModels import NotebookExecuteRequest, PackageRequest, PathRequest, ReactiveExecuteRequest, SetUiValueRequest
 
 
 def createKernelRouter(state: ServerState) -> APIRouter:
@@ -157,6 +157,23 @@ def createKernelRouter(state: ServerState) -> APIRouter:
                 transport="http",
                 sessionId=sessionId,
                 changedBlockId=request.blockId,
+                resultCount=payload.resultCount,
+                executionCount=payload.executionCount,
+                durationMs=payload.durationMs,
+            ),
+        )
+        return payload.httpPayload()
+
+    @router.post("/api/kernel/{sessionId}/execute-all")
+    async def apiExecuteAll(sessionId: str, request: NotebookExecuteRequest) -> dict[str, Any]:
+        session = requireSession(state, sessionId)
+        blocks = [block.model_dump() for block in request.blocks]
+        payload = await executeKernelAll(session, blocks, notebookName=request.notebookName)
+        logger.debug(
+            "kernel-execute-all %s",
+            formatLogFields(
+                transport="http",
+                sessionId=sessionId,
                 resultCount=payload.resultCount,
                 executionCount=payload.executionCount,
                 durationMs=payload.durationMs,

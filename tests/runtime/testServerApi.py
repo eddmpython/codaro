@@ -408,6 +408,29 @@ def testKernelStatePersistence() -> None:
     client.delete(f"/api/kernel/{sessionId}")
 
 
+def testKernelExecuteAllRunsEveryIndependentBranch() -> None:
+    client = TestClient(createServerApp())
+    sessionId = client.post("/api/kernel/create", json={}).json()["sessionId"]
+    response = client.post(
+        f"/api/kernel/{sessionId}/execute-all",
+        json={
+            "notebookName": "all-cells.py",
+            "blocks": [
+                {"id": "a", "type": "code", "content": "x = 1"},
+                {"id": "b", "type": "code", "content": "y = x + 1"},
+                {"id": "c", "type": "code", "content": "independent = 42"},
+            ],
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["executionOrder"] == ["a", "b", "c"]
+    assert [result["blockId"] for result in payload["results"]] == ["a", "b", "c"]
+    assert payload["dependents"] == {"a": ["b"]}
+    client.delete(f"/api/kernel/{sessionId}")
+
+
 def testKernelRemoveCellEndpointClearsDefinitions() -> None:
     client = TestClient(createServerApp())
     sessionId = client.post("/api/kernel/create", json={}).json()["sessionId"]

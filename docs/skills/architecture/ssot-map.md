@@ -145,7 +145,8 @@ Codaro에서 기준 파일은 아래 순서로 본다. 같은 의미의 규칙�
 | document block execution | `src/codaro/kernel/documentExecution.py` | 검증된 document code block을 kernel 실행 payload로 넘기는 document/runtime 접점 |
 | kernel UI event flow | `src/codaro/kernel/uiEventFlow.py` | widget callback 호출 결과를 `UiEventResponse`와 reactive trigger로 변환하는 기준 |
 | kernel session | `src/codaro/kernel/session.py` | runtime engine을 kernel protocol로 변환하는 session 경계 |
-| reactive 실행 | `src/codaro/kernel/reactive.py` | block 의존 그래프와 reactive 실행 순서 |
+| reactive 계획 | `src/codaro/kernel/reactivePlan.py` | Local과 Web이 함께 소비하는 block 의존 그래프, 진단, reactive·전체 실행 순서 |
+| reactive 실행 | `src/codaro/kernel/reactive.py` | 공용 계획을 KernelSession 실행과 에러 가지 전파 중단으로 연결 |
 | runtime engine | `src/codaro/runtime/executionEngine.py` | 교체 가능한 실행 capability 인터페이스 |
 | local engine | `src/codaro/runtime/localEngine.py` | 로컬 기본 실행 engine 구현 |
 

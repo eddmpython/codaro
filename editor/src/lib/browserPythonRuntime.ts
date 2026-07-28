@@ -5,7 +5,9 @@
 // mainPlan/astryx-product-experience/00-product-contract/README.md.
 // pyproc은 첫 실행에서 lazy import(런타임 다운로드 지연 + 코드 스플릿). 단일 boot 경로는
 // SharedArrayBuffer/COOP-COEP가 필요 없어 정적 호스팅에서도 돈다.
-import type { ExecutionResult, VariableInfo } from "@/types";
+import analysisSource from "../../../src/codaro/document/analysis.py?raw";
+import reactivePlanSource from "../../../src/codaro/kernel/reactivePlan.py?raw";
+import type { ExecutionResult, ReactiveDiagnostics, VariableInfo } from "@/types";
 
 type PyRuntime = {
   readonly indexURL: string;
@@ -64,6 +66,10 @@ const browserFsRoot = "/home/web/codaro";
 const browserFsCellsDir = `${browserFsRoot}/cells`;
 const browserFsRunsDir = `${browserFsRoot}/runs`;
 
+export type BrowserReactivePlan = ReactiveDiagnostics & {
+  executionOrder: string[];
+};
+
 function assetIntegrityUrl(): string {
   const envUrl = import.meta.env.VITE_PYPROC_ASSET_INTEGRITY_URL;
   if (typeof envUrl === "string" && envUrl.trim()) return envUrl;
@@ -113,6 +119,39 @@ export function isBrowserKernelBooted(): boolean {
 export async function getBrowserPythonRuntimeInfo(): Promise<{ indexURL: string }> {
   const runtime = await ensureRuntime();
   return { indexURL: runtime.indexURL };
+}
+
+export async function planBrowserReactiveNotebook(
+  blocks: Array<{ id: string; type: "code" | "markdown"; content: string }>,
+  changedBlockId: string | null,
+  notebookName?: string | null,
+): Promise<BrowserReactivePlan> {
+  const runtime = await ensureRuntime();
+  const code = [
+    "import json as _codaroJson",
+    "import sys as _codaroSys",
+    "import types as _codaroTypes",
+    "_codaroAnalysis = _codaroSys.modules.get('_codaro_analysis_ssot')",
+    "if _codaroAnalysis is None:",
+    "    _codaroAnalysis = _codaroTypes.ModuleType('_codaro_analysis_ssot')",
+    "    _codaroSys.modules[_codaroAnalysis.__name__] = _codaroAnalysis",
+    `    exec(${JSON.stringify(analysisSource)}, _codaroAnalysis.__dict__)`,
+    "_codaroPlan = _codaroSys.modules.get('_codaro_reactive_plan_ssot')",
+    "if _codaroPlan is None:",
+    "    _codaroPlan = _codaroTypes.ModuleType('_codaro_reactive_plan_ssot')",
+    "    _codaroSys.modules[_codaroPlan.__name__] = _codaroPlan",
+    `    exec(${JSON.stringify(reactivePlanSource)}, _codaroPlan.__dict__)`,
+    `_codaroBlocks = _codaroJson.loads(${JSON.stringify(JSON.stringify(blocks))})`,
+    "_codaroPayload = _codaroPlan.reactivePlanPayload(",
+    "    _codaroBlocks,",
+    `    ${changedBlockId === null ? "None" : JSON.stringify(changedBlockId)},`,
+    "    _codaroAnalysis.analyzeCellBindings,",
+    "    _codaroAnalysis.analyzeMarkdownRefs,",
+    `    notebookName=${notebookName ? JSON.stringify(notebookName) : "None"},`,
+    ")",
+    "_codaroJson.dumps(_codaroPayload)",
+  ].join("\n");
+  return JSON.parse(String(runtime.run(code))) as BrowserReactivePlan;
 }
 
 // 사용자 전역을 VariableInfo 목록(JSON)으로 뽑는다. 밑줄 프리픽스는 내부용이라 제외.
@@ -440,21 +479,87 @@ export async function executeBrowserBlock(
   };
 }
 
-/** 노트북 전체를 순차 실행한다(브라우저 티어는 리액티브 그래프 대신 문서 순서). */
+/** 노트북 전체를 공용 AST 그래프의 문서 순서로 실행한다. */
 export async function runBrowserNotebook(
-  blocks: { id: string; code: string }[],
+  blocks: Array<{ id: string; type?: "code" | "markdown"; code: string }>,
   packages: string[] = [],
+  notebookName?: string | null,
+): Promise<{
+  results: Record<string, ExecutionResult>;
+  variables: VariableInfo[];
+  diagnostics: BrowserReactivePlan;
+}> {
+  const planBlocks = blocks.map((block) => ({
+    id: block.id,
+    type: block.type ?? "code",
+    content: block.code,
+  }));
+  const diagnostics = await planBrowserReactiveNotebook(planBlocks, null, notebookName);
+  const outcome = await runBrowserExecutionPlan(blocks, diagnostics, packages);
+  return { ...outcome, diagnostics };
+}
+
+/** 선택 셀과 그 셀에 의존하는 하위 셀만 공용 AST 계획에 따라 실행한다. */
+export async function runBrowserReactiveNotebook(
+  blocks: Array<{ id: string; type?: "code" | "markdown"; code: string }>,
+  changedBlockId: string,
+  packages: string[] = [],
+  notebookName?: string | null,
+): Promise<{
+  results: Record<string, ExecutionResult>;
+  variables: VariableInfo[];
+  diagnostics: BrowserReactivePlan;
+}> {
+  const planBlocks = blocks.map((block) => ({
+    id: block.id,
+    type: block.type ?? "code",
+    content: block.code,
+  }));
+  const diagnostics = await planBrowserReactiveNotebook(planBlocks, changedBlockId, notebookName);
+  const outcome = await runBrowserExecutionPlan(blocks, diagnostics, packages);
+  return { ...outcome, diagnostics };
+}
+
+async function runBrowserExecutionPlan(
+  blocks: Array<{ id: string; type?: "code" | "markdown"; code: string }>,
+  plan: BrowserReactivePlan,
+  packages: string[],
 ): Promise<{ results: Record<string, ExecutionResult>; variables: VariableInfo[] }> {
   const results: Record<string, ExecutionResult> = {};
+  const blockById = new Map(blocks.map((block) => [block.id, block]));
+  const skipped = new Set<string>();
   let lastVariables: VariableInfo[] = [];
   let executionCount = 0;
-  for (const block of blocks) {
+  for (const blockId of plan.executionOrder) {
+    if (skipped.has(blockId)) continue;
+    const block = blockById.get(blockId);
+    if (!block || block.type === "markdown") continue;
     executionCount += 1;
     const result = await executeBrowserBlock(block.id, block.code, executionCount, packages);
     results[block.id] = result;
-    if (result.status !== "error") lastVariables = result.variables;
+    if (result.status === "error") {
+      for (const dependent of transitiveDependents(plan.dependents, block.id)) skipped.add(dependent);
+    } else {
+      lastVariables = result.variables;
+    }
   }
+  plan.staleBlockIds = plan.executionOrder.filter((blockId) => skipped.has(blockId));
   return { results, variables: lastVariables };
+}
+
+function transitiveDependents(dependents: Record<string, string[]>, sourceBlockId: string): Set<string> {
+  const affected = new Set<string>();
+  const queue = [sourceBlockId];
+  while (queue.length) {
+    const current = queue.shift();
+    if (!current) continue;
+    for (const dependent of dependents[current] ?? []) {
+      if (affected.has(dependent)) continue;
+      affected.add(dependent);
+      queue.push(dependent);
+    }
+  }
+  return affected;
 }
 
 type BrowserPythonRuntimeDiagnostics = {
@@ -462,6 +567,8 @@ type BrowserPythonRuntimeDiagnostics = {
   isBooted: typeof isBrowserKernelBooted;
   readTextFile: (path: string) => Promise<string>;
   runNotebook: typeof runBrowserNotebook;
+  runReactiveNotebook: typeof runBrowserReactiveNotebook;
+  planReactiveNotebook: typeof planBrowserReactiveNotebook;
   verifyAsgiServer: typeof verifyBrowserAsgiServer;
 };
 
@@ -481,6 +588,8 @@ export function installBrowserPythonRuntimeDiagnostics(): () => void {
       return String(runtime.fs.readFile(path, { encoding: "utf8" }));
     },
     runNotebook: runBrowserNotebook,
+    runReactiveNotebook: runBrowserReactiveNotebook,
+    planReactiveNotebook: planBrowserReactiveNotebook,
     verifyAsgiServer: verifyBrowserAsgiServer,
   };
   return () => {

@@ -1,7 +1,11 @@
 import { codaroApi, type ReactiveResponse } from "@/lib/api";
 import { runAutomationSessionCell } from "@/lib/automationCellRuntime";
 import type { ResultMap } from "@/lib/assistantContext";
-import { executeBrowserBlock, runBrowserNotebook } from "@/lib/browserPythonRuntime";
+import {
+  executeBrowserBlock,
+  runBrowserNotebook,
+  runBrowserReactiveNotebook,
+} from "@/lib/browserPythonRuntime";
 import { isKernelExecutableBlock, isPersistentAutomationBlock } from "@/lib/cellModel";
 import { firstOutputLine } from "@/lib/localRuntime";
 import { translate } from "@/lib/localeCopy";
@@ -301,22 +305,28 @@ export async function runReactiveNotebook({
   }
 
   if (!apiOnline) {
-    // 백엔드 없음 = 브라우저 티어. 리액티브 그래프(백엔드 소유) 대신 문서 순서로 진짜 실행한다.
+    // 백엔드가 없어도 Local과 같은 Python AST·그래프 SSOT로 선택 셀의 하위 의존 셀만 실행한다.
     try {
-      const localBlocks = codeBlocks.filter(isKernelExecutableBlock);
-      const { results, variables } = await runBrowserNotebook(
-        localBlocks.map((block) => ({ id: block.id, code: drafts[block.id] ?? block.content })),
+      const runtimeBlocks = documentRuntimeBlocks(document, drafts);
+      const { results, variables, diagnostics } = await runBrowserReactiveNotebook(
+        runtimeBlocks.map((block) => ({
+          id: block.id,
+          type: block.type,
+          code: block.content,
+        })),
+        firstBlock.id,
         inferDocumentRuntimePackages(document, drafts),
+        document.title,
       );
       return {
         sessionId,
         results: results as ResultMap,
         variables,
-        diagnostics: emptyReactiveDiagnostics,
+        diagnostics,
         notice: {
           tone: "success",
           title: translate("runtime.notebookRunDone"),
-          detail: translate("runtime.evaluatedCells", { count: localBlocks.length }),
+          detail: translate("runtime.evaluatedCells", { count: Object.keys(results).length }),
         },
       };
     } catch (error) {
@@ -369,6 +379,130 @@ export async function runReactiveNotebook({
         tone: "success",
         title: translate("runtime.notebookRunDone"),
         detail: runDetail(translate("runtime.evaluatedCells", { count: payload.executionOrder.length }), preflight),
+      },
+    };
+  } catch (error) {
+    return {
+      sessionId: activeSession.sessionId,
+      notice: {
+        tone: "error",
+        title: translate("runtime.notebookRunFailed"),
+        detail: errorMessage(error),
+      },
+    };
+  }
+}
+
+export async function runAllNotebook({
+  apiOnline,
+  codeBlocks,
+  document,
+  drafts,
+  firstBlock,
+  previousVariables,
+  sessionId,
+  automationSessionId = null,
+}: {
+  apiOnline: boolean;
+  codeBlocks: BlockConfig[];
+  document: CodaroDocument;
+  drafts: Record<string, string>;
+  firstBlock: BlockConfig;
+  previousVariables: VariableInfo[];
+  sessionId: string | null;
+  automationSessionId?: string | null;
+}): Promise<RunNotebookResult> {
+  const firstKernelBlock = codeBlocks.find(isKernelExecutableBlock);
+  if (isPersistentAutomationBlock(firstBlock) && !firstKernelBlock) {
+    return runReactiveNotebook({
+      apiOnline,
+      codeBlocks,
+      document,
+      drafts,
+      firstBlock,
+      previousVariables,
+      sessionId,
+      automationSessionId,
+    });
+  }
+
+  const runtimeBlocks = documentRuntimeBlocks(document, drafts);
+  if (!apiOnline) {
+    try {
+      const { results, variables, diagnostics } = await runBrowserNotebook(
+        runtimeBlocks.map((block) => ({
+          id: block.id,
+          type: block.type,
+          code: block.content,
+        })),
+        inferDocumentRuntimePackages(document, drafts),
+        document.title,
+      );
+      return {
+        sessionId,
+        results: results as ResultMap,
+        variables,
+        diagnostics,
+        notice: {
+          tone: "success",
+          title: translate("runtime.notebookRunDone"),
+          detail: translate("runtime.evaluatedCells", { count: Object.keys(results).length }),
+        },
+      };
+    } catch (error) {
+      return {
+        sessionId,
+        variables: previousVariables,
+        diagnostics: emptyReactiveDiagnostics,
+        notice: {
+          tone: "error",
+          title: translate("runtime.notebookRunFailed"),
+          detail: errorMessage(error),
+        },
+      };
+    }
+  }
+
+  const activeSession = await ensureRuntimeSession(sessionId);
+  if (!activeSession.sessionId) return activeSession;
+  try {
+    const preflight = await preflightRuntimePackages(
+      activeSession.sessionId,
+      inferDocumentRuntimePackages(document, drafts),
+    );
+    if (preflight.failed) {
+      return {
+        sessionId: activeSession.sessionId,
+        results: {
+          [(firstKernelBlock ?? firstBlock).id]: packagePreflightFailureResult(
+            firstKernelBlock ?? firstBlock,
+            preflight.failed,
+            1,
+          ),
+        },
+        notice: packagePreflightFailureNotice(preflight.failed),
+      };
+    }
+    const payload = await codaroApi.executeAll(
+      activeSession.sessionId,
+      runtimeBlocks,
+      document.title,
+    );
+    const results = Object.fromEntries(
+      payload.results.map((result) => [result.blockId ?? "", result]),
+    ) as ResultMap;
+    return {
+      sessionId: activeSession.sessionId,
+      results,
+      variables: payload.results.at(-1)?.variables ?? previousVariables,
+      diagnostics: extractDiagnostics(payload),
+      notice: {
+        tone: "success",
+        title: translate("runtime.notebookRunDone"),
+        detail: runDetail(
+          translate("runtime.evaluatedCells", { count: payload.results.length }),
+          preflight,
+        ),
       },
     };
   } catch (error) {
@@ -461,6 +595,19 @@ function inferDocumentRuntimePackages(document: CodaroDocument, drafts: Record<s
     }
   }
   return Array.from(packages);
+}
+
+function documentRuntimeBlocks(
+  document: CodaroDocument,
+  drafts: Record<string, string>,
+): Array<{ id: string; type: "code" | "markdown"; content: string }> {
+  return document.blocks
+    .filter((block) => isKernelExecutableBlock(block) || block.type === "markdown")
+    .map((block) => ({
+      id: block.id,
+      type: isKernelExecutableBlock(block) ? "code" : "markdown",
+      content: drafts[block.id] ?? block.content,
+    }));
 }
 
 function uniquePackages(packageNames: string[]) {
