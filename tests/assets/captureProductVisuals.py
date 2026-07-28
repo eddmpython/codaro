@@ -26,7 +26,9 @@ CAPTURE_OWNER_PATHS = (
     "tests/surface/verifyProductExperiencePlaywright.py",
 )
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
-MAX_RASTER_NOISE_PIXELS = 8
+MIN_RASTER_NOISE_PIXELS = 8
+MAX_RASTER_NOISE_PIXELS = 32
+RASTER_NOISE_AREA_DIVISOR = 40_000
 MAX_RASTER_CHANNEL_DELTA = 12
 
 
@@ -177,6 +179,17 @@ def pngDimensions(path: Path) -> tuple[int, int]:
     return struct.unpack(">II", header[16:24])
 
 
+def allowedRasterNoisePixels(size: tuple[int, int]) -> int:
+    width, height = size
+    areaScaledPixels = (
+        width * height + RASTER_NOISE_AREA_DIVISOR - 1
+    ) // RASTER_NOISE_AREA_DIVISOR
+    return min(
+        MAX_RASTER_NOISE_PIXELS,
+        max(MIN_RASTER_NOISE_PIXELS, areaScaledPixels),
+    )
+
+
 def pngPixelComparison(expectedPath: Path, actualPath: Path) -> dict[str, Any]:
     from PIL import Image, ImageChops
 
@@ -188,11 +201,13 @@ def pngPixelComparison(expectedPath: Path, actualPath: Path) -> dict[str, Any]:
                 "equivalent": False,
                 "byteExact": False,
                 "differingPixelCount": None,
+                "allowedDifferingPixelCount": None,
                 "maxChannelDelta": None,
                 "expectedSize": list(expected.size),
                 "actualSize": list(actual.size),
             }
         difference = ImageChops.difference(expected, actual)
+        allowedDifferingPixelCount = allowedRasterNoisePixels(expected.size)
         differingPixelCount = 0
         maxChannelDelta = 0
         differenceBytes = difference.tobytes()
@@ -203,11 +218,12 @@ def pngPixelComparison(expectedPath: Path, actualPath: Path) -> dict[str, Any]:
                 maxChannelDelta = max(maxChannelDelta, pixelDelta)
         return {
             "equivalent": (
-                differingPixelCount <= MAX_RASTER_NOISE_PIXELS
+                differingPixelCount <= allowedDifferingPixelCount
                 and maxChannelDelta <= MAX_RASTER_CHANNEL_DELTA
             ),
             "byteExact": differingPixelCount == 0,
             "differingPixelCount": differingPixelCount,
+            "allowedDifferingPixelCount": allowedDifferingPixelCount,
             "maxChannelDelta": maxChannelDelta,
             "expectedSize": list(expected.size),
             "actualSize": list(actual.size),

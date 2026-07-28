@@ -90,7 +90,7 @@ class CaptureProductVisualsTest(unittest.TestCase):
             expected.save(expectedPath)
 
             withinTolerance = expected.copy()
-            for x in range(CAPTURE_TOOL.MAX_RASTER_NOISE_PIXELS):
+            for x in range(CAPTURE_TOOL.MIN_RASTER_NOISE_PIXELS):
                 withinTolerance.putpixel((x, 0), (28, 21, 24, 255))
             withinTolerance.save(withinTolerancePath)
             comparison = CAPTURE_TOOL.pngPixelComparison(
@@ -100,10 +100,14 @@ class CaptureProductVisualsTest(unittest.TestCase):
             self.assertTrue(comparison["equivalent"])
             self.assertFalse(comparison["byteExact"])
             self.assertEqual(comparison["differingPixelCount"], 8)
+            self.assertEqual(comparison["allowedDifferingPixelCount"], 8)
             self.assertEqual(comparison["maxChannelDelta"], 8)
 
             tooManyPixels = withinTolerance.copy()
-            tooManyPixels.putpixel((8, 0), (28, 21, 24, 255))
+            tooManyPixels.putpixel(
+                (CAPTURE_TOOL.MIN_RASTER_NOISE_PIXELS, 0),
+                (28, 21, 24, 255),
+            )
             tooManyPixels.save(tooManyPixelsPath)
             self.assertFalse(
                 CAPTURE_TOOL.pngPixelComparison(
@@ -124,6 +128,13 @@ class CaptureProductVisualsTest(unittest.TestCase):
                     tooMuchDeltaPath,
                 )["equivalent"]
             )
+
+    def testRasterNoiseBudgetScalesWithViewportAreaAndStaysCapped(self) -> None:
+        self.assertEqual(CAPTURE_TOOL.allowedRasterNoisePixels((10, 10)), 8)
+        self.assertEqual(CAPTURE_TOOL.allowedRasterNoisePixels((390, 844)), 9)
+        self.assertEqual(CAPTURE_TOOL.allowedRasterNoisePixels((900, 760)), 18)
+        self.assertEqual(CAPTURE_TOOL.allowedRasterNoisePixels((1440, 900)), 32)
+        self.assertEqual(CAPTURE_TOOL.allowedRasterNoisePixels((3840, 2160)), 32)
 
     def testEquivalentCaptureNoiseDoesNotReplaceCanonicalSource(self) -> None:
         with tempfile.TemporaryDirectory(prefix="codaro-product-promotion-") as directory:
@@ -150,7 +161,7 @@ class CaptureProductVisualsTest(unittest.TestCase):
             self.assertEqual(promotedHash, CAPTURE_TOOL.sha256Path(sourcePath))
 
             changed = source.copy()
-            for x in range(CAPTURE_TOOL.MAX_RASTER_NOISE_PIXELS + 1):
+            for x in range(CAPTURE_TOOL.MIN_RASTER_NOISE_PIXELS + 1):
                 changed.putpixel((x, 0), (100, 21, 24, 255))
             changed.save(changedPath)
             promotedHash, comparison = CAPTURE_TOOL.promoteCaptureSource(
