@@ -2,7 +2,7 @@
 
 상태: 진행
 
-남은 종료 조건은 instructional asset의 lesson anchor 사람 승인, 사람 자산 검수와 전체 상태 shot이다.
+남은 종료 조건은 instructional asset의 lesson anchor 사람 승인과 Web·Local 전체 상태 shot이다.
 
 ## 목표
 
@@ -20,12 +20,11 @@
 
 | 순서 | packet | 시작 의존 | 종료 조건 |
 | --- | --- | --- | --- |
-| 00 | [manifest-pipeline](00-manifest-pipeline/) | 공용 design contract | source, provenance, variant, budget가 schema와 generator로 고정됨 |
 | 01 | [instructional-assets](01-instructional-assets/) | 해당 `08-learning-content` path ledger·anchor author review | 대표 경로의 outcome visual이 승인된 section의 학습 판단을 실제로 도움 |
 | 02 | [run-captures](02-run-captures/) | `04-web-learning` fixture green | 실제 desktop/mobile proof를 캡처함 |
 | 03 | [local-captures](03-local-captures/) | `05-local-studio` fixture green | automation/notebook 상태 proof를 캡처함 |
 
-각 packet은 구현, asset review, budget, accessibility 검사가 끝나면 해당 TODO를 삭제한다. 네 packet이 모두 삭제되기 전에는 `06-visual-assets` TODO를 유지한다.
+각 packet은 구현, asset review, budget, accessibility 검사가 끝나면 해당 TODO를 삭제한다. 남은 세 packet이 모두 삭제되기 전에는 `06-visual-assets` TODO를 유지한다.
 
 ## 교육 시각 자산 기준
 

@@ -54,13 +54,24 @@
     "provenance": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["author", "license", "licenseUrl", "fixtureId"],
+      "required": ["author", "license", "licenseUrl", "fixtureId", "promptHash"],
       "properties": {
         "author": { "type": "string", "minLength": 1 },
         "license": { "type": "string", "minLength": 1 },
-        "licenseUrl": { "type": ["string", "null"] },
+        "licenseUrl": {
+          "anyOf": [
+            { "type": "string", "format": "uri", "pattern": "^https://" },
+            { "type": "null" }
+          ]
+        },
         "fixtureId": { "type": "string", "minLength": 1 },
-        "promptHash": { "type": ["string", "null"] },
+        "promptPath": { "type": ["string", "null"] },
+        "promptHash": {
+          "anyOf": [
+            { "type": "string", "pattern": "^sha256-[0-9a-f]{64}$" },
+            { "type": "null" }
+          ]
+        },
         "lessonContentHash": { "type": ["string", "null"] }
       }
     },

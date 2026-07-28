@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sourceManifestHash": "sha256-c4242eb050f0977c3335a34c406a5ee9a28f91897a7f9bc6ecf77e7bad0bb90e",
+  "sourceManifestHash": "sha256-4735270950f5d042bb6099145d0336d7a100d1a84383fb7ec0bae00d77dfeac5",
   "assets": [
     {
       "id": "runLearningDetail",
@@ -2060,6 +2060,7 @@
         "license": "proprietary-project",
         "licenseUrl": null,
         "fixtureId": "python-fundamentals-domain-v1",
+        "promptPath": "assets/brand/visuals/prompts/python-fundamentals-v1.txt",
         "promptHash": "sha256-45246801d7843b7af2cc0174e818e81a9d9e0d1925a4e7b738222dce3e4e5d38",
         "lessonContentHash": null
       },
@@ -2186,6 +2187,7 @@
         "license": "proprietary-project",
         "licenseUrl": null,
         "fixtureId": "data-analysis-domain-v1",
+        "promptPath": "assets/brand/visuals/prompts/data-analysis-v1.txt",
         "promptHash": "sha256-c737f07e956cf2e3c97cdec7ff696187f3585c3d665865623c2873a344bba484",
         "lessonContentHash": null
       },
@@ -2309,6 +2311,7 @@
         "license": "proprietary-project",
         "licenseUrl": null,
         "fixtureId": "data-visualization-domain-v1",
+        "promptPath": "assets/brand/visuals/prompts/data-visualization-v1.txt",
         "promptHash": "sha256-e850f31ca2c0d2bb88f54fe8d763a0bdeec70ed29732a5d466f8746a04ed35f1",
         "lessonContentHash": null
       },
@@ -2432,6 +2435,7 @@
         "license": "proprietary-project",
         "licenseUrl": null,
         "fixtureId": "statistics-machine-learning-domain-v1",
+        "promptPath": "assets/brand/visuals/prompts/statistics-ml-v1.txt",
         "promptHash": "sha256-882f948c62f95971f176cc50ee33b87daead4134ea0bcd2130c9bcba9ac4d0a5",
         "lessonContentHash": null
       },
@@ -2555,6 +2559,7 @@
         "license": "proprietary-project",
         "licenseUrl": null,
         "fixtureId": "image-vision-domain-v1",
+        "promptPath": "assets/brand/visuals/prompts/image-vision-v1.txt",
         "promptHash": "sha256-73fc05ae505bab09936dba44d712c45d882f7bafe4b9634a5b0bdb4055abd3ab",
         "lessonContentHash": null
       },
@@ -2678,6 +2683,7 @@
         "license": "proprietary-project",
         "licenseUrl": null,
         "fixtureId": "learning-automation-domain-v1",
+        "promptPath": "assets/brand/visuals/prompts/automation-v1.txt",
         "promptHash": "sha256-2f378e592935ce87e9eed1ae357053602f5e9a625cf8a656d28f5dbff71165b7",
         "lessonContentHash": null
       },
@@ -2801,6 +2807,7 @@
         "license": "proprietary-project",
         "licenseUrl": null,
         "fixtureId": "developer-literacy-domain-v1",
+        "promptPath": "assets/brand/visuals/prompts/developer-literacy-v1.txt",
         "promptHash": "sha256-85e38fd1ca4b81e80c950874eb38b7ad64a9fe79549dc36514be63d4bed709aa",
         "lessonContentHash": null
       },
@@ -2924,6 +2931,7 @@
         "license": "proprietary-project",
         "licenseUrl": null,
         "fixtureId": "ai-integration-domain-v1",
+        "promptPath": "assets/brand/visuals/prompts/ai-integration-v1.txt",
         "promptHash": "sha256-51f558f4635cfe113f30a3771b3d16437bd96f712cb726b65347c3f0e32c7479",
         "lessonContentHash": null
       },

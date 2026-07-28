@@ -4,14 +4,14 @@ state: draft
 scope:
   sealState: draft
   gitCommit: 9d7af242f5bae55599d7d50b27e07fdca1ef0cb6
-  dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: 8bd1b4bd764ba680125a35abd2f8d4693335f010d6b3e9b608da7b66923f9c51
-  fileCount: 2948
-  totalBytes: 92432469
+  dirtyDiffHash: c1aa120ee433442871b2e702c6f4ba516eadf08423c88290dd9f705eb632867a
+  manifestHash: 3c51f36f6adda7d3d925697794d7b8e48d1655b427a3cc2519b482d421a3503b
+  fileCount: 2947
+  totalBytes: 92448716
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: d6df513751598a3b84f673bb780dd9c8929cc4b553e254634bb1d6eb5463f187
-  bytes: 93019145
+  sha256: d0cdc07b53634674fdd0060ee29166e1f6d4bcca6611ade8e742d26a2132be22
+  bytes: 93035152
   format: zip
   compression: stored
   compressionMethod: 0
@@ -233,8 +233,8 @@ files:
   kind: repository
   sourcePath: assets/brand/tools/buildDesignSystem.py
 - path: assets/brand/tools/buildVisualAssets.py
-  sha256: a487ebc0a787ead18ffc57f080e47cb6aad3493aaf56962707b1296e97a7b187
-  bytes: 21771
+  sha256: 73afba057da422460c6ad78f1268b5be8e10afd2f7b3a902e02dd78c712e0a38
+  bytes: 23699
   kind: repository
   sourcePath: assets/brand/tools/buildVisualAssets.py
 - path: assets/brand/tools/captureOutcomeProofs.py
@@ -988,8 +988,8 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: assets/brand/visuals/generated/manifest.json
-  sha256: ca07234099b8106e9beb41c4420d4e7d754bcfceac3933a8f445b8458ccfb707
-  bytes: 112544
+  sha256: 58d74453f789e7472cb2919dd710c5eed3b84621596a2b26080b548ebee737ef
+  bytes: 116204
   kind: repository
   sourcePath: assets/brand/visuals/generated/manifest.json
 - path: assets/brand/visuals/learning/ai-integration-v1.png
@@ -1033,13 +1033,13 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/learning/statistics-ml-v1.png
 - path: assets/brand/visuals/manifest.json
-  sha256: bd9d55fb079eeb48e22671868483c583016d8898c27f6fbfca664a3678c5eba6
-  bytes: 62883
+  sha256: d3bd26e6f789ac0a881dc9e647f87bc747b7d50bbcac7fa47b870656d8388539
+  bytes: 65270
   kind: repository
   sourcePath: assets/brand/visuals/manifest.json
 - path: assets/brand/visuals/manifest.schema.json
-  sha256: b1311eb16aa4b83cd37611b90d834dc37330f3e8e17feebd3908177c8a1d20a5
-  bytes: 6149
+  sha256: 9c5c9d4fcfc8d24d5c7243836f5ad3e99fb7e0f1725a83606981d01de58c47b1
+  bytes: 6452
   kind: repository
   sourcePath: assets/brand/visuals/manifest.schema.json
 - path: assets/brand/visuals/outcomes/dataReportOutcome.png
@@ -4123,8 +4123,8 @@ files:
   kind: repository
   sourcePath: docs/skills/ops/foundation/testing-and-gates.md
 - path: docs/skills/ops/product/branding.md
-  sha256: 742a716fd59c1d09eedbb01f62605a8308cced8daf59d2bb0405cb395cda6903
-  bytes: 10216
+  sha256: 61cd75fc7b7e024609c0c2fb942be0d036343a498ec799ee260b210485e5615f
+  bytes: 10579
   kind: repository
   sourcePath: docs/skills/ops/product/branding.md
 - path: docs/skills/ops/product/contentPipeline.md
@@ -5463,8 +5463,8 @@ files:
   kind: repository
   sourcePath: editor/public/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: editor/public/visuals/manifest.json
-  sha256: ca07234099b8106e9beb41c4420d4e7d754bcfceac3933a8f445b8458ccfb707
-  bytes: 112544
+  sha256: 58d74453f789e7472cb2919dd710c5eed3b84621596a2b26080b548ebee737ef
+  bytes: 116204
   kind: repository
   sourcePath: editor/public/visuals/manifest.json
 - path: editor/scripts/generatePyprocAssets.mjs
@@ -11267,8 +11267,8 @@ files:
   kind: repository
   sourcePath: landing/static/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: landing/static/visuals/manifest.json
-  sha256: ca07234099b8106e9beb41c4420d4e7d754bcfceac3933a8f445b8458ccfb707
-  bytes: 112544
+  sha256: 58d74453f789e7472cb2919dd710c5eed3b84621596a2b26080b548ebee737ef
+  bytes: 116204
   kind: repository
   sourcePath: landing/static/visuals/manifest.json
 - path: landing/vite.config.js
@@ -11441,11 +11441,6 @@ files:
   bytes: 7752
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/05-local-studio/README.md
-- path: mainPlan/astryx-product-experience/06-visual-assets/00-manifest-pipeline/README.md
-  sha256: 10a383b92c4ee956c22601acf479e675cb6b65b50fa49ad4d5be4407f2d6a147
-  bytes: 1649
-  kind: repository
-  sourcePath: mainPlan/astryx-product-experience/06-visual-assets/00-manifest-pipeline/README.md
 - path: mainPlan/astryx-product-experience/06-visual-assets/01-instructional-assets/README.md
   sha256: 691ffe401a7a6e1d83d05788e30757a480be3c93ceb3a553804d258b0aecc841
   bytes: 1669
@@ -11462,8 +11457,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/06-visual-assets/03-local-captures/README.md
 - path: mainPlan/astryx-product-experience/06-visual-assets/README.md
-  sha256: 319183c8889a77fd4b7947b272c325a95b4f3229a9a4d80088288d94a2a64d26
-  bytes: 7497
+  sha256: d9e58f2a6c4fe8b22934b897e5be43261e1c33fd032f9cf4d3859522c55653c3
+  bytes: 7342
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/06-visual-assets/README.md
 - path: mainPlan/astryx-product-experience/07-landing-experience/00-proof-studio-landing/README.md
@@ -13617,8 +13612,8 @@ files:
   kind: repository
   sourcePath: tests/assets/testCaptureProductVisuals.py
 - path: tests/assets/testVisualAssetManifest.py
-  sha256: 24a362d604f4d4a2adb3e82d3a9c69d365176bbbf14de152fd5ed47488ff687f
-  bytes: 7387
+  sha256: c3b9f290d54032886c64929dec990a564eee929dc646ddf87ee27d9685baca4b
+  bytes: 9477
   kind: repository
   sourcePath: tests/assets/testVisualAssetManifest.py
 - path: tests/assets/verifyUnusedIllustrationsRemoved.py

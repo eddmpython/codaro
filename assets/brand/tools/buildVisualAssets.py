@@ -12,6 +12,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[3]
 VISUAL_ROOT = ROOT / "assets" / "brand" / "visuals"
+PROMPTS_ROOT = VISUAL_ROOT / "prompts"
 MANIFEST_PATH = VISUAL_ROOT / "manifest.json"
 SCHEMA_PATH = VISUAL_ROOT / "manifest.schema.json"
 GENERATED_ROOT = VISUAL_ROOT / "generated"
@@ -147,8 +148,36 @@ def validateVisualManifest(manifest: dict[str, Any]) -> None:
         provenance = requiredObject(asset, "provenance", assetId)
         for field in ("author", "license", "fixtureId"):
             requiredText(provenance, field, f"{assetId}.provenance")
-        if sourceType == "generatedRaster" and not provenance.get("promptHash"):
-            raise VisualAssetError(f"{assetId}: generatedRaster requires promptHash")
+        licenseName = provenance["license"]
+        licenseUrl = provenance.get("licenseUrl")
+        if licenseName == "proprietary-project" and licenseUrl is not None:
+            raise VisualAssetError(f"{assetId}: proprietary-project licenseUrl must be null")
+        if sourceType == "licensedMedia":
+            if licenseName == "proprietary-project":
+                raise VisualAssetError(f"{assetId}: licensedMedia cannot use proprietary-project")
+            if not isinstance(licenseUrl, str) or not licenseUrl.startswith("https://"):
+                raise VisualAssetError(f"{assetId}: licensedMedia requires an HTTPS licenseUrl")
+        if sourceType == "generatedRaster":
+            promptRelative = requiredText(
+                provenance,
+                "promptPath",
+                f"{assetId}.provenance",
+            )
+            promptPath = resolvePromptPath(promptRelative)
+            if not promptPath.is_file():
+                raise VisualAssetError(f"{assetId}: missing prompt source {promptRelative}")
+            promptHash = requiredText(
+                provenance,
+                "promptHash",
+                f"{assetId}.provenance",
+            )
+            actualPromptHash = f"sha256-{sha256Bytes(promptPath.read_bytes())}"
+            if promptHash != actualPromptHash:
+                raise VisualAssetError(f"{assetId}: prompt hash drift")
+        elif provenance.get("promptPath") is not None or provenance.get("promptHash") is not None:
+            raise VisualAssetError(
+                f"{assetId}: prompt provenance is limited to generatedRaster"
+            )
 
         rendering = requiredObject(asset, "rendering", assetId)
         width = requiredPositiveInt(rendering, "width", f"{assetId}.rendering")
@@ -398,6 +427,16 @@ def resolveSourcePath(relativeValue: str) -> Path:
     sourceRoot = VISUAL_ROOT.resolve()
     if not resolved.is_relative_to(sourceRoot) or GENERATED_ROOT.resolve() in resolved.parents:
         raise VisualAssetError(f"visual source escapes source root: {relativeValue}")
+    return resolved
+
+
+def resolvePromptPath(relativeValue: str) -> Path:
+    relativePath = Path(relativeValue)
+    if relativePath.is_absolute():
+        raise VisualAssetError(f"visual prompt must be repository-relative: {relativeValue}")
+    resolved = (ROOT / relativePath).resolve()
+    if not resolved.is_relative_to(PROMPTS_ROOT.resolve()):
+        raise VisualAssetError(f"visual prompt escapes prompt source root: {relativeValue}")
     return resolved
 
 

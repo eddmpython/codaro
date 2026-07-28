@@ -95,6 +95,55 @@ class VisualAssetManifestTest(unittest.TestCase):
         with self.assertRaisesRegex(BUILDER.VisualAssetError, "decisionShown must be non-empty text"):
             BUILDER.validateVisualManifest(invalid)
 
+    def testGeneratedRasterPromptSourceAndHashAreVerified(self) -> None:
+        generated = next(
+            asset for asset in self.manifest["assets"]
+            if asset["sourceType"] == "generatedRaster"
+        )
+        promptPath = ROOT / generated["provenance"]["promptPath"]
+        self.assertTrue(promptPath.is_file())
+        self.assertEqual(
+            generated["provenance"]["promptHash"],
+            "sha256-" + BUILDER.sha256Bytes(promptPath.read_bytes()),
+        )
+
+        invalid = deepcopy(self.manifest)
+        invalidGenerated = next(
+            asset for asset in invalid["assets"]
+            if asset["sourceType"] == "generatedRaster"
+        )
+        invalidGenerated["provenance"]["promptHash"] = "sha256-" + "0" * 64
+        with self.assertRaisesRegex(BUILDER.VisualAssetError, "prompt hash drift"):
+            BUILDER.validateVisualManifest(invalid)
+
+    def testProprietaryAndLicensedMediaProvenanceStayDistinct(self) -> None:
+        invalidProprietary = deepcopy(self.manifest)
+        invalidProprietary["assets"][0]["provenance"]["licenseUrl"] = (
+            "https://example.com/license"
+        )
+        with self.assertRaisesRegex(
+            BUILDER.VisualAssetError,
+            "proprietary-project licenseUrl must be null",
+        ):
+            BUILDER.validateVisualManifest(invalidProprietary)
+
+        invalidLicensed = deepcopy(self.manifest)
+        invalidLicensed["assets"][0]["sourceType"] = "licensedMedia"
+        with self.assertRaisesRegex(
+            BUILDER.VisualAssetError,
+            "licensedMedia cannot use proprietary-project",
+        ):
+            BUILDER.validateVisualManifest(invalidLicensed)
+
+        invalidLicenseUrl = deepcopy(self.manifest)
+        invalidLicenseUrl["assets"][0]["sourceType"] = "licensedMedia"
+        invalidLicenseUrl["assets"][0]["provenance"]["license"] = "CC-BY-4.0"
+        with self.assertRaisesRegex(
+            BUILDER.VisualAssetError,
+            "licensedMedia requires an HTTPS licenseUrl",
+        ):
+            BUILDER.validateVisualManifest(invalidLicenseUrl)
+
     def testResponsiveVariantsContainAvifAndWebp(self) -> None:
         with tempfile.TemporaryDirectory(prefix="codaro-visual-test-") as temporary:
             generated = BUILDER.buildResponsiveVariants(self.manifest, Path(temporary))
