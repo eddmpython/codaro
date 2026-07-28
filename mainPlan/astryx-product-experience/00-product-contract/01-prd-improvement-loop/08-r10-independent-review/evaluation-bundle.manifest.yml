@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: 4ce5da44d416fd58e72e8f803a148555f8d03646
+  gitCommit: 9d7af242f5bae55599d7d50b27e07fdca1ef0cb6
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: 097da2b1c06dc80263af2bc0803c287d5332f2edd341716fef347e83dd5bc6f1
+  manifestHash: 8bd1b4bd764ba680125a35abd2f8d4693335f010d6b3e9b608da7b66923f9c51
   fileCount: 2948
-  totalBytes: 92431780
+  totalBytes: 92432469
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: f492aa5fc0f754e1200e63157e5be568b68fb411efbe661273d7025dc63cced2
-  bytes: 93018456
+  sha256: d6df513751598a3b84f673bb780dd9c8929cc4b553e254634bb1d6eb5463f187
+  bytes: 93019145
   format: zip
   compression: stored
   compressionMethod: 0
@@ -897,26 +897,26 @@ files:
   bytes: 2894
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/runLearningHeroLight/runLearningHeroLight-720-5b95612f02ef.webp
-- path: assets/brand/visuals/generated/files/runLearningMobile/runLearningMobile-390-377fad72b07f.avif
-  sha256: 38abab671918081b4f32b5065e23e14b9b9a41be9bb1eaf2936ca5a60e01a466
-  bytes: 20999
+- path: assets/brand/visuals/generated/files/runLearningMobile/runLearningMobile-390-560ce3c7217e.avif
+  sha256: d3c45128109f348d237fe435336bca7b78278ccdbdd5e939b3103e2aaf172975
+  bytes: 21020
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/runLearningMobile/runLearningMobile-390-377fad72b07f.avif
-- path: assets/brand/visuals/generated/files/runLearningMobile/runLearningMobile-390-377fad72b07f.webp
-  sha256: bcc5e1c75c7e8461918ba6c5d2c54c5758686c370cfa597bc25d384ff4c13a91
-  bytes: 30480
+  sourcePath: assets/brand/visuals/generated/files/runLearningMobile/runLearningMobile-390-560ce3c7217e.avif
+- path: assets/brand/visuals/generated/files/runLearningMobile/runLearningMobile-390-560ce3c7217e.webp
+  sha256: e1eccae4425dbf55fa3a3fcddc7c6b7e5f8a15c917417ee19413587119494914
+  bytes: 30504
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/runLearningMobile/runLearningMobile-390-377fad72b07f.webp
-- path: assets/brand/visuals/generated/files/runLearningMobileLight/runLearningMobileLight-390-765971b74969.avif
-  sha256: 618c2c7d5ecd3f07a638f06998f47c818f5693546e7ebdf9627ba15936b5e221
-  bytes: 19205
+  sourcePath: assets/brand/visuals/generated/files/runLearningMobile/runLearningMobile-390-560ce3c7217e.webp
+- path: assets/brand/visuals/generated/files/runLearningMobileLight/runLearningMobileLight-390-212f04693e95.avif
+  sha256: eafdaafbd7f2b0a19011e10350aa00ffbe2caecfe332ac4ae8d38f9212d0c129
+  bytes: 19193
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/runLearningMobileLight/runLearningMobileLight-390-765971b74969.avif
-- path: assets/brand/visuals/generated/files/runLearningMobileLight/runLearningMobileLight-390-765971b74969.webp
-  sha256: 8747435fee9e64ecdadb2f54623fa91b5d4e1a22b35ea979670ec827ab6df57e
-  bytes: 27944
+  sourcePath: assets/brand/visuals/generated/files/runLearningMobileLight/runLearningMobileLight-390-212f04693e95.avif
+- path: assets/brand/visuals/generated/files/runLearningMobileLight/runLearningMobileLight-390-212f04693e95.webp
+  sha256: 46d7f554709fd95bbb8b11f713e1848bcfac7be72ccb891482d53a736a61b61f
+  bytes: 27954
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/runLearningMobileLight/runLearningMobileLight-390-765971b74969.webp
+  sourcePath: assets/brand/visuals/generated/files/runLearningMobileLight/runLearningMobileLight-390-212f04693e95.webp
 - path: assets/brand/visuals/generated/files/statisticsMachineLearning/statisticsMachineLearning-1200-d6e581dafc4f.avif
   sha256: 15b2d32c93f92023c2b208e56d91b4c12ce022c216af232b3616f0be5182dfbc
   bytes: 48588
@@ -988,7 +988,7 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: assets/brand/visuals/generated/manifest.json
-  sha256: ad038004933cb9cef125d00f27a749c9224260bc6b82f6ae556663ebaa73bb08
+  sha256: ca07234099b8106e9beb41c4420d4e7d754bcfceac3933a8f445b8458ccfb707
   bytes: 112544
   kind: repository
   sourcePath: assets/brand/visuals/generated/manifest.json
@@ -1033,7 +1033,7 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/learning/statistics-ml-v1.png
 - path: assets/brand/visuals/manifest.json
-  sha256: 523bd3ea36dd029cd87e49e805dd6412690a6406171f2a601dc9a5e1c27ed5ab
+  sha256: bd9d55fb079eeb48e22671868483c583016d8898c27f6fbfca664a3678c5eba6
   bytes: 62883
   kind: repository
   sourcePath: assets/brand/visuals/manifest.json
@@ -1118,13 +1118,13 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/product/run-learning-hero-light.png
 - path: assets/brand/visuals/product/run-learning-mobile-dark.png
-  sha256: 377fad72b07fe3b0169bdcbd749d4f8e63a03c3421352ec8ce2c38b4d37122fd
-  bytes: 56250
+  sha256: 560ce3c7217e189434ec7d5a45fd26c4515c4fd9e7b05460a8df13fbe5ee89be
+  bytes: 56204
   kind: repository
   sourcePath: assets/brand/visuals/product/run-learning-mobile-dark.png
 - path: assets/brand/visuals/product/run-learning-mobile-light.png
-  sha256: 765971b74969ec6d56b132f71dce41efef67e49c019528e09bb4a6a727db8fd7
-  bytes: 55757
+  sha256: 212f04693e95123025b0a5e7fc131077731d248f0ffd9d2c76bc6e46d4fe4779
+  bytes: 55716
   kind: repository
   sourcePath: assets/brand/visuals/product/run-learning-mobile-light.png
 - path: assets/brand/visuals/prompts/ai-integration-v1.txt
@@ -5372,26 +5372,26 @@ files:
   bytes: 2894
   kind: repository
   sourcePath: editor/public/visuals/files/runLearningHeroLight/runLearningHeroLight-720-5b95612f02ef.webp
-- path: editor/public/visuals/files/runLearningMobile/runLearningMobile-390-377fad72b07f.avif
-  sha256: 38abab671918081b4f32b5065e23e14b9b9a41be9bb1eaf2936ca5a60e01a466
-  bytes: 20999
+- path: editor/public/visuals/files/runLearningMobile/runLearningMobile-390-560ce3c7217e.avif
+  sha256: d3c45128109f348d237fe435336bca7b78278ccdbdd5e939b3103e2aaf172975
+  bytes: 21020
   kind: repository
-  sourcePath: editor/public/visuals/files/runLearningMobile/runLearningMobile-390-377fad72b07f.avif
-- path: editor/public/visuals/files/runLearningMobile/runLearningMobile-390-377fad72b07f.webp
-  sha256: bcc5e1c75c7e8461918ba6c5d2c54c5758686c370cfa597bc25d384ff4c13a91
-  bytes: 30480
+  sourcePath: editor/public/visuals/files/runLearningMobile/runLearningMobile-390-560ce3c7217e.avif
+- path: editor/public/visuals/files/runLearningMobile/runLearningMobile-390-560ce3c7217e.webp
+  sha256: e1eccae4425dbf55fa3a3fcddc7c6b7e5f8a15c917417ee19413587119494914
+  bytes: 30504
   kind: repository
-  sourcePath: editor/public/visuals/files/runLearningMobile/runLearningMobile-390-377fad72b07f.webp
-- path: editor/public/visuals/files/runLearningMobileLight/runLearningMobileLight-390-765971b74969.avif
-  sha256: 618c2c7d5ecd3f07a638f06998f47c818f5693546e7ebdf9627ba15936b5e221
-  bytes: 19205
+  sourcePath: editor/public/visuals/files/runLearningMobile/runLearningMobile-390-560ce3c7217e.webp
+- path: editor/public/visuals/files/runLearningMobileLight/runLearningMobileLight-390-212f04693e95.avif
+  sha256: eafdaafbd7f2b0a19011e10350aa00ffbe2caecfe332ac4ae8d38f9212d0c129
+  bytes: 19193
   kind: repository
-  sourcePath: editor/public/visuals/files/runLearningMobileLight/runLearningMobileLight-390-765971b74969.avif
-- path: editor/public/visuals/files/runLearningMobileLight/runLearningMobileLight-390-765971b74969.webp
-  sha256: 8747435fee9e64ecdadb2f54623fa91b5d4e1a22b35ea979670ec827ab6df57e
-  bytes: 27944
+  sourcePath: editor/public/visuals/files/runLearningMobileLight/runLearningMobileLight-390-212f04693e95.avif
+- path: editor/public/visuals/files/runLearningMobileLight/runLearningMobileLight-390-212f04693e95.webp
+  sha256: 46d7f554709fd95bbb8b11f713e1848bcfac7be72ccb891482d53a736a61b61f
+  bytes: 27954
   kind: repository
-  sourcePath: editor/public/visuals/files/runLearningMobileLight/runLearningMobileLight-390-765971b74969.webp
+  sourcePath: editor/public/visuals/files/runLearningMobileLight/runLearningMobileLight-390-212f04693e95.webp
 - path: editor/public/visuals/files/statisticsMachineLearning/statisticsMachineLearning-1200-d6e581dafc4f.avif
   sha256: 15b2d32c93f92023c2b208e56d91b4c12ce022c216af232b3616f0be5182dfbc
   bytes: 48588
@@ -5463,7 +5463,7 @@ files:
   kind: repository
   sourcePath: editor/public/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: editor/public/visuals/manifest.json
-  sha256: ad038004933cb9cef125d00f27a749c9224260bc6b82f6ae556663ebaa73bb08
+  sha256: ca07234099b8106e9beb41c4420d4e7d754bcfceac3933a8f445b8458ccfb707
   bytes: 112544
   kind: repository
   sourcePath: editor/public/visuals/manifest.json
@@ -11176,26 +11176,26 @@ files:
   bytes: 2894
   kind: repository
   sourcePath: landing/static/visuals/files/runLearningHeroLight/runLearningHeroLight-720-5b95612f02ef.webp
-- path: landing/static/visuals/files/runLearningMobile/runLearningMobile-390-377fad72b07f.avif
-  sha256: 38abab671918081b4f32b5065e23e14b9b9a41be9bb1eaf2936ca5a60e01a466
-  bytes: 20999
+- path: landing/static/visuals/files/runLearningMobile/runLearningMobile-390-560ce3c7217e.avif
+  sha256: d3c45128109f348d237fe435336bca7b78278ccdbdd5e939b3103e2aaf172975
+  bytes: 21020
   kind: repository
-  sourcePath: landing/static/visuals/files/runLearningMobile/runLearningMobile-390-377fad72b07f.avif
-- path: landing/static/visuals/files/runLearningMobile/runLearningMobile-390-377fad72b07f.webp
-  sha256: bcc5e1c75c7e8461918ba6c5d2c54c5758686c370cfa597bc25d384ff4c13a91
-  bytes: 30480
+  sourcePath: landing/static/visuals/files/runLearningMobile/runLearningMobile-390-560ce3c7217e.avif
+- path: landing/static/visuals/files/runLearningMobile/runLearningMobile-390-560ce3c7217e.webp
+  sha256: e1eccae4425dbf55fa3a3fcddc7c6b7e5f8a15c917417ee19413587119494914
+  bytes: 30504
   kind: repository
-  sourcePath: landing/static/visuals/files/runLearningMobile/runLearningMobile-390-377fad72b07f.webp
-- path: landing/static/visuals/files/runLearningMobileLight/runLearningMobileLight-390-765971b74969.avif
-  sha256: 618c2c7d5ecd3f07a638f06998f47c818f5693546e7ebdf9627ba15936b5e221
-  bytes: 19205
+  sourcePath: landing/static/visuals/files/runLearningMobile/runLearningMobile-390-560ce3c7217e.webp
+- path: landing/static/visuals/files/runLearningMobileLight/runLearningMobileLight-390-212f04693e95.avif
+  sha256: eafdaafbd7f2b0a19011e10350aa00ffbe2caecfe332ac4ae8d38f9212d0c129
+  bytes: 19193
   kind: repository
-  sourcePath: landing/static/visuals/files/runLearningMobileLight/runLearningMobileLight-390-765971b74969.avif
-- path: landing/static/visuals/files/runLearningMobileLight/runLearningMobileLight-390-765971b74969.webp
-  sha256: 8747435fee9e64ecdadb2f54623fa91b5d4e1a22b35ea979670ec827ab6df57e
-  bytes: 27944
+  sourcePath: landing/static/visuals/files/runLearningMobileLight/runLearningMobileLight-390-212f04693e95.avif
+- path: landing/static/visuals/files/runLearningMobileLight/runLearningMobileLight-390-212f04693e95.webp
+  sha256: 46d7f554709fd95bbb8b11f713e1848bcfac7be72ccb891482d53a736a61b61f
+  bytes: 27954
   kind: repository
-  sourcePath: landing/static/visuals/files/runLearningMobileLight/runLearningMobileLight-390-765971b74969.webp
+  sourcePath: landing/static/visuals/files/runLearningMobileLight/runLearningMobileLight-390-212f04693e95.webp
 - path: landing/static/visuals/files/statisticsMachineLearning/statisticsMachineLearning-1200-d6e581dafc4f.avif
   sha256: 15b2d32c93f92023c2b208e56d91b4c12ce022c216af232b3616f0be5182dfbc
   bytes: 48588
@@ -11267,7 +11267,7 @@ files:
   kind: repository
   sourcePath: landing/static/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: landing/static/visuals/manifest.json
-  sha256: ad038004933cb9cef125d00f27a749c9224260bc6b82f6ae556663ebaa73bb08
+  sha256: ca07234099b8106e9beb41c4420d4e7d754bcfceac3933a8f445b8458ccfb707
   bytes: 112544
   kind: repository
   sourcePath: landing/static/visuals/manifest.json
@@ -12382,8 +12382,8 @@ files:
   kind: repository
   sourcePath: src/codaro/ai/providers/providerDependencies.py
 - path: src/codaro/ai/secrets.py
-  sha256: cda1dac52d884166385b0cec8653bcfdcd45aaf7685ff72cd314b2e547d06d42
-  bytes: 7634
+  sha256: b344f5b62e528eecee58c225b5211153e871fe924c6cb600e40b1e0ca4331646
+  bytes: 7710
   kind: repository
   sourcePath: src/codaro/ai/secrets.py
 - path: src/codaro/ai/staticCompletion.py
@@ -14737,8 +14737,8 @@ files:
   kind: repository
   sourcePath: tests/teacher/testAiProvider.py
 - path: tests/teacher/testAiSecrets.py
-  sha256: 23b8a6b84639416d8ff3011646862a67fc82327c7542128498a941343f44fe9e
-  bytes: 5231
+  sha256: 493ff2b90acc1755989dd9be66447395efbc1e06bbd8076f2f30d0a4b54ac601
+  bytes: 5802
   kind: repository
   sourcePath: tests/teacher/testAiSecrets.py
 - path: tests/teacher/testAiTools.py
