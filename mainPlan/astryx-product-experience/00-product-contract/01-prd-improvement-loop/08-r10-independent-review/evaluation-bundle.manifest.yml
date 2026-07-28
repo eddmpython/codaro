@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: b50b4f264d790a7e5c47f2fbc835eb9c137409a7
+  gitCommit: afbf7d51dc620141928597d0eb1bb99810a3cc32
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: 75684b9797b4190fb1017fb48c1aafde30b5114b8e7b52be9e3fcf7fc62ccc1b
+  manifestHash: 703caff5cce72681a8a8ff46d3d531d5425a9df8dcc2bacd7dde1c5d4c932626
   fileCount: 2876
-  totalBytes: 91245356
+  totalBytes: 91264471
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: 0df9d38ab67828aeae7ed6ec99e226c77248bbe155418639aa965658e4afe61a
-  bytes: 91813354
+  sha256: 260907c572c64379cff85f1bdcd914810784d24adb650019df0f62fe9d59e184
+  bytes: 91832469
   format: zip
   compression: stored
   compressionMethod: 0
@@ -990,7 +990,7 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: assets/brand/visuals/generated/manifest.json
-  sha256: cd613456b54ef2155875d12b6c550b08fc4373e48cae50a9f488e4476ffbf2f4
+  sha256: 4dd524577cb41b94a9573805198351a200007543c5aa0b370bc8be323d297de6
   bytes: 112540
   kind: repository
   sourcePath: assets/brand/visuals/generated/manifest.json
@@ -1035,7 +1035,7 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/learning/statistics-ml-v1.png
 - path: assets/brand/visuals/manifest.json
-  sha256: f29f1fa60716b295488992d6bcedd2b0a4fbaa678b1a5c7a1287cec03b5bf4a1
+  sha256: bd96038289461c17f67aa8280d6d9ff8c19e77966832ca6a595946381abc815b
   bytes: 62879
   kind: repository
   sourcePath: assets/brand/visuals/manifest.json
@@ -5455,7 +5455,7 @@ files:
   kind: repository
   sourcePath: editor/public/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: editor/public/visuals/manifest.json
-  sha256: cd613456b54ef2155875d12b6c550b08fc4373e48cae50a9f488e4476ffbf2f4
+  sha256: 4dd524577cb41b94a9573805198351a200007543c5aa0b370bc8be323d297de6
   bytes: 112540
   kind: repository
   sourcePath: editor/public/visuals/manifest.json
@@ -6794,8 +6794,8 @@ files:
   kind: repository
   sourcePath: landing/src/pages/home.jsx
 - path: landing/src/pages/learn.jsx
-  sha256: 567e160df5a8d5ce4d81cb414ee28c5c0b62274f6b72cee119c762eecb672785
-  bytes: 21722
+  sha256: 2fff9a8ed26d48668b06fd16bd246247c40e3216d261bb05f7e9dfaf03bd7ad2
+  bytes: 22985
   kind: repository
   sourcePath: landing/src/pages/learn.jsx
 - path: landing/src/pages/lesson.jsx
@@ -10939,7 +10939,7 @@ files:
   kind: repository
   sourcePath: landing/static/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: landing/static/visuals/manifest.json
-  sha256: cd613456b54ef2155875d12b6c550b08fc4373e48cae50a9f488e4476ffbf2f4
+  sha256: 4dd524577cb41b94a9573805198351a200007543c5aa0b370bc8be323d297de6
   bytes: 112540
   kind: repository
   sourcePath: landing/static/visuals/manifest.json
@@ -11094,8 +11094,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/03-product-shell/README.md
 - path: mainPlan/astryx-product-experience/04-web-learning/00-learn-explorer/README.md
-  sha256: 78d32980528d7df61f7e71abd5870711c7942fa5e15e07db6a4bd9290bd3b4a4
-  bytes: 2563
+  sha256: ccd528d5597068d911300beda85eac3bdd07b409fc7785fdbae11802b2cf7cae
+  bytes: 2455
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/04-web-learning/00-learn-explorer/README.md
 - path: mainPlan/astryx-product-experience/04-web-learning/01-canonical-interactive-lesson/README.md
@@ -14204,8 +14204,8 @@ files:
   kind: repository
   sourcePath: tests/surface/testNotebookPersistence.py
 - path: tests/surface/testProductSurfaceContract.py
-  sha256: 9d1718a061a11fb10d6ae629aa71cfcfe4eb97fab7505b194c07b68a6c8cb847
-  bytes: 42899
+  sha256: eb228e46714233c32379f2636bbc77283ce96186d020de1b833f18cb62f4e719
+  bytes: 43418
   kind: repository
   sourcePath: tests/surface/testProductSurfaceContract.py
 - path: tests/surface/testProviderSettingsContract.py
@@ -14299,8 +14299,8 @@ files:
   kind: repository
   sourcePath: tests/surface/verifyPlaywrightMobile.py
 - path: tests/surface/verifyProductExperiencePlaywright.py
-  sha256: 0287995063460f694c65ade5f4e066bb85ca89bd87e8aabfc49e64ca1ba20d8d
-  bytes: 279785
+  sha256: c5451878e5578579ff1d5610b6b2fa6a865affa446f81c13eb447f2815b9e28e
+  bytes: 297226
   kind: repository
   sourcePath: tests/surface/verifyProductExperiencePlaywright.py
 - path: tests/surface/verifyProductModuleBoundaries.py
