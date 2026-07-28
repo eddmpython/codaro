@@ -1,0 +1,22 @@
+{
+  "browser": {
+    "decision": "candidate-b-supported-subset",
+    "localRequiredKinds": [
+      "behavior"
+    ],
+    "strongKinds": [
+      "output",
+      "variable"
+    ]
+  },
+  "localWindows": {
+    "decision": "unsupported",
+    "provisionalExecutorMayGrantStrongCredit": false
+  },
+  "offline": {
+    "cold": "unsupported",
+    "warm": "unsupported"
+  },
+  "enforcementState": "pending-implementation-workstream",
+  "policyVersion": 1
+}

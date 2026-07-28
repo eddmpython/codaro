@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -10,6 +11,12 @@ import tempfile
 import time
 from typing import Any
 
+from checkSandboxCapabilityProbe import (
+    BROWSER_ENGINES,
+    browserCapabilityMatrix,
+    capabilityDecision,
+    windowsCapabilityProbe,
+)
 from codaro.curriculum.localStrongCheck import (
     LocalStrongCheckInvalid,
     fixtureHash,
@@ -25,6 +32,10 @@ REPORT_PATH = ROOT / "output/test-runner/check-sandbox-feasibility/check-sandbox
 BROWSER_EXECUTOR_PATH = ROOT / "editor/src/lib/browserLearningCheckExecutor.ts"
 PRODUCT_BROWSER_PATH = ROOT / "tests/surface/verifyProductExperiencePlaywright.py"
 PRODUCT_BROWSER_REPORT_PATH = ROOT / "output/test-runner/check-sandbox-feasibility/product-experience-report.json"
+PYPROC_MANIFEST_PATH = ROOT / "src/codaro/webBuild/pyproc-assets.json"
+EDITOR_PACKAGE_PATH = ROOT / "editor/package.json"
+PYPROC_RUNTIME_PATH = ROOT / "editor/node_modules/pyproc/src/runtime/runtime.js"
+POLICY_PATH = ROOT / "contracts/checkSandboxFeasibilityDecision.json"
 EMPTY_FIXTURE = {
     "directories": [],
     "env": {"LANG": "C.UTF-8", "TZ": "UTC"},
@@ -239,8 +250,8 @@ def verifyBrowserSandbox() -> dict[str, Any]:
     if not isinstance(cases, list) or len(cases) != 1 or cases[0].get("failures"):
         raise ValueError("browser sandbox report does not contain one passing progression case")
     audit = cases[0].get("audit")
-    if not isinstance(audit, dict) or audit.get("webStrongEvidenceEventCount") != 2:
-        raise ValueError("browser sandbox did not store mastery and delayed retrieval evidence")
+    if not isinstance(audit, dict) or audit.get("webStrongEvidenceEventCount") != 3:
+        raise ValueError("browser sandbox did not store base, mastery, and delayed retrieval evidence")
     return {
         "browser": report.get("browser"),
         "case": cases[0].get("name"),
@@ -252,6 +263,32 @@ def verifyBrowserSandbox() -> dict[str, Any]:
     }
 
 
+def supplyChainFacts() -> dict[str, Any]:
+    manifestBytes = PYPROC_MANIFEST_PATH.read_bytes()
+    manifest = json.loads(manifestBytes)
+    package = json.loads(EDITOR_PACKAGE_PATH.read_text(encoding="utf-8"))
+    pyprocPin = package.get("dependencies", {}).get("pyproc")
+    runtimeSource = PYPROC_RUNTIME_PATH.read_text(encoding="utf-8")
+    marker = 'export const DEFAULT_INDEX = "'
+    start = runtimeSource.index(marker) + len(marker)
+    coreIndex = runtimeSource[start:runtimeSource.index('"', start)]
+    browserRuntimeSource = (ROOT / "editor/src/lib/browserPythonRuntime.ts").read_text(encoding="utf-8")
+    return {
+        "coreCacheConfigured": "coreCacheDir:" in browserRuntimeSource,
+        "coreIndex": coreIndex,
+        "coreIntegrityConfigured": "coreIntegrity:" in browserRuntimeSource,
+        "manifestFileCount": len(manifest.get("files", [])),
+        "manifestSha256": hashlib.sha256(manifestBytes).hexdigest(),
+        "packagePin": pyprocPin,
+    }
+
+
+def verifyPolicy(policy: dict[str, Any]) -> None:
+    recorded = json.loads(POLICY_PATH.read_text(encoding="utf-8"))
+    if recorded != policy:
+        raise ValueError("check sandbox capability policy is stale")
+
+
 def main() -> int:
     startedAt = utcTimestamp()
     started = time.monotonic()
@@ -261,25 +298,33 @@ def main() -> int:
         facts["negativeFixture"] = rejectSharedNamespaceFixture()
         facts["local"] = verifyLocalSandbox()
         facts["browser"] = verifyBrowserSandbox()
+        facts["browserMatrix"] = browserCapabilityMatrix()
+        facts["windows"] = windowsCapabilityProbe(ROOT)
+        facts["supplyChain"] = supplyChainFacts()
+        facts["decision"] = capabilityDecision(facts["browserMatrix"], facts["windows"])
+        verifyPolicy(facts["decision"])
     except (OSError, ValueError, subprocess.SubprocessError) as error:
         failures.append(str(error))
-    completionBlockers = [
-        "browser opaque-origin iframe and three-engine capability matrix are absent",
-        "Windows AppContainer, restricted token, Job Object, and broker probe are absent",
-        "independent runtime-security review is absent",
-    ]
+    matrix = facts.get("browserMatrix", {})
+    windows = facts.get("windows", {})
+    completionEligible = (
+        not failures
+        and matrix.get("engineCount") == len(BROWSER_ENGINES)
+        and isinstance(windows.get("candidateEligible"), bool)
+        and facts.get("decision", {}).get("policyVersion") == 1
+    )
     payload = {
         "schemaVersion": 1,
         "audit": "check-sandbox-feasibility",
         "status": "passed" if not failures else "failed",
         "passed": not failures,
         "machineEligible": not failures,
-        "completionEligible": False,
+        "completionEligible": completionEligible,
         "startedAt": startedAt,
         "completedAt": utcTimestamp(),
         "durationMs": round((time.monotonic() - started) * 1000),
         "facts": facts,
-        "completionBlockers": completionBlockers,
+        "completionBlockers": [] if completionEligible else ["capability matrix or policy decision is incomplete"],
         "failures": failures,
         "reportPath": REPORT_PATH.relative_to(ROOT).as_posix(),
     }
@@ -290,7 +335,7 @@ def main() -> int:
         for failure in failures:
             print(f"  - {failure}", file=sys.stderr)
         return 1
-    print("ok: check sandbox supported subset verified (completionEligible=false)")
+    print("ok: check sandbox feasibility measured and unsupported tiers were preserved")
     return 0
 
 

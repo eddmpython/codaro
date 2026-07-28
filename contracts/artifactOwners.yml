@@ -46,6 +46,14 @@ artifacts:
     surfacePaths:
       - landing/scripts/generateCurriculum.js
       - landing/src/lib/curriculumLessons.js
+  - artifactId: check-sandbox-feasibility-decision
+    role: source
+    owner: learning-runtime
+    sourcePath: contracts/checkSandboxFeasibilityDecision.json
+    surfacePaths:
+      - tests/product/checkSandboxCapabilityProbe.py
+      - tests/product/verifyCheckSandboxFeasibility.py
+      - mainPlan/astryx-product-experience/02-learning-method/README.md
   - artifactId: run-route-state
     role: source
     owner: product-architecture
