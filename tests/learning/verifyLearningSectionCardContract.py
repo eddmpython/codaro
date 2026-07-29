@@ -189,7 +189,9 @@ def main() -> int:
         "verified practice state": 'state: "verified"',
         "unsupported completion state": 'state: "unsupported"',
         "practice evidence only": 'evidence: "practice"',
-        "strong evidence only after isolated check": 'evidence: checked.passed ? "strong" : "none"',
+        "provisional isolated check stays practice-only": (
+            '"strongEligible" in checked && checked.strongEligible === false ? "practice" : "strong"'
+        ),
     }
     for label, token in attempt_tokens.items():
         require(learningAttemptText, token, label, failures)
