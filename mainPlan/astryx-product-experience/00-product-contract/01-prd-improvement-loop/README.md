@@ -40,7 +40,7 @@ Product evidence maturity는 `E0 없음`, `E1 synthetic`, `E2 vertical slice`, `
 | 08 | [r10-independent-review](08-r10-independent-review/) | remediation 작성자 재채점, 이전 점수 노출, 낮은 round 덮어쓰기 |
 | 09 | [learning-quality-revalidation](09-learning-quality-revalidation/) | 부분 browser pass를 전체 통과로 오인, strong·전이·지연 검색의 전수 격차 |
 
-평가 계약은 `contracts/`에 있다. 04가 downgrade-safe rollback을 구현하고, `contracts/checkSandboxFeasibilityDecision.json`이 허용한 범위에서 03·06과 top-level 제품 경로의 W0 증거를 만든다. 09는 Day 1 전이·검색과 W0 Local parity를 다시 감사해 08의 독립 평가 입력을 갱신한다. 현재 source는 R10 전에 468레슨의 strong assessment와 472개 public route까지 확장됐다. 이 구현을 숨기거나 되돌리지는 않지만, machine source coverage는 승인된 W1, E3, 사람 content review나 종료 조건 검증이 아니다. R10 미실시는 추가 machine 개선을 멈추는 조건이 아니라 독립 품질과 공개 승격을 주장하지 못하게 하는 판정 경계다. 07은 candidate release와 경로별 효능 승격을 분리하고, 03·04·06·07·09 closure evidence가 없는 상태에서는 R10 input을 seal하지 않는다.
+평가 계약은 `contracts/`에 있다. 04가 downgrade-safe rollback을 구현하고, `contracts/checkSandboxFeasibilityDecision.json`이 허용한 범위에서 03과 공용 visual 계약, top-level 제품 경로의 W0 증거를 만든다. 09는 Day 1 전이·검색과 W0 Local parity를 다시 감사해 08의 독립 평가 입력을 갱신한다. 현재 source는 R10 전에 468레슨의 strong assessment와 472개 public route까지 확장됐다. 이 구현을 숨기거나 되돌리지는 않지만, machine source coverage는 승인된 W1, E3, 사람 content review나 종료 조건 검증이 아니다. R10 미실시는 추가 machine 개선을 멈추는 조건이 아니라 독립 품질과 공개 승격을 주장하지 못하게 하는 판정 경계다. 07은 candidate release와 경로별 효능 승격을 분리하고, 03·04·07·09 closure evidence와 current visual asset gate가 없는 상태에서는 R10 input을 seal하지 않는다.
 
 ## TODO 삭제 조건
 
@@ -54,7 +54,7 @@ Product evidence maturity는 `E0 없음`, `E1 synthetic`, `E2 vertical slice`, `
 - `mainPlan/astryx-product-experience/03-product-shell/README.md`
 - `mainPlan/astryx-product-experience/04-web-learning/README.md`
 - `mainPlan/astryx-product-experience/05-local-studio/README.md`
-- `mainPlan/astryx-product-experience/06-visual-assets/README.md`
+- `assets/brand/visuals/manifest.json`
 - `mainPlan/astryx-product-experience/07-landing-experience/README.md`
 - `mainPlan/astryx-product-experience/08-learning-content/README.md`
 - `mainPlan/astryx-product-experience/10-quality-release/README.md`

@@ -188,7 +188,7 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 - 신규 `tests/surface/verifyProductAccessibility.py`
 - 선행 산출물 소비 `tests/product/manual-at.matrix.yml`, `tests/product/verifyManualAtMatrix.py` (생성 owner는 00의 Astryx journey evidence packet)
 - 신규 `tests/surface/verifyProductVisualRegression.py`
-- 선행 산출물 소비 `tests/assets/verifyVisualAssetBudget.py` (생성 owner는 `06-visual-assets`)
+- 선행 산출물 소비 `tests/assets/verifyVisualAssetBudget.py` (영구 owner는 공용 visual manifest/capture pipeline)
 - 선행 산출물 소비 `tests/learning/verifyWebLearningPlaywright.py` (생성 owner는 `04-web-learning`)
 - 선행 산출물 소비 `tests/learning/verifyLearningMethodPlaywright.py` (생성 owner는 `02-learning-method`)
 - 선행 산출물 소비 `tests/learning/verifyLearningFlowFriction.py` (생성 owner는 `02-learning-method`)

@@ -915,6 +915,16 @@ def releaseLocalKernelSessions(page: Any, case: dict[str, Any], localPort: int) 
                     )
 
 
+def captureStableViewport(page: Any, screenshotPath: Path) -> None:
+    page.mouse.move(0, 0)
+    page.screenshot(
+        path=str(screenshotPath),
+        animations="disabled",
+        caret="hide",
+        full_page=False,
+    )
+
+
 def verifyNotebookExecutionStates(
     page: Any,
     case: dict[str, Any],
@@ -935,7 +945,7 @@ def verifyNotebookExecutionStates(
     def captureState(state: str) -> None:
         screenshotPath = SCREENSHOT_ROOT / colorScheme / f"{case['name']}-{state}.png"
         screenshotPath.parent.mkdir(parents=True, exist_ok=True)
-        page.screenshot(path=str(screenshotPath), full_page=False)
+        captureStableViewport(page, screenshotPath)
         stateScreenshots[state] = str(screenshotPath.relative_to(ROOT)).replace("\\", "/")
 
     editor.fill(
@@ -1390,7 +1400,7 @@ def verifyLongNotebookKeyboardNavigation(
         SCREENSHOT_ROOT / colorScheme / f"{case['name']}-long-notebook-keyboard.png"
     )
     screenshotPath.parent.mkdir(parents=True, exist_ok=True)
-    page.screenshot(path=str(screenshotPath), full_page=False)
+    captureStableViewport(page, screenshotPath)
     return {
         "cellCount": targetCellCount,
         "firstCellReached": True,
@@ -5305,7 +5315,7 @@ def runBrowserMatrix(
                                 SCREENSHOT_ROOT / colorScheme
                                 / f"{case['name']}-check-mismatch.png"
                             )
-                            page.screenshot(path=str(mismatchScreenshot), full_page=False)
+                            captureStableViewport(page, mismatchScreenshot)
                             checkStateEvidence["screenshots"]["mismatch"] = str(
                                 mismatchScreenshot.relative_to(ROOT)
                             ).replace("\\", "/")
@@ -5331,7 +5341,7 @@ def runBrowserMatrix(
                                 SCREENSHOT_ROOT / colorScheme
                                 / f"{case['name']}-local-required.png"
                             )
-                            page.screenshot(path=str(capabilityScreenshot), full_page=False)
+                            captureStableViewport(page, capabilityScreenshot)
                             checkCapabilityEvidence["screenshot"] = str(
                                 capabilityScreenshot.relative_to(ROOT)
                             ).replace("\\", "/")
@@ -5387,7 +5397,7 @@ def runBrowserMatrix(
                                     SCREENSHOT_ROOT / colorScheme
                                     / f"{case['name']}-check-verified.png"
                                 )
-                                page.screenshot(path=str(verifiedScreenshot), full_page=False)
+                                captureStableViewport(page, verifiedScreenshot)
                                 if checkStateEvidence is None:
                                     checkStateEvidence = {"screenshots": {}}
                                 checkStateEvidence["screenshots"]["verified"] = str(
@@ -6276,7 +6286,7 @@ def runBrowserMatrix(
                             SCREENSHOT_ROOT / colorScheme
                             / f"{case['name']}-provisional.png"
                         )
-                        page.screenshot(path=str(capabilityScreenshot), full_page=False)
+                        captureStableViewport(page, capabilityScreenshot)
                         checkCapabilityEvidence["screenshot"] = str(
                             capabilityScreenshot.relative_to(ROOT)
                         ).replace("\\", "/")
@@ -6626,12 +6636,7 @@ def runBrowserMatrix(
                     )
                     screenshotPath = SCREENSHOT_ROOT / colorScheme / f"{case['name']}.png"
                     screenshotPath.parent.mkdir(parents=True, exist_ok=True)
-                    page.screenshot(
-                        path=str(screenshotPath),
-                        animations="disabled",
-                        caret="hide",
-                        full_page=False,
-                    )
+                    captureStableViewport(page, screenshotPath)
                     if case.get("verifyNotebookTools"):
                         notebookToolsToggle = page.locator('[data-notebook-tools-toggle="true"]')
                         if not notebookToolsToggle.is_visible():
@@ -6687,7 +6692,7 @@ def runBrowserMatrix(
                         if accountNumber != "1002-0421-4626":
                             raise AssertionError(f"support dialog account drifted: {accountNumber}")
                         supportScreenshotPath = SCREENSHOT_ROOT / colorScheme / f"{case['name']}-support.png"
-                        page.screenshot(path=str(supportScreenshotPath), full_page=False)
+                        captureStableViewport(page, supportScreenshotPath)
                         page.keyboard.press("Escape")
                         page.wait_for_selector('[data-support-dialog="codaro"]', state="detached", timeout=5_000)
                         notebookTitle = page.locator('[data-notebook-title="topbar"]')

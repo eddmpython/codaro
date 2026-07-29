@@ -47,7 +47,7 @@ hero와 제품 증명 figure를 분리한다.
 
 - `mainPlan/astryx-product-experience/03-product-shell/README.md`
 - `mainPlan/astryx-product-experience/05-local-studio/README.md`
-- `mainPlan/astryx-product-experience/06-visual-assets/README.md`
+- `assets/brand/visuals/manifest.json`
 - `mainPlan/astryx-product-experience/07-landing-experience/README.md`
 - `assets/brand/designSystem/fontManifest.json`
 - `tests/product/astryxVerticalSlice.matrix.json`

@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: 9d7af242f5bae55599d7d50b27e07fdca1ef0cb6
-  dirtyDiffHash: c1aa120ee433442871b2e702c6f4ba516eadf08423c88290dd9f705eb632867a
-  manifestHash: 3c51f36f6adda7d3d925697794d7b8e48d1655b427a3cc2519b482d421a3503b
-  fileCount: 2947
-  totalBytes: 92448716
+  gitCommit: f969133a418dc1ed6275428861bf6fc8c6e50070
+  dirtyDiffHash: cbe8f0dd541e07185bb5b8d371f9b25e92b6967fd105ba3d3b09acd8beb781af
+  manifestHash: d20ee4526919be1c179d95b695395ea35541a202bd124cc3a901f8f54bd2c877
+  fileCount: 3160
+  totalBytes: 97250458
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: d0cdc07b53634674fdd0060ee29166e1f6d4bcca6611ade8e742d26a2132be22
-  bytes: 93035152
+  sha256: 417aac43c465f0ba94e325777445abdac9d326789c8e910fe4d32ae6e7469ccc
+  bytes: 97891390
   format: zip
   compression: stored
   compressionMethod: 0
@@ -917,6 +917,346 @@ files:
   bytes: 27954
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/runLearningMobileLight/runLearningMobileLight-390-212f04693e95.webp
+- path: assets/brand/visuals/generated/files/runStateCheckFail/runStateCheckFail-480-75a9f78be4a4.avif
+  sha256: 249c5f2ea6f2ed4b17aa34fcd214b0cb1dd2beadb499070cba6504e001049f60
+  bytes: 14406
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckFail/runStateCheckFail-480-75a9f78be4a4.avif
+- path: assets/brand/visuals/generated/files/runStateCheckFail/runStateCheckFail-480-75a9f78be4a4.webp
+  sha256: b9cc12d6a035c634a6deeb0de3f773e37a0dbd11bfa03095fd114683b4d29a14
+  bytes: 15946
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckFail/runStateCheckFail-480-75a9f78be4a4.webp
+- path: assets/brand/visuals/generated/files/runStateCheckFail/runStateCheckFail-720-75a9f78be4a4.avif
+  sha256: a2e3d8567e7e61476338a63e748c8bac947f04553c60a753c24c08f809bb0d6f
+  bytes: 28122
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckFail/runStateCheckFail-720-75a9f78be4a4.avif
+- path: assets/brand/visuals/generated/files/runStateCheckFail/runStateCheckFail-720-75a9f78be4a4.webp
+  sha256: 64525177bd4799cda39c81ec201e2dc6ba63be550e063e9acdf91a80c327f356
+  bytes: 31116
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckFail/runStateCheckFail-720-75a9f78be4a4.webp
+- path: assets/brand/visuals/generated/files/runStateCheckFail/runStateCheckFail-900-75a9f78be4a4.avif
+  sha256: 67b7c15cd4513e789a675f416b52536b389d0f1e7fda82414f537997f0fb8487
+  bytes: 29721
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckFail/runStateCheckFail-900-75a9f78be4a4.avif
+- path: assets/brand/visuals/generated/files/runStateCheckFail/runStateCheckFail-900-75a9f78be4a4.webp
+  sha256: d206b10f532b4136bb3448f67f8709b058aa6d7ce32a5af208c63b3c1d28fb54
+  bytes: 43644
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckFail/runStateCheckFail-900-75a9f78be4a4.webp
+- path: assets/brand/visuals/generated/files/runStateCheckFailLight/runStateCheckFailLight-480-78bb22f7c834.avif
+  sha256: 6bc415494206dd08725ad331ae55af2bcc30d93b3a1f593b276fba4e2c098fd4
+  bytes: 12772
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckFailLight/runStateCheckFailLight-480-78bb22f7c834.avif
+- path: assets/brand/visuals/generated/files/runStateCheckFailLight/runStateCheckFailLight-480-78bb22f7c834.webp
+  sha256: ce266709943dfc9f8de42df18a9841e8f8d08f04ed2200fa77e14bc0cd75cdaa
+  bytes: 14166
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckFailLight/runStateCheckFailLight-480-78bb22f7c834.webp
+- path: assets/brand/visuals/generated/files/runStateCheckFailLight/runStateCheckFailLight-720-78bb22f7c834.avif
+  sha256: 0e7bdf815b8a61fb85cbdc6a717c1eaf52814c776e7e609deac06d5ed2d28fc3
+  bytes: 25103
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckFailLight/runStateCheckFailLight-720-78bb22f7c834.avif
+- path: assets/brand/visuals/generated/files/runStateCheckFailLight/runStateCheckFailLight-720-78bb22f7c834.webp
+  sha256: 6f9f5d30b4684d491e6df3ecbaa020e59a815bc393d85e537c750bb0b866505a
+  bytes: 27838
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckFailLight/runStateCheckFailLight-720-78bb22f7c834.webp
+- path: assets/brand/visuals/generated/files/runStateCheckFailLight/runStateCheckFailLight-900-78bb22f7c834.avif
+  sha256: 6d4eadc0726a4ed5f18cb010c9a9111de0dd113ef9032d1163b52b852c477148
+  bytes: 27903
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckFailLight/runStateCheckFailLight-900-78bb22f7c834.avif
+- path: assets/brand/visuals/generated/files/runStateCheckFailLight/runStateCheckFailLight-900-78bb22f7c834.webp
+  sha256: a54c86b076f9b780a3a5d991b647e06d7d31f054d99d0b76792280f8f7e12369
+  bytes: 40418
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckFailLight/runStateCheckFailLight-900-78bb22f7c834.webp
+- path: assets/brand/visuals/generated/files/runStateCheckPass/runStateCheckPass-480-ace447c0b848.avif
+  sha256: b041e0fcb2c24e6dacdcb6143d85306ef928a4d063ec71e0852a5d0c072a6bd6
+  bytes: 22093
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckPass/runStateCheckPass-480-ace447c0b848.avif
+- path: assets/brand/visuals/generated/files/runStateCheckPass/runStateCheckPass-480-ace447c0b848.webp
+  sha256: e3bbc372b3788dc4af01421d75a3e20995f8d6158d9648983096a2c534fda3dc
+  bytes: 24398
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckPass/runStateCheckPass-480-ace447c0b848.webp
+- path: assets/brand/visuals/generated/files/runStateCheckPass/runStateCheckPass-720-ace447c0b848.avif
+  sha256: c7c3a7a0667fb7a8aca888f1ce1fcd1faf4bfe7c4303a30a1076f19db6cb6593
+  bytes: 41596
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckPass/runStateCheckPass-720-ace447c0b848.avif
+- path: assets/brand/visuals/generated/files/runStateCheckPass/runStateCheckPass-720-ace447c0b848.webp
+  sha256: d2418b4caaa53dfd0d5aaa26a2df47980fc0eda7079a6176b56d16e0c0fc5a6a
+  bytes: 48146
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckPass/runStateCheckPass-720-ace447c0b848.webp
+- path: assets/brand/visuals/generated/files/runStateCheckPass/runStateCheckPass-768-ace447c0b848.avif
+  sha256: f75f4877b3128952820abb177885d99b1ee99de8ef2b7361cdce4fcf6ff52a10
+  bytes: 34965
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckPass/runStateCheckPass-768-ace447c0b848.avif
+- path: assets/brand/visuals/generated/files/runStateCheckPass/runStateCheckPass-768-ace447c0b848.webp
+  sha256: c849a912279ef8c517123d1f7bd2583acaae08991cbb50b4609617016fc2b8e9
+  bytes: 51292
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckPass/runStateCheckPass-768-ace447c0b848.webp
+- path: assets/brand/visuals/generated/files/runStateCheckPassLight/runStateCheckPassLight-480-45789706a23a.avif
+  sha256: 6e89270da072e6723691d17378161fa5648dd0edd4e8ce6c31fe4403e083efd8
+  bytes: 19156
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckPassLight/runStateCheckPassLight-480-45789706a23a.avif
+- path: assets/brand/visuals/generated/files/runStateCheckPassLight/runStateCheckPassLight-480-45789706a23a.webp
+  sha256: 4b47ae7bc23807a46782f1254cd2b94b5032d1633df58e0489b723b560cd5af1
+  bytes: 21142
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckPassLight/runStateCheckPassLight-480-45789706a23a.webp
+- path: assets/brand/visuals/generated/files/runStateCheckPassLight/runStateCheckPassLight-720-45789706a23a.avif
+  sha256: 98b8921ece63923ab24896200fd4cf5ffb2d856f93a6620dec9dc4986c5d6e91
+  bytes: 35992
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckPassLight/runStateCheckPassLight-720-45789706a23a.avif
+- path: assets/brand/visuals/generated/files/runStateCheckPassLight/runStateCheckPassLight-720-45789706a23a.webp
+  sha256: 1e4df502a3ab9a4b2cba0b658547d4f71abe7d9b74e49a149fb1c4d37f8c2758
+  bytes: 42102
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckPassLight/runStateCheckPassLight-720-45789706a23a.webp
+- path: assets/brand/visuals/generated/files/runStateCheckPassLight/runStateCheckPassLight-768-45789706a23a.avif
+  sha256: b902f21b449ff139746394c35f3ae941e1dcf755caa604731b3874bb01c5edbd
+  bytes: 32306
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckPassLight/runStateCheckPassLight-768-45789706a23a.avif
+- path: assets/brand/visuals/generated/files/runStateCheckPassLight/runStateCheckPassLight-768-45789706a23a.webp
+  sha256: 7b906ba3ae179a393df02b3257186fe6e4be07183c3595e37af91089475b45e0
+  bytes: 47212
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateCheckPassLight/runStateCheckPassLight-768-45789706a23a.webp
+- path: assets/brand/visuals/generated/files/runStateLocalRequired/runStateLocalRequired-480-8ff51081db4f.avif
+  sha256: 50304649efbd9446033b0998dcd5b062fa87ed8709679181238083d7983c27b5
+  bytes: 15424
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateLocalRequired/runStateLocalRequired-480-8ff51081db4f.avif
+- path: assets/brand/visuals/generated/files/runStateLocalRequired/runStateLocalRequired-480-8ff51081db4f.webp
+  sha256: 48d1c3a54e70782307ae7db6c4590db4de953e853d0bd1b2bce37b988d14cdca
+  bytes: 16588
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateLocalRequired/runStateLocalRequired-480-8ff51081db4f.webp
+- path: assets/brand/visuals/generated/files/runStateLocalRequired/runStateLocalRequired-720-8ff51081db4f.avif
+  sha256: 4bdedfef6a3d398fe51dcdb4f77b9cd71ad876f7f2c0c72c47ee598b433a81e0
+  bytes: 30680
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateLocalRequired/runStateLocalRequired-720-8ff51081db4f.avif
+- path: assets/brand/visuals/generated/files/runStateLocalRequired/runStateLocalRequired-720-8ff51081db4f.webp
+  sha256: 39fb118e401b1762106fba2cf5dcc0793ab748437062f44d2adced94b9407b2b
+  bytes: 33382
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateLocalRequired/runStateLocalRequired-720-8ff51081db4f.webp
+- path: assets/brand/visuals/generated/files/runStateLocalRequired/runStateLocalRequired-900-8ff51081db4f.avif
+  sha256: 68051276f8638a2a2451d59c75e427d2de645553bd27cf7faab413f85456d23e
+  bytes: 32622
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateLocalRequired/runStateLocalRequired-900-8ff51081db4f.avif
+- path: assets/brand/visuals/generated/files/runStateLocalRequired/runStateLocalRequired-900-8ff51081db4f.webp
+  sha256: 1e55245c83ce07bbd36eb097546523b04cc77a7970397b68c0d1b851e3801f3c
+  bytes: 47788
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateLocalRequired/runStateLocalRequired-900-8ff51081db4f.webp
+- path: assets/brand/visuals/generated/files/runStateLocalRequiredLight/runStateLocalRequiredLight-480-35ca38188df3.avif
+  sha256: 13f112217870c3ba20f1cfbe8b1df88b862157f4a6de883f0fdbbc1ac700649b
+  bytes: 13859
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateLocalRequiredLight/runStateLocalRequiredLight-480-35ca38188df3.avif
+- path: assets/brand/visuals/generated/files/runStateLocalRequiredLight/runStateLocalRequiredLight-480-35ca38188df3.webp
+  sha256: 622d99323917c2e356d8b5a799fc46066b7577879a020fa0014750a574c20a34
+  bytes: 14696
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateLocalRequiredLight/runStateLocalRequiredLight-480-35ca38188df3.webp
+- path: assets/brand/visuals/generated/files/runStateLocalRequiredLight/runStateLocalRequiredLight-720-35ca38188df3.avif
+  sha256: 8afd2d173978f7cb04b0721c22a65604d0e645a1c84dfdc9c6da12dff134be92
+  bytes: 27078
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateLocalRequiredLight/runStateLocalRequiredLight-720-35ca38188df3.avif
+- path: assets/brand/visuals/generated/files/runStateLocalRequiredLight/runStateLocalRequiredLight-720-35ca38188df3.webp
+  sha256: 5d41f36eb11bfa14ff7272f362ad03332d67d09a72e5a83ee0832eaa0a2c2a86
+  bytes: 30678
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateLocalRequiredLight/runStateLocalRequiredLight-720-35ca38188df3.webp
+- path: assets/brand/visuals/generated/files/runStateLocalRequiredLight/runStateLocalRequiredLight-900-35ca38188df3.avif
+  sha256: 5657bd51ea25f59b7431018f4ec9373987ee5f50d4e67e347a75b9e5335f4cde
+  bytes: 30275
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateLocalRequiredLight/runStateLocalRequiredLight-900-35ca38188df3.avif
+- path: assets/brand/visuals/generated/files/runStateLocalRequiredLight/runStateLocalRequiredLight-900-35ca38188df3.webp
+  sha256: 3f226bf082ca1197419314f4953882fe9ee644cf340e8fbd1d827b9c15f2278b
+  bytes: 44048
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateLocalRequiredLight/runStateLocalRequiredLight-900-35ca38188df3.webp
+- path: assets/brand/visuals/generated/files/runStateReady/runStateReady-1200-ec95ae8add82.avif
+  sha256: acfe39005c181ae658badde3a7c0d4d6dbe0a3475e67005e224433db43f3b1db
+  bytes: 5789
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateReady/runStateReady-1200-ec95ae8add82.avif
+- path: assets/brand/visuals/generated/files/runStateReady/runStateReady-1200-ec95ae8add82.webp
+  sha256: 4246e589f78605f1fbbb4fbf72658722c1d595657f880661bb5c919e26a11211
+  bytes: 6896
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateReady/runStateReady-1200-ec95ae8add82.webp
+- path: assets/brand/visuals/generated/files/runStateReady/runStateReady-1440-ec95ae8add82.avif
+  sha256: d2665e0a819ae2482c4cd4fcaa8742aa13e0126b9d4093c520ae5e10ae4e2a8f
+  bytes: 6876
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateReady/runStateReady-1440-ec95ae8add82.avif
+- path: assets/brand/visuals/generated/files/runStateReady/runStateReady-1440-ec95ae8add82.webp
+  sha256: 6644048a076b43e89c637ed8d04ede38647130cc4a1a4c05dda654ea4731e5eb
+  bytes: 8792
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateReady/runStateReady-1440-ec95ae8add82.webp
+- path: assets/brand/visuals/generated/files/runStateReady/runStateReady-480-ec95ae8add82.avif
+  sha256: 61e703d5c6f9be981f2d58167cac6a368d4806a5b7b1f20ea4f566134346d9d2
+  bytes: 1761
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateReady/runStateReady-480-ec95ae8add82.avif
+- path: assets/brand/visuals/generated/files/runStateReady/runStateReady-480-ec95ae8add82.webp
+  sha256: 63cebe191f22d7ddab1f9d8c191573555a110dc315c376f717c3955dd3a1ced2
+  bytes: 1594
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateReady/runStateReady-480-ec95ae8add82.webp
+- path: assets/brand/visuals/generated/files/runStateReady/runStateReady-720-ec95ae8add82.avif
+  sha256: adc00f412b363cd2aefbfdc07fa078469ab0cbd4949efa5fd380059787ddf44d
+  bytes: 3042
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateReady/runStateReady-720-ec95ae8add82.avif
+- path: assets/brand/visuals/generated/files/runStateReady/runStateReady-720-ec95ae8add82.webp
+  sha256: 3ff3f50696210543603634cc4bdb5b8d1142b151336f702bdc57c3650fa82aa0
+  bytes: 2848
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateReady/runStateReady-720-ec95ae8add82.webp
+- path: assets/brand/visuals/generated/files/runStateReadyLight/runStateReadyLight-1200-5b95612f02ef.avif
+  sha256: b5d156fbdc660ed209c1a68d48426bf948513fabb886050a5af993f43593594c
+  bytes: 5609
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateReadyLight/runStateReadyLight-1200-5b95612f02ef.avif
+- path: assets/brand/visuals/generated/files/runStateReadyLight/runStateReadyLight-1200-5b95612f02ef.webp
+  sha256: 0a681971950a6afc1ab8d2e35f7a33703416a0cece4a912c9620a69d2f4e810d
+  bytes: 6798
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateReadyLight/runStateReadyLight-1200-5b95612f02ef.webp
+- path: assets/brand/visuals/generated/files/runStateReadyLight/runStateReadyLight-1440-5b95612f02ef.avif
+  sha256: 5242ef4bd83b15074ec1c06c47c4165b0e0677cfe6ed9f73789be2ed4b779a03
+  bytes: 6883
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateReadyLight/runStateReadyLight-1440-5b95612f02ef.avif
+- path: assets/brand/visuals/generated/files/runStateReadyLight/runStateReadyLight-1440-5b95612f02ef.webp
+  sha256: 4cf52c51b0a81db1d18d1b1b4ce0f3040805c5a3b3ebf8f997031fd579769e62
+  bytes: 8546
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateReadyLight/runStateReadyLight-1440-5b95612f02ef.webp
+- path: assets/brand/visuals/generated/files/runStateReadyLight/runStateReadyLight-480-5b95612f02ef.avif
+  sha256: 7859b0b3950cb864e9ad40edd9f8c9738e45b11ade51b5ccd9687f2c48255563
+  bytes: 1740
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateReadyLight/runStateReadyLight-480-5b95612f02ef.avif
+- path: assets/brand/visuals/generated/files/runStateReadyLight/runStateReadyLight-480-5b95612f02ef.webp
+  sha256: 7a87fa9c6a7435e77a4083bba65f90021b11c7cefeea2e0781448b3b05cfe81e
+  bytes: 1636
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateReadyLight/runStateReadyLight-480-5b95612f02ef.webp
+- path: assets/brand/visuals/generated/files/runStateReadyLight/runStateReadyLight-720-5b95612f02ef.avif
+  sha256: 05e1668b67230e063d910acb0068960824c1bd01b1f06bc238258d2e13278ceb
+  bytes: 2955
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateReadyLight/runStateReadyLight-720-5b95612f02ef.avif
+- path: assets/brand/visuals/generated/files/runStateReadyLight/runStateReadyLight-720-5b95612f02ef.webp
+  sha256: e9744890f36547a885e6ebe4607f0081011e05f60099c9252ff77210ea81c8b5
+  bytes: 2894
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateReadyLight/runStateReadyLight-720-5b95612f02ef.webp
+- path: assets/brand/visuals/generated/files/runStateRunning/runStateRunning-1200-6ef3033dc561.avif
+  sha256: a72130fbbd8d19cbb59e3b92266e0ed6600657762472c6df03ee1297a5ac9ce4
+  bytes: 10546
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateRunning/runStateRunning-1200-6ef3033dc561.avif
+- path: assets/brand/visuals/generated/files/runStateRunning/runStateRunning-1200-6ef3033dc561.webp
+  sha256: b4e8902a967bd2f3c8ce52e9f42d38b5f0c4c7ea32439b5f32951c8f4cd957e1
+  bytes: 13152
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateRunning/runStateRunning-1200-6ef3033dc561.webp
+- path: assets/brand/visuals/generated/files/runStateRunning/runStateRunning-1440-6ef3033dc561.avif
+  sha256: 612d8a1f742900d0dee93d7e86bfe301e06b32e6e964856a7c6a5a426f8b4787
+  bytes: 10667
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateRunning/runStateRunning-1440-6ef3033dc561.avif
+- path: assets/brand/visuals/generated/files/runStateRunning/runStateRunning-1440-6ef3033dc561.webp
+  sha256: 34a168e2b443770f81cf71f97155cf10580487b993cbdd260900d4bdbcabbfba
+  bytes: 16382
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateRunning/runStateRunning-1440-6ef3033dc561.webp
+- path: assets/brand/visuals/generated/files/runStateRunning/runStateRunning-480-6ef3033dc561.avif
+  sha256: 39e02f6cfb4c889e93b4b1c5d1d847cba7a26f9424fa9bc94c5e04dd39521093
+  bytes: 3040
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateRunning/runStateRunning-480-6ef3033dc561.avif
+- path: assets/brand/visuals/generated/files/runStateRunning/runStateRunning-480-6ef3033dc561.webp
+  sha256: fb84b0f57dcbc7cad186ed111f653303bc5aa94ecfdcaf9f99db8f1096713b99
+  bytes: 3124
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateRunning/runStateRunning-480-6ef3033dc561.webp
+- path: assets/brand/visuals/generated/files/runStateRunning/runStateRunning-720-6ef3033dc561.avif
+  sha256: c65a88ed25a408420f965ef6c4e41c28cd89cbb8a12d7da47b25a1a4241bde94
+  bytes: 5206
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateRunning/runStateRunning-720-6ef3033dc561.avif
+- path: assets/brand/visuals/generated/files/runStateRunning/runStateRunning-720-6ef3033dc561.webp
+  sha256: 9fac2db588cc92dce47583f51c8c39748b7e6ae3151c9ab173544cd2da392c3c
+  bytes: 5600
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateRunning/runStateRunning-720-6ef3033dc561.webp
+- path: assets/brand/visuals/generated/files/runStateRunningLight/runStateRunningLight-1200-d40539709513.avif
+  sha256: e2bc3f714c71e30a77609b79ef70dae3294fdc107a083e494ec6b2063d0239e6
+  bytes: 9820
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateRunningLight/runStateRunningLight-1200-d40539709513.avif
+- path: assets/brand/visuals/generated/files/runStateRunningLight/runStateRunningLight-1200-d40539709513.webp
+  sha256: 3af5001e56e6dc0a5f3a6b3842a11518dc3657df40a5a38f5df825cddda3e1e5
+  bytes: 12672
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateRunningLight/runStateRunningLight-1200-d40539709513.webp
+- path: assets/brand/visuals/generated/files/runStateRunningLight/runStateRunningLight-1440-d40539709513.avif
+  sha256: e505332b8bff45c9e5bdfa57e4731498fc988f19fb79fbb0e4cbbbde6d8712a1
+  bytes: 10586
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateRunningLight/runStateRunningLight-1440-d40539709513.avif
+- path: assets/brand/visuals/generated/files/runStateRunningLight/runStateRunningLight-1440-d40539709513.webp
+  sha256: 90682a8a979770a31f8bf481e68e13f9ce89ccbcf5a66dfebcd2eed445f9f17e
+  bytes: 15882
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateRunningLight/runStateRunningLight-1440-d40539709513.webp
+- path: assets/brand/visuals/generated/files/runStateRunningLight/runStateRunningLight-480-d40539709513.avif
+  sha256: 3c2296fb5ef76fdf1102df4884ea4c31ce9e26dbce9f85ac51c765f03b572255
+  bytes: 2958
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateRunningLight/runStateRunningLight-480-d40539709513.avif
+- path: assets/brand/visuals/generated/files/runStateRunningLight/runStateRunningLight-480-d40539709513.webp
+  sha256: ac29e5b45bc79236713995bdd5cc6ba5ab3c29df64ab3b6aab1e957fdcd20b14
+  bytes: 2986
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateRunningLight/runStateRunningLight-480-d40539709513.webp
+- path: assets/brand/visuals/generated/files/runStateRunningLight/runStateRunningLight-720-d40539709513.avif
+  sha256: fb7adfdac740d519ec14458e71b210dcab9dc49751e3f1e329dde1be445d66d9
+  bytes: 4911
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateRunningLight/runStateRunningLight-720-d40539709513.avif
+- path: assets/brand/visuals/generated/files/runStateRunningLight/runStateRunningLight-720-d40539709513.webp
+  sha256: dfa773b257d053716de1624157b34e4a88083e8f232ccb339dd9d45a532f7629
+  bytes: 5250
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/runStateRunningLight/runStateRunningLight-720-d40539709513.webp
 - path: assets/brand/visuals/generated/files/statisticsMachineLearning/statisticsMachineLearning-1200-d6e581dafc4f.avif
   sha256: 15b2d32c93f92023c2b208e56d91b4c12ce022c216af232b3616f0be5182dfbc
   bytes: 48588
@@ -988,8 +1328,8 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: assets/brand/visuals/generated/manifest.json
-  sha256: 58d74453f789e7472cb2919dd710c5eed3b84621596a2b26080b548ebee737ef
-  bytes: 116204
+  sha256: 755e0d20cd6680b0daf97e1d01e67392c394c57965697a461d378f8fe2fca47e
+  bytes: 173609
   kind: repository
   sourcePath: assets/brand/visuals/generated/manifest.json
 - path: assets/brand/visuals/learning/ai-integration-v1.png
@@ -1033,13 +1373,13 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/learning/statistics-ml-v1.png
 - path: assets/brand/visuals/manifest.json
-  sha256: d3bd26e6f789ac0a881dc9e647f87bc747b7d50bbcac7fa47b870656d8388539
-  bytes: 65270
+  sha256: e3fa3a4a69b306c41f39b99ab5792f5425974a02c8a05fd89ca51fa9e48d7a8b
+  bytes: 99458
   kind: repository
   sourcePath: assets/brand/visuals/manifest.json
 - path: assets/brand/visuals/manifest.schema.json
-  sha256: 9c5c9d4fcfc8d24d5c7243836f5ad3e99fb7e0f1725a83606981d01de58c47b1
-  bytes: 6452
+  sha256: 0e35ebf9f3ebddf512c901ec957fda45541d310b0a761ed9d3a7be66462b6c92
+  bytes: 6849
   kind: repository
   sourcePath: assets/brand/visuals/manifest.schema.json
 - path: assets/brand/visuals/outcomes/dataReportOutcome.png
@@ -1127,6 +1467,56 @@ files:
   bytes: 55716
   kind: repository
   sourcePath: assets/brand/visuals/product/run-learning-mobile-light.png
+- path: assets/brand/visuals/product/run/check-fail-dark.png
+  sha256: 75a9f78be4a45abae4d65db463004fa6db5e12e5b44962b19054fa18ef552355
+  bytes: 91035
+  kind: repository
+  sourcePath: assets/brand/visuals/product/run/check-fail-dark.png
+- path: assets/brand/visuals/product/run/check-fail-light.png
+  sha256: 78bb22f7c834a43a3a484fe4c1975fe8a485b2a1773ce6f0939cd0bc7d471dfc
+  bytes: 89973
+  kind: repository
+  sourcePath: assets/brand/visuals/product/run/check-fail-light.png
+- path: assets/brand/visuals/product/run/check-pass-dark.png
+  sha256: ace447c0b848af3bc4fc9f6d04c5417877adbe61fbd9274e7089329b2bf96ee6
+  bytes: 108080
+  kind: repository
+  sourcePath: assets/brand/visuals/product/run/check-pass-dark.png
+- path: assets/brand/visuals/product/run/check-pass-light.png
+  sha256: 45789706a23a014865040b1b35718d4a684fb3b6401d873269283c4d1e5860c3
+  bytes: 107100
+  kind: repository
+  sourcePath: assets/brand/visuals/product/run/check-pass-light.png
+- path: assets/brand/visuals/product/run/local-required-dark.png
+  sha256: 8ff51081db4f3f2cb54fef8e4a5134a217a8919a2e67b28841b448e00dec3b87
+  bytes: 99317
+  kind: repository
+  sourcePath: assets/brand/visuals/product/run/local-required-dark.png
+- path: assets/brand/visuals/product/run/local-required-light.png
+  sha256: 35ca38188df38c46b0daa694dc516561881dd09f18c036422b674048924004b2
+  bytes: 97778
+  kind: repository
+  sourcePath: assets/brand/visuals/product/run/local-required-light.png
+- path: assets/brand/visuals/product/run/ready-dark.png
+  sha256: ec95ae8add825b0270e09dea84157a9809c72f5e3c175e2217efb8fae3529b62
+  bytes: 25447
+  kind: repository
+  sourcePath: assets/brand/visuals/product/run/ready-dark.png
+- path: assets/brand/visuals/product/run/ready-light.png
+  sha256: 5b95612f02ef08633a78380ba7af10a578dcb4ed78bcef95a36043438777e94d
+  bytes: 24922
+  kind: repository
+  sourcePath: assets/brand/visuals/product/run/ready-light.png
+- path: assets/brand/visuals/product/run/running-dark.png
+  sha256: 6ef3033dc561645373c6aaa958fae653f6ca5b4a3c8fc6e92a357d75cbb17c27
+  bytes: 42598
+  kind: repository
+  sourcePath: assets/brand/visuals/product/run/running-dark.png
+- path: assets/brand/visuals/product/run/running-light.png
+  sha256: d40539709513476c0b2998ccc8e1909eee624f7adcae0b87bf6bea3849e998d6
+  bytes: 41740
+  kind: repository
+  sourcePath: assets/brand/visuals/product/run/running-light.png
 - path: assets/brand/visuals/prompts/ai-integration-v1.txt
   sha256: 51f558f4635cfe113f30a3771b3d16437bd96f712cb726b65347c3f0e32c7479
   bytes: 1376
@@ -1488,8 +1878,8 @@ files:
   kind: repository
   sourcePath: curricula/python/aiIntegration/llmBasics/07_프롬프트캐싱.yaml
 - path: curricula/python/aiIntegration/llmBasics/08_도구사용기초.yaml
-  sha256: bb632789fc68bc4fcac6eb33657d6fc5bd60de8acd4bc8c20c23631ed0cdfc02
-  bytes: 33694
+  sha256: 4672ccf12e6f34897654c0a3534b20fb0503b70a63bb698749236596fde6d3e0
+  bytes: 33747
   kind: repository
   sourcePath: curricula/python/aiIntegration/llmBasics/08_도구사용기초.yaml
 - path: curricula/python/aiIntegration/llmBasics/09_멀티도구라우팅.yaml
@@ -2043,8 +2433,8 @@ files:
   kind: repository
   sourcePath: curricula/python/automation/os/watchSched/04_재귀감시와필터.yaml
 - path: curricula/python/automation/os/watchSched/05_schedule간단스케줄.yaml
-  sha256: 500811e7352878222c41042e1045b6c4f9f871d08cf566f4732d4150209cdbaa
-  bytes: 26464
+  sha256: e382d79925f7068aea509828f00f2c130ec906a77c27599b170f4971da003940
+  bytes: 26532
   kind: repository
   sourcePath: curricula/python/automation/os/watchSched/05_schedule간단스케줄.yaml
 - path: curricula/python/automation/os/watchSched/06_APScheduler소개.yaml
@@ -2163,8 +2553,8 @@ files:
   kind: repository
   sourcePath: curricula/python/basics/30days/day01_헬로월드.yaml
 - path: curricula/python/basics/30days/day02_변수와데이터타입.yaml
-  sha256: 631f75623015c5b6db9f6189741c6407027a83a60b4ac32c67da22ec1c7fd3d3
-  bytes: 33848
+  sha256: d2b819b24efc2feda35680a8f6acfb70c8944b3610e97475a3c8349df45b7ca5
+  bytes: 33906
   kind: repository
   sourcePath: curricula/python/basics/30days/day02_변수와데이터타입.yaml
 - path: curricula/python/basics/30days/day03_연산자.yaml
@@ -2808,8 +3198,8 @@ files:
   kind: repository
   sourcePath: curricula/python/dataAnalysis/pandas/00_판다스소개.yaml
 - path: curricula/python/dataAnalysis/pandas/01_레스토랑팁분석.yaml
-  sha256: 2d5fa7ed83147629ca60d4726bbe0ae2e052eeb8beeb6133597a100ef9b22f2e
-  bytes: 37131
+  sha256: d30dd89318821971b9d46a93ea26ae1aaa39e58a8b92ceff6b66bb7433c202b2
+  bytes: 37183
   kind: repository
   sourcePath: curricula/python/dataAnalysis/pandas/01_레스토랑팁분석.yaml
 - path: curricula/python/dataAnalysis/pandas/02_타이타닉생존분석.yaml
@@ -2978,8 +3368,8 @@ files:
   kind: repository
   sourcePath: curricula/python/devLiteracy/devTools/commandLineIntro.yaml
 - path: curricula/python/devLiteracy/devTools/gitFirstSteps.yaml
-  sha256: 6ef0264a42769047dab6cf43abc0cb93e5016c22ac256753baf3822315f4eb85
-  bytes: 27868
+  sha256: dfc775be321c59045d342af4f129587c9105fb46b0d7bf18fcbec3d9b27de7c0
+  bytes: 27935
   kind: repository
   sourcePath: curricula/python/devLiteracy/devTools/gitFirstSteps.yaml
 - path: curricula/python/devLiteracy/devTools/githubIntro.yaml
@@ -3043,8 +3433,8 @@ files:
   kind: repository
   sourcePath: curricula/python/imageVision/opencv/00_OpenCV소개.yaml
 - path: curricula/python/imageVision/opencv/01_이미지구조탐색기.yaml
-  sha256: 1809a6d0a8485b390e0252056a7108016490e7d88ddd4833b227a3c06fc4c5dd
-  bytes: 43963
+  sha256: a97d12d4b49dfe02735b4d21da8f93921230fc190fee90ff76eb5ce71f29f08d
+  bytes: 44014
   kind: repository
   sourcePath: curricula/python/imageVision/opencv/01_이미지구조탐색기.yaml
 - path: curricula/python/imageVision/opencv/02_색공간변환기.yaml
@@ -3408,8 +3798,8 @@ files:
   kind: repository
   sourcePath: curricula/python/mathStatsMl/scipy/10_종합과학프로젝트.yaml
 - path: curricula/python/mathStatsMl/sklearn/00_sklearn소개.yaml
-  sha256: ba6efef04c3a0b28a58da122e44cc05a6d756505303df9312c04e1e9eef838ab
-  bytes: 35184
+  sha256: 3cd24ae818e7af118e6458f7642e726f333bfada470e72d9d28dd4f36b418e52
+  bytes: 35239
   kind: repository
   sourcePath: curricula/python/mathStatsMl/sklearn/00_sklearn소개.yaml
 - path: curricula/python/mathStatsMl/sklearn/01_와인품질분류.yaml
@@ -3693,8 +4083,8 @@ files:
   kind: repository
   sourcePath: curricula/python/visualization/folium/10_종합지도프로젝트.yaml
 - path: curricula/python/visualization/matplotlib/00_Matplotlib소개.yaml
-  sha256: c7061aa54e619dfd926bb84d43d93d48f84dcaeffb06708a05c621db38786ac0
-  bytes: 30577
+  sha256: c463b087a6303000e5e5104616469bb2310ef33769763cd5154c2c02664f4273
+  bytes: 30624
   kind: repository
   sourcePath: curricula/python/visualization/matplotlib/00_Matplotlib소개.yaml
 - path: curricula/python/visualization/matplotlib/01_주가추세분석.yaml
@@ -4118,13 +4508,13 @@ files:
   kind: repository
   sourcePath: docs/skills/ops/foundation/environment.md
 - path: docs/skills/ops/foundation/testing-and-gates.md
-  sha256: df4e2430bb5d5cc7e73f711183367cf68c26292c00ab15a9f67dfc0a5a44213b
-  bytes: 58723
+  sha256: a3092ffce29122d72ec8bc49cff1633b0a219a234d11417f723cff604fa9bdc7
+  bytes: 59290
   kind: repository
   sourcePath: docs/skills/ops/foundation/testing-and-gates.md
 - path: docs/skills/ops/product/branding.md
-  sha256: 61cd75fc7b7e024609c0c2fb942be0d036343a498ec799ee260b210485e5615f
-  bytes: 10579
+  sha256: d4a3cfa18015bc4f07016521c278b2bfd9d170fb8cbfcb6214d185d327a9f327
+  bytes: 12034
   kind: repository
   sourcePath: docs/skills/ops/product/branding.md
 - path: docs/skills/ops/product/contentPipeline.md
@@ -5392,6 +5782,346 @@ files:
   bytes: 27954
   kind: repository
   sourcePath: editor/public/visuals/files/runLearningMobileLight/runLearningMobileLight-390-212f04693e95.webp
+- path: editor/public/visuals/files/runStateCheckFail/runStateCheckFail-480-75a9f78be4a4.avif
+  sha256: 249c5f2ea6f2ed4b17aa34fcd214b0cb1dd2beadb499070cba6504e001049f60
+  bytes: 14406
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckFail/runStateCheckFail-480-75a9f78be4a4.avif
+- path: editor/public/visuals/files/runStateCheckFail/runStateCheckFail-480-75a9f78be4a4.webp
+  sha256: b9cc12d6a035c634a6deeb0de3f773e37a0dbd11bfa03095fd114683b4d29a14
+  bytes: 15946
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckFail/runStateCheckFail-480-75a9f78be4a4.webp
+- path: editor/public/visuals/files/runStateCheckFail/runStateCheckFail-720-75a9f78be4a4.avif
+  sha256: a2e3d8567e7e61476338a63e748c8bac947f04553c60a753c24c08f809bb0d6f
+  bytes: 28122
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckFail/runStateCheckFail-720-75a9f78be4a4.avif
+- path: editor/public/visuals/files/runStateCheckFail/runStateCheckFail-720-75a9f78be4a4.webp
+  sha256: 64525177bd4799cda39c81ec201e2dc6ba63be550e063e9acdf91a80c327f356
+  bytes: 31116
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckFail/runStateCheckFail-720-75a9f78be4a4.webp
+- path: editor/public/visuals/files/runStateCheckFail/runStateCheckFail-900-75a9f78be4a4.avif
+  sha256: 67b7c15cd4513e789a675f416b52536b389d0f1e7fda82414f537997f0fb8487
+  bytes: 29721
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckFail/runStateCheckFail-900-75a9f78be4a4.avif
+- path: editor/public/visuals/files/runStateCheckFail/runStateCheckFail-900-75a9f78be4a4.webp
+  sha256: d206b10f532b4136bb3448f67f8709b058aa6d7ce32a5af208c63b3c1d28fb54
+  bytes: 43644
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckFail/runStateCheckFail-900-75a9f78be4a4.webp
+- path: editor/public/visuals/files/runStateCheckFailLight/runStateCheckFailLight-480-78bb22f7c834.avif
+  sha256: 6bc415494206dd08725ad331ae55af2bcc30d93b3a1f593b276fba4e2c098fd4
+  bytes: 12772
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckFailLight/runStateCheckFailLight-480-78bb22f7c834.avif
+- path: editor/public/visuals/files/runStateCheckFailLight/runStateCheckFailLight-480-78bb22f7c834.webp
+  sha256: ce266709943dfc9f8de42df18a9841e8f8d08f04ed2200fa77e14bc0cd75cdaa
+  bytes: 14166
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckFailLight/runStateCheckFailLight-480-78bb22f7c834.webp
+- path: editor/public/visuals/files/runStateCheckFailLight/runStateCheckFailLight-720-78bb22f7c834.avif
+  sha256: 0e7bdf815b8a61fb85cbdc6a717c1eaf52814c776e7e609deac06d5ed2d28fc3
+  bytes: 25103
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckFailLight/runStateCheckFailLight-720-78bb22f7c834.avif
+- path: editor/public/visuals/files/runStateCheckFailLight/runStateCheckFailLight-720-78bb22f7c834.webp
+  sha256: 6f9f5d30b4684d491e6df3ecbaa020e59a815bc393d85e537c750bb0b866505a
+  bytes: 27838
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckFailLight/runStateCheckFailLight-720-78bb22f7c834.webp
+- path: editor/public/visuals/files/runStateCheckFailLight/runStateCheckFailLight-900-78bb22f7c834.avif
+  sha256: 6d4eadc0726a4ed5f18cb010c9a9111de0dd113ef9032d1163b52b852c477148
+  bytes: 27903
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckFailLight/runStateCheckFailLight-900-78bb22f7c834.avif
+- path: editor/public/visuals/files/runStateCheckFailLight/runStateCheckFailLight-900-78bb22f7c834.webp
+  sha256: a54c86b076f9b780a3a5d991b647e06d7d31f054d99d0b76792280f8f7e12369
+  bytes: 40418
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckFailLight/runStateCheckFailLight-900-78bb22f7c834.webp
+- path: editor/public/visuals/files/runStateCheckPass/runStateCheckPass-480-ace447c0b848.avif
+  sha256: b041e0fcb2c24e6dacdcb6143d85306ef928a4d063ec71e0852a5d0c072a6bd6
+  bytes: 22093
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckPass/runStateCheckPass-480-ace447c0b848.avif
+- path: editor/public/visuals/files/runStateCheckPass/runStateCheckPass-480-ace447c0b848.webp
+  sha256: e3bbc372b3788dc4af01421d75a3e20995f8d6158d9648983096a2c534fda3dc
+  bytes: 24398
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckPass/runStateCheckPass-480-ace447c0b848.webp
+- path: editor/public/visuals/files/runStateCheckPass/runStateCheckPass-720-ace447c0b848.avif
+  sha256: c7c3a7a0667fb7a8aca888f1ce1fcd1faf4bfe7c4303a30a1076f19db6cb6593
+  bytes: 41596
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckPass/runStateCheckPass-720-ace447c0b848.avif
+- path: editor/public/visuals/files/runStateCheckPass/runStateCheckPass-720-ace447c0b848.webp
+  sha256: d2418b4caaa53dfd0d5aaa26a2df47980fc0eda7079a6176b56d16e0c0fc5a6a
+  bytes: 48146
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckPass/runStateCheckPass-720-ace447c0b848.webp
+- path: editor/public/visuals/files/runStateCheckPass/runStateCheckPass-768-ace447c0b848.avif
+  sha256: f75f4877b3128952820abb177885d99b1ee99de8ef2b7361cdce4fcf6ff52a10
+  bytes: 34965
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckPass/runStateCheckPass-768-ace447c0b848.avif
+- path: editor/public/visuals/files/runStateCheckPass/runStateCheckPass-768-ace447c0b848.webp
+  sha256: c849a912279ef8c517123d1f7bd2583acaae08991cbb50b4609617016fc2b8e9
+  bytes: 51292
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckPass/runStateCheckPass-768-ace447c0b848.webp
+- path: editor/public/visuals/files/runStateCheckPassLight/runStateCheckPassLight-480-45789706a23a.avif
+  sha256: 6e89270da072e6723691d17378161fa5648dd0edd4e8ce6c31fe4403e083efd8
+  bytes: 19156
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckPassLight/runStateCheckPassLight-480-45789706a23a.avif
+- path: editor/public/visuals/files/runStateCheckPassLight/runStateCheckPassLight-480-45789706a23a.webp
+  sha256: 4b47ae7bc23807a46782f1254cd2b94b5032d1633df58e0489b723b560cd5af1
+  bytes: 21142
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckPassLight/runStateCheckPassLight-480-45789706a23a.webp
+- path: editor/public/visuals/files/runStateCheckPassLight/runStateCheckPassLight-720-45789706a23a.avif
+  sha256: 98b8921ece63923ab24896200fd4cf5ffb2d856f93a6620dec9dc4986c5d6e91
+  bytes: 35992
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckPassLight/runStateCheckPassLight-720-45789706a23a.avif
+- path: editor/public/visuals/files/runStateCheckPassLight/runStateCheckPassLight-720-45789706a23a.webp
+  sha256: 1e4df502a3ab9a4b2cba0b658547d4f71abe7d9b74e49a149fb1c4d37f8c2758
+  bytes: 42102
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckPassLight/runStateCheckPassLight-720-45789706a23a.webp
+- path: editor/public/visuals/files/runStateCheckPassLight/runStateCheckPassLight-768-45789706a23a.avif
+  sha256: b902f21b449ff139746394c35f3ae941e1dcf755caa604731b3874bb01c5edbd
+  bytes: 32306
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckPassLight/runStateCheckPassLight-768-45789706a23a.avif
+- path: editor/public/visuals/files/runStateCheckPassLight/runStateCheckPassLight-768-45789706a23a.webp
+  sha256: 7b906ba3ae179a393df02b3257186fe6e4be07183c3595e37af91089475b45e0
+  bytes: 47212
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateCheckPassLight/runStateCheckPassLight-768-45789706a23a.webp
+- path: editor/public/visuals/files/runStateLocalRequired/runStateLocalRequired-480-8ff51081db4f.avif
+  sha256: 50304649efbd9446033b0998dcd5b062fa87ed8709679181238083d7983c27b5
+  bytes: 15424
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateLocalRequired/runStateLocalRequired-480-8ff51081db4f.avif
+- path: editor/public/visuals/files/runStateLocalRequired/runStateLocalRequired-480-8ff51081db4f.webp
+  sha256: 48d1c3a54e70782307ae7db6c4590db4de953e853d0bd1b2bce37b988d14cdca
+  bytes: 16588
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateLocalRequired/runStateLocalRequired-480-8ff51081db4f.webp
+- path: editor/public/visuals/files/runStateLocalRequired/runStateLocalRequired-720-8ff51081db4f.avif
+  sha256: 4bdedfef6a3d398fe51dcdb4f77b9cd71ad876f7f2c0c72c47ee598b433a81e0
+  bytes: 30680
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateLocalRequired/runStateLocalRequired-720-8ff51081db4f.avif
+- path: editor/public/visuals/files/runStateLocalRequired/runStateLocalRequired-720-8ff51081db4f.webp
+  sha256: 39fb118e401b1762106fba2cf5dcc0793ab748437062f44d2adced94b9407b2b
+  bytes: 33382
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateLocalRequired/runStateLocalRequired-720-8ff51081db4f.webp
+- path: editor/public/visuals/files/runStateLocalRequired/runStateLocalRequired-900-8ff51081db4f.avif
+  sha256: 68051276f8638a2a2451d59c75e427d2de645553bd27cf7faab413f85456d23e
+  bytes: 32622
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateLocalRequired/runStateLocalRequired-900-8ff51081db4f.avif
+- path: editor/public/visuals/files/runStateLocalRequired/runStateLocalRequired-900-8ff51081db4f.webp
+  sha256: 1e55245c83ce07bbd36eb097546523b04cc77a7970397b68c0d1b851e3801f3c
+  bytes: 47788
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateLocalRequired/runStateLocalRequired-900-8ff51081db4f.webp
+- path: editor/public/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-480-35ca38188df3.avif
+  sha256: 13f112217870c3ba20f1cfbe8b1df88b862157f4a6de883f0fdbbc1ac700649b
+  bytes: 13859
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-480-35ca38188df3.avif
+- path: editor/public/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-480-35ca38188df3.webp
+  sha256: 622d99323917c2e356d8b5a799fc46066b7577879a020fa0014750a574c20a34
+  bytes: 14696
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-480-35ca38188df3.webp
+- path: editor/public/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-720-35ca38188df3.avif
+  sha256: 8afd2d173978f7cb04b0721c22a65604d0e645a1c84dfdc9c6da12dff134be92
+  bytes: 27078
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-720-35ca38188df3.avif
+- path: editor/public/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-720-35ca38188df3.webp
+  sha256: 5d41f36eb11bfa14ff7272f362ad03332d67d09a72e5a83ee0832eaa0a2c2a86
+  bytes: 30678
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-720-35ca38188df3.webp
+- path: editor/public/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-900-35ca38188df3.avif
+  sha256: 5657bd51ea25f59b7431018f4ec9373987ee5f50d4e67e347a75b9e5335f4cde
+  bytes: 30275
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-900-35ca38188df3.avif
+- path: editor/public/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-900-35ca38188df3.webp
+  sha256: 3f226bf082ca1197419314f4953882fe9ee644cf340e8fbd1d827b9c15f2278b
+  bytes: 44048
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-900-35ca38188df3.webp
+- path: editor/public/visuals/files/runStateReady/runStateReady-1200-ec95ae8add82.avif
+  sha256: acfe39005c181ae658badde3a7c0d4d6dbe0a3475e67005e224433db43f3b1db
+  bytes: 5789
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateReady/runStateReady-1200-ec95ae8add82.avif
+- path: editor/public/visuals/files/runStateReady/runStateReady-1200-ec95ae8add82.webp
+  sha256: 4246e589f78605f1fbbb4fbf72658722c1d595657f880661bb5c919e26a11211
+  bytes: 6896
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateReady/runStateReady-1200-ec95ae8add82.webp
+- path: editor/public/visuals/files/runStateReady/runStateReady-1440-ec95ae8add82.avif
+  sha256: d2665e0a819ae2482c4cd4fcaa8742aa13e0126b9d4093c520ae5e10ae4e2a8f
+  bytes: 6876
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateReady/runStateReady-1440-ec95ae8add82.avif
+- path: editor/public/visuals/files/runStateReady/runStateReady-1440-ec95ae8add82.webp
+  sha256: 6644048a076b43e89c637ed8d04ede38647130cc4a1a4c05dda654ea4731e5eb
+  bytes: 8792
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateReady/runStateReady-1440-ec95ae8add82.webp
+- path: editor/public/visuals/files/runStateReady/runStateReady-480-ec95ae8add82.avif
+  sha256: 61e703d5c6f9be981f2d58167cac6a368d4806a5b7b1f20ea4f566134346d9d2
+  bytes: 1761
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateReady/runStateReady-480-ec95ae8add82.avif
+- path: editor/public/visuals/files/runStateReady/runStateReady-480-ec95ae8add82.webp
+  sha256: 63cebe191f22d7ddab1f9d8c191573555a110dc315c376f717c3955dd3a1ced2
+  bytes: 1594
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateReady/runStateReady-480-ec95ae8add82.webp
+- path: editor/public/visuals/files/runStateReady/runStateReady-720-ec95ae8add82.avif
+  sha256: adc00f412b363cd2aefbfdc07fa078469ab0cbd4949efa5fd380059787ddf44d
+  bytes: 3042
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateReady/runStateReady-720-ec95ae8add82.avif
+- path: editor/public/visuals/files/runStateReady/runStateReady-720-ec95ae8add82.webp
+  sha256: 3ff3f50696210543603634cc4bdb5b8d1142b151336f702bdc57c3650fa82aa0
+  bytes: 2848
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateReady/runStateReady-720-ec95ae8add82.webp
+- path: editor/public/visuals/files/runStateReadyLight/runStateReadyLight-1200-5b95612f02ef.avif
+  sha256: b5d156fbdc660ed209c1a68d48426bf948513fabb886050a5af993f43593594c
+  bytes: 5609
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateReadyLight/runStateReadyLight-1200-5b95612f02ef.avif
+- path: editor/public/visuals/files/runStateReadyLight/runStateReadyLight-1200-5b95612f02ef.webp
+  sha256: 0a681971950a6afc1ab8d2e35f7a33703416a0cece4a912c9620a69d2f4e810d
+  bytes: 6798
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateReadyLight/runStateReadyLight-1200-5b95612f02ef.webp
+- path: editor/public/visuals/files/runStateReadyLight/runStateReadyLight-1440-5b95612f02ef.avif
+  sha256: 5242ef4bd83b15074ec1c06c47c4165b0e0677cfe6ed9f73789be2ed4b779a03
+  bytes: 6883
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateReadyLight/runStateReadyLight-1440-5b95612f02ef.avif
+- path: editor/public/visuals/files/runStateReadyLight/runStateReadyLight-1440-5b95612f02ef.webp
+  sha256: 4cf52c51b0a81db1d18d1b1b4ce0f3040805c5a3b3ebf8f997031fd579769e62
+  bytes: 8546
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateReadyLight/runStateReadyLight-1440-5b95612f02ef.webp
+- path: editor/public/visuals/files/runStateReadyLight/runStateReadyLight-480-5b95612f02ef.avif
+  sha256: 7859b0b3950cb864e9ad40edd9f8c9738e45b11ade51b5ccd9687f2c48255563
+  bytes: 1740
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateReadyLight/runStateReadyLight-480-5b95612f02ef.avif
+- path: editor/public/visuals/files/runStateReadyLight/runStateReadyLight-480-5b95612f02ef.webp
+  sha256: 7a87fa9c6a7435e77a4083bba65f90021b11c7cefeea2e0781448b3b05cfe81e
+  bytes: 1636
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateReadyLight/runStateReadyLight-480-5b95612f02ef.webp
+- path: editor/public/visuals/files/runStateReadyLight/runStateReadyLight-720-5b95612f02ef.avif
+  sha256: 05e1668b67230e063d910acb0068960824c1bd01b1f06bc238258d2e13278ceb
+  bytes: 2955
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateReadyLight/runStateReadyLight-720-5b95612f02ef.avif
+- path: editor/public/visuals/files/runStateReadyLight/runStateReadyLight-720-5b95612f02ef.webp
+  sha256: e9744890f36547a885e6ebe4607f0081011e05f60099c9252ff77210ea81c8b5
+  bytes: 2894
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateReadyLight/runStateReadyLight-720-5b95612f02ef.webp
+- path: editor/public/visuals/files/runStateRunning/runStateRunning-1200-6ef3033dc561.avif
+  sha256: a72130fbbd8d19cbb59e3b92266e0ed6600657762472c6df03ee1297a5ac9ce4
+  bytes: 10546
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateRunning/runStateRunning-1200-6ef3033dc561.avif
+- path: editor/public/visuals/files/runStateRunning/runStateRunning-1200-6ef3033dc561.webp
+  sha256: b4e8902a967bd2f3c8ce52e9f42d38b5f0c4c7ea32439b5f32951c8f4cd957e1
+  bytes: 13152
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateRunning/runStateRunning-1200-6ef3033dc561.webp
+- path: editor/public/visuals/files/runStateRunning/runStateRunning-1440-6ef3033dc561.avif
+  sha256: 612d8a1f742900d0dee93d7e86bfe301e06b32e6e964856a7c6a5a426f8b4787
+  bytes: 10667
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateRunning/runStateRunning-1440-6ef3033dc561.avif
+- path: editor/public/visuals/files/runStateRunning/runStateRunning-1440-6ef3033dc561.webp
+  sha256: 34a168e2b443770f81cf71f97155cf10580487b993cbdd260900d4bdbcabbfba
+  bytes: 16382
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateRunning/runStateRunning-1440-6ef3033dc561.webp
+- path: editor/public/visuals/files/runStateRunning/runStateRunning-480-6ef3033dc561.avif
+  sha256: 39e02f6cfb4c889e93b4b1c5d1d847cba7a26f9424fa9bc94c5e04dd39521093
+  bytes: 3040
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateRunning/runStateRunning-480-6ef3033dc561.avif
+- path: editor/public/visuals/files/runStateRunning/runStateRunning-480-6ef3033dc561.webp
+  sha256: fb84b0f57dcbc7cad186ed111f653303bc5aa94ecfdcaf9f99db8f1096713b99
+  bytes: 3124
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateRunning/runStateRunning-480-6ef3033dc561.webp
+- path: editor/public/visuals/files/runStateRunning/runStateRunning-720-6ef3033dc561.avif
+  sha256: c65a88ed25a408420f965ef6c4e41c28cd89cbb8a12d7da47b25a1a4241bde94
+  bytes: 5206
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateRunning/runStateRunning-720-6ef3033dc561.avif
+- path: editor/public/visuals/files/runStateRunning/runStateRunning-720-6ef3033dc561.webp
+  sha256: 9fac2db588cc92dce47583f51c8c39748b7e6ae3151c9ab173544cd2da392c3c
+  bytes: 5600
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateRunning/runStateRunning-720-6ef3033dc561.webp
+- path: editor/public/visuals/files/runStateRunningLight/runStateRunningLight-1200-d40539709513.avif
+  sha256: e2bc3f714c71e30a77609b79ef70dae3294fdc107a083e494ec6b2063d0239e6
+  bytes: 9820
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateRunningLight/runStateRunningLight-1200-d40539709513.avif
+- path: editor/public/visuals/files/runStateRunningLight/runStateRunningLight-1200-d40539709513.webp
+  sha256: 3af5001e56e6dc0a5f3a6b3842a11518dc3657df40a5a38f5df825cddda3e1e5
+  bytes: 12672
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateRunningLight/runStateRunningLight-1200-d40539709513.webp
+- path: editor/public/visuals/files/runStateRunningLight/runStateRunningLight-1440-d40539709513.avif
+  sha256: e505332b8bff45c9e5bdfa57e4731498fc988f19fb79fbb0e4cbbbde6d8712a1
+  bytes: 10586
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateRunningLight/runStateRunningLight-1440-d40539709513.avif
+- path: editor/public/visuals/files/runStateRunningLight/runStateRunningLight-1440-d40539709513.webp
+  sha256: 90682a8a979770a31f8bf481e68e13f9ce89ccbcf5a66dfebcd2eed445f9f17e
+  bytes: 15882
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateRunningLight/runStateRunningLight-1440-d40539709513.webp
+- path: editor/public/visuals/files/runStateRunningLight/runStateRunningLight-480-d40539709513.avif
+  sha256: 3c2296fb5ef76fdf1102df4884ea4c31ce9e26dbce9f85ac51c765f03b572255
+  bytes: 2958
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateRunningLight/runStateRunningLight-480-d40539709513.avif
+- path: editor/public/visuals/files/runStateRunningLight/runStateRunningLight-480-d40539709513.webp
+  sha256: ac29e5b45bc79236713995bdd5cc6ba5ab3c29df64ab3b6aab1e957fdcd20b14
+  bytes: 2986
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateRunningLight/runStateRunningLight-480-d40539709513.webp
+- path: editor/public/visuals/files/runStateRunningLight/runStateRunningLight-720-d40539709513.avif
+  sha256: fb7adfdac740d519ec14458e71b210dcab9dc49751e3f1e329dde1be445d66d9
+  bytes: 4911
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateRunningLight/runStateRunningLight-720-d40539709513.avif
+- path: editor/public/visuals/files/runStateRunningLight/runStateRunningLight-720-d40539709513.webp
+  sha256: dfa773b257d053716de1624157b34e4a88083e8f232ccb339dd9d45a532f7629
+  bytes: 5250
+  kind: repository
+  sourcePath: editor/public/visuals/files/runStateRunningLight/runStateRunningLight-720-d40539709513.webp
 - path: editor/public/visuals/files/statisticsMachineLearning/statisticsMachineLearning-1200-d6e581dafc4f.avif
   sha256: 15b2d32c93f92023c2b208e56d91b4c12ce022c216af232b3616f0be5182dfbc
   bytes: 48588
@@ -5463,8 +6193,8 @@ files:
   kind: repository
   sourcePath: editor/public/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: editor/public/visuals/manifest.json
-  sha256: 58d74453f789e7472cb2919dd710c5eed3b84621596a2b26080b548ebee737ef
-  bytes: 116204
+  sha256: 755e0d20cd6680b0daf97e1d01e67392c394c57965697a461d378f8fe2fca47e
+  bytes: 173609
   kind: repository
   sourcePath: editor/public/visuals/manifest.json
 - path: editor/scripts/generatePyprocAssets.mjs
@@ -5643,8 +6373,8 @@ files:
   kind: repository
   sourcePath: editor/src/components/automation/automationSurface.tsx
 - path: editor/src/components/automation/liveAutomationView.tsx
-  sha256: 92b9149b2cf5db17cd96d506019425435a9630ebf8dfd26b720d50eb9e9881e0
-  bytes: 8285
+  sha256: bcfc904d4664cd4f74bab1990a6992bb5d04afa8ec06cdf18050d7126dc3cda6
+  bytes: 8406
   kind: repository
   sourcePath: editor/src/components/automation/liveAutomationView.tsx
 - path: editor/src/components/chat/chatSurface.tsx
@@ -5683,8 +6413,8 @@ files:
   kind: repository
   sourcePath: editor/src/components/curriculum/curriculumMarkdownHelpers.ts
 - path: editor/src/components/curriculum/curriculumMarkdownMedia.tsx
-  sha256: 9cf203fe3f8f4af02fc1c69e304f96c37d2cbe35abf7d823d84a7affbab44f32
-  bytes: 5798
+  sha256: e8adef1cdebae22086addecad137a33311928b2a3f25da1e754b1783368a682c
+  bytes: 8041
   kind: repository
   sourcePath: editor/src/components/curriculum/curriculumMarkdownMedia.tsx
 - path: editor/src/components/curriculum/curriculumMarkdownRichText.tsx
@@ -5733,8 +6463,8 @@ files:
   kind: repository
   sourcePath: editor/src/components/curriculum/curriculumToc.tsx
 - path: editor/src/components/curriculum/learningDomainVisual.tsx
-  sha256: 4eca665fad1b5c796fb2058443df8141c32707874e54943af15746b4acdcc325
-  bytes: 3754
+  sha256: d809e71533d150db1d88c76b1140b722b2ac4bbe39f34e03e2ab15c2daad0314
+  bytes: 3626
   kind: repository
   sourcePath: editor/src/components/curriculum/learningDomainVisual.tsx
 - path: editor/src/components/curriculum/lessonComments.tsx
@@ -6163,8 +6893,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/connectionStatus.ts
 - path: editor/src/lib/curriculaRegistry.ts
-  sha256: 0269086ad10ce18d3ada600bfd5978a9fc5f4499dd53e5c36e38c17fc9d6a7b9
-  bytes: 63366
+  sha256: b929317a6c4b180aebd4ed534c14e0ed3ebdcbcefca3fe8b2a29f18d5f56dea5
+  bytes: 63424
   kind: repository
   sourcePath: editor/src/lib/curriculaRegistry.ts
 - path: editor/src/lib/curriculumAssessmentQueue.ts
@@ -6428,8 +7158,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/utils.ts
 - path: editor/src/lib/visualAssets.ts
-  sha256: c847f4b3b85849da914478332842ad3c053755c3810d03f446ed552da8ed29ff
-  bytes: 2230
+  sha256: 6529c76d6142c5639bdf687e9565973d0cee6943a064a37660bf865d8a60630f
+  bytes: 2394
   kind: repository
   sourcePath: editor/src/lib/visualAssets.ts
 - path: editor/src/lib/webLearningEvidence.ts
@@ -11196,6 +11926,346 @@ files:
   bytes: 27954
   kind: repository
   sourcePath: landing/static/visuals/files/runLearningMobileLight/runLearningMobileLight-390-212f04693e95.webp
+- path: landing/static/visuals/files/runStateCheckFail/runStateCheckFail-480-75a9f78be4a4.avif
+  sha256: 249c5f2ea6f2ed4b17aa34fcd214b0cb1dd2beadb499070cba6504e001049f60
+  bytes: 14406
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckFail/runStateCheckFail-480-75a9f78be4a4.avif
+- path: landing/static/visuals/files/runStateCheckFail/runStateCheckFail-480-75a9f78be4a4.webp
+  sha256: b9cc12d6a035c634a6deeb0de3f773e37a0dbd11bfa03095fd114683b4d29a14
+  bytes: 15946
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckFail/runStateCheckFail-480-75a9f78be4a4.webp
+- path: landing/static/visuals/files/runStateCheckFail/runStateCheckFail-720-75a9f78be4a4.avif
+  sha256: a2e3d8567e7e61476338a63e748c8bac947f04553c60a753c24c08f809bb0d6f
+  bytes: 28122
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckFail/runStateCheckFail-720-75a9f78be4a4.avif
+- path: landing/static/visuals/files/runStateCheckFail/runStateCheckFail-720-75a9f78be4a4.webp
+  sha256: 64525177bd4799cda39c81ec201e2dc6ba63be550e063e9acdf91a80c327f356
+  bytes: 31116
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckFail/runStateCheckFail-720-75a9f78be4a4.webp
+- path: landing/static/visuals/files/runStateCheckFail/runStateCheckFail-900-75a9f78be4a4.avif
+  sha256: 67b7c15cd4513e789a675f416b52536b389d0f1e7fda82414f537997f0fb8487
+  bytes: 29721
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckFail/runStateCheckFail-900-75a9f78be4a4.avif
+- path: landing/static/visuals/files/runStateCheckFail/runStateCheckFail-900-75a9f78be4a4.webp
+  sha256: d206b10f532b4136bb3448f67f8709b058aa6d7ce32a5af208c63b3c1d28fb54
+  bytes: 43644
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckFail/runStateCheckFail-900-75a9f78be4a4.webp
+- path: landing/static/visuals/files/runStateCheckFailLight/runStateCheckFailLight-480-78bb22f7c834.avif
+  sha256: 6bc415494206dd08725ad331ae55af2bcc30d93b3a1f593b276fba4e2c098fd4
+  bytes: 12772
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckFailLight/runStateCheckFailLight-480-78bb22f7c834.avif
+- path: landing/static/visuals/files/runStateCheckFailLight/runStateCheckFailLight-480-78bb22f7c834.webp
+  sha256: ce266709943dfc9f8de42df18a9841e8f8d08f04ed2200fa77e14bc0cd75cdaa
+  bytes: 14166
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckFailLight/runStateCheckFailLight-480-78bb22f7c834.webp
+- path: landing/static/visuals/files/runStateCheckFailLight/runStateCheckFailLight-720-78bb22f7c834.avif
+  sha256: 0e7bdf815b8a61fb85cbdc6a717c1eaf52814c776e7e609deac06d5ed2d28fc3
+  bytes: 25103
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckFailLight/runStateCheckFailLight-720-78bb22f7c834.avif
+- path: landing/static/visuals/files/runStateCheckFailLight/runStateCheckFailLight-720-78bb22f7c834.webp
+  sha256: 6f9f5d30b4684d491e6df3ecbaa020e59a815bc393d85e537c750bb0b866505a
+  bytes: 27838
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckFailLight/runStateCheckFailLight-720-78bb22f7c834.webp
+- path: landing/static/visuals/files/runStateCheckFailLight/runStateCheckFailLight-900-78bb22f7c834.avif
+  sha256: 6d4eadc0726a4ed5f18cb010c9a9111de0dd113ef9032d1163b52b852c477148
+  bytes: 27903
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckFailLight/runStateCheckFailLight-900-78bb22f7c834.avif
+- path: landing/static/visuals/files/runStateCheckFailLight/runStateCheckFailLight-900-78bb22f7c834.webp
+  sha256: a54c86b076f9b780a3a5d991b647e06d7d31f054d99d0b76792280f8f7e12369
+  bytes: 40418
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckFailLight/runStateCheckFailLight-900-78bb22f7c834.webp
+- path: landing/static/visuals/files/runStateCheckPass/runStateCheckPass-480-ace447c0b848.avif
+  sha256: b041e0fcb2c24e6dacdcb6143d85306ef928a4d063ec71e0852a5d0c072a6bd6
+  bytes: 22093
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckPass/runStateCheckPass-480-ace447c0b848.avif
+- path: landing/static/visuals/files/runStateCheckPass/runStateCheckPass-480-ace447c0b848.webp
+  sha256: e3bbc372b3788dc4af01421d75a3e20995f8d6158d9648983096a2c534fda3dc
+  bytes: 24398
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckPass/runStateCheckPass-480-ace447c0b848.webp
+- path: landing/static/visuals/files/runStateCheckPass/runStateCheckPass-720-ace447c0b848.avif
+  sha256: c7c3a7a0667fb7a8aca888f1ce1fcd1faf4bfe7c4303a30a1076f19db6cb6593
+  bytes: 41596
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckPass/runStateCheckPass-720-ace447c0b848.avif
+- path: landing/static/visuals/files/runStateCheckPass/runStateCheckPass-720-ace447c0b848.webp
+  sha256: d2418b4caaa53dfd0d5aaa26a2df47980fc0eda7079a6176b56d16e0c0fc5a6a
+  bytes: 48146
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckPass/runStateCheckPass-720-ace447c0b848.webp
+- path: landing/static/visuals/files/runStateCheckPass/runStateCheckPass-768-ace447c0b848.avif
+  sha256: f75f4877b3128952820abb177885d99b1ee99de8ef2b7361cdce4fcf6ff52a10
+  bytes: 34965
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckPass/runStateCheckPass-768-ace447c0b848.avif
+- path: landing/static/visuals/files/runStateCheckPass/runStateCheckPass-768-ace447c0b848.webp
+  sha256: c849a912279ef8c517123d1f7bd2583acaae08991cbb50b4609617016fc2b8e9
+  bytes: 51292
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckPass/runStateCheckPass-768-ace447c0b848.webp
+- path: landing/static/visuals/files/runStateCheckPassLight/runStateCheckPassLight-480-45789706a23a.avif
+  sha256: 6e89270da072e6723691d17378161fa5648dd0edd4e8ce6c31fe4403e083efd8
+  bytes: 19156
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckPassLight/runStateCheckPassLight-480-45789706a23a.avif
+- path: landing/static/visuals/files/runStateCheckPassLight/runStateCheckPassLight-480-45789706a23a.webp
+  sha256: 4b47ae7bc23807a46782f1254cd2b94b5032d1633df58e0489b723b560cd5af1
+  bytes: 21142
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckPassLight/runStateCheckPassLight-480-45789706a23a.webp
+- path: landing/static/visuals/files/runStateCheckPassLight/runStateCheckPassLight-720-45789706a23a.avif
+  sha256: 98b8921ece63923ab24896200fd4cf5ffb2d856f93a6620dec9dc4986c5d6e91
+  bytes: 35992
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckPassLight/runStateCheckPassLight-720-45789706a23a.avif
+- path: landing/static/visuals/files/runStateCheckPassLight/runStateCheckPassLight-720-45789706a23a.webp
+  sha256: 1e4df502a3ab9a4b2cba0b658547d4f71abe7d9b74e49a149fb1c4d37f8c2758
+  bytes: 42102
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckPassLight/runStateCheckPassLight-720-45789706a23a.webp
+- path: landing/static/visuals/files/runStateCheckPassLight/runStateCheckPassLight-768-45789706a23a.avif
+  sha256: b902f21b449ff139746394c35f3ae941e1dcf755caa604731b3874bb01c5edbd
+  bytes: 32306
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckPassLight/runStateCheckPassLight-768-45789706a23a.avif
+- path: landing/static/visuals/files/runStateCheckPassLight/runStateCheckPassLight-768-45789706a23a.webp
+  sha256: 7b906ba3ae179a393df02b3257186fe6e4be07183c3595e37af91089475b45e0
+  bytes: 47212
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateCheckPassLight/runStateCheckPassLight-768-45789706a23a.webp
+- path: landing/static/visuals/files/runStateLocalRequired/runStateLocalRequired-480-8ff51081db4f.avif
+  sha256: 50304649efbd9446033b0998dcd5b062fa87ed8709679181238083d7983c27b5
+  bytes: 15424
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateLocalRequired/runStateLocalRequired-480-8ff51081db4f.avif
+- path: landing/static/visuals/files/runStateLocalRequired/runStateLocalRequired-480-8ff51081db4f.webp
+  sha256: 48d1c3a54e70782307ae7db6c4590db4de953e853d0bd1b2bce37b988d14cdca
+  bytes: 16588
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateLocalRequired/runStateLocalRequired-480-8ff51081db4f.webp
+- path: landing/static/visuals/files/runStateLocalRequired/runStateLocalRequired-720-8ff51081db4f.avif
+  sha256: 4bdedfef6a3d398fe51dcdb4f77b9cd71ad876f7f2c0c72c47ee598b433a81e0
+  bytes: 30680
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateLocalRequired/runStateLocalRequired-720-8ff51081db4f.avif
+- path: landing/static/visuals/files/runStateLocalRequired/runStateLocalRequired-720-8ff51081db4f.webp
+  sha256: 39fb118e401b1762106fba2cf5dcc0793ab748437062f44d2adced94b9407b2b
+  bytes: 33382
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateLocalRequired/runStateLocalRequired-720-8ff51081db4f.webp
+- path: landing/static/visuals/files/runStateLocalRequired/runStateLocalRequired-900-8ff51081db4f.avif
+  sha256: 68051276f8638a2a2451d59c75e427d2de645553bd27cf7faab413f85456d23e
+  bytes: 32622
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateLocalRequired/runStateLocalRequired-900-8ff51081db4f.avif
+- path: landing/static/visuals/files/runStateLocalRequired/runStateLocalRequired-900-8ff51081db4f.webp
+  sha256: 1e55245c83ce07bbd36eb097546523b04cc77a7970397b68c0d1b851e3801f3c
+  bytes: 47788
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateLocalRequired/runStateLocalRequired-900-8ff51081db4f.webp
+- path: landing/static/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-480-35ca38188df3.avif
+  sha256: 13f112217870c3ba20f1cfbe8b1df88b862157f4a6de883f0fdbbc1ac700649b
+  bytes: 13859
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-480-35ca38188df3.avif
+- path: landing/static/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-480-35ca38188df3.webp
+  sha256: 622d99323917c2e356d8b5a799fc46066b7577879a020fa0014750a574c20a34
+  bytes: 14696
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-480-35ca38188df3.webp
+- path: landing/static/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-720-35ca38188df3.avif
+  sha256: 8afd2d173978f7cb04b0721c22a65604d0e645a1c84dfdc9c6da12dff134be92
+  bytes: 27078
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-720-35ca38188df3.avif
+- path: landing/static/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-720-35ca38188df3.webp
+  sha256: 5d41f36eb11bfa14ff7272f362ad03332d67d09a72e5a83ee0832eaa0a2c2a86
+  bytes: 30678
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-720-35ca38188df3.webp
+- path: landing/static/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-900-35ca38188df3.avif
+  sha256: 5657bd51ea25f59b7431018f4ec9373987ee5f50d4e67e347a75b9e5335f4cde
+  bytes: 30275
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-900-35ca38188df3.avif
+- path: landing/static/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-900-35ca38188df3.webp
+  sha256: 3f226bf082ca1197419314f4953882fe9ee644cf340e8fbd1d827b9c15f2278b
+  bytes: 44048
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-900-35ca38188df3.webp
+- path: landing/static/visuals/files/runStateReady/runStateReady-1200-ec95ae8add82.avif
+  sha256: acfe39005c181ae658badde3a7c0d4d6dbe0a3475e67005e224433db43f3b1db
+  bytes: 5789
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateReady/runStateReady-1200-ec95ae8add82.avif
+- path: landing/static/visuals/files/runStateReady/runStateReady-1200-ec95ae8add82.webp
+  sha256: 4246e589f78605f1fbbb4fbf72658722c1d595657f880661bb5c919e26a11211
+  bytes: 6896
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateReady/runStateReady-1200-ec95ae8add82.webp
+- path: landing/static/visuals/files/runStateReady/runStateReady-1440-ec95ae8add82.avif
+  sha256: d2665e0a819ae2482c4cd4fcaa8742aa13e0126b9d4093c520ae5e10ae4e2a8f
+  bytes: 6876
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateReady/runStateReady-1440-ec95ae8add82.avif
+- path: landing/static/visuals/files/runStateReady/runStateReady-1440-ec95ae8add82.webp
+  sha256: 6644048a076b43e89c637ed8d04ede38647130cc4a1a4c05dda654ea4731e5eb
+  bytes: 8792
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateReady/runStateReady-1440-ec95ae8add82.webp
+- path: landing/static/visuals/files/runStateReady/runStateReady-480-ec95ae8add82.avif
+  sha256: 61e703d5c6f9be981f2d58167cac6a368d4806a5b7b1f20ea4f566134346d9d2
+  bytes: 1761
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateReady/runStateReady-480-ec95ae8add82.avif
+- path: landing/static/visuals/files/runStateReady/runStateReady-480-ec95ae8add82.webp
+  sha256: 63cebe191f22d7ddab1f9d8c191573555a110dc315c376f717c3955dd3a1ced2
+  bytes: 1594
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateReady/runStateReady-480-ec95ae8add82.webp
+- path: landing/static/visuals/files/runStateReady/runStateReady-720-ec95ae8add82.avif
+  sha256: adc00f412b363cd2aefbfdc07fa078469ab0cbd4949efa5fd380059787ddf44d
+  bytes: 3042
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateReady/runStateReady-720-ec95ae8add82.avif
+- path: landing/static/visuals/files/runStateReady/runStateReady-720-ec95ae8add82.webp
+  sha256: 3ff3f50696210543603634cc4bdb5b8d1142b151336f702bdc57c3650fa82aa0
+  bytes: 2848
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateReady/runStateReady-720-ec95ae8add82.webp
+- path: landing/static/visuals/files/runStateReadyLight/runStateReadyLight-1200-5b95612f02ef.avif
+  sha256: b5d156fbdc660ed209c1a68d48426bf948513fabb886050a5af993f43593594c
+  bytes: 5609
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateReadyLight/runStateReadyLight-1200-5b95612f02ef.avif
+- path: landing/static/visuals/files/runStateReadyLight/runStateReadyLight-1200-5b95612f02ef.webp
+  sha256: 0a681971950a6afc1ab8d2e35f7a33703416a0cece4a912c9620a69d2f4e810d
+  bytes: 6798
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateReadyLight/runStateReadyLight-1200-5b95612f02ef.webp
+- path: landing/static/visuals/files/runStateReadyLight/runStateReadyLight-1440-5b95612f02ef.avif
+  sha256: 5242ef4bd83b15074ec1c06c47c4165b0e0677cfe6ed9f73789be2ed4b779a03
+  bytes: 6883
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateReadyLight/runStateReadyLight-1440-5b95612f02ef.avif
+- path: landing/static/visuals/files/runStateReadyLight/runStateReadyLight-1440-5b95612f02ef.webp
+  sha256: 4cf52c51b0a81db1d18d1b1b4ce0f3040805c5a3b3ebf8f997031fd579769e62
+  bytes: 8546
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateReadyLight/runStateReadyLight-1440-5b95612f02ef.webp
+- path: landing/static/visuals/files/runStateReadyLight/runStateReadyLight-480-5b95612f02ef.avif
+  sha256: 7859b0b3950cb864e9ad40edd9f8c9738e45b11ade51b5ccd9687f2c48255563
+  bytes: 1740
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateReadyLight/runStateReadyLight-480-5b95612f02ef.avif
+- path: landing/static/visuals/files/runStateReadyLight/runStateReadyLight-480-5b95612f02ef.webp
+  sha256: 7a87fa9c6a7435e77a4083bba65f90021b11c7cefeea2e0781448b3b05cfe81e
+  bytes: 1636
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateReadyLight/runStateReadyLight-480-5b95612f02ef.webp
+- path: landing/static/visuals/files/runStateReadyLight/runStateReadyLight-720-5b95612f02ef.avif
+  sha256: 05e1668b67230e063d910acb0068960824c1bd01b1f06bc238258d2e13278ceb
+  bytes: 2955
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateReadyLight/runStateReadyLight-720-5b95612f02ef.avif
+- path: landing/static/visuals/files/runStateReadyLight/runStateReadyLight-720-5b95612f02ef.webp
+  sha256: e9744890f36547a885e6ebe4607f0081011e05f60099c9252ff77210ea81c8b5
+  bytes: 2894
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateReadyLight/runStateReadyLight-720-5b95612f02ef.webp
+- path: landing/static/visuals/files/runStateRunning/runStateRunning-1200-6ef3033dc561.avif
+  sha256: a72130fbbd8d19cbb59e3b92266e0ed6600657762472c6df03ee1297a5ac9ce4
+  bytes: 10546
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateRunning/runStateRunning-1200-6ef3033dc561.avif
+- path: landing/static/visuals/files/runStateRunning/runStateRunning-1200-6ef3033dc561.webp
+  sha256: b4e8902a967bd2f3c8ce52e9f42d38b5f0c4c7ea32439b5f32951c8f4cd957e1
+  bytes: 13152
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateRunning/runStateRunning-1200-6ef3033dc561.webp
+- path: landing/static/visuals/files/runStateRunning/runStateRunning-1440-6ef3033dc561.avif
+  sha256: 612d8a1f742900d0dee93d7e86bfe301e06b32e6e964856a7c6a5a426f8b4787
+  bytes: 10667
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateRunning/runStateRunning-1440-6ef3033dc561.avif
+- path: landing/static/visuals/files/runStateRunning/runStateRunning-1440-6ef3033dc561.webp
+  sha256: 34a168e2b443770f81cf71f97155cf10580487b993cbdd260900d4bdbcabbfba
+  bytes: 16382
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateRunning/runStateRunning-1440-6ef3033dc561.webp
+- path: landing/static/visuals/files/runStateRunning/runStateRunning-480-6ef3033dc561.avif
+  sha256: 39e02f6cfb4c889e93b4b1c5d1d847cba7a26f9424fa9bc94c5e04dd39521093
+  bytes: 3040
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateRunning/runStateRunning-480-6ef3033dc561.avif
+- path: landing/static/visuals/files/runStateRunning/runStateRunning-480-6ef3033dc561.webp
+  sha256: fb84b0f57dcbc7cad186ed111f653303bc5aa94ecfdcaf9f99db8f1096713b99
+  bytes: 3124
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateRunning/runStateRunning-480-6ef3033dc561.webp
+- path: landing/static/visuals/files/runStateRunning/runStateRunning-720-6ef3033dc561.avif
+  sha256: c65a88ed25a408420f965ef6c4e41c28cd89cbb8a12d7da47b25a1a4241bde94
+  bytes: 5206
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateRunning/runStateRunning-720-6ef3033dc561.avif
+- path: landing/static/visuals/files/runStateRunning/runStateRunning-720-6ef3033dc561.webp
+  sha256: 9fac2db588cc92dce47583f51c8c39748b7e6ae3151c9ab173544cd2da392c3c
+  bytes: 5600
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateRunning/runStateRunning-720-6ef3033dc561.webp
+- path: landing/static/visuals/files/runStateRunningLight/runStateRunningLight-1200-d40539709513.avif
+  sha256: e2bc3f714c71e30a77609b79ef70dae3294fdc107a083e494ec6b2063d0239e6
+  bytes: 9820
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateRunningLight/runStateRunningLight-1200-d40539709513.avif
+- path: landing/static/visuals/files/runStateRunningLight/runStateRunningLight-1200-d40539709513.webp
+  sha256: 3af5001e56e6dc0a5f3a6b3842a11518dc3657df40a5a38f5df825cddda3e1e5
+  bytes: 12672
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateRunningLight/runStateRunningLight-1200-d40539709513.webp
+- path: landing/static/visuals/files/runStateRunningLight/runStateRunningLight-1440-d40539709513.avif
+  sha256: e505332b8bff45c9e5bdfa57e4731498fc988f19fb79fbb0e4cbbbde6d8712a1
+  bytes: 10586
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateRunningLight/runStateRunningLight-1440-d40539709513.avif
+- path: landing/static/visuals/files/runStateRunningLight/runStateRunningLight-1440-d40539709513.webp
+  sha256: 90682a8a979770a31f8bf481e68e13f9ce89ccbcf5a66dfebcd2eed445f9f17e
+  bytes: 15882
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateRunningLight/runStateRunningLight-1440-d40539709513.webp
+- path: landing/static/visuals/files/runStateRunningLight/runStateRunningLight-480-d40539709513.avif
+  sha256: 3c2296fb5ef76fdf1102df4884ea4c31ce9e26dbce9f85ac51c765f03b572255
+  bytes: 2958
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateRunningLight/runStateRunningLight-480-d40539709513.avif
+- path: landing/static/visuals/files/runStateRunningLight/runStateRunningLight-480-d40539709513.webp
+  sha256: ac29e5b45bc79236713995bdd5cc6ba5ab3c29df64ab3b6aab1e957fdcd20b14
+  bytes: 2986
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateRunningLight/runStateRunningLight-480-d40539709513.webp
+- path: landing/static/visuals/files/runStateRunningLight/runStateRunningLight-720-d40539709513.avif
+  sha256: fb7adfdac740d519ec14458e71b210dcab9dc49751e3f1e329dde1be445d66d9
+  bytes: 4911
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateRunningLight/runStateRunningLight-720-d40539709513.avif
+- path: landing/static/visuals/files/runStateRunningLight/runStateRunningLight-720-d40539709513.webp
+  sha256: dfa773b257d053716de1624157b34e4a88083e8f232ccb339dd9d45a532f7629
+  bytes: 5250
+  kind: repository
+  sourcePath: landing/static/visuals/files/runStateRunningLight/runStateRunningLight-720-d40539709513.webp
 - path: landing/static/visuals/files/statisticsMachineLearning/statisticsMachineLearning-1200-d6e581dafc4f.avif
   sha256: 15b2d32c93f92023c2b208e56d91b4c12ce022c216af232b3616f0be5182dfbc
   bytes: 48588
@@ -11267,8 +12337,8 @@ files:
   kind: repository
   sourcePath: landing/static/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: landing/static/visuals/manifest.json
-  sha256: 58d74453f789e7472cb2919dd710c5eed3b84621596a2b26080b548ebee737ef
-  bytes: 116204
+  sha256: 755e0d20cd6680b0daf97e1d01e67392c394c57965697a461d378f8fe2fca47e
+  bytes: 173609
   kind: repository
   sourcePath: landing/static/visuals/manifest.json
 - path: landing/vite.config.js
@@ -11441,26 +12511,6 @@ files:
   bytes: 7752
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/05-local-studio/README.md
-- path: mainPlan/astryx-product-experience/06-visual-assets/01-instructional-assets/README.md
-  sha256: 691ffe401a7a6e1d83d05788e30757a480be3c93ceb3a553804d258b0aecc841
-  bytes: 1669
-  kind: repository
-  sourcePath: mainPlan/astryx-product-experience/06-visual-assets/01-instructional-assets/README.md
-- path: mainPlan/astryx-product-experience/06-visual-assets/02-run-captures/README.md
-  sha256: dd7984bb6d98e25a7a741737ef402807762158fc265add053fef8e3bc419e06c
-  bytes: 1303
-  kind: repository
-  sourcePath: mainPlan/astryx-product-experience/06-visual-assets/02-run-captures/README.md
-- path: mainPlan/astryx-product-experience/06-visual-assets/03-local-captures/README.md
-  sha256: 233a97b7adbfe27c969b6d772eccd3e2d374d881086dc3649e1ad690b2613072
-  bytes: 1548
-  kind: repository
-  sourcePath: mainPlan/astryx-product-experience/06-visual-assets/03-local-captures/README.md
-- path: mainPlan/astryx-product-experience/06-visual-assets/README.md
-  sha256: d9e58f2a6c4fe8b22934b897e5be43261e1c33fd032f9cf4d3859522c55653c3
-  bytes: 7342
-  kind: repository
-  sourcePath: mainPlan/astryx-product-experience/06-visual-assets/README.md
 - path: mainPlan/astryx-product-experience/07-landing-experience/00-proof-studio-landing/README.md
   sha256: da28e60a45d8ce850ca5c7b06a553314a7c85f07debcc35b0bb197052cda4fd8
   bytes: 2419
@@ -12237,13 +13287,13 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/09-repository-simplification/README.md
 - path: mainPlan/astryx-product-experience/10-quality-release/README.md
-  sha256: 15978bdc52dee2fe81927699bc03834502490e61207edc0d4eb10ac17fac0467
-  bytes: 27869
+  sha256: 57af7e5a93e1c4bdfdd1f4e4bc3d1c8ccbc0c0e661077e4eafe2642eaba47b56
+  bytes: 27890
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/10-quality-release/README.md
 - path: mainPlan/astryx-product-experience/README.md
-  sha256: 3b46904c0a8613112d4d5f6db3f212a007200fb3f15a5820de8c6b09323474f8
-  bytes: 14981
+  sha256: 11ccb4f0d62374bd3905290933e84a12a4ac57ba92f936786e9ffc43c0452414
+  bytes: 14846
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/README.md
 - path: pyproject.toml
@@ -13057,8 +14107,8 @@ files:
   kind: repository
   sourcePath: src/codaro/curriculum/authoringProposalFlow.py
 - path: src/codaro/curriculum/cardContract.py
-  sha256: be36f8b305c6f57fc7d0e85b87a04e128a2d17a4c3f62a683ca84a70ec56a263
-  bytes: 9839
+  sha256: b8335590a8cf387c710d5330472aa2b1a2e903e1ce77dc36bf223e9fe1b45755
+  bytes: 9850
   kind: repository
   sourcePath: src/codaro/curriculum/cardContract.py
 - path: src/codaro/curriculum/catalogFlow.py
@@ -13092,8 +14142,8 @@ files:
   kind: repository
   sourcePath: src/codaro/curriculum/contentFlow.py
 - path: src/codaro/curriculum/converter.py
-  sha256: 0e2ba57b83a57c1b2e8229a2a9a0e8669a1d3d8b51d7a0c79a3b0bcaf43eb9df
-  bytes: 47604
+  sha256: 232a3faca40ec88ff69d836bbc6d3282605c3734921d13688ecbedb6f13c8de5
+  bytes: 47664
   kind: repository
   sourcePath: src/codaro/curriculum/converter.py
 - path: src/codaro/curriculum/efficacyStage.py
@@ -13587,8 +14637,8 @@ files:
   kind: repository
   sourcePath: tests/architecture/verifyClassroomRemoved.py
 - path: tests/assets/captureProductVisuals.py
-  sha256: 560feea18d1336a44c504cc9e869fcb75c01057bdc1b9da1447d73a4e7872c9f
-  bytes: 19729
+  sha256: 28f1adc14655a7f0318ce9e8cbdfc15e20800243716b3e59ac6c4c5623678b7e
+  bytes: 20384
   kind: repository
   sourcePath: tests/assets/captureProductVisuals.py
 - path: tests/assets/testBuildDesignSystem.py
@@ -13607,8 +14657,8 @@ files:
   kind: repository
   sourcePath: tests/assets/testCaptureOutcomeProofs.py
 - path: tests/assets/testCaptureProductVisuals.py
-  sha256: f0ed5185f52a35bf4ab96b83bb2303ad40b9d9d47988155052563caccaeb46a8
-  bytes: 9727
+  sha256: 7fb19d490dd46467602ce1d095d32cfc8c9d001d31b2eb9fa414f03dde8e64d5
+  bytes: 10678
   kind: repository
   sourcePath: tests/assets/testCaptureProductVisuals.py
 - path: tests/assets/testVisualAssetManifest.py
@@ -13616,6 +14666,16 @@ files:
   bytes: 9477
   kind: repository
   sourcePath: tests/assets/testVisualAssetManifest.py
+- path: tests/assets/verifyInstructionalVisualPurpose.py
+  sha256: e4d0c03e7fc6811eb223ac5c5e9c2378fdc199f1be8367db0936c3a3f346dc29
+  bytes: 6643
+  kind: repository
+  sourcePath: tests/assets/verifyInstructionalVisualPurpose.py
+- path: tests/assets/verifyRunCaptureMatrix.py
+  sha256: a8bb83208c98ce1031924d6c67cc364f6c6a2aed68fc3d73de861cdb30b8bc77
+  bytes: 6982
+  kind: repository
+  sourcePath: tests/assets/verifyRunCaptureMatrix.py
 - path: tests/assets/verifyUnusedIllustrationsRemoved.py
   sha256: 83cbf0071ab862bcaa4c2e162109bda17bd1635171bf3505e9421547c7f877b4
   bytes: 2033
@@ -14196,6 +15256,11 @@ files:
   bytes: 4638
   kind: repository
   sourcePath: tests/learning/testQualityAnalytics.py
+- path: tests/learning/verifyInstructionalVisualPlaywright.py
+  sha256: bb87dd59820339bec1f8764e3a5201f26cdfdf8ada8a0f20394e86b26f91434e
+  bytes: 5665
+  kind: repository
+  sourcePath: tests/learning/verifyInstructionalVisualPlaywright.py
 - path: tests/learning/verifyLearningCardPlaywright.py
   sha256: 0a72cfb2451449c336256e51f66bc50a52d62dd58f64337a9b7be6f0bf7ddd79
   bytes: 47831
@@ -14377,13 +15442,13 @@ files:
   kind: repository
   sourcePath: tests/product/verifyReleaseResearchOperations.py
 - path: tests/product/verifyWebView2ProductSmoke.py
-  sha256: a00f9dbe4fe933e693257e03e15abc23657974fd23c63e4a8499d7a53e1adf73
-  bytes: 81396
+  sha256: 1024f563e7e37a949fbe3ea2aff9a8815c3d65e3bd10aff0054af9b0ba54e53a
+  bytes: 97761
   kind: repository
   sourcePath: tests/product/verifyWebView2ProductSmoke.py
 - path: tests/run.py
-  sha256: 97390ee5fe4619985612adb57d0f883c0e6c215dc0f92460b65244947785f2f8
-  bytes: 81406
+  sha256: 7e5403ba12f2a881701808b5c35b31b6135c3c644c7304eb5b09f31627903f99
+  bytes: 81822
   kind: repository
   sourcePath: tests/run.py
 - path: tests/runtime/testAppRuntime.py
@@ -14647,8 +15712,8 @@ files:
   kind: repository
   sourcePath: tests/surface/verifyPlaywrightMobile.py
 - path: tests/surface/verifyProductExperiencePlaywright.py
-  sha256: b16e72ab8cbaeab8a07979254afdcd8e8dd72240535ebce0dd6e5c37ba901cf4
-  bytes: 353803
+  sha256: a8916b2488e92a74c7cdd8a9ba7e5e7fac3ea5f0d3a90481e117de51ec9e8fea
+  bytes: 361710
   kind: repository
   sourcePath: tests/surface/verifyProductExperiencePlaywright.py
 - path: tests/surface/verifyProductModuleBoundaries.py
