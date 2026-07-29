@@ -90,3 +90,15 @@ def testBrokerAvailabilityNeedsWindowsAndExistingExecutable(
 
     executable.unlink()
     assert brokerClient.checkSandboxBrokerAvailable() is False
+
+
+def testManagedPythonExecutableDoesNotEscapeToVenvBase(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    managed = tmp_path / "managed-runtime" / "python.exe"
+    unmanaged = tmp_path / "base-runtime" / "python.exe"
+    monkeypatch.setattr(brokerClient.os.sys, "executable", str(managed))
+    monkeypatch.setattr(brokerClient.os.sys, "_base_executable", str(unmanaged), raising=False)
+
+    assert brokerClient.managedPythonExecutable() == str(managed.resolve())

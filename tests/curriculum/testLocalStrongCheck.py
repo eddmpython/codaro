@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+from concurrent.futures import ThreadPoolExecutor
 import os
 from pathlib import Path
 
@@ -393,3 +394,35 @@ def testW0AutomationSolutionsPassNativeSandbox(relativePath: str) -> None:
         assert result["executor"] == "local-sandbox"
         checked += 1
     assert checked == 4
+
+
+def testScheduleStrongCheckUsesConcurrentColdInstalledPackageSnapshot(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    lessonPath = Path("curricula/python/automation/os/watchSched/05_schedule간단스케줄.yaml")
+    content = yaml.safe_load(lessonPath.read_text(encoding="utf-8"))
+    section = next(item for item in content["sections"] if item["id"] == "schedule-register")
+    sourceWheel = Path("editor/public/check-packages/schedule-1.2.2-py3-none-any.whl")
+    webBuildRoot = tmp_path / "installed-web"
+    installedWheel = webBuildRoot / "check-packages" / sourceWheel.name
+    installedWheel.parent.mkdir(parents=True)
+    wheelBytes = sourceWheel.read_bytes()
+    installedWheel.write_bytes(wheelBytes)
+    monkeypatch.setenv("CODARO_WEB_BUILD_ROOT", str(webBuildRoot))
+    monkeypatch.delenv("CODARO_CHECK_BROKER_EXE", raising=False)
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results = list(
+            executor.map(
+                lambda _index: runLocalStrongCheck(section["check"], section["exercise"]["solution"]),
+                range(2),
+            )
+        )
+
+    assert all(result["passed"] is True for result in results)
+    assert all(result["executor"] == "local-sandbox" for result in results)
+    assert installedWheel.read_bytes() == wheelBytes
+    assert [item.relative_to(webBuildRoot).as_posix() for item in webBuildRoot.rglob("*") if item.is_file()] == [
+        "check-packages/schedule-1.2.2-py3-none-any.whl"
+    ]

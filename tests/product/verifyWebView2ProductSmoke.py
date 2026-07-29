@@ -1,14 +1,17 @@
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
 import ctypes
 from ctypes import wintypes
+import hashlib
 import json
 import os
 import platform
 import re
 import shutil
 import socket
+import struct
 import subprocess
 import sys
 import time
@@ -19,6 +22,7 @@ from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 from playwright.sync_api import Locator, Page, sync_playwright
+import yaml
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -35,6 +39,7 @@ DEPLOYED_LOCAL_REEXPORT_PATH = WORK_ROOT / "deployed-local-reexport-learning-arc
 CARGO_TARGET_ROOT = WORK_ROOT / "cargo-target"
 LAUNCHER_EXE = CARGO_TARGET_ROOT / "debug" / "codaro-launcher.exe"
 PYTHON_EXE = ROOT / ".venv" / "Scripts" / "python.exe"
+RUNTIME_VERSION = "product-smoke-3.12"
 DEPLOYED_WEB_URL = os.environ.get("CODARO_DEPLOYED_WEB_URL", "").strip().rstrip("/")
 EXPECTED_SOCIAL_ORDER = ["github", "support", "youtube", "threads"]
 EXPECTED_ACCOUNT_NUMBER = "1002-0421-4626"
@@ -128,6 +133,7 @@ def main() -> int:
                         )
                     )
 
+                cases.append(verify_installed_schedule_cold_concurrency(app_port))
                 cases.append(
                     verify_native_automation_state_matrix(
                         page,
@@ -219,7 +225,9 @@ def main() -> int:
             "launcherRoot": display_path(LAUNCHER_ROOT),
             "productHome": display_path(PRODUCT_HOME),
             "packagedWheel": packaged_wheel_evidence(),
-            "runtimePython": str(PYTHON_EXE),
+            "runtimePython": display_path(
+                LAUNCHER_ROOT / "installs" / "_runtimes" / RUNTIME_VERSION / "python.exe"
+            ),
         },
         "caseCount": len(cases),
         "cases": cases,
@@ -246,6 +254,7 @@ def main() -> int:
                 "Code and Markdown native Korean IME input and composition-boundary arrow guards",
                 "WebView2 forced-colors control boundaries and keyboard focus order",
                 "isolated installed-product user data",
+                "concurrent installed AppContainer checks using the unchanged pinned schedule wheel",
                 "Web-origin learning archive Local import, reload, re-export, and disabled automation adoption",
             ] + ([
                 "public deployed Web edit, strong verification, archive export, and installed Local roundtrip",
@@ -278,6 +287,102 @@ def require_windows() -> None:
         raise VerificationError(f"built launcher is missing: {LAUNCHER_EXE}")
 
 
+def verify_installed_schedule_cold_concurrency(app_port: int) -> dict[str, Any]:
+    lesson_path = ROOT / "curricula/python/automation/os/watchSched/05_schedule간단스케줄.yaml"
+    lesson = yaml.safe_load(lesson_path.read_text(encoding="utf-8"))
+    sections = lesson.get("sections") if isinstance(lesson, dict) else None
+    section = next(
+        (
+            item
+            for item in sections or []
+            if isinstance(item, dict) and item.get("id") == "schedule-register"
+        ),
+        None,
+    )
+    if not isinstance(section, dict):
+        raise VerificationError("installed schedule cold check fixture is missing")
+    check = section.get("check")
+    exercise = section.get("exercise")
+    if not isinstance(check, dict) or not isinstance(exercise, dict):
+        raise VerificationError("installed schedule cold check fixture is incomplete")
+    source = exercise.get("solution")
+    if not isinstance(source, str) or not source.strip():
+        raise VerificationError("installed schedule cold check solution is missing")
+
+    wheel_paths = sorted(
+        LAUNCHER_ROOT.rglob("check-packages/schedule-1.2.2-py3-none-any.whl")
+    )
+    before = {
+        display_path(path): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in wheel_paths
+    }
+    before_package_files = {
+        display_path(path): hashlib.sha256(path.read_bytes()).hexdigest()
+        for wheel in wheel_paths
+        for path in wheel.parent.rglob("*")
+        if path.is_file()
+    }
+    payload = {"checkSpec": check, "source": source}
+    url = f"http://127.0.0.1:{app_port}/api/curriculum/check/strong/local"
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results = list(executor.map(lambda _index: post_json(url, payload), range(2)))
+    after_paths = sorted(
+        LAUNCHER_ROOT.rglob("check-packages/schedule-1.2.2-py3-none-any.whl")
+    )
+    after = {
+        display_path(path): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in after_paths
+    }
+    after_package_files = {
+        display_path(path): hashlib.sha256(path.read_bytes()).hexdigest()
+        for wheel in after_paths
+        for path in wheel.parent.rglob("*")
+        if path.is_file()
+    }
+    checks = {
+        "installedWheelUnique": len(before) == 1,
+        "concurrentPass": len(results) == 2
+        and all(result.get("passed") is True for result in results),
+        "appContainerIsolation": all(
+            result.get("executor") == "local-sandbox"
+            and result.get("isolation") == "windows-appcontainer"
+            for result in results
+        ),
+        "wheelUnchanged": before == after,
+        "noPackageCacheWrites": before_package_files == after_package_files,
+    }
+    failures = [f"{check_name} check failed" for check_name, passed in checks.items() if not passed]
+    return {
+        "id": "local-installed-schedule-cold-concurrency",
+        "surface": "curriculum-api",
+        "snapshot": {
+            "requestCount": len(results),
+            "executors": sorted({str(result.get("executor")) for result in results}),
+            "isolations": sorted({str(result.get("isolation")) for result in results}),
+            "installedWheels": before,
+            "packageFiles": after_package_files,
+            "results": results,
+        },
+        "checks": checks,
+        "passed": not failures,
+        "failures": failures,
+    }
+
+
+def post_json(url: str, payload: dict[str, Any]) -> dict[str, Any]:
+    request = Request(
+        url,
+        data=json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urlopen(request, timeout=30) as response:
+        value = json.loads(response.read().decode("utf-8"))
+    if not isinstance(value, dict):
+        raise VerificationError(f"installed product returned non-object JSON from {url}")
+    return value
+
+
 def prepare_product_install() -> None:
     reset_work_paths()
     DIST_ROOT.mkdir(parents=True, exist_ok=True)
@@ -301,7 +406,7 @@ def prepare_product_install() -> None:
         raise VerificationError(f"expected one current wheel, found {len(wheels)}: {build[-800:]}")
 
     release_id = f"webview2-{(current_git_head() or 'worktree')[:12]}"
-    runtime_version = "product-smoke-3.12"
+    runtime_version = RUNTIME_VERSION
     release_root = LAUNCHER_ROOT / "installs" / release_id
     site_packages = release_root / "backend" / "site-packages"
     runtime_root = LAUNCHER_ROOT / "installs" / "_runtimes" / runtime_version
@@ -317,8 +422,35 @@ def prepare_product_install() -> None:
     if not (web_build_root / "index.html").is_file() or not (web_build_root / "_app").is_dir():
         raise VerificationError("current wheel does not contain the built editor frontend")
 
-    python_wrapper = runtime_root / "python.cmd"
-    python_wrapper.write_text(f'@echo off\r\n"{PYTHON_EXE}" %*\r\n', encoding="utf-8")
+    runtime_python, runtime_archive_sha, runtime_tree_sha = stage_managed_runtime(runtime_root)
+    wheel_sha = hashlib.sha256(wheels[0].read_bytes()).hexdigest()
+    install_record = {
+        "releaseId": release_id,
+        "backend": {
+            "name": "codaro",
+            "version": "0.0.12",
+            "sha256": wheel_sha,
+            "source": wheels[0].resolve().as_uri(),
+            "stagedPath": str(wheels[0].resolve()),
+        },
+        "editor": {
+            "name": "editor",
+            "version": "0.0.12",
+            "sha256": wheel_sha,
+            "source": "backendWheel:codaro/webBuild",
+            "stagedPath": str(web_build_root.resolve()),
+        },
+        "pythonRuntime": {
+            "name": "python-runtime",
+            "version": runtime_version,
+            "sha256": runtime_archive_sha,
+            "treeSha256": runtime_tree_sha,
+            "source": runtime_python.resolve().as_uri(),
+            "stagedPath": str(runtime_root.resolve()),
+        },
+        "bundles": [],
+    }
+    write_json(release_root / "backend" / "install-record.json", install_record)
     active_release = {
         "releaseId": release_id,
         "channel": "internal",
@@ -343,6 +475,76 @@ def prepare_product_install() -> None:
     write_json(state_root / "active-release.json", active_release)
     write_json(state_root / "update-config.json", update_config)
     seed_native_automation_fixture()
+
+
+def stage_managed_runtime(runtime_root: Path) -> tuple[Path, str, str]:
+    probe = run_checked(
+        (
+            str(PYTHON_EXE),
+            "-I",
+            "-c",
+            "import sys; print(sys.base_prefix)",
+        ),
+        timeout_seconds=30,
+    ).strip()
+    base_runtime = Path(probe).resolve()
+    base_python = base_runtime / "python.exe"
+    source_site_packages = ROOT / ".venv" / "Lib" / "site-packages"
+    if not base_python.is_file() or not source_site_packages.is_dir():
+        raise VerificationError("managed runtime source is incomplete")
+
+    shutil.copytree(base_runtime, runtime_root, dirs_exist_ok=True)
+    shutil.copytree(
+        windows_extended_path(source_site_packages),
+        windows_extended_path(runtime_root / "Lib" / "site-packages"),
+        dirs_exist_ok=True,
+        ignore=shutil.ignore_patterns("codaro.pth", "codaro-*.dist-info"),
+    )
+    runtime_python = runtime_root / "python.exe"
+    runtime_archive_sha = hashlib.sha256(
+        runtime_python.read_bytes() + (ROOT / "uv.lock").read_bytes()
+    ).hexdigest()
+    (runtime_root / ".runtime-sha256").write_text(runtime_archive_sha, encoding="utf-8")
+    runtime_tree_sha = runtime_tree_sha256(runtime_root)
+    (runtime_root / ".runtime-tree-sha256").write_text(runtime_tree_sha, encoding="utf-8")
+    return runtime_python, runtime_archive_sha, runtime_tree_sha
+
+
+def runtime_tree_sha256(root: Path) -> str:
+    digest = hashlib.sha256()
+    hash_root = windows_extended_path(root)
+
+    def collect(directory: Path) -> None:
+        for path in sorted(directory.iterdir(), key=lambda item: item.name):
+            relative = path.relative_to(hash_root).as_posix()
+            if relative == ".runtime-tree-sha256":
+                continue
+            if path.is_symlink() or (hasattr(path, "is_junction") and path.is_junction()):
+                raise VerificationError(f"managed runtime contains a link: {path}")
+            encoded = relative.encode("utf-8")
+            if path.is_dir():
+                digest.update(b"d")
+                digest.update(struct.pack("<Q", len(encoded)))
+                digest.update(encoded)
+                collect(path)
+                continue
+            if not path.is_file():
+                raise VerificationError(f"managed runtime contains an unsupported entry: {path}")
+            digest.update(b"f")
+            digest.update(struct.pack("<Q", len(encoded)))
+            digest.update(encoded)
+            digest.update(struct.pack("<Q", path.stat().st_size))
+            with path.open("rb") as stream:
+                while chunk := stream.read(64 * 1024):
+                    digest.update(chunk)
+
+    collect(hash_root)
+    return digest.hexdigest()
+
+
+def windows_extended_path(path: Path) -> Path:
+    resolved = str(path.resolve())
+    return Path(resolved if resolved.startswith("\\\\?\\") else f"\\\\?\\{resolved}")
 
 
 def seed_native_automation_fixture() -> None:

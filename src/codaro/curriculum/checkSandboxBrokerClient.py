@@ -55,7 +55,7 @@ def runCheckSandboxBroker(
         "--pipe-name",
         pipeName,
         "--python-executable",
-        os.path.realpath(getattr(os.sys, "_base_executable", os.sys.executable)),
+        managedPythonExecutable(),
         "--worker-path",
         str(workerPath.resolve()),
     ]
@@ -99,6 +99,11 @@ def runCheckSandboxBroker(
         raise
     finally:
         secret[:] = b"\0" * len(secret)
+
+
+def managedPythonExecutable() -> str:
+    """Return the executable selected by the managed launcher runtime."""
+    return os.path.realpath(os.sys.executable)
 
 
 def signedEnvelope(

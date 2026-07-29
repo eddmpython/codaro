@@ -60,7 +60,6 @@ struct ResponsePayload {
 
 pub fn run(paths: &LauncherPaths, args: CheckBrokerArgs) -> Result<()> {
     let run_id = validate_pipe_name(&args.pipe_name)?;
-    validate_trusted_runtime(paths, &args)?;
     let secret = read_bootstrap_secret()?;
     let mut sandbox = AppContainerSandbox::create(paths, &run_id)?;
     let mut pipe = create_pipe(&args.pipe_name, sandbox.sid_string())?;
@@ -73,6 +72,10 @@ pub fn run(paths: &LauncherPaths, args: CheckBrokerArgs) -> Result<()> {
     if request.schema_version != 1 || request.run_id != run_id {
         bail!("check broker request identity does not match the pipe");
     }
+    // A production runtime can be hundreds of MB. Publish the authenticated pipe
+    // before hashing it so the client startup deadline measures broker readiness,
+    // while the trust check still completes before any worker process is launched.
+    validate_trusted_runtime(paths, &args)?;
     validate_trusted_request(paths, &request)?;
 
     let (worker_response, infrastructure_error) =

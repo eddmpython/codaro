@@ -8,6 +8,8 @@ use std::path::{Path, PathBuf};
 const MAX_OUTPUT_BYTES: usize = 1024 * 1024;
 const MAX_ENVIRONMENT_ENTRIES: usize = 32;
 const MAX_PACKAGE_PATHS: usize = 16;
+#[cfg(windows)]
+const SHARED_ACL_MUTEX_NAME: &str = r"Local\Codaro.CheckSandbox.SharedAcl.v1";
 
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -31,6 +33,8 @@ struct RunReceipt {
     sid: String,
     mutex_name: String,
     broker_pid: u32,
+    #[serde(default)]
+    acl_lock_name: Option<String>,
     acl_roots: Vec<AclReceipt>,
 }
 
@@ -119,12 +123,13 @@ impl AppContainerSandbox {
         };
         let receipt_path = run_receipt_dir(paths).join(format!("{run_id}.json"));
         let receipt = RunReceipt {
-            schema_version: 1,
+            schema_version: 2,
             run_id: run_id.to_string(),
             profile_name: profile_name_text.clone(),
             sid: sid_string.clone(),
             mutex_name,
             broker_pid: std::process::id(),
+            acl_lock_name: Some(SHARED_ACL_MUTEX_NAME.to_string()),
             acl_roots: Vec::new(),
         };
         if let Err(error) = save_run_receipt(&receipt_path, &receipt) {
@@ -190,34 +195,23 @@ impl AppContainerSandbox {
             })
             .collect::<Result<Vec<_>>>()?;
 
-        let mut acl_roots = Vec::new();
         for runtime_root in python_runtime_roots(&python_executable)? {
             self.record_acl_root(&runtime_root, AccessKind::ReadExecute)?;
-            acl_roots.push(AclGrant::recursive(
-                &runtime_root,
-                self.sid,
-                AccessKind::ReadExecute,
-            )?);
+            grant_path_acl(&runtime_root, self.sid, AccessKind::ReadExecute)?;
         }
         let worker_root = worker_path
             .parent()
             .context("sandbox worker has no parent directory")?;
         self.record_acl_root(worker_root, AccessKind::ReadExecute)?;
         self.record_acl_root(&fixture_root, AccessKind::ReadWriteExecute)?;
-        acl_roots.extend([
-            AclGrant::recursive(worker_root, self.sid, AccessKind::ReadExecute)?,
-            AclGrant::recursive(&fixture_root, self.sid, AccessKind::ReadWriteExecute)?,
-        ]);
+        grant_path_acl(worker_root, self.sid, AccessKind::ReadExecute)?;
+        grant_path_acl(&fixture_root, self.sid, AccessKind::ReadWriteExecute)?;
         for path in &package_paths {
             self.record_acl_root(path, AccessKind::ReadExecute)?;
-            acl_roots.push(AclGrant::recursive(
-                path,
-                self.sid,
-                AccessKind::ReadExecute,
-            )?);
+            grant_path_acl(path, self.sid, AccessKind::ReadExecute)?;
         }
 
-        let output = launch_appcontainer_process(
+        let output_result = launch_appcontainer_process(
             self.sid,
             &python_executable,
             &worker_path,
@@ -225,10 +219,18 @@ impl AppContainerSandbox {
             &request.environment,
             &request.worker_request,
             request.timeout_ms,
-        )?;
-        drop(acl_roots);
-        self.receipt.acl_roots.clear();
-        save_run_receipt(&self.receipt_path, &self.receipt)?;
+        );
+        let cleanup_result = self.release_acl_roots();
+        let output = match (output_result, cleanup_result) {
+            (Ok(output), Ok(())) => output,
+            (Err(error), Ok(())) => return Err(error),
+            (Ok(_), Err(error)) => return Err(error),
+            (Err(error), Err(cleanup_error)) => {
+                return Err(error.context(format!(
+                    "check sandbox ACL cleanup also failed: {cleanup_error:#}"
+                )));
+            }
+        };
         if output.stdout_exceeded || output.stderr_exceeded {
             bail!("AppContainer worker output exceeded the 1 MB limit");
         }
@@ -322,7 +324,12 @@ fn run_receipt_dir(paths: &LauncherPaths) -> PathBuf {
 
 #[cfg(windows)]
 fn validate_run_receipt(receipt: &RunReceipt) -> Result<()> {
-    if receipt.schema_version != 1
+    let acl_lock_valid = match receipt.schema_version {
+        1 => receipt.acl_lock_name.is_none(),
+        2 => receipt.acl_lock_name.as_deref() == Some(SHARED_ACL_MUTEX_NAME),
+        _ => false,
+    };
+    if !acl_lock_valid
         || receipt.run_id.len() != 32
         || !receipt.run_id.bytes().all(|item| item.is_ascii_hexdigit())
         || receipt.profile_name != format!("Codaro.CheckSandbox.{}", receipt.run_id)
@@ -474,6 +481,18 @@ impl AppContainerSandbox {
         }
         Ok(())
     }
+
+    fn release_acl_roots(&mut self) -> Result<()> {
+        if self.receipt.acl_roots.is_empty() {
+            return Ok(());
+        }
+        cleanup_receipt_acl(&self.receipt)?;
+        let mut cleared = self.receipt.clone();
+        cleared.acl_roots.clear();
+        save_run_receipt(&self.receipt_path, &cleared)?;
+        self.receipt = cleared;
+        Ok(())
+    }
 }
 
 #[cfg(windows)]
@@ -483,15 +502,19 @@ impl Drop for AppContainerSandbox {
         use windows_sys::Win32::Security::FreeSid;
         use windows_sys::Win32::Security::Isolation::DeleteAppContainerProfile;
 
-        let _ = cleanup_receipt_acl(&self.receipt);
+        let cleanup_succeeded = self.release_acl_roots().is_ok();
         unsafe {
-            DeleteAppContainerProfile(self.profile_name.as_ptr());
+            if cleanup_succeeded {
+                DeleteAppContainerProfile(self.profile_name.as_ptr());
+            }
             FreeSid(self.sid);
             if !self.mutex.is_null() {
                 CloseHandle(self.mutex);
             }
         }
-        let _ = std::fs::remove_file(&self.receipt_path);
+        if cleanup_succeeded {
+            let _ = std::fs::remove_file(&self.receipt_path);
+        }
     }
 }
 
@@ -698,36 +721,63 @@ impl AccessKind {
 }
 
 #[cfg(windows)]
-struct AclGrant {
-    paths: Vec<PathBuf>,
+fn grant_path_acl(
+    root: &Path,
     sid: windows_sys::Win32::Security::PSID,
+    access: AccessKind,
+) -> Result<()> {
+    let metadata = std::fs::symlink_metadata(root)
+        .with_context(|| format!("failed to inspect sandbox ACL path `{}`", root.display()))?;
+    if metadata.file_type().is_symlink() {
+        bail!("sandbox ACL root may not be a symbolic link");
+    }
+    update_path_acl(root, sid, Some(access))
 }
 
 #[cfg(windows)]
-impl AclGrant {
-    fn recursive(
-        root: &Path,
-        sid: windows_sys::Win32::Security::PSID,
-        access: AccessKind,
-    ) -> Result<Self> {
-        let metadata = std::fs::symlink_metadata(root)
-            .with_context(|| format!("failed to inspect sandbox ACL path `{}`", root.display()))?;
-        if metadata.file_type().is_symlink() {
-            bail!("sandbox ACL root may not be a symbolic link");
+struct SharedAclMutex {
+    handle: windows_sys::Win32::Foundation::HANDLE,
+}
+
+#[cfg(windows)]
+impl SharedAclMutex {
+    fn acquire() -> Result<Self> {
+        use std::ptr;
+        use windows_sys::Win32::Foundation::{
+            CloseHandle, WAIT_ABANDONED, WAIT_OBJECT_0, WAIT_TIMEOUT,
+        };
+        use windows_sys::Win32::System::Threading::{CreateMutexW, WaitForSingleObject};
+
+        let name = wide(SHARED_ACL_MUTEX_NAME);
+        let handle = unsafe { CreateMutexW(ptr::null(), 0, name.as_ptr()) };
+        if handle.is_null() {
+            return Err(std::io::Error::last_os_error())
+                .context("failed to create the shared sandbox ACL mutex");
         }
-        update_path_acl(root, sid, Some(access))?;
-        Ok(Self {
-            paths: vec![root.to_path_buf()],
-            sid,
-        })
+        let wait = unsafe { WaitForSingleObject(handle, 30_000) };
+        if wait != WAIT_OBJECT_0 && wait != WAIT_ABANDONED {
+            unsafe {
+                CloseHandle(handle);
+            }
+            if wait == WAIT_TIMEOUT {
+                bail!("timed out waiting for the shared sandbox ACL mutex");
+            }
+            return Err(std::io::Error::last_os_error())
+                .context("failed to acquire the shared sandbox ACL mutex");
+        }
+        Ok(Self { handle })
     }
 }
 
 #[cfg(windows)]
-impl Drop for AclGrant {
+impl Drop for SharedAclMutex {
     fn drop(&mut self) {
-        for path in self.paths.iter().rev() {
-            let _ = update_path_acl(path, self.sid, None);
+        use windows_sys::Win32::Foundation::CloseHandle;
+        use windows_sys::Win32::System::Threading::ReleaseMutex;
+
+        unsafe {
+            ReleaseMutex(self.handle);
+            CloseHandle(self.handle);
         }
     }
 }
@@ -738,6 +788,7 @@ fn update_path_acl(
     sid: windows_sys::Win32::Security::PSID,
     access: Option<AccessKind>,
 ) -> Result<()> {
+    let _shared_acl_mutex = SharedAclMutex::acquire()?;
     use std::ptr;
     use windows_sys::Win32::Foundation::{ERROR_SUCCESS, LocalFree};
     use windows_sys::Win32::Security::Authorization::{
@@ -1305,6 +1356,27 @@ mod tests {
 
     #[cfg(windows)]
     #[test]
+    fn shared_acl_mutex_serializes_concurrent_mutations() {
+        use super::SharedAclMutex;
+        use std::sync::mpsc;
+        use std::time::Duration;
+
+        let first = SharedAclMutex::acquire().unwrap();
+        let (sender, receiver) = mpsc::channel();
+        let contender = std::thread::spawn(move || {
+            let second = SharedAclMutex::acquire().unwrap();
+            sender.send(()).unwrap();
+            drop(second);
+        });
+
+        assert!(receiver.recv_timeout(Duration::from_millis(150)).is_err());
+        drop(first);
+        receiver.recv_timeout(Duration::from_secs(5)).unwrap();
+        contender.join().unwrap();
+    }
+
+    #[cfg(windows)]
+    #[test]
     fn appcontainer_enforces_os_boundaries_and_runs_the_worker() {
         use super::{AppContainerSandbox, SandboxRequest};
         use crate::paths::LauncherPaths;
@@ -1473,6 +1545,13 @@ print(json.dumps({"facts": facts}, separators=(",", ":")))
         );
         let mut sandbox = AppContainerSandbox::create(&paths, &run_id).unwrap();
         let receipt_path = sandbox.receipt_path.clone();
+        let receipt: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(&receipt_path).unwrap()).unwrap();
+        assert_eq!(receipt["schemaVersion"], 2);
+        assert_eq!(
+            receipt["aclLockName"],
+            r"Local\Codaro.CheckSandbox.SharedAcl.v1"
+        );
 
         reconcile(&paths).unwrap();
         assert!(receipt_path.is_file());

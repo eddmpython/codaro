@@ -445,6 +445,7 @@ def materializeFixture(root: Path, fixture: dict[str, Any]) -> None:
 def validatePackageAssets(value: Any) -> list[str]:
     if not isinstance(value, list) or len(value) > 16:
         raise LocalStrongCheckInvalid("packageAssets는 최대 16개 array여야 합니다.")
+    assetRoot = packageAssetRoot()
     paths: list[str] = []
     for asset in value:
         if not isinstance(asset, dict):
@@ -466,15 +467,28 @@ def validatePackageAssets(value: Any) -> list[str]:
             raise LocalStrongCheckInvalid("package asset URL은 check-packages 아래 wheel이어야 합니다.")
         if not isinstance(integrity, str) or not re.fullmatch(r"sha256-[A-Za-z0-9+/]+={0,2}", integrity):
             raise LocalStrongCheckInvalid("package asset integrity가 유효하지 않습니다.")
-        path = (REPOSITORY_ROOT / "editor" / "public" / url).resolve()
-        assetRoot = (REPOSITORY_ROOT / "editor" / "public" / "check-packages").resolve()
-        if assetRoot not in path.parents or not path.is_file():
+        relativePath = Path(url).relative_to("check-packages")
+        path = (assetRoot / relativePath).resolve()
+        if (path != assetRoot and assetRoot not in path.parents) or not path.is_file():
             raise LocalStrongCheckInvalid(f"package asset 파일을 찾을 수 없습니다: {url}")
         actual = "sha256-" + base64.b64encode(hashlib.sha256(path.read_bytes()).digest()).decode("ascii")
         if actual != integrity:
             raise LocalStrongCheckInvalid(f"package asset integrity가 일치하지 않습니다: {name}")
         paths.append(str(path))
     return paths
+
+
+def packageAssetRoot() -> Path:
+    configured = os.environ.get("CODARO_WEB_BUILD_ROOT", "").strip()
+    webBuildRoot = (
+        Path(configured).expanduser().resolve()
+        if configured
+        else (REPOSITORY_ROOT / "editor" / "public").resolve()
+    )
+    assetRoot = (webBuildRoot / "check-packages").resolve()
+    if not assetRoot.is_dir():
+        raise LocalStrongCheckInvalid("고정된 local check package asset root를 찾을 수 없습니다.")
+    return assetRoot
 
 
 def workerEnvironment(root: Path, fixture: dict[str, Any], packagePaths: list[str]) -> dict[str, str]:

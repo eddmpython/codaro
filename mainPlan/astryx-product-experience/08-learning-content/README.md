@@ -97,7 +97,7 @@ W1~W5는 이제 source 생성 순서가 아니라 사람 승인과 공개 승격
 | --- | --- | --- |
 | W0 | `fileOps/01_pathlib경로감각`, `fileOps/06_zip압축`, `watchSched/05_schedule간단스케줄` | Web run·자동 check·feedback·reload·archive와 Local dry-run·audit round trip |
 
-W0의 남은 종료 조건은 Local 재내보내기 파일의 Web 재수입, 경합 없는 cold package 준비, 목표 Windows 10 설치본 AppContainer conformance와 shared runtime ACL receipt·GC, independent assessment review다.
+W0의 공유 DACL mutex·ACL receipt v2·startup stale GC와 설치본 pinned wheel 기반 동시 cold `schedule` 검사는 current Windows에서 green이다. 설치형 wheel·launcher·WebView2의 Web-origin archive Local import·reload·re-export도 통과했다. 남은 종료 조건은 실제 공개 Web export에서 시작한 Local 재내보내기 파일의 Web 재수입, 목표 Windows 10 설치본 AppContainer conformance와 independent assessment review다.
 | W1 | `pythonFoundation` | 실제 선택 레슨 Web 완주, required mission weak-only 0, 확인·reveal 마찰 0 |
 | W2 | `dataReporting` | report capstone, unseen transfer, formative usability |
 | W3 | `fileAutomation` | Web 가능한 outcome과 Local graduation을 같은 evidence archive로 연결 |

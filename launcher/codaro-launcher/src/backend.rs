@@ -80,6 +80,9 @@ impl BackendLaunchConfig {
         let mut command = Command::new(&self.python_executable);
         command.args(&preview.args);
         command.current_dir(&self.workspace_root);
+        // The broker validates the managed runtime against the install-time tree hash.
+        // Keep ordinary backend imports from mutating that trusted tree with lazy .pyc files.
+        command.env("PYTHONDONTWRITEBYTECODE", "1");
         command.env("PYTHONPATH", &self.backend_python_path);
         command.env("CODARO_WEB_BUILD_ROOT", &self.editor_root);
         command.env("CODARO_LAUNCHER_LOG_DIR", &self.logs_dir);
