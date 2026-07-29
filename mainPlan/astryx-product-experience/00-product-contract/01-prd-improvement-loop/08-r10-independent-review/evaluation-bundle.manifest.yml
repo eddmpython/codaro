@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: 6ad7aaa51060c5ae4eabf601c37ce59d83f58ac7
-  dirtyDiffHash: 4d81642b2c308241136c00514d2fd5c662dd8872da47c8ac01005e3faa7fd22c
-  manifestHash: 76a321e8729ca100610a9b434647b5097e5e85054ce092dca2f236385a881364
+  gitCommit: d4d1bee1f8dedf571719f44f45609d3156b1f35f
+  dirtyDiffHash: 1c796c9d55f2529ad9e188ad055b857de50d640aeaa71090eefeffc853fcd52d
+  manifestHash: b64ca13e1e07448931d9f426f59aeb6c5f9ac9b5308948080d1615e008605f88
   fileCount: 3160
-  totalBytes: 97246543
+  totalBytes: 97232530
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: d02db6c7f34a6349a4677d50102790223c4749502c2f5217a7602bc8b638fc74
-  bytes: 97887475
+  sha256: 33e66852ee6a64b572b7b768cbfa4b8d8526463b819e3e4973e05a71dfde2dc1
+  bytes: 97873462
   format: zip
   compression: stored
   compressionMethod: 0
@@ -1328,8 +1328,8 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: assets/brand/visuals/generated/manifest.json
-  sha256: cbb9a1f9a7dc5b320ed775377e28c7b89cd8a102a4f2ced07a9e63526f545ea9
-  bytes: 173609
+  sha256: 2e4ff3001f78984d88fd9b446a25bd9f3732abe8184069456bf1d5d5ae37dc14
+  bytes: 169069
   kind: repository
   sourcePath: assets/brand/visuals/generated/manifest.json
 - path: assets/brand/visuals/learning/ai-integration-v1.png
@@ -1373,8 +1373,8 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/learning/statistics-ml-v1.png
 - path: assets/brand/visuals/manifest.json
-  sha256: 9ffe8fb5f77a496d1e2744929db170105bfb73a19c16b11058d7c16a88320fa8
-  bytes: 99458
+  sha256: 527fc2e3f07aac911cf004f2a97c24b051702e6198c5809eb4df05364cc7d168
+  bytes: 96715
   kind: repository
   sourcePath: assets/brand/visuals/manifest.json
 - path: assets/brand/visuals/manifest.schema.json
@@ -6193,8 +6193,8 @@ files:
   kind: repository
   sourcePath: editor/public/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: editor/public/visuals/manifest.json
-  sha256: cbb9a1f9a7dc5b320ed775377e28c7b89cd8a102a4f2ced07a9e63526f545ea9
-  bytes: 173609
+  sha256: 2e4ff3001f78984d88fd9b446a25bd9f3732abe8184069456bf1d5d5ae37dc14
+  bytes: 169069
   kind: repository
   sourcePath: editor/public/visuals/manifest.json
 - path: editor/scripts/generatePyprocAssets.mjs
@@ -12337,8 +12337,8 @@ files:
   kind: repository
   sourcePath: landing/static/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: landing/static/visuals/manifest.json
-  sha256: cbb9a1f9a7dc5b320ed775377e28c7b89cd8a102a4f2ced07a9e63526f545ea9
-  bytes: 173609
+  sha256: 2e4ff3001f78984d88fd9b446a25bd9f3732abe8184069456bf1d5d5ae37dc14
+  bytes: 169069
   kind: repository
   sourcePath: landing/static/visuals/manifest.json
 - path: landing/vite.config.js
@@ -12527,8 +12527,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/README.md
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/30days.yml
-  sha256: 19739c6224081cbcb6f55e7af9c34968bac37b28f93396d3c43b6572386ea764
-  bytes: 32555
+  sha256: 181264d3913455a1156ec266ac79ad6fb7c25459d6b82f0f2d058b706d8bd59f
+  bytes: 33129
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/30days.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/advancedPython.yml
@@ -12552,8 +12552,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/deepVision.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/devTools.yml
-  sha256: 9412a1e79a260ff19195b7e7fdabb75bdb209476aad8482507cbe3035dc75adb
-  bytes: 3205
+  sha256: f9cda2ee54f57315f05ec6f4ba3148cf5206b32a8228957d789a2d7447fd7643
+  bytes: 3266
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/devTools.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/duckdb.yml
@@ -12587,13 +12587,13 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/inputCtl.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/llmBasics.yml
-  sha256: 930494526e0d9fac2cf5042998bb8c67cd8e21abf5f12c4eea864f77f857aea3
-  bytes: 11604
+  sha256: 9b9da3151218bde0650aef7acb4868ac4770e1cdc50417bac3cd0859c4e27093
+  bytes: 11817
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/llmBasics.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/matplotlib.yml
-  sha256: 9c4739161ecf01e20b8979aa1dc0eeb51f2a9b2a04cf5cba7d2d9ea2a5cdc889
-  bytes: 11787
+  sha256: 2dc3c79d14e11d922dd1dbb5d3524cac7d0e3a8720338459e04655811b75f038
+  bytes: 12000
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/matplotlib.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/networkx.yml
@@ -12607,8 +12607,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/numpy.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/opencv.yml
-  sha256: e80b5259611c4780ffe97461f030eac7b92968f0d922ac9c116632a319eabf46
-  bytes: 11578
+  sha256: 0fd1b95a7cc6e09cc8e71792cf63a0b47a4870d01fa5c98d882721a0c2a05aa1
+  bytes: 11791
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/opencv.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/openpyxl.yml
@@ -12617,8 +12617,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/openpyxl.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/pandas.yml
-  sha256: e050362f334df640bbf84661c6e073c0143bf53aa373763755206439e6fa23f2
-  bytes: 12816
+  sha256: a80e60a84eea8c0f04cc645f176b9a5c80d4c6f67254a3589d09b45f795df79a
+  bytes: 13048
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/pandas.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/pdf.yml
@@ -12687,8 +12687,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/seaborn.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/sklearn.yml
-  sha256: 02e47667bd809988022c9dacf27210efb7e9ae68da70e6898876041f29d0b991
-  bytes: 11342
+  sha256: 4c9d823fd249562e7073c997a8c825c59315dd81ccb09e4d1b6fac7d9cd18343
+  bytes: 11555
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/sklearn.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/statsmodels.yml
@@ -12697,8 +12697,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/statsmodels.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/summary.yml
-  sha256: cc35a31f88a482506f2ab3af59a242522a24c4782ab7e54cc3d261446cd25e8d
-  bytes: 2431
+  sha256: 17ca8b3f28dd3bafef8207918df53018f195cc4e8b7761c8071095c84de4d24c
+  bytes: 2451
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/summary.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/sympy.yml
@@ -12722,8 +12722,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/visionFeatures.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/watchSched.yml
-  sha256: fb679dd21c244b282f46db95880c18900fb76e7b7d68e92dd2e19b052e13430d
-  bytes: 10785
+  sha256: c1beed7d6f9e2ecf342a0c0a5e927051f5e9bf1d2633834f77b57ba40e603229
+  bytes: 10979
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/watchSched.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/word.yml
@@ -12742,8 +12742,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/evidence/legacy-alias-migration.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/evidence/taxonomy-transition.yml
-  sha256: 41bb540dfd04e8df506ea8ecc6503008611964f33359c2d252f68a1c46272e3a
-  bytes: 13924
+  sha256: aa0368530fbc3593b2b171b19ca712f06ec54f53a115105b467d25c4479cf1d2
+  bytes: 14311
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/evidence/taxonomy-transition.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/identity-ledger/30days.yml
@@ -12917,8 +12917,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/identity-ledger/statsmodels.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/identity-ledger/summary.yml
-  sha256: 4d74c8df4759080c11a85d0a3d8a53a19a13978d94d6ec301f463d4f21e66f84
-  bytes: 844
+  sha256: 1573a98a1e7700ffe7164728328e69eb770ba0b8e777f105faf4df0306ea1f26
+  bytes: 874
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/identity-ledger/summary.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/identity-ledger/sympy.yml

@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "sklearn/00_sklearn소개"
     identityLedgerRef: "identity-ledger/sklearn.yml"
-    lessonContentHash: "ba6efef04c3a0b28a58da122e44cc05a6d756505303df9312c04e1e9eef838ab"
+    lessonContentHash: "3cd24ae818e7af118e6458f7642e726f333bfada470e72d9d28dd4f36b418e52"
     disposition: migrate
     ownerPacket: "07-remaining-domains/08-machine-learning"
     eligiblePathIds: ["machineLearning"]

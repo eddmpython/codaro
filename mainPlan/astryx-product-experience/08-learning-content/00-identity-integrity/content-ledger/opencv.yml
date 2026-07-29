@@ -23,7 +23,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "opencv/01_이미지구조탐색기"
     identityLedgerRef: "identity-ledger/opencv.yml"
-    lessonContentHash: "1809a6d0a8485b390e0252056a7108016490e7d88ddd4833b227a3c06fc4c5dd"
+    lessonContentHash: "a97d12d4b49dfe02735b4d21da8f93921230fc190fee90ff76eb5ce71f29f08d"
     disposition: migrate
     ownerPacket: "07-remaining-domains/12-computer-vision"
     eligiblePathIds: ["computerVision","deepLearningVision","visionAdvanced","visionAutomation"]

@@ -156,7 +156,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "llmBasics/08_도구사용기초"
     identityLedgerRef: "identity-ledger/llmBasics.yml"
-    lessonContentHash: "bb632789fc68bc4fcac6eb33657d6fc5bd60de8acd4bc8c20c23631ed0cdfc02"
+    lessonContentHash: "4672ccf12e6f34897654c0a3534b20fb0503b70a63bb698749236596fde6d3e0"
     disposition: migrate
     ownerPacket: "07-remaining-domains/24-ai-integration"
     eligiblePathIds: ["aiIntegration"]

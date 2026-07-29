@@ -80,7 +80,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "watchSched/05_schedule간단스케줄"
     identityLedgerRef: "identity-ledger/watchSched.yml"
-    lessonContentHash: "500811e7352878222c41042e1045b6c4f9f871d08cf566f4732d4150209cdbaa"
+    lessonContentHash: "e382d79925f7068aea509828f00f2c130ec906a77c27599b170f4971da003940"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation"]

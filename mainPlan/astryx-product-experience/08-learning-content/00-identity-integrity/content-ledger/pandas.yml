@@ -23,7 +23,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pandas/01_레스토랑팁분석"
     identityLedgerRef: "identity-ledger/pandas.yml"
-    lessonContentHash: "2d5fa7ed83147629ca60d4726bbe0ae2e052eeb8beeb6133597a100ef9b22f2e"
+    lessonContentHash: "d30dd89318821971b9d46a93ea26ae1aaa39e58a8b92ceff6b66bb7433c202b2"
     disposition: migrate
     ownerPacket: "02-data-reporting"
     eligiblePathIds: ["dataReporting","dataVisualization","geoVisualization","interactiveDashboards","machineLearning","officeAutomation","statisticalAnalysis","timeSeriesAnalysis"]

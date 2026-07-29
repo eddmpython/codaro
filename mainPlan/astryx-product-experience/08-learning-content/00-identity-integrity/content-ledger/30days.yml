@@ -23,7 +23,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day02_변수와데이터타입"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "631f75623015c5b6db9f6189741c6407027a83a60b4ac32c67da22ec1c7fd3d3"
+    lessonContentHash: "d2b819b24efc2feda35680a8f6acfb70c8944b3610e97475a3c8349df45b7ca5"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["computerVision","dataReporting","dataVisualization","geoVisualization","imageProcessing","officeAutomation","pythonFoundation","scriptingAutomation","sqlAnalysis","webMonitoring"]

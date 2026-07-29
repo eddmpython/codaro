@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "matplotlib/00_Matplotlib소개"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "c7061aa54e619dfd926bb84d43d93d48f84dcaeffb06708a05c621db38786ac0"
+    lessonContentHash: "c463b087a6303000e5e5104616469bb2310ef33769763cd5154c2c02664f4273"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization","timeSeriesAnalysis","timeSeriesForecasting"]
