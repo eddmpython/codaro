@@ -11,10 +11,11 @@ whenToUse: 학습 경로 beta·featured 상태, formative study, learning signal
 
 # Learning Efficacy Operations
 
-학습 경로의 공개 상태는 `src/codaro/curriculum/efficacyStage.py`가 경로별로 판정한다. 여러 경로의 평균이나 전체 참가자 수로 실패한 한 경로를 승격하지 않는다.
+학습 경로의 공개 상태는 `src/codaro/curriculum/pathPromotion.py`와 `efficacyStage.py`가 경로별로 판정한다. 여러 경로의 평균이나 전체 참가자 수로 실패한 한 경로를 승격하지 않는다.
 
 | 단계 | 최소 근거 | 허용 claim |
 | --- | --- | --- |
+| M0 | 경로 구조, mastery·transfer·retrieval, capstone artifact, solution 실행, 저작 무결성 | `machineVerified`, provisional 유지 |
 | E0 | curriculum owner와 learning QA 승인, 현재 content hash | `contentApproved` |
 | E1 | 대표 사용자 8명 이상, usability report | `usable` |
 | E2 | 초보자 20명 이상, pre/post/unseen transfer, 완전한 연구 운영 계약 | `learningSignal` |
@@ -22,7 +23,7 @@ whenToUse: 학습 경로 beta·featured 상태, formative study, learning signal
 
 E2부터 `researchOwner`, `privacyOwner`, 모집 채널, 양수 예산 상한, 일정, consent, withdrawal route, encrypted raw store, access roster, 정확히 90일인 deletion job, preregistration URL·hash가 모두 필요하다. consent, withdrawal 동작, deletion job, secret·사용자 path redaction은 각각 SHA-256 receipt를 남긴다. owner 두 역할은 서로 달라야 하며 운영 계약에 secret, email, 사용자 filesystem path가 들어가면 실패한다. 하나라도 없으면 모집과 분석을 시작하지 않는다. content hash가 달라지면 이전 근거는 stale이며, E2는 인과효과 표현을 허용하지 않는다.
 
-`PathReleaseState`는 E0을 internal, E1·E2를 beta, E3만 featured로 해석한다. `productReleaseAggregate`는 shell release 가능성과 모든 경로의 effect 검증을 별도 필드로 유지한다. 따라서 shell이 배포 가능해도 실패하거나 근거가 없는 경로는 featured로 승격되지 않는다.
+`PathPromotionState`는 M0를 사람 증거가 아니라 검수 입력 준비 완료로 해석한다. M0만 통과했거나 R10 round가 준비되지 않으면 공개 상태는 `provisional`이고 허용 claim은 `machineVerified`를 넘지 않는다. `PathReleaseState`는 E0을 internal, E1·E2를 beta, E3만 featured로 해석한다. M0, current-content E3, R10 round readiness가 모두 참일 때만 featured 승격이 가능하다. `productReleaseAggregate`는 shell release 가능성과 모든 경로의 effect 검증을 별도 필드로 유지한다. 따라서 shell이 배포 가능해도 실패하거나 근거가 없는 경로는 featured로 승격되지 않는다.
 
 `src/codaro/releaseResearch.py`의 `CompatibilityMilestone`과 `verifyCompatibilityRelease`는 C0부터 목표 milestone까지 증거를 누적 검증한다. C1은 frozen `/app/`과 current `/run/` tree 분리, 하위 service worker scope, direct/deep reload, cold online Python, output collision 0을 요구한다. C2는 서로 다른 stable release 두 개, query·hash·back/forward, workflow 소유 cache와 두 tombstone path, exact release marker unregister를 요구한다. C3 telemetry threshold policy는 관측 전에 canonical hash로 봉인돼야 하고, 28일 이상 관측과 봉인된 표본·legacy request rate threshold를 만족한 뒤에만 asset retirement를 허용한다.
 
@@ -31,4 +32,5 @@ E2부터 `researchOwner`, `privacyOwner`, 모집 채널, 양수 예산 상한, �
 ```powershell
 uv run pytest -q tests/product/testLearningEfficacyStage.py tests/product/testReleaseResearchCompatibility.py tests/product/testReleaseResearchOperations.py
 uv run python -X utf8 tests/product/verifyReleaseResearchOperations.py
+uv run python -X utf8 tests/run.py gate path-promotion-readiness
 ```

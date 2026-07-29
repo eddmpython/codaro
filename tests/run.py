@@ -89,6 +89,9 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "learning-efficacy-report": (
         "output/test-runner/learning-efficacy-report/learning-efficacy-report.json",
     ),
+    "path-promotion-readiness": (
+        "output/test-runner/path-promotion-readiness/path-promotion-readiness-report.json",
+    ),
     "path-learning-signal": (
         "output/test-runner/path-learning-signal/path-learning-signal-report.json",
     ),
@@ -506,6 +509,22 @@ GATES: dict[str, Gate] = {
             command(("uv", "run", "python", "-X", "utf8", "tests/product/verifyLearningEfficacyReport.py")),
         ),
     ),
+    "path-promotion-readiness": Gate(
+        tier="fast",
+        description="대표 6경로의 M0 구조·평가·capstone·solution을 검증하고 R10·사람 근거 전 공개 승격을 차단한다.",
+        commands=(
+            command((
+                "uv", "run", "python", "-X", "utf8", "-m", "pytest",
+                "tests/product/testPathPromotion.py",
+                "-q", "--tb=short",
+            )),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyFeaturedLearningPaths.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyFeaturedCapstoneContracts.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyStrongAssessmentSolutions.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyAssessmentAuthoringQuality.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/product/verifyPathPromotionReadiness.py")),
+        ),
+    ),
     "path-learning-signal": Gate(
         tier="release",
         description="대표 6경로의 current-content E2 pre/post/unseen-transfer 사람 근거를 경로별로 확인한다.",
@@ -856,6 +875,7 @@ PRODUCT_QUALITY_GATES = (
     "pyproc-runtime-fs-browser",
     "pyproc-asgi-browser",
     "curriculum-quality-matrix",
+    "path-promotion-readiness",
     "repository-simplification",
     "curriculum-executability",
     "curriculum-top-tier-audit",
@@ -886,6 +906,7 @@ PRODUCT_RELEASE_GATES = (
     "visual-accessibility-browser",
     "learning-method",
     "curriculum-quality-matrix",
+    "path-promotion-readiness",
     "repository-simplification",
     "learning-content",
     "web-learning",
@@ -1886,8 +1907,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 61:
-        failures.append(f"expected 61 gates, found {len(GATES)}")
+    if len(GATES) != 62:
+        failures.append(f"expected 62 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

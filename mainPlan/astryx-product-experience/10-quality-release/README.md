@@ -95,6 +95,7 @@ Astryx migration을 보기 좋은 screenshot 몇 장으로 끝내지 않는다. 
 
 | 단계 | 최소 방법 | 허용 상태 |
 | --- | --- | --- |
+| M0 machine readiness | 경로 구조, mastery·transfer·retrieval, capstone artifact, solution 실행과 저작 무결성 | `machineVerified`, provisional 유지 |
 | E0 construct review | curriculum owner·learning QA 2인이 assessment claim·predicate 전수 검수 | `contentApproved` |
 | E1 formative | 경로당 대표 사용자 8명 이상 | `usable`, beta 공개 |
 | E2 learning signal | 경로당 초보자 20명 이상, unseen pre/post/transfer | `learningSignal`, 인과효과 표현 금지 |
@@ -123,6 +124,7 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 | `learning-method` | learning product | yes | every change | 자동 feedback·hint·next, learning relevance와 control intent |
 | `learning-content` | curriculum | no | human approval completion | identity와 472개 ledger aggregate, 현재 identity/content 0/472·taxonomy 0/7·independent assessment 0/468 |
 | `curriculum-quality-matrix` | curriculum | yes | every change | path metadata·check·visual coverage |
+| `path-promotion-readiness` | curriculum/product | yes | every change | 대표 6경로 M0와 R10·사람 근거 전 provisional 차단 |
 | `curriculum-top-tier-audit` | curriculum | no | human approval completion | 독립 assessment 승인과 top-tier completion eligibility |
 | `curriculum-executability` | runtime | no | curriculum audit | browser/local tier 실행 가능성 |
 | `web-learning` | learning frontend | yes | every change | route, browser check, resume, archive |
@@ -160,13 +162,14 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 | `product-experience-browser` | responsive matrix, accessibility, visual regression, performance, route/history, desktop/mobile 비학습 UI 노출 0 tests |
 | `local-studio-browser` | Local Home/Automation fixture, provider, recovery, archive tests |
 | `learning-efficacy-report` | protocol/report fixture와 hash/stale/privacy schema tests |
+| `path-promotion-readiness` | 경로 구조, mastery·transfer·retrieval, capstone artifact, solution 실행, 저작 무결성과 provisional 차단 |
 | `plan-quality` | 봉인된 raw report, rubric·scope hash, evaluator 독립성, P0/P1 ledger, link/path/symbol/gate `PlanFactAudit`; 점수 threshold 없음 |
 
 `.github/workflows/ci.yml`의 기존 `experience` job은 locked browser matrix를 설치하고 `visual-accessibility-browser`를 required gate로 실행한다. resolver에서 존재하는 exact Python Playwright `1.61.0`을 `pyproject.toml`과 `uv.lock`에 고정했고, runner의 임시 `uv run --with playwright` 호출은 locked `uv run`으로 교체했다. 현재 대표 gate는 package version을 다시 검사하고 Chromium 149.0.7827.55, Firefox 151.0, WebKit 26.5를 320·390·900·1440px에서 실행한다. package pin과 설치 engine version은 증명하지만 browser archive·executable SHA-256까지 독립 고정한 release lock은 아직 아니다. 후속 `tests/product/browser-matrix.lock.json`은 embedded driver commit, 각 archive URL·SHA-256·executable SHA-256을 가져야 하며 Chromium latest-1도 Chrome for Testing version·download URL·SHA-256을 별도 channel로 고정한다. `latest`라는 floating install은 release CI에서 금지하고 Playwright upgrade는 lock과 baseline을 함께 바꾸는 별도 dependency review로 수행한다.
 
 `product-browser-webview2-evergreen`은 구현됐고 `.github/workflows/ci.yml`의 hosted `windows-latest` job이 current stable 5-case smoke를 실행한다. `.github/workflows/pages.yml`은 실제 Pages deploy 성공 뒤 `page_url`을 Windows 후속 job의 `CODARO_DEPLOYED_WEB_URL`로 넘겨 공개 Web edit·strong check·archive export와 설치형 Local import·reload·re-export를 추가한 6-case 경로를 실행하고 report·screenshots·다운로드 파일을 artifact로 남긴다. verifier는 editor build, current-commit wheel 조립·설치, gate 전용 `CODARO_HOME`, 실제 launcher EXE, WebView2 CDP 관찰, Win32 client resize, 3개 Local surface와 공용 control, 두 종류 Web-origin 학습 archive 왕복을 한 report로 묶는다. 재내보내기는 evidence manifest 재생성과 Local evidence set union으로 root hash가 달라질 수 있어 document·drafts·virtual FS·packages·automation drafts와 source evidence events를 materialize한 의미 동일성으로 판정한다. release blocker `product-browser-webview2-win10`과 `tests/product/webview2-runtime.lock.json`은 아직 구현되지 않았다. 후속 self-hosted job은 labels `[self-hosted, windows, x64, codaro-win10-22h2, interactive]`인 Windows 10 22H2 image에서만 실행하고, Fixed Version exact version·release date·official archive URL·SHA-256·executable SHA-256·설치 경로와 30일 freshness를 검사해야 한다. minimum supported runtime compatibility는 release-candidate lock과 분리하고 오래된 runtime을 release 기본 설치물로 되살리지 않는다. 이 미구현 조건을 current Evergreen green으로 대체하지 않는다.
 
-표의 `product-release`는 개별 `Gate`가 아니라 `PRODUCT_RELEASE_GATES` tuple, `product-release` CLI subparser, `GATE_ARTIFACTS["product-release"]`를 가진 sequence다. 기존 quick `preflight`를 재정의하지 않는다. 현재 순서는 `root-clean`, `docs`, `backend`, `architecture-boundary`, `editor-build`, `landing-build`, `mobile-layout`, `frontend-performance-budget`, `design-system-contract`, `theme-runtime-browser`, `visual-accessibility-browser`, `learning-method`, `curriculum-quality-matrix`, `repository-simplification`, `learning-content`, `web-learning`, `visual-assets`, `landing-public`, `removed-learning-concepts`, `product-experience-browser`, `astryx-journey`, `local-studio-browser`, `run-local-state-browser`, `learning-evidence-contract`, `learning-efficacy-report`, `automation-ide-audit`, `launcher-test`, `path-learning-signal`, `plan-quality`다. non-required인 사람·독립 증거 gate도 release aggregate에서는 실행하고 하위 실패를 aggregate success로 바꾸지 않는다. `path-efficacy-confirmatory`는 featured path 승격 조건이며 shell artifact 배포 sequence와 분리한다.
+표의 `product-release`는 개별 `Gate`가 아니라 `PRODUCT_RELEASE_GATES` tuple, `product-release` CLI subparser, `GATE_ARTIFACTS["product-release"]`를 가진 sequence다. 기존 quick `preflight`를 재정의하지 않는다. 현재 순서는 `root-clean`, `docs`, `backend`, `architecture-boundary`, `editor-build`, `landing-build`, `mobile-layout`, `frontend-performance-budget`, `design-system-contract`, `theme-runtime-browser`, `visual-accessibility-browser`, `learning-method`, `curriculum-quality-matrix`, `path-promotion-readiness`, `repository-simplification`, `learning-content`, `web-learning`, `visual-assets`, `landing-public`, `removed-learning-concepts`, `product-experience-browser`, `astryx-journey`, `local-studio-browser`, `run-local-state-browser`, `learning-evidence-contract`, `learning-efficacy-report`, `automation-ide-audit`, `launcher-test`, `path-learning-signal`, `evaluation-contract`, `plan-quality`, `r10-independent-review`다. non-required인 사람·독립 증거 gate도 release aggregate에서는 실행하고 하위 실패를 aggregate success로 바꾸지 않는다. `path-efficacy-confirmatory`는 featured path 승격 조건이며 shell artifact 배포 sequence와 분리한다.
 
 ## 구현 순서
 
@@ -177,7 +180,7 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 5. local static server와 Pages preview에서 동일 flow를 실행한다.
 6. 실제 배포 URL에서 route, asset, service worker, browser runtime smoke를 실행한다.
 7. prediction/classroom/dead source가 실제로 제거됐는지 negative gate를 실행한다.
-8. 각 path를 E0 -> E1 -> E2 순서로 독립 승격하고 E3를 완료한 path만 featured로 표시한다.
+8. 각 path의 M0를 기계 검증한 뒤 E0 -> E1 -> E2 순서로 독립 승격하고, R10 round와 E3를 완료한 path만 featured로 표시한다.
 9. 각 workstream의 구현·검증·사람 evidence를 확인하고 종료 조건을 충족한 TODO를 parent 인덱스와 함께 삭제한다.
 10. 이 문서의 모든 종료 조건이 충족되면 `10-quality-release` TODO를 삭제하고, initiative에 남은 일이 없으면 initiative 폴더도 삭제한다. 6경로 모두의 E3는 `effectVerified` 홍보 조건이며 shell artifact 배포 조건과 분리한다.
 
@@ -233,7 +236,7 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 - `uv run python -X utf8 tests/run.py gate editor-build`
 - `uv run python -X utf8 tests/run.py gate landing-build`
 - `uv run python -X utf8 tests/run.py gate product-quality-audit`
-- 신규 staged gate `design-system-contract`, `theme-runtime-browser`, `learning-method`, `learning-content`, `web-learning`, `visual-assets`, `landing-public`, `removed-learning-concepts`, `product-experience-browser`, `learning-evidence-contract`, `learning-efficacy-report`, `path-learning-signal`, `path-efficacy-confirmatory`, `plan-quality`
+- 신규 staged gate `design-system-contract`, `theme-runtime-browser`, `learning-method`, `learning-content`, `web-learning`, `visual-assets`, `landing-public`, `removed-learning-concepts`, `product-experience-browser`, `learning-evidence-contract`, `learning-efficacy-report`, `path-promotion-readiness`, `path-learning-signal`, `path-efficacy-confirmatory`, `plan-quality`
 - 신규 release sequence `PRODUCT_RELEASE_GATES`와 CLI `product-release`
 - `learning-method` gate는 금지 label 목록을 만들지 않고 role, event handler, destination, data marker, progress mutation을 함께 검사한다.
 - quick check: `uv run python -X utf8 tests/run.py preflight`

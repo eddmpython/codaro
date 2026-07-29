@@ -95,6 +95,7 @@ def testGateNamesAreStable() -> None:
         "app-runtime",
         "mobile-layout",
         "attempts",
+        "path-promotion-readiness",
         "path-learning-signal",
         "path-efficacy-confirmatory",
     }
@@ -169,6 +170,7 @@ def testGateNamesAreStable() -> None:
         "pyproc-runtime-fs-browser",
         "pyproc-asgi-browser",
         "curriculum-quality-matrix",
+        "path-promotion-readiness",
         "repository-simplification",
         "curriculum-executability",
         "curriculum-top-tier-audit",
@@ -199,6 +201,7 @@ def testGateNamesAreStable() -> None:
         "visual-accessibility-browser",
         "learning-method",
         "curriculum-quality-matrix",
+        "path-promotion-readiness",
         "repository-simplification",
         "learning-content",
         "web-learning",
