@@ -8,9 +8,9 @@ R9가 드러낸 결함을 문서 작성자가 스스로 닫았다고 선언하�
 
 ## 현재 준비 상태
 
-`buildPrdEvaluationBundle.py --write`는 현재 제품 source와 미완료 제품 TODO를 history-free ZIP으로 만든다. 일반 output·dist·build·cache는 제외하되 허용 목록의 current machine report 9개와 report가 직접 참조하는 JSON·이미지는 `evaluation-evidence/` 아래에 원본 byte 그대로 복제한다. 각 root report의 `gitHead`는 최신 평가 source commit으로 환산돼야 하고 stale·missing·invalid report나 dirty source scope는 seal을 차단한다. ZIP의 모든 entry는 읽기 전용이며 specialist review, PRD 개선 이력, 완료 기록을 포함하지 않는다. bundle hash와 file count는 current source와 raw evidence에서 다시 생성한 manifest가 소유하며, 이 무결성은 evaluator 제출이나 round seal을 뜻하지 않는다.
+`buildPrdEvaluationBundle.py --freeze-input`은 현재 제품 source와 미완료 제품 TODO를 history-free ZIP으로 만들고 입력 hash를 `input-frozen`으로 고정한다. 일반 output·dist·build·cache는 제외하되 허용 목록의 current machine report 9개와 report가 직접 참조하는 JSON·이미지는 `evaluation-evidence/` 아래에 원본 byte 그대로 복제한다. 각 root report의 `gitHead`는 최신 평가 source commit으로 환산돼야 하고 stale·missing·invalid report나 dirty source scope는 input freeze를 차단한다. ZIP의 모든 entry는 읽기 전용이며 specialist review, PRD 개선 이력, 완료 기록을 포함하지 않는다. bundle hash와 file count는 current source와 raw evidence에서 다시 생성한 manifest가 소유한다.
 
-current bundle integrity와 draft fact audit도 R10 통과가 아니다. draft 범위는 최신이지만 입력 manifest와 scope는 unsealed이고 03~07·09 remediation closure, 세 명의 독립 evaluator 배정·독립성·conflict 확인, raw report 3개와 finding ledger가 없다. Local·Web reader floor, canonical mastery, full archive와 weak-only 0은 machine 구현 사실일 뿐 독립 검수와 전 release compatibility matrix를 대신하지 않는다. 따라서 manifest는 `state: draft`, `sealEligible: false`이며 현재 R10 점수와 통과 판정은 없다. `--seal`은 current bundle, 각 remediation closure evidence·fact audit·negative fixture와 세 evaluator의 독립성·conflict·서명이 모두 유효할 때만 성공해야 한다.
+`input-frozen`은 evaluator 제출이나 round seal이 아니다. 입력 manifest는 `sealed: false`, `roundState: blocked`이고 03~07·09 remediation closure, 세 명의 독립 evaluator 배정·독립성·conflict 확인, raw report 3개와 finding ledger가 없다. Local·Web reader floor, canonical mastery, full archive와 weak-only 0은 machine 구현 사실일 뿐 독립 검수와 전 release compatibility matrix를 대신하지 않는다. 따라서 `roundSealEligible: false`이며 현재 R10 점수와 통과 판정은 없다. `--seal`은 frozen input, 각 remediation closure evidence·fact audit·negative fixture와 세 evaluator의 독립성·conflict·서명이 모두 유효할 때만 성공해야 한다.
 
 2026-07-30 machine contract는 `sealIndependentReport`, `mergeCanonicalFindings`, `verifyRoundEvidence`까지 구현됐다. raw YAML은 원본 byte SHA-256과 untouched total score로 봉인되고 같은 이름의 Markdown은 이 seal에서 결정적으로 렌더링되므로 점수·finding 변경을 정본으로 위장할 수 없다. 세 discipline report가 모두 봉인되기 전에는 canonical merge가 거부되며, `contracts/prdEvaluationFindingLedger.schema.yml`의 closed ledger는 세 report seal, scope 4종 hash, 원본 severity, 모든 raw finding의 정확히 한 번 병합, owner·packet·response·review 시각을 강제한다. P0·P1이 open이면 점수와 무관하게 strict round gate는 계속 차단된다.
 
@@ -41,7 +41,7 @@ PRD 점수는 구현 완료 판정이 아니다. E2 이상은 실행 가능한 v
 
 - 현재 차단 초안 `mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/08-r10-independent-review/r10-input-manifest.yml`
 - 현재 차단 초안 `mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/08-r10-independent-review/evaluator-roster.yml`
-- 현재 draft `mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/08-r10-independent-review/evaluation-bundle.manifest.yml`
+- 현재 input-frozen `mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/08-r10-independent-review/evaluation-bundle.manifest.yml`
 - 신규 `mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/08-r10-independent-review/reports/learning.yml`, 읽기 view `learning.md`
 - 신규 `mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/08-r10-independent-review/reports/ux.yml`, 읽기 view `ux.md`
 - 신규 `mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/08-r10-independent-review/reports/architecture.yml`, 읽기 view `architecture.md`
@@ -76,6 +76,7 @@ PRD 점수는 구현 완료 판정이 아니다. E2 이상은 실행 가능한 v
 - bundle 안에 제외 path, prior round report hash, output·build·cache가 하나라도 있거나 manifest에 없는 파일이 있으면 거부
 - `uv run --no-sync python -X utf8 docs/skills/ops/tools/buildPrdEvaluationBundle.py --write`
 - `uv run --no-sync python -X utf8 docs/skills/ops/tools/buildPrdEvaluationBundle.py --check`
+- `uv run --no-sync python -X utf8 docs/skills/ops/tools/buildPrdEvaluationBundle.py --freeze-input` (current source와 machine evidence 입력만 고정)
 - `uv run --no-sync python -X utf8 docs/skills/ops/tools/buildPrdEvaluationBundle.py --seal` (모든 pre-seal 조건 충족 뒤에만 허용)
 - `uv run --no-sync python -X utf8 docs/skills/ops/tools/buildPrdRoundFactAudit.py --write`
 - `uv run --no-sync python -X utf8 docs/skills/ops/tools/buildPrdRoundFactAudit.py --check`

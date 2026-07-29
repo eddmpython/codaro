@@ -18,7 +18,6 @@ Day 1 Web vertical slice에서는 mastery strong evidence 뒤 전이 과제가 �
 | --- | --- | --- |
 | 01 | [day1-evidence-loop](01-day1-evidence-loop/) | acquisition·unseen transfer·24h retrieval이 Web에서 자동 판정·저장·재방문을 통과 |
 | 02 | [w0-local-parity](02-w0-local-parity/) | Local strong check와 artifact archive가 같은 event 계약으로 동작 |
-| 03 | [independent-r10-input](03-independent-r10-input/) | current commit의 원본 증거만 blind evaluator 입력 manifest에 봉인됨 |
 | 04 | [post-r10-path-review-and-promotion](04-post-r10-path-expansion/) | R10 green 뒤 선행 구현된 대표 경로의 author review·효능 검증·공개 승격 순서가 승인됨 |
 | 05 | [python-foundations-assessment](05-python-foundations-assessment/) | Day 1~30 mastery·transfer·retrieval이 저작 검수·실행 검산·브라우저 표본을 통과 |
 
@@ -80,4 +79,4 @@ Python과 TypeScript materializer가 같은 YAML을 다르게 해석하지 않�
 
 ## TODO 삭제 조건
 
-각 하위 packet은 자체 증거가 모두 green일 때만 해당 TODO를 삭제한다. 남은 01~05 TODO가 모두 삭제되고 독립 R10이 현재 commit을 승인하기 전에는 이 packet도, 상위 PRD loop도 완료가 아니다.
+각 하위 packet은 자체 증거가 모두 green일 때만 해당 TODO를 삭제한다. 남은 하위 TODO가 모두 삭제되고 독립 R10이 현재 commit을 승인하기 전에는 이 packet도, 상위 PRD loop도 완료가 아니다.

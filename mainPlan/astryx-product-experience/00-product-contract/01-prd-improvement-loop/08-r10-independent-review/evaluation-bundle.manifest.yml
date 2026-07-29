@@ -1,21 +1,26 @@
 schemaVersion: 1
 roundId: R10
-state: draft
+state: input-frozen
 scope:
-  sealState: draft
-  gitCommit: 19ba17f667dd7a600e049a10c295f485e7e27497
+  sealState: input-frozen
+  gitCommit: e0cafedbe55e91fbacd6007fc2718122c4d48156
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: abd20467745a26346a9e1decd8c1193c822181bd48ab29d9a5afe4af89325545
+  manifestHash: 0de7cafb4974a3e68c02275875169d5219005c024036843253746411fdbca97d
   fileCount: 3358
-  totalBytes: 114848698
+  totalBytes: 114864406
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: 933380b61e9ecd3bf99455b459187d55b232a9dac43faa795d6de06f12563c80
-  bytes: 115542378
+  sha256: 8ece7277faa99b18f6cefb2923252a637ed6bd9d06764ad5f15a3d8889e9bb43
+  bytes: 115558086
   format: zip
   compression: stored
   compressionMethod: 0
   readOnlyEntries: true
+inputReadiness:
+  freezeEligible: true
+  inputFrozen: true
+  freezeBlockingReasons: []
+  blockingReasons: []
 roundReadiness:
   sealEligible: false
   roundReady: false
@@ -43,7 +48,7 @@ roundReadiness:
   - ux evaluator is unassigned
 machineEvidence:
   indexPath: evaluation-evidence/manifest.yml
-  scopeGitCommit: 19ba17f667dd7a600e049a10c295f485e7e27497
+  scopeGitCommit: e0cafedbe55e91fbacd6007fc2718122c4d48156
   scopeClean: true
   requiredReportCount: 9
   includedReportCount: 9
@@ -4531,8 +4536,8 @@ files:
   kind: repository
   sourcePath: docs/skills/ops/foundation/environment.md
 - path: docs/skills/ops/foundation/testing-and-gates.md
-  sha256: b5087d6d6ac77ebb58cddeba09663d6ba4d3e0afed1ef213faf35a6566e9e22c
-  bytes: 62544
+  sha256: a7ce84fe23b13b189a16ec5b23450fa64985a77d79afb0cb6e031a70fd8ec284
+  bytes: 63271
   kind: repository
   sourcePath: docs/skills/ops/foundation/testing-and-gates.md
 - path: docs/skills/ops/product/branding.md
@@ -4796,13 +4801,13 @@ files:
   kind: repository
   sourcePath: docs/skills/ops/tools/buildLearningLedgers.py
 - path: docs/skills/ops/tools/buildPrdEvaluationBundle.py
-  sha256: 071f06f2b4c21224e9a062594d7b9c4ad91fc1a843bd09840e8e7c9555d25b86
-  bytes: 42757
+  sha256: aac7ed49ca7598dc3b0e00b6b01c03a08b4c6a5cb2328f86410227f3a044bfa9
+  bytes: 49436
   kind: repository
   sourcePath: docs/skills/ops/tools/buildPrdEvaluationBundle.py
 - path: docs/skills/ops/tools/buildPrdRoundFactAudit.py
-  sha256: 9a411ff396786384cf27188c4ef5869bb4a87698503cbc8c6ff0a2ca330641a0
-  bytes: 16406
+  sha256: 34a8a3afcf6fecab9755bcbbb77d3757bf1a255a589a9414ea749c16919194d9
+  bytes: 16566
   kind: repository
   sourcePath: docs/skills/ops/tools/buildPrdRoundFactAudit.py
 - path: docs/skills/ops/tools/buildPublicLearningCatalog.py
@@ -7330,62 +7335,62 @@ files:
   kind: frozen-contract
   sourcePath: contracts/prdEvaluationRubric.yml
 - path: evaluation-evidence/astryx-journey/astryx-journey-report.json
-  sha256: c02d0cf24659b86368ca9f9f7933b6f3794e2e0ab5531e073b200a28ffd6bb45
+  sha256: 9acaad3a17cb5e03e7501b0d579973067331c987e4cec5dbe3214027d3fab6ba
   bytes: 5551
   kind: raw-machine-report
   sourcePath: output/test-runner/astryx-journey/astryx-journey-report.json
 - path: evaluation-evidence/astryx-journey/manual-at-report.json
-  sha256: ad950b5b7170508909ea52ddbdbd550e13e6799170b4c6b1ec0c32901b4ea2e1
+  sha256: 998dc251bfdd35fe0e718fcf1ab1404fb62d48cca86dab1b329975377fbe1887
   bytes: 2792
   kind: raw-machine-report
   sourcePath: output/test-runner/astryx-journey/manual-at-report.json
 - path: evaluation-evidence/astryx-journey/product-experience-dark-report.json
-  sha256: 6c05ea542b247cad79ac72c6e02ad4afc11736bc71971f86f5584814af4289b3
+  sha256: 69e5a28f2755a22ab2c75132d319d2d15a869967fbb1906c99ef78496c72cffe
   bytes: 127268
   kind: raw-machine-artifact
   sourcePath: output/test-runner/astryx-journey/product-experience-dark-report.json
 - path: evaluation-evidence/astryx-journey/product-experience-light-report.json
-  sha256: 8b6a3d9c0565dd1fb1adea274b40d594080a418e40402387b897f8188725f19c
+  sha256: 46a702cb3e031b524d4b02978706b88dccb910c662fe55966c9d12ff1cb550c6
   bytes: 127231
   kind: raw-machine-artifact
   sourcePath: output/test-runner/astryx-journey/product-experience-light-report.json
 - path: evaluation-evidence/curriculum-top-tier-audit/curriculum-top-tier-report.json
-  sha256: f67e4f4af5b058f805ec76cf282fb01794c5c9a87d3ad996abfeb13694f8f6d8
+  sha256: d22af9a8cc8ae989afd39bab1decfc5ed6ccd2ec744421e0ba1111f4df57058d
   bytes: 34269
   kind: raw-machine-report
   sourcePath: output/test-runner/curriculum-top-tier-audit/curriculum-top-tier-report.json
 - path: evaluation-evidence/evidence-migration/evidence-migration-report.json
-  sha256: 90665e6dcd3a3ffaa0a97340d38215d76e3569b2f34a173e2f31fcf3df1ed70b
+  sha256: 37bcaf1fcf352c91024079d3dc4f0fdd1c478a01d55603d5a27f5566bfd1ff4f
   bytes: 2404
   kind: raw-machine-report
   sourcePath: output/test-runner/evidence-migration/evidence-migration-report.json
 - path: evaluation-evidence/evidence-migration/product-experience-report.json
-  sha256: a9e755d1d29710e4a52d5dbc63c248cbc6c621d63e9c0817790dfd91d3da37e5
+  sha256: 233a490c4b021b7790419a199d2a994ffa0f25c0d8ed3adc5f3ef5da40e939db
   bytes: 9910
   kind: raw-machine-artifact
   sourcePath: output/test-runner/evidence-migration/product-experience-report.json
 - path: evaluation-evidence/learning-vertical-slice/learning-vertical-slice-report.json
-  sha256: 6d041c7398ec063438152b14d52e38eb0407577d01a96166988196bde592bfc2
+  sha256: a193e191fa62fc162626717025cb21b58daed68c4033f4fd8a14b67ebb8d0639
   bytes: 3876
   kind: raw-machine-report
   sourcePath: output/test-runner/learning-vertical-slice/learning-vertical-slice-report.json
 - path: evaluation-evidence/learning-vertical-slice/product-experience-report.json
-  sha256: eb9785b900d043f956ff62bc1d9e0d4a142c2687a3a5e85107a840aee87da9ce
+  sha256: af14121e417d302855df8ae54f6582a17c02c672b01047e6b01c3cf45f8fc6a5
   bytes: 52870
   kind: raw-machine-artifact
   sourcePath: output/test-runner/learning-vertical-slice/product-experience-report.json
 - path: evaluation-evidence/local-studio-browser/local-studio-report.json
-  sha256: fcf59a2288a4f5a9e5209743b25721f7f9d9b65a9086dfdf47346c33f81c7dde
+  sha256: 438f7590f1e7630a563abce8c6085546542ea837baac344f2e50b7c27d9af4e7
   bytes: 237201
   kind: raw-machine-report
   sourcePath: output/test-runner/local-studio-browser/local-studio-report.json
 - path: evaluation-evidence/manifest.yml
-  sha256: 580702b4fa17e81a9672b6190af1360e82b343e62ba12dae3c5eded25400139a
+  sha256: 1c2127d6815a19fe9b2a9f6fee901131ee68bff6c46cc85cb4b49a7b781ba51d
   bytes: 67577
   kind: machine-evidence-index
 - path: evaluation-evidence/product-browser-webview2-evergreen/screenshots/local-automation-1440x900.png
-  sha256: 47d6de24b3277dc661c9604c0d3352f8a7ab51d953d7c6a7e825e999684cdd27
-  bytes: 151856
+  sha256: 16241f292449b9d2123f4820b052f062a9a6e316bfaeb6a0b7e0c4091c98a75c
+  bytes: 151412
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-browser-webview2-evergreen/screenshots/local-automation-1440x900.png
 - path: evaluation-evidence/product-browser-webview2-evergreen/screenshots/local-automation-disconnected-1440x900.png
@@ -7404,18 +7409,18 @@ files:
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-browser-webview2-evergreen/screenshots/local-automation-paused-1440x900.png
 - path: evaluation-evidence/product-browser-webview2-evergreen/screenshots/local-automation-running-1440x900.png
-  sha256: c41e2870a1ed7ab8d2478532bac12743aece9b118610bed629dcd0e09d988c41
-  bytes: 153451
+  sha256: 955bf36f3b90c8fd0990a51a93cb4e67c7386ffd0503b176a619e84efc790e3d
+  bytes: 153416
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-browser-webview2-evergreen/screenshots/local-automation-running-1440x900.png
 - path: evaluation-evidence/product-browser-webview2-evergreen/screenshots/local-automation-scheduled-1440x900.png
-  sha256: 3d6f5104fdbf8f1e1c7888365d232f42b903a7234cca9023482323de1da0964f
-  bytes: 151888
+  sha256: 56c185c15d740f0f1b1bd64c920e874bfb77c05fd84e02a335593b94a15b87b8
+  bytes: 151885
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-browser-webview2-evergreen/screenshots/local-automation-scheduled-1440x900.png
 - path: evaluation-evidence/product-browser-webview2-evergreen/screenshots/local-automation-succeeded-1440x900.png
-  sha256: d064447fd4bb99461d5e0f7c5559b9f6442cc30acf7dba87bac1baaec2f13b79
-  bytes: 155318
+  sha256: 5f38b0aab361476fa2c188ddc964a986a8ec356b0530840563b1eb159709271f
+  bytes: 155349
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-browser-webview2-evergreen/screenshots/local-automation-succeeded-1440x900.png
 - path: evaluation-evidence/product-browser-webview2-evergreen/screenshots/local-home-900x640.png
@@ -7444,17 +7449,17 @@ files:
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-browser-webview2-evergreen/screenshots/local-shell-keyboard-forced-colors-900x640.png
 - path: evaluation-evidence/product-browser-webview2-evergreen/screenshots/shared-support-dialog.png
-  sha256: 859a22f30ae6d91950a06c9b03811ea4650fb63a202e63145c400d498c96f905
-  bytes: 87828
+  sha256: 5161ec7c8251cbc4f1a34b8840f11ecba37d810ac6152299f941fed546276c81
+  bytes: 87933
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-browser-webview2-evergreen/screenshots/shared-support-dialog.png
 - path: evaluation-evidence/product-browser-webview2-evergreen/webview2-product-smoke-report.json
-  sha256: 1f610f8c78c3f69f00ec96a41f68af224ac45262b71d908621fcbc8de8f7f713
+  sha256: 15a6cd66e2488ff57a7223e9252b8148c685961c63cce9093fa38c0f9e784978
   bytes: 41134
   kind: raw-machine-report
   sourcePath: output/test-runner/product-browser-webview2-evergreen/webview2-product-smoke-report.json
 - path: evaluation-evidence/product-experience-browser/product-experience-report.json
-  sha256: 476a732750d26bcb7dec6082270e9713b6577469c0c8c78691f330e0d8ef903b
+  sha256: b992078e98c4a457069830eb02dfe854670ffd95bb9d61b1a26080c23b074e0f
   bytes: 724164
   kind: raw-machine-report
   sourcePath: output/test-runner/product-experience-browser/product-experience-report.json
@@ -7569,13 +7574,13 @@ files:
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/dark/local-learning-evidence-desktop.png
 - path: evaluation-evidence/product-experience-browser/screenshots/dark/local-learning-home-desktop.png
-  sha256: 9d59471bcd4427d4daa658b99ad776252fc5dc7bf7e962d3a1c8ad47f13d0795
+  sha256: 65a4b94cbb872eefff2670741eca24beb5362e05773eb4f45c2f8699bafa84f9
   bytes: 145988
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/dark/local-learning-home-desktop.png
 - path: evaluation-evidence/product-experience-browser/screenshots/dark/local-learning-home-minimum.png
-  sha256: 046ba1b3f132862b6faba02144cd3efad9090744f7b05c7e3c97a2bcc9173024
-  bytes: 116186
+  sha256: 165fe3ecd7db6aae3a955d9089c613d1ca06a3e8e5810cf43ac22ae94f17aae4
+  bytes: 116187
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/dark/local-learning-home-minimum.png
 - path: evaluation-evidence/product-experience-browser/screenshots/dark/local-mobile-chat.png
@@ -7759,8 +7764,8 @@ files:
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/dark/local-run-minimum.png
 - path: evaluation-evidence/product-experience-browser/screenshots/dark/local-strong-learning-desktop-provisional.png
-  sha256: be89fcfd7fb8dbb8dfbaff209b26cf88ae8aab8214b07f9385c2f04e48ae95cc
-  bytes: 100961
+  sha256: ee888b3e10efe76046cf12ec59b274561f6bb0b3f6b83857a86eb0f4aab75a51
+  bytes: 100972
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/dark/local-strong-learning-desktop-provisional.png
 - path: evaluation-evidence/product-experience-browser/screenshots/dark/local-strong-learning-desktop.png
@@ -7789,12 +7794,12 @@ files:
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/dark/web-canonical-keyboard-desktop.png
 - path: evaluation-evidence/product-experience-browser/screenshots/dark/web-canonical-navigation-mobile.png
-  sha256: 73e84236595ba6d69899c2bc40f5685e3874993df338f3dff39cb10932b37c2d
-  bytes: 50907
+  sha256: 1f9efc29cef9367f9e5274824d0dd776648364989e1ecb7c311e71e0a251fc52
+  bytes: 50911
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/dark/web-canonical-navigation-mobile.png
 - path: evaluation-evidence/product-experience-browser/screenshots/dark/web-chat-mobile.png
-  sha256: 0c0d770a0dca0f80bf3b9c1382b2b9fe6bb178cf55b6f791ce9df3865446dd00
+  sha256: 4b6040fd34010d586ef78925bc7f35800d3e3f96ac58b23ce6c682abee307377
   bytes: 77572
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/dark/web-chat-mobile.png
@@ -7914,13 +7919,13 @@ files:
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/dark/web-day30-capstone-progression-desktop.png
 - path: evaluation-evidence/product-experience-browser/screenshots/dark/web-learning-home-desktop.png
-  sha256: d86a31df83aebd1997a4db8e24b92cac98c80f81f7d77fb3c978a09b4482fc1d
+  sha256: 6c4ac1f88f91a75436931fcf495511c33b5a0d1837d0a33cdd0c0a9849088fae
   bytes: 214902
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/dark/web-learning-home-desktop.png
 - path: evaluation-evidence/product-experience-browser/screenshots/dark/web-learning-home-mobile.png
-  sha256: da9918811879400a372e2902090e2b797496fad0b8bb7a5dc24b8214888dd68e
-  bytes: 134028
+  sha256: 420f11d996554b790c29dbf83890840e0e977aa6579fbd5d15b0a6702058f6b5
+  bytes: 134029
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/dark/web-learning-home-mobile.png
 - path: evaluation-evidence/product-experience-browser/screenshots/dark/web-lesson-mobile.png
@@ -7979,12 +7984,12 @@ files:
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/dark/web-pathlib-versions-desktop.png
 - path: evaluation-evidence/product-experience-browser/screenshots/dark/web-run-compact-long-notebook-keyboard.png
-  sha256: 903fc8f4e1304eb3afe46b941dd8b8518ee959ff2cebd5a66838235967f0a520
-  bytes: 28404
+  sha256: 9dbcbe3ce55f095017853138b40efab6bf48d22a1a8560faf3ec4e7612f14b02
+  bytes: 27521
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/dark/web-run-compact-long-notebook-keyboard.png
 - path: evaluation-evidence/product-experience-browser/screenshots/dark/web-run-compact.png
-  sha256: 42830caab46019ae3b97fdd45fc307fd51342cac877684c556448480b6d74369
+  sha256: 039d2c545af0188b2e011cf399ba10f16b726298f509f173da3f70ac6c556497
   bytes: 16944
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/dark/web-run-compact.png
@@ -8164,8 +8169,8 @@ files:
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/light/landing-public-lesson-desktop.png
 - path: evaluation-evidence/product-experience-browser/screenshots/light/local-automation-desktop.png
-  sha256: 6fd5e3c9a45d85f3f0ca9648b9eab2f4100929312d0bd4f5e0757ca76a702c20
-  bytes: 144212
+  sha256: 1083b1ead0303300accf27c27a00a053e65453af41e855dba8192f97575a1a23
+  bytes: 144216
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/light/local-automation-desktop.png
 - path: evaluation-evidence/product-experience-browser/screenshots/light/local-learning-home-desktop.png
@@ -8199,8 +8204,8 @@ files:
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/light/local-run-minimum.png
 - path: evaluation-evidence/product-experience-browser/screenshots/light/local-strong-learning-desktop-provisional.png
-  sha256: 7d9da36c464264a34edb97a14b4516126a65d986fefca1218834b9527c146ba0
-  bytes: 99589
+  sha256: 6996e314719db740b4b75bd45d5bba4b8f63cffdfda54b4121208b244ab4bd14
+  bytes: 99570
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/light/local-strong-learning-desktop-provisional.png
 - path: evaluation-evidence/product-experience-browser/screenshots/light/local-strong-learning-desktop.png
@@ -8254,8 +8259,8 @@ files:
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/light/web-run-desktop.png
 - path: evaluation-evidence/product-experience-browser/screenshots/light/web-run-mobile-long-notebook-keyboard.png
-  sha256: c34cb171fdc059524fc059acc6d9d6e87e71b59b63cec10e63d7d3226e45da52
-  bytes: 34526
+  sha256: 0418555f88f2646daa98b68d978d6f05c296be7ad22c9e0e76113bcaf66c0b09
+  bytes: 34530
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/light/web-run-mobile-long-notebook-keyboard.png
 - path: evaluation-evidence/product-experience-browser/screenshots/light/web-run-mobile.png
@@ -8264,7 +8269,7 @@ files:
   kind: raw-machine-artifact
   sourcePath: output/test-runner/product-experience-browser/screenshots/light/web-run-mobile.png
 - path: evaluation-evidence/release-research-operations/release-research-operations-report.json
-  sha256: 83fbb5f2c91ca16e498c31764898300db0051f831be54443c7bf0916116ca0c0
+  sha256: 5a3b1329dabe1cf975c1355ec73f1743bc93be5911866635d4684bfd581a782c
   bytes: 2312
   kind: raw-machine-report
   sourcePath: output/test-runner/release-research-operations/release-research-operations-report.json
@@ -16289,8 +16294,8 @@ files:
   kind: repository
   sourcePath: tests/migrations/testClassroomArchive.py
 - path: tests/plan/testMainPlanTodoPolicy.py
-  sha256: 45183dc515fd8022dea4871b0c78a9e76b49090c689d98f2251716ec2a1bb435
-  bytes: 3398
+  sha256: 50ed1b4b0e2dfe9666df83ecdfc37e64c1a7a241880450a07fb95d0ea77feb76
+  bytes: 5008
   kind: repository
   sourcePath: tests/plan/testMainPlanTodoPolicy.py
 - path: tests/playwrightCli.py
@@ -16354,8 +16359,8 @@ files:
   kind: repository
   sourcePath: tests/product/testManualAtMatrix.py
 - path: tests/product/testPrdEvaluationBundle.py
-  sha256: 3a385cc25da399bb5939adbb5bffca2a5cf1b4e79819808e0941d1bfdd370b1c
-  bytes: 16484
+  sha256: 1fd90e740ad1b5f7d96c68a7415b2dcd2de1496b8e44b163ff2c5ab184b90e7b
+  bytes: 20258
   kind: repository
   sourcePath: tests/product/testPrdEvaluationBundle.py
 - path: tests/product/testPrdEvaluationContract.py
@@ -16364,8 +16369,8 @@ files:
   kind: repository
   sourcePath: tests/product/testPrdEvaluationContract.py
 - path: tests/product/testPrdEvaluationReport.py
-  sha256: 5ad95ce5430b712060593778f47b17cf39cb4287e79056f42fa7ee33f5828097
-  bytes: 24378
+  sha256: 2f89d4ea5906a83415c55fc218e15a2d7154f6f0b4bc7a87d31ab197869b9d81
+  bytes: 27137
   kind: repository
   sourcePath: tests/product/testPrdEvaluationReport.py
 - path: tests/product/testReleaseResearchCompatibility.py
@@ -16429,8 +16434,8 @@ files:
   kind: repository
   sourcePath: tests/product/verifyPrdEvaluationContract.py
 - path: tests/product/verifyPrdEvaluationReport.py
-  sha256: 5e21a7633b375c2b7670b59c42e3aaf8b1ef80e7ac4a6bf0704890e0a9f9a61e
-  bytes: 52075
+  sha256: f3f03cf432cc7efec6d05272df6318fde5f09117719f9614a81df7463949d372
+  bytes: 53297
   kind: repository
   sourcePath: tests/product/verifyPrdEvaluationReport.py
 - path: tests/product/verifyProductQualityAudit.py
