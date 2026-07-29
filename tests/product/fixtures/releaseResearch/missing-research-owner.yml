@@ -7,8 +7,9 @@ candidate:
   learningQaReviewer: learning-qa
   contentApproved: true
   representativeParticipants: 8
-  usabilityReportHash: sha256-formative
+  usabilityReportHash: sha256-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
   noviceParticipants: 20
+  participantReportHash: sha256-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
   measures: [pre, post, unseenTransfer]
   causalClaim: false
   researchOperations:
@@ -21,8 +22,14 @@ candidate:
     withdrawalRoute: /research/withdraw
     encryptedRawStore: research-raw-v1
     accessRoster: research-roster-v1
-    deletionJob: delete-after-90-days
+    deletionJob:
+      jobId: delete-after-90-days
+      retentionDays: 90
     preregistrationUrl: https://example.invalid/preregistration
-    preregistrationHash: sha256-preregistration
+    preregistrationHash: sha256-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    consentReceiptHash: sha256-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    withdrawalTestReceiptHash: sha256-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    deletionTestReceiptHash: sha256-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    redactionAuditHash: sha256-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 expectedFailure:
   code: missing-research-owner

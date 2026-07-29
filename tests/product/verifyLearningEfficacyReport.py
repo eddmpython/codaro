@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from datetime import UTC, datetime
 import json
 from pathlib import Path
@@ -43,6 +44,7 @@ def stageCandidate(stage: str) -> dict[str, Any]:
     if stage in {"E2", "E3"}:
         candidate.update({
             "noviceParticipants": 20,
+            "participantReportHash": CONTENT_HASH,
             "measures": ["pre", "post", "unseenTransfer"],
             "causalClaim": False,
             "researchOperations": {
@@ -55,9 +57,16 @@ def stageCandidate(stage: str) -> dict[str, Any]:
                 "withdrawalRoute": "/withdraw",
                 "encryptedRawStore": "encrypted-store",
                 "accessRoster": "two-person-roster",
-                "deletionJob": "90-day-delete",
+                "deletionJob": {
+                    "jobId": "90-day-delete",
+                    "retentionDays": 90,
+                },
                 "preregistrationUrl": "https://example.invalid/preregistered",
                 "preregistrationHash": CONTENT_HASH,
+                "consentReceiptHash": CONTENT_HASH,
+                "withdrawalTestReceiptHash": CONTENT_HASH,
+                "deletionTestReceiptHash": CONTENT_HASH,
+                "redactionAuditHash": CONTENT_HASH,
             },
         })
     if stage == "E3":
@@ -75,13 +84,19 @@ def verifyStages() -> dict[str, Any]:
         result = resolveEfficacyStage(stageCandidate(stage), currentContentHash=CONTENT_HASH)
         claims[stage] = result["allowedClaim"]
     rejected: list[str] = []
+    wrongRetention = deepcopy(stageCandidate("E2"))
+    wrongRetention["researchOperations"]["deletionJob"]["retentionDays"] = 91
+    pathLeak = deepcopy(stageCandidate("E2"))
+    pathLeak["researchOperations"]["accessRoster"] = "C:\\Users\\person\\research-roster.yml"
     cases = (
         ({**stageCandidate("E2"), "causalClaim": True}, "causal-claim-forbidden"),
         ({**stageCandidate("E3"), "participantsPerArm": 59}, "confirmatory-arm-too-small"),
         (stageCandidate("E2"), "stale-content-evidence"),
+        (wrongRetention, "invalid-deletion-job"),
+        (pathLeak, "research-operations-sensitive-data"),
     )
     for index, (candidate, expectedCode) in enumerate(cases):
-        currentHash = ("sha256-" + ("b" * 64)) if index == 2 else CONTENT_HASH
+        currentHash = ("sha256-" + ("b" * 64)) if expectedCode == "stale-content-evidence" else CONTENT_HASH
         try:
             resolveEfficacyStage(candidate, currentContentHash=currentHash)
         except EfficacyStageInvalid as error:

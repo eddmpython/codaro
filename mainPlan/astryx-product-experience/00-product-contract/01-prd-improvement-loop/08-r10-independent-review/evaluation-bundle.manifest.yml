@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: a0109b55cf88927f9fd07810809ae04fc525c69a
-  dirtyDiffHash: 13701463d912f8212019fa4fd61ef737976a3e6aef3cc5bbf1d9888b59a937c0
-  manifestHash: 2499a4be3e7583f231b0293d3a75b011e6de339782ef2014ba3e8e6def4bac73
-  fileCount: 3165
-  totalBytes: 97421953
+  gitCommit: 7c16dba3d9b8e115ef1e92540df972b3959cd501
+  dirtyDiffHash: 1a76a99dcdc616bedc925c00bfe4d441f99a95b7b890914cfa9d648324b2cfc9
+  manifestHash: f3d2668311c2803fa561057d407a5ca4c443ab3dffc805a78e69101e2e9b6384
+  fileCount: 3168
+  totalBytes: 97462143
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: 112dcb9e5a8c3d0c0a814405cc5eba662ea6a809537322c6ee5c4c64463db08d
-  bytes: 98063299
+  sha256: c171711417852cc40da674255316db8fa0de42011c157adff2df8052effc6942
+  bytes: 98103965
   format: zip
   compression: stored
   compressionMethod: 0
@@ -4513,8 +4513,8 @@ files:
   kind: repository
   sourcePath: docs/skills/ops/foundation/environment.md
 - path: docs/skills/ops/foundation/testing-and-gates.md
-  sha256: d869d6f09eb96a3548faec14cce03dc64a48529eab9a44daaacf2b1f160591d8
-  bytes: 61567
+  sha256: ab98162a66627c1ac3e25d56f6caca64d822ebe851faecf7b052894613a99aa7
+  bytes: 61628
   kind: repository
   sourcePath: docs/skills/ops/foundation/testing-and-gates.md
 - path: docs/skills/ops/product/branding.md
@@ -4533,8 +4533,8 @@ files:
   kind: repository
   sourcePath: docs/skills/ops/product/dogfood-alpha.md
 - path: docs/skills/ops/product/learning-efficacy-operations.md
-  sha256: 2fe3471bf863b61628d6fa6f3261c16a212ca61d2f7df829f5d64884ed4a37e4
-  bytes: 1700
+  sha256: 99fbcec93618ef3232cb4a835bc8d0b65dc1fb2dd9acd69441cfdc832cc768b8
+  bytes: 3086
   kind: repository
   sourcePath: docs/skills/ops/product/learning-efficacy-operations.md
 - path: docs/skills/ops/product/service-candidate.md
@@ -14147,8 +14147,8 @@ files:
   kind: repository
   sourcePath: src/codaro/curriculum/converter.py
 - path: src/codaro/curriculum/efficacyStage.py
-  sha256: aef870241f7ababd9dd242c20c8b6a37f8bff809ea04fc4452cb470e3887052d
-  bytes: 5569
+  sha256: 127fdb77bdf48f2c3b0b9907ba828094c8cd2c619af2f6109bae1e9be39d9e37
+  bytes: 11747
   kind: repository
   sourcePath: src/codaro/curriculum/efficacyStage.py
 - path: src/codaro/curriculum/evidenceArchive.py
@@ -14486,6 +14486,11 @@ files:
   bytes: 17387
   kind: repository
   sourcePath: src/codaro/outputDescriptor.py
+- path: src/codaro/releaseResearch.py
+  sha256: 12a0c9ad4ef4be850d326260116265bbe2a046b6808169dd904e312a9afd1fbd
+  bytes: 13683
+  kind: repository
+  sourcePath: src/codaro/releaseResearch.py
 - path: src/codaro/runtime/DEV.md
   sha256: 707b38a9186af3a11cbfe7c90da5b6ad87b1094fdb7b895295fff66f952f9bf2
   bytes: 3372
@@ -15347,8 +15352,8 @@ files:
   kind: repository
   sourcePath: tests/product/fixtures/astryxVerticalSlice/reveal-only-control.json
 - path: tests/product/fixtures/releaseResearch/missing-research-owner.yml
-  sha256: ceb6859570eeeadc9eedaf14ae47da5d44186e982e9f55260dd820c9e46d28ef
-  bytes: 928
+  sha256: 09a5f98e3d0561f7023a4e5bd96715857d8129094108fcafafe750e5a6a49797
+  bytes: 1562
   kind: repository
   sourcePath: tests/product/fixtures/releaseResearch/missing-research-owner.yml
 - path: tests/product/manual-at.matrix.yml
@@ -15377,8 +15382,8 @@ files:
   kind: repository
   sourcePath: tests/product/testCheckSandboxRuntimePolicy.py
 - path: tests/product/testLearningEfficacyStage.py
-  sha256: d4723c798af0b56c6455213d765a581e8e11815cd5b89372b91725f4b4b5a7cf
-  bytes: 2029
+  sha256: 0a9c4a2ed6e92044b49345d2679caa87cccc74e1fca8045d5f888c56ff2b4cc2
+  bytes: 6480
   kind: repository
   sourcePath: tests/product/testLearningEfficacyStage.py
 - path: tests/product/testManualAtMatrix.py
@@ -15401,6 +15406,16 @@ files:
   bytes: 8527
   kind: repository
   sourcePath: tests/product/testPrdEvaluationReport.py
+- path: tests/product/testReleaseResearchCompatibility.py
+  sha256: 2e95919f3beb2e0ed9b35aaa7233bd43109990daf943966aac42f88ca45b208f
+  bytes: 6026
+  kind: repository
+  sourcePath: tests/product/testReleaseResearchCompatibility.py
+- path: tests/product/testReleaseResearchOperations.py
+  sha256: 7e35f0f6cfe3a98ce367e4212f8e3f6b8e409aa56bedced6dc79e6944e989444
+  bytes: 2116
+  kind: repository
+  sourcePath: tests/product/testReleaseResearchOperations.py
 - path: tests/product/verifyAstryxJourneyAudit.py
   sha256: 91893927daf44aa7e7cdf9b8c01cc3fd39399b2806cc606d2c99375f6a081d0d
   bytes: 13350
@@ -15427,8 +15442,8 @@ files:
   kind: repository
   sourcePath: tests/product/verifyInstallLauncherSmoke.py
 - path: tests/product/verifyLearningEfficacyReport.py
-  sha256: aefd31dfdc528f66554762ccad2f8e61a232a6505047c2c9b7bb35c1dac74e86
-  bytes: 4870
+  sha256: 7f43d9add990cf537731e923cc70b81dc907581922f8784ffaaa9174b70e4016
+  bytes: 5666
   kind: repository
   sourcePath: tests/product/verifyLearningEfficacyReport.py
 - path: tests/product/verifyManualAtMatrix.py
@@ -15462,8 +15477,8 @@ files:
   kind: repository
   sourcePath: tests/product/verifyProductQualityAudit.py
 - path: tests/product/verifyReleaseResearchOperations.py
-  sha256: e8eaf29aa01cb366a10c7c40fcf4f0e2fdbe40d9c59a3cb477e651657d646629
-  bytes: 13041
+  sha256: 0fd1b693c0195da50cb08e2fbc72b4c2d81d4aefde7b2a2992051bbf884acc6d
+  bytes: 18126
   kind: repository
   sourcePath: tests/product/verifyReleaseResearchOperations.py
 - path: tests/product/verifyWebView2ProductSmoke.py
@@ -15472,8 +15487,8 @@ files:
   kind: repository
   sourcePath: tests/product/verifyWebView2ProductSmoke.py
 - path: tests/run.py
-  sha256: dc0851a7d75b93cb583d8bd0dc3227f3847b6140a8e3c8f878d83e71556b82a8
-  bytes: 81936
+  sha256: 3157010b06d10da62ec988daf63d8a1713e7c8c8ad8cc22e52cfafccbbbc8fba
+  bytes: 82090
   kind: repository
   sourcePath: tests/run.py
 - path: tests/runtime/testAppRuntime.py
@@ -15527,8 +15542,8 @@ files:
   kind: repository
   sourcePath: tests/runtime/testReactiveMarkdown.py
 - path: tests/runtime/testRunEntrypoint.py
-  sha256: c89533e946fd90bc98419c26afd09ea26f115ee92da18734b56f5c1a3c9f2eed
-  bytes: 29995
+  sha256: 80058cf5c433a679546a4cd046960eb2990e487d003d94326c5f0b539d2d84ab
+  bytes: 29615
   kind: repository
   sourcePath: tests/runtime/testRunEntrypoint.py
 - path: tests/runtime/testRuntime.py

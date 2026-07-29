@@ -134,7 +134,7 @@ uv run python -X utf8 tests/run.py gate attempts
 | `visual-assets` | surface | 공용 manifest provenance, 8개 instructional lesson anchor, Web Run 5상태·390/768/1440 viewport, checksum, source/variant 동기화, 실제 제품 캡처의 fixture 픽셀·redaction과 Landing/Run/Local 소비 계약을 확인한다. |
 | `learning-method` | surface | 실행 뒤 자동 검증·inline feedback/hint, 목표 중심 학습 홈, navigation control intent, 확인 전용 클릭과 classroom 도구의 핵심 학습 경로 재유입을 확인한다. |
 | `learning-evidence-contract` | fast | Web/Local append-only 학습 증거의 event hash, archive dedup, tamper rejection, artifact descriptor 계약을 확인한다. |
-| `learning-efficacy-report` | fast | E0-E3 경로별 효능 보고서 state machine과 stale content, 표본, privacy, causal-claim negative fixture를 확인한다. 실제 참가자 근거를 대신하지 않는다. |
+| `learning-efficacy-report` | fast | C0-C3 호환 종료와 E0-E3 경로별 효능 state machine, stale content, consent·철회·90일 삭제 receipt, redaction, 표본, causal-claim negative fixture를 확인한다. 실제 release·참가자 근거를 대신하지 않는다. |
 | `web-learning` | surface | 공개 학습 진입부터 Web Run 편집, 자동 강검증, transfer/retrieval, resume, evidence archive까지 설치 없는 대표 흐름을 확인한다. |
 | `landing-public` | surface | Landing·Learn의 실제 제품 media, Web-first CTA, lazy docs, SEO와 390/1440 responsive 렌더를 확인한다. |
 | `local-studio-browser` | surface | Local 학습, native file/zip/schedule 강검증, archive, 최소 창, Automation 표면을 확인한다. |

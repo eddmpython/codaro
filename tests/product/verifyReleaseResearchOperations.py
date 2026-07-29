@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import contextmanager
 from datetime import UTC, datetime
 import hashlib
 import json
@@ -14,7 +15,18 @@ from typing import Any
 
 import yaml
 
-from codaro.curriculum.efficacyStage import EfficacyStageInvalid, resolveEfficacyStage, resolvePathPortfolio
+from codaro.curriculum.efficacyStage import (
+    EfficacyStageInvalid,
+    productReleaseAggregate,
+    resolveEfficacyStage,
+    resolvePathPortfolio,
+)
+from codaro.releaseResearch import (  # noqa: E402
+    COMPATIBILITY_TOMBSTONES,
+    CompatibilityReleaseInvalid,
+    telemetryPolicyHash,
+    verifyCompatibilityRelease,
+)
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -27,6 +39,8 @@ EDITOR_INDEX_PATH = ROOT / "editor/index.html"
 SERVICE_WORKER_PATH = ROOT / "editor/public/serviceWorker.js"
 C0_CONTRACT_PATH = ROOT / "contracts/webCompatibilityC0.json"
 CONTENT_HASH = "sha256-" + ("a" * 64)
+SECOND_HASH = "sha256-" + ("b" * 64)
+THIRD_HASH = "sha256-" + ("c" * 64)
 NPM_COMMAND = "npm.cmd" if os.name == "nt" else "npm"
 
 
@@ -86,11 +100,100 @@ def verifyEfficacyStateMachine() -> dict[str, Any]:
             raise
     else:
         raise ValueError("stale content evidence unexpectedly passed")
+    aggregate = productReleaseAggregate(
+        [passed, failed],
+        currentContentHashes={
+            "passed-path": CONTENT_HASH,
+            "failed-path": CONTENT_HASH,
+        },
+        shellReleaseEligible=True,
+    )
+    if (
+        aggregate["shellReleaseEligible"] is not True
+        or aggregate["allPathsEffectVerified"] is not False
+        or aggregate["failedPathIds"] != ["failed-path"]
+    ):
+        raise ValueError("shell release and path efficacy aggregation were coupled")
     return {
         "aggregatePromotionForbidden": True,
         "allowedClaims": ["contentApproved", "usable", "learningSignal", "effectVerified"],
         "missingOwnerRejected": True,
+        "shellReleaseSeparated": True,
         "staleContentRejected": True,
+    }
+
+
+def compatibilityCandidate() -> dict[str, Any]:
+    policy: dict[str, Any] = {
+        "sealedAt": "2026-01-01T00:00:00Z",
+        "minimumWindowDays": 28,
+        "minimumEligibleSessions": 100,
+        "maximumLegacyRequestRate": 0.01,
+    }
+    policy["sha256"] = telemetryPolicyHash(policy)
+    return {
+        "milestone": "C3",
+        "releaseArchiveUrl": "https://example.invalid/releases/c0.zip",
+        "releaseArchiveSha256": CONTENT_HASH,
+        "deployedTreeSha256": SECOND_HASH,
+        "deployedCrawlSha256": SECOND_HASH,
+        "stableReleaseIds": ["stable-1", "stable-2"],
+        "appTreeSha256": SECOND_HASH,
+        "runTreeSha256": THIRD_HASH,
+        "outputCollisionCount": 0,
+        "serviceWorkerScopes": ["/codaro/app/", "/codaro/run/"],
+        "directReloadPassed": True,
+        "deepReloadPassed": True,
+        "coldOnlinePythonPassed": True,
+        "rollbackArchiveSha256": CONTENT_HASH,
+        "scopeAuditSha256": SECOND_HASH,
+        "compatibilityPagePassed": True,
+        "queryRoundTripPassed": True,
+        "hashRoundTripPassed": True,
+        "backForwardPassed": True,
+        "ownedCacheOnly": True,
+        "exactUnregisterPassed": True,
+        "tombstonePaths": list(COMPATIBILITY_TOMBSTONES),
+        "unregisterReleaseMarker": "stable-1-to-stable-2",
+        "navigationAuditSha256": CONTENT_HASH,
+        "ownedCacheAuditSha256": SECOND_HASH,
+        "telemetryPolicy": policy,
+        "telemetryReport": {
+            "windowStartedAt": "2026-02-01T00:00:00Z",
+            "windowEndedAt": "2026-03-01T00:00:00Z",
+            "eligibleSessions": 200,
+            "legacyRequests": 1,
+            "reportSha256": THIRD_HASH,
+        },
+        "retirementDiffSha256": CONTENT_HASH,
+        "previousUrlSmokePassed": True,
+    }
+
+
+def verifyCompatibilityStateMachine() -> dict[str, Any]:
+    candidate = compatibilityCandidate()
+    result = verifyCompatibilityRelease(candidate)
+    if result["milestone"] != "C3" or result["appAssetsRetired"] is not True:
+        raise ValueError("valid C3 compatibility evidence did not pass")
+    shortWindow = {
+        **candidate,
+        "telemetryReport": {
+            **candidate["telemetryReport"],
+            "windowEndedAt": "2026-02-14T00:00:00Z",
+        },
+    }
+    try:
+        verifyCompatibilityRelease(shortWindow)
+    except CompatibilityReleaseInvalid as error:
+        if error.code != "telemetry-window-too-short":
+            raise
+    else:
+        raise ValueError("short C3 telemetry window unexpectedly passed")
+    return {
+        "milestones": ["C0", "C1", "C2", "C3"],
+        "cumulativeEvidenceRequired": True,
+        "c3ShortWindowRejected": True,
+        "tombstonePaths": list(COMPATIBILITY_TOMBSTONES),
     }
 
 
@@ -126,6 +229,37 @@ def treeDigest(root: Path) -> tuple[int, str]:
         digest.update(len(content).to_bytes(8, "big"))
         digest.update(content)
     return len(files), digest.hexdigest()
+
+
+@contextmanager
+def preserveDirectories(
+    paths: tuple[Path, ...],
+    backupRoot: Path,
+    *,
+    allowedRoot: Path = ROOT,
+):
+    resolvedAllowed = allowedRoot.resolve()
+    snapshots: list[tuple[Path, Path, bool]] = []
+    backupRoot.mkdir(parents=True, exist_ok=False)
+    for index, path in enumerate(paths):
+        resolved = path.resolve()
+        if not resolved.is_relative_to(resolvedAllowed):
+            raise ValueError(f"refusing to preserve directory outside allowed root: {resolved}")
+        backup = backupRoot / str(index)
+        existed = path.is_dir()
+        if existed:
+            shutil.copytree(path, backup)
+        snapshots.append((path, backup, existed))
+    try:
+        yield
+    finally:
+        for path, backup, existed in snapshots:
+            if path.exists():
+                if not path.is_dir():
+                    raise ValueError(f"preserved directory was replaced by a file: {path}")
+                shutil.rmtree(path)
+            if existed:
+                shutil.copytree(backup, path)
 
 
 def buildPinnedC0(contract: dict[str, Any], root: Path) -> Path:
@@ -241,28 +375,34 @@ def verifyCompatibilityBuild() -> dict[str, Any]:
         raise ValueError(f"C0 source commit is unavailable: {sourceCommit}")
 
     with tempfile.TemporaryDirectory(prefix="codaro-c0-") as temporary:
-        c0Tree = buildPinnedC0(contract, Path(temporary))
-        environment = os.environ.copy()
-        environment["CODARO_WEB_BASE"] = "codaro/run"
-        environment["CODARO_WEB_OUT"] = "../landing/static/run"
-        runBuild((NPM_COMMAND, "run", "build"), cwd=ROOT / "editor", environment=environment)
+        temporaryRoot = Path(temporary)
+        c0Tree = buildPinnedC0(contract, temporaryRoot / "c0")
         appStaticTree = ROOT / "landing/static/app"
-        if appStaticTree.is_dir():
-            shutil.rmtree(appStaticTree)
-        shutil.copytree(c0Tree, appStaticTree)
-        runBuild((NPM_COMMAND, "run", "build"), cwd=ROOT / "landing")
-        appFacts = verifyC0Tree(c0Tree, contract)
+        runStaticTree = ROOT / "landing/static/run"
+        with preserveDirectories(
+            (appStaticTree, runStaticTree),
+            temporaryRoot / "static-backup",
+        ):
+            environment = os.environ.copy()
+            environment["CODARO_WEB_BASE"] = "codaro/run"
+            environment["CODARO_WEB_OUT"] = "../landing/static/run"
+            runBuild((NPM_COMMAND, "run", "build"), cwd=ROOT / "editor", environment=environment)
+            if appStaticTree.is_dir():
+                shutil.rmtree(appStaticTree)
+            shutil.copytree(c0Tree, appStaticTree)
+            runBuild((NPM_COMMAND, "run", "build"), cwd=ROOT / "landing")
+            appFacts = verifyC0Tree(c0Tree, contract)
 
-    runTree = ROOT / "landing/build/run"
-    appTree = ROOT / "landing/build/app"
-    if not runTree.is_dir() or not appTree.is_dir():
-        raise ValueError("fresh site composition did not contain both /run/ and /app/")
-    runFileCount, runSha256 = treeDigest(runTree)
-    composedAppFacts = verifyC0Tree(appTree, contract)
-    if composedAppFacts != appFacts:
-        raise ValueError("Landing composition changed the pinned C0 tree")
-    if runSha256 == appFacts["sha256"]:
-        raise ValueError("current /run/ unexpectedly equals pinned C0 /app/")
+            runTree = ROOT / "landing/build/run"
+            appTree = ROOT / "landing/build/app"
+            if not runTree.is_dir() or not appTree.is_dir():
+                raise ValueError("fresh site composition did not contain both /run/ and /app/")
+            runFileCount, runSha256 = treeDigest(runTree)
+            composedAppFacts = verifyC0Tree(appTree, contract)
+            if composedAppFacts != appFacts:
+                raise ValueError("Landing composition changed the pinned C0 tree")
+            if runSha256 == appFacts["sha256"]:
+                raise ValueError("current /run/ unexpectedly equals pinned C0 /app/")
     return {
         "appCompatibilityTree": appFacts,
         "c0SourceCommit": sourceCommit,
@@ -281,6 +421,7 @@ def main() -> int:
     try:
         facts["negativeFixture"] = rejectMissingOwnerFixture()
         facts["efficacy"] = verifyEfficacyStateMachine()
+        facts["compatibilityStateMachine"] = verifyCompatibilityStateMachine()
         facts["compatibility"] = verifyCompatibilityBuild()
     except (OSError, ValueError, subprocess.SubprocessError, yaml.YAMLError) as error:
         failures.append(str(error))

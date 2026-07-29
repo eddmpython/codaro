@@ -494,11 +494,14 @@ GATES: dict[str, Gate] = {
     ),
     "learning-efficacy-report": Gate(
         tier="fast",
-        description="경로별 E0-E3 효능 보고서 state machine, stale hash, privacy·표본 negative fixture를 확인한다.",
+        description="C0-C3 호환 종료와 경로별 E0-E3 효능 state machine, stale hash, privacy·표본 경계를 확인한다.",
         commands=(
             command((
                 "uv", "run", "python", "-X", "utf8", "-m", "pytest",
-                "tests/product/testLearningEfficacyStage.py", "-q", "--tb=short",
+                "tests/product/testLearningEfficacyStage.py",
+                "tests/product/testReleaseResearchCompatibility.py",
+                "tests/product/testReleaseResearchOperations.py",
+                "-q", "--tb=short",
             )),
             command(("uv", "run", "python", "-X", "utf8", "tests/product/verifyLearningEfficacyReport.py")),
         ),

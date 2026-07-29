@@ -2,7 +2,11 @@
 
 상태: 진행
 
-2026-07-27 source와 machine composition 기준으로 Landing의 primary Web 학습·Run 링크는 `/codaro/run/`을 사용한다. `/codaro/app/`은 더 이상 current editor의 두 번째 build가 아니며 `contracts/webCompatibilityC0.json`이 고정한 `eb3176e0c691920c3c4244fdafc47c490af8749f`의 LF build다. Pages는 pinned source를 별도 checkout하고 632개 파일·23,761,225 byte·UTF-8 POSIX path canonical tree SHA-256 `5c421c1bc35b28d722c4258ef946915ae6a24a39df383ec9a30b4f084b515dee`를 검증한 뒤 current `/run/`과 조립한다. captured Pages artifact와 공개 `/app/` 632개 파일의 byte·response type crawl도 일치한다. 정식 release asset URL·archive SHA-256은 명시적 release 전까지 비어 있으므로 C0/C1 완료를 과장하지 않는다. C2 두 release·C3 telemetry와 실제 연구 owner·참가자 report도 없으므로 `completionEligible=false`이며 TODO가 남아 있다.
+2026-07-29 source와 machine composition 기준으로 Landing의 primary Web 학습·Run 링크는 `/codaro/run/`을 사용한다. `/codaro/app/`은 더 이상 current editor의 두 번째 build가 아니며 `contracts/webCompatibilityC0.json`이 고정한 `eb3176e0c691920c3c4244fdafc47c490af8749f`의 LF build다. Pages는 pinned source를 별도 checkout하고 632개 파일·23,761,225 byte·UTF-8 POSIX path canonical tree SHA-256 `5c421c1bc35b28d722c4258ef946915ae6a24a39df383ec9a30b4f084b515dee`를 검증한 뒤 current `/run/`과 조립한다. captured Pages artifact와 공개 `/app/` 632개 파일의 byte·response type crawl도 일치한다.
+
+`CompatibilityMilestone`은 C0→C3 누적 증거를 검증한다. C1 tree·scope·reload·cold online Python·collision, C2 두 stable release·query/hash/history·owned cache·exact unregister·tombstone, C3 사전 봉인 threshold와 28일 telemetry·retirement diff·이전 URL smoke가 하나라도 없으면 건너뛰지 못한다. `PathReleaseState`는 E0 internal, E1·E2 beta, E3 featured를 분리하고 shell release 가능성을 경로 효과 검증과 합치지 않는다. E2부터 서로 다른 research/privacy owner, participant report, consent·withdrawal·정확한 90일 deletion·redaction receipt를 요구하며 secret·email·사용자 path를 거부한다.
+
+정식 release asset URL·archive SHA-256은 명시적 release 전까지 비어 있으므로 C0/C1 완료를 과장하지 않는다. C2 두 release·C3 telemetry, 실제 연구 owner·참가자 report, 독립 검토도 없으므로 `completionEligible=false`이며 TODO가 남아 있다.
 
 ## 목표
 
@@ -41,7 +45,10 @@ research operations는 모집 전에 `researchOwner`, `privacyOwner`, 모집 채
 - `mainPlan/astryx-product-experience/10-quality-release/README.md`
 - `docs/skills/ops/product/learning-efficacy-operations.md`
 - `src/codaro/curriculum/efficacyStage.py`
+- `src/codaro/releaseResearch.py`
 - `tests/product/testLearningEfficacyStage.py`
+- `tests/product/testReleaseResearchCompatibility.py`
+- `tests/product/testReleaseResearchOperations.py`
 - `tests/product/verifyReleaseResearchOperations.py`
 - `tests/product/fixtures/releaseResearch/missing-research-owner.yml`
 - `contracts/webCompatibilityC0.json`
@@ -50,9 +57,9 @@ research operations는 모집 전에 `researchOwner`, `privacyOwner`, 모집 채
 
 ## 영향 함수·심볼
 
-- 신규 `CompatibilityMilestone`, `PathReleaseState`, `EfficacyStage`
-- 신규 `verifyCompatibilityRelease`, `verifyLearningEfficacyReport`
-- 수정 `productReleaseAggregate`, `resolveFeaturedPathStatus`
+- `CompatibilityMilestone`, `PathReleaseState`, `EfficacyStage`
+- `verifyCompatibilityRelease`, `verifyLearningEfficacyReport`
+- `productReleaseAggregate`, `resolveFeaturedPathStatus`
 
 ## 테스트
 
@@ -61,6 +68,7 @@ research operations는 모집 전에 `researchOwner`, `privacyOwner`, 모집 채
 - E0~E3 상태가 evidence 없이 건너뛰지 못하고 content hash 변경 시 stale 처리
 - consent withdrawal과 90일 deletion receipt, secret·path redaction
 - 한 path 실패가 다른 path 또는 aggregate 평균에 숨겨지지 않음
+- `uv run python -X utf8 -m pytest tests/product/testLearningEfficacyStage.py tests/product/testReleaseResearchCompatibility.py tests/product/testReleaseResearchOperations.py -q`
 - `uv run python -X utf8 tests/product/verifyReleaseResearchOperations.py`
 
 ## 롤백
