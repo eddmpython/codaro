@@ -51,7 +51,6 @@ Product evidence maturity는 `E0 없음`, `E1 synthetic`, `E2 vertical slice`, `
 - `mainPlan/astryx-product-experience/README.md`
 - `mainPlan/astryx-product-experience/00-product-contract/README.md`
 - `mainPlan/astryx-product-experience/02-learning-method/README.md`
-- `mainPlan/astryx-product-experience/03-product-shell/README.md`
 - `mainPlan/astryx-product-experience/04-web-learning/README.md`
 - `mainPlan/astryx-product-experience/05-local-studio/README.md`
 - `assets/brand/visuals/manifest.json`

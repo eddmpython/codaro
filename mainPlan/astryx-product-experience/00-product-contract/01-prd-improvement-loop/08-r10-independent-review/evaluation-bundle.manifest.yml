@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: 0604554b01a93c6322b8fcefc03f93ed1e03150c
-  dirtyDiffHash: 93d5f26b4beae42c119163d1f7571cec5d3a2d24c9833e28a023eeee62debe76
-  manifestHash: 4f4b4d064fde5d022d5cbc9bc69d558d58e270a59716f0b7c32ffb3026cae87b
-  fileCount: 3158
-  totalBytes: 97244871
+  gitCommit: 5fee3fef4fe50bd9bcde1160ce31a30dcd428d24
+  dirtyDiffHash: a8dda3b6b4ede4475f96735287faebb107f675a00fb0f13c796037ff90f447a8
+  manifestHash: 180da88f337ca953812e0bb87fec6df4da03bf824fee680a010f544d3cf76f55
+  fileCount: 3155
+  totalBytes: 97277955
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: 6e68955e6ca8f3232e153ddb5e81d06cd26816493ccc10c9213b07d61f2a54d3
-  bytes: 97885339
+  sha256: b1663ab30b4efda4a9e74d58434d8fe02b102767799ca2f4fc2ecf81393c428f
+  bytes: 97917741
   format: zip
   compression: stored
   compressionMethod: 0
@@ -1328,8 +1328,8 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: assets/brand/visuals/generated/manifest.json
-  sha256: 2e4ff3001f78984d88fd9b446a25bd9f3732abe8184069456bf1d5d5ae37dc14
-  bytes: 169069
+  sha256: 7bb71833a63bee8e799da94ffea863fc9a96e1039e4b6b80c560b3637e9f0b96
+  bytes: 173609
   kind: repository
   sourcePath: assets/brand/visuals/generated/manifest.json
 - path: assets/brand/visuals/learning/ai-integration-v1.png
@@ -1373,8 +1373,8 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/learning/statistics-ml-v1.png
 - path: assets/brand/visuals/manifest.json
-  sha256: 527fc2e3f07aac911cf004f2a97c24b051702e6198c5809eb4df05364cc7d168
-  bytes: 96715
+  sha256: 3181fca2a8c3b856daf9180490fb6afa54339b670fd3fb5a7b6aa23f87575f5a
+  bytes: 99458
   kind: repository
   sourcePath: assets/brand/visuals/manifest.json
 - path: assets/brand/visuals/manifest.schema.json
@@ -4508,8 +4508,8 @@ files:
   kind: repository
   sourcePath: docs/skills/ops/foundation/environment.md
 - path: docs/skills/ops/foundation/testing-and-gates.md
-  sha256: a3092ffce29122d72ec8bc49cff1633b0a219a234d11417f723cff604fa9bdc7
-  bytes: 59290
+  sha256: aabc1641ccdc37faaa870ae0719d95d1bdabf72d8fba5479b7fd120a8e6e70b5
+  bytes: 60116
   kind: repository
   sourcePath: docs/skills/ops/foundation/testing-and-gates.md
 - path: docs/skills/ops/product/branding.md
@@ -6193,8 +6193,8 @@ files:
   kind: repository
   sourcePath: editor/public/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: editor/public/visuals/manifest.json
-  sha256: 2e4ff3001f78984d88fd9b446a25bd9f3732abe8184069456bf1d5d5ae37dc14
-  bytes: 169069
+  sha256: 7bb71833a63bee8e799da94ffea863fc9a96e1039e4b6b80c560b3637e9f0b96
+  bytes: 173609
   kind: repository
   sourcePath: editor/public/visuals/manifest.json
 - path: editor/scripts/generatePyprocAssets.mjs
@@ -6488,8 +6488,8 @@ files:
   kind: repository
   sourcePath: editor/src/components/notebook/notebookPanel.css
 - path: editor/src/components/notebook/notebookPanel.tsx
-  sha256: cd0c1347c82e5ea022031f371b9fef02c09d8be4e356a230ed54795a4f10fdc1
-  bytes: 40151
+  sha256: e9693a5f36329137558ae3e0631e68a65e1a5b597e568a9376218918f1c05f2e
+  bytes: 41928
   kind: repository
   sourcePath: editor/src/components/notebook/notebookPanel.tsx
 - path: editor/src/components/notebook/variableExplorerPanel.tsx
@@ -7058,8 +7058,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/masteryPolicy.ts
 - path: editor/src/lib/notebookCellNavigation.ts
-  sha256: a33102256f0f704d6b2da3ec3e6331494eb76ae7ce2852a763df1daef98f7639
-  bytes: 549
+  sha256: 12cedf0be9ef5dc7aa29b5673178545a9fb9f1ac3016d7e6e16ac1fd92fce5d4
+  bytes: 1155
   kind: repository
   sourcePath: editor/src/lib/notebookCellNavigation.ts
 - path: editor/src/lib/notebookPersistence.ts
@@ -12337,8 +12337,8 @@ files:
   kind: repository
   sourcePath: landing/static/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: landing/static/visuals/manifest.json
-  sha256: 2e4ff3001f78984d88fd9b446a25bd9f3732abe8184069456bf1d5d5ae37dc14
-  bytes: 169069
+  sha256: 7bb71833a63bee8e799da94ffea863fc9a96e1039e4b6b80c560b3637e9f0b96
+  bytes: 173609
   kind: repository
   sourcePath: landing/static/visuals/manifest.json
 - path: landing/vite.config.js
@@ -12392,8 +12392,8 @@ files:
   kind: repository
   sourcePath: launcher/codaro-launcher/src/autostart.rs
 - path: launcher/codaro-launcher/src/backend.rs
-  sha256: 3c06ce34c8a7a4933ec8822c14a32708431301bca1bb1d6857a698bb748776a2
-  bytes: 14042
+  sha256: b8efc18cdbe31a488e48f43259f669848a51ef217ed41dbe6029063d912da2b1
+  bytes: 14991
   kind: repository
   sourcePath: launcher/codaro-launcher/src/backend.rs
 - path: launcher/codaro-launcher/src/download.rs
@@ -12432,8 +12432,8 @@ files:
   kind: repository
   sourcePath: launcher/codaro-launcher/src/ipc.rs
 - path: launcher/codaro-launcher/src/main.rs
-  sha256: ee557b59fcfc386f8326d63108c9695354a1680cc1a1f554c814a491e6cd25f8
-  bytes: 103059
+  sha256: 499d4b25c9ef266442db28e27fc33dfb9a7d8e9d92c459f171cec68d5a7f014d
+  bytes: 102965
   kind: repository
   sourcePath: launcher/codaro-launcher/src/main.rs
 - path: launcher/codaro-launcher/src/manifest.rs
@@ -12476,21 +12476,6 @@ files:
   bytes: 34696
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/02-learning-method/README.md
-- path: mainPlan/astryx-product-experience/03-product-shell/00-astryx-proof-shell/README.md
-  sha256: 1c913dd552a21203a5e8cbf29df7b0f9861869af9e96354da275182bbca496a1
-  bytes: 2546
-  kind: repository
-  sourcePath: mainPlan/astryx-product-experience/03-product-shell/00-astryx-proof-shell/README.md
-- path: mainPlan/astryx-product-experience/03-product-shell/01-notebook-workbench/README.md
-  sha256: fb89a90fd4e69760e1a3330dc99b83639ed7026f3a91ccd4e54bf167a4320579
-  bytes: 2912
-  kind: repository
-  sourcePath: mainPlan/astryx-product-experience/03-product-shell/01-notebook-workbench/README.md
-- path: mainPlan/astryx-product-experience/03-product-shell/README.md
-  sha256: 5ad8405d91a98065ef90b1499d111b5da63e0ee9d663477643a8d4f668d3e93d
-  bytes: 2489
-  kind: repository
-  sourcePath: mainPlan/astryx-product-experience/03-product-shell/README.md
 - path: mainPlan/astryx-product-experience/04-web-learning/00-learn-explorer/README.md
   sha256: ccd528d5597068d911300beda85eac3bdd07b409fc7785fdbae11802b2cf7cae
   bytes: 2455
@@ -12507,8 +12492,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/04-web-learning/README.md
 - path: mainPlan/astryx-product-experience/05-local-studio/README.md
-  sha256: 3d691a696c09da009bb55a0e80f3e93c16e59d0d7e336ba4735157683e2e4378
-  bytes: 7752
+  sha256: fc133d1ad4d4868fc824715856f1fb8f07cba0495c13d21f0705c9489a7fdfe0
+  bytes: 7732
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/05-local-studio/README.md
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/README.md
@@ -13282,8 +13267,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/10-quality-release/README.md
 - path: mainPlan/astryx-product-experience/README.md
-  sha256: 77e2fd63c0d9bcae2bbc2dead8d23760d8d62e57d085b34ef528a795e46eba93
-  bytes: 14619
+  sha256: 8a0bbbb3ff3a4de982fa247161e3f11a5de473033b03bdd3044d70432580d50f
+  bytes: 14470
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/README.md
 - path: pyproject.toml
@@ -15392,7 +15377,7 @@ files:
   kind: repository
   sourcePath: tests/product/verifyEvidenceMigrationAudit.py
 - path: tests/product/verifyInstallLauncherSmoke.py
-  sha256: c6dc303217bad28b1236a484bfa37ab8c60456e724d73268d28ee0a79c975a40
+  sha256: de49239ef9c36d0df0317b7d3ae05e24501cc57cbc0b085194232159fe630a5c
   bytes: 12656
   kind: repository
   sourcePath: tests/product/verifyInstallLauncherSmoke.py
@@ -15432,13 +15417,13 @@ files:
   kind: repository
   sourcePath: tests/product/verifyReleaseResearchOperations.py
 - path: tests/product/verifyWebView2ProductSmoke.py
-  sha256: 1024f563e7e37a949fbe3ea2aff9a8815c3d65e3bd10aff0054af9b0ba54e53a
-  bytes: 97761
+  sha256: 261f06809411d4aecb0796b0864408c897b4a190759dfd2e428f3b1e62a8c94a
+  bytes: 117769
   kind: repository
   sourcePath: tests/product/verifyWebView2ProductSmoke.py
 - path: tests/run.py
-  sha256: 7e5403ba12f2a881701808b5c35b31b6135c3c644c7304eb5b09f31627903f99
-  bytes: 81822
+  sha256: ed58ad3ddf2af98a109183f2dd2141e899d277778ed7d10b4616e510714cb0fa
+  bytes: 81854
   kind: repository
   sourcePath: tests/run.py
 - path: tests/runtime/testAppRuntime.py
@@ -15607,8 +15592,8 @@ files:
   kind: repository
   sourcePath: tests/surface/testNotebookPersistence.py
 - path: tests/surface/testProductSurfaceContract.py
-  sha256: ce30cdcc6c2e79a2d4dd5b68a3757909aa92e11879caafbaff9f7e98cf6c7f5e
-  bytes: 48405
+  sha256: 87db10cf2171374e4b0965225257863c7864433827da35c63f836e357a96f1ab
+  bytes: 48741
   kind: repository
   sourcePath: tests/surface/testProductSurfaceContract.py
 - path: tests/surface/testProviderSettingsContract.py
@@ -15702,8 +15687,8 @@ files:
   kind: repository
   sourcePath: tests/surface/verifyPlaywrightMobile.py
 - path: tests/surface/verifyProductExperiencePlaywright.py
-  sha256: a34ca022334cae39eeb03b82775ffec7d00e6fe43e6f1f716cbdcbf59cc98009
-  bytes: 361669
+  sha256: 310a2f67b580a481645a4f6c2fe1d819230866568a9cb0d1081b441b67573bb1
+  bytes: 362066
   kind: repository
   sourcePath: tests/surface/verifyProductExperiencePlaywright.py
 - path: tests/surface/verifyProductModuleBoundaries.py

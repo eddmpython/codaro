@@ -6,7 +6,7 @@
 
 Local을 웹의 큰 버전이 아니라 실제 파일, 패키지, terminal, schedule, webhook, GUI automation을 다루는 강한 작업대로 만든다. 디자인은 Run과 같고 capability와 밀도만 확장한다.
 
-착수 의존은 `00-product-contract`, `02-learning-method`, `03-product-shell`, `04-web-learning`이다. 남은 종료 조건은 Windows 10 22H2 Fixed Version lock과 사람 시각·보조기술 검수다.
+착수 의존은 `00-product-contract`, `02-learning-method`, `04-web-learning`이다. 남은 종료 조건은 Windows 10 22H2 Fixed Version lock과 사람 시각·보조기술 검수다.
 
 ## Local 홈
 

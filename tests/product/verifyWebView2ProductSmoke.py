@@ -240,8 +240,8 @@ def main() -> int:
                 "shared theme and social controls",
                 "shared support dialog account structure",
                 "12-cell Code and Markdown keyboard boundary navigation with focus scrolling",
-                "12-cell input and action names include the current cell position",
-                "WebView2 Chromium accessibility-tree cell and document-control reading order",
+                "12-cell input, execution output, and action names include the current cell position",
+                "WebView2 Chromium accessibility-tree input, execution output, cell-action, and document-control reading order",
                 "Code and Markdown composition-event shortcut guards",
                 "Code and Markdown native Korean IME input and composition-boundary arrow guards",
                 "WebView2 forced-colors control boundaries and keyboard focus order",
@@ -1031,6 +1031,25 @@ def verify_long_notebook_keyboard_navigation(
             markdown_down = page.evaluate("document.activeElement?.tagName") == "TEXTAREA"
 
     bottom_state = notebook_navigation_viewport_state(page)
+    output_marker = "screen-reader-output-order"
+    first_editor = cells.nth(0).locator(".cm-content")
+    first_editor.fill(f"print('{output_marker}')")
+    first_editor.press("Control+Enter")
+    page.wait_for_function(
+        """
+        ({ marker, element }) => {
+          const status = element.getAttribute('data-notebook-cell-status');
+          const output = element.querySelector('[data-execution-output="true"]');
+          return ['success', 'done'].includes(status)
+            && (output?.textContent || '').includes(marker);
+        }
+        """,
+        arg={
+            "element": cells.nth(0).element_handle(),
+            "marker": output_marker,
+        },
+        timeout=120_000,
+    )
     composition_evidence = verify_notebook_composition_guards(page, cells)
     native_ime_evidence = verify_native_korean_ime(page, hwnd=hwnd, cells=cells)
     accessible_name_evidence = notebook_accessible_name_state(page)
@@ -1049,6 +1068,10 @@ def verify_long_notebook_keyboard_navigation(
         "lastCellReached": bottom_state["selectedIndex"] == target_count - 1,
         "lastCellVisible": bool(bottom_state["selectedVisible"]),
         "lastCellUnobscured": not bottom_state["controlOverlaps"],
+        "executionOutputPresent": (
+            accessible_name_evidence["outputCount"] >= 1
+            and output_marker in accessible_name_evidence["outputText"]
+        ),
         "markdownFocusedUp": markdown_up,
         "markdownFocusedDown": markdown_down,
         "positionedAccessibleNames": accessible_name_evidence["valid"],
@@ -1066,6 +1089,7 @@ def verify_long_notebook_keyboard_navigation(
         "requestedCssViewport": {"width": 1024, "height": 768},
         "snapshot": {
             "cellCount": cells.count(),
+            "executionOutputMarker": output_marker,
             "scrollHeight": initial_scroll["scrollHeight"],
             "viewportHeight": initial_scroll["clientHeight"],
             "topScrollTop": top_state["scrollTop"],
@@ -1486,6 +1510,10 @@ def notebook_accessibility_tree_state(
         node for node in positioned_nodes
         if node["role"] == "button"
     ]
+    outputs = [
+        node for node in positioned_nodes
+        if node["role"] in {"alert", "status"}
+    ]
     notebook_list = next(
         (
             node for node in semantic_nodes
@@ -1503,6 +1531,27 @@ def notebook_accessibility_tree_state(
     expected_positions = list(range(1, expected_cell_count + 1))
     cell_positions = [node["position"] for node in list_items]
     editor_positions = [node["position"] for node in editors]
+    output_positions = [node["position"] for node in outputs]
+    output_order_valid = all(
+        next(
+            (
+                editor["treeIndex"]
+                for editor in editors
+                if editor["position"] == output["position"]
+            ),
+            output["treeIndex"],
+        )
+        < output["treeIndex"]
+        < min(
+            (
+                action["treeIndex"]
+                for action in cell_actions
+                if action["position"] == output["position"]
+            ),
+            default=output["treeIndex"],
+        )
+        for output in outputs
+    )
     checks = {
         "notebookList": notebook_list is not None,
         "cellOrder": cell_positions == expected_positions,
@@ -1510,6 +1559,8 @@ def notebook_accessibility_tree_state(
             node["setSize"] == expected_cell_count for node in list_items
         ),
         "editorOrder": editor_positions == expected_positions,
+        "executionOutput": bool(outputs),
+        "executionOutputOrder": output_order_valid,
         "positionedCellActions": bool(cell_actions),
         "bottomControlAfterDocument": (
             bottom_toolbar is not None
@@ -1522,6 +1573,8 @@ def notebook_accessibility_tree_state(
         "notebookList": notebook_list,
         "cellItems": list_items,
         "editors": editors,
+        "executionOutputs": outputs,
+        "executionOutputPositions": output_positions,
         "positionedActionCount": len(cell_actions),
         "bottomToolbar": bottom_toolbar,
         "checks": checks,
@@ -1556,13 +1609,17 @@ def notebook_accessible_name_state(page: Page) -> dict[str, Any]:
               contentLabel: content?.getAttribute('aria-label') || null,
               menuLabel: menu?.getAttribute('aria-label') || null,
               outputLabel: output?.getAttribute('aria-label') || null,
+              outputText: output?.textContent || null,
               positionLabel,
               runLabel: run?.getAttribute('aria-label') || null,
             };
           });
+          const outputs = items.filter((item) => item.outputLabel);
           return {
             items,
-            valid: items.every((item) => (
+            outputCount: outputs.length,
+            outputText: outputs.map((item) => item.outputText || "").join("\\n"),
+            valid: outputs.length > 0 && items.every((item) => (
               item.contentLabel?.includes(item.positionLabel)
               && item.menuLabel?.includes(item.positionLabel)
               && (!item.runLabel || item.runLabel.includes(item.positionLabel))
