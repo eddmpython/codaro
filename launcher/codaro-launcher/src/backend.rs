@@ -223,6 +223,41 @@ pub fn wait_for_backend_ready(child: &mut Child, url: &str, timeout: Duration) -
     }
 }
 
+pub fn terminate_backend(child: &mut Child) -> Result<()> {
+    if child
+        .try_wait()
+        .context("Failed to poll backend child process before termination.")?
+        .is_some()
+    {
+        return Ok(());
+    }
+
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+
+        let status = Command::new("taskkill")
+            .args(["/PID", &child.id().to_string(), "/T", "/F"])
+            .creation_flags(CREATE_NO_WINDOW)
+            .status()
+            .context("Failed to launch Windows backend process-tree termination.")?;
+        if !status.success() {
+            child
+                .kill()
+                .context("Failed to terminate backend process after taskkill failure.")?;
+        }
+    }
+
+    #[cfg(not(windows))]
+    child
+        .kill()
+        .context("Failed to terminate backend process.")?;
+
+    let _ = child.wait();
+    Ok(())
+}
+
 fn build_healthcheck_client() -> Result<Client> {
     Client::builder()
         .no_proxy()

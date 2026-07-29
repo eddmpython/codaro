@@ -391,7 +391,7 @@ GATES: dict[str, Gate] = {
     ),
     "product-browser-webview2-evergreen": Gate(
         tier="release",
-        description="Windows의 실제 launcher WebView2에서 설치 wheel, Local Home·Notebook·Automation viewport와 자동화 6상태·E-Stop·redaction을 확인한다.",
+        description="Windows의 실제 launcher WebView2에서 설치 wheel, Local Home·Notebook·Automation, 한국어 IME·AX tree·forced-colors와 자동화 6상태를 확인한다.",
         commands=(
             command(("npm", "run", "build"), cwd="editor"),
             command(("cargo", "build"), cwd="launcher/codaro-launcher", timeoutSeconds=1200),

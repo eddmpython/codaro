@@ -420,8 +420,10 @@ def testLongNotebookKeyboardNavigationSharesCodeAndMarkdownBoundaries() -> None:
         "view.compositionStarted",
         "completionStatus(view.state)",
         "event.nativeEvent.isComposing",
-        "event.nativeEvent.keyCode === 229",
+        "keyCode: event.nativeEvent.keyCode",
         "markdownCompositionRef",
+        "markdownCompositionEndedAtRef",
+        "shouldSuppressNotebookCellBoundaryDuringComposition",
         "accessibilityAttributesRef.current.reconfigure",
         'aria-label={`${cellAriaLabel} 편집기`}',
         'ariaLabel={`${cellAriaLabel} 코드 편집기`}',
@@ -436,6 +438,8 @@ def testLongNotebookKeyboardNavigationSharesCodeAndMarkdownBoundaries() -> None:
         "selectionAnchor !== selectionHead",
         'key === "ArrowUp" && selectionHead === 0',
         'key === "ArrowDown" && selectionHead === textLength',
+        "NOTEBOOK_IME_BOUNDARY_GUARD_MS = 120",
+        "compositionEndedAt",
     ):
         assert marker in navigation
     for marker in (
@@ -460,9 +464,13 @@ def testLongNotebookKeyboardNavigationSharesCodeAndMarkdownBoundaries() -> None:
     for marker in (
         "verify_long_notebook_keyboard_navigation",
         "verify_notebook_composition_guards",
+        "verify_native_korean_ime",
+        "notebook_accessibility_tree_state",
         "notebook_accessible_name_state",
         '"local-notebook-keyboard-12-cells"',
         '"positionedAccessibleNames"',
+        '"accessibilityTreeReadingOrder"',
+        '"nativeKoreanIme"',
         '"markdownFocusedUp"',
         '"markdownFocusedDown"',
         '"lastCellUnobscured"',

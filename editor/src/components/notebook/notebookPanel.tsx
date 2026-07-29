@@ -67,6 +67,7 @@ import {
 } from "@/lib/cellModel";
 import type { NotebookPersistenceState } from "@/lib/notebookPersistence";
 import {
+  shouldSuppressNotebookCellBoundaryDuringComposition,
   resolveNotebookCellBoundaryNavigation,
   type NotebookCellNavigationDirection,
 } from "@/lib/notebookCellNavigation";
@@ -569,6 +570,10 @@ export function CodeCellEditor({
   const onRunRef = useRef(onRun);
   const onRunAndAdvanceRef = useRef(onRunAndAdvance);
   const completionContextRef = useRef(completionContext);
+  const compositionBoundaryRef = useRef({
+    active: false,
+    endedAt: Number.NEGATIVE_INFINITY,
+  });
 
   useEffect(() => {
     onChangeRef.current = onChange;
@@ -629,6 +634,32 @@ export function CodeCellEditor({
           maxRenderedOptions: 6,
           defaultKeymap: true,
         }),
+        Prec.highest(EditorView.domEventHandlers({
+          compositionstart: () => {
+            compositionBoundaryRef.current.active = true;
+            compositionBoundaryRef.current.endedAt = Number.NEGATIVE_INFINITY;
+            return false;
+          },
+          compositionend: () => {
+            compositionBoundaryRef.current.active = false;
+            compositionBoundaryRef.current.endedAt = performance.now();
+            return false;
+          },
+          keydown: (event) => {
+            if (!shouldSuppressNotebookCellBoundaryDuringComposition({
+              key: event.key,
+              isComposing: event.isComposing,
+              keyCode: event.keyCode,
+              compositionActive: compositionBoundaryRef.current.active,
+              compositionEndedAt: compositionBoundaryRef.current.endedAt,
+              now: performance.now(),
+            })) {
+              return false;
+            }
+            event.preventDefault();
+            return true;
+          },
+        })),
         errorMarkerField,
         errorLineDecorationField,
         errorGutter,
@@ -860,6 +891,7 @@ function DocumentBlock({
   const draftRef = useRef(draft);
   const markdownEditorRef = useRef<HTMLTextAreaElement | null>(null);
   const markdownCompositionRef = useRef(false);
+  const markdownCompositionEndedAtRef = useRef(Number.NEGATIVE_INFINITY);
 
   useEffect(() => {
     draftRef.current = draft;
@@ -936,20 +968,28 @@ function DocumentBlock({
               value={draft}
               onBlur={() => {
                 markdownCompositionRef.current = false;
+                markdownCompositionEndedAtRef.current = Number.NEGATIVE_INFINITY;
               }}
               onChange={(event) => updateDraft(event.target.value)}
               onCompositionEnd={() => {
                 markdownCompositionRef.current = false;
+                markdownCompositionEndedAtRef.current = performance.now();
               }}
               onCompositionStart={() => {
                 markdownCompositionRef.current = true;
+                markdownCompositionEndedAtRef.current = Number.NEGATIVE_INFINITY;
               }}
               onFocus={onSelect}
               onKeyDown={(event) => {
                 if (
-                  markdownCompositionRef.current
-                  || event.nativeEvent.isComposing
-                  || event.nativeEvent.keyCode === 229
+                  shouldSuppressNotebookCellBoundaryDuringComposition({
+                    key: event.key,
+                    isComposing: event.nativeEvent.isComposing,
+                    keyCode: event.nativeEvent.keyCode,
+                    compositionActive: markdownCompositionRef.current,
+                    compositionEndedAt: markdownCompositionEndedAtRef.current,
+                    now: performance.now(),
+                  })
                   || event.altKey
                   || event.ctrlKey
                   || event.metaKey

@@ -1487,6 +1487,7 @@ def verifyNotebookCompositionGuards(page: Any, cells: Any) -> dict[str, Any]:
             f"{codeDuringComposition}"
         )
     codeEditor.dispatch_event("compositionend", {"data": "한글"})
+    page.wait_for_timeout(160)
     page.keyboard.press("Control+End")
     page.keyboard.press("ArrowDown")
     page.wait_for_function(
@@ -1536,6 +1537,7 @@ def verifyNotebookCompositionGuards(page: Any, cells: Any) -> dict[str, Any]:
             f"{markdownDuringComposition}"
         )
     markdownEditor.dispatch_event("compositionend", {"data": "한글"})
+    page.wait_for_timeout(160)
     page.keyboard.press("ArrowDown")
     page.wait_for_function(
         """
@@ -2135,6 +2137,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "viewport": {"width": 900, "height": 760},
             "surface": "web-lesson",
             "waitFor": '[data-learning-section-mode="mastery"]',
+            "expectedLearningVisualAssetId": "learningAutomation",
             "runLearningCell": True,
             "targetAssessmentMode": "mastery",
             "expectTransferSection": True,
@@ -2370,6 +2373,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "viewport": {"width": 900, "height": 760},
             "surface": "web-lesson",
             "waitFor": "[data-learning-section-card]",
+            "expectedLearningVisualAssetId": "learningAutomation",
             "runLearningCell": True,
             "exerciseIndex": 0,
             "initialCheckState": "mismatch",
@@ -2392,6 +2396,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "viewport": {"width": 900, "height": 760},
             "surface": "web-lesson",
             "waitFor": "[data-learning-section-card]",
+            "expectedLearningVisualAssetId": "learningAutomation",
             "runLearningCell": True,
             "exerciseIndex": 1,
             "initialCheckState": "mismatch",
@@ -2415,6 +2420,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "viewport": {"width": 900, "height": 760},
             "surface": "web-lesson",
             "waitFor": "[data-learning-section-card]",
+            "expectedLearningVisualAssetId": "learningAutomation",
             "runLearningCell": True,
             "exerciseIndex": 2,
             "initialCheckState": "mismatch",
@@ -2441,6 +2447,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "viewport": {"width": 900, "height": 760},
             "surface": "web-lesson",
             "waitFor": "[data-learning-section-card]",
+            "expectedLearningVisualAssetId": "learningAutomation",
             "runLearningCell": True,
             "exerciseIndex": 3,
             "initialCheckState": "mismatch",

@@ -356,7 +356,7 @@ def runLauncherJson(*args: str) -> dict[str, Any]:
         cwd=ROOT,
         text=True,
         capture_output=True,
-        timeout=120,
+        timeout=300,
         check=False,
     )
     if result.returncode != 0:

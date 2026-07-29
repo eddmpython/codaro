@@ -6,6 +6,7 @@ from ctypes import wintypes
 import json
 import os
 import platform
+import re
 import shutil
 import socket
 import subprocess
@@ -38,6 +39,12 @@ DEPLOYED_WEB_URL = os.environ.get("CODARO_DEPLOYED_WEB_URL", "").strip().rstrip(
 EXPECTED_SOCIAL_ORDER = ["github", "support", "youtube", "threads"]
 EXPECTED_ACCOUNT_NUMBER = "1002-0421-4626"
 CREATE_NO_WINDOW = 0x08000000
+KEYEVENTF_KEYUP = 0x0002
+VK_BACK = 0x08
+VK_DOWN = 0x28
+VK_ESCAPE = 0x1B
+VK_HANGUL = 0x15
+VK_SPACE = 0x20
 
 
 class VerificationError(RuntimeError):
@@ -139,6 +146,13 @@ def main() -> int:
                 support_case = verify_support_dialog(page)
                 cases.append(support_case)
                 cases.append(
+                    verify_native_shell_keyboard_and_forced_colors(
+                        page,
+                        hwnd=hwnd,
+                        app_port=app_port,
+                    )
+                )
+                cases.append(
                     verify_web_to_local_roundtrip(
                         page,
                         hwnd=hwnd,
@@ -227,7 +241,10 @@ def main() -> int:
                 "shared support dialog account structure",
                 "12-cell Code and Markdown keyboard boundary navigation with focus scrolling",
                 "12-cell input and action names include the current cell position",
+                "WebView2 Chromium accessibility-tree cell and document-control reading order",
                 "Code and Markdown composition-event shortcut guards",
+                "Code and Markdown native Korean IME input and composition-boundary arrow guards",
+                "WebView2 forced-colors control boundaries and keyboard focus order",
                 "isolated installed-product user data",
                 "Web-origin learning archive Local import, reload, re-export, and disabled automation adoption",
             ] + ([
@@ -237,8 +254,7 @@ def main() -> int:
             "notCovered": [
                 "Windows 10 22H2 self-hosted image",
                 "WebView2 Fixed Version lock",
-                "manual assistive technology",
-                "IME composition",
+                "manual NVDA or Narrator speech-output review",
                 "200% and 400% zoom",
             ] + ([] if deployed_archive is not None else ["public deployed Web archive export"]),
         },
@@ -1016,7 +1032,12 @@ def verify_long_notebook_keyboard_navigation(
 
     bottom_state = notebook_navigation_viewport_state(page)
     composition_evidence = verify_notebook_composition_guards(page, cells)
+    native_ime_evidence = verify_native_korean_ime(page, hwnd=hwnd, cells=cells)
     accessible_name_evidence = notebook_accessible_name_state(page)
+    accessibility_tree_evidence = notebook_accessibility_tree_state(
+        page,
+        expected_cell_count=target_count,
+    )
     screenshot_path = SCREENSHOT_ROOT / f"{case_id}.png"
     page.screenshot(path=str(screenshot_path))
     checks = {
@@ -1031,6 +1052,8 @@ def verify_long_notebook_keyboard_navigation(
         "markdownFocusedUp": markdown_up,
         "markdownFocusedDown": markdown_down,
         "positionedAccessibleNames": accessible_name_evidence["valid"],
+        "accessibilityTreeReadingOrder": accessibility_tree_evidence["valid"],
+        "nativeKoreanIme": native_ime_evidence["valid"],
     }
     case_failures = [
         f"{check} check failed"
@@ -1048,7 +1071,9 @@ def verify_long_notebook_keyboard_navigation(
             "topScrollTop": top_state["scrollTop"],
             "bottomScrollTop": bottom_state["scrollTop"],
             "accessibleNames": accessible_name_evidence,
+            "accessibilityTree": accessibility_tree_evidence,
             "compositionGuards": composition_evidence,
+            "nativeKoreanIme": native_ime_evidence,
         },
         "screenshot": display_path(screenshot_path),
         "checks": checks,
@@ -1127,6 +1152,7 @@ def verify_notebook_composition_guards(page: Page, cells: Locator) -> dict[str, 
             f"{code_during_composition}"
         )
     code_editor.dispatch_event("compositionend", {"data": "한글"})
+    page.wait_for_timeout(160)
     page.keyboard.press("Control+End")
     page.keyboard.press("ArrowDown")
     page.wait_for_function(
@@ -1175,6 +1201,7 @@ def verify_notebook_composition_guards(page: Page, cells: Locator) -> dict[str, 
             f"{markdown_during_composition}"
         )
     markdown_editor.dispatch_event("compositionend", {"data": "한글"})
+    page.wait_for_timeout(160)
     page.keyboard.press("ArrowDown")
     page.wait_for_function(
         """
@@ -1197,6 +1224,316 @@ def verify_notebook_composition_guards(page: Page, cells: Locator) -> dict[str, 
         "markdownCompositionPreservedTextAndFocus": True,
         "markdownPostCompositionBoundaryMoved": True,
     }
+
+
+def verify_native_korean_ime(
+    page: Page,
+    *,
+    hwnd: int,
+    cells: Locator,
+) -> dict[str, Any]:
+    cell_types = [
+        cells.nth(index).get_attribute("data-notebook-cell")
+        for index in range(cells.count())
+    ]
+    markdown_index = next(
+        (
+            index
+            for index, cell_type in enumerate(cell_types)
+            if cell_type == "markdown" and 0 < index < len(cell_types) - 1
+        ),
+        None,
+    )
+    if markdown_index is None or cell_types[markdown_index - 1] != "code":
+        raise VerificationError(
+            "native Korean IME check needs a code, Markdown, code sequence"
+        )
+
+    code_index = markdown_index - 1
+    code_editor = cells.nth(code_index).locator(".cm-content")
+    markdown_editor = cells.nth(markdown_index).locator(".notebookMarkdownEditor")
+    toggled_to_korean = False
+
+    def reset_editor(editor: Locator, *, textarea: bool) -> None:
+        if textarea:
+            editor.fill("")
+        else:
+            editor.click()
+            page.keyboard.press("Control+A")
+            page.keyboard.press("Backspace")
+        editor.evaluate(
+            """
+            (element) => {
+              element.__codaroNativeImeEvents = [];
+              if (!element.__codaroNativeImeListenerInstalled) {
+                for (const type of ['compositionstart', 'compositionupdate', 'compositionend']) {
+                  element.addEventListener(type, (event) => {
+                    element.__codaroNativeImeEvents.push({
+                      data: event.data ?? '',
+                      type: event.type,
+                    });
+                  });
+                }
+                element.__codaroNativeImeListenerInstalled = true;
+              }
+            }
+            """
+        )
+
+    def editor_value(editor: Locator, *, textarea: bool) -> str:
+        if textarea:
+            return editor.input_value()
+        return editor.evaluate(
+            "(element) => (element.innerText || '').replace(/\\r/g, '')"
+        )
+
+    def ime_events(editor: Locator) -> list[dict[str, str]]:
+        return editor.evaluate(
+            "(element) => element.__codaroNativeImeEvents || []"
+        )
+
+    def type_hangeul(editor: Locator, *, textarea: bool) -> tuple[str, list[dict[str, str]]]:
+        activate_native_window(hwnd)
+        for key in "GKSRMF":
+            native_key_tap(ord(key))
+        native_key_tap(VK_SPACE)
+        native_key_tap(VK_BACK)
+        page.wait_for_timeout(350)
+        return editor_value(editor, textarea=textarea), ime_events(editor)
+
+    try:
+        reset_editor(code_editor, textarea=False)
+        code_value, code_events = type_hangeul(code_editor, textarea=False)
+        if "한글" not in code_value:
+            native_key_tap(VK_HANGUL)
+            toggled_to_korean = True
+            reset_editor(code_editor, textarea=False)
+            code_value, code_events = type_hangeul(code_editor, textarea=False)
+
+        reset_editor(code_editor, textarea=False)
+        activate_native_window(hwnd)
+        native_key_tap(ord("G"))
+        page.wait_for_timeout(180)
+        code_composing_events = ime_events(code_editor)
+        native_key_tap(VK_DOWN)
+        page.wait_for_timeout(250)
+        code_arrow_state = notebook_selected_cell_state(page)
+        code_arrow_value = editor_value(code_editor, textarea=False)
+        native_key_tap(VK_ESCAPE)
+
+        reset_editor(markdown_editor, textarea=True)
+        markdown_value, markdown_events = type_hangeul(
+            markdown_editor,
+            textarea=True,
+        )
+
+        reset_editor(markdown_editor, textarea=True)
+        activate_native_window(hwnd)
+        native_key_tap(ord("G"))
+        page.wait_for_timeout(180)
+        markdown_composing_events = ime_events(markdown_editor)
+        native_key_tap(VK_DOWN)
+        page.wait_for_timeout(250)
+        markdown_arrow_state = notebook_selected_cell_state(page)
+        markdown_arrow_value = editor_value(markdown_editor, textarea=True)
+        native_key_tap(VK_ESCAPE)
+    finally:
+        if toggled_to_korean:
+            activate_native_window(hwnd)
+            native_key_tap(VK_HANGUL)
+
+    code_event_types = [event["type"] for event in code_events]
+    markdown_event_types = [event["type"] for event in markdown_events]
+    code_composing_types = [event["type"] for event in code_composing_events]
+    markdown_composing_types = [
+        event["type"] for event in markdown_composing_events
+    ]
+    checks = {
+        "foregroundWindow": ctypes.windll.user32.GetForegroundWindow() == hwnd,
+        "codeText": "한글" in code_value,
+        "codeCompositionLifecycle": (
+            "compositionstart" in code_event_types
+            and "compositionupdate" in code_event_types
+            and "compositionend" in code_event_types
+        ),
+        "codeComposingArrowStayed": (
+            "compositionstart" in code_composing_types
+            and code_arrow_state["selectedIndex"] == code_index
+            and code_arrow_state["focused"]
+            and bool(code_arrow_value)
+        ),
+        "markdownText": "한글" in markdown_value,
+        "markdownCompositionLifecycle": (
+            "compositionstart" in markdown_event_types
+            and "compositionupdate" in markdown_event_types
+            and "compositionend" in markdown_event_types
+        ),
+        "markdownComposingArrowStayed": (
+            "compositionstart" in markdown_composing_types
+            and markdown_arrow_state["selectedIndex"] == markdown_index
+            and markdown_arrow_state["focused"]
+            and bool(markdown_arrow_value)
+        ),
+    }
+    return {
+        "inputMethod": "Windows Korean IME via native virtual-key input",
+        "keyboardLayout": "Korean 2-set",
+        "codeCellIndex": code_index,
+        "codeValue": code_value,
+        "codeEvents": code_events,
+        "codeComposingArrowEvents": code_composing_events,
+        "codeComposingArrowState": code_arrow_state,
+        "markdownCellIndex": markdown_index,
+        "markdownValue": markdown_value,
+        "markdownEvents": markdown_events,
+        "markdownComposingArrowEvents": markdown_composing_events,
+        "markdownComposingArrowState": markdown_arrow_state,
+        "checks": checks,
+        "valid": all(checks.values()),
+    }
+
+
+def notebook_selected_cell_state(page: Page) -> dict[str, Any]:
+    return page.evaluate(
+        """
+        () => {
+          const cells = [...document.querySelectorAll('[data-notebook-cell]')];
+          const selected = document.querySelector(
+            '[data-notebook-cell-selected="true"]'
+          );
+          return {
+            focused: Boolean(selected?.contains(document.activeElement)),
+            selectedIndex: cells.indexOf(selected),
+          };
+        }
+        """
+    )
+
+
+def notebook_accessibility_tree_state(
+    page: Page,
+    *,
+    expected_cell_count: int,
+) -> dict[str, Any]:
+    session = page.context.new_cdp_session(page)
+    try:
+        payload = session.send("Accessibility.getFullAXTree")
+    finally:
+        session.detach()
+
+    raw_nodes = payload.get("nodes", [])
+    node_by_id = {
+        node["nodeId"]: node
+        for node in raw_nodes
+        if isinstance(node.get("nodeId"), str)
+    }
+    roots = [
+        node for node in raw_nodes
+        if node.get("role", {}).get("value") == "RootWebArea"
+    ]
+    ordered_nodes: list[dict[str, Any]] = []
+    visited: set[str] = set()
+
+    def visit(node: dict[str, Any]) -> None:
+        node_id = node.get("nodeId")
+        if not isinstance(node_id, str) or node_id in visited:
+            return
+        visited.add(node_id)
+        ordered_nodes.append(node)
+        for child_id in node.get("childIds", []):
+            child = node_by_id.get(child_id)
+            if child is not None:
+                visit(child)
+
+    for root in roots:
+        visit(root)
+    for node in raw_nodes:
+        visit(node)
+
+    semantic_nodes: list[dict[str, Any]] = []
+    for tree_index, node in enumerate(ordered_nodes):
+        if node.get("ignored"):
+            continue
+        role = ax_value(node.get("role"))
+        name = ax_value(node.get("name"))
+        semantic_nodes.append({
+            "treeIndex": tree_index,
+            "role": role,
+            "name": name,
+        })
+
+    cell_pattern = re.compile(r"(?:Python|Markdown|Automation).*셀 (\d+) / (\d+)")
+    positioned_nodes: list[dict[str, Any]] = []
+    for node in semantic_nodes:
+        match = cell_pattern.search(node["name"])
+        if not match:
+            continue
+        positioned_nodes.append({
+            **node,
+            "position": int(match.group(1)),
+            "setSize": int(match.group(2)),
+        })
+
+    list_items = [
+        node for node in positioned_nodes
+        if node["role"] == "listitem"
+    ]
+    editors = [
+        node for node in positioned_nodes
+        if node["role"] in {"textbox", "TextField"}
+    ]
+    cell_actions = [
+        node for node in positioned_nodes
+        if node["role"] == "button"
+    ]
+    notebook_list = next(
+        (
+            node for node in semantic_nodes
+            if node["role"] == "list" and node["name"] == "노트북 셀"
+        ),
+        None,
+    )
+    bottom_toolbar = next(
+        (
+            node for node in semantic_nodes
+            if node["role"] == "toolbar" and node["name"] == "노트북 셀 추가"
+        ),
+        None,
+    )
+    expected_positions = list(range(1, expected_cell_count + 1))
+    cell_positions = [node["position"] for node in list_items]
+    editor_positions = [node["position"] for node in editors]
+    checks = {
+        "notebookList": notebook_list is not None,
+        "cellOrder": cell_positions == expected_positions,
+        "cellSetSize": all(
+            node["setSize"] == expected_cell_count for node in list_items
+        ),
+        "editorOrder": editor_positions == expected_positions,
+        "positionedCellActions": bool(cell_actions),
+        "bottomControlAfterDocument": (
+            bottom_toolbar is not None
+            and bool(list_items)
+            and bottom_toolbar["treeIndex"] > list_items[-1]["treeIndex"]
+        ),
+    }
+    return {
+        "source": "WebView2 Chromium Accessibility.getFullAXTree",
+        "notebookList": notebook_list,
+        "cellItems": list_items,
+        "editors": editors,
+        "positionedActionCount": len(cell_actions),
+        "bottomToolbar": bottom_toolbar,
+        "checks": checks,
+        "valid": all(checks.values()),
+    }
+
+
+def ax_value(value: Any) -> str:
+    if isinstance(value, dict):
+        raw = value.get("value")
+        return raw if isinstance(raw, str) else str(raw or "")
+    return value if isinstance(value, str) else ""
 
 
 def notebook_accessible_name_state(page: Page) -> dict[str, Any]:
@@ -1329,6 +1666,174 @@ def verify_support_dialog(page: Page) -> dict[str, Any]:
         "passed": not failures,
         "failures": failures,
     }
+
+
+def verify_native_shell_keyboard_and_forced_colors(
+    page: Page,
+    *,
+    hwnd: int,
+    app_port: int,
+) -> dict[str, Any]:
+    case_id = "local-shell-keyboard-forced-colors-900x640"
+    response = page.goto(
+        f"http://127.0.0.1:{app_port}/?surface=home&runtime=local#home",
+        wait_until="domcontentloaded",
+        timeout=45_000,
+    )
+    if response is not None and response.status >= 400:
+        raise VerificationError(f"{case_id} returned HTTP {response.status}")
+    page.wait_for_selector(
+        "[data-local-home-surface='true']",
+        state="visible",
+        timeout=45_000,
+    )
+    resize_native_client(
+        hwnd,
+        900,
+        640,
+        float(page.evaluate("window.devicePixelRatio")),
+    )
+    page.wait_for_timeout(250)
+
+    page.evaluate(
+        """
+        () => {
+          if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+          }
+          document.body.tabIndex = -1;
+          document.body.focus();
+        }
+        """
+    )
+    tab_order: list[dict[str, Any]] = []
+    for _ in range(18):
+        page.keyboard.press("Tab")
+        focus = active_element_state(page)
+        marker = (
+            focus.get("ariaLabel")
+            or focus.get("title")
+            or focus.get("text")
+            or focus.get("tag")
+        )
+        if marker and not any(item["marker"] == marker for item in tab_order):
+            tab_order.append({"marker": marker, **focus})
+
+    session = page.context.new_cdp_session(page)
+    try:
+        session.send(
+            "Emulation.setEmulatedMedia",
+            {
+                "features": [
+                    {"name": "forced-colors", "value": "active"},
+                    {"name": "prefers-color-scheme", "value": "light"},
+                ]
+            },
+        )
+        page.wait_for_function(
+            "() => matchMedia('(forced-colors: active)').matches",
+            timeout=5_000,
+        )
+        support_control = page.locator("[data-social-link-id='support']").first
+        support_control.focus()
+        page.wait_for_timeout(100)
+        forced_color_state = support_control.evaluate(
+            """
+            (element) => {
+              const style = getComputedStyle(element);
+              return {
+                borderStyle: style.borderStyle,
+                borderWidth: style.borderWidth,
+                forcedColors: matchMedia('(forced-colors: active)').matches,
+                outlineStyle: style.outlineStyle,
+                outlineWidth: style.outlineWidth,
+              };
+            }
+            """
+        )
+        screenshot_path = SCREENSHOT_ROOT / f"{case_id}.png"
+        page.screenshot(path=str(screenshot_path))
+    finally:
+        session.send("Emulation.setEmulatedMedia", {"features": []})
+        session.detach()
+
+    markers = [item["marker"] for item in tab_order]
+    required_focus_names = (
+        "Codaro 홈으로 이동",
+        "홈",
+        "현재 학습",
+        "노트북",
+        "자동화",
+    )
+    checks = {
+        "keyboardOrderNamed": (
+            len(tab_order) >= 8
+            and all(item["visible"] and item["marker"] for item in tab_order)
+        ),
+        "primaryNavigationReached": all(
+            any(required in marker for marker in markers)
+            for required in required_focus_names
+        ),
+        "forcedColorsActive": forced_color_state["forcedColors"],
+        "forcedColorBoundary": (
+            forced_color_state["borderStyle"] not in {"", "none"}
+            and forced_color_state["borderWidth"] != "0px"
+        ),
+        "forcedColorFocus": (
+            forced_color_state["outlineStyle"] not in {"", "none"}
+            and forced_color_state["outlineWidth"] != "0px"
+        ),
+    }
+    failures = [
+        f"{check} check failed"
+        for check, passed in checks.items()
+        if not passed
+    ]
+    return {
+        "id": case_id,
+        "surface": "home",
+        "requestedCssViewport": {"width": 900, "height": 640},
+        "keyboardTabOrder": tab_order,
+        "forcedColors": forced_color_state,
+        "screenshot": display_path(screenshot_path),
+        "checks": checks,
+        "passed": not failures,
+        "failures": failures,
+    }
+
+
+def active_element_state(page: Page) -> dict[str, Any]:
+    return page.evaluate(
+        """
+        () => {
+          const element = document.activeElement;
+          if (!(element instanceof HTMLElement)) {
+            return {
+              ariaLabel: '',
+              tag: '',
+              text: '',
+              title: '',
+              visible: false,
+            };
+          }
+          const rect = element.getBoundingClientRect();
+          const style = getComputedStyle(element);
+          return {
+            ariaLabel: element.getAttribute('aria-label') || '',
+            tag: element.tagName.toLowerCase(),
+            text: (element.innerText || element.textContent || '')
+              .replace(/\\s+/g, ' ')
+              .trim()
+              .slice(0, 120),
+            title: element.getAttribute('title') || '',
+            visible: rect.width > 0
+              && rect.height > 0
+              && style.display !== 'none'
+              && style.visibility !== 'hidden',
+          };
+        }
+        """
+    )
 
 
 def capture_deployed_web_learning_archive(playwright: Any) -> dict[str, Any]:
@@ -2162,6 +2667,28 @@ def configure_dpi_awareness() -> None:
         ctypes.windll.user32.SetProcessDpiAwarenessContext(ctypes.c_void_p(-4))
     except (AttributeError, OSError):
         pass
+
+
+def activate_native_window(hwnd: int) -> None:
+    user32 = ctypes.windll.user32
+    user32.ShowWindow(hwnd, 5)
+    user32.SetForegroundWindow(hwnd)
+    deadline = time.monotonic() + 2
+    while time.monotonic() < deadline:
+        if user32.GetForegroundWindow() == hwnd:
+            return
+        time.sleep(0.05)
+    raise VerificationError(
+        f"native launcher window {hwnd} did not become the foreground window"
+    )
+
+
+def native_key_tap(virtual_key: int) -> None:
+    user32 = ctypes.windll.user32
+    user32.keybd_event(virtual_key, 0, 0, 0)
+    time.sleep(0.035)
+    user32.keybd_event(virtual_key, 0, KEYEVENTF_KEYUP, 0)
+    time.sleep(0.06)
 
 
 def runtime_evidence(cdp_version: dict[str, Any], hwnd: int, pid: int) -> dict[str, Any]:

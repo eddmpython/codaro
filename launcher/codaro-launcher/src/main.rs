@@ -17,7 +17,7 @@ mod tray;
 mod webview;
 
 use anyhow::{Context, Result, bail};
-use backend::{BackendLaunchConfig, wait_for_backend_ready, wait_for_health};
+use backend::{BackendLaunchConfig, terminate_backend, wait_for_backend_ready, wait_for_health};
 use clap::{Args, Parser, Subcommand};
 use github::{GitHubManifestDiscovery, discover_manifest_for_repo};
 use paths::LauncherPaths;
@@ -39,6 +39,7 @@ use std::time::Duration;
 const LAUNCHER_VERSION: &str = env!("CARGO_PKG_VERSION");
 const BACKEND_CRASH_RESTART_LIMIT: u32 = 3;
 const BACKEND_CRASH_WINDOW: Duration = Duration::from_secs(60);
+const BACKEND_HEALTH_TIMEOUT: Duration = Duration::from_secs(60);
 const BACKEND_RESTART_DELAY: Duration = Duration::from_millis(750);
 
 #[derive(Parser, Debug)]
@@ -521,7 +522,7 @@ fn provision_and_spawn(
     let url = config.app_url();
     let health_url = config.health_url();
 
-    match wait_for_backend_ready(&mut child, &health_url, Duration::from_secs(30)) {
+    match wait_for_backend_ready(&mut child, &health_url, BACKEND_HEALTH_TIMEOUT) {
         Ok(()) => {
             println!(
                 "{}",
@@ -532,7 +533,7 @@ fn provision_and_spawn(
             );
         }
         Err(err) => {
-            let _ = child.kill();
+            let _ = terminate_backend(&mut child);
             println!(
                 "{}",
                 encode_ipc(&IpcMessage::SetError(ErrorPayload {
@@ -737,7 +738,7 @@ fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
                 Some(tray::TrayAction::Quit) => {
                     if let Ok(mut slot) = child_slot.lock() {
                         if let Some(mut child) = slot.take() {
-                            let _ = child.kill();
+                            let _ = terminate_backend(&mut child);
                         }
                     }
                     *control_flow = ControlFlow::Exit;
@@ -1780,10 +1781,9 @@ fn start_backend_for_state(
     )?;
     let mut child = config.spawn()?;
     if let Err(error) =
-        wait_for_backend_ready(&mut child, &config.health_url(), Duration::from_secs(30))
+        wait_for_backend_ready(&mut child, &config.health_url(), BACKEND_HEALTH_TIMEOUT)
     {
-        let _ = child.kill();
-        let _ = child.wait();
+        let _ = terminate_backend(&mut child);
         return Err(error.context(format!(
             "Backend failed health check for release `{}`.",
             state.release_id
@@ -1847,18 +1847,7 @@ fn resolve_probe_port(host: &str, requested_port: Option<u16>) -> Result<u16> {
 }
 
 fn stop_backend_probe(child: &mut Child) -> Result<()> {
-    if child
-        .try_wait()
-        .context("Failed to poll staged backend probe process.")?
-        .is_some()
-    {
-        return Ok(());
-    }
-    child
-        .kill()
-        .context("Failed to terminate staged backend probe process.")?;
-    let _ = child.wait();
-    Ok(())
+    terminate_backend(child).context("Failed to terminate staged backend probe process.")
 }
 
 fn guard_against_frozen_release(
