@@ -8,7 +8,7 @@ R9가 드러낸 결함을 문서 작성자가 스스로 닫았다고 선언하�
 
 ## 현재 준비 상태
 
-`buildPrdEvaluationBundle.py --write`는 현재 제품 source와 미완료 제품 TODO만 history-free ZIP으로 만든다. ZIP의 모든 entry는 읽기 전용이며 specialist review, PRD 개선 이력, 완료 기록, output·dist·build·cache를 포함하지 않는다. bundle hash와 file count는 current source에서 다시 생성한 manifest가 소유하며, 이 무결성은 evaluator 제출이나 round seal을 뜻하지 않는다.
+`buildPrdEvaluationBundle.py --write`는 현재 제품 source와 미완료 제품 TODO를 history-free ZIP으로 만든다. 일반 output·dist·build·cache는 제외하되 허용 목록의 current machine report 9개와 report가 직접 참조하는 JSON·이미지는 `evaluation-evidence/` 아래에 원본 byte 그대로 복제한다. 각 root report의 `gitHead`는 최신 평가 source commit으로 환산돼야 하고 stale·missing·invalid report나 dirty source scope는 seal을 차단한다. ZIP의 모든 entry는 읽기 전용이며 specialist review, PRD 개선 이력, 완료 기록을 포함하지 않는다. bundle hash와 file count는 current source와 raw evidence에서 다시 생성한 manifest가 소유하며, 이 무결성은 evaluator 제출이나 round seal을 뜻하지 않는다.
 
 current bundle integrity와 draft fact audit도 R10 통과가 아니다. draft 범위는 최신이지만 입력 manifest와 scope는 unsealed이고 03~07·09 remediation closure, 세 명의 독립 evaluator 배정·독립성·conflict 확인, raw report 3개와 finding ledger가 없다. Local·Web reader floor, canonical mastery, full archive와 weak-only 0은 machine 구현 사실일 뿐 독립 검수와 전 release compatibility matrix를 대신하지 않는다. 따라서 manifest는 `state: draft`, `sealEligible: false`이며 현재 R10 점수와 통과 판정은 없다. `--seal`은 current bundle, 각 remediation closure evidence·fact audit·negative fixture와 세 evaluator의 독립성·conflict·서명이 모두 유효할 때만 성공해야 한다.
 

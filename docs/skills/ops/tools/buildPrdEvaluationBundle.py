@@ -76,6 +76,77 @@ CONTRACT_BUNDLE_PATHS = {
     "evaluation-contract/finding-ledger.schema.yml": LEDGER_SCHEMA_SOURCE,
 }
 BRIEFING_PATH = "evaluation-contract/evaluator-briefing.yml"
+EVIDENCE_INDEX_PATH = "evaluation-evidence/manifest.yml"
+EVIDENCE_SOURCE_PREFIX = "output/test-runner/"
+EVIDENCE_BUNDLE_PREFIX = "evaluation-evidence/"
+EVIDENCE_ARTIFACT_SUFFIXES = {
+    ".avif",
+    ".json",
+    ".png",
+    ".txt",
+    ".webp",
+    ".yaml",
+    ".yml",
+}
+MACHINE_EVIDENCE_REPORTS = (
+    (
+        "product-experience-browser",
+        "output/test-runner/product-experience-browser/product-experience-report.json",
+        "gate",
+        "product-experience-browser",
+    ),
+    (
+        "local-studio-browser",
+        "output/test-runner/local-studio-browser/local-studio-report.json",
+        "gate",
+        "local-studio-browser",
+    ),
+    (
+        "curriculum-top-tier-audit",
+        "output/test-runner/curriculum-top-tier-audit/curriculum-top-tier-report.json",
+        "gate",
+        "curriculum-top-tier-audit",
+    ),
+    (
+        "learning-vertical-slice",
+        "output/test-runner/learning-vertical-slice/learning-vertical-slice-report.json",
+        "audit",
+        "learning-vertical-slice",
+    ),
+    (
+        "evidence-migration",
+        "output/test-runner/evidence-migration/evidence-migration-report.json",
+        "audit",
+        "evidence-migration",
+    ),
+    (
+        "astryx-journey",
+        "output/test-runner/astryx-journey/astryx-journey-report.json",
+        "audit",
+        "astryx-journey",
+    ),
+    (
+        "manual-at-matrix",
+        "output/test-runner/astryx-journey/manual-at-report.json",
+        "audit",
+        "manual-at-matrix",
+    ),
+    (
+        "release-research-operations",
+        "output/test-runner/release-research-operations/release-research-operations-report.json",
+        "audit",
+        "release-research-operations",
+    ),
+    (
+        "product-browser-webview2-evergreen",
+        "output/test-runner/product-browser-webview2-evergreen/webview2-product-smoke-report.json",
+        "gate",
+        "product-browser-webview2-evergreen",
+    ),
+)
+EVIDENCE_ALLOWED_SOURCE_PREFIXES = tuple(
+    sorted({sourcePath.rsplit("/", 1)[0] + "/" for _, sourcePath, _, _ in MACHINE_EVIDENCE_REPORTS})
+)
 ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
 ZIP_COMPRESSION = zipfile.ZIP_STORED
 ZIP_COMPRESSION_NAME = "stored"
@@ -296,6 +367,209 @@ def collectRepositoryEntries(paths: Iterable[str], sourceBytes: dict[str, bytes]
     return entries
 
 
+def nestedTextValues(value: Any) -> Iterable[str]:
+    if isinstance(value, str):
+        yield value
+    elif isinstance(value, dict):
+        for child in value.values():
+            yield from nestedTextValues(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from nestedTextValues(child)
+
+
+def normalizedEvidencePath(value: str) -> str | None:
+    normalized = PurePosixPath(value).as_posix()
+    parts = PurePosixPath(normalized).parts
+    if (
+        not normalized.startswith(EVIDENCE_SOURCE_PREFIX)
+        or not any(normalized.startswith(prefix) for prefix in EVIDENCE_ALLOWED_SOURCE_PREFIXES)
+        or normalized.startswith("/")
+        or ".." in parts
+        or PurePosixPath(normalized).suffix.lower() not in EVIDENCE_ARTIFACT_SUFFIXES
+    ):
+        return None
+    return normalized
+
+
+def evidenceBundlePath(sourcePath: str) -> str:
+    if not sourcePath.startswith(EVIDENCE_SOURCE_PREFIX):
+        raise BundleError(f"machine evidence path is outside the allowlist: {sourcePath}")
+    return EVIDENCE_BUNDLE_PREFIX + sourcePath[len(EVIDENCE_SOURCE_PREFIX):]
+
+
+def readEvidenceFile(sourcePath: str) -> bytes:
+    source = ROOT / Path(sourcePath)
+    if source.is_symlink():
+        raise BundleError(f"machine evidence must not be a symbolic link: {sourcePath}")
+    if not source.is_file():
+        raise BundleError(f"referenced machine evidence is absent: {sourcePath}")
+    try:
+        source.resolve().relative_to(ROOT.resolve())
+    except ValueError as exc:
+        raise BundleError(f"machine evidence escapes repository root: {sourcePath}") from exc
+    return source.read_bytes()
+
+
+def reportScopeMatches(
+    reportHead: Any,
+    *,
+    currentHistory: set[str],
+    scopeCommit: str,
+) -> bool:
+    if not isinstance(reportHead, str) or reportHead not in currentHistory:
+        return False
+    try:
+        return latestIncludedScopeCommit(reportHead) == scopeCommit
+    except BundleError:
+        return False
+
+
+def collectReferencedEvidence(
+    rootPath: str,
+    *,
+    currentHistory: set[str],
+    scopeCommit: str,
+) -> dict[str, bytes]:
+    pending = [rootPath]
+    payloads: dict[str, bytes] = {}
+    while pending:
+        sourcePath = pending.pop()
+        if sourcePath in payloads:
+            continue
+        data = readEvidenceFile(sourcePath)
+        payloads[sourcePath] = data
+        if PurePosixPath(sourcePath).suffix.lower() != ".json":
+            continue
+        try:
+            payload = json.loads(data.decode("utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise BundleError(f"machine evidence JSON is invalid: {sourcePath}") from exc
+        if not isinstance(payload, dict):
+            raise BundleError(f"machine evidence JSON root must be an object: {sourcePath}")
+        reportHead = payload.get("gitHead")
+        if reportHead is not None and not reportScopeMatches(
+            reportHead,
+            currentHistory=currentHistory,
+            scopeCommit=scopeCommit,
+        ):
+            raise BundleError(f"referenced machine evidence is stale: {sourcePath}")
+        for value in nestedTextValues(payload):
+            referencedPath = normalizedEvidencePath(value)
+            if referencedPath is not None and referencedPath not in payloads:
+                pending.append(referencedPath)
+    return payloads
+
+
+def collectMachineEvidence(
+    *,
+    currentHead: str,
+    scopeCommit: str,
+    scopeDirty: bool,
+) -> tuple[tuple[BundleEntry, ...], dict[str, Any]]:
+    currentHistory = set(
+        runGit("rev-list", "--first-parent", currentHead)
+        .decode("ascii", errors="strict")
+        .splitlines()
+    )
+    entriesByPath: dict[str, BundleEntry] = {}
+    reportRows: list[dict[str, Any]] = []
+    blockers: list[str] = []
+    for reportId, sourcePath, identityField, expectedIdentity in MACHINE_EVIDENCE_REPORTS:
+        reportRow: dict[str, Any] = {
+            "reportId": reportId,
+            "sourcePath": sourcePath,
+            "bundlePath": evidenceBundlePath(sourcePath),
+            "status": "missing",
+        }
+        source = ROOT / Path(sourcePath)
+        if not source.is_file():
+            blockers.append(f"current machine evidence report is missing: {reportId}")
+            reportRows.append(reportRow)
+            continue
+        try:
+            rawBytes = readEvidenceFile(sourcePath)
+            payload = json.loads(rawBytes.decode("utf-8"))
+            if not isinstance(payload, dict):
+                raise BundleError(f"machine evidence JSON root must be an object: {sourcePath}")
+            if payload.get(identityField) != expectedIdentity:
+                raise BundleError(f"machine evidence identity is invalid: {sourcePath}")
+            reportedPath = payload.get("reportPath")
+            if (
+                not isinstance(reportedPath, str)
+                or PurePosixPath(reportedPath.replace("\\", "/")).as_posix() != sourcePath
+            ):
+                raise BundleError(f"machine evidence reportPath is invalid: {sourcePath}")
+            if not isinstance(payload.get("passed"), bool):
+                raise BundleError(f"machine evidence passed state is invalid: {sourcePath}")
+            reportHead = payload.get("gitHead")
+            reportRow["reportedGitHead"] = reportHead
+            reportRow["sha256"] = sha256Bytes(rawBytes)
+            reportRow["bytes"] = len(rawBytes)
+            if not reportScopeMatches(
+                reportHead,
+                currentHistory=currentHistory,
+                scopeCommit=scopeCommit,
+            ):
+                reportRow["status"] = "stale"
+                blockers.append(f"current machine evidence report is stale: {reportId}")
+                reportRows.append(reportRow)
+                continue
+            referenced = collectReferencedEvidence(
+                sourcePath,
+                currentHistory=currentHistory,
+                scopeCommit=scopeCommit,
+            )
+        except (BundleError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+            reportRow["status"] = "invalid"
+            reportRow["reason"] = str(exc)
+            blockers.append(f"current machine evidence report is invalid: {reportId}")
+            reportRows.append(reportRow)
+            continue
+        reportRow["status"] = "current"
+        reportRow["artifactCount"] = len(referenced)
+        reportRows.append(reportRow)
+        for referencedPath, data in referenced.items():
+            bundlePath = evidenceBundlePath(referencedPath)
+            entry = BundleEntry(
+                bundlePath,
+                data,
+                referencedPath,
+                "raw-machine-report" if referencedPath == sourcePath else "raw-machine-artifact",
+            )
+            existing = entriesByPath.get(bundlePath)
+            if existing is not None and existing.data != entry.data:
+                raise BundleError(f"machine evidence bundle path collision: {bundlePath}")
+            entriesByPath[bundlePath] = entry
+    if scopeDirty:
+        blockers.append("current evaluation scope has uncommitted changes not covered by machine reports")
+    includedReports = [row for row in reportRows if row["status"] == "current"]
+    evidenceFiles = [
+        entry.manifestRow()
+        for entry in sorted(entriesByPath.values(), key=lambda item: item.path)
+    ]
+    index = {
+        "schemaVersion": 1,
+        "scopeGitCommit": scopeCommit,
+        "scopeClean": not scopeDirty,
+        "requiredReportCount": len(MACHINE_EVIDENCE_REPORTS),
+        "includedReportCount": len(includedReports),
+        "artifactCount": len(evidenceFiles),
+        "allCurrent": not blockers and len(includedReports) == len(MACHINE_EVIDENCE_REPORTS),
+        "blockingReasons": sorted(set(blockers)),
+        "reports": reportRows,
+        "files": evidenceFiles,
+    }
+    indexBytes = yaml.safe_dump(index, allow_unicode=True, sort_keys=False, width=120).encode("utf-8")
+    entriesByPath[EVIDENCE_INDEX_PATH] = BundleEntry(
+        EVIDENCE_INDEX_PATH,
+        indexBytes,
+        None,
+        "machine-evidence-index",
+    )
+    return tuple(sorted(entriesByPath.values(), key=lambda item: item.path)), index
+
+
 def evaluatorBriefing() -> bytes:
     payload = {
         "schemaVersion": 1,
@@ -304,6 +578,7 @@ def evaluatorBriefing() -> bytes:
         "disciplines": ["learning", "ux", "architecture"],
         "constraints": [
             "Use only files contained in this bundle.",
+            "Treat evaluation-evidence/manifest.yml as the index of current raw machine reports and artifacts.",
             "Record current evidence and counter-evidence for every dimension.",
             "Do not infer implementation completion from a plan or a passing wiring audit.",
             "Preserve raw scores and report new P0, P1, or P2 findings without normalization.",
@@ -321,12 +596,14 @@ def evaluatorBriefing() -> bytes:
 def collectBundleEntries(
     paths: Iterable[str],
     sourceBytes: dict[str, bytes],
+    machineEvidenceEntries: Iterable[BundleEntry] = (),
 ) -> tuple[BundleEntry, ...]:
     entries = collectRepositoryEntries(paths, sourceBytes)
     for bundlePath, source in CONTRACT_BUNDLE_PATHS.items():
         sourcePath = relativePath(source)
         entries.append(BundleEntry(bundlePath, sourceBytes[sourcePath], sourcePath, "frozen-contract"))
     entries.append(BundleEntry(BRIEFING_PATH, evaluatorBriefing(), None, "generated-briefing"))
+    entries.extend(machineEvidenceEntries)
     entries.sort(key=lambda entry: entry.path)
     paths = [entry.path for entry in entries]
     if len(paths) != len(set(paths)):
@@ -517,8 +794,13 @@ def roundReadiness(
     inputManifest: dict[str, Any],
     roster: dict[str, Any],
     rubricBytes: bytes,
+    machineEvidenceBlockers: Iterable[str] = (),
 ) -> dict[str, Any]:
-    sealBlockers = remediationSealBlockers(inputManifest) + verifyEvaluatorRoster(roster)
+    sealBlockers = (
+        remediationSealBlockers(inputManifest)
+        + verifyEvaluatorRoster(roster)
+        + list(machineEvidenceBlockers)
+    )
     rubric = inputManifest.get("rubric")
     if (
         not isinstance(rubric, dict)
@@ -570,7 +852,12 @@ def buildPrdEvaluationBundle() -> tuple[dict[str, Any], bytes]:
     }
     sourcePaths.update(relativePath(source) for source in CONTRACT_BUNDLE_PATHS.values())
     sourceBytes = repositorySourceBytes(sourcePaths, repositoryStatuses)
-    entries = collectBundleEntries(paths, sourceBytes)
+    machineEvidenceEntries, machineEvidence = collectMachineEvidence(
+        currentHead=gitHead,
+        scopeCommit=scopeCommit,
+        scopeDirty=bool(beforeStatuses),
+    )
+    entries = collectBundleEntries(paths, sourceBytes, machineEvidenceEntries)
     beforeDiffHash = dirtyDiffHash(entries, beforeStatuses)
     scope = buildEvaluationScopeManifest(entries, gitHead=scopeCommit, diffHash=beforeDiffHash)
     archiveBytes = buildZipBytes(entries)
@@ -581,6 +868,7 @@ def buildPrdEvaluationBundle() -> tuple[dict[str, Any], bytes]:
         inputManifest,
         loadMapping(ROSTER_PATH),
         sourceBytes[relativePath(RUBRIC_SOURCE)],
+        machineEvidence["blockingReasons"],
     )
     inputScope = inputManifest.get("scope")
     sealedScopeMatches = (
@@ -615,9 +903,20 @@ def buildPrdEvaluationBundle() -> tuple[dict[str, Any], bytes]:
             "readOnlyEntries": True,
         },
         "roundReadiness": readiness,
+        "machineEvidence": {
+            "indexPath": EVIDENCE_INDEX_PATH,
+            "scopeGitCommit": machineEvidence["scopeGitCommit"],
+            "scopeClean": machineEvidence["scopeClean"],
+            "requiredReportCount": machineEvidence["requiredReportCount"],
+            "includedReportCount": machineEvidence["includedReportCount"],
+            "artifactCount": machineEvidence["artifactCount"],
+            "allCurrent": machineEvidence["allCurrent"],
+            "blockingReasons": machineEvidence["blockingReasons"],
+        },
         "exclusions": {
             "forbiddenPrefixes": list(FORBIDDEN_PREFIXES),
             "forbiddenSegments": sorted(FORBIDDEN_SEGMENTS),
+            "allowlistedMachineEvidencePrefix": EVIDENCE_BUNDLE_PREFIX,
             "priorScoresIncluded": False,
             "priorConclusionsIncluded": False,
         },

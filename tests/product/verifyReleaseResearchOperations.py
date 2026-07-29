@@ -44,6 +44,23 @@ THIRD_HASH = "sha256-" + ("c" * 64)
 NPM_COMMAND = "npm.cmd" if os.name == "nt" else "npm"
 
 
+def currentGitHead() -> str:
+    result = subprocess.run(
+        ("git", "rev-parse", "HEAD"),
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=30,
+    )
+    gitHead = result.stdout.strip()
+    if len(gitHead) not in {40, 64}:
+        raise ValueError("current Git head is invalid")
+    return gitHead
+
+
 def utcTimestamp() -> str:
     return datetime.now(UTC).isoformat(timespec="seconds")
 
@@ -416,6 +433,7 @@ def verifyCompatibilityBuild() -> dict[str, Any]:
 def main() -> int:
     startedAt = utcTimestamp()
     started = time.monotonic()
+    gitHead = currentGitHead()
     failures: list[str] = []
     facts: dict[str, Any] = {}
     try:
@@ -423,6 +441,8 @@ def main() -> int:
         facts["efficacy"] = verifyEfficacyStateMachine()
         facts["compatibilityStateMachine"] = verifyCompatibilityStateMachine()
         facts["compatibility"] = verifyCompatibilityBuild()
+        if currentGitHead() != gitHead:
+            raise ValueError("Git head changed while release research operations were running")
     except (OSError, ValueError, subprocess.SubprocessError, yaml.YAMLError) as error:
         failures.append(str(error))
     completionBlockers = [
@@ -439,6 +459,7 @@ def main() -> int:
         "passed": not failures,
         "machineEligible": not failures,
         "completionEligible": False,
+        "gitHead": gitHead,
         "startedAt": startedAt,
         "completedAt": utcTimestamp(),
         "durationMs": round((time.monotonic() - started) * 1000),

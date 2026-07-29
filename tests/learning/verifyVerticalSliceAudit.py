@@ -34,6 +34,23 @@ ASSESSMENT_MODES = {
 }
 
 
+def currentGitHead() -> str:
+    result = subprocess.run(
+        ("git", "rev-parse", "HEAD"),
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=30,
+    )
+    gitHead = result.stdout.strip()
+    if len(gitHead) not in {40, 64}:
+        raise ValueError("current Git head is invalid")
+    return gitHead
+
+
 def loadMapping(path: Path) -> dict[str, Any]:
     payload = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
@@ -290,12 +307,15 @@ def utcTimestamp() -> str:
 def main() -> int:
     startedAt = utcTimestamp()
     started = time.monotonic()
+    gitHead = currentGitHead()
     failures: list[str] = []
     facts: dict[str, Any] = {}
     try:
         facts["negativeFixture"] = rejectWeakFixture()
         facts["verticalSlice"] = verifyLessons()
         facts["browserProgression"] = verifyBrowserProgression()
+        if currentGitHead() != gitHead:
+            raise ValueError("Git head changed while the learning vertical slice audit was running")
     except (OSError, ValueError, subprocess.SubprocessError, yaml.YAMLError) as error:
         failures.append(str(error))
     assessmentCounts = facts.get("verticalSlice", {}).get("assessmentVariants", {})
@@ -313,6 +333,7 @@ def main() -> int:
         "passed": not failures,
         "machineEligible": machineEligible,
         "completionEligible": False,
+        "gitHead": gitHead,
         "startedAt": startedAt,
         "completedAt": utcTimestamp(),
         "durationMs": round((time.monotonic() - started) * 1000),

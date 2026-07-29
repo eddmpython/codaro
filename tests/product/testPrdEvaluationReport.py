@@ -251,6 +251,13 @@ def completeFactAudit() -> dict[str, object]:
             "requiredPaths": {"missing": []},
             "symbols": {"requiredMissing": []},
             "qualityGates": {"requiredMissing": [], "planQualityRegistered": True},
+            "machineEvidence": {
+                "allCurrent": True,
+                "scopeClean": True,
+                "requiredReportCount": 9,
+                "includedReportCount": 9,
+                "blockingReasons": [],
+            },
             "learningCoverage": {
                 "lessonCount": 472,
                 "strongCheckSpecCount": 345,
@@ -348,6 +355,40 @@ def testDraftFactAuditIsRejectedWithoutChangingLearningFacts() -> None:
 
     assert any("not bound" in failure for failure in failures)
     assert factAudit["facts"]["learningCoverage"]["weakOnlyLessonCount"] == 353
+
+
+def testCleanFactAuditRejectsIncompleteMachineEvidence() -> None:
+    verifier = loadVerifier()
+    _, manifest, _ = context(verifier)
+    factAudit = completeFactAudit()
+    factAudit["facts"]["machineEvidence"].update({
+        "allCurrent": False,
+        "includedReportCount": 8,
+        "blockingReasons": ["current machine evidence report is stale"],
+    })
+
+    failures = verifier.validateFactAudit(factAudit, manifest)
+
+    assert "round fact audit machine evidence check failed" in failures
+
+
+def testDirtyDraftPreservesMachineEvidenceBlockerWithoutInternalFailure() -> None:
+    verifier = loadVerifier()
+    _, manifest, _ = context(verifier)
+    factAudit = completeFactAudit()
+    factAudit["state"] = "draft"
+    factAudit["roundSealEligible"] = False
+    factAudit["facts"]["machineEvidence"].update({
+        "scopeClean": False,
+        "allCurrent": False,
+        "includedReportCount": 8,
+        "blockingReasons": ["current evaluation scope has uncommitted changes"],
+    })
+
+    failures = verifier.validateFactAudit(factAudit, manifest)
+
+    assert "round fact audit is not bound to a seal-eligible scope" in failures
+    assert "round fact audit machine evidence check failed" not in failures
 
 
 def testPlanQualityAcceptsOnlyIndependentReadinessBlockers() -> None:

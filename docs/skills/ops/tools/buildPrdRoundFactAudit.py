@@ -34,6 +34,7 @@ RETIRED_COMPLETION_PATHS = (
 REQUIRED_BUNDLE_PATHS = (
     "README.md",
     "contracts/prdEvaluationFindingLedger.schema.yml",
+    "evaluation-evidence/manifest.yml",
     "mainPlan/astryx-product-experience/README.md",
     "mainPlan/astryx-product-experience/02-learning-method/README.md",
     "mainPlan/astryx-product-experience/04-web-learning/README.md",
@@ -218,6 +219,46 @@ def symbolFacts(files: dict[str, bytes]) -> dict[str, Any]:
     }
 
 
+def machineEvidenceFacts(files: dict[str, bytes], manifest: dict[str, Any]) -> dict[str, Any]:
+    try:
+        index = yaml.safe_load(files["evaluation-evidence/manifest.yml"].decode("utf-8"))
+    except (KeyError, UnicodeDecodeError, yaml.YAMLError) as exc:
+        raise FactAuditError("machine evidence index is absent or invalid") from exc
+    if not isinstance(index, dict):
+        raise FactAuditError("machine evidence index root must be a mapping")
+    summary = manifest.get("machineEvidence")
+    expected = {
+        "indexPath": "evaluation-evidence/manifest.yml",
+        "scopeGitCommit": index.get("scopeGitCommit"),
+        "scopeClean": index.get("scopeClean"),
+        "requiredReportCount": index.get("requiredReportCount"),
+        "includedReportCount": index.get("includedReportCount"),
+        "artifactCount": index.get("artifactCount"),
+        "allCurrent": index.get("allCurrent"),
+        "blockingReasons": index.get("blockingReasons"),
+    }
+    if summary != expected:
+        raise FactAuditError("machine evidence summary does not match its bundled index")
+    reports = index.get("reports")
+    if not isinstance(reports, list) or len(reports) != index.get("requiredReportCount"):
+        raise FactAuditError("machine evidence report rows are malformed")
+    currentReportIds = sorted(
+        str(row.get("reportId"))
+        for row in reports
+        if isinstance(row, dict) and row.get("status") == "current"
+    )
+    return {
+        "scopeGitCommit": index.get("scopeGitCommit"),
+        "scopeClean": index.get("scopeClean"),
+        "requiredReportCount": index.get("requiredReportCount"),
+        "includedReportCount": index.get("includedReportCount"),
+        "artifactCount": index.get("artifactCount"),
+        "allCurrent": index.get("allCurrent"),
+        "blockingReasons": index.get("blockingReasons"),
+        "currentReportIds": currentReportIds,
+    }
+
+
 def buildPrdRoundFactAudit() -> dict[str, Any]:
     builder = loadModule(BUNDLE_BUILDER_PATH, "prdEvaluationBundleBuilder")
     expectedManifest, expectedArchiveBytes = builder.buildPrdEvaluationBundle()
@@ -240,15 +281,19 @@ def buildPrdRoundFactAudit() -> dict[str, Any]:
     if symbols["requiredMissing"]:
         raise FactAuditError("required current symbols are absent: " + ", ".join(symbols["requiredMissing"]))
     learning = learningCoverageFacts()
+    machineEvidence = machineEvidenceFacts(files, actualManifest)
     todoPolicy = mainPlanTodoPolicyFacts()
     if not todoPolicy["todoOnly"] or not todoPolicy["policyTestPresent"]:
         raise FactAuditError("mainPlan TODO-only policy is not satisfied")
     scope = actualManifest["scope"]
     archive = actualManifest["archive"]
-    productGaps = [
-        f"{learning['weakOnlyLessonCount']} of {learning['lessonCount']} lessons remain weak-only",
-        "independent learning, UX, and architecture reports are not assigned or sealed",
-    ]
+    productGaps = ["independent learning, UX, and architecture reports are not assigned or sealed"]
+    if learning["weakOnlyLessonCount"]:
+        productGaps.append(
+            f"{learning['weakOnlyLessonCount']} of {learning['lessonCount']} lessons remain weak-only"
+        )
+    if not machineEvidence["allCurrent"]:
+        productGaps.append("current raw machine evidence set is incomplete, stale, or bound to a dirty scope")
     if not symbols["rollbackCutoverImplemented"]:
         productGaps.append("minimumReaderVersion and cutoverMarker rollback contract is not implemented")
     return {
@@ -285,6 +330,7 @@ def buildPrdRoundFactAudit() -> dict[str, Any]:
                 "planQualityRegistered": planQualityRegistered,
             },
             "learningCoverage": learning,
+            "machineEvidence": machineEvidence,
             "mainPlanTodoPolicy": todoPolicy,
         },
         "productGaps": productGaps,

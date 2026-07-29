@@ -205,6 +205,119 @@ def testDirtyAndUntrackedSourcesPreserveExactWorktreeBytes(
     }
 
 
+def testMachineEvidenceSealsCurrentReportAndReferencedArtifact(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    builder = loadBuilder()
+    currentHead = "4" * 40
+    reportPath = "output/test-runner/current/current-report.json"
+    screenshotPath = "output/test-runner/current/screenshots/current.png"
+    report = {
+        "gate": "current-gate",
+        "passed": True,
+        "gitHead": currentHead,
+        "reportPath": reportPath.replace("/", "\\"),
+        "screenshot": screenshotPath,
+    }
+    reportFile = tmp_path / reportPath
+    screenshotFile = tmp_path / screenshotPath
+    reportFile.parent.mkdir(parents=True)
+    screenshotFile.parent.mkdir(parents=True)
+    reportFile.write_text(json.dumps(report), encoding="utf-8")
+    screenshotFile.write_bytes(b"png")
+    monkeypatch.setattr(builder, "ROOT", tmp_path)
+    monkeypatch.setattr(
+        builder,
+        "MACHINE_EVIDENCE_REPORTS",
+        (("current-gate", reportPath, "gate", "current-gate"),),
+    )
+    monkeypatch.setattr(
+        builder,
+        "EVIDENCE_ALLOWED_SOURCE_PREFIXES",
+        ("output/test-runner/current/",),
+    )
+    monkeypatch.setattr(
+        builder,
+        "runGit",
+        lambda *args: f"{currentHead}\n".encode("ascii"),
+    )
+    monkeypatch.setattr(
+        builder,
+        "latestIncludedScopeCommit",
+        lambda reportHead: currentHead,
+    )
+
+    entries, index = builder.collectMachineEvidence(
+        currentHead=currentHead,
+        scopeCommit=currentHead,
+        scopeDirty=False,
+    )
+
+    paths = [entry.path for entry in entries]
+    assert paths == [
+        "evaluation-evidence/current/current-report.json",
+        "evaluation-evidence/current/screenshots/current.png",
+        "evaluation-evidence/manifest.yml",
+    ]
+    assert index["allCurrent"] is True
+    assert index["includedReportCount"] == 1
+    assert index["artifactCount"] == 2
+    assert index["blockingReasons"] == []
+
+
+def testMachineEvidenceRejectsStaleReportAndDirtyScope(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    builder = loadBuilder()
+    currentHead = "5" * 40
+    staleHead = "6" * 40
+    reportPath = "output/test-runner/stale/stale-report.json"
+    reportFile = tmp_path / reportPath
+    reportFile.parent.mkdir(parents=True)
+    reportFile.write_text(
+        json.dumps({
+            "audit": "stale-audit",
+            "passed": True,
+            "gitHead": staleHead,
+            "reportPath": reportPath,
+        }),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(builder, "ROOT", tmp_path)
+    monkeypatch.setattr(
+        builder,
+        "MACHINE_EVIDENCE_REPORTS",
+        (("stale-audit", reportPath, "audit", "stale-audit"),),
+    )
+    monkeypatch.setattr(
+        builder,
+        "EVIDENCE_ALLOWED_SOURCE_PREFIXES",
+        ("output/test-runner/stale/",),
+    )
+    monkeypatch.setattr(
+        builder,
+        "runGit",
+        lambda *args: f"{currentHead}\n".encode("ascii"),
+    )
+
+    entries, index = builder.collectMachineEvidence(
+        currentHead=currentHead,
+        scopeCommit=currentHead,
+        scopeDirty=True,
+    )
+
+    assert [entry.path for entry in entries] == ["evaluation-evidence/manifest.yml"]
+    assert index["allCurrent"] is False
+    assert index["includedReportCount"] == 0
+    assert index["reports"][0]["status"] == "stale"
+    assert index["blockingReasons"] == [
+        "current evaluation scope has uncommitted changes not covered by machine reports",
+        "current machine evidence report is stale: stale-audit",
+    ]
+
+
 def testCurrentBundleIsCompleteAndStillBlockedFromSealing() -> None:
     builder = loadBuilder()
 
@@ -231,6 +344,8 @@ def testCurrentBundleIsCompleteAndStillBlockedFromSealing() -> None:
     assert "evaluation-contract/evaluation-report.schema.yml" in paths
     assert "evaluation-contract/finding-ledger.schema.yml" in paths
     assert "evaluation-contract/evaluator-briefing.yml" in paths
+    assert "evaluation-evidence/manifest.yml" in paths
+    assert manifest["machineEvidence"]["requiredReportCount"] == len(builder.MACHINE_EVIDENCE_REPORTS)
     with zipfile.ZipFile(io.BytesIO(archiveBytes)) as archive:
         assert archive.namelist() == paths
         assert all(info.compress_type == zipfile.ZIP_STORED for info in archive.infolist())

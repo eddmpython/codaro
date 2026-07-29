@@ -44,6 +44,23 @@ PRODUCT_BROWSER_REPORT_PATH = (
 )
 
 
+def currentGitHead() -> str:
+    result = subprocess.run(
+        ("git", "rev-parse", "HEAD"),
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=30,
+    )
+    gitHead = result.stdout.strip()
+    if len(gitHead) not in {40, 64}:
+        raise ValueError("current Git head is invalid")
+    return gitHead
+
+
 def loadFixture() -> dict[str, Any]:
     payload = yaml.safe_load(FIXTURE_PATH.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
@@ -423,6 +440,7 @@ def utcTimestamp() -> str:
 def main() -> int:
     startedAt = utcTimestamp()
     started = time.monotonic()
+    gitHead = currentGitHead()
     failures: list[str] = []
     facts: dict[str, Any] = {}
     try:
@@ -452,6 +470,8 @@ def main() -> int:
         facts["webCutover"] = verifyWebCutover()
         facts["launcherRejection"] = verifyLauncherRejection()
         facts["evidenceTimePolicy"] = verifyEvidenceTimePolicy()
+        if currentGitHead() != gitHead:
+            raise ValueError("Git head changed while the evidence migration audit was running")
     except (OSError, ValueError, subprocess.SubprocessError, yaml.YAMLError) as error:
         failures.append(str(error))
     payload = {
@@ -459,6 +479,7 @@ def main() -> int:
         "audit": "evidence-migration",
         "status": "passed" if not failures else "failed",
         "passed": not failures,
+        "gitHead": gitHead,
         "startedAt": startedAt,
         "completedAt": utcTimestamp(),
         "durationMs": round((time.monotonic() - started) * 1000),

@@ -116,7 +116,7 @@ uv run python -X utf8 tests/run.py gate attempts
 | --- | --- | --- |
 | `docs` | fast | 운영 문서 포인터, gate 정의, CI 연결 상태를 확인한다. |
 | `root-clean` | fast | 저장소 루트가 canonical tree와 맞고 로컬 실습 파일, 로그, 임시 산출물이 남지 않았는지 확인한다. |
-| `evaluation-contract` | fast | clean implementation commit에서 목표 점수 없는 frozen rubric, closed raw report·canonical finding ledger schema, bundle exclusion과 raw report·scope·maturity·score/severity 보존 negative fixture를 검증한다. 독립 evaluator 배정과 R10 report 생성은 실행하지 않는다. |
+| `evaluation-contract` | fast | clean implementation commit에서 목표 점수 없는 frozen rubric, closed raw report·canonical finding ledger schema, bundle exclusion과 raw report·scope·maturity·score/severity 보존 negative fixture를 검증한다. R10 bundle의 허용 목록 machine report와 직접 참조 JSON·이미지는 current source commit, 원본 hash, read-only entry로 묶고 stale·dirty scope는 seal을 차단한다. 독립 evaluator 배정과 R10 report 생성은 실행하지 않는다. |
 | `plan-quality` | fast | mainPlan이 미완료 TODO만 보존하는지, 현재 사실과 R10 draft가 일관적인지 검사한다. evaluator 배정·sealed scope·raw report 같은 외부 readiness blocker만 남은 draft는 통과하지만 blocker를 report에서 제거하지 않는다. |
 | `r10-independent-review` | release | 서명 hash와 가용 기간이 있는 독립 evaluator roster, sealed scope, 세 raw report byte seal·결정적 Markdown view와 손실 없는 canonical finding ledger를 목표 점수 없이 엄격하게 검사한다. open P0·P1은 점수와 무관하게 `product-release`를 차단한다. |
 | `backend` | fast | Python backend 전체 테스트를 최대 1800초 안에서 실행한다. `tests/_attempts`는 `--ignore`로 수집하지 않고, 0.25초 이상 걸린 항목 중 가장 느린 25개를 출력해 preflight 병목을 관찰한다. |

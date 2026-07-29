@@ -42,7 +42,8 @@ FORBIDDEN_BUNDLE_SEGMENTS = {
     "build", "coverage", "dist", "node_modules", "output",
 }
 REQUIRED_FACT_DOMAINS = {
-    "bundleIntegrity", "requiredPaths", "symbols", "qualityGates", "learningCoverage", "mainPlanTodoPolicy",
+    "bundleIntegrity", "requiredPaths", "symbols", "qualityGates", "learningCoverage", "machineEvidence",
+    "mainPlanTodoPolicy",
 }
 DIMENSION_IDS = (
     "learnerValue",
@@ -671,6 +672,18 @@ def validateFactAudit(factAudit: dict[str, Any], inputManifest: dict[str, Any]) 
         or qualityGates.get("planQualityRegistered") is not True
     ):
         failures.append("round fact audit gate registry check failed")
+    machineEvidence = facts.get("machineEvidence")
+    if not isinstance(machineEvidence, dict):
+        failures.append("round fact audit machine evidence check failed")
+    elif (
+        machineEvidence.get("scopeClean") is True
+        and (
+            machineEvidence.get("allCurrent") is not True
+            or machineEvidence.get("includedReportCount") != machineEvidence.get("requiredReportCount")
+            or machineEvidence.get("blockingReasons") != []
+        )
+    ):
+        failures.append("round fact audit machine evidence check failed")
     todoPolicy = facts.get("mainPlanTodoPolicy")
     if (
         not isinstance(todoPolicy, dict)
