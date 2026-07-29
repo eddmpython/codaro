@@ -8,23 +8,23 @@
   "productCompletionEligible": false,
   "roundSealEligible": false,
   "scope": {
-    "gitCommit": "d755b3ebea15d7d87a44ce90b983f6b3bd3c5c0b",
+    "gitCommit": "19ba17f667dd7a600e049a10c295f485e7e27497",
     "dirtyDiffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "manifestHash": "d8691a52a6f2a677f896c1dcef4847f5b935adf52912d0747a10621526a01bd5",
-    "evaluationBundleHash": "bfc38fb09a371f3d5bb2d85eefb4ee658aaad4acfc40ca1fefe9ec30d2a0567f"
+    "manifestHash": "abd20467745a26346a9e1decd8c1193c822181bd48ab29d9a5afe4af89325545",
+    "evaluationBundleHash": "933380b61e9ecd3bf99455b459187d55b232a9dac43faa795d6de06f12563c80"
   },
   "facts": {
     "bundleIntegrity": {
-      "fileCount": 3170,
-      "totalSourceBytes": 97534756,
-      "archiveBytes": 98176914,
+      "fileCount": 3358,
+      "totalSourceBytes": 114848698,
+      "archiveBytes": 115542378,
       "archiveEntriesReadOnly": true,
       "excludedHistoryPathCount": 0,
       "priorScoresIncluded": false,
       "priorConclusionsIncluded": false
     },
     "requiredPaths": {
-      "checked": 11,
+      "checked": 12,
       "missing": []
     },
     "symbols": {
@@ -105,6 +105,26 @@
       "topTierEligible": false,
       "completionEligible": false
     },
+    "machineEvidence": {
+      "scopeGitCommit": "19ba17f667dd7a600e049a10c295f485e7e27497",
+      "scopeClean": true,
+      "requiredReportCount": 9,
+      "includedReportCount": 9,
+      "artifactCount": 187,
+      "allCurrent": true,
+      "blockingReasons": [],
+      "currentReportIds": [
+        "astryx-journey",
+        "curriculum-top-tier-audit",
+        "evidence-migration",
+        "learning-vertical-slice",
+        "local-studio-browser",
+        "manual-at-matrix",
+        "product-browser-webview2-evergreen",
+        "product-experience-browser",
+        "release-research-operations"
+      ]
+    },
     "mainPlanTodoPolicy": {
       "todoOnly": true,
       "doneDirectoryCount": 0,
@@ -115,7 +135,6 @@
     }
   },
   "productGaps": [
-    "0 of 472 lessons remain weak-only",
     "independent learning, UX, and architecture reports are not assigned or sealed"
   ]
 }
