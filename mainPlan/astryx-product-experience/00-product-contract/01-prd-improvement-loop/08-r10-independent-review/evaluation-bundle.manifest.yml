@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: a30139324c15e70575dabcc75aebc486ee31e2bf
+  gitCommit: 7afe397f545dffa37c4d1378cd485a131402c267
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: 540091fbac37470f5cba607d75417417100d7f67f25850a253a25c3e700ab522
+  manifestHash: b92df9d14c328a98a0f01ac462ee30a6859a920454fdbf3664c569d57997601a
   fileCount: 3170
-  totalBytes: 97518377
+  totalBytes: 97518449
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: 42f4a299342505f3e280d009f7118983e532125c6b7e34e10cb43e7b81c67be7
-  bytes: 98160535
+  sha256: 8d4fae01098813ac2a4a52b22dc727aa987d381510a390f674b8352a26367216
+  bytes: 98160607
   format: zip
   compression: stored
   compressionMethod: 0
@@ -4521,7 +4521,7 @@ files:
   kind: repository
   sourcePath: docs/skills/ops/foundation/environment.md
 - path: docs/skills/ops/foundation/testing-and-gates.md
-  sha256: f474a63e0e310344aca6d09830e7faf7d8ec3ba4b703875f3dc11310f3aa7731
+  sha256: 2a06a56cd3a5225b4c6884825aa53d387dbc87c6e632db520ee4032de3a60755
   bytes: 61834
   kind: repository
   sourcePath: docs/skills/ops/foundation/testing-and-gates.md
@@ -12505,7 +12505,7 @@ files:
   kind: repository
   sourcePath: launcher/codaro-launcher/src/webview.rs
 - path: mainPlan/astryx-product-experience/02-learning-method/README.md
-  sha256: d3d404739c3c0de8f3b5164437a6c73f7ebb6824d1abced0bf54ab87072db760
+  sha256: c042690b011d89fe6530612c736322a801f13674e70995cbb06ecf8ad2613bf5
   bytes: 35157
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/02-learning-method/README.md
@@ -13280,7 +13280,7 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/07-remaining-domains/README.md
 - path: mainPlan/astryx-product-experience/08-learning-content/README.md
-  sha256: 3bd28ea3456abcc763f8c144bb721ece0aa46abe5f0c2e9e66c7fb9df67ec252
+  sha256: 14d83c5c77a22762b7ed704f7c13f8a26bd7441b5c37595e02c0a2de04f10d98
   bytes: 24633
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/README.md
@@ -15305,8 +15305,8 @@ files:
   kind: repository
   sourcePath: tests/learning/verifyLearningFlowFriction.py
 - path: tests/learning/verifyLearningSectionCardContract.py
-  sha256: 5e91df313b678ee035a1dd9250ab3777cb424f5e9aa201ee2e598326b61f75d8
-  bytes: 51064
+  sha256: 1954fd81e749d20341391f95d0687e82850e52c3e1648d63c5d70e192c8459ad
+  bytes: 51136
   kind: repository
   sourcePath: tests/learning/verifyLearningSectionCardContract.py
 - path: tests/learning/verifyLearningSystemReadiness.py
