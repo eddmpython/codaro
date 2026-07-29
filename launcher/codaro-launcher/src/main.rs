@@ -2,6 +2,8 @@
 
 mod autostart;
 mod backend;
+mod check_broker;
+mod check_sandbox;
 mod download;
 mod failure;
 mod generated_contracts;
@@ -57,6 +59,8 @@ struct Cli {
 #[derive(Subcommand, Debug)]
 enum Command {
     Doctor,
+    #[command(hide = true)]
+    CheckBroker(CheckBrokerArgs),
     Launch(LaunchArgs),
     Manifest(ManifestCommand),
     State(StateCommand),
@@ -64,6 +68,16 @@ enum Command {
     Update(UpdateCommand),
     SelfUpdate(SelfUpdateCommand),
     Backend(BackendCommand),
+}
+
+#[derive(Args, Debug)]
+struct CheckBrokerArgs {
+    #[arg(long)]
+    pipe_name: String,
+    #[arg(long)]
+    python_executable: PathBuf,
+    #[arg(long)]
+    worker_path: PathBuf,
 }
 
 #[derive(Args, Debug)]
@@ -352,11 +366,13 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
     let paths = LauncherPaths::discover(cli.root)?;
     paths.ensure_layout()?;
+    check_sandbox::reconcile(&paths)?;
 
     match cli.command {
         // 인자 없이 실행 = 탐색기 더블클릭. dartlab처럼 바로 네이티브 창을 띄운다.
         None => run_launch(&paths, LaunchArgs::default())?,
         Some(Command::Doctor) => run_doctor(&paths)?,
+        Some(Command::CheckBroker(args)) => check_broker::run(&paths, args)?,
         Some(Command::Launch(args)) => run_launch(&paths, args)?,
         Some(Command::Manifest(command)) => run_manifest(command)?,
         Some(Command::State(command)) => run_state(&paths, command)?,

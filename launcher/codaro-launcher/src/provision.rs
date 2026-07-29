@@ -9,7 +9,7 @@ use sha2::{Digest, Sha256};
 use std::fs;
 use std::fs::File;
 use std::fs::OpenOptions;
-use std::io;
+use std::io::{self, Read};
 #[cfg(unix)]
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Component, Path, PathBuf};
@@ -48,6 +48,8 @@ pub struct InstalledArtifact {
     pub name: String,
     pub version: String,
     pub sha256: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tree_sha256: Option<String>,
     pub source: String,
     pub staged_path: PathBuf,
 }
@@ -128,11 +130,49 @@ pub fn stage_release_with_progress(
     )?;
     // 런타임 재사용: 같은 python version이 이미 추출돼 있고 sha256 마커가 일치하면 재다운로드/추출을 건너뛴다.
     let runtime_marker = python_runtime_dir.join(".runtime-sha256");
+    let runtime_tree_marker = python_runtime_dir.join(".runtime-tree-sha256");
     let runtime_sha = manifest.python_runtime.sha256.to_ascii_lowercase();
-    let runtime_reused = fs::read_to_string(&runtime_marker)
+    let archive_marker_matches = fs::read_to_string(&runtime_marker)
         .map(|recorded| recorded.trim() == runtime_sha)
         .unwrap_or(false)
         && LauncherPaths::resolve_python_executable(&python_runtime_dir).is_ok();
+    let runtime_reused = if archive_marker_matches {
+        let actual_tree_sha = runtime_tree_sha256(&python_runtime_dir)?;
+        match fs::read_to_string(&runtime_tree_marker) {
+            Ok(recorded) if recorded.trim() != actual_tree_sha => {
+                bail!(
+                    "Managed Python runtime tree hash mismatch at `{}`.",
+                    python_runtime_dir.display()
+                );
+            }
+            Ok(_) => {}
+            Err(error) if error.kind() == io::ErrorKind::NotFound => {
+                fs::write(&runtime_tree_marker, &actual_tree_sha).with_context(|| {
+                    format!(
+                        "Failed to write runtime tree marker `{}`.",
+                        runtime_tree_marker.display()
+                    )
+                })?;
+            }
+            Err(error) => {
+                return Err(error).with_context(|| {
+                    format!(
+                        "Failed to read runtime tree marker `{}`.",
+                        runtime_tree_marker.display()
+                    )
+                });
+            }
+        }
+        true
+    } else {
+        if python_runtime_dir.exists() {
+            bail!(
+                "Managed Python runtime at `{}` is incomplete or belongs to another artifact.",
+                python_runtime_dir.display()
+            );
+        }
+        false
+    };
     let python_runtime_archive_path = if runtime_reused {
         python_runtime_dir.clone()
     } else {
@@ -146,6 +186,13 @@ pub fn stage_release_with_progress(
         extract_zip_archive(&archive, &python_runtime_dir)?;
         fs::write(&runtime_marker, &runtime_sha).with_context(|| {
             format!("Failed to write runtime marker `{}`.", runtime_marker.display())
+        })?;
+        let runtime_tree_sha = runtime_tree_sha256(&python_runtime_dir)?;
+        fs::write(&runtime_tree_marker, runtime_tree_sha).with_context(|| {
+            format!(
+                "Failed to write runtime tree marker `{}`.",
+                runtime_tree_marker.display()
+            )
         })?;
         archive
     };
@@ -236,6 +283,7 @@ pub fn stage_release_with_progress(
             name: manifest.backend.name.clone(),
             version: manifest.backend.version.clone(),
             sha256: manifest.backend.sha256.clone(),
+            tree_sha256: None,
             source: manifest.backend.wheel_url.clone(),
             staged_path: backend_wheel_path.clone(),
         },
@@ -243,6 +291,7 @@ pub fn stage_release_with_progress(
             name: "editor".into(),
             version: manifest.editor.version.clone(),
             sha256: editor_sha256,
+            tree_sha256: None,
             source: editor_source,
             staged_path: editor_staged_path,
         },
@@ -250,6 +299,17 @@ pub fn stage_release_with_progress(
             name: "python-runtime".into(),
             version: manifest.python_runtime.version.clone(),
             sha256: manifest.python_runtime.sha256.clone(),
+            tree_sha256: Some(
+                fs::read_to_string(&runtime_tree_marker)
+                    .with_context(|| {
+                        format!(
+                            "Failed to read runtime tree marker `{}`.",
+                            runtime_tree_marker.display()
+                        )
+                    })?
+                    .trim()
+                    .to_string(),
+            ),
             source: manifest.python_runtime.url.clone(),
             staged_path: python_runtime_archive_path.clone(),
         },
@@ -385,6 +445,7 @@ fn installed_bundle(bundle: &BundleArtifact, staged_path: PathBuf) -> InstalledA
         name: bundle.package_name.clone(),
         version: bundle.version.clone(),
         sha256: bundle.sha256.clone(),
+        tree_sha256: None,
         source: bundle.wheel_url.clone(),
         staged_path,
     }
@@ -568,11 +629,104 @@ fn source_file_name(source: &str) -> Result<String> {
 
 fn sha256_hex(bytes: &[u8]) -> String {
     let digest = Sha256::digest(bytes);
-    let mut output = String::with_capacity(digest.len() * 2);
-    for byte in digest {
+    hex_bytes(&digest)
+}
+
+fn hex_bytes(bytes: &[u8]) -> String {
+    let mut output = String::with_capacity(bytes.len() * 2);
+    for byte in bytes {
         output.push_str(&format!("{byte:02x}"));
     }
     output
+}
+
+pub fn runtime_tree_sha256(root: &Path) -> Result<String> {
+    fn collect(
+        root: &Path,
+        directory: &Path,
+        entries: &mut Vec<(String, PathBuf, bool)>,
+    ) -> Result<()> {
+        let mut children = fs::read_dir(directory)
+            .with_context(|| {
+                format!(
+                    "Failed to inspect runtime directory `{}`.",
+                    directory.display()
+                )
+            })?
+            .collect::<std::result::Result<Vec<_>, _>>()?;
+        children.sort_by_key(|entry| entry.file_name());
+        for child in children {
+            let path = child.path();
+            let relative = path
+                .strip_prefix(root)
+                .context("Runtime tree entry escaped its root.")?;
+            if relative == Path::new(".runtime-tree-sha256") {
+                continue;
+            }
+            let metadata = fs::symlink_metadata(&path).with_context(|| {
+                format!("Failed to inspect runtime entry `{}`.", path.display())
+            })?;
+            if metadata.file_type().is_symlink() || metadata_is_reparse_point(&metadata) {
+                bail!(
+                    "Managed runtime may not contain a link or reparse point: `{}`.",
+                    path.display()
+                );
+            }
+            let relative = relative
+                .to_str()
+                .context("Managed runtime path is not valid Unicode.")?
+                .replace('\\', "/");
+            if metadata.is_dir() {
+                entries.push((relative, path.clone(), true));
+                collect(root, &path, entries)?;
+            } else if metadata.is_file() {
+                entries.push((relative, path, false));
+            } else {
+                bail!("Managed runtime contains an unsupported entry.");
+            }
+        }
+        Ok(())
+    }
+
+    let root = root
+        .canonicalize()
+        .with_context(|| format!("Failed to resolve managed runtime `{}`.", root.display()))?;
+    let mut entries = Vec::new();
+    collect(&root, &root, &mut entries)?;
+    let mut digest = Sha256::new();
+    for (relative, path, directory) in entries {
+        let relative = relative.as_bytes();
+        digest.update(if directory { b"d" } else { b"f" });
+        digest.update((relative.len() as u64).to_le_bytes());
+        digest.update(relative);
+        if directory {
+            continue;
+        }
+        let metadata = fs::metadata(&path)?;
+        digest.update(metadata.len().to_le_bytes());
+        let mut file = File::open(&path)?;
+        let mut buffer = [0_u8; 64 * 1024];
+        loop {
+            let length = file.read(&mut buffer)?;
+            if length == 0 {
+                break;
+            }
+            digest.update(&buffer[..length]);
+        }
+    }
+    Ok(hex_bytes(&digest.finalize()))
+}
+
+#[cfg(windows)]
+fn metadata_is_reparse_point(metadata: &fs::Metadata) -> bool {
+    use std::os::windows::fs::MetadataExt;
+
+    metadata.file_attributes() & 0x400 != 0
+}
+
+#[cfg(not(windows))]
+fn metadata_is_reparse_point(_metadata: &fs::Metadata) -> bool {
+    false
 }
 
 fn extract_zip_archive(archive_path: &Path, destination_dir: &Path) -> Result<()> {
@@ -845,8 +999,8 @@ fn archive_output_path(
 #[cfg(test)]
 mod tests {
     use super::{
-        InstallRecord, activate_release, extract_zip_into, load_manifest_from_source, sha256_hex,
-        stage_release,
+        InstallRecord, activate_release, extract_zip_into, load_manifest_from_source,
+        runtime_tree_sha256, sha256_hex, stage_release,
     };
     use crate::paths::LauncherPaths;
     use crate::state::ActiveReleaseStore;
@@ -881,6 +1035,29 @@ mod tests {
         let manifest = load_manifest_from_source(manifest_path.to_str().unwrap()).unwrap();
 
         assert_eq!(manifest.release_id, "2026.03.18-1");
+    }
+
+    #[test]
+    fn runtime_tree_hash_tracks_paths_and_bytes_but_ignores_its_marker() {
+        let temp_dir = tempdir().unwrap();
+        fs::create_dir_all(temp_dir.path().join("Lib")).unwrap();
+        fs::write(temp_dir.path().join("python.exe"), b"runtime").unwrap();
+        fs::write(
+            temp_dir.path().join("Lib").join("module.py"),
+            b"value = 1\n",
+        )
+        .unwrap();
+
+        let original = runtime_tree_sha256(temp_dir.path()).unwrap();
+        fs::write(temp_dir.path().join(".runtime-tree-sha256"), "stale").unwrap();
+        assert_eq!(runtime_tree_sha256(temp_dir.path()).unwrap(), original);
+
+        fs::write(
+            temp_dir.path().join("Lib").join("module.py"),
+            b"value = 2\n",
+        )
+        .unwrap();
+        assert_ne!(runtime_tree_sha256(temp_dir.path()).unwrap(), original);
     }
 
     #[test]
@@ -983,6 +1160,20 @@ mod tests {
         assert_eq!(install_record.release_id, "2026.03.18-1");
         assert_eq!(install_record.backend.name, "codaro");
         assert_eq!(install_record.bundles[0].name, "codaro-excel");
+        assert_eq!(
+            install_record.python_runtime.tree_sha256.as_deref(),
+            Some(
+                fs::read_to_string(
+                    summary
+                        .python_executable_path
+                        .parent()
+                        .unwrap()
+                        .join(".runtime-tree-sha256")
+                )
+                .unwrap()
+                .trim()
+            )
+        );
     }
 
     #[test]

@@ -220,58 +220,59 @@ def verifyBrowserProgression() -> dict[str, Any]:
     expectedNames = expectedWebNames | expectedLocalNames
     if not isinstance(cases, list) or {case.get("name") for case in cases if isinstance(case, dict)} != expectedNames:
         raise ValueError("W0 assessment browser report does not contain the six required Web/Local cases")
-    localEvidenceByName = {
-        "local-native-pathlib-assessment-progression-desktop": 1,
-        "local-native-zip-assessment-progression-desktop": 2,
-        "local-native-schedule-assessment-progression-desktop": 3,
-    }
     facts: list[dict[str, Any]] = []
     for case in cases:
         if not isinstance(case, dict):
             raise ValueError("W0 assessment browser case is not an object")
         audit = case.get("audit")
         name = str(case.get("name"))
+        capabilityEvidence = case.get("checkCapabilityEvidence")
         if name in expectedWebNames:
-            expectedEvidence = 3 if name == "web-pathlib-assessment-progression-desktop" else 1
-            expectedCompleted = 1
-            expectedTransfer = (
-                0 if name == "web-pathlib-assessment-progression-desktop" else 1
-            )
             complete = (
                 isinstance(audit, dict)
                 and not case.get("failures")
-                and audit.get("transferSectionCount") == expectedTransfer
-                and audit.get("webStrongEvidenceEventCount") == expectedEvidence
-                and audit.get("webEvidenceSummaryCount") == expectedEvidence
-                and audit.get("webCompletedLessonCount") == expectedCompleted
+                and audit.get("runtimeTier") == "web"
+                and audit.get("transferSectionCount") == 0
+                and audit.get("webStrongEvidenceEventCount") == 0
+                and audit.get("webEvidenceSummaryCount") == 0
+                and audit.get("webCompletedLessonCount") == 0
                 and audit.get("forbiddenLearningControls") == []
+                and isinstance(capabilityEvidence, dict)
+                and capabilityEvidence.get("checkKind") == "behavior"
+                and capabilityEvidence.get("evidence") == "none"
+                and capabilityEvidence.get("state") == "unsupported"
+                and capabilityEvidence.get("strongEventCount") == 0
+                and "Local" in str(capabilityEvidence.get("feedback"))
             )
             runtimeTier = "web"
+            evidenceState = "unsupported"
         else:
-            expectedEvidence = localEvidenceByName[name]
-            expectedCompleted = {
-                "local-native-pathlib-assessment-progression-desktop": 1,
-                "local-native-zip-assessment-progression-desktop": 2,
-                "local-native-schedule-assessment-progression-desktop": 1,
-            }[name]
             complete = (
                 isinstance(audit, dict)
                 and not case.get("failures")
-                and audit.get("transferSectionCount") == 1
+                and audit.get("runtimeTier") == "local"
+                and audit.get("transferSectionCount") == 0
                 and audit.get("retrievalSectionCount") == 0
-                and audit.get("webEvidenceSummaryCount") == expectedEvidence
-                and audit.get("learningEvidenceRuntime") == "local"
-                and audit.get("webCompletedLessonCount") == expectedCompleted
+                and audit.get("webStrongEvidenceEventCount") == 0
+                and audit.get("webEvidenceSummaryCount") == 0
+                and audit.get("webCompletedLessonCount") == 0
                 and audit.get("forbiddenLearningControls") == []
+                and isinstance(capabilityEvidence, dict)
+                and capabilityEvidence.get("checkKind") == "behavior"
+                and capabilityEvidence.get("evidence") == "practice"
+                and capabilityEvidence.get("state") == "verified"
+                and capabilityEvidence.get("strongEventCount") == 0
             )
             runtimeTier = "local"
+            evidenceState = "practice"
         if not complete:
             raise ValueError(f"W0 assessment browser evidence is incomplete: {name}")
         facts.append({
-            "evidenceEvents": expectedEvidence,
+            "evidenceEvents": 0,
+            "evidenceState": evidenceState,
             "name": name,
             "runtimeTier": runtimeTier,
-            "transferAutoProvided": True,
+            "transferAutoProvided": False,
         })
     return {
         "browser": report.get("browser"),

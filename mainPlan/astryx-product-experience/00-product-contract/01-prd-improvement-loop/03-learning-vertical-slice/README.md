@@ -2,7 +2,7 @@
 
 상태: 진행
 
-2026-07-22 `fileOps/01_pathlib경로감각`, `fileOps/06_zip압축`, `watchSched/05_schedule간단스케줄`은 각각 4개씩 12개 base `behavior` CheckSpec과 총 19개 base case를 가진다. 저자 solution 12개와 mastery·transfer·retrieval solution 9개는 native provisional sandbox의 fixture·hidden case를 통과하고 `weak no-error only` fixture는 거부된다. 후속 3-engine feasibility 판정 적용 뒤 Web behavior는 정확한 Local handoff를 표시하고 strong event 0, Local UI는 같은 solution을 `local-sandbox`에서 판정하되 practice로 표시하고 native evidence 0을 유지한다. Windows AppContainer broker와 독립적인 사람 학습성 검수가 없으므로 `completionEligible=false`이며 이 packet은 TODO가 남아 있다.
+2026-07-29 `fileOps/01_pathlib경로감각`, `fileOps/06_zip압축`, `watchSched/05_schedule간단스케줄`은 각각 4개씩 12개 base `behavior` CheckSpec과 총 19개 base case를 가진다. 저자 solution 12개와 mastery·transfer·retrieval solution 9개는 native provisional sandbox의 fixture·hidden case를 통과하고 `weak no-error only` fixture는 거부된다. 후속 3-engine feasibility 판정 적용 뒤 Web behavior는 정확한 Local handoff를 표시하고 strong event 0, Local UI는 같은 solution을 `local-sandbox`에서 판정하되 practice로 표시하고 native evidence 0을 유지한다. launcher AppContainer broker source와 HMAC pipe 계약, Job Object 제한, per-run ACL receipt·startup 회수, managed runtime tree hash 차단은 구현됐고 현재 Windows 11에서 fixture 쓰기 허용과 외부 파일·network·child process 차단을 실기동했다. 목표 Windows 10 22H2 설치본 conformance, shared runtime ACL receipt·GC, 경합 없는 cold package 준비와 독립적인 사람 학습성 검수가 없으므로 `completionEligible=false`이며 이 packet은 TODO가 남아 있다.
 
 ## 목표
 

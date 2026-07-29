@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: 5fee3fef4fe50bd9bcde1160ce31a30dcd428d24
-  dirtyDiffHash: a8dda3b6b4ede4475f96735287faebb107f675a00fb0f13c796037ff90f447a8
-  manifestHash: 180da88f337ca953812e0bb87fec6df4da03bf824fee680a010f544d3cf76f55
-  fileCount: 3155
-  totalBytes: 97277955
+  gitCommit: b87a37b74bf10f2d0fdaa8223e3d3f147c744fec
+  dirtyDiffHash: e52ac8dbf6e4342adf467eb32415863ca122a49a64045d99abbef3eeb3cb93e9
+  manifestHash: 20cff6086189310565a1819bb70f507a8ea897fb92aa459f06b1fd58a9e7acfe
+  fileCount: 3160
+  totalBytes: 97353247
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: b1663ab30b4efda4a9e74d58434d8fe02b102767799ca2f4fc2ecf81393c428f
-  bytes: 97917741
+  sha256: acb8e2f87969a8f09c05283cf40ef7b22910371e71f0c0252ec048c7ae2f4350
+  bytes: 97993867
   format: zip
   compression: stored
   compressionMethod: 0
@@ -1328,8 +1328,8 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: assets/brand/visuals/generated/manifest.json
-  sha256: 7bb71833a63bee8e799da94ffea863fc9a96e1039e4b6b80c560b3637e9f0b96
-  bytes: 173609
+  sha256: a3efc37d93cda0b2a66ed8d6a01f6797ebb1f90e7483410a4470e555cf4fb597
+  bytes: 169069
   kind: repository
   sourcePath: assets/brand/visuals/generated/manifest.json
 - path: assets/brand/visuals/learning/ai-integration-v1.png
@@ -1373,8 +1373,8 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/learning/statistics-ml-v1.png
 - path: assets/brand/visuals/manifest.json
-  sha256: 3181fca2a8c3b856daf9180490fb6afa54339b670fd3fb5a7b6aa23f87575f5a
-  bytes: 99458
+  sha256: 8b4a406bdb77cef1a3acf37df0eb10293235dbbbbdb6e919a080bdfac4560531
+  bytes: 96715
   kind: repository
   sourcePath: assets/brand/visuals/manifest.json
 - path: assets/brand/visuals/manifest.schema.json
@@ -1558,13 +1558,13 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/prompts/statistics-ml-v1.txt
 - path: contracts/README.md
-  sha256: 6c44f8efaeb9e29694e4e480833b75766034812d93c3ee86dd908623de603dbd
-  bytes: 3434
+  sha256: d89050ba3de193ea8684fb7c1c23588cbf8b90fac410eb331a4ed8056892b9e9
+  bytes: 3618
   kind: repository
   sourcePath: contracts/README.md
 - path: contracts/artifactOwners.yml
-  sha256: e8f528b70a269a926fa4e3737a7d2ff284a7a37cfb9697d5d02ef798dea4d4b1
-  bytes: 4271
+  sha256: ac8031dd9d74489afae8f755033c66df5820500e36b65271a302c8105a68eb54
+  bytes: 4651
   kind: repository
   sourcePath: contracts/artifactOwners.yml
 - path: contracts/artifactOwnership.schema.json
@@ -1572,6 +1572,11 @@ files:
   bytes: 1243
   kind: repository
   sourcePath: contracts/artifactOwnership.schema.json
+- path: contracts/checkSandboxBroker.schema.json
+  sha256: 7f21051e57203baa4dbf8b18eb419e404f1cf1248c0695047377ba9f0bdf0f55
+  bytes: 3273
+  kind: repository
+  sourcePath: contracts/checkSandboxBroker.schema.json
 - path: contracts/checkSandboxFeasibilityDecision.json
   sha256: e7818fb85f0cdfc9b010bd175ccd1e619bc9afab3adf312d1cbb96abedc05ec8
   bytes: 421
@@ -4363,8 +4368,8 @@ files:
   kind: repository
   sourcePath: docs/skills/architecture/frontend-product-surface.md
 - path: docs/skills/architecture/learning-yaml-contract.md
-  sha256: 5f6d5ec8ae7acee274e90b9d65a8c8f5585ab96e73fe7cc11ca6fde43c15adbe
-  bytes: 17747
+  sha256: 50016c3bacd49d559f29f81bd1500c6bd4deddb5d3bc9e401619849aabdf20d0
+  bytes: 18169
   kind: repository
   sourcePath: docs/skills/architecture/learning-yaml-contract.md
 - path: docs/skills/architecture/live-provider-ops.md
@@ -4508,8 +4513,8 @@ files:
   kind: repository
   sourcePath: docs/skills/ops/foundation/environment.md
 - path: docs/skills/ops/foundation/testing-and-gates.md
-  sha256: aabc1641ccdc37faaa870ae0719d95d1bdabf72d8fba5479b7fd120a8e6e70b5
-  bytes: 60116
+  sha256: 8d272fc74bdb45dff13159b804fcbdd78d746636d8f74450b49ff1e79cd80eb9
+  bytes: 60468
   kind: repository
   sourcePath: docs/skills/ops/foundation/testing-and-gates.md
 - path: docs/skills/ops/product/branding.md
@@ -6193,8 +6198,8 @@ files:
   kind: repository
   sourcePath: editor/public/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: editor/public/visuals/manifest.json
-  sha256: 7bb71833a63bee8e799da94ffea863fc9a96e1039e4b6b80c560b3637e9f0b96
-  bytes: 173609
+  sha256: a3efc37d93cda0b2a66ed8d6a01f6797ebb1f90e7483410a4470e555cf4fb597
+  bytes: 169069
   kind: repository
   sourcePath: editor/public/visuals/manifest.json
 - path: editor/scripts/generatePyprocAssets.mjs
@@ -6973,7 +6978,7 @@ files:
   kind: repository
   sourcePath: editor/src/lib/fallbackData.ts
 - path: editor/src/lib/generatedContracts/artifactOwnership.ts
-  sha256: 3352eecb9a06bc19518212196953270bef76fdb9347802f607d35754aa20499a
+  sha256: a187715a0ec0b02e6fd0ae2333d3354e7d2841ba26a9dfb6561983d964e809cd
   bytes: 703
   kind: repository
   sourcePath: editor/src/lib/generatedContracts/artifactOwnership.ts
@@ -12337,8 +12342,8 @@ files:
   kind: repository
   sourcePath: landing/static/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: landing/static/visuals/manifest.json
-  sha256: 7bb71833a63bee8e799da94ffea863fc9a96e1039e4b6b80c560b3637e9f0b96
-  bytes: 173609
+  sha256: a3efc37d93cda0b2a66ed8d6a01f6797ebb1f90e7483410a4470e555cf4fb597
+  bytes: 169069
   kind: repository
   sourcePath: landing/static/visuals/manifest.json
 - path: landing/vite.config.js
@@ -12347,8 +12352,8 @@ files:
   kind: repository
   sourcePath: landing/vite.config.js
 - path: launcher/Cargo.lock
-  sha256: 010f8f1ee149ca664917614a423a8d3f3f0e165fd4fdae41b416799418952b22
-  bytes: 116946
+  sha256: e8a7719759b2017c1d52e80d42eb1ee986244beb24a70895c005246c5d419499
+  bytes: 116955
   kind: repository
   sourcePath: launcher/Cargo.lock
 - path: launcher/Cargo.toml
@@ -12367,8 +12372,8 @@ files:
   kind: repository
   sourcePath: launcher/PRD.md
 - path: launcher/codaro-launcher/Cargo.toml
-  sha256: e9986e7028f8f681e528a361b3814bd3662003582068c38c63acbe5955fb7f8a
-  bytes: 1362
+  sha256: 0fac53a98c7972c6ef9af26ed0caa30bc292013855ec363df72ae9a272e439ff
+  bytes: 1534
   kind: repository
   sourcePath: launcher/codaro-launcher/Cargo.toml
 - path: launcher/codaro-launcher/assets/codaro-icon.png
@@ -12392,10 +12397,20 @@ files:
   kind: repository
   sourcePath: launcher/codaro-launcher/src/autostart.rs
 - path: launcher/codaro-launcher/src/backend.rs
-  sha256: b8efc18cdbe31a488e48f43259f669848a51ef217ed41dbe6029063d912da2b1
-  bytes: 14991
+  sha256: 828f9f6dd1bd23ac47964eef6b292f2d8a69894d6ab4a71093b73aa93c467711
+  bytes: 15314
   kind: repository
   sourcePath: launcher/codaro-launcher/src/backend.rs
+- path: launcher/codaro-launcher/src/check_broker.rs
+  sha256: bcdd3c74a23ae145e8e7374fd7b818360671f7c23293820bd67a1c0314e46938
+  bytes: 17132
+  kind: repository
+  sourcePath: launcher/codaro-launcher/src/check_broker.rs
+- path: launcher/codaro-launcher/src/check_sandbox.rs
+  sha256: f11f186d72b86b427c6b6ddab38aa4c195da602d98a0b8f635cf98ac1407b207
+  bytes: 49241
+  kind: repository
+  sourcePath: launcher/codaro-launcher/src/check_sandbox.rs
 - path: launcher/codaro-launcher/src/download.rs
   sha256: 7176c0db9edef748f4f58a486f2bc0964fa5eb98bf7689b427b88ed429416611
   bytes: 23959
@@ -12407,12 +12422,12 @@ files:
   kind: repository
   sourcePath: launcher/codaro-launcher/src/failure.rs
 - path: launcher/codaro-launcher/src/generated_contracts/artifact_ownership.rs
-  sha256: 45046a52ab833575e077e035458fd2573b5ce36d6b6849b3bf3816894d39dc92
+  sha256: 79db65ebf19db09d86233c74684106b5240373936dbf933defff84f033cc3cf3
   bytes: 961
   kind: repository
   sourcePath: launcher/codaro-launcher/src/generated_contracts/artifact_ownership.rs
 - path: launcher/codaro-launcher/src/generated_contracts/mod.rs
-  sha256: b68ec4c9f26f350b2c26efc781e6fc417ab0a9828e5651e68fa4facc60363c70
+  sha256: c81f7754a0ccdf1217f93cb9bbed21545e5de5eaea6d54a506d492499866d220
   bytes: 258
   kind: repository
   sourcePath: launcher/codaro-launcher/src/generated_contracts/mod.rs
@@ -12432,8 +12447,8 @@ files:
   kind: repository
   sourcePath: launcher/codaro-launcher/src/ipc.rs
 - path: launcher/codaro-launcher/src/main.rs
-  sha256: 499d4b25c9ef266442db28e27fc33dfb9a7d8e9d92c459f171cec68d5a7f014d
-  bytes: 102965
+  sha256: f6a8af9943fb7cbaf30a872c05f677fb7b16ff63a0672339fde325357d6f93d7
+  bytes: 103364
   kind: repository
   sourcePath: launcher/codaro-launcher/src/main.rs
 - path: launcher/codaro-launcher/src/manifest.rs
@@ -12447,8 +12462,8 @@ files:
   kind: repository
   sourcePath: launcher/codaro-launcher/src/paths.rs
 - path: launcher/codaro-launcher/src/provision.rs
-  sha256: 2c3f12aff57996251582970fc70885d029dba7a0a567fc83c01bc416c137e53e
-  bytes: 51399
+  sha256: 7c91efa5af26e48c87571caba071eb6374012c09d9bc923271ae17d2c309e5c8
+  bytes: 58274
   kind: repository
   sourcePath: launcher/codaro-launcher/src/provision.rs
 - path: launcher/codaro-launcher/src/self_update.rs
@@ -12472,8 +12487,8 @@ files:
   kind: repository
   sourcePath: launcher/codaro-launcher/src/webview.rs
 - path: mainPlan/astryx-product-experience/02-learning-method/README.md
-  sha256: d94948a3a7978228c10fe76c72b8a6cdfe0e6b2d55a54373720f54ec739e081f
-  bytes: 34696
+  sha256: d3d404739c3c0de8f3b5164437a6c73f7ebb6824d1abced0bf54ab87072db760
+  bytes: 35157
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/02-learning-method/README.md
 - path: mainPlan/astryx-product-experience/04-web-learning/00-learn-explorer/README.md
@@ -12497,8 +12512,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/05-local-studio/README.md
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/README.md
-  sha256: 3ab2d3b4d6566925dfe411f8ad4ab9ef9cbf8c79654b7b6e14fbb6f95f6efeae
-  bytes: 4492
+  sha256: 168a3cb00ee0f5daf664603f59a1c7e8d56c1c5991dd1ebe8090ccc40b01a6e6
+  bytes: 4532
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/README.md
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/30days.yml
@@ -12962,8 +12977,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/03-data-visualization/lesson-ledger.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/04-file-automation/README.md
-  sha256: f30b3a39f9b7e1ebcca2ab64a0b603d7110f941c398c73b558f1366683c51c98
-  bytes: 3257
+  sha256: 250edb7ebfa5a32a0855cc6764c71f3b028393ee86947468ff0adf2550002042
+  bytes: 3429
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/04-file-automation/README.md
 - path: mainPlan/astryx-product-experience/08-learning-content/04-file-automation/lesson-ledger.yml
@@ -13247,8 +13262,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/07-remaining-domains/README.md
 - path: mainPlan/astryx-product-experience/08-learning-content/README.md
-  sha256: 59a3c3707081b76bbcbc829bc15cb187a4bbe532e275ec2afdd8c3cf7bcba13f
-  bytes: 24569
+  sha256: 3bd28ea3456abcc763f8c144bb721ece0aa46abe5f0c2e9e66c7fb9df67ec252
+  bytes: 24633
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/README.md
 - path: mainPlan/astryx-product-experience/08-learning-content/evidence/featured-capstones.yml
@@ -14101,6 +14116,11 @@ files:
   bytes: 9692
   kind: repository
   sourcePath: src/codaro/curriculum/checkProposer.py
+- path: src/codaro/curriculum/checkSandboxBrokerClient.py
+  sha256: 9f8b4f7a7d05ab6803341b0a60533a2c2828d1b110a52a2cd64bd27083a024a7
+  bytes: 7534
+  kind: repository
+  sourcePath: src/codaro/curriculum/checkSandboxBrokerClient.py
 - path: src/codaro/curriculum/checker.py
   sha256: 366a109fd113a54f5e44eb1563f71dfdb411b040a1cc02c0577cdc8889959cc9
   bytes: 11612
@@ -14197,8 +14217,8 @@ files:
   kind: repository
   sourcePath: src/codaro/curriculum/localData.py
 - path: src/codaro/curriculum/localStrongCheck.py
-  sha256: d43436377ffa925107bb925ee4d58c6f2ac35ec1585865a378a77faf47ced1f9
-  bytes: 27968
+  sha256: 6c530976fffdf74b225aeeb32b3e26f11fc798c50d3bdcacb2e036770a1f9737
+  bytes: 29058
   kind: repository
   sourcePath: src/codaro/curriculum/localStrongCheck.py
 - path: src/codaro/curriculum/masteryPolicy.py
@@ -14372,12 +14392,12 @@ files:
   kind: repository
   sourcePath: src/codaro/extensions/registry.py
 - path: src/codaro/generatedContracts/__init__.py
-  sha256: 8707984b30f28e37b499ece8aeb2abc71ac9636fea7a411df1920a7133cbc5ba
+  sha256: 5394c7687187e443b011b44e1c164b2459982c5e01fbb7b481ffb7651beb6c1c
   bytes: 515
   kind: repository
   sourcePath: src/codaro/generatedContracts/__init__.py
 - path: src/codaro/generatedContracts/artifactOwnership.py
-  sha256: 720f20a51b97d504f303580096a3219921950fb2d0528148d457e03c8c17dda3
+  sha256: 7241d9f3b0306813cbe2afa52d57fe2af9c13b3cc5402bd537d7885d65e62391
   bytes: 761
   kind: repository
   sourcePath: src/codaro/generatedContracts/artifactOwnership.py
@@ -14841,6 +14861,11 @@ files:
   bytes: 636
   kind: repository
   sourcePath: tests/conftest.py
+- path: tests/contracts/testCheckSandboxBrokerContract.py
+  sha256: b39ae3cc56e430ad190d471d0f8c73e08d300f86c4f7c1e6fd3115ba57656f5d
+  bytes: 3257
+  kind: repository
+  sourcePath: tests/contracts/testCheckSandboxBrokerContract.py
 - path: tests/contracts/testImageArtifactDescriptorContract.py
   sha256: 1d5e043731d4f17d945e04867e512620031f611f3eb8aa6a255b455eed1a50e2
   bytes: 672
@@ -15007,8 +15032,8 @@ files:
   kind: repository
   sourcePath: tests/curriculum/testLearningLedgerAudit.py
 - path: tests/curriculum/testLocalStrongCheck.py
-  sha256: d2d822e5c703262c5e8eb406187df4d38dd75de75d4b9956c3c4ba8071381b94
-  bytes: 13293
+  sha256: a73071cd76f7d4bc55865c19240e3099384024969cfc3dee3c7b117a3609379f
+  bytes: 13463
   kind: repository
   sourcePath: tests/curriculum/testLocalStrongCheck.py
 - path: tests/curriculum/testNotebookGeneration.py
@@ -15267,8 +15292,8 @@ files:
   kind: repository
   sourcePath: tests/learning/verifyRemovedLearningConcepts.py
 - path: tests/learning/verifyVerticalSliceAudit.py
-  sha256: 5ccca42146af5824b981eb33e91b9a803573129ee103e4e2257a5ef824cae399
-  bytes: 15122
+  sha256: cfb050d25407c2b97e075726add55e4c3dcee0f3cd710c95ff6d9720a783f318
+  bytes: 15227
   kind: repository
   sourcePath: tests/learning/verifyVerticalSliceAudit.py
 - path: tests/learning/verifyWebLearningPlaywright.py

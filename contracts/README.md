@@ -20,6 +20,7 @@
 | `imageArtifactDescriptor.schema.json` | PNG·JPEG·GIF의 media type·크기·hash 계약 | Local/Web strong check |
 | `learningArchive.schema.json` | document·draft·virtual FS·package·evidence 실제 bytes와 lineage를 묶는 닫힌 archive v2 계약 | Web export와 Local atomic import |
 | `publicLearningCatalog.json` | 472개 canonical LessonRef의 browser/local tier, eligible path, strong CheckSpec 공개 계약 | Landing lesson generator와 공개 route |
+| `checkSandboxBroker.schema.json` | Local 검사 요청·응답, nonce, HMAC, frame 제한을 고정한 닫힌 broker 계약 | Python client와 Windows launcher AppContainer broker |
 | `runRouteState.schema.json` | 공개 레슨, Web Run, Local 사이의 lesson identity, path, runtime, durable history 계약 | Landing handoff와 공용 editor route adapter |
 | `webCompatibilityC0.json` | 기존 `/codaro/app/` 제품 tree의 source·build·hash·response type 고정 계약 | Pages C0 build, C1 조립, deployed crawl |
 

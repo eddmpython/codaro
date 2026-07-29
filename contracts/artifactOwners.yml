@@ -58,6 +58,15 @@ artifacts:
       - tests/product/checkSandboxCapabilityProbe.py
       - tests/product/verifyCheckSandboxFeasibility.py
       - mainPlan/astryx-product-experience/02-learning-method/README.md
+  - artifactId: check-sandbox-broker
+    role: source
+    owner: learning-runtime
+    sourcePath: contracts/checkSandboxBroker.schema.json
+    surfacePaths:
+      - src/codaro/curriculum/checkSandboxBrokerClient.py
+      - launcher/codaro-launcher/src/check_broker.rs
+      - launcher/codaro-launcher/src/check_sandbox.rs
+      - tests/contracts/testCheckSandboxBrokerContract.py
   - artifactId: run-route-state
     role: source
     owner: product-architecture

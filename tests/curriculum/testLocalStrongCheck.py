@@ -79,6 +79,11 @@ def testLocalStrongOutputCheckSeparatesPassAndMismatch() -> None:
     assert passed["passed"] is True
     assert passed["state"] == "verified"
     assert passed["executor"] == "local-sandbox"
+    assert passed["isolation"] == (
+        "windows-appcontainer"
+        if localStrongCheckModule.checkSandboxBrokerAvailable()
+        else "python-audit-hook"
+    )
     assert failed["passed"] is False
     assert failed["state"] == "mismatch"
 

@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codaro.dev/contracts/checkSandboxBroker.schema.json",
+  "title": "Codaro Check Sandbox Broker",
+  "oneOf": [
+    { "$ref": "#/$defs/RequestEnvelope" },
+    { "$ref": "#/$defs/ResponseEnvelope" }
+  ],
+  "$defs": {
+    "Hex256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "Nonce": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}$"
+    },
+    "Environment": {
+      "type": "object",
+      "maxProperties": 32,
+      "propertyNames": {
+        "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "maxLength": 32768
+      }
+    },
+    "Request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "runId",
+        "fixtureRoot",
+        "packagePaths",
+        "environment",
+        "timeoutMs",
+        "workerRequest"
+      ],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "runId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "fixtureRoot": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32768
+        },
+        "packagePaths": {
+          "type": "array",
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32768
+          }
+        },
+        "environment": { "$ref": "#/$defs/Environment" },
+        "timeoutMs": {
+          "type": "integer",
+          "minimum": 250,
+          "maximum": 15000
+        },
+        "workerRequest": {
+          "type": "object"
+        }
+      }
+    },
+    "Response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "runId",
+        "executor",
+        "workerResponse",
+        "infrastructureError"
+      ],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "runId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "executor": { "const": "windows-appcontainer" },
+        "workerResponse": {
+          "type": ["object", "null"]
+        },
+        "infrastructureError": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 8192
+        }
+      }
+    },
+    "RequestEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "direction", "nonce", "payload", "mac"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "direction": { "const": "request" },
+        "nonce": { "$ref": "#/$defs/Nonce" },
+        "payload": { "$ref": "#/$defs/Request" },
+        "mac": { "$ref": "#/$defs/Hex256" }
+      }
+    },
+    "ResponseEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "direction", "nonce", "payload", "mac"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "direction": { "const": "response" },
+        "nonce": { "$ref": "#/$defs/Nonce" },
+        "payload": { "$ref": "#/$defs/Response" },
+        "mac": { "$ref": "#/$defs/Hex256" }
+      }
+    }
+  }
+}

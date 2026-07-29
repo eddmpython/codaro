@@ -13,6 +13,8 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+from .checkSandboxBrokerClient import checkSandboxBrokerAvailable, runCheckSandboxBroker
+
 
 WORKER_PATH = Path(__file__).with_name("_localStrongCheckWorker.py")
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
@@ -77,19 +79,31 @@ def runLocalStrongCheckAttempt(
             "payload": runtimeCheckPayload(normalized),
             "source": source,
         }
+        environment = workerEnvironment(root, normalized["fixture"], normalized["_localPackagePaths"])
+        usedAppContainer = checkSandboxBrokerAvailable()
         try:
-            completed = subprocess.run(
-                [sys.executable, "-I", "-X", "utf8", str(WORKER_PATH)],
-                input=json.dumps(request, ensure_ascii=False, separators=(",", ":")),
-                text=True,
-                encoding="utf-8",
-                errors="replace",
-                cwd=root,
-                env=workerEnvironment(root, normalized["fixture"], normalized["_localPackagePaths"]),
-                capture_output=True,
-                timeout=(timeoutMs / 1000) + 1.5,
-                check=False,
-            )
+            if usedAppContainer:
+                completed = runCheckSandboxBroker(
+                    fixtureRoot=root,
+                    packagePaths=normalized["_localPackagePaths"],
+                    environment=environment,
+                    timeoutMs=timeoutMs,
+                    workerPath=WORKER_PATH,
+                    workerRequest=request,
+                )
+            else:
+                completed = subprocess.run(
+                    [sys.executable, "-I", "-X", "utf8", str(WORKER_PATH)],
+                    input=json.dumps(request, ensure_ascii=False, separators=(",", ":")),
+                    text=True,
+                    encoding="utf-8",
+                    errors="replace",
+                    cwd=root,
+                    env=environment,
+                    capture_output=True,
+                    timeout=(timeoutMs / 1000) + 1.5,
+                    check=False,
+                )
         except subprocess.TimeoutExpired:
             return (
                 failedResult(
@@ -144,12 +158,17 @@ def runLocalStrongCheckAttempt(
                 "actual": actual,
                 "artifacts": normalizeWorkerArtifacts(response.get("artifacts")),
                 "detail": (
-                    "새 로컬 Python 격리 프로세스에서 fixture와 함께 다시 실행해 정확한 출력을 확인했습니다."
+                    "Windows AppContainer에서 fixture와 함께 다시 실행해 정확한 출력을 확인했습니다."
+                    if usedAppContainer and normalized["kind"] == "output"
+                    else "Windows AppContainer에서 함수 반환값과 생성된 경로를 함께 확인했습니다."
+                    if usedAppContainer
+                    else "새 로컬 Python 격리 프로세스에서 fixture와 함께 다시 실행해 정확한 출력을 확인했습니다."
                     if normalized["kind"] == "output"
                     else "새 로컬 Python 격리 프로세스에서 함수 반환값과 생성된 경로를 함께 확인했습니다."
                 ),
                 "executor": "local-sandbox",
                 "expected": expected,
+                "isolation": "windows-appcontainer" if usedAppContainer else "python-audit-hook",
                 "passed": True,
                 "state": "verified",
             },

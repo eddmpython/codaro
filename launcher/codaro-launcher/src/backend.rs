@@ -24,6 +24,7 @@ pub struct BackendLaunchConfig {
     editor_root: PathBuf,
     logs_dir: PathBuf,
     learning_evidence_store_header_path: PathBuf,
+    launcher_root: PathBuf,
     workspace_root: PathBuf,
     uv_executable: Option<PathBuf>,
     release_id: String,
@@ -49,6 +50,7 @@ impl BackendLaunchConfig {
             backend_python_path,
             logs_dir: paths.logs_dir(),
             learning_evidence_store_header_path: paths.learning_evidence_store_header_path(),
+            launcher_root: paths.root().to_path_buf(),
             workspace_root,
             uv_executable: resolve_uv_executable(paths, state),
             release_id: state.release_id.clone(),
@@ -85,6 +87,11 @@ impl BackendLaunchConfig {
             "CODARO_LEARNING_STORE_HEADER_PATH",
             &self.learning_evidence_store_header_path,
         );
+        command.env("CODARO_LAUNCHER_ROOT", &self.launcher_root);
+        #[cfg(windows)]
+        if let Ok(launcher_executable) = std::env::current_exe() {
+            command.env("CODARO_CHECK_BROKER_EXE", launcher_executable);
+        }
         if let Some(uv_executable) = &self.uv_executable {
             command.env("CODARO_UV_EXE", uv_executable);
         }
