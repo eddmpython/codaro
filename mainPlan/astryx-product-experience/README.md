@@ -2,7 +2,7 @@
 
 상태: 진행
 
-전문 평가 입력은 [PRD improvement loop](00-product-contract/01-prd-improvement-loop/)가 제품 PRD와 분리해 관리한다. 과거 점수·결론은 blind evaluator 입력에 넣지 않으며, 어떤 역사 점수도 현재 완료 판정을 대신하지 않는다. 현재 top-level TODO는 9개다. R8의 100점은 동일 평가자 자기수렴으로 무효 처리한 역사 기록이며, 현재 PRD에는 독립 점수도 R10 통과 판정도 없다.
+전문 평가 입력은 [PRD improvement loop](00-product-contract/01-prd-improvement-loop/)가 제품 PRD와 분리해 관리한다. 과거 점수·결론은 blind evaluator 입력에 넣지 않으며, 어떤 역사 점수도 현재 완료 판정을 대신하지 않는다. 현재 top-level TODO는 8개다. R8의 100점은 동일 평가자 자기수렴으로 무효 처리한 역사 기록이며, 현재 PRD에는 독립 점수도 R10 통과 판정도 없다.
 
 ## 목표
 
@@ -62,9 +62,8 @@ Codaro를 다운로드 중심 랜딩과 별도 로컬 앱의 조합으로 보지
 | 03 | [product-shell](03-product-shell/) | B0, 공용 design contract | 웹 Run과 로컬이 같은 Astryx AppShell과 route state를 사용함 |
 | 04 | [web-learning](04-web-learning/) | B0·B1, 02, 03. W1+ 승인은 B3 | 다운로드 없이 목표 선택, 레슨 실행, 검증, 진행 저장이 가능함 |
 | 05 | [local-studio](05-local-studio/) | B0·B1, 02, 03, 04 W0. W1+ 승인은 B3 | 로컬 capability, 공용 archive와 자동화가 같은 디자인 언어로 완성됨 |
-| 07 | [landing-experience](07-landing-experience/) | 공용 design contract, 04, 05, 공용 visual manifest의 product capture | 웹 학습 중심 랜딩과 문서 셸이 실제 제품 media로 출시 품질에 도달함 |
 | 08 | [learning-content](08-learning-content/) | W0는 B0·B1, 02, 04. W1+ 사람 승인은 B3 | 대표 경로와 472레슨이 자동 검증, 전이, 결과물 기준으로 이관됨 |
-| 09 | [repository-simplification](09-repository-simplification/) | 남은 02~05, 07~08과 공용 visual 계약 | prediction, classroom, dead source, unused asset, 거짓 gate가 제거됨 |
+| 09 | [repository-simplification](09-repository-simplification/) | 남은 02~05, 08과 공용 visual 계약 | prediction, classroom, dead source, unused asset, 거짓 gate가 제거됨 |
 | 10 | [quality-release](10-quality-release/) | B3와 02~09 | 접근성, 성능, 학습 효과, 반응형, 실제 배포 smoke가 통과함 |
 
 ## Artifact ownership

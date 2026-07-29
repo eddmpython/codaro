@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: d4d1bee1f8dedf571719f44f45609d3156b1f35f
-  dirtyDiffHash: 1c796c9d55f2529ad9e188ad055b857de50d640aeaa71090eefeffc853fcd52d
-  manifestHash: b64ca13e1e07448931d9f426f59aeb6c5f9ac9b5308948080d1615e008605f88
-  fileCount: 3160
-  totalBytes: 97232530
+  gitCommit: 0604554b01a93c6322b8fcefc03f93ed1e03150c
+  dirtyDiffHash: 93d5f26b4beae42c119163d1f7571cec5d3a2d24c9833e28a023eeee62debe76
+  manifestHash: 4f4b4d064fde5d022d5cbc9bc69d558d58e270a59716f0b7c32ffb3026cae87b
+  fileCount: 3158
+  totalBytes: 97244871
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: 33e66852ee6a64b572b7b768cbfa4b8d8526463b819e3e4973e05a71dfde2dc1
-  bytes: 97873462
+  sha256: 6e68955e6ca8f3232e153ddb5e81d06cd26816493ccc10c9213b07d61f2a54d3
+  bytes: 97885339
   format: zip
   compression: stored
   compressionMethod: 0
@@ -7412,8 +7412,8 @@ files:
   kind: repository
   sourcePath: landing/src/components/productVisual.jsx
 - path: landing/src/components/publicShell.jsx
-  sha256: 391d6e712bc448748bfade12bf4b93639fd5f755e1be17f743aed64216f18c9f
-  bytes: 7287
+  sha256: 00ac3674221e68ae13eb8a7e50083f118caf95bd4363ae30489f755c563d5da9
+  bytes: 7763
   kind: repository
   sourcePath: landing/src/components/publicShell.jsx
 - path: landing/src/lib/brand.js
@@ -7542,13 +7542,13 @@ files:
   kind: repository
   sourcePath: landing/src/main.jsx
 - path: landing/src/pages/home.jsx
-  sha256: 5a6aaf51d65920796ca79145e931a077c345e1c4b2ba110eefa550ac920a282e
-  bytes: 11391
+  sha256: 136d0b9757237d2174ba244f4769f06f53ca93641f554908c5811156c35fa8d9
+  bytes: 11450
   kind: repository
   sourcePath: landing/src/pages/home.jsx
 - path: landing/src/pages/learn.jsx
-  sha256: dcad51ec1d82f3c032253ee19bfd5d8bbf6478cd5ccf8511df343dba49dbdaba
-  bytes: 22365
+  sha256: f014dff9f98b8bbefc396caf9dc76b3a2953b13594f128c8cc60fa0208041302
+  bytes: 22363
   kind: repository
   sourcePath: landing/src/pages/learn.jsx
 - path: landing/src/pages/lesson.jsx
@@ -7592,7 +7592,7 @@ files:
   kind: repository
   sourcePath: landing/src/routes/toolRoutes.jsx
 - path: landing/src/styles.css
-  sha256: 7af09f1ff2faa2e3438c396b70bd40fba6b31a158a4ba163e29233a117652523
+  sha256: 772bff7867c91c351e7af9065f7abaa1488c62ac36aede9ff937db98bc3478e3
   bytes: 23746
   kind: repository
   sourcePath: landing/src/styles.css
@@ -7632,8 +7632,8 @@ files:
   kind: repository
   sourcePath: landing/src/styles/generated/socialLinks.tsx
 - path: landing/src/styles/homeAstryx.css
-  sha256: faae85edae86c3142d3fc7e5796f1a6ec645fe5af759b3b9afd42f412f5b4bbb
-  bytes: 15226
+  sha256: 1824f5cf5f20303b217a0742dad5669c137d9c200dc324db89f0fbd90f769ed1
+  bytes: 15588
   kind: repository
   sourcePath: landing/src/styles/homeAstryx.css
 - path: landing/src/styles/learnExplorer.css
@@ -7647,8 +7647,8 @@ files:
   kind: repository
   sourcePath: landing/src/styles/lessonAstryx.css
 - path: landing/src/styles/publicShell.css
-  sha256: e5634ec90a243c9d55c43d04a66750e7a32e910c56b43b0db3f5a68b019b6dba
-  bytes: 5233
+  sha256: e2dacd2d22e82eee2827caf7bce6847085ed2e6fc1af93e76da8cd1700ca7c34
+  bytes: 5449
   kind: repository
   sourcePath: landing/src/styles/publicShell.css
 - path: landing/static/brand/apple-touch-icon.png
@@ -12511,24 +12511,14 @@ files:
   bytes: 7752
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/05-local-studio/README.md
-- path: mainPlan/astryx-product-experience/07-landing-experience/00-proof-studio-landing/README.md
-  sha256: da28e60a45d8ce850ca5c7b06a553314a7c85f07debcc35b0bb197052cda4fd8
-  bytes: 2419
-  kind: repository
-  sourcePath: mainPlan/astryx-product-experience/07-landing-experience/00-proof-studio-landing/README.md
-- path: mainPlan/astryx-product-experience/07-landing-experience/README.md
-  sha256: 0c66c026339c478c891e9b4d73817b642e0748cca6d0ead798196765697968d1
-  bytes: 2268
-  kind: repository
-  sourcePath: mainPlan/astryx-product-experience/07-landing-experience/README.md
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/README.md
   sha256: 3ab2d3b4d6566925dfe411f8ad4ab9ef9cbf8c79654b7b6e14fbb6f95f6efeae
   bytes: 4492
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/README.md
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/30days.yml
-  sha256: 181264d3913455a1156ec266ac79ad6fb7c25459d6b82f0f2d058b706d8bd59f
-  bytes: 33129
+  sha256: 887a49dbf95be573d2bdb5d20f8e8e97a6069a1eb52e9eae36546cc44a9a7316
+  bytes: 32555
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/30days.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/advancedPython.yml
@@ -12552,8 +12542,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/deepVision.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/devTools.yml
-  sha256: f9cda2ee54f57315f05ec6f4ba3148cf5206b32a8228957d789a2d7447fd7643
-  bytes: 3266
+  sha256: 81aaf2c8f18ff12be161a829dd7af4b25f610be7549fd82d948526951c6c0e21
+  bytes: 3205
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/devTools.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/duckdb.yml
@@ -12587,13 +12577,13 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/inputCtl.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/llmBasics.yml
-  sha256: 9b9da3151218bde0650aef7acb4868ac4770e1cdc50417bac3cd0859c4e27093
-  bytes: 11817
+  sha256: a69749a9aa6de4364344b948fa484165e2431c70711d787cbd1f14243783a278
+  bytes: 11604
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/llmBasics.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/matplotlib.yml
-  sha256: 2dc3c79d14e11d922dd1dbb5d3524cac7d0e3a8720338459e04655811b75f038
-  bytes: 12000
+  sha256: f662355b8865f3c96ce279108d359a4408098edb9b659bb4d1b76e95fcfc5ae7
+  bytes: 11787
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/matplotlib.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/networkx.yml
@@ -12607,8 +12597,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/numpy.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/opencv.yml
-  sha256: 0fd1b95a7cc6e09cc8e71792cf63a0b47a4870d01fa5c98d882721a0c2a05aa1
-  bytes: 11791
+  sha256: 500b15dd14c7178a6aec3d4bafae3b0a8d0465a83e40c867496db6bff6abb116
+  bytes: 11578
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/opencv.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/openpyxl.yml
@@ -12617,8 +12607,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/openpyxl.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/pandas.yml
-  sha256: a80e60a84eea8c0f04cc645f176b9a5c80d4c6f67254a3589d09b45f795df79a
-  bytes: 13048
+  sha256: 58968fbdf68d7d5b66e61f93857cc77afa5023471915cafa46e9c448ec5d315e
+  bytes: 12816
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/pandas.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/pdf.yml
@@ -12687,8 +12677,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/seaborn.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/sklearn.yml
-  sha256: 4c9d823fd249562e7073c997a8c825c59315dd81ccb09e4d1b6fac7d9cd18343
-  bytes: 11555
+  sha256: 7d02f9162687a67e705d92e664e8b15a43134cbc18f28cb959b2777026a81081
+  bytes: 11342
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/sklearn.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/statsmodels.yml
@@ -12697,8 +12687,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/statsmodels.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/summary.yml
-  sha256: 17ca8b3f28dd3bafef8207918df53018f195cc4e8b7761c8071095c84de4d24c
-  bytes: 2451
+  sha256: 46418ac8062305745d55c72d21c770bbe17dab309f98ba799723af3b6d0017f7
+  bytes: 2431
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/summary.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/sympy.yml
@@ -12722,8 +12712,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/visionFeatures.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/watchSched.yml
-  sha256: c1beed7d6f9e2ecf342a0c0a5e927051f5e9bf1d2633834f77b57ba40e603229
-  bytes: 10979
+  sha256: 41b29021a17cd79fc78d8a99fad3549d73eae72dc59dfee23f634bb5b9f8ac21
+  bytes: 10785
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/watchSched.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/word.yml
@@ -12742,8 +12732,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/evidence/legacy-alias-migration.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/evidence/taxonomy-transition.yml
-  sha256: aa0368530fbc3593b2b171b19ca712f06ec54f53a115105b467d25c4479cf1d2
-  bytes: 14311
+  sha256: e5d2bf8708b4ebbe8619ebd6a5a62cb23657d61b3fe859a9ec11471a2c6cc89d
+  bytes: 13924
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/evidence/taxonomy-transition.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/identity-ledger/30days.yml
@@ -12917,8 +12907,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/identity-ledger/statsmodels.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/identity-ledger/summary.yml
-  sha256: 1573a98a1e7700ffe7164728328e69eb770ba0b8e777f105faf4df0306ea1f26
-  bytes: 874
+  sha256: 2e077ee9724f3e886e4854bfd36a1c1ecf85dda51455fe824fefa48c10e10c22
+  bytes: 844
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/identity-ledger/summary.yml
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/identity-ledger/sympy.yml
@@ -13292,8 +13282,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/10-quality-release/README.md
 - path: mainPlan/astryx-product-experience/README.md
-  sha256: 11ccb4f0d62374bd3905290933e84a12a4ac57ba92f936786e9ffc43c0452414
-  bytes: 14846
+  sha256: 77e2fd63c0d9bcae2bbc2dead8d23760d8d62e57d085b34ef528a795e46eba93
+  bytes: 14619
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/README.md
 - path: pyproject.toml
@@ -15637,8 +15627,8 @@ files:
   kind: repository
   sourcePath: tests/surface/testUiValueBinding.py
 - path: tests/surface/testVisualAccessibilityBrowser.py
-  sha256: ea8778eeb73d3a28081a4061415d068a4243f9820d0b429b0578fbd10d56c698
-  bytes: 2538
+  sha256: 299440848f944f34778887b35bb0b7beefec49c7a757004eb791498e1b4719ed
+  bytes: 2811
   kind: repository
   sourcePath: tests/surface/testVisualAccessibilityBrowser.py
 - path: tests/surface/testWidgetBridge.py
@@ -15772,8 +15762,8 @@ files:
   kind: repository
   sourcePath: tests/surface/verifyThemeRuntimePlaywright.py
 - path: tests/surface/verifyVisualAccessibilityPlaywright.py
-  sha256: e1282890a702de646ca9ab78c67a08f19e434d098af50789c27ba197a78d7924
-  bytes: 40506
+  sha256: 1bb110c2ff726b888518a0afb256fdff654aac2ba3f81409cadc58177de73cb8
+  bytes: 58727
   kind: repository
   sourcePath: tests/surface/verifyVisualAccessibilityPlaywright.py
 - path: tests/surface/verifyWidgetBridgeRoundTrip.py
