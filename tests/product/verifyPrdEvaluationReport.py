@@ -55,6 +55,7 @@ DIMENSION_IDS = (
     "measurementRelease",
 )
 READINESS_BLOCKERS = {
+    "R10 input bundle is not frozen",
     "R10 input manifest is not sealed and ready",
     "R10 scope is not sealed",
     "evaluation bundle is not eligible for a round seal",
@@ -131,6 +132,9 @@ def expectedScopeBinding(inputManifest: dict[str, Any]) -> dict[str, Any] | None
     scope = inputManifest.get("scope")
     if isinstance(scope, dict) and scope.get("sealState") == "sealed":
         return scope
+    inputFreeze = inputManifest.get("inputFreeze")
+    if isinstance(inputFreeze, dict) and inputFreeze.get("state") == "frozen":
+        return inputFreeze
     draft = inputManifest.get("draftBundle")
     return draft if isinstance(draft, dict) else scope if isinstance(scope, dict) else None
 
@@ -513,6 +517,19 @@ def validateBundleManifest(bundle: dict[str, Any], inputManifest: dict[str, Any]
         failures.append("evaluation bundle schemaVersion or roundId does not match")
     if bundle.get("state") != "sealed":
         failures.append("evaluation bundle manifest is not sealed")
+    inputFreeze = inputManifest.get("inputFreeze")
+    if isinstance(inputFreeze, dict) and inputFreeze.get("state") == "frozen":
+        inputReadiness = bundle.get("inputReadiness")
+        if (
+            not isinstance(inputReadiness, dict)
+            or inputReadiness.get("freezeEligible") is not True
+            or inputReadiness.get("inputFrozen") is not True
+            or inputReadiness.get("freezeBlockingReasons") != []
+            or inputReadiness.get("blockingReasons") != []
+        ):
+            failures.append("frozen input bundle integrity is invalid")
+        if bundle.get("state") not in {"input-frozen", "sealed"}:
+            failures.append("frozen input bundle state is invalid")
     readiness = bundle.get("roundReadiness")
     if not isinstance(readiness, dict) or readiness.get("sealEligible") is not True:
         failures.append("evaluation bundle is not eligible for a round seal")
@@ -630,6 +647,10 @@ def validateFactAudit(factAudit: dict[str, Any], inputManifest: dict[str, Any]) 
         failures.append("round fact audit is incomplete or failed")
     if factAudit.get("scoreThresholdApplied") is not False:
         failures.append("round fact audit must not apply a score threshold")
+    inputFreeze = inputManifest.get("inputFreeze")
+    if isinstance(inputFreeze, dict) and inputFreeze.get("state") == "frozen":
+        if factAudit.get("inputFreezeEligible") is not True or factAudit.get("inputFrozen") is not True:
+            failures.append("round fact audit input freeze binding is invalid")
     if factAudit.get("roundSealEligible") is not True or factAudit.get("state") == "draft":
         failures.append("round fact audit is not bound to a seal-eligible scope")
     scope = factAudit.get("scope")

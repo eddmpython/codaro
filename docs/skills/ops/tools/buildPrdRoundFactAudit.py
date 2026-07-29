@@ -304,6 +304,8 @@ def buildPrdRoundFactAudit() -> dict[str, Any]:
         "auditComplete": True,
         "scoreThresholdApplied": False,
         "productCompletionEligible": False,
+        "inputFreezeEligible": actualManifest["inputReadiness"]["freezeEligible"],
+        "inputFrozen": actualManifest["inputReadiness"]["inputFrozen"],
         "roundSealEligible": actualManifest["roundReadiness"]["sealEligible"],
         "scope": {
             "gitCommit": scope["gitCommit"],
@@ -366,7 +368,7 @@ def main(argv: list[str] | None = None) -> int:
                     "R10 fact audit is stale; run "
                     "uv run --no-sync python -X utf8 docs/skills/ops/tools/buildPrdRoundFactAudit.py --write"
                 )
-            print("ok: R10 fact audit matches the current draft bundle")
+            print("ok: R10 fact audit matches the current evaluation bundle")
     except FactAuditError as exc:
         print(f"FAIL: {exc}", file=sys.stderr)
         return 1

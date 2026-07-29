@@ -344,6 +344,63 @@ def testDraftBundleManifestIsRejected() -> None:
     assert any("not eligible" in failure for failure in failures)
 
 
+def testFrozenInputBundlePreservesIntegrityWithoutClaimingRoundSeal() -> None:
+    verifier = loadVerifier()
+    _, manifest, _ = context(verifier)
+    bundle = completeBundle(verifier)
+    bundle["state"] = "input-frozen"
+    bundle["scope"]["sealState"] = "input-frozen"
+    bundle["roundReadiness"]["sealEligible"] = False
+    bundle["inputReadiness"] = {
+        "freezeEligible": True,
+        "inputFrozen": True,
+        "freezeBlockingReasons": [],
+        "blockingReasons": [],
+    }
+    manifest["inputFreeze"] = {
+        "state": "frozen",
+        "gitCommit": COMMIT,
+        "dirtyDiffHash": SHA,
+        "manifestHash": bundle["scope"]["manifestHash"],
+        "evaluationBundleHash": SHA,
+    }
+
+    failures = verifier.validateBundleManifest(bundle, manifest)
+
+    assert failures == [
+        "evaluation bundle manifest is not sealed",
+        "evaluation bundle is not eligible for a round seal",
+        "evaluation bundle scope is not sealed",
+    ]
+
+
+def testFrozenInputBundleRejectsAChangedFreezeBinding() -> None:
+    verifier = loadVerifier()
+    _, manifest, _ = context(verifier)
+    bundle = completeBundle(verifier)
+    bundle["state"] = "input-frozen"
+    bundle["scope"]["sealState"] = "input-frozen"
+    bundle["roundReadiness"]["sealEligible"] = False
+    bundle["inputReadiness"] = {
+        "freezeEligible": True,
+        "inputFrozen": False,
+        "freezeBlockingReasons": [],
+        "blockingReasons": ["frozen input scope does not match the current bundle"],
+    }
+    manifest["inputFreeze"] = {
+        "state": "frozen",
+        "gitCommit": COMMIT,
+        "dirtyDiffHash": SHA,
+        "manifestHash": "b" * 64,
+        "evaluationBundleHash": SHA,
+    }
+
+    failures = verifier.validateBundleManifest(bundle, manifest)
+
+    assert "frozen input bundle integrity is invalid" in failures
+    assert any("manifestHash does not match" in failure for failure in failures)
+
+
 def testDraftFactAuditIsRejectedWithoutChangingLearningFacts() -> None:
     verifier = loadVerifier()
     _, manifest, _ = context(verifier)
@@ -355,6 +412,30 @@ def testDraftFactAuditIsRejectedWithoutChangingLearningFacts() -> None:
 
     assert any("not bound" in failure for failure in failures)
     assert factAudit["facts"]["learningCoverage"]["weakOnlyLessonCount"] == 353
+
+
+def testFrozenInputFactAuditRequiresFreezeBinding() -> None:
+    verifier = loadVerifier()
+    _, manifest, _ = context(verifier)
+    manifest["inputFreeze"] = {
+        "state": "frozen",
+        "gitCommit": COMMIT,
+        "dirtyDiffHash": SHA,
+        "manifestHash": SHA,
+        "evaluationBundleHash": SHA,
+    }
+    factAudit = completeFactAudit()
+    factAudit["state"] = "input-frozen"
+    factAudit["roundSealEligible"] = False
+    factAudit["inputFreezeEligible"] = True
+    factAudit["inputFrozen"] = True
+
+    failures = verifier.validateFactAudit(factAudit, manifest)
+
+    assert "round fact audit input freeze binding is invalid" not in failures
+    factAudit["inputFrozen"] = False
+    failures = verifier.validateFactAudit(factAudit, manifest)
+    assert "round fact audit input freeze binding is invalid" in failures
 
 
 def testCleanFactAuditRejectsIncompleteMachineEvidence() -> None:

@@ -790,6 +790,34 @@ def remediationSealBlockers(inputManifest: dict[str, Any]) -> list[str]:
     return blockers
 
 
+def rubricFreezeBlockers(inputManifest: dict[str, Any], rubricBytes: bytes) -> list[str]:
+    rubric = inputManifest.get("rubric")
+    if (
+        not isinstance(rubric, dict)
+        or rubric.get("sha256") != sha256Bytes(rubricBytes)
+        or rubric.get("targetScore") is not None
+        or rubric.get("passThreshold") is not None
+    ):
+        return ["frozen rubric metadata is invalid"]
+    return []
+
+
+def inputFreezeReadiness(
+    inputManifest: dict[str, Any],
+    rubricBytes: bytes,
+    machineEvidenceBlockers: Iterable[str] = (),
+) -> dict[str, Any]:
+    freezeBlockers = sorted(
+        set(list(machineEvidenceBlockers) + rubricFreezeBlockers(inputManifest, rubricBytes))
+    )
+    return {
+        "freezeEligible": not freezeBlockers,
+        "inputFrozen": False,
+        "freezeBlockingReasons": freezeBlockers,
+        "blockingReasons": list(freezeBlockers),
+    }
+
+
 def roundReadiness(
     inputManifest: dict[str, Any],
     roster: dict[str, Any],
@@ -800,15 +828,8 @@ def roundReadiness(
         remediationSealBlockers(inputManifest)
         + verifyEvaluatorRoster(roster)
         + list(machineEvidenceBlockers)
+        + rubricFreezeBlockers(inputManifest, rubricBytes)
     )
-    rubric = inputManifest.get("rubric")
-    if (
-        not isinstance(rubric, dict)
-        or rubric.get("sha256") != sha256Bytes(rubricBytes)
-        or rubric.get("targetScore") is not None
-        or rubric.get("passThreshold") is not None
-    ):
-        sealBlockers.append("frozen rubric metadata is invalid")
     blockers = list(sealBlockers)
     if inputManifest.get("sealed") is not True or inputManifest.get("roundState") != "ready":
         blockers.append("R10 input manifest is not sealed and ready")
@@ -839,6 +860,32 @@ def buildEvaluationScopeManifest(entries: tuple[BundleEntry, ...], *, gitHead: s
     }
 
 
+def inputFreezeMatches(
+    binding: Any,
+    scope: dict[str, Any],
+    archive: dict[str, Any],
+    machineEvidence: dict[str, Any],
+) -> bool:
+    return (
+        isinstance(binding, dict)
+        and binding.get("state") == "frozen"
+        and binding.get("manifestPath") == relativePath(MANIFEST_PATH)
+        and binding.get("archivePath") == archive["path"]
+        and binding.get("gitCommit") == scope["gitCommit"]
+        and binding.get("dirtyDiffHash") == scope["dirtyDiffHash"]
+        and binding.get("manifestHash") == scope["manifestHash"]
+        and binding.get("evaluationBundleHash") == archive["sha256"]
+        and binding.get("fileCount") == scope["fileCount"]
+        and binding.get("machineEvidenceIndexPath") == EVIDENCE_INDEX_PATH
+        and binding.get("requiredReportCount") == machineEvidence["requiredReportCount"]
+        and binding.get("includedReportCount") == machineEvidence["includedReportCount"]
+        and binding.get("artifactCount") == machineEvidence["artifactCount"]
+        and binding.get("allCurrent") is True
+        and machineEvidence["allCurrent"] is True
+        and machineEvidence["blockingReasons"] == []
+    )
+
+
 def buildPrdEvaluationBundle() -> tuple[dict[str, Any], bytes]:
     gitHead = currentGitHead()
     scopeCommit = latestIncludedScopeCommit(gitHead)
@@ -861,9 +908,23 @@ def buildPrdEvaluationBundle() -> tuple[dict[str, Any], bytes]:
     beforeDiffHash = dirtyDiffHash(entries, beforeStatuses)
     scope = buildEvaluationScopeManifest(entries, gitHead=scopeCommit, diffHash=beforeDiffHash)
     archiveBytes = buildZipBytes(entries)
+    archive = {
+        "path": relativePath(ARCHIVE_PATH),
+        "sha256": sha256Bytes(archiveBytes),
+        "bytes": len(archiveBytes),
+        "format": "zip",
+        "compression": ZIP_COMPRESSION_NAME,
+        "compressionMethod": ZIP_COMPRESSION,
+        "readOnlyEntries": True,
+    }
     if currentGitHead() != gitHead or changedScopeStatuses() != beforeStatuses:
         raise BundleError("evaluation scope changed while the bundle was being built")
     inputManifest = loadMapping(INPUT_PATH)
+    inputReadiness = inputFreezeReadiness(
+        inputManifest,
+        sourceBytes[relativePath(RUBRIC_SOURCE)],
+        machineEvidence["blockingReasons"],
+    )
     readiness = roundReadiness(
         inputManifest,
         loadMapping(ROSTER_PATH),
@@ -879,29 +940,52 @@ def buildPrdEvaluationBundle() -> tuple[dict[str, Any], bytes]:
         and inputScope.get("gitCommit") == scope["gitCommit"]
         and inputScope.get("dirtyDiffHash") == scope["dirtyDiffHash"]
         and inputScope.get("manifestHash") == scope["manifestHash"]
-        and inputScope.get("evaluationBundleHash") == sha256Bytes(archiveBytes)
+        and inputScope.get("evaluationBundleHash") == archive["sha256"]
     )
+    frozenBinding = inputManifest.get("inputFreeze")
+    frozenBindingPresent = isinstance(frozenBinding, dict) and frozenBinding.get("state") == "frozen"
+    frozenInputMatches = inputFreezeMatches(frozenBinding, scope, archive, machineEvidence)
+    inputReadiness["inputFrozen"] = inputReadiness["freezeEligible"] and frozenInputMatches
+    if frozenBindingPresent and not frozenInputMatches:
+        inputReadiness["blockingReasons"] = sorted(
+            set(inputReadiness["blockingReasons"] + ["frozen input scope does not match the current bundle"])
+        )
     if inputManifest.get("sealed") is True and not sealedScopeMatches:
         readiness["blockingReasons"] = sorted(
             set(readiness["blockingReasons"] + ["sealed input scope does not match the current bundle"])
         )
+    if not inputReadiness["inputFrozen"] and not sealedScopeMatches:
+        readiness["sealEligible"] = False
+        readiness["sealBlockingReasons"] = sorted(
+            set(readiness["sealBlockingReasons"] + ["R10 input bundle is not frozen"])
+        )
+        readiness["blockingReasons"] = sorted(
+            set(readiness["blockingReasons"] + ["R10 input bundle is not frozen"])
+        )
     readiness["roundReady"] = readiness["sealEligible"] and sealedScopeMatches
-    scope["sealState"] = "sealed" if sealedScopeMatches else "draft"
-    state = "sealed" if sealedScopeMatches else "ready-to-seal" if readiness["sealEligible"] else "draft"
+    scope["sealState"] = (
+        "sealed"
+        if sealedScopeMatches
+        else "input-frozen"
+        if inputReadiness["inputFrozen"]
+        else "draft"
+    )
+    state = (
+        "sealed"
+        if sealedScopeMatches
+        else "input-frozen"
+        if inputReadiness["inputFrozen"]
+        else "ready-to-seal"
+        if readiness["sealEligible"]
+        else "draft"
+    )
     manifest = {
         "schemaVersion": 1,
         "roundId": "R10",
         "state": state,
         "scope": {key: value for key, value in scope.items() if key != "files"},
-        "archive": {
-            "path": relativePath(ARCHIVE_PATH),
-            "sha256": sha256Bytes(archiveBytes),
-            "bytes": len(archiveBytes),
-            "format": "zip",
-            "compression": ZIP_COMPRESSION_NAME,
-            "compressionMethod": ZIP_COMPRESSION,
-            "readOnlyEntries": True,
-        },
+        "archive": archive,
+        "inputReadiness": inputReadiness,
         "roundReadiness": readiness,
         "machineEvidence": {
             "indexPath": EVIDENCE_INDEX_PATH,
@@ -1026,6 +1110,66 @@ def draftInputManifest(inputManifest: dict[str, Any], bundleManifest: dict[str, 
     return updated
 
 
+def frozenInputManifest(inputManifest: dict[str, Any], bundleManifest: dict[str, Any]) -> dict[str, Any]:
+    inputReadiness = bundleManifest.get("inputReadiness")
+    if not isinstance(inputReadiness, dict) or inputReadiness.get("freezeEligible") is not True:
+        reasons = (
+            inputReadiness.get("freezeBlockingReasons", [])
+            if isinstance(inputReadiness, dict)
+            else ["input freeze readiness is absent"]
+        )
+        raise BundleError("R10 input cannot be frozen: " + "; ".join(reasons))
+    scope = bundleManifest["scope"]
+    archive = bundleManifest["archive"]
+    machineEvidence = bundleManifest["machineEvidence"]
+    updated = draftInputManifest(inputManifest, bundleManifest)
+    remainingSealBlockers = [
+        blocker
+        for blocker in bundleManifest["roundReadiness"]["sealBlockingReasons"]
+        if blocker != "R10 input bundle is not frozen"
+    ]
+    updated["draftBundle"]["sealEligible"] = not remainingSealBlockers
+    updated["inputFreeze"] = {
+        "state": "frozen",
+        "manifestPath": relativePath(MANIFEST_PATH),
+        "archivePath": archive["path"],
+        "gitCommit": scope["gitCommit"],
+        "dirtyDiffHash": scope["dirtyDiffHash"],
+        "manifestHash": scope["manifestHash"],
+        "evaluationBundleHash": archive["sha256"],
+        "fileCount": scope["fileCount"],
+        "machineEvidenceIndexPath": machineEvidence["indexPath"],
+        "requiredReportCount": machineEvidence["requiredReportCount"],
+        "includedReportCount": machineEvidence["includedReportCount"],
+        "artifactCount": machineEvidence["artifactCount"],
+        "allCurrent": machineEvidence["allCurrent"],
+    }
+    return updated
+
+
+def freezeInputBundle(manifest: dict[str, Any], archiveBytes: bytes) -> dict[str, Any]:
+    inputManifest = loadMapping(INPUT_PATH)
+    updatedInput = frozenInputManifest(inputManifest, manifest)
+    originalInputBytes = INPUT_PATH.read_bytes()
+    updatedInputBytes = yaml.safe_dump(updatedInput, allow_unicode=True, sort_keys=False, width=120).encode("utf-8")
+    try:
+        writeAtomic(INPUT_PATH, updatedInputBytes)
+        frozenManifest, frozenArchiveBytes = buildPrdEvaluationBundle()
+        if (
+            frozenManifest["state"] != "input-frozen"
+            or frozenManifest["inputReadiness"]["inputFrozen"] is not True
+        ):
+            raise BundleError("R10 input was updated but the current bundle did not reach an input-frozen state")
+        if frozenArchiveBytes != archiveBytes:
+            raise BundleError("evaluation archive changed during the input freeze transition")
+    except Exception:
+        writeAtomic(INPUT_PATH, originalInputBytes)
+        raise
+    writeAtomic(ARCHIVE_PATH, frozenArchiveBytes, readOnly=True)
+    writeAtomic(MANIFEST_PATH, dumpManifest(frozenManifest))
+    return frozenManifest
+
+
 def sealBundle(manifest: dict[str, Any], archiveBytes: bytes) -> dict[str, Any]:
     inputManifest = loadMapping(INPUT_PATH)
     updatedInput = sealedInputManifest(inputManifest, manifest)
@@ -1051,6 +1195,11 @@ def buildParser() -> argparse.ArgumentParser:
     action = parser.add_mutually_exclusive_group(required=True)
     action.add_argument("--write", action="store_true", help="Write the tracked manifest and generated ZIP archive.")
     action.add_argument("--check", action="store_true", help="Verify the tracked manifest against the current scope.")
+    action.add_argument(
+        "--freeze-input",
+        action="store_true",
+        help="Freeze current source and machine evidence without claiming evaluator or round readiness.",
+    )
     action.add_argument("--seal", action="store_true", help="Seal only after remediation and evaluator evidence is ready.")
     return parser
 
@@ -1065,6 +1214,12 @@ def main(argv: list[str] | None = None) -> int:
                 f"sealed R10 bundle: {sealed['scope']['fileCount']} files, "
                 f"sha256={sealed['archive']['sha256']}"
             )
+        elif args.freeze_input:
+            frozen = freezeInputBundle(manifest, archiveBytes)
+            print(
+                f"froze R10 input bundle: {frozen['scope']['fileCount']} files, "
+                f"sha256={frozen['archive']['sha256']}"
+            )
         elif args.write:
             inputManifest = loadMapping(INPUT_PATH)
             updatedInput = draftInputManifest(inputManifest, manifest)
@@ -1074,14 +1229,16 @@ def main(argv: list[str] | None = None) -> int:
             )
             writeAtomic(ARCHIVE_PATH, archiveBytes, readOnly=True)
             writeAtomic(MANIFEST_PATH, dumpManifest(manifest))
+            state = "input-frozen" if manifest["inputReadiness"]["inputFrozen"] else "draft"
             print(
-                f"wrote draft R10 bundle: {manifest['scope']['fileCount']} files, "
+                f"wrote {state} R10 bundle: {manifest['scope']['fileCount']} files, "
                 f"sha256={manifest['archive']['sha256']}"
             )
         else:
             verifyWrittenManifest(manifest)
             print(
                 f"ok: R10 bundle manifest matches {manifest['scope']['fileCount']} files; "
+                f"inputFrozen={str(manifest['inputReadiness']['inputFrozen']).lower()}, "
                 f"sealEligible={str(manifest['roundReadiness']['sealEligible']).lower()}"
             )
     except BundleError as exc:

@@ -3,9 +3,26 @@ from __future__ import annotations
 from pathlib import Path
 import re
 
+import yaml
+
 
 ROOT = Path(__file__).resolve().parents[2]
 MAIN_PLAN = ROOT / "mainPlan"
+R10_INPUT_PACKET = (
+    MAIN_PLAN
+    / "astryx-product-experience"
+    / "00-product-contract"
+    / "01-prd-improvement-loop"
+    / "09-learning-quality-revalidation"
+    / "03-independent-r10-input"
+)
+R10_ROUND_ROOT = (
+    MAIN_PLAN
+    / "astryx-product-experience"
+    / "00-product-contract"
+    / "01-prd-improvement-loop"
+    / "08-r10-independent-review"
+)
 FORBIDDEN_COMPLETION_PATHS = (
     "mainPlan/completion-evidence.schema.yml",
     "mainPlan/completion-transition.schema.yml",
@@ -100,3 +117,26 @@ def testFinishedStateIsDeletedInsteadOfMarkedDone() -> None:
             offenders.append(path.relative_to(ROOT).as_posix())
 
     assert offenders == []
+
+
+def testDeletedR10InputPacketHasAFrozenCurrentBundle() -> None:
+    if R10_INPUT_PACKET.exists():
+        return
+
+    inputManifest = yaml.safe_load(
+        (R10_ROUND_ROOT / "r10-input-manifest.yml").read_text(encoding="utf-8")
+    )
+    bundleManifest = yaml.safe_load(
+        (R10_ROUND_ROOT / "evaluation-bundle.manifest.yml").read_text(encoding="utf-8")
+    )
+    inputFreeze = inputManifest.get("inputFreeze") if isinstance(inputManifest, dict) else None
+    inputReadiness = bundleManifest.get("inputReadiness") if isinstance(bundleManifest, dict) else None
+    scope = bundleManifest.get("scope") if isinstance(bundleManifest, dict) else None
+
+    assert isinstance(inputFreeze, dict) and inputFreeze.get("state") == "frozen"
+    assert isinstance(inputReadiness, dict) and inputReadiness.get("inputFrozen") is True
+    assert bundleManifest.get("state") in {"input-frozen", "sealed"}
+    assert isinstance(scope, dict) and scope.get("sealState") in {"input-frozen", "sealed"}
+    assert inputFreeze.get("gitCommit") == scope.get("gitCommit")
+    assert inputFreeze.get("manifestHash") == scope.get("manifestHash")
+    assert inputFreeze.get("evaluationBundleHash") == bundleManifest.get("archive", {}).get("sha256")

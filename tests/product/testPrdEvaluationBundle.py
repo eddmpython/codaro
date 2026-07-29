@@ -326,7 +326,8 @@ def testCurrentBundleIsCompleteAndStillBlockedFromSealing() -> None:
     paths = [row["path"] for row in rows]
 
     builder.verifyExcludedPriorReports(paths)
-    assert manifest["state"] == "draft"
+    assert manifest["state"] in {"draft", "input-frozen"}
+    assert manifest["inputReadiness"]["inputFrozen"] is (manifest["state"] == "input-frozen")
     assert manifest["roundReadiness"]["sealEligible"] is False
     assert manifest["archive"]["sha256"] == hashlib.sha256(archiveBytes).hexdigest()
     assert manifest["archive"]["format"] == "zip"
@@ -371,6 +372,118 @@ def testSealTransitionRejectsAnUnreadyRound() -> None:
 
     with pytest.raises(builder.BundleError, match="cannot be sealed"):
         builder.sealedInputManifest({}, manifest)
+
+
+def testInputFreezeTransitionRejectsStaleMachineEvidence() -> None:
+    builder = loadBuilder()
+    manifest = {
+        "inputReadiness": {
+            "freezeEligible": False,
+            "freezeBlockingReasons": ["current machine evidence report is stale"],
+        }
+    }
+
+    with pytest.raises(builder.BundleError, match="cannot be frozen"):
+        builder.frozenInputManifest({}, manifest)
+
+
+def testInputFreezeBindsScopeWithoutClaimingRoundReadiness() -> None:
+    builder = loadBuilder()
+    manifest = {
+        "inputReadiness": {
+            "freezeEligible": True,
+            "freezeBlockingReasons": [],
+        },
+        "roundReadiness": {
+            "sealEligible": False,
+            "sealBlockingReasons": ["learning evaluator is unassigned"],
+        },
+        "scope": {
+            "gitCommit": "1" * 40,
+            "dirtyDiffHash": "a" * 64,
+            "manifestHash": "b" * 64,
+            "fileCount": 12,
+        },
+        "archive": {"path": "output/bundle.zip", "sha256": "c" * 64},
+        "machineEvidence": {
+            "indexPath": "evaluation-evidence/manifest.yml",
+            "requiredReportCount": 9,
+            "includedReportCount": 9,
+            "artifactCount": 187,
+            "allCurrent": True,
+        },
+    }
+
+    frozen = builder.frozenInputManifest(
+        {
+            "roundState": "blocked",
+            "sealed": False,
+            "draftBundle": {},
+        },
+        manifest,
+    )
+
+    assert frozen["roundState"] == "blocked"
+    assert frozen["sealed"] is False
+    assert frozen["inputFreeze"] == {
+        "state": "frozen",
+        "manifestPath": builder.relativePath(builder.MANIFEST_PATH),
+        "archivePath": "output/bundle.zip",
+        "gitCommit": "1" * 40,
+        "dirtyDiffHash": "a" * 64,
+        "manifestHash": "b" * 64,
+        "evaluationBundleHash": "c" * 64,
+        "fileCount": 12,
+        "machineEvidenceIndexPath": "evaluation-evidence/manifest.yml",
+        "requiredReportCount": 9,
+        "includedReportCount": 9,
+        "artifactCount": 187,
+        "allCurrent": True,
+    }
+    assert frozen["draftBundle"]["sealEligible"] is False
+
+
+def testInputFreezeMatchRejectsChangedArchiveOrEvidenceInventory() -> None:
+    builder = loadBuilder()
+    scope = {
+        "gitCommit": "1" * 40,
+        "dirtyDiffHash": "a" * 64,
+        "manifestHash": "b" * 64,
+        "fileCount": 12,
+    }
+    archive = {
+        "path": builder.relativePath(builder.ARCHIVE_PATH),
+        "sha256": "c" * 64,
+    }
+    machineEvidence = {
+        "requiredReportCount": 9,
+        "includedReportCount": 9,
+        "artifactCount": 187,
+        "allCurrent": True,
+        "blockingReasons": [],
+    }
+    binding = {
+        "state": "frozen",
+        "manifestPath": builder.relativePath(builder.MANIFEST_PATH),
+        "archivePath": archive["path"],
+        "gitCommit": scope["gitCommit"],
+        "dirtyDiffHash": scope["dirtyDiffHash"],
+        "manifestHash": scope["manifestHash"],
+        "evaluationBundleHash": archive["sha256"],
+        "fileCount": scope["fileCount"],
+        "machineEvidenceIndexPath": builder.EVIDENCE_INDEX_PATH,
+        "requiredReportCount": 9,
+        "includedReportCount": 9,
+        "artifactCount": 187,
+        "allCurrent": True,
+    }
+
+    assert builder.inputFreezeMatches(binding, scope, archive, machineEvidence) is True
+
+    changedArchive = dict(archive, sha256="d" * 64)
+    changedEvidence = dict(machineEvidence, artifactCount=188)
+    assert builder.inputFreezeMatches(binding, scope, changedArchive, machineEvidence) is False
+    assert builder.inputFreezeMatches(binding, scope, archive, changedEvidence) is False
 
 
 def testSealTransitionBindsAllScopeHashes() -> None:
