@@ -105,6 +105,7 @@ def testGateNamesAreStable() -> None:
     )
     assert runner.GATE_ARTIFACTS["astryx-journey"] == (
         "output/test-runner/astryx-journey/astryx-journey-report.json",
+        "output/test-runner/astryx-journey/manual-at-report.json",
     )
     assert runner.GATE_ARTIFACTS["theme-runtime-browser"] == (
         "output/test-runner/theme-runtime-browser/theme-runtime-report.json",

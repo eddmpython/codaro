@@ -169,12 +169,27 @@ def testAuditMainBuildsBeforeJourneyAndBindsGitHead(
     monkeypatch.setattr(
         audit,
         "verifyJourney",
-        lambda: calls.append("journey") or {"caseCount": 12, "colorSchemes": ["dark", "light"]},
+        lambda: calls.append("journey") or {"caseCount": 14, "colorSchemes": ["dark", "light"]},
+    )
+    monkeypatch.setattr(
+        audit,
+        "verifyManualAtMatrix",
+        lambda **_kwargs: calls.append("manual") or {
+            "passed": True,
+            "machineEligible": True,
+            "completionEligible": False,
+            "completionBlockers": ["manual evidence remains"],
+            "failures": [],
+            "facts": {"manualScenarios": {"passed": 0}},
+            "reportPath": "output/manual-at-report.json",
+        },
     )
 
     assert audit.main() == 0
 
     payload = json.loads(reportPath.read_text(encoding="utf-8"))
-    assert calls == ["build", "fixture", "journey"]
+    assert calls == ["build", "fixture", "journey", "manual"]
     assert payload["gitHead"] == "a" * 40
     assert payload["facts"]["builds"]["landing"]["passed"] is True
+    assert payload["completionEligible"] is False
+    assert payload["completionBlockers"] == ["manual evidence remains"]

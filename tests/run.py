@@ -128,6 +128,7 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     ),
     "astryx-journey": (
         "output/test-runner/astryx-journey/astryx-journey-report.json",
+        "output/test-runner/astryx-journey/manual-at-report.json",
     ),
     "install-launcher-smoke": ("output/test-runner/install-launcher-smoke/install-launcher-report.json",),
     "product-browser-webview2-evergreen": (
@@ -694,7 +695,7 @@ GATES: dict[str, Gate] = {
     ),
     "astryx-journey": Gate(
         tier="surface",
-        description="현재 source를 build한 뒤 Landing·Learn·Run·Local의 Astryx 대표 여정을 Dark·Light에서 각각 확인한다.",
+        description="현재 source의 Astryx 대표 여정을 Dark·Light에서 확인하고 수동 접근성·사용자 연구 완료 증거를 판정한다.",
         commands=(command((
             "uv",
             "run",

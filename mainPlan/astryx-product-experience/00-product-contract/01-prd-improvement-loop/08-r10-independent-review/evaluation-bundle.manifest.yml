@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: ecbd0fea6bd7e469168e275769bdcbb025c62c04
-  dirtyDiffHash: 3dae9058613efcdcba01d449d9abb9ee6f8dfb47ccce5ce14c1510b2d05b2b4d
-  manifestHash: ad2c0be4f15c4e17a5c4facee99da7a5254509add8d7aeaa75d581e359705915
-  fileCount: 3162
-  totalBytes: 97374746
+  gitCommit: a0109b55cf88927f9fd07810809ae04fc525c69a
+  dirtyDiffHash: 13701463d912f8212019fa4fd61ef737976a3e6aef3cc5bbf1d9888b59a937c0
+  manifestHash: 2499a4be3e7583f231b0293d3a75b011e6de339782ef2014ba3e8e6def4bac73
+  fileCount: 3165
+  totalBytes: 97421953
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: 1fd6ba596821b0d2df7c2fde5626619657cdfeef396f3a4f9947110eb4f250b7
-  bytes: 98015652
+  sha256: 112dcb9e5a8c3d0c0a814405cc5eba662ea6a809537322c6ee5c4c64463db08d
+  bytes: 98063299
   format: zip
   compression: stored
   compressionMethod: 0
@@ -4368,8 +4368,8 @@ files:
   kind: repository
   sourcePath: docs/skills/architecture/frontend-product-surface.md
 - path: docs/skills/architecture/learning-yaml-contract.md
-  sha256: 7af226d790e69f209b846184e25f85fa8b682fc7fb385648134093a3d0673c2f
-  bytes: 18736
+  sha256: cd4673759532377ab61da9cfe76e92e931e5ca51f7bc02f89200e410ba7be489
+  bytes: 18677
   kind: repository
   sourcePath: docs/skills/architecture/learning-yaml-contract.md
 - path: docs/skills/architecture/live-provider-ops.md
@@ -4513,8 +4513,8 @@ files:
   kind: repository
   sourcePath: docs/skills/ops/foundation/environment.md
 - path: docs/skills/ops/foundation/testing-and-gates.md
-  sha256: 8d272fc74bdb45dff13159b804fcbdd78d746636d8f74450b49ff1e79cd80eb9
-  bytes: 60468
+  sha256: d869d6f09eb96a3548faec14cce03dc64a48529eab9a44daaacf2b1f160591d8
+  bytes: 61567
   kind: repository
   sourcePath: docs/skills/ops/foundation/testing-and-gates.md
 - path: docs/skills/ops/product/branding.md
@@ -15351,9 +15351,14 @@ files:
   bytes: 928
   kind: repository
   sourcePath: tests/product/fixtures/releaseResearch/missing-research-owner.yml
+- path: tests/product/manual-at.matrix.yml
+  sha256: b6df3cc67a0fcf998f6177c91d5884259c2a00400408431eb61d83734569cc46
+  bytes: 4374
+  kind: repository
+  sourcePath: tests/product/manual-at.matrix.yml
 - path: tests/product/testAstryxJourneyAudit.py
-  sha256: 0afb2b77d93ee5ba7e6267fff31b369059e714431522fa393984943b47fd7a3f
-  bytes: 5886
+  sha256: ab4d578b1b43c43c667c6bb11beda271384ce31a8e8c7ace20908f76df8a55d3
+  bytes: 6473
   kind: repository
   sourcePath: tests/product/testAstryxJourneyAudit.py
 - path: tests/product/testAstryxJourneyMatrix.py
@@ -15376,6 +15381,11 @@ files:
   bytes: 2029
   kind: repository
   sourcePath: tests/product/testLearningEfficacyStage.py
+- path: tests/product/testManualAtMatrix.py
+  sha256: 34f81364aa6f2fb7d11ec2fa852dbe96c116af694866617f0ff0b83f210af7bc
+  bytes: 6841
+  kind: repository
+  sourcePath: tests/product/testManualAtMatrix.py
 - path: tests/product/testPrdEvaluationBundle.py
   sha256: 43fb2bddb815392d24f446bf02b8833789999b5fdf4e324096deb51ece007521
   bytes: 11431
@@ -15392,8 +15402,8 @@ files:
   kind: repository
   sourcePath: tests/product/testPrdEvaluationReport.py
 - path: tests/product/verifyAstryxJourneyAudit.py
-  sha256: c9a1f9e6c01a4ad21550fc6f5b3a511ca11418310e64411915e52cee01243664
-  bytes: 12346
+  sha256: 91893927daf44aa7e7cdf9b8c01cc3fd39399b2806cc606d2c99375f6a081d0d
+  bytes: 13350
   kind: repository
   sourcePath: tests/product/verifyAstryxJourneyAudit.py
 - path: tests/product/verifyCheckSandboxFeasibility.py
@@ -15421,6 +15431,11 @@ files:
   bytes: 4870
   kind: repository
   sourcePath: tests/product/verifyLearningEfficacyReport.py
+- path: tests/product/verifyManualAtMatrix.py
+  sha256: 270ae0a5598581ff3131e99f573266a3a54372cb92c2120d50bf90d2afd1e494
+  bytes: 32832
+  kind: repository
+  sourcePath: tests/product/verifyManualAtMatrix.py
 - path: tests/product/verifyPathEfficacyEvidence.py
   sha256: 15d0bfceda2f1f767ae853b9d957e8843c79b626da635307dc362d5927ad2acc
   bytes: 4696
@@ -15457,8 +15472,8 @@ files:
   kind: repository
   sourcePath: tests/product/verifyWebView2ProductSmoke.py
 - path: tests/run.py
-  sha256: ed58ad3ddf2af98a109183f2dd2141e899d277778ed7d10b4616e510714cb0fa
-  bytes: 81854
+  sha256: dc0851a7d75b93cb583d8bd0dc3227f3847b6140a8e3c8f878d83e71556b82a8
+  bytes: 81936
   kind: repository
   sourcePath: tests/run.py
 - path: tests/runtime/testAppRuntime.py
@@ -15512,8 +15527,8 @@ files:
   kind: repository
   sourcePath: tests/runtime/testReactiveMarkdown.py
 - path: tests/runtime/testRunEntrypoint.py
-  sha256: a18bc2ea5d6154882846bc86d3c1beedfe2d58ec5d698ccd26eba430575d55b9
-  bytes: 29548
+  sha256: c89533e946fd90bc98419c26afd09ea26f115ee92da18734b56f5c1a3c9f2eed
+  bytes: 29995
   kind: repository
   sourcePath: tests/runtime/testRunEntrypoint.py
 - path: tests/runtime/testRuntime.py

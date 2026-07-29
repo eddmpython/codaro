@@ -2,7 +2,9 @@
 
 상태: 진행
 
-2026-07-23 machine journey는 Landing Home mobile·desktop, Landing Learn catalog, public canonical lesson, Web Learn·Lesson·Run, Local Learn·native Lesson·Run·Automation의 12개 Chromium case를 Dark·Light 각각 통과한다. 24개 scheme별 evidence에서 Astryx theme, overflow·control overlap 0, accessible name, image load, 분리된 screenshot을 검사했고 두 lesson의 확인·제출·hint reveal control은 0개다. `reveal-only-control` negative fixture도 실행 상태로 이미 제공할 수 있는 내용을 클릭 뒤에 숨기는 계약으로 거부한다. 현재 Windows 11 WebView2의 NVDA 발화·한국어 IME·forced-colors 증거는 통과했지만 Windows 10 Narrator, Web의 Firefox NVDA·VoiceOver·TalkBack 수동 matrix와 12명 학습성 연구가 없으므로 `completionEligible=false`이며 TODO가 남아 있다.
+2026-07-29 machine journey는 Landing Home mobile·desktop, Landing Learn catalog, public canonical lesson, Web Learn·Lesson·Chat·Automation·Run, Local Learn·native Lesson·Run·Automation의 14개 Chromium case를 Dark·Light 각각 통과한다. 28개 scheme별 evidence에서 Astryx theme, overflow·control overlap 0, accessible name, image load, 분리된 screenshot을 검사했고 두 lesson의 확인·제출·hint reveal control은 0개다. `reveal-only-control` negative fixture도 실행 상태로 이미 제공할 수 있는 내용을 클릭 뒤에 숨기는 계약으로 거부한다.
+
+실제 네이티브 WebView2 gate는 900x640 Home, 1024x768 Notebook, 1440x900 Automation과 상태별 screenshot, 접근성 tree, 한국어 IME, keyboard, forced-colors를 검사한다. 다만 현재 저장된 통과 report는 현재 커밋보다 오래됐으며 NVDA·Narrator 발화를 사람이 청취한 증거가 아니다. `manual-at.matrix.yml`은 Web Windows NVDA 2종, macOS·iOS VoiceOver, Android TalkBack, Windows 10 22H2 Narrator의 정확한 6개 조합과 12명 연구, 제품 디자인·접근성 독립 검토를 폐쇄형 schema로 고정했다. 현재 모든 사람 증거는 정직하게 `pending`이므로 `completionEligible=false`이며 이 TODO는 남아 있다.
 
 ## 목표
 
@@ -51,7 +53,8 @@ hero와 제품 증명 figure를 분리한다.
 - `tests/product/astryxVerticalSlice.matrix.json`
 - `tests/product/fixtures/astryxVerticalSlice/reveal-only-control.json`
 - `tests/product/verifyAstryxJourneyAudit.py`
-- 신규 `tests/product/manual-at.matrix.yml`, `tests/product/verifyManualAtMatrix.py`
+- `tests/product/manual-at.matrix.yml`
+- `tests/product/verifyManualAtMatrix.py`
 - `tests/surface/verifyProductExperiencePlaywright.py`
 
 ## 영향 함수·심볼
@@ -67,7 +70,10 @@ hero와 제품 증명 figure를 분리한다.
 - `document.fonts.check`, font request, CLS, 한국어·Latin·code fallback fixture
 - hero text가 code·result·check를 가리지 않고 detail figure에서 실제 상태가 읽히는지 검사
 - NVDA·VoiceOver·TalkBack·Narrator 수동 report와 keyboard·IME·forced-colors 시나리오
+- 수동 통과 row는 exact OS·browser·보조기술 version, tester, timezone 시각, 검증한 제품 commit, `docs/evidence/astryx-journey` 아래 artifact와 SHA-256이 모두 있어야 함
+- `pending` row는 결과·테스터·artifact를 미리 채울 수 없고, 제품 source가 검증 commit 뒤 바뀌면 기존 사람 증거를 완료 근거로 사용할 수 없음
 - 기본 Python 수정·실행은 가능하지만 file automation은 처음인 대표 사용자 12명 중 80% 이상이 진행자 도움 없이 첫 strong check까지 3분 이내 도달. 이 결과를 Python 완전 초보자 전체에 일반화하지 않음
+- `uv run python -X utf8 tests/product/verifyManualAtMatrix.py`
 - `uv run python -X utf8 tests/product/verifyAstryxJourneyAudit.py`
 
 ## 롤백

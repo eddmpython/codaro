@@ -1,0 +1,176 @@
+schemaVersion: 1
+matrixId: astryx-journey-manual-at-v1
+evidenceRoot: docs/evidence/astryx-journey
+productSourcePaths:
+  - assets/brand
+  - curricula
+  - editor
+  - landing
+  - launcher
+  - src/codaro
+automatedNativeEvidence:
+  gate: product-browser-webview2-evergreen
+  reportPath: output/test-runner/product-browser-webview2-evergreen/webview2-product-smoke-report.json
+  requiredCases:
+    - local-home-900x640
+    - local-automation-1440x900
+    - local-automation-state-matrix-1440x900
+    - local-notebook-keyboard-12-cells
+    - local-shell-keyboard-forced-colors-900x640
+manualScenarios:
+  - id: web-windows-nvda-chromium
+    target:
+      surface: web
+      osFamily: Windows
+      osRelease: supported
+      browserFamily: Chromium
+      assistiveTechnology: NVDA
+    requiredChecks:
+      - landmark-heading-navigation
+      - codemirror-enter-exit
+      - run-retry-keyboard
+      - result-announced-once
+    status: pending
+    actual: null
+    tester: null
+    observedAt: null
+    productGitHead: null
+    checkResults: {}
+    findings: []
+    evidence: []
+  - id: web-windows-nvda-firefox
+    target:
+      surface: web
+      osFamily: Windows
+      osRelease: supported
+      browserFamily: Firefox
+      assistiveTechnology: NVDA
+    requiredChecks:
+      - landmark-heading-navigation
+      - codemirror-enter-exit
+      - run-retry-keyboard
+      - result-announced-once
+    status: pending
+    actual: null
+    tester: null
+    observedAt: null
+    productGitHead: null
+    checkResults: {}
+    findings: []
+    evidence: []
+  - id: web-macos-voiceover-safari
+    target:
+      surface: web
+      osFamily: macOS
+      osRelease: supported
+      browserFamily: Safari
+      assistiveTechnology: VoiceOver
+    requiredChecks:
+      - rotor-landmark-heading-navigation
+      - codemirror-enter-exit
+      - run-retry-keyboard
+      - result-announced-once
+    status: pending
+    actual: null
+    tester: null
+    observedAt: null
+    productGitHead: null
+    checkResults: {}
+    findings: []
+    evidence: []
+  - id: web-ios-voiceover-safari
+    target:
+      surface: web
+      osFamily: iOS
+      osRelease: supported
+      browserFamily: Safari
+      assistiveTechnology: VoiceOver
+    requiredChecks:
+      - rotor-landmark-heading-navigation
+      - codemirror-enter-exit
+      - virtual-keyboard
+      - result-announced-once
+    status: pending
+    actual: null
+    tester: null
+    observedAt: null
+    productGitHead: null
+    checkResults: {}
+    findings: []
+    evidence: []
+  - id: web-android-talkback-chrome
+    target:
+      surface: web
+      osFamily: Android
+      osRelease: supported
+      browserFamily: Chrome
+      assistiveTechnology: TalkBack
+    requiredChecks:
+      - swipe-navigation
+      - codemirror-enter-exit
+      - run-retry-keyboard
+      - result-announced-once
+    status: pending
+    actual: null
+    tester: null
+    observedAt: null
+    productGitHead: null
+    checkResults: {}
+    findings: []
+    evidence: []
+  - id: local-windows10-narrator-webview2
+    target:
+      surface: local
+      osFamily: Windows
+      osRelease: Windows 10 22H2
+      browserFamily: WebView2
+      assistiveTechnology: Narrator
+    requiredChecks:
+      - landmark-heading-navigation
+      - codemirror-enter-exit
+      - result-announced-once
+      - dialog-focus-return
+      - run-retry-local-estop-keyboard
+      - korean-ime-no-shortcut-conflict
+      - forced-colors-state-distinction
+    status: pending
+    actual: null
+    tester: null
+    observedAt: null
+    productGitHead: null
+    checkResults: {}
+    findings: []
+    evidence: []
+study:
+  id: first-strong-check-file-automation
+  status: pending
+  cohort: basic-python-users-new-to-file-automation
+  claimBoundary: not-generalized-beyond-recruited-cohort
+  requiredParticipants: 12
+  minimumUnassistedRate: 0.8
+  maximumElapsedSeconds: 180
+  researchOwner: null
+  privacyOwner: null
+  observedAt: null
+  productGitHead: null
+  participants: []
+  evidence: []
+independentReviews:
+  - discipline: product-design
+    status: pending
+    reviewer: null
+    relationship: null
+    observedAt: null
+    productGitHead: null
+    decision: null
+    findings: []
+    evidence: []
+  - discipline: accessibility
+    status: pending
+    reviewer: null
+    relationship: null
+    observedAt: null
+    productGitHead: null
+    decision: null
+    findings: []
+    evidence: []

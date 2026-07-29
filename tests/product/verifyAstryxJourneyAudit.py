@@ -11,6 +11,15 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "tests/product"))
+
+from verifyManualAtMatrix import (  # noqa: E402
+    MATRIX_PATH as MANUAL_AT_MATRIX_PATH,
+    REPORT_PATH as MANUAL_AT_REPORT_PATH,
+    verifyManualAtMatrix,
+)
+
+
 FIXTURE_PATH = ROOT / "tests/product/fixtures/astryxVerticalSlice/reveal-only-control.json"
 MATRIX_PATH = ROOT / "tests/product/astryxVerticalSlice.matrix.json"
 PRODUCT_BROWSER_PATH = ROOT / "tests/surface/verifyProductExperiencePlaywright.py"
@@ -265,21 +274,43 @@ def main() -> int:
     failures: list[str] = []
     facts: dict[str, Any] = {}
     gitHead = "unknown"
+    manualAtReport: dict[str, Any] | None = None
     try:
         gitHead = currentGitHead()
         facts["builds"] = buildCurrentSources()
         facts["negativeFixture"] = rejectRevealOnlyFixture()
         facts["journey"] = verifyJourney()
+        manualAtReport = verifyManualAtMatrix(
+            matrixPath=MANUAL_AT_MATRIX_PATH,
+            reportPath=MANUAL_AT_REPORT_PATH,
+            root=ROOT,
+            gitHead=gitHead,
+        )
+        facts["manualAt"] = {
+            "reportPath": manualAtReport["reportPath"],
+            "machineEligible": manualAtReport["machineEligible"],
+            "completionEligible": manualAtReport["completionEligible"],
+            "facts": manualAtReport["facts"],
+        }
+        if manualAtReport["passed"] is not True:
+            raise ValueError(
+                "manual accessibility matrix contract failed: "
+                + "; ".join(manualAtReport["failures"])
+            )
         if currentGitHead() != gitHead:
             raise ValueError("Git head changed while the Astryx journey was running")
     except (OSError, ValueError, subprocess.SubprocessError) as error:
         failures.append(str(error))
-    completionBlockers = [
-        "actual Windows WebView2 900x640 and 1440x900 capture matrix is absent",
-        "NVDA, VoiceOver, TalkBack, Narrator, IME, and forced-colors manual reports are absent",
-        "12-person facilitated first-strong-check study is absent",
-        "independent product-design and accessibility review is absent",
-    ]
+    completionBlockers = (
+        list(manualAtReport["completionBlockers"])
+        if manualAtReport is not None
+        else ["manual accessibility completion evidence was not evaluated"]
+    )
+    completionEligible = (
+        not failures
+        and manualAtReport is not None
+        and manualAtReport["completionEligible"] is True
+    )
     payload = {
         "schemaVersion": 1,
         "audit": "astryx-journey",
@@ -287,7 +318,7 @@ def main() -> int:
         "passed": not failures,
         "gitHead": gitHead,
         "machineEligible": not failures,
-        "completionEligible": False,
+        "completionEligible": completionEligible,
         "startedAt": startedAt,
         "completedAt": utcTimestamp(),
         "durationMs": round((time.monotonic() - started) * 1000),
@@ -306,7 +337,8 @@ def main() -> int:
     print(
         "ok: Astryx journey verified "
         f"({facts['journey']['caseCount']} cases x "
-        f"{len(facts['journey']['colorSchemes'])} color schemes, completionEligible=false)"
+        f"{len(facts['journey']['colorSchemes'])} color schemes, "
+        f"completionEligible={str(completionEligible).lower()})"
     )
     return 0
 
