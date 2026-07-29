@@ -68,6 +68,8 @@ sections:
       title: 클러스터링
     - emoji: ⚙️
       title: 통일된 API
+  - type: image
+    assetId: statisticsMachineLearning
   goal: scikit-learn이란?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
   why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
 - id: what_is_sklearn

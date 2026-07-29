@@ -58,6 +58,9 @@ sections:
   - id: classify-status
     title: git status에서 현재 상태 찾기
     structuredPrimary: true
+    blocks:
+      - type: image
+        assetId: developerLiteracy
     subtitle: 출력 문구를 저장소 상태로 바꾸기
     goal: git status의 핵심 문구를 untracked, modified, staged, conflict, clean 상태로 분류한다.
     why: 명령을 외워도 현재 상태를 잘못 읽으면 add나 commit을 엉뚱한 시점에 실행하게 됩니다.

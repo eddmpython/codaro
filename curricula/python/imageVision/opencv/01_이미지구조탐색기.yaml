@@ -60,6 +60,9 @@ sections:
 - id: step1_load
   title: 1단계. 샘플 이미지 로드
   structuredPrimary: true
+  blocks:
+  - type: image
+    assetId: imageVision
   subtitle: sklearn 샘플로 시작
   goal: sklearn의 flower 샘플을 ndarray로 받고 type/shape/dtype을 한 번에 확인합니다.
   why: OpenCV 학습을 파일 다운로드 없이 시작하려면 sklearn 샘플이 가장 짧은 경로입니다. 이 단계에서 "이미지가 곧 ndarray"라는 첫 번째 멘탈 모델을 굳혀야 이후 모든 cv2 함수의 인자가 자연스럽게 해석됩니다.

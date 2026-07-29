@@ -391,7 +391,7 @@ GATES: dict[str, Gate] = {
     ),
     "product-browser-webview2-evergreen": Gate(
         tier="release",
-        description="Windows의 실제 launcher WebView2에서 설치 wheel과 Local Home·Notebook·Automation viewport를 확인한다.",
+        description="Windows의 실제 launcher WebView2에서 설치 wheel, Local Home·Notebook·Automation viewport와 자동화 6상태·E-Stop·redaction을 확인한다.",
         commands=(
             command(("npm", "run", "build"), cwd="editor"),
             command(("cargo", "build"), cwd="launcher/codaro-launcher", timeoutSeconds=1200),
@@ -629,13 +629,16 @@ GATES: dict[str, Gate] = {
     ),
     "visual-assets": Gate(
         tier="surface",
-        description="공용 visual manifest, fresh 제품 fixture, redaction, source provenance, AVIF/WebP 파생물, 앱 mirror, 용량 예산을 확인한다.",
+        description="공용 visual manifest, instructional 앵커, Run 5상태·3 viewport, fresh 제품 fixture, redaction, source provenance, 파생물과 용량 예산을 확인한다.",
         commands=(
             command(("uv", "run", "--with", "pillow", "python", "-X", "utf8", "-m", "pytest", "tests/assets/testVisualAssetManifest.py", "tests/assets/testBuildVisualAssets.py", "tests/assets/testCaptureProductVisuals.py", "tests/assets/testCaptureOutcomeProofs.py", "-q", "--tb=short")),
             command(("uv", "run", "--with", "pillow", "python", "-X", "utf8", "assets/brand/tools/buildVisualAssets.py", "--check")),
             command(("node", "scripts/syncVisualAssets.js", "--check"), cwd="landing"),
             command(("node", "scripts/syncVisualAssets.mjs", "--check"), cwd="editor"),
             command(("uv", "run", "python", "-X", "utf8", "tests/assets/verifyVisualAssetBudget.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/assets/verifyInstructionalVisualPurpose.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/assets/verifyRunCaptureMatrix.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/learning/verifyInstructionalVisualPlaywright.py"), timeoutSeconds=900),
             command(("npm", "run", "build"), cwd="landing"),
             command(("npm", "run", "build"), cwd="editor"),
             command((

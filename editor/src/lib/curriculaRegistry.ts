@@ -728,9 +728,10 @@ function convertYamlBlock(block: YamlMap, parentRole?: CellRole): BlockConfig[] 
   }
 
   if (["image", "video", "youtube", "videoCarousel", "pdf", "MIME"].includes(sourceType)) {
+    const assetId = textValue(block.assetId);
     const src = textValue(block.src ?? block.url ?? block.href ?? block.imageUrl ?? block.videoUrl ?? block.buttonLink ?? block.youtubeId ?? block.videoId ?? block.youtube);
     const items = arrayOfMaps(block.items ?? block.videos);
-    if (!src && !items.length && !title && !subtitle && !description) return [];
+    if (!assetId && !src && !items.length && !title && !subtitle && !description) return [];
     return [markdownBlock({
       content: formatMedia({ sourceType, src, title, subtitle, description, items }),
       displayKind: "media",

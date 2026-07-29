@@ -294,6 +294,7 @@ def _convertBlock(block: dict[str, Any], solutions: dict[str, str], parentRole: 
         ]
 
     if sourceType in MEDIA_TYPES:
+        assetId = _textValue(block.get("assetId"))
         src = _textValue(
             block.get("src")
             or block.get("url")
@@ -306,7 +307,7 @@ def _convertBlock(block: dict[str, Any], solutions: dict[str, str], parentRole: 
             or block.get("youtube")
         )
         items = _firstMaps(block, "items", "videos")
-        if not any([src, items, title, subtitle, description]):
+        if not any([assetId, src, items, title, subtitle, description]):
             return []
         return [
             _markdownBlock(

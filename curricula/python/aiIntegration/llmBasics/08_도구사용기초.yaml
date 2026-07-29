@@ -51,6 +51,9 @@ sections:
 - id: define_tool
   title: 1단계. 도구 스키마 정의
   structuredPrimary: true
+  blocks:
+  - type: image
+    assetId: aiIntegration
   subtitle: name, description, input_schema
   goal: get_weather 도구를 JSON 스키마로 정의하고 tools 리스트에 담는다.
   why: 도구 스키마는 Claude가 도구를 언제·어떻게 호출할지 결정하는 정보입니다. 정확한 스키마가 도구 사용의 첫 단계입니다.

@@ -77,15 +77,19 @@ def productCaptureAssets(
         (
             str(asset.get("provenance", {}).get("fixtureId", "")),
             str(asset.get("capture", {}).get("theme", "")),
+            str(asset.get("capture", {}).get("evidencePath", "")),
         )
         for asset in assets
     ]
     if (
         len(fixtureThemes) != len(set(fixtureThemes))
-        or any(not fixtureId or theme not in {"light", "dark"} for fixtureId, theme in fixtureThemes)
+        or any(
+            not fixtureId or theme not in {"light", "dark"}
+            for fixtureId, theme, _ in fixtureThemes
+        )
     ):
         raise ProductVisualCaptureError(
-            "product capture fixture and theme pairs must be non-empty and unique"
+            "product capture fixture, theme, and evidence paths must be non-empty and unique"
         )
     return assets
 
@@ -298,7 +302,10 @@ def runCapture(asset: dict[str, Any], expectedGitHead: str) -> dict[str, Any]:
         raise ProductVisualCaptureError(
             f"{assetId}: capture has product or redaction failure(s): {failures[:5]}"
         )
-    screenshotValue = case.get("screenshot")
+    screenshotValue = nestedReportValue(
+        case,
+        str(asset.get("capture", {}).get("evidencePath", "")),
+    )
     if not isinstance(screenshotValue, str) or not screenshotValue:
         raise ProductVisualCaptureError(f"{assetId}: capture screenshot path is missing")
     screenshotPath = (ROOT / screenshotValue).resolve()
@@ -321,6 +328,19 @@ def runCapture(asset: dict[str, Any], expectedGitHead: str) -> dict[str, Any]:
         "reportPath": reportPath,
         "redactionSignals": redactionSignals,
     }
+
+
+def nestedReportValue(case: dict[str, Any], evidencePath: str) -> Any:
+    if not evidencePath:
+        return case.get("screenshot")
+    value: Any = case
+    for segment in evidencePath.split("."):
+        if not isinstance(value, dict) or segment not in value:
+            raise ProductVisualCaptureError(
+                f"{case.get('name')}: capture evidence path is missing: {evidencePath}"
+            )
+        value = value[segment]
+    return value
 
 
 def captureAssets(assets: list[dict[str, Any]], expectedGitHead: str) -> tuple[list[dict[str, Any]], list[str]]:

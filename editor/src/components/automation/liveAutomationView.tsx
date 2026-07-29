@@ -113,7 +113,11 @@ export function LiveAutomationView({
 
   return (
     <ScrollArea className="h-full min-h-0">
-      <div className="mx-auto max-w-3xl space-y-4 p-4">
+      <div
+        className="mx-auto max-w-3xl space-y-4 p-4"
+        data-automation-live-kind={agentKind}
+        data-automation-live-status={run?.status ?? "idle"}
+      >
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

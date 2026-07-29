@@ -1,8 +1,12 @@
 import { visualAssetManifest } from "@/lib/generated/visualAssetManifest";
 
-type VisualAssetId = (typeof visualAssetManifest.assets)[number]["id"];
+export type VisualAssetId = (typeof visualAssetManifest.assets)[number]["id"];
 type VisualAssetFormat = "avif" | "webp";
 type VisualAssetTheme = "light" | "dark";
+
+export function isVisualAssetId(value: string): value is VisualAssetId {
+  return visualAssetManifest.assets.some((candidate) => candidate.id === value);
+}
 
 export function resolveVisualAsset(
   assetId: VisualAssetId,

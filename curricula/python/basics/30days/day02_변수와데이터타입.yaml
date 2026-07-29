@@ -60,6 +60,9 @@ sections:
   title: 변수란?
   structuredPrimary: true
   subtitle: 데이터를 저장하는 이름표
+  blocks:
+  - type: image
+    assetId: pythonFundamentals
   goal: 변수란?에서 `msg` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
   why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-

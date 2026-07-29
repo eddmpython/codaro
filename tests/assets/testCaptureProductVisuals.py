@@ -56,6 +56,34 @@ class CaptureProductVisualsTest(unittest.TestCase):
                 self.assertEqual(sourcePaths, sorted(set(sourcePaths)))
                 self.assertTrue(set(CAPTURE_TOOL.CAPTURE_OWNER_PATHS).issubset(sourcePaths))
 
+    def testNestedEvidencePathSelectsExactIntermediateStateScreenshot(self) -> None:
+        case = {
+            "name": "fixture",
+            "screenshot": "final.png",
+            "checkStateEvidence": {
+                "screenshots": {
+                    "mismatch": "mismatch.png",
+                    "verified": "verified.png",
+                }
+            },
+        }
+        self.assertEqual(CAPTURE_TOOL.nestedReportValue(case, ""), "final.png")
+        self.assertEqual(
+            CAPTURE_TOOL.nestedReportValue(
+                case,
+                "checkStateEvidence.screenshots.mismatch",
+            ),
+            "mismatch.png",
+        )
+        with self.assertRaisesRegex(
+            CAPTURE_TOOL.ProductVisualCaptureError,
+            "capture evidence path is missing",
+        ):
+            CAPTURE_TOOL.nestedReportValue(
+                case,
+                "checkStateEvidence.screenshots.unknown",
+            )
+
     def testEveryFixtureHasOneLightAndOneDarkCapture(self) -> None:
         themesByFixture: dict[str, set[str]] = {}
         for asset in self.assets:

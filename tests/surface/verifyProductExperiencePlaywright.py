@@ -1802,6 +1802,23 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "expectTransferSection": True,
             "initialCheckState": "mismatch",
             "solutionCode": "print('Hello Codaro')",
+            "captureCheckStates": True,
+        },
+        {
+            "name": "web-day1-transfer-tablet",
+            "url": (
+                f"http://127.0.0.1:{webPort}/?surface=curriculum"
+                "&category=30days&lesson=day01#curriculum"
+            ),
+            "viewport": {"width": 768, "height": 1024},
+            "surface": "web-lesson",
+            "waitFor": "[data-learning-section-card]",
+            "runLearningCell": True,
+            "targetAssessmentMode": "mastery",
+            "expectTransferSection": True,
+            "initialCheckState": "mismatch",
+            "solutionCode": "print('Hello Codaro')",
+            "captureCheckStates": True,
         },
         {
             "name": "web-day2-progression-desktop",
@@ -2501,6 +2518,19 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "verifyNotebookKeyboardNavigation": True,
         },
         {
+            "name": "web-run-ready-desktop",
+            "url": (
+                f"http://127.0.0.1:{webPort}/?surface=editor"
+                f"&category=30days&lesson={quote('day01_헬로월드')}"
+                "&path=pythonFoundation&runtime=web&section=py-1axs#editor"
+            ),
+            "viewport": {"width": 1440, "height": 900},
+            "surface": "web-run",
+            "expectedTier": "web",
+            "waitFor": "[data-notebook-input='code']",
+            "expectMinimalNotebook": True,
+        },
+        {
             "name": "web-run-desktop",
             "url": (
                 f"http://127.0.0.1:{webPort}/?surface=editor"
@@ -2516,6 +2546,102 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "verifyNotebookKeyboardNavigation": True,
             "verifyNotebookRunAdvance": True,
             "verifyNotebookTools": True,
+        },
+        {
+            "name": "instructional-python-320",
+            "url": (
+                f"http://127.0.0.1:{webPort}/?surface=curriculum"
+                f"&category=30days&lesson={quote('day02_변수와데이터타입')}#curriculum"
+            ),
+            "viewport": {"width": 320, "height": 720},
+            "surface": "web-lesson",
+            "waitFor": "[data-learning-visual-asset='pythonFundamentals']",
+            "scrollTo": "[data-learning-visual-asset='pythonFundamentals']",
+            "expectedLearningVisualAssetId": "pythonFundamentals",
+        },
+        {
+            "name": "instructional-data-analysis-390",
+            "url": (
+                f"http://127.0.0.1:{webPort}/?surface=curriculum"
+                f"&category=pandas&lesson={quote('01_레스토랑팁분석')}#curriculum"
+            ),
+            "viewport": {"width": 390, "height": 844},
+            "surface": "web-lesson",
+            "waitFor": "[data-learning-visual-asset='dataAnalysis']",
+            "scrollTo": "[data-learning-visual-asset='dataAnalysis']",
+            "expectedLearningVisualAssetId": "dataAnalysis",
+        },
+        {
+            "name": "instructional-data-visualization-768",
+            "url": (
+                f"http://127.0.0.1:{webPort}/?surface=curriculum"
+                f"&category=matplotlib&lesson={quote('00_Matplotlib소개')}#curriculum"
+            ),
+            "viewport": {"width": 768, "height": 1024},
+            "surface": "web-lesson",
+            "waitFor": "[data-learning-visual-asset='dataVisualization']",
+            "scrollTo": "[data-learning-visual-asset='dataVisualization']",
+            "expectedLearningVisualAssetId": "dataVisualization",
+        },
+        {
+            "name": "instructional-statistics-1440",
+            "url": (
+                f"http://127.0.0.1:{webPort}/?surface=curriculum"
+                f"&category=sklearn&lesson={quote('00_sklearn소개')}#curriculum"
+            ),
+            "viewport": {"width": 1440, "height": 900},
+            "surface": "web-lesson",
+            "waitFor": "[data-learning-visual-asset='statisticsMachineLearning']",
+            "scrollTo": "[data-learning-visual-asset='statisticsMachineLearning']",
+            "expectedLearningVisualAssetId": "statisticsMachineLearning",
+        },
+        {
+            "name": "instructional-image-320",
+            "url": (
+                f"http://127.0.0.1:{webPort}/?surface=curriculum"
+                f"&category=opencv&lesson={quote('01_이미지구조탐색기')}#curriculum"
+            ),
+            "viewport": {"width": 320, "height": 720},
+            "surface": "web-lesson",
+            "waitFor": "[data-learning-visual-asset='imageVision']",
+            "scrollTo": "[data-learning-visual-asset='imageVision']",
+            "expectedLearningVisualAssetId": "imageVision",
+        },
+        {
+            "name": "instructional-automation-390",
+            "url": (
+                f"http://127.0.0.1:{webPort}/?surface=curriculum"
+                f"&category=watchSched&lesson={quote('05_schedule간단스케줄')}#curriculum"
+            ),
+            "viewport": {"width": 390, "height": 844},
+            "surface": "web-lesson",
+            "waitFor": "[data-learning-visual-asset='learningAutomation']",
+            "scrollTo": "[data-learning-visual-asset='learningAutomation']",
+            "expectedLearningVisualAssetId": "learningAutomation",
+        },
+        {
+            "name": "instructional-developer-768",
+            "url": (
+                f"http://127.0.0.1:{webPort}/?surface=curriculum"
+                "&category=devTools&lesson=gitFirstSteps#curriculum"
+            ),
+            "viewport": {"width": 768, "height": 1024},
+            "surface": "web-lesson",
+            "waitFor": "[data-learning-visual-asset='developerLiteracy']",
+            "scrollTo": "[data-learning-visual-asset='developerLiteracy']",
+            "expectedLearningVisualAssetId": "developerLiteracy",
+        },
+        {
+            "name": "instructional-ai-1440",
+            "url": (
+                f"http://127.0.0.1:{webPort}/?surface=curriculum"
+                f"&category=llmBasics&lesson={quote('08_도구사용기초')}#curriculum"
+            ),
+            "viewport": {"width": 1440, "height": 900},
+            "surface": "web-lesson",
+            "waitFor": "[data-learning-visual-asset='aiIntegration']",
+            "scrollTo": "[data-learning-visual-asset='aiIntegration']",
+            "expectedLearningVisualAssetId": "aiIntegration",
         },
         {
             "name": "local-strong-learning-desktop",
@@ -3946,6 +4072,12 @@ def runBrowserMatrix(
                         "local-home-minimum",
                         "local-automation-minimum",
                     }
+                elif selectedCase == "instructional-visuals":
+                    selectedNames = {
+                        case["name"]
+                        for case in cases
+                        if case["name"].startswith("instructional-")
+                    }
                 elif selectedCase == "local-studio":
                     selectedNames = {"web-lesson-mobile"}
                     selectedNames.update(
@@ -3999,6 +4131,7 @@ def runBrowserMatrix(
                 page = context.new_page()
                 webArtifactEvidence: dict[str, Any] | None = None
                 checkCapabilityEvidence: dict[str, Any] | None = None
+                checkStateEvidence: dict[str, Any] | None = None
                 firstViewportEvidence: dict[str, Any] | None = None
                 learnSearchEvidence: dict[str, Any] | None = None
                 siteSearchEvidence: dict[str, Any] | None = None
@@ -5165,6 +5298,17 @@ def runBrowserMatrix(
                                 f"initial check expected {expectedInitialState}, got {firstState}: "
                                 f"{firstCheck.inner_text()[:500]}"
                             )
+                        if case.get("captureCheckStates"):
+                            checkStateEvidence = {"screenshots": {}}
+                            firstCheck.scroll_into_view_if_needed(timeout=20_000)
+                            mismatchScreenshot = (
+                                SCREENSHOT_ROOT / colorScheme
+                                / f"{case['name']}-check-mismatch.png"
+                            )
+                            page.screenshot(path=str(mismatchScreenshot), full_page=False)
+                            checkStateEvidence["screenshots"]["mismatch"] = str(
+                                mismatchScreenshot.relative_to(ROOT)
+                            ).replace("\\", "/")
                         if case.get("expectLocalRequiredCheck"):
                             checkKind = exerciseParts.nth(exerciseIndex).get_attribute(
                                 "data-learning-check-kind"
@@ -5234,6 +5378,21 @@ def runBrowserMatrix(
                                 '[data-learning-evidence-state="stored"]',
                                 timeout=20_000,
                             )
+                            if case.get("captureCheckStates"):
+                                verifiedCheck = page.locator(
+                                    '[data-learning-check-result="verified"]'
+                                ).last
+                                verifiedCheck.scroll_into_view_if_needed(timeout=20_000)
+                                verifiedScreenshot = (
+                                    SCREENSHOT_ROOT / colorScheme
+                                    / f"{case['name']}-check-verified.png"
+                                )
+                                page.screenshot(path=str(verifiedScreenshot), full_page=False)
+                                if checkStateEvidence is None:
+                                    checkStateEvidence = {"screenshots": {}}
+                                checkStateEvidence["screenshots"]["verified"] = str(
+                                    verifiedScreenshot.relative_to(ROOT)
+                                ).replace("\\", "/")
                         if case.get("expectCompletedLessons") is not None:
                             page.wait_for_function(
                                 """
@@ -6667,6 +6826,7 @@ def runBrowserMatrix(
                             "learningHomeMinimumEvidence": learningHomeMinimumEvidence,
                             "webArtifactEvidence": webArtifactEvidence,
                             "checkCapabilityEvidence": checkCapabilityEvidence,
+                            "checkStateEvidence": checkStateEvidence,
                             "notebookRunAdvanceVerified": notebookRunAdvanceVerified,
                             "notebookReactiveExecutionEvidence": notebookReactiveExecutionEvidence,
                             "notebookToolsVerified": notebookToolsVerified,

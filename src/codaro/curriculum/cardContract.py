@@ -58,7 +58,7 @@ CARD_REGISTRY: dict[str, CardSpec] = {
     # 표
     "table": CardSpec("table", "visual", (("rows", "items", "data", "headers"),)),
     # 미디어
-    "image": CardSpec("media", "visual", (("src", "url", "href", "imageUrl"),)),
+    "image": CardSpec("media", "visual", (("assetId", "src", "url", "href", "imageUrl"),)),
     "video": CardSpec("media", "visual", (("src", "url", "href", "videoUrl", "items", "videos"),)),
     "youtube": CardSpec("media", "visual", (("youtube", "youtubeId", "videoId", "src", "url", "items", "videos"),)),
     "videoCarousel": CardSpec("media", "visual", (("items", "videos"),)),

@@ -1,4 +1,5 @@
 import { blockLabel, stripMarkdown } from "@/lib/cellModel";
+import { isVisualAssetId, resolveVisualAsset } from "@/lib/visualAssets";
 import type { BlockConfig } from "@/types";
 import { ImageIcon, MonitorPlay, PlayCircle } from "lucide-react";
 import { SectionLead, blockTypeLabel } from "./curriculumMarkdownDataCells";
@@ -6,11 +7,65 @@ import { payloadItems, payloadText } from "./curriculumMarkdownHelpers";
 import { InlineLink, MarkdownBlock } from "./curriculumMarkdownRichText";
 
 export function MediaCell({ block, payload }: { block: BlockConfig; payload: Record<string, unknown> }) {
+  const assetId = payloadText(payload, "assetId");
   const src = payloadText(payload, "src") || payloadText(payload, "url") || youtubeUrl(payloadText(payload, "youtube"));
   const sourceType = payloadText(payload, "sourceType") || block.sourceType || "media";
   const title = payloadText(payload, "title") || block.title || blockLabel(block);
   const description = payloadText(payload, "description") || payloadText(payload, "subtitle");
   const items = payloadItems(payload, "items");
+
+  if (sourceType === "image" && assetId) {
+    if (!isVisualAssetId(assetId)) {
+      return <p className="text-sm text-destructive">등록되지 않은 학습 이미지입니다.</p>;
+    }
+    const visual = resolveVisualAsset(assetId, { width: 840 });
+    return (
+      <figure
+        className="grid min-w-0 gap-3 sm:grid-cols-[minmax(240px,0.95fr)_minmax(0,1.05fr)] sm:items-start sm:gap-4"
+        data-learning-domain-visual="true"
+        data-learning-visual-asset={visual.id}
+        data-learning-visual-kind={visual.kind}
+      >
+        <picture className="block min-w-0 overflow-hidden rounded-lg border border-border bg-card">
+          {visual.sources.map((source) => (
+            <source
+              key={source.format}
+              sizes="(min-width: 640px) 420px, 100vw"
+              srcSet={source.srcSet}
+              type={source.type}
+            />
+          ))}
+          <img
+            alt={visual.alt}
+            className="aspect-video h-auto w-full object-contain"
+            decoding="async"
+            height={visual.height}
+            loading="lazy"
+            src={visual.src}
+            srcSet={visual.srcSet}
+            width={visual.width}
+          />
+        </picture>
+        <figcaption className="min-w-0">
+          <p className="text-sm font-normal leading-6 text-foreground">{visual.caption}</p>
+          <dl className="mt-2 space-y-2.5">
+            <div data-learning-visual-question="true">
+              <dt className="text-xs font-medium text-muted-foreground">살펴볼 질문</dt>
+              <dd className="mt-0.5 text-sm font-normal leading-6 text-foreground">
+                {visual.learning.learningQuestion}
+              </dd>
+            </div>
+            <div data-learning-visual-decision="true">
+              <dt className="text-xs font-medium text-muted-foreground">그림의 판단 기준</dt>
+              <dd className="mt-0.5 text-xs font-normal leading-5 text-foreground">
+                {visual.learning.decisionShown}
+              </dd>
+            </div>
+          </dl>
+        </figcaption>
+      </figure>
+    );
+  }
 
   if ((sourceType === "image" || sourceType === "video" || sourceType === "youtube") && src) {
     return (

@@ -894,6 +894,922 @@
       "themePairId": "localAutomationDesktop"
     },
     {
+      "id": "runStateReady",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run/ready-dark.png",
+      "sourceHash": "sha256-0000000000000000000000000000000000000000000000000000000000000000",
+      "sourceGitHead": "48dba9a79d7d74bd2e603112cd3c27ab5c1eb60a",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-run-ready-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1440,
+        "height": 900,
+        "aspectRatio": 1.6,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": {
+          "x": 0.2,
+          "y": 0.32,
+          "width": 0.48,
+          "height": 0.48
+        },
+        "fit": "cover",
+        "background": "surface",
+        "proofUsage": [
+          "run-state-matrix",
+          "run-state-ready"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200,
+          1440
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "브라우저 Run에서 편집 가능한 코드 셀이 실행 전 준비 상태로 열린 화면",
+        "caption": "설치 없이 코드 셀을 편집하고 실행을 시작할 수 있는 준비 상태입니다.",
+        "learningQuestion": "처음 진입한 학습자는 어디에 코드를 입력하고 실행을 시작하는가?",
+        "decisionShown": "편집 가능한 셀, 셀 실행과 전체 실행의 시작 위치",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/src/App.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/notebookSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/notebook",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "themePairId": "runStateReadyLight"
+    },
+    {
+      "id": "runStateReadyLight",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run/ready-light.png",
+      "sourceHash": "sha256-0000000000000000000000000000000000000000000000000000000000000000",
+      "sourceGitHead": "48dba9a79d7d74bd2e603112cd3c27ab5c1eb60a",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-run-ready-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1440,
+        "height": 900,
+        "aspectRatio": 1.6,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": {
+          "x": 0.2,
+          "y": 0.32,
+          "width": 0.48,
+          "height": 0.48
+        },
+        "fit": "cover",
+        "background": "surface",
+        "proofUsage": [
+          "run-state-matrix",
+          "run-state-ready"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200,
+          1440
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "브라우저 Run에서 편집 가능한 코드 셀이 실행 전 준비 상태로 열린 화면",
+        "caption": "설치 없이 코드 셀을 편집하고 실행을 시작할 수 있는 준비 상태입니다.",
+        "learningQuestion": "처음 진입한 학습자는 어디에 코드를 입력하고 실행을 시작하는가?",
+        "decisionShown": "편집 가능한 셀, 셀 실행과 전체 실행의 시작 위치",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "theme": "light",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/src/App.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/notebookSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/notebook",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "themePairId": "runStateReady"
+    },
+    {
+      "id": "runStateRunning",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run/running-dark.png",
+      "sourceHash": "sha256-0000000000000000000000000000000000000000000000000000000000000000",
+      "sourceGitHead": "48dba9a79d7d74bd2e603112cd3c27ab5c1eb60a",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-run-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1440,
+        "height": 900,
+        "aspectRatio": 1.6,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": {
+          "x": 0.2,
+          "y": 0.32,
+          "width": 0.48,
+          "height": 0.48
+        },
+        "fit": "cover",
+        "background": "surface",
+        "proofUsage": [
+          "run-state-matrix",
+          "run-state-running"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200,
+          1440
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "브라우저 Run의 코드 셀이 실행 중이며 상단에 실행 상태가 표시된 화면",
+        "caption": "실행 중인 셀과 노트북 전체 상태를 같은 화면에서 확인합니다.",
+        "learningQuestion": "현재 어느 셀이 실행 중이고 노트북이 작업 중임을 어떻게 아는가?",
+        "decisionShown": "셀 실행 상태와 노트북 실행 표시의 동시 피드백",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/src/App.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/notebookSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/notebook",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-0000000000000000000000000000000000000000000000000000000000000000",
+        "evidencePath": "notebookStateEvidence.screenshots.running"
+      },
+      "themePairId": "runStateRunningLight"
+    },
+    {
+      "id": "runStateRunningLight",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run/running-light.png",
+      "sourceHash": "sha256-0000000000000000000000000000000000000000000000000000000000000000",
+      "sourceGitHead": "48dba9a79d7d74bd2e603112cd3c27ab5c1eb60a",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-run-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1440,
+        "height": 900,
+        "aspectRatio": 1.6,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": {
+          "x": 0.2,
+          "y": 0.32,
+          "width": 0.48,
+          "height": 0.48
+        },
+        "fit": "cover",
+        "background": "surface",
+        "proofUsage": [
+          "run-state-matrix",
+          "run-state-running"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200,
+          1440
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "브라우저 Run의 코드 셀이 실행 중이며 상단에 실행 상태가 표시된 화면",
+        "caption": "실행 중인 셀과 노트북 전체 상태를 같은 화면에서 확인합니다.",
+        "learningQuestion": "현재 어느 셀이 실행 중이고 노트북이 작업 중임을 어떻게 아는가?",
+        "decisionShown": "셀 실행 상태와 노트북 실행 표시의 동시 피드백",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "theme": "light",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/src/App.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/notebookSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/notebook",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-0000000000000000000000000000000000000000000000000000000000000000",
+        "evidencePath": "notebookStateEvidence.screenshots.running"
+      },
+      "themePairId": "runStateRunning"
+    },
+    {
+      "id": "runStateCheckFail",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run/check-fail-dark.png",
+      "sourceHash": "sha256-0000000000000000000000000000000000000000000000000000000000000000",
+      "sourceGitHead": "48dba9a79d7d74bd2e603112cd3c27ab5c1eb60a",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-day1-transfer-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 900,
+        "height": 760,
+        "aspectRatio": 1.184211,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "run-state-matrix",
+          "run-state-check-fail"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          900
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "웹 레슨에서 첫 실행 결과가 기대와 달라 수정 단서가 바로 표시된 화면",
+        "caption": "틀린 실행은 진도를 올리지 않고 코드 가까이에 다음 수정 단서를 보여 줍니다.",
+        "learningQuestion": "실행 결과가 기준과 다를 때 학습자는 무엇을 바로 수정해야 하는가?",
+        "decisionShown": "검증 실패, 진도 미반영과 인라인 수정 단서",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 900,
+          "height": 760
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "assets/brand/visuals/learning/python-fundamentals-v1.png",
+          "curricula/python/basics/30days",
+          "editor/src/App.tsx",
+          "editor/src/components/app/curriculumSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/curriculum",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/curriculaRegistry.ts",
+          "editor/src/lib/learningVisualAssets.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-0000000000000000000000000000000000000000000000000000000000000000",
+        "evidencePath": "checkStateEvidence.screenshots.mismatch"
+      },
+      "themePairId": "runStateCheckFailLight"
+    },
+    {
+      "id": "runStateCheckFailLight",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run/check-fail-light.png",
+      "sourceHash": "sha256-0000000000000000000000000000000000000000000000000000000000000000",
+      "sourceGitHead": "48dba9a79d7d74bd2e603112cd3c27ab5c1eb60a",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-day1-transfer-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 900,
+        "height": 760,
+        "aspectRatio": 1.184211,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "run-state-matrix",
+          "run-state-check-fail"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          900
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "웹 레슨에서 첫 실행 결과가 기대와 달라 수정 단서가 바로 표시된 화면",
+        "caption": "틀린 실행은 진도를 올리지 않고 코드 가까이에 다음 수정 단서를 보여 줍니다.",
+        "learningQuestion": "실행 결과가 기준과 다를 때 학습자는 무엇을 바로 수정해야 하는가?",
+        "decisionShown": "검증 실패, 진도 미반영과 인라인 수정 단서",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 900,
+          "height": 760
+        },
+        "theme": "light",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "assets/brand/visuals/learning/python-fundamentals-v1.png",
+          "curricula/python/basics/30days",
+          "editor/src/App.tsx",
+          "editor/src/components/app/curriculumSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/curriculum",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/curriculaRegistry.ts",
+          "editor/src/lib/learningVisualAssets.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-0000000000000000000000000000000000000000000000000000000000000000",
+        "evidencePath": "checkStateEvidence.screenshots.mismatch"
+      },
+      "themePairId": "runStateCheckFail"
+    },
+    {
+      "id": "runStateCheckPass",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run/check-pass-dark.png",
+      "sourceHash": "sha256-0000000000000000000000000000000000000000000000000000000000000000",
+      "sourceGitHead": "48dba9a79d7d74bd2e603112cd3c27ab5c1eb60a",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-day1-transfer-tablet",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 768,
+        "height": 1024,
+        "aspectRatio": 0.75,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "run-state-matrix",
+          "run-state-check-pass"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          768
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "웹 레슨에서 수정한 코드가 강한 검증을 통과하고 학습 증거가 저장된 화면",
+        "caption": "정답 코드를 다시 실행하면 검증 통과와 저장된 학습 증거가 함께 표시됩니다.",
+        "learningQuestion": "실행 성공과 검증 통과, 학습 증거 저장을 어떻게 구분하는가?",
+        "decisionShown": "검증 통과 상태와 저장된 증거의 분리된 표시",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "assets/brand/visuals/learning/python-fundamentals-v1.png",
+          "curricula/python/basics/30days",
+          "editor/src/App.tsx",
+          "editor/src/components/app/curriculumSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/curriculum",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/curriculaRegistry.ts",
+          "editor/src/lib/learningVisualAssets.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-0000000000000000000000000000000000000000000000000000000000000000",
+        "evidencePath": "checkStateEvidence.screenshots.verified"
+      },
+      "themePairId": "runStateCheckPassLight"
+    },
+    {
+      "id": "runStateCheckPassLight",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run/check-pass-light.png",
+      "sourceHash": "sha256-0000000000000000000000000000000000000000000000000000000000000000",
+      "sourceGitHead": "48dba9a79d7d74bd2e603112cd3c27ab5c1eb60a",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-day1-transfer-tablet",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 768,
+        "height": 1024,
+        "aspectRatio": 0.75,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "run-state-matrix",
+          "run-state-check-pass"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          768
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "웹 레슨에서 수정한 코드가 강한 검증을 통과하고 학습 증거가 저장된 화면",
+        "caption": "정답 코드를 다시 실행하면 검증 통과와 저장된 학습 증거가 함께 표시됩니다.",
+        "learningQuestion": "실행 성공과 검증 통과, 학습 증거 저장을 어떻게 구분하는가?",
+        "decisionShown": "검증 통과 상태와 저장된 증거의 분리된 표시",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "theme": "light",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "assets/brand/visuals/learning/python-fundamentals-v1.png",
+          "curricula/python/basics/30days",
+          "editor/src/App.tsx",
+          "editor/src/components/app/curriculumSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/curriculum",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/curriculaRegistry.ts",
+          "editor/src/lib/learningVisualAssets.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-0000000000000000000000000000000000000000000000000000000000000000",
+        "evidencePath": "checkStateEvidence.screenshots.verified"
+      },
+      "themePairId": "runStateCheckPass"
+    },
+    {
+      "id": "runStateLocalRequired",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run/local-required-dark.png",
+      "sourceHash": "sha256-0000000000000000000000000000000000000000000000000000000000000000",
+      "sourceGitHead": "48dba9a79d7d74bd2e603112cd3c27ab5c1eb60a",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-day2-progression-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 900,
+        "height": 760,
+        "aspectRatio": 1.184211,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "run-state-matrix",
+          "run-state-local-required"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          900
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "브라우저 레슨의 로컬 동작 검증이 Local 필요 상태와 전환 이유를 표시한 화면",
+        "caption": "파일과 운영체제 접근이 필요한 검증은 실패로 가장하지 않고 Local 전환 이유를 설명합니다.",
+        "learningQuestion": "브라우저에서 끝낼 수 없는 검증을 학습자는 어떻게 구분하는가?",
+        "decisionShown": "지원되지 않음 상태, Local 필요 범위와 전환 근거",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 900,
+          "height": 760
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "assets/brand/visuals/learning/python-fundamentals-v1.png",
+          "curricula/python/basics/30days",
+          "editor/src/App.tsx",
+          "editor/src/components/app/curriculumSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/curriculum",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/curriculaRegistry.ts",
+          "editor/src/lib/learningVisualAssets.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-0000000000000000000000000000000000000000000000000000000000000000",
+        "evidencePath": "checkCapabilityEvidence.screenshot"
+      },
+      "themePairId": "runStateLocalRequiredLight"
+    },
+    {
+      "id": "runStateLocalRequiredLight",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run/local-required-light.png",
+      "sourceHash": "sha256-0000000000000000000000000000000000000000000000000000000000000000",
+      "sourceGitHead": "48dba9a79d7d74bd2e603112cd3c27ab5c1eb60a",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-day2-progression-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 900,
+        "height": 760,
+        "aspectRatio": 1.184211,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "run-state-matrix",
+          "run-state-local-required"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          900
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "브라우저 레슨의 로컬 동작 검증이 Local 필요 상태와 전환 이유를 표시한 화면",
+        "caption": "파일과 운영체제 접근이 필요한 검증은 실패로 가장하지 않고 Local 전환 이유를 설명합니다.",
+        "learningQuestion": "브라우저에서 끝낼 수 없는 검증을 학습자는 어떻게 구분하는가?",
+        "decisionShown": "지원되지 않음 상태, Local 필요 범위와 전환 근거",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 900,
+          "height": 760
+        },
+        "theme": "light",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "assets/brand/visuals/learning/python-fundamentals-v1.png",
+          "curricula/python/basics/30days",
+          "editor/src/App.tsx",
+          "editor/src/components/app/curriculumSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/curriculum",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/curriculaRegistry.ts",
+          "editor/src/lib/learningVisualAssets.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-0000000000000000000000000000000000000000000000000000000000000000",
+        "evidencePath": "checkCapabilityEvidence.screenshot"
+      },
+      "themePairId": "runStateLocalRequired"
+    },
+    {
       "id": "dataReportOutcome",
       "kind": "outcomeProof",
       "sourceType": "playwrightCapture",
@@ -1357,7 +2273,7 @@
         "fixtureId": "python-fundamentals-domain-v1",
         "promptPath": "assets/brand/visuals/prompts/python-fundamentals-v1.txt",
         "promptHash": "sha256-45246801d7843b7af2cc0174e818e81a9d9e0d1925a4e7b738222dce3e4e5d38",
-        "lessonContentHash": null
+        "lessonContentHash": "sha256-d2b819b24efc2feda35680a8f6acfb70c8944b3610e97475a3c8349df45b7ca5"
       },
       "rendering": {
         "width": 1672,
@@ -1399,8 +2315,7 @@
         "learningQuestion": "하나의 값은 어떤 과정을 거쳐 컬렉션과 반복 흐름으로 확장되는가?",
         "decisionShown": "변수, 자료형, 컬렉션, 제어 흐름의 선후 관계",
         "lessonRefs": [
-          "30days/day02_변수와데이터타입",
-          "30days/day07_리스트기초"
+          "30days/day02_변수와데이터타입"
         ]
       }
     },
@@ -1418,7 +2333,7 @@
         "fixtureId": "data-analysis-domain-v1",
         "promptPath": "assets/brand/visuals/prompts/data-analysis-v1.txt",
         "promptHash": "sha256-c737f07e956cf2e3c97cdec7ff696187f3585c3d665865623c2873a344bba484",
-        "lessonContentHash": null
+        "lessonContentHash": "sha256-d30dd89318821971b9d46a93ea26ae1aaa39e58a8b92ceff6b66bb7433c202b2"
       },
       "rendering": {
         "width": 1672,
@@ -1459,7 +2374,9 @@
         "caption": "원본 데이터를 정리하고 묶어 비교 가능한 결과로 바꾸는 분석 흐름입니다.",
         "learningQuestion": "원본 행은 어떤 변환을 거쳐 비교 가능한 결과가 되는가?",
         "decisionShown": "정리, 그룹화, 비교, 보고의 분석 순서",
-        "lessonRefs": []
+        "lessonRefs": [
+          "pandas/01_레스토랑팁분석"
+        ]
       }
     },
     {
@@ -1476,7 +2393,7 @@
         "fixtureId": "data-visualization-domain-v1",
         "promptPath": "assets/brand/visuals/prompts/data-visualization-v1.txt",
         "promptHash": "sha256-e850f31ca2c0d2bb88f54fe8d763a0bdeec70ed29732a5d466f8746a04ed35f1",
-        "lessonContentHash": null
+        "lessonContentHash": "sha256-c463b087a6303000e5e5104616469bb2310ef33769763cd5154c2c02664f4273"
       },
       "rendering": {
         "width": 1672,
@@ -1517,7 +2434,9 @@
         "caption": "같은 값도 질문에 따라 적합한 시각적 표현이 달라집니다.",
         "learningQuestion": "비교, 변화, 관계, 분포에는 각각 어떤 차트가 맞는가?",
         "decisionShown": "데이터 질문과 시각적 인코딩의 대응",
-        "lessonRefs": []
+        "lessonRefs": [
+          "matplotlib/00_Matplotlib소개"
+        ]
       }
     },
     {
@@ -1534,7 +2453,7 @@
         "fixtureId": "statistics-machine-learning-domain-v1",
         "promptPath": "assets/brand/visuals/prompts/statistics-ml-v1.txt",
         "promptHash": "sha256-882f948c62f95971f176cc50ee33b87daead4134ea0bcd2130c9bcba9ac4d0a5",
-        "lessonContentHash": null
+        "lessonContentHash": "sha256-3cd24ae818e7af118e6458f7642e726f333bfada470e72d9d28dd4f36b418e52"
       },
       "rendering": {
         "width": 1672,
@@ -1575,7 +2494,9 @@
         "caption": "표본의 불확실성을 모델에 반영하고 별도 데이터로 판단을 검증합니다.",
         "learningQuestion": "모델의 적합과 일반화는 어떤 서로 다른 근거로 판단하는가?",
         "decisionShown": "표본, 적합, 분리, 평가의 모델링 순서",
-        "lessonRefs": []
+        "lessonRefs": [
+          "sklearn/00_sklearn소개"
+        ]
       }
     },
     {
@@ -1592,7 +2513,7 @@
         "fixtureId": "image-vision-domain-v1",
         "promptPath": "assets/brand/visuals/prompts/image-vision-v1.txt",
         "promptHash": "sha256-73fc05ae505bab09936dba44d712c45d882f7bafe4b9634a5b0bdb4055abd3ab",
-        "lessonContentHash": null
+        "lessonContentHash": "sha256-a97d12d4b49dfe02735b4d21da8f93921230fc190fee90ff76eb5ce71f29f08d"
       },
       "rendering": {
         "width": 1672,
@@ -1633,7 +2554,9 @@
         "caption": "하나의 이미지를 픽셀 수준에서 변환하고 경계와 객체로 해석하는 흐름입니다.",
         "learningQuestion": "원본 픽셀은 어떤 변환을 거쳐 측정 가능한 객체가 되는가?",
         "decisionShown": "픽셀, 변환, 윤곽, 분할, 측정의 처리 순서",
-        "lessonRefs": []
+        "lessonRefs": [
+          "opencv/01_이미지구조탐색기"
+        ]
       }
     },
     {
@@ -1650,7 +2573,7 @@
         "fixtureId": "learning-automation-domain-v1",
         "promptPath": "assets/brand/visuals/prompts/automation-v1.txt",
         "promptHash": "sha256-2f378e592935ce87e9eed1ae357053602f5e9a625cf8a656d28f5dbff71165b7",
-        "lessonContentHash": null
+        "lessonContentHash": "sha256-e382d79925f7068aea509828f00f2c130ec906a77c27599b170f4971da003940"
       },
       "rendering": {
         "width": 1672,
@@ -1691,7 +2614,9 @@
         "caption": "검증된 코드는 안전 점검과 기록을 포함한 반복 작업으로 확장됩니다.",
         "learningQuestion": "반복 실행 전에 어떤 검증과 안전 경계가 필요한가?",
         "decisionShown": "입력, dry-run, 예약, 산출물, 감사의 자동화 흐름",
-        "lessonRefs": []
+        "lessonRefs": [
+          "watchSched/05_schedule간단스케줄"
+        ]
       }
     },
     {
@@ -1708,7 +2633,7 @@
         "fixtureId": "developer-literacy-domain-v1",
         "promptPath": "assets/brand/visuals/prompts/developer-literacy-v1.txt",
         "promptHash": "sha256-85e38fd1ca4b81e80c950874eb38b7ad64a9fe79549dc36514be63d4bed709aa",
-        "lessonContentHash": null
+        "lessonContentHash": "sha256-dfc775be321c59045d342af4f129587c9105fb46b0d7bf18fcbec3d9b27de7c0"
       },
       "rendering": {
         "width": 1672,
@@ -1749,7 +2674,9 @@
         "caption": "작은 소프트웨어 프로젝트를 구성하는 파일, 실행, 검증, 배포의 관계입니다.",
         "learningQuestion": "소스 변경은 어떤 검증과 패키징 단계를 거쳐 공유되는가?",
         "decisionShown": "저장소, 실행, 테스트, 패키지, 문서의 프로젝트 구조",
-        "lessonRefs": []
+        "lessonRefs": [
+          "devTools/gitFirstSteps"
+        ]
       }
     },
     {
@@ -1766,7 +2693,7 @@
         "fixtureId": "ai-integration-domain-v1",
         "promptPath": "assets/brand/visuals/prompts/ai-integration-v1.txt",
         "promptHash": "sha256-51f558f4635cfe113f30a3771b3d16437bd96f712cb726b65347c3f0e32c7479",
-        "lessonContentHash": null
+        "lessonContentHash": "sha256-4672ccf12e6f34897654c0a3534b20fb0503b70a63bb698749236596fde6d3e0"
       },
       "rendering": {
         "width": 1672,
@@ -1807,7 +2734,9 @@
         "caption": "출처와 도구 경계를 유지하면서 모델 응답을 실제 작업과 평가로 연결합니다.",
         "learningQuestion": "모델의 응답을 근거와 도구 실행, 평가에 어떻게 묶는가?",
         "decisionShown": "입력, 검색, 모델, 도구, 출처, 평가의 통합 경계",
-        "lessonRefs": []
+        "lessonRefs": [
+          "llmBasics/08_도구사용기초"
+        ]
       }
     }
   ]

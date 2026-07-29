@@ -40,6 +40,9 @@ sections:
   - id: job-skeleton
     title: 작업 함수 정의
     structuredPrimary: true
+    blocks:
+      - type: image
+        assetId: learningAutomation
     subtitle: 결과 리스트에 누적
     goal: 호출될 때마다 결과 리스트에 카운터를 추가하는 단순 작업 함수를 만든다.
     why: 스케줄러 학습은 작업 함수가 단순할 때 실행 흐름을 가장 명확히 보여 준다.

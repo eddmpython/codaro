@@ -122,6 +122,14 @@ def main() -> int:
                     )
 
                 cases.append(
+                    verify_native_automation_state_matrix(
+                        page,
+                        hwnd=hwnd,
+                        app_port=app_port,
+                        console_errors=console_errors,
+                    )
+                )
+                cases.append(
                     verify_long_notebook_keyboard_navigation(
                         page,
                         hwnd=hwnd,
@@ -212,6 +220,9 @@ def main() -> int:
                 "900x640 Local Home",
                 "1024x768 Local Notebook",
                 "1440x900 Local Automation",
+                "1440x900 Local Automation scheduled, running, succeeded, failed, paused, and disconnected state matrix",
+                "Local Automation E-stop and failure artifact evidence",
+                "Local Automation visible-text redaction scan",
                 "shared theme and social controls",
                 "shared support dialog account structure",
                 "12-cell Code and Markdown keyboard boundary navigation with focus scrolling",
@@ -315,6 +326,94 @@ def prepare_product_install() -> None:
     }
     write_json(state_root / "active-release.json", active_release)
     write_json(state_root / "update-config.json", update_config)
+    seed_native_automation_fixture()
+
+
+def seed_native_automation_fixture() -> None:
+    task_root = PRODUCT_HOME / "tasks"
+    runs_root = task_root / "runs"
+    automation_root = WORKSPACE_ROOT / "automation"
+    runs_root.mkdir(parents=True, exist_ok=True)
+    automation_root.mkdir(parents=True, exist_ok=True)
+    timestamp = "2026-07-29T09:00:00+00:00"
+    approved = {
+        "schemaVersion": 1,
+        "fingerprint": "fixture-approved",
+        "confirmedAt": timestamp,
+        "riskLevel": "destructive",
+        "permissionScopes": [
+            "filesystem.read",
+            "filesystem.write",
+            "network",
+            "process.execute",
+        ],
+    }
+    task_specs = (
+        ("task-scheduled", "매일 학습 요약 예약", "0 9 * * *"),
+        ("task-running", "실행 중인 리포트", None),
+        ("task-succeeded", "완료된 학습 리포트", None),
+        ("task-failed", "실패한 워크북 점검", None),
+    )
+    tasks: list[dict[str, Any]] = []
+    for task_id, name, schedule in task_specs:
+        document_path = f"automation/{task_id.removeprefix('task-')}.py"
+        (WORKSPACE_ROOT / document_path).write_text(
+            f'print("{name}")\n',
+            encoding="utf-8",
+        )
+        tasks.append({
+            "id": task_id,
+            "name": name,
+            "description": "격리된 제품 검증 작업공간의 자동화 상태 증빙입니다.",
+            "documentPath": document_path,
+            "schedule": schedule,
+            "inputs": {"workspace": "fixture"},
+            "outputs": ["summary.json"],
+            "permissionScopes": list(approved["permissionScopes"]),
+            "riskLevel": "destructive",
+            "safetyApproval": approved,
+            "createdAt": timestamp,
+            "updatedAt": timestamp,
+            "enabled": False,
+        })
+    write_json(task_root / "index.json", {"tasks": tasks})
+    run_specs = {
+        "task-running": {
+            "id": "run-running",
+            "taskId": "task-running",
+            "status": "running",
+            "startedAt": "2026-07-29T09:01:00+00:00",
+            "finishedAt": None,
+            "durationMs": None,
+            "output": "리포트 데이터 3개를 읽는 중입니다.",
+            "error": None,
+            "variables": {"processed": 2, "total": 3},
+        },
+        "task-succeeded": {
+            "id": "run-succeeded",
+            "taskId": "task-succeeded",
+            "status": "success",
+            "startedAt": "2026-07-29T09:02:00+00:00",
+            "finishedAt": "2026-07-29T09:02:01+00:00",
+            "durationMs": 842,
+            "output": "학습 리포트 3개를 summary.json에 저장했습니다.",
+            "error": None,
+            "variables": {"artifacts": ["summary.json"], "verified": True},
+        },
+        "task-failed": {
+            "id": "run-failed",
+            "taskId": "task-failed",
+            "status": "failed",
+            "startedAt": "2026-07-29T09:03:00+00:00",
+            "finishedAt": "2026-07-29T09:03:00+00:00",
+            "durationMs": 219,
+            "output": "",
+            "error": "입력 워크북이 없어 실행을 중단했습니다.",
+            "variables": {"artifact": "summary.json", "retryable": True},
+        },
+    }
+    for task_id, run in run_specs.items():
+        write_json(runs_root / f"{task_id}.json", {"runs": [run]})
 
 
 def reset_work_paths() -> None:
@@ -517,6 +616,297 @@ def verify_surface_case(
         "checks": checks,
         "passed": not case_failures,
         "failures": case_failures,
+    }
+
+
+def verify_native_automation_state_matrix(
+    page: Page,
+    *,
+    hwnd: int,
+    app_port: int,
+    console_errors: list[str],
+) -> dict[str, Any]:
+    case_id = "local-automation-state-matrix-1440x900"
+    response = page.goto(
+        f"http://127.0.0.1:{app_port}/?surface=automation&runtime=local#automation",
+        wait_until="domcontentloaded",
+        timeout=45_000,
+    )
+    if response is not None and response.status >= 400:
+        raise VerificationError(f"{case_id} returned HTTP {response.status}")
+    page.wait_for_selector("[data-automation-studio-layout='true']", state="visible", timeout=45_000)
+    page.wait_for_selector(
+        "[data-automation-capability-state='operational']",
+        state="visible",
+        timeout=45_000,
+    )
+    page.wait_for_function(
+        "() => document.querySelectorAll('[data-automation-task-selector]').length === 4",
+        timeout=45_000,
+    )
+    dpr = float(page.evaluate("window.devicePixelRatio"))
+    resize_native_client(hwnd, 1440, 900, dpr)
+    page.wait_for_timeout(400)
+
+    captures: dict[str, dict[str, Any]] = {}
+    expected_tasks = {
+        "scheduled": ("task-scheduled", "idle"),
+        "running": ("task-running", "running"),
+        "succeeded": ("task-succeeded", "success"),
+    }
+    for state_name, (task_id, run_status) in expected_tasks.items():
+        select_native_automation_task(page, task_id, run_status)
+        captures[state_name] = capture_native_automation_state(page, state_name)
+
+    select_native_automation_task(page, "task-failed", "failed")
+    page.locator("[data-automation-estop-control='true']").click()
+    page.wait_for_selector(
+        "[data-automation-estop-state='active']",
+        state="visible",
+        timeout=20_000,
+    )
+    page.wait_for_selector(
+        "[data-automation-estop-reason='true']",
+        state="visible",
+        timeout=20_000,
+    )
+    page.locator("[data-automation-run-stream='stderr']").scroll_into_view_if_needed()
+    page.wait_for_timeout(200)
+    captures["failed"] = capture_native_automation_state(page, "failed")
+    page.locator("[data-automation-estop-control='true']").click()
+    page.wait_for_selector(
+        "[data-automation-estop-state='clear']",
+        state="visible",
+        timeout=20_000,
+    )
+
+    paused_payload = {
+        "runId": "agent-run-paused",
+        "kind": "browserUse",
+        "goal": "학습 결과 페이지를 열어 요약을 확인합니다.",
+        "status": "paused",
+        "outcome": None,
+        "error": None,
+        "steps": [{
+            "id": "step-open-summary",
+            "index": 0,
+            "decision": "act",
+            "verb": "navigate",
+            "params": {"url": "https://example.com/learning-summary"},
+            "rationale": "검증된 요약 페이지를 확인합니다.",
+            "label": "학습 요약 열기",
+            "gateVerdict": "allow",
+            "stepStatus": "success",
+            "stepError": None,
+            "observationSummary": "요약 화면을 열었습니다.",
+        }],
+        "pending": None,
+    }
+
+    def handle_paused_agent(route: Any) -> None:
+        route.fulfill(
+            status=200,
+            content_type="application/json",
+            body=json.dumps(paused_payload, ensure_ascii=False),
+        )
+
+    page.route("**/api/automation/agent/**", handle_paused_agent)
+    try:
+        page.get_by_role("button", name="브라우저유즈", exact=True).click()
+        page.wait_for_selector(
+            "[data-automation-live-kind='browserUse'][data-automation-live-status='idle']",
+            state="visible",
+            timeout=20_000,
+        )
+        page.locator("[data-automation-live-kind='browserUse'] textarea").fill(
+            "학습 결과 페이지를 열어 요약을 확인해 줘"
+        )
+        page.get_by_role("button", name="맡기기", exact=True).click()
+        page.wait_for_selector(
+            "[data-automation-live-kind='browserUse'][data-automation-live-status='paused']",
+            state="visible",
+            timeout=20_000,
+        )
+        captures["paused"] = capture_native_automation_state(page, "paused")
+    finally:
+        page.unroute("**/api/automation/agent/**", handle_paused_agent)
+
+    def handle_disconnected_health(route: Any) -> None:
+        route.abort("connectionfailed")
+
+    disconnect_console_start = len(console_errors)
+    disconnect_console_errors: list[str] = []
+    page.route("**/api/health", handle_disconnected_health)
+    try:
+        page.reload(wait_until="domcontentloaded", timeout=45_000)
+        page.wait_for_selector(
+            "[data-automation-capability-state='connection-required']",
+            state="visible",
+            timeout=45_000,
+        )
+        resize_native_client(hwnd, 1440, 900, float(page.evaluate("window.devicePixelRatio")))
+        page.wait_for_timeout(300)
+        captures["disconnected"] = capture_native_automation_state(page, "disconnected")
+    finally:
+        page.unroute("**/api/health", handle_disconnected_health)
+        page.reload(wait_until="domcontentloaded", timeout=45_000)
+        page.wait_for_selector("[data-automation-studio-layout='true']", state="visible", timeout=45_000)
+        page.wait_for_timeout(200)
+        disconnect_console_errors = console_errors[disconnect_console_start:]
+        unexpected_disconnect_errors = [
+            message
+            for message in disconnect_console_errors
+            if message != "Failed to load resource: net::ERR_CONNECTION_FAILED"
+        ]
+        del console_errors[disconnect_console_start:]
+        console_errors.extend(unexpected_disconnect_errors)
+
+    state_checks = {
+        "scheduled": (
+            captures["scheduled"]["snapshot"]["selectedTask"] == "task-scheduled"
+            and captures["scheduled"]["snapshot"]["runStatus"] == "idle"
+            and captures["scheduled"]["snapshot"]["hasSchedule"]
+        ),
+        "running": captures["running"]["snapshot"]["runStatus"] == "running",
+        "succeeded": captures["succeeded"]["snapshot"]["runStatus"] == "success",
+        "failed": (
+            captures["failed"]["snapshot"]["runStatus"] == "failed"
+            and captures["failed"]["snapshot"]["eStopState"] == "active"
+            and captures["failed"]["snapshot"]["hasEStopReason"]
+            and captures["failed"]["snapshot"]["hasFailureCause"]
+            and captures["failed"]["snapshot"]["hasArtifact"]
+        ),
+        "paused": (
+            captures["paused"]["snapshot"]["liveKind"] == "browserUse"
+            and captures["paused"]["snapshot"]["liveStatus"] == "paused"
+        ),
+        "disconnected": (
+            captures["disconnected"]["snapshot"]["capabilityState"] == "connection-required"
+        ),
+        "viewport": all(
+            abs(capture["snapshot"]["viewportWidth"] - 1440) <= 2
+            and abs(capture["snapshot"]["viewportHeight"] - 900) <= 2
+            for capture in captures.values()
+        ),
+        "screenshots": all(capture["bytes"] > 1024 for capture in captures.values()),
+        "redaction": all(
+            not any(capture["snapshot"]["redactionSignals"].values())
+            for capture in captures.values()
+        ),
+        "disconnectConsoleSignal": any(
+            message == "Failed to load resource: net::ERR_CONNECTION_FAILED"
+            for message in disconnect_console_errors
+        ),
+    }
+    failures = [
+        f"{check} check failed"
+        for check, passed in state_checks.items()
+        if not passed
+    ]
+    return {
+        "id": case_id,
+        "surface": "automation",
+        "requestedCssViewport": {"width": 1440, "height": 900},
+        "stateOrder": [
+            "scheduled",
+            "running",
+            "succeeded",
+            "failed",
+            "paused",
+            "disconnected",
+        ],
+        "states": captures,
+        "expectedDisconnectConsoleErrors": disconnect_console_errors,
+        "checks": state_checks,
+        "passed": not failures,
+        "failures": failures,
+    }
+
+
+def select_native_automation_task(page: Page, task_id: str, run_status: str) -> None:
+    page.locator(f"[data-automation-task-selector='{task_id}']").click()
+    page.wait_for_selector(
+        f"[data-automation-run-inspector='true'][data-automation-selected-task='{task_id}']",
+        state="visible",
+        timeout=20_000,
+    )
+    page.wait_for_selector(
+        f"[data-automation-run-status='{run_status}']",
+        state="visible",
+        timeout=20_000,
+    )
+
+
+def capture_native_automation_state(page: Page, state_name: str) -> dict[str, Any]:
+    snapshot = page.evaluate(
+        """() => {
+          const visibleText = document.body.innerText || "";
+          const isVisibleInViewport = (element) => {
+            if (!(element instanceof HTMLElement)) return false;
+            const rect = element.getBoundingClientRect();
+            const style = getComputedStyle(element);
+            return rect.width > 0
+              && rect.height > 0
+              && rect.bottom > 0
+              && rect.top < window.innerHeight
+              && rect.right > 0
+              && rect.left < window.innerWidth
+              && style.display !== "none"
+              && style.visibility !== "hidden";
+          };
+          const visibleEmailAddresses = visibleText.match(
+            /\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b/gi
+          ) || [];
+          const nonExampleEmailAddresses = visibleEmailAddresses.filter((address) => {
+            const domain = address.split("@").at(-1)?.toLowerCase();
+            return !["example.com", "example.org", "example.net"].includes(domain || "");
+          });
+          return {
+            viewportWidth: window.innerWidth,
+            viewportHeight: window.innerHeight,
+            horizontalOverflow: Math.max(
+              0,
+              document.documentElement.scrollWidth - window.innerWidth
+            ),
+            capabilityState: document.querySelector("[data-automation-capability-state]")
+              ?.getAttribute("data-automation-capability-state") ?? null,
+            selectedTask: document.querySelector("[data-automation-run-inspector]")
+              ?.getAttribute("data-automation-selected-task") ?? null,
+            runStatus: document.querySelector("[data-automation-run-status]")
+              ?.getAttribute("data-automation-run-status") ?? null,
+            liveKind: document.querySelector("[data-automation-live-kind]")
+              ?.getAttribute("data-automation-live-kind") ?? null,
+            liveStatus: document.querySelector("[data-automation-live-status]")
+              ?.getAttribute("data-automation-live-status") ?? null,
+            eStopState: document.querySelector("[data-automation-estop-state]")
+              ?.getAttribute("data-automation-estop-state") ?? null,
+            hasEStopReason: Boolean(
+              document.querySelector("[data-automation-estop-reason]")?.textContent?.trim()
+            ),
+            hasSchedule: visibleText.includes("0 9 * * *") && visibleText.includes("예약"),
+            hasFailureCause: [...document.querySelectorAll("[data-automation-run-stream='stderr']")]
+              .some((element) => isVisibleInViewport(element)
+                && (element.textContent || "").includes("입력 워크북이 없어 실행을 중단했습니다.")),
+            hasArtifact: [...document.querySelectorAll("code, [data-slot='badge'], span")]
+              .some((element) => isVisibleInViewport(element)
+                && (element.textContent || "").trim() === "summary.json"),
+            redactionSignals: {
+              windowsUserPath: /[A-Za-z]:\\\\Users\\\\[^\\s\\\\]+/i.test(visibleText),
+              macUserPath: /\\/Users\\/[^\\s/]+/i.test(visibleText),
+              linuxUserPath: /\\/home\\/[^\\s/]+/i.test(visibleText),
+              emailAddress: nonExampleEmailAddresses.length > 0,
+              accessCredential: /\\b(?:sk-[A-Za-z0-9_-]{12,}|ghp_[A-Za-z0-9]{12,}|github_pat_[A-Za-z0-9_]{12,}|Bearer\\s+[A-Za-z0-9._~-]{12,})\\b/i.test(visibleText),
+            },
+          };
+        }"""
+    )
+    screenshot_path = SCREENSHOT_ROOT / f"local-automation-{state_name}-1440x900.png"
+    page.screenshot(path=str(screenshot_path))
+    return {
+        "state": state_name,
+        "screenshot": display_path(screenshot_path),
+        "bytes": screenshot_path.stat().st_size,
+        "snapshot": snapshot,
     }
 
 

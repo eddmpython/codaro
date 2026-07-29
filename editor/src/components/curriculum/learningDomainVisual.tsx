@@ -2,7 +2,6 @@ import {
   learningVisualDomainForCategory,
   resolveLearningOutcomeVisual,
   resolveLearningVisual,
-  resolveLearningVisualForLesson,
   type LearningVisualDomainId,
 } from "@/lib/learningVisualAssets";
 import { cn } from "@/lib/utils";
@@ -35,10 +34,8 @@ export function LearningDomainVisual({
     ? resolveLearningOutcomeVisual(category, contentId, 840)
     : null;
   const visual = outcomeVisual
-    ?? (resolvedDomainId
-      ? variant === "lesson"
-        ? resolveLearningVisualForLesson(resolvedDomainId, category, contentId, 840)
-        : resolveLearningVisual(resolvedDomainId, 480)
+    ?? (resolvedDomainId && variant === "home"
+      ? resolveLearningVisual(resolvedDomainId, 480)
       : null);
   if (!visual) {
     return children ? <div className={cn("min-w-0", className)}>{children}</div> : null;
