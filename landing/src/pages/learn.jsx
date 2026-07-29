@@ -251,7 +251,7 @@ export function LearnPage({ search = "" }) {
         <div className="homeShell">
           <header className="learnUtilityHead">
             <div>
-              <Badge variant="accent" label="CODARO LEARN" icon={<Route size={13} aria-hidden="true" />} />
+              <Badge variant="accent" label="CODARO 학습" icon={<Route size={13} aria-hidden="true" />} />
               <Heading id="learn-title" level={1}>만들 결과를 고르고, 코드로 증명하세요.</Heading>
               <Text color="secondary">
                 Web에서는 설치 없이 실행하고 강하게 검증합니다. 운영체제 권한이 필요한 단계만 Local로 이어집니다.
@@ -325,7 +325,7 @@ export function LearnPage({ search = "" }) {
         >
           <div className="homeShell">
             <div className="learnSectionLead">
-              <span className="learnKicker">OUTCOME PATHS</span>
+              <span className="learnKicker">결과 경로</span>
               <Heading id="guided-path-title" level={2}>여섯 개의 결과 경로</Heading>
               <Text color="secondary">문법 목차가 아니라 실제로 남길 결과를 기준으로 필요한 개념을 연결합니다.</Text>
             </div>
@@ -362,7 +362,7 @@ export function LearnPage({ search = "" }) {
       >
         <div className="homeShell learnExplorerInner">
           <div className="learnExplorerLead">
-            <span className="learnKicker"><Filter size={14} aria-hidden="true" /> LESSON FINDER</span>
+            <span className="learnKicker"><Filter size={14} aria-hidden="true" /> 레슨 찾기</span>
             <Heading id="learn-explorer-title" level={2}>필요한 레슨만 찾기</Heading>
             <Text color="secondary">
               처음에는 추천 시작점만 보여줍니다. 검색하거나 목표와 실행 환경을 고르면 관련 결과를 최대 30개까지 펼칩니다.
@@ -440,7 +440,7 @@ export function LearnPage({ search = "" }) {
             <div className="homeShell">
               <div className="learnSearchResultsHead">
                 <div>
-                  <span className="learnKicker">MATCHING LESSONS</span>
+                  <span className="learnKicker">검색 결과</span>
                   <Heading id="learn-search-results-title" level={2}>찾은 레슨</Heading>
                 </div>
                 <span>{matchingLessons.length}개</span>

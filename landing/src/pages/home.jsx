@@ -52,7 +52,7 @@ const proofSteps = [
 const outcomeStories = [
   {
     icon: FileSpreadsheet,
-    eyebrow: "DATA REPORT",
+    eyebrow: "데이터 보고서",
     title: "흩어진 표를 읽히는 보고서로",
     copy: "정리, 비교, 시각화, 해석을 하나의 재현 가능한 Python 흐름으로 만듭니다.",
     assetId: "dataReportOutcome",
@@ -60,7 +60,7 @@ const outcomeStories = [
   },
   {
     icon: Workflow,
-    eyebrow: "SAFE AUTOMATION",
+    eyebrow: "안전한 자동화",
     title: "반복 작업을 검증 가능한 자동화로",
     copy: "웹에서 로직을 익힌 뒤 Local에서 파일, 일정, 실제 업무 환경까지 연결합니다.",
     assetId: "fileAutomationOutcome",
@@ -84,7 +84,7 @@ export function HomePage() {
       <section className="homeProductHero" aria-labelledby="home-title">
         <div className="homeShell homeHeroLayout">
           <div className="homeProductHeroContent">
-            <Badge variant="neutral" label="PYTHON, PROVEN BY RUNNING" />
+            <Badge variant="neutral" label="실행으로 증명하는 PYTHON" />
             <Heading id="home-title" level={1}>Codaro</Heading>
             <p className="homeProductStatement">
               배우는 순간 실행하고,<br />
@@ -122,7 +122,7 @@ export function HomePage() {
           </div>
           <div className="homeHeroProductFrame">
             <div className="homeHeroProductBar">
-              <span><Globe2 size={14} aria-hidden="true" /> CODARO WEB</span>
+              <span><Globe2 size={14} aria-hidden="true" /> CODARO WEB 실행</span>
               <span>실제 제품 화면</span>
             </div>
             <ProductVisual
@@ -138,9 +138,9 @@ export function HomePage() {
               width={390}
             />
             <dl className="homeHeroProofRail">
-              <div><dt>Web lesson</dt><dd>{curriculumRuntimeCounts.browser}</dd></div>
-              <div><dt>Local lesson</dt><dd>{curriculumRuntimeCounts.local}</dd></div>
-              <div><dt>Flow</dt><dd>Code → Proof</dd></div>
+              <div><dt>Web 레슨</dt><dd>{curriculumRuntimeCounts.browser}</dd></div>
+              <div><dt>Local 레슨</dt><dd>{curriculumRuntimeCounts.local}</dd></div>
+              <div><dt>흐름</dt><dd>코드 → 검증</dd></div>
             </dl>
           </div>
         </div>
@@ -154,7 +154,7 @@ export function HomePage() {
           </div>
           <div>
             <header className="homeSectionHeading homeSectionHeadingCompact">
-              <span className="homeKicker">LEARN BY PROOF</span>
+              <span className="homeKicker">실행과 검증으로 학습</span>
               <Heading id="proof-loop-title" level={2}>한 화면에서 이해하고, 바꾸고, 검증합니다.</Heading>
               <Text color="secondary">
                 확인 버튼으로 학습을 끊지 않습니다. 실행하면 필요한 결과와 다음 단계가 같은 흐름에 나타납니다.
@@ -180,7 +180,7 @@ export function HomePage() {
       <section className="homeOutcomeBand" aria-labelledby="outcome-title">
         <div className="homeShell">
           <header className="homeSectionHeading">
-            <span className="homeKicker">CHOOSE AN OUTCOME</span>
+            <span className="homeKicker">만들 결과 선택</span>
             <Heading id="outcome-title" level={2}>문법 목록보다 만들 결과에서 시작하세요.</Heading>
             <Text color="secondary">
               경로마다 필요한 선행 개념, Web에서 끝낼 범위, Local로 확장할 지점을 처음부터 정직하게 보여줍니다.
@@ -208,7 +208,7 @@ export function HomePage() {
       <section className="homeRuntimeBand" aria-labelledby="runtime-title">
         <div className="homeShell homeRuntimeLayout">
           <div className="homeRuntimeCopy">
-            <span className="homeKicker">ONE PRODUCT, TWO RUNTIMES</span>
+            <span className="homeKicker">하나의 제품, 두 실행 환경</span>
             <Heading id="runtime-title" level={2}>Web은 완전한 학습실, Local은 더 강한 작업실입니다.</Heading>
             <Text color="secondary">
               {curriculumRuntimeCounts.browser}개 레슨은 브라우저에서 실행, 강검증, 진도 저장까지 끝냅니다.
@@ -230,11 +230,11 @@ export function HomePage() {
           <div className="homeRuntimeProof">
             <div className="homeRuntimeVisuals" aria-label="Local 노트북과 자동화 제품 화면">
               <figure className="homeRuntimeFigure">
-                <figcaption>LOCAL NOTEBOOK</figcaption>
+                <figcaption>LOCAL 노트북</figcaption>
                 <ProductVisual assetId="localNotebookDesktop" className="homeRuntimeImage" width={900} />
               </figure>
               <figure className="homeRuntimeFigure">
-                <figcaption>LOCAL AUTOMATION</figcaption>
+                <figcaption>LOCAL 자동화</figcaption>
                 <ProductVisual assetId="localAutomationDesktop" className="homeRuntimeImage" width={900} />
               </figure>
             </div>

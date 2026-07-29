@@ -24,7 +24,7 @@ def testVisualAccessibilityMatrixCoversRepresentativeBrowserContract() -> None:
     verifier = loadVerifier()
     cases = verifier.VISUAL_ACCESSIBILITY_CASES
 
-    assert len(cases) == 12
+    assert len(cases) == 14
     assert {case.engine for case in cases} == {"chromium", "firefox", "webkit"}
     assert {case.product for case in cases} == {"landing", "run", "local"}
     assert {case.width for case in cases} == {320, 390, 900, 1440}
@@ -34,7 +34,7 @@ def testVisualAccessibilityMatrixCoversRepresentativeBrowserContract() -> None:
         "learningComfortable",
         "studioDense",
     }
-    assert sum(case.forcedColors for case in cases) == 1
+    assert sum(case.forcedColors for case in cases) == 3
     assert sum(case.reducedMotion for case in cases) == 1
     assert sum(case.keyboardDialog for case in cases) == 6
 
@@ -44,7 +44,7 @@ def testVisualAccessibilityReportCarriesMachineAndManualEvidenceBoundary() -> No
     payload = verifier.buildReport(
         startedAt="2026-07-26T00:00:00+00:00",
         startedMonotonic=time.monotonic(),
-        results=[{"passed": True}] * 12,
+        results=[{"passed": True}] * 14,
         failures=[],
         browserVersions={
             "chromium": "unit-chromium",
@@ -53,17 +53,21 @@ def testVisualAccessibilityReportCarriesMachineAndManualEvidenceBoundary() -> No
         },
     )
 
-    assert payload["schemaVersion"] == 1
+    assert payload["schemaVersion"] == 2
     assert payload["gate"] == "visual-accessibility-browser"
     assert payload["passed"] is True
     assert payload["status"] == "passed"
     assert payload["gitHead"]
     assert payload["playwright"]["lockedVersion"] == "1.61.0"
-    assert payload["matrix"]["caseCount"] == 12
+    assert payload["matrix"]["caseCount"] == 14
     assert payload["matrix"]["engines"] == ["chromium", "firefox", "webkit"]
     assert payload["matrix"]["viewportWidths"] == [320, 390, 900, 1440]
+    assert payload["matrix"]["forcedColorsCaseCount"] == 3
+    assert payload["matrix"]["publicExperienceCaseCount"] == 8
+    assert payload["matrix"]["publicKeyboardJourneyCaseCount"] == 5
     assert payload["failureCount"] == 0
     assert "installed Windows WebView2 rendering" in payload["manualEvidenceNotClaimed"]
+    assert "independent human brand review" in payload["manualEvidenceNotClaimed"]
     assert payload["reportPath"] == (
         "output/test-runner/visual-accessibility-browser/visual-accessibility-report.json"
     )

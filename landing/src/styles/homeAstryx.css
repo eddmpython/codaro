@@ -826,3 +826,22 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+@media (forced-colors: active) {
+  .homeHeroProductFrame,
+  .homeProofProductVisual,
+  .homeOutcomeStory,
+  .homeRuntimeImage,
+  .homeRuntimeFigure figcaption {
+    border-color: CanvasText;
+  }
+
+  .homeV3 [data-visual-asset] img {
+    forced-color-adjust: none;
+  }
+
+  .homeV3 a:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 3px;
+  }
+}

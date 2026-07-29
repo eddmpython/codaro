@@ -374,7 +374,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   line-height: 1.6;
 }
 
-.footerCol h4 {
+.footerCol h2 {
   margin: 0 0 14px;
   color: var(--foreground);
   font-family: var(--font-mono);

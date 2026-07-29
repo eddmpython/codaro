@@ -265,15 +265,24 @@
   .publicHeaderInner {
     gap: 8px;
   }
-
-  .publicBrand span {
-    display: none;
-  }
 }
 
 @media (max-width: 360px) {
   .publicHeaderInner,
   .publicMobileMenu {
     width: calc(100% - 20px);
+  }
+}
+
+@media (forced-colors: active) {
+  .publicHeader,
+  .publicMobileMenu {
+    border-color: CanvasText;
+  }
+
+  .publicPrimaryNav a[aria-current="page"],
+  .publicMobileMenu a[aria-current="page"] {
+    outline: 1px solid LinkText;
+    outline-offset: -3px;
   }
 }

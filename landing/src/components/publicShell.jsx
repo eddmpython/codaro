@@ -1,5 +1,5 @@
 import { ChevronDown, Menu, Moon, Search, Sun, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { brand } from "../lib/brand.js";
 import { appPath } from "../lib/publicRouting.js";
 import { SocialLinks } from "../styles/generated/socialLinks.tsx";
@@ -12,11 +12,23 @@ const primaryNavigation = [
 
 export function Header({ currentPath, onNavigate, themeMode, resolvedTheme, onToggleTheme }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuToggleRef = useRef(null);
   const themeLabel = resolvedTheme === "dark" ? "라이트 모드로" : "다크 모드로";
   const navigate = (event, path) => {
     setMenuOpen(false);
     onNavigate(event, appPath(path));
   };
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    const closeWithEscape = (event) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      setMenuOpen(false);
+      menuToggleRef.current?.focus();
+    };
+    window.addEventListener("keydown", closeWithEscape);
+    return () => window.removeEventListener("keydown", closeWithEscape);
+  }, [menuOpen]);
   return (
     <header className="publicHeader" data-public-shell="astryx">
       <a className="publicSkipLink" href="#public-main">본문으로 건너뛰기</a>
@@ -78,6 +90,7 @@ export function Header({ currentPath, onNavigate, themeMode, resolvedTheme, onTo
         <SocialLinks className="publicSocialLinks" label="Codaro SNS" />
         <button
           className="publicIconCommand publicMenuToggle"
+          ref={menuToggleRef}
           type="button"
           aria-expanded={menuOpen}
           aria-controls="public-mobile-menu"
@@ -131,7 +144,7 @@ export function Footer() {
           <SocialLinks className="footerSocialLinks" />
         </div>
         <div className="footerCol">
-          <h4>제품</h4>
+          <h2>제품</h2>
           <ul>
             <li><a href={appPath("/learn")}>웹 학습</a></li>
             <li><a href={brand.appPath("/run/")}>Run</a></li>
@@ -142,7 +155,7 @@ export function Footer() {
           </ul>
         </div>
         <div className="footerCol">
-          <h4>검증·신뢰</h4>
+          <h2>검증·신뢰</h2>
           <ul>
             <li><a href={brand.repoUrl} rel="noopener noreferrer" target="_blank">GitHub</a></li>
             <li><a href={brand.releaseUrl} rel="noopener noreferrer" target="_blank">Releases</a></li>
@@ -151,7 +164,7 @@ export function Footer() {
           </ul>
         </div>
         <div className="footerCol">
-          <h4>탐색</h4>
+          <h2>탐색</h2>
           <ul>
             <li><a href={appPath("/docs/blog")}>Codaro 소식</a></li>
             <li><a href={appPath("/search")}>검색</a></li>

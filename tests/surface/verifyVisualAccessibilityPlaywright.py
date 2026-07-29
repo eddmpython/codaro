@@ -29,7 +29,7 @@ LANDING_BUILD = ROOT / "landing" / "build"
 REPORT_ROOT = ROOT / "output" / "test-runner" / "visual-accessibility-browser"
 REPORT_PATH = REPORT_ROOT / "visual-accessibility-report.json"
 SCREENSHOT_ROOT = REPORT_ROOT / "screenshots"
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 PLAYWRIGHT_VERSION = "1.61.0"
 SOCIAL_ORDER = ["github", "support", "youtube", "threads"]
 ACCOUNT_NUMBER = "1002-0421-4626"
@@ -62,6 +62,28 @@ VISUAL_ACCESSIBILITY_CASES = (
         theme="dark",
         density="public",
         keyboardDialog=True,
+    ),
+    VisualAccessibilityCase(
+        name="chromium-landing-mobile-forced-colors",
+        engine="chromium",
+        product="landing",
+        route="/codaro/",
+        width=320,
+        height=720,
+        theme="light",
+        density="public",
+        forcedColors=True,
+    ),
+    VisualAccessibilityCase(
+        name="chromium-landing-desktop-forced-colors",
+        engine="chromium",
+        product="landing",
+        route="/codaro/",
+        width=1440,
+        height=900,
+        theme="dark",
+        density="public",
+        forcedColors=True,
     ),
     VisualAccessibilityCase(
         name="chromium-learn-desktop-light",
@@ -363,6 +385,8 @@ def auditCase(
         "passed": False,
         "snapshot": None,
         "keyboard": None,
+        "publicExperience": None,
+        "publicKeyboardJourney": None,
         "screenshot": None,
     }
     try:
@@ -372,6 +396,16 @@ def auditCase(
         result["snapshot"] = snapshot
         failures.extend(validateSnapshot(case, snapshot))
 
+        if case.product == "landing":
+            publicExperience = publicExperienceSnapshot(page)
+            result["publicExperience"] = publicExperience
+            failures.extend(validatePublicExperience(case, publicExperience))
+
+        if case.product == "landing" and case.route == "/codaro/":
+            publicKeyboardJourney = publicKeyboardJourneyAudit(page, case)
+            result["publicKeyboardJourney"] = publicKeyboardJourney
+            failures.extend(validatePublicKeyboardJourney(case, publicKeyboardJourney))
+
         if case.keyboardDialog:
             keyboard = keyboardDialogAudit(page, case)
             result["keyboard"] = keyboard
@@ -380,7 +414,7 @@ def auditCase(
         page.evaluate("window.scrollTo(0, 0)")
         screenshotPath = SCREENSHOT_ROOT / case.engine / f"{case.name}.png"
         screenshotPath.parent.mkdir(parents=True, exist_ok=True)
-        page.screenshot(path=str(screenshotPath), full_page=False)
+        page.screenshot(path=str(screenshotPath), full_page=False, animations="disabled", caret="hide")
         result["screenshot"] = screenshotPath.relative_to(ROOT).as_posix()
     except Exception as exc:  # noqa: BLE001 - preserve unexpected browser failures in the gate report
         failures.append(f"{case.name}: {type(exc).__name__}: {exc}")
@@ -584,6 +618,223 @@ def surfaceSnapshot(page: Any) -> dict[str, Any]:
     )
 
 
+def publicExperienceSnapshot(page: Any) -> dict[str, Any]:
+    return page.evaluate(
+        """
+        () => {
+          const visible = (element) => {
+            if (!element) return false;
+            const style = getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            return !element.closest('[aria-hidden="true"]')
+              && style.display !== "none"
+              && style.visibility !== "hidden"
+              && Number(style.opacity) > 0
+              && rect.width > 0
+              && rect.height > 0;
+          };
+          const normalize = (value) => String(value || "").replace(/\\s+/g, " ").trim();
+          const routeKind = document.querySelector(".learnPage") ? "learn" : "home";
+          const allElements = Array.from(document.querySelectorAll("*"));
+          const elementIndex = (selector) => {
+            const element = document.querySelector(selector);
+            return element ? allElements.indexOf(element) : -1;
+          };
+          const headings = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"))
+            .filter(visible)
+            .map((heading) => ({
+              level: Number(heading.tagName.slice(1)),
+              text: normalize(heading.textContent),
+            }));
+          const headingSkips = headings
+            .map((heading, index) => ({
+              from: index ? headings[index - 1].level : 0,
+              to: heading.level,
+              text: heading.text,
+            }))
+            .filter((item) => item.to > item.from + 1);
+          const visualImages = Array.from(
+            document.querySelectorAll("[data-visual-asset] img"),
+          ).filter(visible);
+          const brandLabel = document.querySelector(".publicBrand span");
+          const homeOrderSelectors = [
+            ".homeProductStatement",
+            ".homeProductDetail",
+            ".homeHeroActions",
+            ".homeLocalLink",
+            ".homeHeroProductFrame",
+          ];
+          const learnOrderSelectors = [
+            ".learnUtilityHead",
+            ".learnResumeBand",
+            ".learnSearchBar",
+            ".learnGuideBand",
+            ".learnExplorerBand",
+            ".learnCatalog",
+            ".learnLocalBand",
+          ];
+          const forbiddenEditorialLabels = [
+            "PYTHON, PROVEN BY RUNNING",
+            "DATA REPORT",
+            "SAFE AUTOMATION",
+            "LEARN BY PROOF",
+            "CHOOSE AN OUTCOME",
+            "ONE PRODUCT, TWO RUNTIMES",
+            "LOCAL NOTEBOOK",
+            "LOCAL AUTOMATION",
+            "CODARO LEARN",
+            "OUTCOME PATHS",
+            "LESSON FINDER",
+            "MATCHING LESSONS",
+          ];
+          const bodyText = normalize(document.body.innerText);
+          const forcedColorProof = Array.from(document.querySelectorAll(
+            ".homeHeroProductFrame, .homeProofProductVisual, "
+              + ".homeOutcomeStory, .homeRuntimeImage, .homeRuntimeFigure figcaption",
+          )).filter(visible).map((element) => ({
+            selector: element.className,
+            borderStyle: getComputedStyle(element).borderStyle,
+          }));
+          return {
+            routeKind,
+            lang: document.documentElement.lang,
+            landmarks: {
+              headerCount: document.querySelectorAll("header.publicHeader").length,
+              mainCount: document.querySelectorAll("#public-main > main").length,
+              footerCount: document.querySelectorAll("footer.siteFooter").length,
+              primaryNavLabel: document.querySelector(".publicPrimaryNav")?.getAttribute("aria-label") || "",
+            },
+            brand: {
+              text: normalize(brandLabel?.textContent),
+              visible: visible(brandLabel),
+            },
+            headings,
+            headingSkips,
+            h1Count: headings.filter((heading) => heading.level === 1).length,
+            visualAltCount: visualImages.length,
+            emptyVisualAlts: visualImages
+              .filter((image) => !normalize(image.getAttribute("alt")))
+              .map((image) => image.closest("[data-visual-asset]")?.getAttribute("data-visual-asset")),
+            homeActionLabels: Array.from(
+              document.querySelectorAll(".homeHeroActions a, .homeLocalLink"),
+            ).filter(visible).map((element) => normalize(element.textContent)),
+            homeOrder: homeOrderSelectors.map((selector) => ({
+              selector,
+              index: elementIndex(selector),
+            })),
+            learnOrder: learnOrderSelectors.map((selector) => ({
+              selector,
+              index: elementIndex(selector),
+            })),
+            requiredKoreanLabels: routeKind === "home"
+              ? ["실행으로 증명하는 PYTHON", "실행과 검증으로 학습", "만들 결과 선택", "하나의 제품, 두 실행 환경"]
+              : ["CODARO 학습", "결과 경로", "레슨 찾기"],
+            missingKoreanLabels: (
+              routeKind === "home"
+                ? ["실행으로 증명하는 PYTHON", "실행과 검증으로 학습", "만들 결과 선택", "하나의 제품, 두 실행 환경"]
+                : ["CODARO 학습", "결과 경로", "레슨 찾기"]
+            ).filter((label) => !bodyText.includes(label)),
+            forbiddenEditorialLabels: forbiddenEditorialLabels.filter(
+              (label) => bodyText.includes(label),
+            ),
+            forcedColorProof,
+            forcedColorImageAdjust: Array.from(new Set(
+              visualImages.map((image) => getComputedStyle(image).forcedColorAdjust),
+            )),
+          };
+        }
+        """
+    )
+
+
+def publicKeyboardJourneyAudit(page: Any, case: VisualAccessibilityCase) -> dict[str, Any]:
+    skipLink = page.locator(".publicSkipLink")
+    skipLink.focus()
+    skipFocus = activeElementSnapshot(page)
+    skipTransform = skipLink.evaluate("(element) => getComputedStyle(element).transform")
+    page.keyboard.press("Enter")
+    page.wait_for_function(
+        "() => document.activeElement?.id === 'public-main'",
+        timeout=10_000,
+    )
+    skipTarget = activeElementSnapshot(page)
+
+    page.evaluate("window.__codaroPublicKeyboardActivations = []")
+    activationTargets = (
+        ("primaryLesson", ".homeHeroPrimaryAction"),
+        ("resultPaths", ".homeHeroSecondaryAction"),
+        ("localExtension", ".homeLocalLink"),
+    )
+    activations: list[dict[str, Any]] = []
+    for marker, selector in activationTargets:
+        target = page.locator(selector).first
+        target.focus()
+        before = len(page.evaluate("window.__codaroPublicKeyboardActivations"))
+        target.evaluate(
+            """
+            (element, marker) => {
+              element.addEventListener("click", (event) => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                window.__codaroPublicKeyboardActivations.push({
+                  marker,
+                  href: element.href,
+                  label: element.textContent.replace(/\\s+/g, " ").trim(),
+                });
+              }, {capture: true, once: true});
+            }
+            """,
+            marker,
+        )
+        page.keyboard.press("Enter")
+        page.wait_for_function(
+            "(count) => window.__codaroPublicKeyboardActivations.length > count",
+            arg=before,
+            timeout=10_000,
+        )
+        activation = page.evaluate("window.__codaroPublicKeyboardActivations.at(-1)")
+        activation["focus"] = activeElementSnapshot(page)
+        activations.append(activation)
+
+    mobileMenu: dict[str, Any] | None = None
+    menuToggle = page.locator(".publicMenuToggle")
+    if menuToggle.is_visible():
+        menuToggle.focus()
+        page.keyboard.press("Enter")
+        menu = page.locator("#public-mobile-menu")
+        menu.wait_for(state="visible", timeout=10_000)
+        expanded = menuToggle.get_attribute("aria-expanded")
+        page.keyboard.press("Tab")
+        plainTabFocus = activeElementSnapshot(page)
+        firstMenuLink = menu.locator("a").first
+        firstMenuTabIndex = firstMenuLink.evaluate("(element) => element.tabIndex")
+        if case.engine == "webkit" and plainTabFocus.get("label") != "웹에서 시작":
+            firstMenuLink.focus()
+        firstMenuFocus = activeElementSnapshot(page)
+        page.keyboard.press("Escape")
+        menu.wait_for(state="detached", timeout=10_000)
+        returnedFocus = activeElementSnapshot(page)
+        mobileMenu = {
+            "openedWithEnter": expanded == "true",
+            "plainTabFocus": plainTabFocus,
+            "firstMenuTabIndex": firstMenuTabIndex,
+            "firstTabFocus": firstMenuFocus,
+            "closedWithEscape": menu.count() == 0,
+            "returnedFocus": returnedFocus,
+        }
+
+    return {
+        "viewport": {"width": case.width, "height": case.height},
+        "skipLink": {
+            "focus": skipFocus,
+            "focusedTransform": skipTransform,
+            "target": skipTarget,
+        },
+        "activations": activations,
+        "mobileMenu": mobileMenu,
+    }
+
+
 def keyboardDialogAudit(page: Any, case: VisualAccessibilityCase) -> dict[str, Any]:
     focused: list[str] = []
     focusIndicators: dict[str, dict[str, str]] = {}
@@ -766,7 +1017,9 @@ def activeElementSnapshot(page: Any) -> dict[str, Any]:
           const style = getComputedStyle(element);
           return {
             marker,
+            id: element.id || null,
             label,
+            href: element instanceof HTMLAnchorElement ? element.href : null,
             socialId,
             tag: element.tagName.toLowerCase(),
             insideDialog: Boolean(element.closest('[data-support-dialog="codaro"]')),
@@ -829,6 +1082,153 @@ def validateSnapshot(case: VisualAccessibilityCase, snapshot: dict[str, Any]) ->
         failures.append(f"{prefix}: forced-colors media state drifted")
     if case.forcedColors and snapshot.get("forcedColorSocialBorder") in {None, "none"}:
         failures.append(f"{prefix}: forced-colors social border is missing")
+    return failures
+
+
+def validatePublicExperience(
+    case: VisualAccessibilityCase,
+    experience: dict[str, Any],
+) -> list[str]:
+    failures: list[str] = []
+    prefix = case.name
+    expectedRouteKind = "learn" if "/learn/" in case.route else "home"
+    if experience.get("routeKind") != expectedRouteKind:
+        failures.append(
+            f"{prefix}: public route kind {experience.get('routeKind')!r} != {expectedRouteKind!r}"
+        )
+    if experience.get("lang") != "ko":
+        failures.append(f"{prefix}: public document language is not Korean")
+    expectedLandmarks = {
+        "headerCount": 1,
+        "mainCount": 1,
+        "footerCount": 1,
+        "primaryNavLabel": "주요 탐색",
+    }
+    for key, expected in expectedLandmarks.items():
+        if experience.get("landmarks", {}).get(key) != expected:
+            failures.append(
+                f"{prefix}: public landmark {key} drifted: "
+                f"{experience.get('landmarks', {}).get(key)!r}"
+            )
+    brandSnapshot = experience.get("brand", {})
+    if brandSnapshot.get("text") != "Codaro" or brandSnapshot.get("visible") is not True:
+        failures.append(f"{prefix}: visible Codaro brand label is missing: {brandSnapshot}")
+    if experience.get("h1Count") != 1:
+        failures.append(f"{prefix}: expected exactly one visible h1")
+    if experience.get("headingSkips"):
+        failures.append(f"{prefix}: heading levels skip: {experience.get('headingSkips')}")
+    if experience.get("visualAltCount", 0) < 1:
+        failures.append(f"{prefix}: no visible product proof image was found")
+    if experience.get("emptyVisualAlts"):
+        failures.append(
+            f"{prefix}: product proof image alt text is empty: {experience.get('emptyVisualAlts')}"
+        )
+    if experience.get("missingKoreanLabels"):
+        failures.append(
+            f"{prefix}: Korean editorial labels are missing: {experience.get('missingKoreanLabels')}"
+        )
+    if experience.get("forbiddenEditorialLabels"):
+        failures.append(
+            f"{prefix}: English editorial labels remain: "
+            f"{experience.get('forbiddenEditorialLabels')}"
+        )
+
+    orderKey = "learnOrder" if expectedRouteKind == "learn" else "homeOrder"
+    order = experience.get(orderKey, [])
+    indexes = [item.get("index", -1) for item in order]
+    if any(index < 0 for index in indexes) or indexes != sorted(set(indexes)):
+        failures.append(f"{prefix}: public reading order drifted: {order}")
+
+    if expectedRouteKind == "home":
+        expectedActions = [
+            "웹에서 첫 레슨 실행",
+            "학습 경로 보기",
+            "Windows Local 받기",
+        ]
+        if experience.get("homeActionLabels") != expectedActions:
+            failures.append(
+                f"{prefix}: Web-first action order drifted: {experience.get('homeActionLabels')}"
+            )
+
+    if case.forcedColors:
+        proofBorders = experience.get("forcedColorProof", [])
+        if not proofBorders:
+            failures.append(f"{prefix}: forced-colors product proof borders are missing")
+        for border in proofBorders:
+            if border.get("borderStyle") in {None, "", "none"}:
+                failures.append(
+                    f"{prefix}: forced-colors proof boundary is missing: {border}"
+                )
+        if experience.get("forcedColorImageAdjust") != ["none"]:
+            failures.append(
+                f"{prefix}: product images are not preserved in forced colors: "
+                f"{experience.get('forcedColorImageAdjust')}"
+            )
+    return failures
+
+
+def validatePublicKeyboardJourney(
+    case: VisualAccessibilityCase,
+    keyboard: dict[str, Any],
+) -> list[str]:
+    failures: list[str] = []
+    prefix = case.name
+    skipLink = keyboard.get("skipLink", {})
+    if skipLink.get("focus", {}).get("label") != "본문으로 건너뛰기":
+        failures.append(f"{prefix}: skip link did not accept keyboard focus")
+    if skipLink.get("target", {}).get("id") != "public-main":
+        failures.append(f"{prefix}: skip link did not move focus to public-main")
+
+    activations = keyboard.get("activations", [])
+    expectedMarkers = ["primaryLesson", "resultPaths", "localExtension"]
+    if [activation.get("marker") for activation in activations] != expectedMarkers:
+        failures.append(f"{prefix}: public action activation order drifted: {activations}")
+    expectedLabels = {
+        "primaryLesson": "웹에서 첫 레슨 실행",
+        "resultPaths": "학습 경로 보기",
+        "localExtension": "Windows Local 받기",
+    }
+    for activation in activations:
+        marker = activation.get("marker")
+        if activation.get("label") != expectedLabels.get(marker):
+            failures.append(f"{prefix}: {marker} keyboard label drifted: {activation}")
+        if activation.get("focus", {}).get("tag") != "a":
+            failures.append(f"{prefix}: {marker} did not retain anchor focus")
+    activationByMarker = {
+        activation.get("marker"): activation
+        for activation in activations
+    }
+    if "/learn/lesson/" not in str(activationByMarker.get("primaryLesson", {}).get("href") or ""):
+        failures.append(f"{prefix}: primary lesson keyboard target drifted")
+    if "/learn" not in str(activationByMarker.get("resultPaths", {}).get("href") or ""):
+        failures.append(f"{prefix}: result path keyboard target drifted")
+    if not str(activationByMarker.get("localExtension", {}).get("href") or "").startswith(
+        ("https://", "http://")
+    ):
+        failures.append(f"{prefix}: Local extension keyboard target is not absolute")
+
+    mobileMenu = keyboard.get("mobileMenu")
+    if case.width <= 820:
+        if not isinstance(mobileMenu, dict):
+            failures.append(f"{prefix}: mobile navigation keyboard audit is missing")
+        else:
+            if mobileMenu.get("openedWithEnter") is not True:
+                failures.append(f"{prefix}: Enter did not open the mobile menu")
+            if mobileMenu.get("firstMenuTabIndex") != 0:
+                failures.append(f"{prefix}: mobile menu first link is not in the Tab order")
+            if mobileMenu.get("firstTabFocus", {}).get("label") != "웹에서 시작":
+                failures.append(f"{prefix}: mobile menu first link did not accept focus")
+            if (
+                case.engine != "webkit"
+                and mobileMenu.get("plainTabFocus", {}).get("label") != "웹에서 시작"
+            ):
+                failures.append(f"{prefix}: mobile menu first Tab target drifted")
+            if mobileMenu.get("closedWithEscape") is not True:
+                failures.append(f"{prefix}: Escape did not close the mobile menu")
+            if mobileMenu.get("returnedFocus", {}).get("label") != "메뉴 열기":
+                failures.append(f"{prefix}: mobile menu did not return focus to its trigger")
+    elif mobileMenu is not None:
+        failures.append(f"{prefix}: hidden mobile menu was audited on desktop")
     return failures
 
 
@@ -942,6 +1342,13 @@ def buildReport(
             "forcedColorsCaseCount": sum(case.forcedColors for case in VISUAL_ACCESSIBILITY_CASES),
             "reducedMotionCaseCount": sum(case.reducedMotion for case in VISUAL_ACCESSIBILITY_CASES),
             "keyboardDialogCaseCount": sum(case.keyboardDialog for case in VISUAL_ACCESSIBILITY_CASES),
+            "publicExperienceCaseCount": sum(
+                case.product == "landing" for case in VISUAL_ACCESSIBILITY_CASES
+            ),
+            "publicKeyboardJourneyCaseCount": sum(
+                case.product == "landing" and case.route == "/codaro/"
+                for case in VISUAL_ACCESSIBILITY_CASES
+            ),
         },
         "machineEvidenceScope": [
             "Chromium, Firefox, WebKit representative rendering",
@@ -950,12 +1357,17 @@ def buildReport(
             "keyboard reach, focus indicator, modal focus trap, Escape close, focus return",
             "font loading, token contrast, reduced motion, forced colors",
             "duplicate IDs, accessible names, image alt, ARIA reference integrity",
+            "public landmark and heading hierarchy, DOM reading order, Korean editorial labels",
+            "Web-first CTA, learning path, Local extension keyboard activation",
+            "mobile menu Enter open, link focusability, Escape close, focus return",
+            "public product-proof boundaries and images in mobile and desktop forced colors",
         ],
         "manualEvidenceNotClaimed": [
             "installed Windows WebView2 rendering",
             "NVDA, Narrator, VoiceOver, TalkBack screen-reader output",
             "IME composition and operating-system zoom behavior",
             "independent human accessibility review",
+            "independent human brand review",
         ],
         "failureCount": len(failures),
         "failures": failures,
