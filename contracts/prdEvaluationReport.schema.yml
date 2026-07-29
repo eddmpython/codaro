@@ -181,6 +181,11 @@ $defs:
     type: object
     additionalProperties: false
     required: [path]
+    anyOf:
+      - required: [line]
+      - required: [symbol]
+      - required: [command]
+      - required: [resultHash]
     properties:
       path:
         type: string

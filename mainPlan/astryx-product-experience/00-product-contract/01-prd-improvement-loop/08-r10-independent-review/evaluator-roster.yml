@@ -11,6 +11,7 @@ slots:
     conflictOfInterest: unknown
     availability: null
     signedAt: null
+    signatureHash: null
     eligible: false
   ux:
     evaluatorId: null
@@ -20,6 +21,7 @@ slots:
     conflictOfInterest: unknown
     availability: null
     signedAt: null
+    signatureHash: null
     eligible: false
   architecture:
     evaluatorId: null
@@ -29,6 +31,7 @@ slots:
     conflictOfInterest: unknown
     availability: null
     signedAt: null
+    signatureHash: null
     eligible: false
 blockingReasons:
   - learning evaluator is unassigned

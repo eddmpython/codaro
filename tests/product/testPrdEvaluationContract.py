@@ -34,8 +34,12 @@ def testCurrentEvaluationContractIsFrozenAndComplete() -> None:
     assert facts["rubric"]["targetScore"] is None
     assert facts["rubric"]["passThreshold"] is None
     assert facts["schema"]["closedObject"] is True
+    assert facts["findingLedgerSchema"]["closedObject"] is True
+    assert facts["findingLedgerSchema"]["scoreThresholdApplied"] is False
+    assert facts["findingLedgerSchema"]["disciplines"] == ["learning", "ux", "architecture"]
     assert len(facts["rubric"]["sha256"]) == 64
     assert len(facts["schema"]["sha256"]) == 64
+    assert len(facts["findingLedgerSchema"]["sha256"]) == 64
 
 
 def testEvaluationContractRejectsTargetScoreAndThreshold() -> None:
@@ -95,6 +99,20 @@ def testEvaluationContractReportsMissingDimensionSchemaWithoutCrashing() -> None
     _, failures = verifier.validateContract(rubric, changed)
 
     assert "evaluation report schema dimensions must mirror the frozen rubric IDs" in failures
+
+
+def testEvaluationContractRejectsOpenFindingLedgerOrScoreThreshold() -> None:
+    verifier = loadVerifier()
+    rubric, schema = currentContract(verifier)
+    ledger = verifier.loadMapping(verifier.LEDGER_SCHEMA_PATH)
+    changed = copy.deepcopy(ledger)
+    changed["additionalProperties"] = True
+    changed["properties"]["scoreThresholdApplied"] = {"const": True}
+
+    _, failures = verifier.validateContract(rubric, schema, changed)
+
+    assert "finding ledger schema must be a closed object" in failures
+    assert "finding ledger schema must forbid score thresholds" in failures
 
 
 def testEvaluationContractRunsRawReportAndBundleNegativeFixtures() -> None:

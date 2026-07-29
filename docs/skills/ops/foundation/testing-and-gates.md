@@ -116,9 +116,9 @@ uv run python -X utf8 tests/run.py gate attempts
 | --- | --- | --- |
 | `docs` | fast | 운영 문서 포인터, gate 정의, CI 연결 상태를 확인한다. |
 | `root-clean` | fast | 저장소 루트가 canonical tree와 맞고 로컬 실습 파일, 로그, 임시 산출물이 남지 않았는지 확인한다. |
-| `evaluation-contract` | fast | clean implementation commit에서 목표 점수 없는 frozen rubric, closed raw report schema, bundle exclusion과 raw report·scope·maturity negative fixture를 검증한다. 독립 evaluator 배정과 R10 report 생성은 실행하지 않는다. |
+| `evaluation-contract` | fast | clean implementation commit에서 목표 점수 없는 frozen rubric, closed raw report·canonical finding ledger schema, bundle exclusion과 raw report·scope·maturity·score/severity 보존 negative fixture를 검증한다. 독립 evaluator 배정과 R10 report 생성은 실행하지 않는다. |
 | `plan-quality` | fast | mainPlan이 미완료 TODO만 보존하는지, 현재 사실과 R10 draft가 일관적인지 검사한다. evaluator 배정·sealed scope·raw report 같은 외부 readiness blocker만 남은 draft는 통과하지만 blocker를 report에서 제거하지 않는다. |
-| `r10-independent-review` | release | 독립 evaluator roster, sealed scope, 세 raw report와 finding ledger 완전성을 목표 점수 없이 엄격하게 검사한다. `product-release`의 마지막 차단선이다. |
+| `r10-independent-review` | release | 서명 hash와 가용 기간이 있는 독립 evaluator roster, sealed scope, 세 raw report byte seal·결정적 Markdown view와 손실 없는 canonical finding ledger를 목표 점수 없이 엄격하게 검사한다. open P0·P1은 점수와 무관하게 `product-release`를 차단한다. |
 | `backend` | fast | Python backend 전체 테스트를 최대 1800초 안에서 실행한다. `tests/_attempts`는 `--ignore`로 수집하지 않고, 0.25초 이상 걸린 항목 중 가장 느린 25개를 출력해 preflight 병목을 관찰한다. |
 | `attempts` | experiment | 운영과 분리된 `tests/_attempts` 실험 샌드박스를 실행한다. preflight/quality-cycle/CI 비포함이며 `tier` 스윕에도 끼지 않는다. |
 | `architecture-boundary` | fast | core→engine→domain→transport→entry 의존 방향과 router/domain 경계를 집중 확인한다. |
@@ -256,4 +256,4 @@ uv run python -X utf8 tests/run.py gate attempts
 - `landing-build`는 공개 문서 surface가 generated docs 본문 HTML을 nav chunk에 싣지 않는지도 확인한다. `docsNav.js`는 metadata와 `contentModule`만 담고, 각 문서 본문 module은 화면과 prerender가 소비하는 `html`만 가진 채 `landing/src/lib/generated/docsPages/page*.js`로 분리되어 slug route에서 동적 로딩되어야 한다. 검색 원문 `text`는 `searchIndex.js`가 소유하므로 페이지 module에 중복하지 않는다. `docs/skills` 핵심 SSOT 문구가 generated docs에 반영되지 않은 stale 상태도 실패로 본다.
 - 기존 부채를 새 테스트로 한 번에 해결하지 못하면 별도 baseline 또는 명시적 TODO 문서로 분리한다.
 - CI YAML은 세부 명령을 소유하지 않고 `tests/run.py gate <name>`만 호출한다.
-- `evaluation-contract`은 rubric·report schema·negative fixture 자체만 봉인한다. sealed bundle, evaluator roster, raw report와 finding ledger는 `08-r10-independent-review`가 소유하며 이 downstream 산출물을 계약 packet의 완료 조건으로 되돌리지 않는다.
+- `evaluation-contract`은 rubric·raw report schema·canonical finding ledger schema·negative fixture 자체만 봉인한다. sealed bundle, evaluator roster, 실제 raw report와 finding ledger는 `08-r10-independent-review`가 소유하며 이 downstream 산출물을 계약 packet의 완료 조건으로 되돌리지 않는다.

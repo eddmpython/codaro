@@ -12,6 +12,8 @@ R9가 드러낸 결함을 문서 작성자가 스스로 닫았다고 선언하�
 
 current bundle integrity와 draft fact audit도 R10 통과가 아니다. draft 범위는 최신이지만 입력 manifest와 scope는 unsealed이고 03~07·09 remediation closure, 세 명의 독립 evaluator 배정·독립성·conflict 확인, raw report 3개와 finding ledger가 없다. Local·Web reader floor, canonical mastery, full archive와 weak-only 0은 machine 구현 사실일 뿐 독립 검수와 전 release compatibility matrix를 대신하지 않는다. 따라서 manifest는 `state: draft`, `sealEligible: false`이며 현재 R10 점수와 통과 판정은 없다. `--seal`은 current bundle, 각 remediation closure evidence·fact audit·negative fixture와 세 evaluator의 독립성·conflict·서명이 모두 유효할 때만 성공해야 한다.
 
+2026-07-30 machine contract는 `sealIndependentReport`, `mergeCanonicalFindings`, `verifyRoundEvidence`까지 구현됐다. raw YAML은 원본 byte SHA-256과 untouched total score로 봉인되고 같은 이름의 Markdown은 이 seal에서 결정적으로 렌더링되므로 점수·finding 변경을 정본으로 위장할 수 없다. 세 discipline report가 모두 봉인되기 전에는 canonical merge가 거부되며, `contracts/prdEvaluationFindingLedger.schema.yml`의 closed ledger는 세 report seal, scope 4종 hash, 원본 severity, 모든 raw finding의 정확히 한 번 병합, owner·packet·response·review 시각을 강제한다. P0·P1이 open이면 점수와 무관하게 strict round gate는 계속 차단된다.
+
 ## 착수 조건
 
 - 02~07 각 finding의 상태, 수정 path, fact audit command, negative fixture, owner가 `r10-input-manifest.yml`에 고정돼 있다.
@@ -45,6 +47,7 @@ PRD 점수는 구현 완료 판정이 아니다. E2 이상은 실행 가능한 v
 - 신규 `mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/08-r10-independent-review/reports/architecture.yml`, 읽기 view `architecture.md`
 - 신규 `mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/08-r10-independent-review/fact-audit.json`
 - 신규 `mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/08-r10-independent-review/finding-ledger.yml`
+- 구현 `contracts/prdEvaluationFindingLedger.schema.yml`
 - 구현 `docs/skills/ops/tools/buildPrdEvaluationBundle.py`
 - 구현 `docs/skills/ops/tools/buildPrdRoundFactAudit.py`
 
@@ -55,6 +58,7 @@ PRD 점수는 구현 완료 판정이 아니다. E2 이상은 실행 가능한 v
 ## 영향 파일
 
 - 현재 차단 초안 `r10-input-manifest.yml`, `evaluator-roster.yml`; seal 때 신규 `evaluation-bundle.manifest.yml`, `fact-audit.json`, `finding-ledger.yml`
+- 구현 `contracts/prdEvaluationFindingLedger.schema.yml`
 - 신규 structured raw `reports/learning.yml`, `reports/ux.yml`, `reports/architecture.yml`
 - 신규 읽기 view `reports/learning.md`, `reports/ux.md`, `reports/architecture.md`
 - 구현 `docs/skills/ops/tools/buildPrdEvaluationBundle.py`
@@ -64,7 +68,7 @@ PRD 점수는 구현 완료 판정이 아니다. E2 이상은 실행 가능한 v
 ## 영향 함수·심볼
 
 - 구현 `buildPrdEvaluationBundle`, `buildEvaluationScopeManifest`, `verifyExcludedPriorReports`, `verifyEvaluatorRoster`
-- 계획 단계 `sealIndependentReport`, `mergeCanonicalFindings`, `verifyRoundEvidence`
+- 구현 `sealIndependentReport`, `mergeCanonicalFindings`, `verifyRoundEvidence`
 
 ## 테스트
 
@@ -76,8 +80,10 @@ PRD 점수는 구현 완료 판정이 아니다. E2 이상은 실행 가능한 v
 - `uv run --no-sync python -X utf8 docs/skills/ops/tools/buildPrdRoundFactAudit.py --write`
 - `uv run --no-sync python -X utf8 docs/skills/ops/tools/buildPrdRoundFactAudit.py --check`
 - evaluator roster의 remediation 참여, 이전 round 참여, conflict, 중복 evaluator, 배정 누락 거부
+- evaluator roster의 expertise evidence, timezone availability, `signedAt`, `signatureHash` 누락·변조 거부
 - 세 YAML report 중 하나가 먼저 다른 report를 참조하거나 raw score가 Markdown·ledger에서 바뀌면 거부
 - 근거 없는 점수, 재현 불가 path·symbol, 중복 canonical finding, 누락된 counter-evidence 거부
+- 원본 severity 변경, raw finding 누락·중복 merge, scope hash·raw report seal 변경 거부
 - rubric dimension 누락·중복·unknown ID, scope hash 불일치, evidence reference 없는 product maturity 거부
 - 낮아진 총점과 새 P0가 손실 없이 round 결과에 남는 positive fixture
 - 소비 `uv run python -X utf8 tests/run.py gate plan-quality` (현재 runner와 plan fact audit가 소유)

@@ -16,6 +16,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[2]
 RUBRIC_PATH = ROOT / "contracts" / "prdEvaluationRubric.yml"
 SCHEMA_PATH = ROOT / "contracts" / "prdEvaluationReport.schema.yml"
+LEDGER_SCHEMA_PATH = ROOT / "contracts" / "prdEvaluationFindingLedger.schema.yml"
 REPORT_PATH = (
     ROOT
     / "output"
@@ -97,8 +98,11 @@ def sha256File(path: Path) -> str:
 def validateContract(
     rubric: dict[str, Any],
     schema: dict[str, Any],
+    ledgerSchema: dict[str, Any] | None = None,
 ) -> tuple[dict[str, Any], list[str]]:
     failures: list[str] = []
+    if ledgerSchema is None:
+        ledgerSchema = loadMapping(LEDGER_SCHEMA_PATH)
     rawDimensions = rubric.get("dimensions")
     dimensions = [row for row in rawDimensions if isinstance(row, dict)] if isinstance(rawDimensions, list) else []
     dimensionIds = [row.get("id") for row in dimensions]
@@ -138,6 +142,59 @@ def validateContract(
     totalScore = properties.get("totalScore")
     if not isinstance(totalScore, dict) or "const" in totalScore:
         failures.append("evaluation report schema must preserve the evaluator's raw total score")
+    reportDefs = schema.get("$defs")
+    reportEvidenceRef = reportDefs.get("evidenceRef") if isinstance(reportDefs, dict) else None
+    reportEvidenceSelectors = reportEvidenceRef.get("anyOf") if isinstance(reportEvidenceRef, dict) else None
+    expectedEvidenceSelectors = {("line",), ("symbol",), ("command",), ("resultHash",)}
+    actualReportSelectors = {
+        tuple(row.get("required", []))
+        for row in reportEvidenceSelectors
+        if isinstance(reportEvidenceSelectors, list) and isinstance(row, dict)
+    } if isinstance(reportEvidenceSelectors, list) else set()
+    if actualReportSelectors != expectedEvidenceSelectors:
+        failures.append("evaluation report evidence references need reproducible location or result fields")
+
+    ledgerRequired = ledgerSchema.get("required")
+    ledgerProperties = ledgerSchema.get("properties")
+    requiredLedgerFields = {
+        "evaluationBundleHash",
+        "scopeGitCommit",
+        "scopeDirtyDiffHash",
+        "scopeManifestHash",
+        "scoreThresholdApplied",
+        "sourceReports",
+        "canonicalFindings",
+    }
+    if ledgerSchema.get("type") != "object" or ledgerSchema.get("additionalProperties") is not False:
+        failures.append("finding ledger schema must be a closed object")
+    if not isinstance(ledgerRequired, list) or not requiredLedgerFields.issubset(ledgerRequired):
+        failures.append("finding ledger schema misses scope, report seal, or canonical finding fields")
+    if not isinstance(ledgerProperties, dict):
+        failures.append("finding ledger schema properties must be a mapping")
+        ledgerProperties = {}
+    scoreThresholdApplied = ledgerProperties.get("scoreThresholdApplied")
+    if not isinstance(scoreThresholdApplied, dict) or scoreThresholdApplied.get("const") is not False:
+        failures.append("finding ledger schema must forbid score thresholds")
+    sourceReports = ledgerProperties.get("sourceReports")
+    sourceProperties = sourceReports.get("properties") if isinstance(sourceReports, dict) else None
+    if (
+        not isinstance(sourceReports, dict)
+        or sourceReports.get("additionalProperties") is not False
+        or sourceReports.get("required") != ["learning", "ux", "architecture"]
+        or not isinstance(sourceProperties, dict)
+        or set(sourceProperties) != {"learning", "ux", "architecture"}
+    ):
+        failures.append("finding ledger schema must preserve three exact independent report seals")
+    ledgerDefs = ledgerSchema.get("$defs")
+    ledgerEvidenceRef = ledgerDefs.get("evidenceRef") if isinstance(ledgerDefs, dict) else None
+    ledgerEvidenceSelectors = ledgerEvidenceRef.get("anyOf") if isinstance(ledgerEvidenceRef, dict) else None
+    actualLedgerSelectors = {
+        tuple(row.get("required", []))
+        for row in ledgerEvidenceSelectors
+        if isinstance(ledgerEvidenceSelectors, list) and isinstance(row, dict)
+    } if isinstance(ledgerEvidenceSelectors, list) else set()
+    if actualLedgerSelectors != expectedEvidenceSelectors:
+        failures.append("finding ledger evidence references need reproducible location or result fields")
 
     return {
         "rubric": {
@@ -155,6 +212,21 @@ def validateContract(
             "closedObject": schema.get("additionalProperties") is False,
             "requiredEvidenceFields": sorted(REQUIRED_REPORT_FIELDS),
             "dimensionIds": schemaDimensionIds if isinstance(schemaDimensionIds, list) else [],
+        },
+        "findingLedgerSchema": {
+            "path": LEDGER_SCHEMA_PATH.relative_to(ROOT).as_posix(),
+            "sha256": sha256File(LEDGER_SCHEMA_PATH),
+            "closedObject": ledgerSchema.get("additionalProperties") is False,
+            "scoreThresholdApplied": (
+                scoreThresholdApplied.get("const")
+                if isinstance(scoreThresholdApplied, dict)
+                else None
+            ),
+            "disciplines": (
+                list(sourceProperties)
+                if isinstance(sourceProperties, dict)
+                else []
+            ),
         },
     }, failures
 
@@ -252,7 +324,11 @@ def verifyEvaluationContract() -> dict[str, Any]:
     if gitHead is None:
         failures.append("current Git HEAD is unavailable")
     try:
-        facts, contractFailures = validateContract(loadMapping(RUBRIC_PATH), loadMapping(SCHEMA_PATH))
+        facts, contractFailures = validateContract(
+            loadMapping(RUBRIC_PATH),
+            loadMapping(SCHEMA_PATH),
+            loadMapping(LEDGER_SCHEMA_PATH),
+        )
         failures.extend(contractFailures)
     except (EvaluationContractError, OSError) as exc:
         failures.append(str(exc))

@@ -229,6 +229,7 @@ def testCurrentBundleIsCompleteAndStillBlockedFromSealing() -> None:
     ).hexdigest()
     assert "evaluation-contract/rubric.yml" in paths
     assert "evaluation-contract/evaluation-report.schema.yml" in paths
+    assert "evaluation-contract/finding-ledger.schema.yml" in paths
     assert "evaluation-contract/evaluator-briefing.yml" in paths
     with zipfile.ZipFile(io.BytesIO(archiveBytes)) as archive:
         assert archive.namelist() == paths
@@ -317,3 +318,37 @@ def testDraftTransitionRefreshesBundleFactsWithoutSealing() -> None:
         "bundleIntegrityState": "passed",
         "sealEligible": False,
     }
+
+
+def testEvaluatorRosterRequiresSignedExpertiseAndBoundedAvailability() -> None:
+    builder = loadBuilder()
+    roster = {
+        "roundState": "ready",
+        "roundEligible": True,
+        "slots": {
+            discipline: {
+                "evaluatorId": f"{discipline}-reviewer",
+                "expertiseEvidence": f"https://example.invalid/{discipline}",
+                "remediationParticipation": False,
+                "priorRoundParticipation": False,
+                "conflictOfInterest": False,
+                "availability": {
+                    "startsAt": "2026-07-18T00:00:00+00:00",
+                    "endsAt": "2026-07-20T00:00:00+00:00",
+                },
+                "signedAt": "2026-07-18T12:00:00+00:00",
+                "signatureHash": "a" * 64,
+                "eligible": True,
+            }
+            for discipline in ("learning", "ux", "architecture")
+        },
+    }
+
+    assert builder.verifyEvaluatorRoster(roster) == []
+
+    roster["slots"]["ux"]["signedAt"] = None
+    roster["slots"]["architecture"]["expertiseEvidence"] = None
+    blockers = builder.verifyEvaluatorRoster(roster)
+
+    assert "ux evaluator signature is absent" in blockers
+    assert "architecture evaluator expertise evidence is absent" in blockers

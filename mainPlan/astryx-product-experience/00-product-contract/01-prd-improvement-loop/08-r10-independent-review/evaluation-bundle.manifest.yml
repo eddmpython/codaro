@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: 7c16dba3d9b8e115ef1e92540df972b3959cd501
-  dirtyDiffHash: 1a76a99dcdc616bedc925c00bfe4d441f99a95b7b890914cfa9d648324b2cfc9
-  manifestHash: f3d2668311c2803fa561057d407a5ca4c443ab3dffc805a78e69101e2e9b6384
-  fileCount: 3168
-  totalBytes: 97462143
+  gitCommit: 547421458845678215f903b987d963ad1f957485
+  dirtyDiffHash: 03382806ce513a86be6732b29e678d218b29284a26cc275926f7d597d995bd1b
+  manifestHash: 540091fbac37470f5cba607d75417417100d7f67f25850a253a25c3e700ab522
+  fileCount: 3170
+  totalBytes: 97518377
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: c171711417852cc40da674255316db8fa0de42011c157adff2df8052effc6942
-  bytes: 98103965
+  sha256: 42f4a299342505f3e280d009f7118983e532125c6b7e34e10cb43e7b81c67be7
+  bytes: 98160535
   format: zip
   compression: stored
   compressionMethod: 0
@@ -65,7 +65,10 @@ contracts:
   sha256: 0150ee794a4fd567e3462d059d46192e4f22d8fc56c0a452ce4e347c2582f08d
 - bundlePath: evaluation-contract/evaluation-report.schema.yml
   sourcePath: contracts/prdEvaluationReport.schema.yml
-  sha256: 3a7e5a28de2b81c7ee2b2f81c41f3bbedb8dd58efe3a6c23ee65b4cd57254dec
+  sha256: 83a94f75c7ceceb76d101e760c04d15e52b02d8c7eef6fdbf9b7c06a64f6e16d
+- bundlePath: evaluation-contract/finding-ledger.schema.yml
+  sourcePath: contracts/prdEvaluationFindingLedger.schema.yml
+  sha256: 0dc8eb7c6b1d5883d26ebec132c1763cfba7e5294047508ed91f0e243748c6b7
 files:
 - path: .github/workflows/ci.yml
   sha256: cb4eac241c7e2d26e73b22798fbde8ff46e35f6bfc54dce94f9c0e253a68e57f
@@ -1617,9 +1620,14 @@ files:
   bytes: 764
   kind: repository
   sourcePath: contracts/masteryPolicy.v1.json
+- path: contracts/prdEvaluationFindingLedger.schema.yml
+  sha256: 0dc8eb7c6b1d5883d26ebec132c1763cfba7e5294047508ed91f0e243748c6b7
+  bytes: 3910
+  kind: repository
+  sourcePath: contracts/prdEvaluationFindingLedger.schema.yml
 - path: contracts/prdEvaluationReport.schema.yml
-  sha256: 3a7e5a28de2b81c7ee2b2f81c41f3bbedb8dd58efe3a6c23ee65b4cd57254dec
-  bytes: 4193
+  sha256: 83a94f75c7ceceb76d101e760c04d15e52b02d8c7eef6fdbf9b7c06a64f6e16d
+  bytes: 4315
   kind: repository
   sourcePath: contracts/prdEvaluationReport.schema.yml
 - path: contracts/prdEvaluationRubric.yml
@@ -4513,8 +4521,8 @@ files:
   kind: repository
   sourcePath: docs/skills/ops/foundation/environment.md
 - path: docs/skills/ops/foundation/testing-and-gates.md
-  sha256: ab98162a66627c1ac3e25d56f6caca64d822ebe851faecf7b052894613a99aa7
-  bytes: 61628
+  sha256: f474a63e0e310344aca6d09830e7faf7d8ec3ba4b703875f3dc11310f3aa7731
+  bytes: 61834
   kind: repository
   sourcePath: docs/skills/ops/foundation/testing-and-gates.md
 - path: docs/skills/ops/product/branding.md
@@ -4778,13 +4786,13 @@ files:
   kind: repository
   sourcePath: docs/skills/ops/tools/buildLearningLedgers.py
 - path: docs/skills/ops/tools/buildPrdEvaluationBundle.py
-  sha256: e2b9dac196cec617b72f2e75c53a1a17f44718dc0f4e4d6b0eb0ff324ff5f17d
-  bytes: 29257
+  sha256: 3b3aa84732c9d33d35bfca05cb460d6f3a899f9c35ca6b7052bccfc9e2e3bc92
+  bytes: 31270
   kind: repository
   sourcePath: docs/skills/ops/tools/buildPrdEvaluationBundle.py
 - path: docs/skills/ops/tools/buildPrdRoundFactAudit.py
-  sha256: 8cb562b5926721d360bb5478de1a36b6fd219febbfaaa8280f93a3c0f1da2dce
-  bytes: 13908
+  sha256: b3c84e9106e87e65e2a4f5c7a510d15247e1261844d8a04e8d9b98f8944d892a
+  bytes: 14120
   kind: repository
   sourcePath: docs/skills/ops/tools/buildPrdRoundFactAudit.py
 - path: docs/skills/ops/tools/buildPublicLearningCatalog.py
@@ -7293,14 +7301,19 @@ files:
   kind: repository
   sourcePath: editor/vite.config.ts
 - path: evaluation-contract/evaluation-report.schema.yml
-  sha256: 3a7e5a28de2b81c7ee2b2f81c41f3bbedb8dd58efe3a6c23ee65b4cd57254dec
-  bytes: 4193
+  sha256: 83a94f75c7ceceb76d101e760c04d15e52b02d8c7eef6fdbf9b7c06a64f6e16d
+  bytes: 4315
   kind: frozen-contract
   sourcePath: contracts/prdEvaluationReport.schema.yml
 - path: evaluation-contract/evaluator-briefing.yml
   sha256: a038a1ba2905333289977a27caa08f1935e50cd8e69dfb9059e9aa0a305362c1
   bytes: 634
   kind: generated-briefing
+- path: evaluation-contract/finding-ledger.schema.yml
+  sha256: 0dc8eb7c6b1d5883d26ebec132c1763cfba7e5294047508ed91f0e243748c6b7
+  bytes: 3910
+  kind: frozen-contract
+  sourcePath: contracts/prdEvaluationFindingLedger.schema.yml
 - path: evaluation-contract/rubric.yml
   sha256: 0150ee794a4fd567e3462d059d46192e4f22d8fc56c0a452ce4e347c2582f08d
   bytes: 2177
@@ -15392,18 +15405,18 @@ files:
   kind: repository
   sourcePath: tests/product/testManualAtMatrix.py
 - path: tests/product/testPrdEvaluationBundle.py
-  sha256: 43fb2bddb815392d24f446bf02b8833789999b5fdf4e324096deb51ece007521
-  bytes: 11431
+  sha256: e988263e4fa05a0b7cde32e2fe9a4b3a1a9611c1ca000fc5a7addb7b98e9e80d
+  bytes: 12770
   kind: repository
   sourcePath: tests/product/testPrdEvaluationBundle.py
 - path: tests/product/testPrdEvaluationContract.py
-  sha256: 99f119d5d7541b562573b9467ca6d881da00fa71754d8b1ae8024d11d71ff614
-  bytes: 3931
+  sha256: 172103f478f79354512e5db7677f244877a1e4c2e9c728df230ea7343f8304ee
+  bytes: 4809
   kind: repository
   sourcePath: tests/product/testPrdEvaluationContract.py
 - path: tests/product/testPrdEvaluationReport.py
-  sha256: c1ce7bf2e0d2af543f498e2d368de56f0a648c848b7412a3fb7c75ca804568c7
-  bytes: 8527
+  sha256: b901d4302dd9f8bcda5d34f1c99033045e284859f9f102f250bc16c4bc8f2b34
+  bytes: 22913
   kind: repository
   sourcePath: tests/product/testPrdEvaluationReport.py
 - path: tests/product/testReleaseResearchCompatibility.py
@@ -15462,13 +15475,13 @@ files:
   kind: repository
   sourcePath: tests/product/verifyPlanFactAudit.py
 - path: tests/product/verifyPrdEvaluationContract.py
-  sha256: f682fdaec5bb271d442ee6528071b2989b5b88712e19609b85dc6a916dc5e790
-  bytes: 10857
+  sha256: 335de2578b8ea7dae4976cd2833498d39443d1cdea1001bd6231c304d5b077ee
+  bytes: 14882
   kind: repository
   sourcePath: tests/product/verifyPrdEvaluationContract.py
 - path: tests/product/verifyPrdEvaluationReport.py
-  sha256: f6bb64cba5b8c380608733e0543a7dc36130642c4697ef5d5cd1d0e59b952844
-  bytes: 26435
+  sha256: eb8b7d0b2e19851b2d81ad320e080c2d0ea0a612c3ad0583df913d241ddefa1a
+  bytes: 51493
   kind: repository
   sourcePath: tests/product/verifyPrdEvaluationReport.py
 - path: tests/product/verifyProductQualityAudit.py
@@ -15487,8 +15500,8 @@ files:
   kind: repository
   sourcePath: tests/product/verifyWebView2ProductSmoke.py
 - path: tests/run.py
-  sha256: 3157010b06d10da62ec988daf63d8a1713e7c8c8ad8cc22e52cfafccbbbc8fba
-  bytes: 82090
+  sha256: 65f1c1fc3d5d055ae2a367a0cd4ca27069c001e0fd9092646a17faa094e63527
+  bytes: 82143
   kind: repository
   sourcePath: tests/run.py
 - path: tests/runtime/testAppRuntime.py

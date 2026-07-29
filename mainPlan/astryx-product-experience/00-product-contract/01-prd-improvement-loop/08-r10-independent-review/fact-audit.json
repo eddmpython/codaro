@@ -8,29 +8,32 @@
   "productCompletionEligible": false,
   "roundSealEligible": false,
   "scope": {
-    "gitCommit": "7c16dba3d9b8e115ef1e92540df972b3959cd501",
-    "dirtyDiffHash": "1a76a99dcdc616bedc925c00bfe4d441f99a95b7b890914cfa9d648324b2cfc9",
-    "manifestHash": "f3d2668311c2803fa561057d407a5ca4c443ab3dffc805a78e69101e2e9b6384",
-    "evaluationBundleHash": "c171711417852cc40da674255316db8fa0de42011c157adff2df8052effc6942"
+    "gitCommit": "547421458845678215f903b987d963ad1f957485",
+    "dirtyDiffHash": "03382806ce513a86be6732b29e678d218b29284a26cc275926f7d597d995bd1b",
+    "manifestHash": "540091fbac37470f5cba607d75417417100d7f67f25850a253a25c3e700ab522",
+    "evaluationBundleHash": "42f4a299342505f3e280d009f7118983e532125c6b7e34e10cb43e7b81c67be7"
   },
   "facts": {
     "bundleIntegrity": {
-      "fileCount": 3168,
-      "totalSourceBytes": 97462143,
-      "archiveBytes": 98103965,
+      "fileCount": 3170,
+      "totalSourceBytes": 97518377,
+      "archiveBytes": 98160535,
       "archiveEntriesReadOnly": true,
       "excludedHistoryPathCount": 0,
       "priorScoresIncluded": false,
       "priorConclusionsIncluded": false
     },
     "requiredPaths": {
-      "checked": 10,
+      "checked": 11,
       "missing": []
     },
     "symbols": {
       "requiredPresent": [
         "editor/src/lib/curriculumProgressEvent.ts::PROGRESS_UPDATED_EVENT",
         "editor/src/lib/webLearningEvidence.ts::appendWebStrongCheckEvidenceTransaction",
+        "tests/product/verifyPrdEvaluationReport.py::mergeCanonicalFindings",
+        "tests/product/verifyPrdEvaluationReport.py::sealIndependentReport",
+        "tests/product/verifyPrdEvaluationReport.py::verifyRoundEvidence",
         "tests/run.py::PRODUCT_QUALITY_GATES"
       ],
       "requiredMissing": [],

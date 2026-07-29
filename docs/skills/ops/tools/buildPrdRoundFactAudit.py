@@ -33,6 +33,7 @@ RETIRED_COMPLETION_PATHS = (
 )
 REQUIRED_BUNDLE_PATHS = (
     "README.md",
+    "contracts/prdEvaluationFindingLedger.schema.yml",
     "mainPlan/astryx-product-experience/README.md",
     "mainPlan/astryx-product-experience/02-learning-method/README.md",
     "mainPlan/astryx-product-experience/04-web-learning/README.md",
@@ -47,6 +48,11 @@ REQUIRED_SYMBOLS = {
     "editor/src/lib/webLearningEvidence.ts": ("appendWebStrongCheckEvidenceTransaction",),
     "editor/src/lib/curriculumProgressEvent.ts": ("PROGRESS_UPDATED_EVENT",),
     "tests/run.py": ("PRODUCT_QUALITY_GATES",),
+    "tests/product/verifyPrdEvaluationReport.py": (
+        "sealIndependentReport",
+        "mergeCanonicalFindings",
+        "verifyRoundEvidence",
+    ),
 }
 ROLLBACK_SYMBOLS = ("minimumReaderVersion", "cutoverMarker")
 REQUIRED_QUALITY_GATES = {

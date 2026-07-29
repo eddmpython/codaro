@@ -314,7 +314,7 @@ GATES: dict[str, Gate] = {
     ),
     "evaluation-contract": Gate(
         tier="fast",
-        description="목표 점수 없는 평가 rubric, closed report schema, raw report·bundle negative fixture를 clean commit에서 검증한다.",
+        description="목표 점수 없는 평가 rubric, closed raw report·finding ledger schema, score·severity 보존 negative fixture를 clean commit에서 검증한다.",
         commands=(command((
             "uv", "run", "python", "-X", "utf8", "tests/product/verifyPrdEvaluationContract.py",
         )),),
@@ -354,7 +354,7 @@ GATES: dict[str, Gate] = {
     ),
     "r10-independent-review": Gate(
         tier="release",
-        description="독립 R10 roster, sealed scope, 세 raw report와 finding ledger 완전성을 엄격하게 검증한다.",
+        description="독립 R10 roster, sealed scope, 세 raw report byte seal·Markdown view와 손실 없는 finding ledger를 엄격하게 검증한다.",
         commands=(command((
             "uv", "run", "python", "-X", "utf8", "tests/product/verifyPrdEvaluationReport.py",
         )),),

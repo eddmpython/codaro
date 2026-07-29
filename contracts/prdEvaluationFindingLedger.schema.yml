@@ -1,0 +1,180 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: astryx-prd-evaluation-finding-ledger-v1
+type: object
+additionalProperties: false
+required:
+  - schemaVersion
+  - roundId
+  - state
+  - evaluationBundleHash
+  - scopeGitCommit
+  - scopeDirtyDiffHash
+  - scopeManifestHash
+  - scoreThresholdApplied
+  - sourceReports
+  - canonicalFindings
+  - completedAt
+properties:
+  schemaVersion:
+    const: 1
+  roundId:
+    type: string
+    pattern: ^R[0-9]+$
+  state:
+    const: sealed
+  evaluationBundleHash:
+    $ref: '#/$defs/sha256'
+  scopeGitCommit:
+    type: string
+    pattern: ^(?:[a-f0-9]{40}|[a-f0-9]{64})$
+  scopeDirtyDiffHash:
+    $ref: '#/$defs/sha256'
+  scopeManifestHash:
+    $ref: '#/$defs/sha256'
+  scoreThresholdApplied:
+    const: false
+  sourceReports:
+    type: object
+    additionalProperties: false
+    required: [learning, ux, architecture]
+    properties:
+      learning:
+        $ref: '#/$defs/reportSeal'
+      ux:
+        $ref: '#/$defs/reportSeal'
+      architecture:
+        $ref: '#/$defs/reportSeal'
+  canonicalFindings:
+    type: array
+    items:
+      $ref: '#/$defs/canonicalFinding'
+  completedAt:
+    type: string
+    format: date-time
+$defs:
+  sha256:
+    type: string
+    pattern: ^[a-f0-9]{64}$
+  evidenceRef:
+    type: object
+    additionalProperties: false
+    required: [path]
+    anyOf:
+      - required: [line]
+      - required: [symbol]
+      - required: [command]
+      - required: [resultHash]
+    properties:
+      path:
+        type: string
+        minLength: 1
+      line:
+        type: integer
+        minimum: 1
+      symbol:
+        type: string
+        minLength: 1
+      command:
+        type: string
+        minLength: 1
+      resultHash:
+        $ref: '#/$defs/sha256'
+  reportSeal:
+    type: object
+    additionalProperties: false
+    required:
+      - evaluationId
+      - evaluatorId
+      - rawReportHash
+      - totalScore
+      - findingCount
+      - completedAt
+    properties:
+      evaluationId:
+        type: string
+        minLength: 1
+      evaluatorId:
+        type: string
+        minLength: 1
+      rawReportHash:
+        $ref: '#/$defs/sha256'
+      totalScore:
+        type: number
+        minimum: 0
+        maximum: 100
+      findingCount:
+        type: integer
+        minimum: 0
+      completedAt:
+        type: string
+        format: date-time
+  sourceFinding:
+    type: object
+    additionalProperties: false
+    required: [discipline, findingId, severity, rawReportHash]
+    properties:
+      discipline:
+        enum: [learning, ux, architecture]
+      findingId:
+        type: string
+        pattern: ^[A-Z]+-[0-9]+$
+      severity:
+        enum: [P0, P1, P2]
+      rawReportHash:
+        $ref: '#/$defs/sha256'
+  remediationResponse:
+    type: object
+    additionalProperties: false
+    required:
+      - status
+      - owner
+      - packet
+      - response
+      - evidenceRefs
+      - reviewAt
+      - closureEvidenceHash
+    properties:
+      status:
+        enum: [open, remediated]
+      owner:
+        type: string
+        minLength: 1
+      packet:
+        type: string
+        minLength: 1
+      response:
+        type: string
+        minLength: 1
+      evidenceRefs:
+        type: array
+        items:
+          $ref: '#/$defs/evidenceRef'
+      reviewAt:
+        type: string
+        format: date-time
+      closureEvidenceHash:
+        oneOf:
+          - $ref: '#/$defs/sha256'
+          - type: 'null'
+  canonicalFinding:
+    type: object
+    additionalProperties: false
+    required:
+      - canonicalFindingId
+      - title
+      - sourceFindings
+      - remediationResponse
+    properties:
+      canonicalFindingId:
+        type: string
+        pattern: ^R[0-9]+-F[0-9]+$
+      title:
+        type: string
+        minLength: 1
+      sourceFindings:
+        type: array
+        minItems: 1
+        items:
+          $ref: '#/$defs/sourceFinding'
+      remediationResponse:
+        $ref: '#/$defs/remediationResponse'

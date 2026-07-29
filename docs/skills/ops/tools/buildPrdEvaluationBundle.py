@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import dataclass
+from datetime import datetime
 import hashlib
 import io
 import json
@@ -26,6 +27,7 @@ ROSTER_PATH = ROUND_ROOT / "evaluator-roster.yml"
 MANIFEST_PATH = ROUND_ROOT / "evaluation-bundle.manifest.yml"
 RUBRIC_SOURCE = ROOT / "contracts/prdEvaluationRubric.yml"
 SCHEMA_SOURCE = ROOT / "contracts/prdEvaluationReport.schema.yml"
+LEDGER_SCHEMA_SOURCE = ROOT / "contracts/prdEvaluationFindingLedger.schema.yml"
 ARCHIVE_PATH = ROOT / "output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip"
 
 ROOT_FILES = {
@@ -71,6 +73,7 @@ FORBIDDEN_SEGMENTS = {
 CONTRACT_BUNDLE_PATHS = {
     "evaluation-contract/rubric.yml": RUBRIC_SOURCE,
     "evaluation-contract/evaluation-report.schema.yml": SCHEMA_SOURCE,
+    "evaluation-contract/finding-ledger.schema.yml": LEDGER_SCHEMA_SOURCE,
 }
 BRIEFING_PATH = "evaluation-contract/evaluator-briefing.yml"
 ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
@@ -181,6 +184,14 @@ def readGitBlobs(objectIds: Iterable[str]) -> dict[str, bytes]:
 
 def sha256Bytes(payload: bytes) -> str:
     return hashlib.sha256(payload).hexdigest()
+
+
+def isSha256(value: Any) -> bool:
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(character in "0123456789abcdef" for character in value)
+    )
 
 
 def canonicalJson(payload: Any) -> bytes:
@@ -441,9 +452,41 @@ def verifyEvaluatorRoster(roster: dict[str, Any]) -> list[str]:
             blockers.append(f"{discipline} evaluator independence is not proven")
         if slot.get("conflictOfInterest") is not False:
             blockers.append(f"{discipline} evaluator conflict status is not clean")
+        expertiseEvidence = slot.get("expertiseEvidence")
+        if not isinstance(expertiseEvidence, str) or not expertiseEvidence.strip():
+            blockers.append(f"{discipline} evaluator expertise evidence is absent")
+        availability = slot.get("availability")
+        if not isinstance(availability, dict) or set(availability) != {"startsAt", "endsAt"}:
+            blockers.append(f"{discipline} evaluator availability is invalid")
+        else:
+            startsAt = parseTimestamp(availability.get("startsAt"))
+            endsAt = parseTimestamp(availability.get("endsAt"))
+            if startsAt is None or endsAt is None or startsAt >= endsAt:
+                blockers.append(f"{discipline} evaluator availability is invalid")
+        signedAt = parseTimestamp(slot.get("signedAt"))
+        if signedAt is None:
+            blockers.append(f"{discipline} evaluator signature is absent")
+        elif isinstance(availability, dict):
+            endsAt = parseTimestamp(availability.get("endsAt"))
+            if endsAt is not None and signedAt > endsAt:
+                blockers.append(f"{discipline} evaluator signature is outside availability")
+        if not isSha256(slot.get("signatureHash")):
+            blockers.append(f"{discipline} evaluator signature hash is absent")
     if len(evaluatorIds) != len(set(evaluatorIds)):
         blockers.append("evaluator IDs must be unique")
     return blockers
+
+
+def parseTimestamp(value: Any) -> datetime | None:
+    if not isinstance(value, str) or not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        return None
+    return parsed
 
 
 def remediationSealBlockers(inputManifest: dict[str, Any]) -> list[str]:

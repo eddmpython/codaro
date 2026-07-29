@@ -19,11 +19,11 @@ scope:
 draftBundle:
   manifestPath: mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/08-r10-independent-review/evaluation-bundle.manifest.yml
   archivePath: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  gitCommit: 7c16dba3d9b8e115ef1e92540df972b3959cd501
-  dirtyDiffHash: 1a76a99dcdc616bedc925c00bfe4d441f99a95b7b890914cfa9d648324b2cfc9
-  manifestHash: f3d2668311c2803fa561057d407a5ca4c443ab3dffc805a78e69101e2e9b6384
-  evaluationBundleHash: c171711417852cc40da674255316db8fa0de42011c157adff2df8052effc6942
-  fileCount: 3168
+  gitCommit: 547421458845678215f903b987d963ad1f957485
+  dirtyDiffHash: 03382806ce513a86be6732b29e678d218b29284a26cc275926f7d597d995bd1b
+  manifestHash: 540091fbac37470f5cba607d75417417100d7f67f25850a253a25c3e700ab522
+  evaluationBundleHash: 42f4a299342505f3e280d009f7118983e532125c6b7e34e10cb43e7b81c67be7
+  fileCount: 3170
   bundleIntegrityState: passed
   sealEligible: false
 excludedEvaluatorInputs:
@@ -85,14 +85,14 @@ remediations:
   negativeFixtureState: present
   closureEvidence:
     reportPath: output/test-runner/astryx-journey/astryx-journey-report.json
-    browserCases: 11
-    astryxThemeCases: 11
+    browserCases: 14
+    astryxThemeCases: 28
     redundantLearningControls: 0
     landingImageProofCases: 2
     actualWebView2Matrix: absent
-    manualAccessibilityMatrix: absent
-    facilitatedLearningStudy: absent
-    humanDesignAccessibilityReview: absent
+    manualAccessibilityMatrix: 0/6
+    facilitatedLearningStudy: 0/12
+    humanDesignAccessibilityReview: 0/2
   eligibleForR10: false
 - packet: 07-release-research-operations
   primaryFindings:
@@ -111,8 +111,11 @@ remediations:
     primaryRunBuild: verified
     appCompatibilityBuild: verified
     scopedServiceWorkerCaches: verified
+    compatibilityStateMachine: verified
     efficacyStageMachine: verified
     aggregatePromotionForbidden: verified
+    researchReceiptContract: verified
+    staticCompositionRestoration: verified
     deployedC0Archive: absent
     c2TwoReleaseEvidence: absent
     c3Telemetry: absent
@@ -132,17 +135,17 @@ remediations:
   negativeFixture: tests/learning/fixtures/verticalSlice/weak-no-error-only.yml
   negativeFixtureState: present
   closureEvidence:
-    strongCheckSpecLessons: 467
-    strongCheckSpecs: 1413
+    strongCheckSpecLessons: 468
+    strongCheckSpecs: 1419
     weakOnlyLessons: 0
-    masteryLessons: 467
-    transferLessons: 467
-    retrievalLessons: 467
+    masteryLessons: 468
+    transferLessons: 468
+    retrievalLessons: 468
     productExperienceBrowserCases: 72
   eligibleForR10: false
 blockingReasons:
 - packet 02 completion bootstrap has a verified clean A/E/B transition; packets 03 through 07 and 09 have no independent closure
-- learning ledgers are reproducible and weak-only coverage is 0, but independent assessment approval coverage is 0 of 472
+- learning ledgers are reproducible and weak-only coverage is 0, but independent assessment approval coverage is 0 of 468
   lessons
 - author-fact-audit.snapshot.yml is non-independent and cannot decide pass
 - the draft evaluation bundle passes integrity checks, but its scope hashes are not sealed
