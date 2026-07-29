@@ -986,7 +986,6 @@ def validateCanonicalEventBinding(
     if credit is not None and (
         credit["attemptFingerprint"] != outerEvent["attemptFingerprint"]
         or credit["evidenceTime"] != outerEvent["occurredAt"]
-        or credit["appendReceiptAt"] != outerEvent["occurredAt"]
     ):
         raise EvidenceArchiveError("학습 증거 canonical credit가 outer evidence와 일치하지 않습니다.")
 

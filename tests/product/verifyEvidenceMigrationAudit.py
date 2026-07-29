@@ -34,6 +34,10 @@ LAUNCHER_MAIN_PATH = ROOT / "launcher/codaro-launcher/src/main.rs"
 LAUNCHER_BACKEND_PATH = ROOT / "launcher/codaro-launcher/src/backend.rs"
 LAUNCHER_MANIFEST_PATH = ROOT / "launcher/codaro-launcher/src/manifest.rs"
 RELEASE_BUILDER_PATH = ROOT / "docs/skills/ops/tools/buildReleaseManifest.py"
+EVIDENCE_TIME_PATH = ROOT / "src/codaro/curriculum/evidenceTime.py"
+MASTERY_POLICY_PATH = ROOT / "src/codaro/curriculum/masteryPolicy.py"
+WEB_EVIDENCE_TIME_PATH = ROOT / "editor/src/lib/evidenceTime.ts"
+WEB_MASTERY_POLICY_PATH = ROOT / "editor/src/lib/masteryPolicy.ts"
 PRODUCT_BROWSER_PATH = ROOT / "tests/surface/verifyProductExperiencePlaywright.py"
 PRODUCT_BROWSER_REPORT_PATH = (
     ROOT / "output/test-runner/evidence-migration/product-experience-report.json"
@@ -267,6 +271,12 @@ def verifySourceContracts() -> dict[str, Any]:
         ),
         "manifest": LAUNCHER_MANIFEST_PATH.read_text(encoding="utf-8"),
         "release": RELEASE_BUILDER_PATH.read_text(encoding="utf-8"),
+        "timePolicy": (
+            EVIDENCE_TIME_PATH.read_text(encoding="utf-8")
+            + MASTERY_POLICY_PATH.read_text(encoding="utf-8")
+            + WEB_EVIDENCE_TIME_PATH.read_text(encoding="utf-8")
+            + WEB_MASTERY_POLICY_PATH.read_text(encoding="utf-8")
+        ),
     }
     required = {
         "web": (
@@ -286,6 +296,13 @@ def verifySourceContracts() -> dict[str, Any]:
         "launcher": ("learning_evidence_reader_floor", "Rollback blocked", "CODARO_LEARNING_STORE_HEADER_PATH"),
         "manifest": ("learning_evidence_reader_version",),
         "release": ('"learningEvidenceReaderVersion"',),
+        "timePolicy": (
+            "EvidenceTime",
+            "ClockAnomaly",
+            "deferredCreditEventIds",
+            "elapsed-time-divergence",
+            "evidenceAvailabilityTime",
+        ),
     }
     missing = [
         f"{scope}:{token}"
@@ -373,6 +390,32 @@ def verifyLauncherRejection() -> dict[str, Any]:
     return {"command": " ".join(command), "passed": True, "returnCode": result.returncode}
 
 
+def verifyEvidenceTimePolicy() -> dict[str, Any]:
+    command = (
+        "uv", "run", "--no-sync", "python", "-X", "utf8", "-m", "pytest",
+        "tests/learning/testCanonicalMasteryPolicy.py",
+        "-k", "ClockJump or OfflineBatchReceipt or MigrationImportTimestamp",
+        "-q", "--tb=short", "-p", "no:cacheprovider",
+    )
+    result = subprocess.run(
+        command,
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=180,
+    )
+    output = f"{result.stdout}\n{result.stderr}"
+    if result.returncode != 0 or "3 passed" not in output:
+        raise ValueError("clock anomaly and offline import time policy tests failed")
+    return {
+        "clockAnomalyRecorded": True,
+        "command": " ".join(command),
+        "delayedCreditDeferred": True,
+        "freshRetrievalRequired": True,
+        "offlineImportCreatesElapsedTime": False,
+    }
+
+
 def utcTimestamp() -> str:
     return datetime.now(UTC).isoformat(timespec="seconds")
 
@@ -408,6 +451,7 @@ def main() -> int:
         facts["sourceContracts"] = verifySourceContracts()
         facts["webCutover"] = verifyWebCutover()
         facts["launcherRejection"] = verifyLauncherRejection()
+        facts["evidenceTimePolicy"] = verifyEvidenceTimePolicy()
     except (OSError, ValueError, subprocess.SubprocessError, yaml.YAMLError) as error:
         failures.append(str(error))
     payload = {

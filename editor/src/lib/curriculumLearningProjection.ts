@@ -1,4 +1,5 @@
 import { nestedCanonicalLearningEvents } from "@/lib/canonicalLearningEvidence";
+import { evidenceAvailabilityTime, parseEvidenceTime } from "@/lib/evidenceTime";
 import type { CreditMode, LearningEvent } from "@/lib/learningEvent";
 import { MasteryPolicy, type MasteryProjection, type OutcomeMasteryState } from "@/lib/masteryPolicy";
 import type { WebStrongCheckEvidenceEvent } from "@/lib/webLearningEvidence";
@@ -47,6 +48,7 @@ type AcceptedCredit = {
   creditMode: CreditMode;
   eventId: string;
   evidenceAt: string;
+  availableAt: string;
   lessonRef: string;
   outcomeIds: string[];
   sectionId: string;
@@ -197,20 +199,20 @@ function projectLessonReview(
   for (const retrieval of contract.retrievals) {
     const completedRetrieval = retrievalCredits
       .filter((credit) => credit.sectionId === retrieval.sectionId)
-      .sort((left, right) => compareTimestamps(right.evidenceAt, left.evidenceAt))[0];
+      .sort((left, right) => compareTimestamps(right.availableAt, left.availableAt))[0];
     const sourceCredits = credits.filter((credit) => (
       retrieval.sourceSectionIds.length
         ? retrieval.sourceSectionIds.includes(credit.sectionId)
         : credit.outcomeIds.some((outcomeId) => retrieval.outcomeIds.includes(outcomeId))
     ));
-    const latestSource = sourceCredits.sort((left, right) => compareTimestamps(right.evidenceAt, left.evidenceAt))[0];
+    const latestSource = sourceCredits.sort((left, right) => compareTimestamps(right.availableAt, left.availableAt))[0];
     if (
       !latestSource
-      || (completedRetrieval && Date.parse(completedRetrieval.evidenceAt) >= Date.parse(latestSource.evidenceAt))
+      || (completedRetrieval && Date.parse(completedRetrieval.availableAt) >= Date.parse(latestSource.availableAt))
     ) continue;
     const intervalDays = Math.max(1, Math.ceil(retrieval.minimumDelayHours / 24));
     dueCandidates.push({
-      dueAt: new Date(Date.parse(latestSource.evidenceAt) + retrieval.minimumDelayHours * 3_600_000).toISOString(),
+      dueAt: new Date(Date.parse(latestSource.availableAt) + retrieval.minimumDelayHours * 3_600_000).toISOString(),
       intervalDays,
       outcomeIds: retrieval.outcomeIds,
     });
@@ -275,6 +277,10 @@ function acceptedCredits(events: LearningEvent[], mastery: MasteryProjection): A
       creditMode: creditMode as CreditMode,
       eventId,
       evidenceAt: String(credit.evidenceTime),
+      availableAt: new Date(evidenceAvailabilityTime(parseEvidenceTime(
+        credit.evidenceTime,
+        credit.appendReceiptAt,
+      ))).toISOString(),
       lessonRef: String(context.lessonRef),
       outcomeIds,
       sectionId: String(context.sectionId),

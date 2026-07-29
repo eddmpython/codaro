@@ -132,12 +132,14 @@ def creditEvent(
     *,
     mode: str,
     preAttemptState: str,
+    appendReceiptAt: str | None = None,
+    evidenceTime: str | None = None,
 ) -> dict[str, object]:
     return envelope(
         "CreditGranted",
         sequence,
         occurredAt,
-        appendReceiptAt=occurredAt,
+        appendReceiptAt=appendReceiptAt or occurredAt,
         attemptFingerprint=learningEventDigest(f"attempt-{sequence}"),
         checkEventIds=[item["eventId"] for item in checks],
         creditSlices=[{
@@ -145,7 +147,7 @@ def creditEvent(
             "outcomeId": OUTCOME_ID,
             "preAttemptState": preAttemptState,
         }],
-        evidenceTime=occurredAt,
+        evidenceTime=evidenceTime or occurredAt,
         runEventId=run["eventId"],
         supportEventIds=[item["eventId"] for item in supports],
     )
@@ -321,6 +323,126 @@ def testDueMasteryAcceptsRepeatedRetrievalAndSchedulesNextReview() -> None:
     assert projection.outcomes[0].stage == "mastered"
     assert len(projection.outcomes[0].creditEventIds) == 5
     assert projection.outcomes[0].dueAt == "2026-08-07T00:00:07.000Z"
+
+
+def testClockJumpDefersRetrievalAndFreshReceiptRecoversMastery() -> None:
+    events = masteredEventVector()[:10]
+    jumpedRun = runEvent(
+        11,
+        "2026-07-10T00:00:02Z",
+        variant="retrieval-jumped",
+        fixture="fixture-jumped",
+        sectionId="retrieval",
+    )
+    jumpedCheck = checkEvent(12, "2026-07-10T00:00:03Z", jumpedRun, mode="retrieval")
+    jumpedCredit = creditEvent(
+        13,
+        "2026-07-10T00:00:04Z",
+        jumpedRun,
+        [jumpedCheck],
+        [],
+        mode="retrieval",
+        preAttemptState="transfer",
+        appendReceiptAt="2026-07-03T00:05:04Z",
+    )
+
+    deferred = MasteryPolicy().reduce([*events, jumpedRun, jumpedCheck, jumpedCredit])
+
+    assert deferred.invalidEventIds == []
+    assert deferred.deferredCreditEventIds == [jumpedCredit["eventId"]]
+    assert deferred.outcomes[0].stage == "reviewDue"
+    assert jumpedCredit["eventId"] not in deferred.outcomes[0].creditEventIds
+    assert {
+        anomaly.reason for anomaly in deferred.clockAnomalies
+    } == {"evidence-after-receipt", "elapsed-time-divergence"}
+
+    freshRun = runEvent(
+        14,
+        "2026-07-10T00:10:02Z",
+        variant="retrieval-fresh",
+        fixture="fixture-fresh",
+        sectionId="retrieval",
+    )
+    freshCheck = checkEvent(15, "2026-07-10T00:10:03Z", freshRun, mode="retrieval")
+    freshCredit = creditEvent(
+        16,
+        "2026-07-10T00:10:04Z",
+        freshRun,
+        [freshCheck],
+        [],
+        mode="retrieval",
+        preAttemptState="reviewDue",
+    )
+    recovered = MasteryPolicy().reduce([
+        *events,
+        jumpedRun,
+        jumpedCheck,
+        jumpedCredit,
+        freshRun,
+        freshCheck,
+        freshCredit,
+    ])
+
+    assert recovered.outcomes[0].stage == "mastered"
+    assert recovered.outcomes[0].creditEventIds[-1] == freshCredit["eventId"]
+    assert recovered.deferredCreditEventIds == [jumpedCredit["eventId"]]
+
+
+def testOfflineBatchReceiptCannotManufactureDelayedMastery() -> None:
+    events = masteredEventVector()[:10]
+    transferCredit = events[-1]
+    transferCore = {key: value for key, value in transferCredit.items() if key != "payloadHash"}
+    transferCore["appendReceiptAt"] = "2026-07-20T00:00:00Z"
+    events[-1] = sealLearningEvent(transferCore)
+    retrievalRun = runEvent(
+        11,
+        "2026-07-10T00:00:02Z",
+        variant="offline-retrieval",
+        fixture="fixture-offline",
+        sectionId="retrieval",
+    )
+    retrievalCheck = checkEvent(12, "2026-07-10T00:00:03Z", retrievalRun, mode="retrieval")
+    retrievalCredit = creditEvent(
+        13,
+        "2026-07-10T00:00:04Z",
+        retrievalRun,
+        [retrievalCheck],
+        [],
+        mode="retrieval",
+        preAttemptState="transfer",
+        appendReceiptAt="2026-07-20T00:00:01Z",
+    )
+
+    projection = MasteryPolicy().reduce([
+        *events,
+        retrievalRun,
+        retrievalCheck,
+        retrievalCredit,
+    ])
+
+    assert projection.outcomes[0].stage == "reviewDue"
+    assert projection.deferredCreditEventIds == [retrievalCredit["eventId"]]
+    assert {
+        anomaly.reason for anomaly in projection.clockAnomalies
+    } == {"elapsed-time-divergence"}
+
+
+def testMigrationImportTimestampDoesNotAdvanceProjectionClock() -> None:
+    events = masteredEventVector()
+    migration = envelope(
+        "MigrationImported",
+        14,
+        "2027-07-10T00:00:00Z",
+        creditEligibility="none",
+        recordCount=1,
+        sourceKind="offline-archive",
+        sourceRecordHash=learningEventDigest("offline-import"),
+    )
+
+    projection = MasteryPolicy().reduce([*events, migration])
+
+    assert projection.outcomes[0].stage == "mastered"
+    assert projection.outcomes[0].reviewDue is False
 
 
 def testLearningEventTimestampRequiresTimezoneInPythonAndTypeScript(tmp_path: Path) -> None:
@@ -537,6 +659,7 @@ def testPythonAndTypeScriptMasteryPolicyConformance(tmp_path: Path) -> None:
         [],
         mode="retrieval",
         preAttemptState="reviewDue",
+        appendReceiptAt="2026-07-10T00:00:07Z",
     )
     events = [*masteredEventVector(), renewalRun, renewalCheck, renewalCredit]
     asOf = "2026-07-24T00:00:07Z"

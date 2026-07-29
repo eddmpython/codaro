@@ -171,8 +171,16 @@
             "supportEventIds": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
             "attemptFingerprint": { "$ref": "#/$defs/Hash" },
             "creditSlices": { "type": "array", "items": { "$ref": "#/$defs/CreditSlice" }, "minItems": 1 },
-            "evidenceTime": { "type": "string", "format": "date-time" },
-            "appendReceiptAt": { "type": "string", "format": "date-time" }
+            "evidenceTime": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Time captured by the execution evidence producer; never rewritten during import."
+            },
+            "appendReceiptAt": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Time the canonical writer first accepted the credit; delayed eligibility requires both timelines."
+            }
           }
         }
       ]

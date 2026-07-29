@@ -1,5 +1,12 @@
 import policyContract from "@/lib/generatedContracts/masteryPolicy.v1.json";
 import {
+  clockAnomalies,
+  evidenceAvailabilityTime,
+  parseEvidenceTime,
+  type ClockAnomaly,
+  type EvidenceTime,
+} from "@/lib/evidenceTime";
+import {
   compareLearningEvents,
   type CreditMode,
   type LearningEvent,
@@ -16,6 +23,7 @@ export type OutcomeMasteryState = {
   taskVariantIds: string[];
   fixtureHashes: string[];
   lastEvidenceTime: string | null;
+  lastAppendReceiptAt: string | null;
   dueAt: string | null;
 };
 
@@ -23,6 +31,8 @@ export type MasteryProjection = {
   policyVersion: 1;
   outcomes: OutcomeMasteryState[];
   invalidEventIds: string[];
+  deferredCreditEventIds: string[];
+  clockAnomalies: ClockAnomaly[];
 };
 
 type OutcomeAccumulator = {
@@ -34,6 +44,7 @@ type OutcomeAccumulator = {
   fixtureHashes: string[];
   fingerprints: Set<string>;
   lastEvidenceTime: number | null;
+  lastAppendReceiptAt: number | null;
   dueAt: number | null;
 };
 
@@ -47,6 +58,10 @@ const contract = policyContract as {
   independentMaxHintLevel: number;
   higherStageMaxHintLevel: number;
   minimumDistinctTaskVariantsForMastered: number;
+  clockPolicy: {
+    maximumFutureSkewSeconds: number;
+    maximumElapsedDivergenceSeconds: number;
+  };
   retrievalWindowDays: { minimum: number; maximum: number };
 };
 
@@ -56,6 +71,14 @@ export class MasteryPolicy {
   constructor() {
     if (contract.policyId !== "mastery-policy-v1" || contract.version !== 1 || contract.creditEventKind !== "CreditGranted") {
       throw new Error("mastery policy contract identity is invalid");
+    }
+    if (
+      !Number.isInteger(contract.clockPolicy.maximumFutureSkewSeconds)
+      || contract.clockPolicy.maximumFutureSkewSeconds < 0
+      || !Number.isInteger(contract.clockPolicy.maximumElapsedDivergenceSeconds)
+      || contract.clockPolicy.maximumElapsedDivergenceSeconds < 0
+    ) {
+      throw new Error("mastery policy clock policy is invalid");
     }
   }
 
@@ -72,6 +95,8 @@ export class MasteryPolicy {
     const checks = eventMap(ordered, "CheckEvaluated");
     const supports = eventMap(ordered, "SupportProvided");
     let states = new Map<string, OutcomeAccumulator>();
+    const deferredCreditEventIds = new Set<string>();
+    const anomalies: ClockAnomaly[] = [];
 
     for (const event of ordered) {
       if (event.kind === "CheckEvaluated") {
@@ -80,10 +105,14 @@ export class MasteryPolicy {
       }
       if (event.kind !== contract.creditEventKind || revoked.has(event.eventId)) continue;
       const before = cloneStates(states);
-      if (!this.applyCredit(event, { runs, checks, supports, orderIndex, states })) {
+      const result = this.applyCredit(event, { runs, checks, supports, orderIndex, states });
+      if (!result.accepted) {
         states = before;
         invalidEventIds.add(event.eventId);
+        continue;
       }
+      anomalies.push(...result.anomalies);
+      if (result.deferred) deferredCreditEventIds.add(event.eventId);
     }
 
     const projectionTime = this.projectionTime(options.asOf, ordered);
@@ -98,6 +127,8 @@ export class MasteryPolicy {
         .map((state) => this.buildOutcomeState(state))
         .sort((left, right) => left.outcomeId.localeCompare(right.outcomeId)),
       invalidEventIds: [...invalidEventIds].sort(),
+      deferredCreditEventIds: [...deferredCreditEventIds].sort(),
+      clockAnomalies: anomalies.sort(compareClockAnomalies),
     };
   }
 
@@ -158,27 +189,28 @@ export class MasteryPolicy {
       orderIndex: Map<string, number>;
       states: Map<string, OutcomeAccumulator>;
     },
-  ): boolean {
+  ): { accepted: boolean; deferred: boolean; anomalies: ClockAnomaly[] } {
+    const rejected = { accepted: false, deferred: false, anomalies: [] as ClockAnomaly[] };
     const eventPosition = input.orderIndex.get(event.eventId) ?? -1;
     const runEventId = String(event.runEventId);
     const run = input.runs.get(runEventId);
-    if (!run || (input.orderIndex.get(runEventId) ?? eventPosition) >= eventPosition || run.runStatus !== "success") return false;
+    if (!run || (input.orderIndex.get(runEventId) ?? eventPosition) >= eventPosition || run.runStatus !== "success") return rejected;
     const selectedChecks = (event.checkEventIds as string[]).map((eventId) => input.checks.get(eventId));
-    if (selectedChecks.some((check) => !check)) return false;
+    if (selectedChecks.some((check) => !check)) return rejected;
     const checks = selectedChecks as LearningEvent[];
     if (checks.some((check) => (
       check.runEventId !== runEventId
       || check.strength !== "strong"
       || check.passed !== true
       || (input.orderIndex.get(check.eventId) ?? eventPosition) >= eventPosition
-    ))) return false;
+    ))) return rejected;
     const selectedSupports = (event.supportEventIds as string[]).map((eventId) => input.supports.get(eventId));
-    if (selectedSupports.some((support) => !support)) return false;
+    if (selectedSupports.some((support) => !support)) return rejected;
     const supports = selectedSupports as LearningEvent[];
     if (supports.some((support) => (
       support.runEventId !== runEventId
       || (input.orderIndex.get(support.eventId) ?? eventPosition) >= eventPosition
-    ))) return false;
+    ))) return rejected;
     const maxHintUsed = Math.max(0, ...supports.map((support) => Number(support.hintLevel)));
     const answerReveal = supports.some((support) => support.answerReveal === true);
     const strongestMode = checks
@@ -189,25 +221,61 @@ export class MasteryPolicy {
     const taskVariantId = String(context.taskVariantId);
     const fixtureHash = String(context.fixtureHash);
     const outcomeIds = context.outcomeIds as string[];
-    const evidenceTime = Date.parse(String(event.evidenceTime));
+    const evidenceTime = parseEvidenceTime(event.evidenceTime, event.appendReceiptAt);
     const fingerprint = String(event.attemptFingerprint);
+    const prepared: Array<{
+      outcomeId: string;
+      mode: CreditMode;
+      state: OutcomeAccumulator;
+    }> = [];
 
     for (const rawSlice of event.creditSlices as Record<string, unknown>[]) {
       const outcomeId = String(rawSlice.outcomeId);
       const mode = rawSlice.creditMode as CreditMode;
-      if (mode !== strongestMode || !outcomeIds.includes(outcomeId)) return false;
+      if (mode !== strongestMode || !outcomeIds.includes(outcomeId)) return rejected;
       const state = input.states.get(outcomeId) ?? emptyState(outcomeId);
       input.states.set(outcomeId, state);
-      if (state.dueAt !== null && evidenceTime >= state.dueAt) state.reviewDue = true;
-      if (rawSlice.preAttemptState !== causalStage(state) || state.fingerprints.has(fingerprint)) return false;
-      if (!this.advance(state, { mode, unseen, maxHintUsed, answerReveal, taskVariantId, fixtureHash, evidenceTime })) return false;
+      if (state.dueAt !== null && evidenceAvailabilityTime(evidenceTime) >= state.dueAt) state.reviewDue = true;
+      if (rawSlice.preAttemptState !== causalStage(state) || state.fingerprints.has(fingerprint)) return rejected;
+      prepared.push({ outcomeId, mode, state });
+    }
+    const eventAnomalies = prepared.flatMap(({ outcomeId, mode, state }) => clockAnomalies(
+      evidenceTime,
+      {
+        creditEventId: event.eventId,
+        outcomeId,
+        previous: state.lastEvidenceTime === null || state.lastAppendReceiptAt === null
+          ? null
+          : {
+            evidenceTime: state.lastEvidenceTime,
+            appendReceiptAt: state.lastAppendReceiptAt,
+          },
+        delayed: mode === "retrieval",
+        ...contract.clockPolicy,
+      },
+    ));
+    if (eventAnomalies.length && prepared.some(({ mode }) => mode === "retrieval")) {
+      for (const { mode, state } of prepared) {
+        if (mode === "retrieval" && stageRank(state.baseStage) >= stageRank("transfer")) {
+          state.reviewDue = true;
+        }
+      }
+      return { accepted: true, deferred: true, anomalies: eventAnomalies };
+    }
+
+    for (const { mode, state } of prepared) {
+      if (!this.advance(state, { mode, unseen, maxHintUsed, answerReveal, taskVariantId, fixtureHash, evidenceTime })) return rejected;
       state.fingerprints.add(fingerprint);
       state.creditEventIds.push(event.eventId);
       if (!state.taskVariantIds.includes(taskVariantId)) state.taskVariantIds.push(taskVariantId);
       if (!state.fixtureHashes.includes(fixtureHash)) state.fixtureHashes.push(fixtureHash);
-      state.lastEvidenceTime = evidenceTime;
+      state.lastEvidenceTime = Math.max(evidenceTime.evidenceTime, state.lastEvidenceTime ?? evidenceTime.evidenceTime);
+      state.lastAppendReceiptAt = Math.max(
+        evidenceTime.appendReceiptAt,
+        state.lastAppendReceiptAt ?? evidenceTime.appendReceiptAt,
+      );
     }
-    return true;
+    return { accepted: true, deferred: false, anomalies: eventAnomalies };
   }
 
   private advance(
@@ -219,7 +287,7 @@ export class MasteryPolicy {
       answerReveal: boolean;
       taskVariantId: string;
       fixtureHash: string;
-      evidenceTime: number;
+      evidenceTime: EvidenceTime;
     },
   ): boolean {
     const independentEligible = input.unseen
@@ -244,22 +312,35 @@ export class MasteryPolicy {
     if (input.mode === "retrieval") {
       const renewingMastery = state.baseStage === "mastered"
         && state.dueAt !== null
-        && input.evidenceTime >= state.dueAt;
+        && evidenceAvailabilityTime(input.evidenceTime) >= state.dueAt;
       if (renewingMastery) {
         if (!higherStageEligible) return false;
         state.reviewDue = false;
-        state.dueAt = input.evidenceTime + contract.retrievalWindowDays.maximum * 86_400_000;
+        state.dueAt = evidenceAvailabilityTime(input.evidenceTime)
+          + contract.retrievalWindowDays.maximum * 86_400_000;
         return true;
       }
-      if (stageRank(state.baseStage) < stageRank("transfer") || !higherStageEligible || state.lastEvidenceTime === null) return false;
+      if (
+        stageRank(state.baseStage) < stageRank("transfer")
+        || !higherStageEligible
+        || state.lastEvidenceTime === null
+        || state.lastAppendReceiptAt === null
+      ) return false;
       if (state.taskVariantIds.includes(input.taskVariantId)) return false;
-      const elapsedDays = (input.evidenceTime - state.lastEvidenceTime) / 86_400_000;
-      if (elapsedDays < contract.retrievalWindowDays.minimum || elapsedDays > contract.retrievalWindowDays.maximum) return false;
+      const evidenceElapsedDays = (input.evidenceTime.evidenceTime - state.lastEvidenceTime) / 86_400_000;
+      const receiptElapsedDays = (input.evidenceTime.appendReceiptAt - state.lastAppendReceiptAt) / 86_400_000;
+      if (
+        evidenceElapsedDays < contract.retrievalWindowDays.minimum
+        || evidenceElapsedDays > contract.retrievalWindowDays.maximum
+        || receiptElapsedDays < contract.retrievalWindowDays.minimum
+        || receiptElapsedDays > contract.retrievalWindowDays.maximum
+      ) return false;
       const variants = new Set([...state.taskVariantIds, input.taskVariantId]);
       if (variants.size < contract.minimumDistinctTaskVariantsForMastered) return false;
       state.baseStage = "mastered";
       state.reviewDue = false;
-      state.dueAt = input.evidenceTime + contract.retrievalWindowDays.maximum * 86_400_000;
+      state.dueAt = evidenceAvailabilityTime(input.evidenceTime)
+        + contract.retrievalWindowDays.maximum * 86_400_000;
       return true;
     }
     return false;
@@ -275,6 +356,7 @@ export class MasteryPolicy {
       taskVariantIds: [...state.taskVariantIds],
       fixtureHashes: [...state.fixtureHashes],
       lastEvidenceTime: timestamp(state.lastEvidenceTime),
+      lastAppendReceiptAt: timestamp(state.lastAppendReceiptAt),
       dueAt: timestamp(state.dueAt),
     };
   }
@@ -307,6 +389,7 @@ function emptyState(outcomeId: string): OutcomeAccumulator {
     fixtureHashes: [],
     fingerprints: new Set(),
     lastEvidenceTime: null,
+    lastAppendReceiptAt: null,
     dueAt: null,
   };
 }
@@ -331,6 +414,17 @@ function stageRank(stage: Exclude<MasteryStage, "reviewDue">): number {
 
 function timestamp(value: number | null): string | null {
   return value === null ? null : new Date(value).toISOString();
+}
+
+function compareClockAnomalies(left: ClockAnomaly, right: ClockAnomaly): number {
+  for (const [leftValue, rightValue] of [
+    [left.creditEventId, right.creditEventId],
+    [left.outcomeId, right.outcomeId],
+    [left.reason, right.reason],
+  ]) {
+    if (leftValue !== rightValue) return leftValue < rightValue ? -1 : 1;
+  }
+  return 0;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

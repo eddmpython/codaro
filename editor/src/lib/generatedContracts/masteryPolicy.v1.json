@@ -26,6 +26,10 @@
   "independentMaxHintLevel": 1,
   "higherStageMaxHintLevel": 0,
   "minimumDistinctTaskVariantsForMastered": 3,
+  "clockPolicy": {
+    "maximumFutureSkewSeconds": 300,
+    "maximumElapsedDivergenceSeconds": 300
+  },
   "retrievalWindowDays": {
     "minimum": 7,
     "maximum": 14

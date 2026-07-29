@@ -1036,7 +1036,6 @@ async function validateCanonicalEventBinding(
   if (credit && (
     credit.attemptFingerprint !== outerEvent.attemptFingerprint
     || credit.evidenceTime !== outerEvent.occurredAt
-    || credit.appendReceiptAt !== outerEvent.occurredAt
   )) {
     throw new Error("학습 증거 canonical credit가 outer evidence와 일치하지 않습니다.");
   }

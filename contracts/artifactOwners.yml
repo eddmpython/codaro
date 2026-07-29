@@ -99,7 +99,9 @@ artifacts:
     surfacePaths:
       - src/codaro/generatedContracts/masteryPolicy.v1.json
       - editor/src/lib/generatedContracts/masteryPolicy.v1.json
+      - src/codaro/curriculum/evidenceTime.py
       - src/codaro/curriculum/masteryPolicy.py
+      - editor/src/lib/evidenceTime.ts
       - editor/src/lib/masteryPolicy.ts
   - artifactId: prd-evaluation-rubric
     role: source

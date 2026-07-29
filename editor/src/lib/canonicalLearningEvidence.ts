@@ -98,14 +98,15 @@ export async function buildCanonicalStrongCheckEvents(
   }
   if (!outcomeIds.length) return events;
 
-  const projection = await new MasteryPolicy().reduce(prior, { asOf: evidence.occurredAt });
+  const appendReceiptAt = new Date().toISOString();
+  const projection = await new MasteryPolicy().reduce(prior, { asOf: appendReceiptAt });
   const stageByOutcome = new Map(projection.outcomes.map((outcome) => [outcome.outcomeId, outcome.stage]));
   const supportEventIds = events
     .filter((event) => event.kind === "SupportProvided")
     .map((event) => event.eventId);
   const credit = await sealLearningEvent({
     ...envelope("CreditGranted", `${identity}:credit`),
-    appendReceiptAt: evidence.occurredAt,
+    appendReceiptAt,
     attemptFingerprint: evidence.attemptFingerprint,
     checkEventIds: [check.eventId],
     creditSlices: outcomeIds.map((outcomeId) => ({
@@ -118,7 +119,7 @@ export async function buildCanonicalStrongCheckEvents(
     supportEventIds,
   });
   const candidateProjection = await new MasteryPolicy().reduce([...prior, ...events, credit], {
-    asOf: evidence.occurredAt,
+    asOf: appendReceiptAt,
   });
   return candidateProjection.invalidEventIds.includes(credit.eventId)
     ? events

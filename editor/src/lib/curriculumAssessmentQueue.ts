@@ -1,4 +1,5 @@
 import { nestedCanonicalLearningEvents } from "@/lib/canonicalLearningEvidence";
+import { evidenceAvailabilityTime, parseEvidenceTime } from "@/lib/evidenceTime";
 import type { LearningEvent } from "@/lib/learningEvent";
 import { MasteryPolicy } from "@/lib/masteryPolicy";
 import type { WebStrongCheckEvidenceEvent } from "@/lib/webLearningEvidence";
@@ -27,7 +28,10 @@ export async function dueAssessmentSectionIds(
   if (!Number.isFinite(now)) throw new Error("assessment queue time must be finite");
   const canonicalEvents = nestedCanonicalLearningEvents(evidenceEvents);
   const projection = await new MasteryPolicy().reduce(canonicalEvents, { asOf: new Date(now).toISOString() });
-  const accepted = acceptedCredits(canonicalEvents, projection.invalidEventIds, projection.outcomes.flatMap(
+  const accepted = acceptedCredits(canonicalEvents, [
+    ...projection.invalidEventIds,
+    ...projection.deferredCreditEventIds,
+  ], projection.outcomes.flatMap(
     (outcome) => outcome.creditEventIds,
   ));
   const masteryByOutcome = new Map(projection.outcomes.map((outcome) => [outcome.outcomeId, outcome]));
@@ -81,8 +85,10 @@ function acceptedCredits(
     const slices = Array.isArray(credit.creditSlices)
       ? credit.creditSlices.filter(isRecord)
       : [];
-    const evidenceTime = Date.parse(String(credit.evidenceTime));
-    if (!Number.isFinite(evidenceTime)) continue;
+    const evidenceTime = evidenceAvailabilityTime(parseEvidenceTime(
+      credit.evidenceTime,
+      credit.appendReceiptAt,
+    ));
     credits.push({
       evidenceTime,
       outcomeIds: slices.map((slice) => String(slice.outcomeId ?? "")).filter(Boolean),

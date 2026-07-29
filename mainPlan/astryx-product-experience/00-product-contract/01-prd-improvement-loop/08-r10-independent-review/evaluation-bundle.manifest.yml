@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: b87a37b74bf10f2d0fdaa8223e3d3f147c744fec
-  dirtyDiffHash: e52ac8dbf6e4342adf467eb32415863ca122a49a64045d99abbef3eeb3cb93e9
-  manifestHash: 20cff6086189310565a1819bb70f507a8ea897fb92aa459f06b1fd58a9e7acfe
-  fileCount: 3160
-  totalBytes: 97353247
+  gitCommit: ecbd0fea6bd7e469168e275769bdcbb025c62c04
+  dirtyDiffHash: 3dae9058613efcdcba01d449d9abb9ee6f8dfb47ccce5ce14c1510b2d05b2b4d
+  manifestHash: ad2c0be4f15c4e17a5c4facee99da7a5254509add8d7aeaa75d581e359705915
+  fileCount: 3162
+  totalBytes: 97374746
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: acb8e2f87969a8f09c05283cf40ef7b22910371e71f0c0252ec048c7ae2f4350
-  bytes: 97993867
+  sha256: 1fd6ba596821b0d2df7c2fde5626619657cdfeef396f3a4f9947110eb4f250b7
+  bytes: 98015652
   format: zip
   compression: stored
   compressionMethod: 0
@@ -1558,13 +1558,13 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/prompts/statistics-ml-v1.txt
 - path: contracts/README.md
-  sha256: d89050ba3de193ea8684fb7c1c23588cbf8b90fac410eb331a4ed8056892b9e9
-  bytes: 3618
+  sha256: 0602575f0bdcc6a5d864e6fcc6b853f0401066139b1152b60bc89b3013f1d827
+  bytes: 4391
   kind: repository
   sourcePath: contracts/README.md
 - path: contracts/artifactOwners.yml
-  sha256: ac8031dd9d74489afae8f755033c66df5820500e36b65271a302c8105a68eb54
-  bytes: 4651
+  sha256: 04be59aad7b836587bf7a0f695b6c3e70f06ce6fd5f266f0d12efc4d2035c01e
+  bytes: 4736
   kind: repository
   sourcePath: contracts/artifactOwners.yml
 - path: contracts/artifactOwnership.schema.json
@@ -1608,13 +1608,13 @@ files:
   kind: repository
   sourcePath: contracts/learningArtifactDescriptor.schema.json
 - path: contracts/learningEvent.schema.json
-  sha256: 43fb9a66d772b00607a3774515ac02439d9c23cf654ac229e324345b2ca3b9df
-  bytes: 8560
+  sha256: e9ca3fe681e2246628bf9c4b59be8402ae7ce5ab315f21b77c62e82d82eddcb4
+  bytes: 8883
   kind: repository
   sourcePath: contracts/learningEvent.schema.json
 - path: contracts/masteryPolicy.v1.json
-  sha256: bfba299a516f07d1d3c9358ad6327061d10ae3c57f5f075ed82ad7da7e849aa7
-  bytes: 660
+  sha256: 443e5c722c2959d1693b64b47e484652716c9e7bf7a641675b581f0deb56d408
+  bytes: 764
   kind: repository
   sourcePath: contracts/masteryPolicy.v1.json
 - path: contracts/prdEvaluationReport.schema.yml
@@ -4368,8 +4368,8 @@ files:
   kind: repository
   sourcePath: docs/skills/architecture/frontend-product-surface.md
 - path: docs/skills/architecture/learning-yaml-contract.md
-  sha256: 50016c3bacd49d559f29f81bd1500c6bd4deddb5d3bc9e401619849aabdf20d0
-  bytes: 18169
+  sha256: 7af226d790e69f209b846184e25f85fa8b682fc7fb385648134093a3d0673c2f
+  bytes: 18736
   kind: repository
   sourcePath: docs/skills/architecture/learning-yaml-contract.md
 - path: docs/skills/architecture/live-provider-ops.md
@@ -6853,8 +6853,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/browserPythonRuntime.ts
 - path: editor/src/lib/canonicalLearningEvidence.ts
-  sha256: b75cd41f77dc2237fd78b3bf45b4272d53bb6f9025745166124b62743c97706e
-  bytes: 5107
+  sha256: 99d4b3b8e222655434b2bda658b0c4521c298fac1dfb46707e032e66f61ebee4
+  bytes: 5130
   kind: repository
   sourcePath: editor/src/lib/canonicalLearningEvidence.ts
 - path: editor/src/lib/cellModel.ts
@@ -6903,13 +6903,13 @@ files:
   kind: repository
   sourcePath: editor/src/lib/curriculaRegistry.ts
 - path: editor/src/lib/curriculumAssessmentQueue.ts
-  sha256: af1394a9f0ff1db1a112c10d4722b3ea03a2acc008d088f97952e2866576fcaf
-  bytes: 3822
+  sha256: 432ae7c0c7b59aa6331677ff8dcd1d3adc5e4da80e92bd4eb594be5d1536d1fc
+  bytes: 3978
   kind: repository
   sourcePath: editor/src/lib/curriculumAssessmentQueue.ts
 - path: editor/src/lib/curriculumLearningProjection.ts
-  sha256: 2e8180459fa3e19f603e41713a6acbe2d0cf6553ab41aaf0ad492476077f92bb
-  bytes: 13188
+  sha256: d87fdcb40175c38f265aa931dfcd3907948a4c89108886c7e4be8152df272cc9
+  bytes: 13458
   kind: repository
   sourcePath: editor/src/lib/curriculumLearningProjection.ts
 - path: editor/src/lib/curriculumLearningState.ts
@@ -6967,6 +6967,11 @@ files:
   bytes: 1071
   kind: repository
   sourcePath: editor/src/lib/documentSavePolicy.ts
+- path: editor/src/lib/evidenceTime.ts
+  sha256: 82ecf54340fde88e63be487b87c474656f171c9355847bb36c3f8cc5ee9fe096
+  bytes: 2573
+  kind: repository
+  sourcePath: editor/src/lib/evidenceTime.ts
 - path: editor/src/lib/externalLinks.ts
   sha256: 22a5f849e8ca7b45397ea61bfb41bd426335a37e4121a16902d7ab3d7d7629c9
   bytes: 377
@@ -6978,7 +6983,7 @@ files:
   kind: repository
   sourcePath: editor/src/lib/fallbackData.ts
 - path: editor/src/lib/generatedContracts/artifactOwnership.ts
-  sha256: a187715a0ec0b02e6fd0ae2333d3354e7d2841ba26a9dfb6561983d964e809cd
+  sha256: 899c0b787b072c95da5ec0e84a8904ed6128b4c3ad06ceb677e4a9d38311ce10
   bytes: 703
   kind: repository
   sourcePath: editor/src/lib/generatedContracts/artifactOwnership.ts
@@ -6988,8 +6993,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/generatedContracts/checkSandboxFeasibilityDecision.json
 - path: editor/src/lib/generatedContracts/masteryPolicy.v1.json
-  sha256: bfba299a516f07d1d3c9358ad6327061d10ae3c57f5f075ed82ad7da7e849aa7
-  bytes: 660
+  sha256: 443e5c722c2959d1693b64b47e484652716c9e7bf7a641675b581f0deb56d408
+  bytes: 764
   kind: repository
   sourcePath: editor/src/lib/generatedContracts/masteryPolicy.v1.json
 - path: editor/src/lib/giscusConfig.ts
@@ -7058,8 +7063,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/localeCopy.ts
 - path: editor/src/lib/masteryPolicy.ts
-  sha256: 8cc0332bec1b34b44a5dcb9178c29f4b0629f18fa0c31c9835811b734a84b153
-  bytes: 13714
+  sha256: 504f5b69c76b9a3c921e4bec2fc5937e57c211df79d0bab6b5b1ac3babaf3cb1
+  bytes: 17403
   kind: repository
   sourcePath: editor/src/lib/masteryPolicy.ts
 - path: editor/src/lib/notebookCellNavigation.ts
@@ -7168,8 +7173,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/visualAssets.ts
 - path: editor/src/lib/webLearningEvidence.ts
-  sha256: 0aca7c3d27273d4493be175c65ac55acc40842db42f69624523e2d074864ddce
-  bytes: 51363
+  sha256: bb4f2739dc8572514575958eecb532be3c1f05a2d90be5c08100cb55d8004fdb
+  bytes: 51307
   kind: repository
   sourcePath: editor/src/lib/webLearningEvidence.ts
 - path: editor/src/lib/widgetSession.tsx
@@ -12422,12 +12427,12 @@ files:
   kind: repository
   sourcePath: launcher/codaro-launcher/src/failure.rs
 - path: launcher/codaro-launcher/src/generated_contracts/artifact_ownership.rs
-  sha256: 79db65ebf19db09d86233c74684106b5240373936dbf933defff84f033cc3cf3
+  sha256: 8af2af7596575fe97f79853eaf40f2264e52ac69ddb1f318783ab6eef04a20be
   bytes: 961
   kind: repository
   sourcePath: launcher/codaro-launcher/src/generated_contracts/artifact_ownership.rs
 - path: launcher/codaro-launcher/src/generated_contracts/mod.rs
-  sha256: c81f7754a0ccdf1217f93cb9bbed21545e5de5eaea6d54a506d492499866d220
+  sha256: 44becb61677aeb5ba730c87e5955895afef6ed7a66eed258b7b7281cc873568c
   bytes: 258
   kind: repository
   sourcePath: launcher/codaro-launcher/src/generated_contracts/mod.rs
@@ -14147,10 +14152,15 @@ files:
   kind: repository
   sourcePath: src/codaro/curriculum/efficacyStage.py
 - path: src/codaro/curriculum/evidenceArchive.py
-  sha256: 54008f3c2594f1808794cf89c152f2b2c913f29e3c809fc6064ad3e314cc2c60
-  bytes: 51060
+  sha256: 8b43c2772ada7f410d997eaa7294a2ecbd6573236caa98ec038e80884036628b
+  bytes: 50995
   kind: repository
   sourcePath: src/codaro/curriculum/evidenceArchive.py
+- path: src/codaro/curriculum/evidenceTime.py
+  sha256: 72c1406ab101db40baa497cbf7483d7a0b61a6dfea42c2addef4840d8baf68c9
+  bytes: 3416
+  kind: repository
+  sourcePath: src/codaro/curriculum/evidenceTime.py
 - path: src/codaro/curriculum/exerciseCheck.py
   sha256: eb35eb37cf498619fb70ab8358ab61d6d68398b73e3538ec20cdd4a59583b0ca
   bytes: 5111
@@ -14222,8 +14232,8 @@ files:
   kind: repository
   sourcePath: src/codaro/curriculum/localStrongCheck.py
 - path: src/codaro/curriculum/masteryPolicy.py
-  sha256: ec0f06f1b57fc06e2af3a06402ec7f62ea824fb1e94578ed8057f89d1d5f6701
-  bytes: 15980
+  sha256: 87763fbf42bf988d42cfd8873501892e971437b9828cfe0410349447f4526c1a
+  bytes: 19777
   kind: repository
   sourcePath: src/codaro/curriculum/masteryPolicy.py
 - path: src/codaro/curriculum/masterySignal.py
@@ -14392,12 +14402,12 @@ files:
   kind: repository
   sourcePath: src/codaro/extensions/registry.py
 - path: src/codaro/generatedContracts/__init__.py
-  sha256: 5394c7687187e443b011b44e1c164b2459982c5e01fbb7b481ffb7651beb6c1c
+  sha256: ccda4ed007e13e01568b7506906e47aedf35ea305df6e753c11de2cb3ed5a600
   bytes: 515
   kind: repository
   sourcePath: src/codaro/generatedContracts/__init__.py
 - path: src/codaro/generatedContracts/artifactOwnership.py
-  sha256: 7241d9f3b0306813cbe2afa52d57fe2af9c13b3cc5402bd537d7885d65e62391
+  sha256: 5441cb58b5412ffc58d586e33e0995a40306bbe1083485985ade2673ade7d0a2
   bytes: 761
   kind: repository
   sourcePath: src/codaro/generatedContracts/artifactOwnership.py
@@ -14407,8 +14417,8 @@ files:
   kind: repository
   sourcePath: src/codaro/generatedContracts/artifactOwnership.schema.json
 - path: src/codaro/generatedContracts/masteryPolicy.v1.json
-  sha256: bfba299a516f07d1d3c9358ad6327061d10ae3c57f5f075ed82ad7da7e849aa7
-  bytes: 660
+  sha256: 443e5c722c2959d1693b64b47e484652716c9e7bf7a641675b581f0deb56d408
+  bytes: 764
   kind: repository
   sourcePath: src/codaro/generatedContracts/masteryPolicy.v1.json
 - path: src/codaro/kernel/DEV.md
@@ -15172,8 +15182,8 @@ files:
   kind: repository
   sourcePath: tests/learning/testAnalyticsTimeline.py
 - path: tests/learning/testCanonicalMasteryPolicy.py
-  sha256: f47dbc957dd94e7eb079f644097f2ec99e369af2c753b532138b862915226535
-  bytes: 32357
+  sha256: c44039586d67a41a6b1c516628d21da836f3a42200cedfb88f368a0beec6ce04
+  bytes: 36270
   kind: repository
   sourcePath: tests/learning/testCanonicalMasteryPolicy.py
 - path: tests/learning/testCheckProposer.py
@@ -15397,8 +15407,8 @@ files:
   kind: repository
   sourcePath: tests/product/verifyDogfoodAlphaAudit.py
 - path: tests/product/verifyEvidenceMigrationAudit.py
-  sha256: ca29f3f32114cde7a83d6a28be5c59702be6408d93ecf21c7393c335a574028a
-  bytes: 18623
+  sha256: 9abd1a44e5e9312d5b3b8e8a55df35308f2be080056adc039e5719658d48fb3a
+  bytes: 20346
   kind: repository
   sourcePath: tests/product/verifyEvidenceMigrationAudit.py
 - path: tests/product/verifyInstallLauncherSmoke.py

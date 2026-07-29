@@ -2,7 +2,7 @@
 
 상태: 진행
 
-2026-07-22 Local `LearningEvidenceArchiveStore`는 기존 SQLite event set을 해시한 `legacySnapshotHash`, `dataEpoch`, `minimumReaderVersion`, 원자적 `cutoverMarker`를 metadata table과 launcher sidecar에 함께 기록한다. C1 시작 시 `progress.json`과 `learnerState.db` 전체 snapshot을 해시·백업하고 credit을 주지 않는 `MigrationImported` event 2개로 같은 SQLite transaction에 넣는다. Web IndexedDB v3도 `codaro-web-progress-v1` 전체 snapshot을 metadata backup과 `MigrationImported` event로 원자 이관한다. backup, import, marker commit, sidecar replace 네 crash point는 재시작 뒤 중복 0으로 복구된다. 더 높은 reader floor의 store는 event를 바꾸기 전에 거부하고 version 2 Web client는 upgrade된 DB를 다시 열 수 없다. release manifest와 active release state는 `learningEvidenceReaderVersion`을 보존하며 launcher는 sidecar floor보다 낮은 last-known-good·manifest rollback target과 직접 실행을 거부한다. Local import·crash matrix 15개 단위 회귀, TypeScript production build, Chromium v3 header·Web migration·v2 `VersionError`, Rust rollback negative test와 통합 `evidence-migration` 감사는 통과했다. clock anomaly·offline import 시간 규칙, 실제 C0/C1 다중 release 왕복과 독립 검수가 없으므로 이 packet은 TODO가 남아 있다.
+2026-07-29 Local `LearningEvidenceArchiveStore`는 기존 SQLite event set을 해시한 `legacySnapshotHash`, `dataEpoch`, `minimumReaderVersion`, 원자적 `cutoverMarker`를 metadata table과 launcher sidecar에 함께 기록한다. C1 시작 시 `progress.json`과 `learnerState.db` 전체 snapshot을 해시·백업하고 credit을 주지 않는 `MigrationImported` event 2개로 같은 SQLite transaction에 넣는다. Web IndexedDB v3도 `codaro-web-progress-v1` 전체 snapshot을 metadata backup과 `MigrationImported` event로 원자 이관한다. backup, import, marker commit, sidecar replace 네 crash point는 재시작 뒤 중복 0으로 복구된다. 더 높은 reader floor의 store는 event를 바꾸기 전에 거부하고 version 2 Web client는 upgrade된 DB를 다시 열 수 없다. release manifest와 active release state는 `learningEvidenceReaderVersion`을 보존하며 launcher는 sidecar floor보다 낮은 last-known-good·manifest rollback target과 직접 실행을 거부한다. Python·TypeScript `EvidenceTime`/`ClockAnomaly`는 evidence와 최초 append receipt의 경과를 함께 계산한다. 5분 future skew·역행·경과 불일치가 있으면 retrieval credit을 보류하고 `reviewDue`로 새 retrieval을 남기며, offline batch receipt와 `MigrationImported` 시각만으로 delayed mastery를 만들지 않는다. 자동 time-policy 3개, Python/TypeScript 동형 vector, Local import·crash matrix, production build, Chromium v3 header·Web migration·v2 `VersionError`, Rust rollback negative test와 통합 `evidence-migration` 감사를 실행한다. 실제 C0/C1 설치 release 왕복과 독립 검수가 없으므로 이 packet은 TODO가 남아 있다.
 
 ## 목표
 
@@ -40,7 +40,7 @@ store header는 `schemaVersion`, `dataEpoch`, `minimumReaderVersion`, `cutoverMa
 - 구현 `LearningEvidenceArchiveStore._ensureStoreHeader`, `LearningEvidenceArchiveStore._prepareLegacyImport`, `validateStoreHeader`
 - 구현 `WebLearningEvidenceStoreHeader`, `WebMigrationImportedEvent`, `ensureWebLearningEvidenceCutover`
 - 구현 `learning_evidence_reader_floor`, `ensure_learning_evidence_reader_compatibility`
-- 후속 구현 `EvidenceTime`, `ClockAnomaly`
+- 구현 `EvidenceTime`, `ClockAnomaly`, `MasteryProjection.deferredCreditEventIds`
 
 ## 테스트
 
@@ -48,7 +48,7 @@ store header는 `schemaVersion`, `dataEpoch`, `minimumReaderVersion`, `cutoverMa
 - import, backup, marker write, fsync, rename 각 crash point 뒤 recovery
 - store reader floor보다 오래된 rollback 거부와 compatible last-known-good 선택
 - Web IndexedDB archive와 Local SQLite의 header·event round trip
-- clock 역행·jump·offline import가 delayed mastery를 거짓 생성하지 않음
+- 구현 clock 역행·jump·offline batch receipt가 delayed mastery를 거짓 생성하지 않고 새 retrieval을 남김
 - 현재 자동 감사: `uv run python -X utf8 tests/product/verifyEvidenceMigrationAudit.py`
 - 자동 감사 내부에서 `web-lesson-mobile` Chromium case와 launcher old-reader Rust test를 실제 실행한다.
 

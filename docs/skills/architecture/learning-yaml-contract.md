@@ -113,6 +113,7 @@ fixture hash는 key를 정렬한 compact JSON UTF-8 bytes의 SHA-256 SRI다. aut
 - transfer 또는 retrieval strong event가 저장되면 같은 check ID의 due 카드는 queue에서 빠진다.
 - variant 배열이 존재하거나 ID가 생성됐다는 사실은 학습 evidence가 아니다. strong executor 실제 통과와 append-only event가 있어야 실행 증거로 계산한다.
 - 현재 machine audit의 source 저작 범위는 strong CheckSpec 1,419개/468레슨이며 mastery·transfer·24시간 retrieval은 각각 468레슨이다. 1,402개 assessment solution은 1,400개 behavior와 2개 output 검증으로 실행됐고 실패는 0이다. 이것은 author source 검산이며 제품 strong evidence 지원 범위와 다르다. Web behavior는 `localRequired`, Local native behavior는 provisional practice이고 둘 다 strong event 0이다. Web Day 1 output strong event와 legacy migration event 2건은 Local import·재내보내기·Web reload 뒤에도 Web runtime identity를 유지한다. AppContainer broker source와 현재 Windows 11 직접 경계 검증은 존재하지만 전부의 `independentReview`는 pending이고 승인 수는 0이며 cold package 준비, 목표 Windows 10 설치본 conformance, 실제 설치본 round trip과 독립 author review가 없으므로 전체 scheduler 또는 mastery 완료로 부르지 않는다.
+- delayed retrieval은 `occurredAt` 표시 시각만으로 열지 않는다. canonical `CreditGranted`의 `evidenceTime`과 최초 `appendReceiptAt`이 모두 최소·최대 window를 만족해야 하며, 둘의 경과 차이가 5분을 넘거나 어느 시간축이 역행하면 `ClockAnomaly`를 기록하고 credit을 `deferredCreditEventIds`에 둔다. 이때 outcome은 `reviewDue`로 남아 새 retrieval을 요구한다. archive import는 원래 두 시각을 보존하고 `MigrationImported.occurredAt`만으로 projection clock을 전진시키지 않는다.
 
 ## 렌더링 원칙
 

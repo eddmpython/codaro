@@ -10,6 +10,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from .evidenceTime import ClockAnomaly, EvidenceTime
 from .learningEvent import (
     LearningEventError,
     learningEventOrderKey,
@@ -38,6 +39,7 @@ class OutcomeMasteryState(BaseModel):
     taskVariantIds: list[str] = Field(default_factory=list)
     fixtureHashes: list[str] = Field(default_factory=list)
     lastEvidenceTime: str | None = None
+    lastAppendReceiptAt: str | None = None
     dueAt: str | None = None
 
 
@@ -47,6 +49,8 @@ class MasteryProjection(BaseModel):
     policyVersion: int = 1
     outcomes: list[OutcomeMasteryState] = Field(default_factory=list)
     invalidEventIds: list[str] = Field(default_factory=list)
+    deferredCreditEventIds: list[str] = Field(default_factory=list)
+    clockAnomalies: list[ClockAnomaly] = Field(default_factory=list)
 
 
 @dataclass(slots=True)
@@ -59,6 +63,7 @@ class _OutcomeAccumulator:
     fixtureHashes: list[str] = field(default_factory=list)
     fingerprints: set[str] = field(default_factory=set)
     lastEvidenceTime: datetime | None = None
+    lastAppendReceiptAt: datetime | None = None
     dueAt: datetime | None = None
 
     @property
@@ -103,6 +108,8 @@ class MasteryPolicy:
         checks = {str(event["eventId"]): event for event in ordered if event["kind"] == "CheckEvaluated"}
         supports = {str(event["eventId"]): event for event in ordered if event["kind"] == "SupportProvided"}
         states: dict[str, _OutcomeAccumulator] = {}
+        deferredCreditEventIds: set[str] = set()
+        clockAnomalies: list[ClockAnomaly] = []
 
         for event in ordered:
             kind = str(event["kind"])
@@ -112,16 +119,21 @@ class MasteryPolicy:
             if kind != self._contract["creditEventKind"] or event["eventId"] in revoked:
                 continue
             before = deepcopy(states)
-            if not self._applyCredit(
+            accepted, deferred, anomalies = self._applyCredit(
                 event,
                 runs=runs,
                 checks=checks,
                 supports=supports,
                 orderIndex=orderIndex,
                 states=states,
-            ):
+            )
+            if not accepted:
                 states = before
                 invalidEventIds.add(str(event["eventId"]))
+                continue
+            clockAnomalies.extend(anomalies)
+            if deferred:
+                deferredCreditEventIds.add(str(event["eventId"]))
 
         projectionTime = self._projectionTime(asOf, ordered)
         if projectionTime is not None:
@@ -133,6 +145,11 @@ class MasteryPolicy:
             policyVersion=self.version,
             outcomes=sorted(outcomes, key=lambda item: item.outcomeId),
             invalidEventIds=sorted(invalidEventIds),
+            deferredCreditEventIds=sorted(deferredCreditEventIds),
+            clockAnomalies=sorted(
+                clockAnomalies,
+                key=lambda item: (item.creditEventId, item.outcomeId, item.reason),
+            ),
         )
 
     def _normalizeEvents(self, events: Iterable[object]) -> tuple[list[dict[str, Any]], set[str]]:
@@ -197,18 +214,18 @@ class MasteryPolicy:
         supports: Mapping[str, Mapping[str, Any]],
         orderIndex: Mapping[str, int],
         states: dict[str, _OutcomeAccumulator],
-    ) -> bool:
+    ) -> tuple[bool, bool, list[ClockAnomaly]]:
         eventId = str(event["eventId"])
         eventPosition = orderIndex[eventId]
         runEventId = str(event["runEventId"])
         run = runs.get(runEventId)
         if run is None or orderIndex.get(runEventId, eventPosition) >= eventPosition:
-            return False
+            return False, False, []
         if run["runStatus"] != "success":
-            return False
+            return False, False, []
         selectedChecks = [checks.get(str(checkId)) for checkId in event["checkEventIds"]]
         if any(check is None for check in selectedChecks):
-            return False
+            return False, False, []
         checked = [check for check in selectedChecks if check is not None]
         if any(
             check["runEventId"] != runEventId
@@ -217,17 +234,17 @@ class MasteryPolicy:
             or orderIndex.get(str(check["eventId"]), eventPosition) >= eventPosition
             for check in checked
         ):
-            return False
+            return False, False, []
         selectedSupports = [supports.get(str(supportId)) for supportId in event["supportEventIds"]]
         if any(support is None for support in selectedSupports):
-            return False
+            return False, False, []
         supportRows = [support for support in selectedSupports if support is not None]
         if any(
             support["runEventId"] != runEventId
             or orderIndex.get(str(support["eventId"]), eventPosition) >= eventPosition
             for support in supportRows
         ):
-            return False
+            return False, False, []
         maxHintUsed = max((int(support["hintLevel"]) for support in supportRows), default=0)
         answerReveal = any(bool(support["answerReveal"]) for support in supportRows)
         strongestMode = max(
@@ -238,21 +255,58 @@ class MasteryPolicy:
         context = run["runContext"]
         taskVariantId = str(context["taskVariantId"])
         fixtureHash = str(context["fixtureHash"])
-        evidenceTime = self._parseTimestamp(str(event["evidenceTime"]))
+        evidenceTime = EvidenceTime.parse(
+            str(event["evidenceTime"]),
+            str(event["appendReceiptAt"]),
+        )
         fingerprint = str(event["attemptFingerprint"])
+        prepared: list[tuple[Mapping[str, Any], str, str, _OutcomeAccumulator]] = []
 
         for creditSlice in event["creditSlices"]:
             outcomeId = str(creditSlice["outcomeId"])
             mode = str(creditSlice["creditMode"])
             if mode != strongestMode or outcomeId not in context["outcomeIds"]:
-                return False
+                return False, False, []
             state = states.setdefault(outcomeId, _OutcomeAccumulator(outcomeId=outcomeId))
-            if state.dueAt is not None and evidenceTime >= state.dueAt:
+            if state.dueAt is not None and evidenceTime.availabilityTime >= state.dueAt:
                 state.reviewDue = True
             if creditSlice["preAttemptState"] != state.causalStage:
-                return False
+                return False, False, []
             if fingerprint in state.fingerprints:
-                return False
+                return False, False, []
+            prepared.append((creditSlice, outcomeId, mode, state))
+
+        anomalies = [
+            anomaly
+            for _creditSlice, outcomeId, mode, state in prepared
+            for anomaly in evidenceTime.anomalies(
+                creditEventId=eventId,
+                outcomeId=outcomeId,
+                previous=(
+                    EvidenceTime(
+                        evidenceTime=state.lastEvidenceTime,
+                        appendReceiptAt=state.lastAppendReceiptAt,
+                    )
+                    if state.lastEvidenceTime is not None
+                    and state.lastAppendReceiptAt is not None
+                    else None
+                ),
+                delayed=mode == "retrieval",
+                maximumFutureSkewSeconds=int(
+                    self._contract["clockPolicy"]["maximumFutureSkewSeconds"]
+                ),
+                maximumElapsedDivergenceSeconds=int(
+                    self._contract["clockPolicy"]["maximumElapsedDivergenceSeconds"]
+                ),
+            )
+        ]
+        if anomalies and any(mode == "retrieval" for _slice, _outcomeId, mode, _state in prepared):
+            for _creditSlice, _outcomeId, mode, state in prepared:
+                if mode == "retrieval" and self._stageRank(state.baseStage) >= self._stageRank("transfer"):
+                    state.reviewDue = True
+            return True, True, anomalies
+
+        for _creditSlice, _outcomeId, mode, state in prepared:
             if not self._advance(
                 state,
                 mode=mode,
@@ -263,15 +317,22 @@ class MasteryPolicy:
                 fixtureHash=fixtureHash,
                 evidenceTime=evidenceTime,
             ):
-                return False
+                return False, False, []
             state.fingerprints.add(fingerprint)
             state.creditEventIds.append(eventId)
             if taskVariantId not in state.taskVariantIds:
                 state.taskVariantIds.append(taskVariantId)
             if fixtureHash not in state.fixtureHashes:
                 state.fixtureHashes.append(fixtureHash)
-            state.lastEvidenceTime = evidenceTime
-        return True
+            state.lastEvidenceTime = max(
+                evidenceTime.evidenceTime,
+                state.lastEvidenceTime or evidenceTime.evidenceTime,
+            )
+            state.lastAppendReceiptAt = max(
+                evidenceTime.appendReceiptAt,
+                state.lastAppendReceiptAt or evidenceTime.appendReceiptAt,
+            )
+        return True, False, anomalies
 
     def _advance(
         self,
@@ -283,7 +344,7 @@ class MasteryPolicy:
         answerReveal: bool,
         taskVariantId: str,
         fixtureHash: str,
-        evidenceTime: datetime,
+        evidenceTime: EvidenceTime,
     ) -> bool:
         independentEligible = (
             unseen
@@ -314,13 +375,13 @@ class MasteryPolicy:
             renewingMastery = (
                 state.baseStage == "mastered"
                 and state.dueAt is not None
-                and evidenceTime >= state.dueAt
+                and evidenceTime.availabilityTime >= state.dueAt
             )
             if renewingMastery:
                 if not higherStageEligible:
                     return False
                 state.reviewDue = False
-                state.dueAt = evidenceTime + timedelta(
+                state.dueAt = evidenceTime.availabilityTime + timedelta(
                     days=int(self._contract["retrievalWindowDays"]["maximum"])
                 )
                 return True
@@ -328,20 +389,23 @@ class MasteryPolicy:
                 return False
             if taskVariantId in state.taskVariantIds:
                 return False
-            if state.lastEvidenceTime is None:
+            if state.lastEvidenceTime is None or state.lastAppendReceiptAt is None:
                 return False
-            elapsed = evidenceTime - state.lastEvidenceTime
+            evidenceElapsed = evidenceTime.evidenceTime - state.lastEvidenceTime
+            receiptElapsed = evidenceTime.appendReceiptAt - state.lastAppendReceiptAt
             window = self._contract["retrievalWindowDays"]
-            if elapsed < timedelta(days=int(window["minimum"])):
+            minimum = timedelta(days=int(window["minimum"]))
+            maximum = timedelta(days=int(window["maximum"]))
+            if evidenceElapsed < minimum or receiptElapsed < minimum:
                 return False
-            if elapsed > timedelta(days=int(window["maximum"])):
+            if evidenceElapsed > maximum or receiptElapsed > maximum:
                 return False
             distinctVariants = len(set(state.taskVariantIds) | {taskVariantId})
             if distinctVariants < int(self._contract["minimumDistinctTaskVariantsForMastered"]):
                 return False
             state.baseStage = "mastered"
             state.reviewDue = False
-            state.dueAt = evidenceTime + timedelta(days=int(window["maximum"]))
+            state.dueAt = evidenceTime.availabilityTime + maximum
             return True
         return False
 
@@ -356,6 +420,7 @@ class MasteryPolicy:
             taskVariantIds=list(state.taskVariantIds),
             fixtureHashes=list(state.fixtureHashes),
             lastEvidenceTime=self._formatTimestamp(state.lastEvidenceTime),
+            lastAppendReceiptAt=self._formatTimestamp(state.lastAppendReceiptAt),
             dueAt=self._formatTimestamp(state.dueAt),
         )
 
@@ -406,3 +471,12 @@ class MasteryPolicy:
             raise RuntimeError("mastery policy score stages are invalid")
         if self._contract.get("creditEventKind") != "CreditGranted":
             raise RuntimeError("mastery policy credit event kind is invalid")
+        clockPolicy = self._contract.get("clockPolicy")
+        if (
+            not isinstance(clockPolicy, dict)
+            or not isinstance(clockPolicy.get("maximumFutureSkewSeconds"), int)
+            or clockPolicy["maximumFutureSkewSeconds"] < 0
+            or not isinstance(clockPolicy.get("maximumElapsedDivergenceSeconds"), int)
+            or clockPolicy["maximumElapsedDivergenceSeconds"] < 0
+        ):
+            raise RuntimeError("mastery policy clock policy is invalid")
