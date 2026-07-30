@@ -19,11 +19,11 @@ scope:
 draftBundle:
   manifestPath: mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/08-r10-independent-review/evaluation-bundle.manifest.yml
   archivePath: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  gitCommit: 5cb29543400c8572202a5f638dc23819e28a8aa4
+  gitCommit: 18e6d48e7bd848d782b7c95fb3a340fd761c476d
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: 427d54d059173fa0fb0d8b93634db0abaa2caac9bf62b204cee5a7b34a62827a
-  evaluationBundleHash: db51dddf2e26a4c86bb19fe520bc5cd3e6570a8f517f3b0097697ac131d34242
-  fileCount: 3361
+  manifestHash: b57316de21ea77450f0920d2bf1dea064ee9a173a81c08390b4d2079cfc79249
+  evaluationBundleHash: 67d0a08bcf42bdf9ddb78d3be4a8f49a337ef5691296c96592568183aca84486
+  fileCount: 3350
   bundleIntegrityState: passed
   sealEligible: false
 excludedEvaluatorInputs:
@@ -155,13 +155,13 @@ inputFreeze:
   state: frozen
   manifestPath: mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/08-r10-independent-review/evaluation-bundle.manifest.yml
   archivePath: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  gitCommit: 5cb29543400c8572202a5f638dc23819e28a8aa4
+  gitCommit: 18e6d48e7bd848d782b7c95fb3a340fd761c476d
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: 427d54d059173fa0fb0d8b93634db0abaa2caac9bf62b204cee5a7b34a62827a
-  evaluationBundleHash: db51dddf2e26a4c86bb19fe520bc5cd3e6570a8f517f3b0097697ac131d34242
-  fileCount: 3361
+  manifestHash: b57316de21ea77450f0920d2bf1dea064ee9a173a81c08390b4d2079cfc79249
+  evaluationBundleHash: 67d0a08bcf42bdf9ddb78d3be4a8f49a337ef5691296c96592568183aca84486
+  fileCount: 3350
   machineEvidenceIndexPath: evaluation-evidence/manifest.yml
   requiredReportCount: 9
   includedReportCount: 9
-  artifactCount: 187
+  artifactCount: 177
   allCurrent: true
