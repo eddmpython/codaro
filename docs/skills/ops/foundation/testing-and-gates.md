@@ -79,6 +79,7 @@ uv run python -X utf8 tests/run.py gate editor-build
 uv run python -X utf8 tests/run.py gate landing-build
 uv run python -X utf8 tests/run.py gate launcher-check
 uv run python -X utf8 tests/run.py gate launcher-test
+uv run python -X utf8 tests/run.py gate published-release-smoke
 uv run python -X utf8 tests/run.py gate widget-bridge
 uv run python -X utf8 tests/run.py gate app-runtime
 uv run python -X utf8 tests/run.py gate mobile-layout
@@ -154,6 +155,7 @@ uv run python -X utf8 tests/run.py gate attempts
 | `service-readiness-audit` | surface | 기존 자동화와 문서 링크를 위한 `product-quality-audit` 호환 alias다. |
 | `diagnostic-summary-contract` | fast | local diagnostic summary/export가 provider/runtime/package/frontend 실패 범주와 secret redaction 계약을 지키는지 확인한다. |
 | `install-launcher-smoke` | release | repo-local launcher root에서 실제 `doctor`/`state show` CLI JSON, layout 생성, health check, rollback, exact artifact 설치 경계와 `cargo check`를 확인한다. |
+| `published-release-smoke` | release | 발행된 릴리즈 아티팩트를 빌드 환경 밖에서 끝까지 받아 HTTP 200, Content-Length, sha256, ranged 수신을 검증한다. 릴리즈 워크플로가 엄격 모드로 호출한다. |
 | `product-browser-webview2-evergreen` | release | Windows의 실제 네이티브 launcher와 현재 WebView2 Evergreen에서 current-commit wheel을 격리 설치해 Local Home 900x640, Notebook 1024x768, Automation 1440x900과 scheduled/running/succeeded/failed/paused/disconnected 상태·E-Stop·redaction, 12셀 Code·Markdown keyboard·한국어 IME 경계 이동, 실제 실행 결과를 포함한 Chromium accessibility tree 읽기 순서, forced-colors, 테마·SNS·후원 dialog와 Web-origin 학습 작업의 Local 왕복을 확인한다. `CODARO_DEPLOYED_WEB_URL`이 있으면 실제 배포 Web에서 편집·강검증·내보낸 파일까지 같은 설치본으로 왕복한다. |
 | `runtime-recovery-contract` | fast | runtime worker crash, package preflight, uv 설치 실패, cell 실행 실패 복구 계약을 확인한다. |
 | `runtime-recovery-browser` | surface | 브라우저에서 package install 실패가 셀 근처 복구 UX로 보이고 cell-call로 번지지 않는지 확인한다. |

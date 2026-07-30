@@ -62,6 +62,7 @@ def testGateNamesAreStable() -> None:
         "service-readiness-audit",
         "diagnostic-summary-contract",
         "install-launcher-smoke",
+        "published-release-smoke",
         "product-browser-webview2-evergreen",
         "runtime-recovery-contract",
         "runtime-recovery-browser",
@@ -117,6 +118,9 @@ def testGateNamesAreStable() -> None:
     assert runner.GATE_ARTIFACTS["run-local-state-browser"] == (
         "output/test-runner/run-local-state-browser/run-local-state-report.json",
     )
+    assert runner.GATE_ARTIFACTS["published-release-smoke"] == (
+        "output/test-runner/published-release-smoke/published-release-report.json",
+    )
     assert runner.GATES["astryx-journey"].commands == (
         runner.GateCommand(
             args=(
@@ -128,6 +132,19 @@ def testGateNamesAreStable() -> None:
                 "tests/product/verifyAstryxJourneyAudit.py",
             ),
             timeoutSeconds=2400,
+        ),
+    )
+    assert runner.GATES["published-release-smoke"].commands == (
+        runner.GateCommand(
+            args=(
+                "uv",
+                "run",
+                "python",
+                "-X",
+                "utf8",
+                "docs/skills/ops/tools/verifyPublishedRelease.py",
+            ),
+            timeoutSeconds=600,
         ),
     )
     assert runner.changedCycleGates((

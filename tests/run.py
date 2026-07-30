@@ -138,6 +138,9 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
         "output/test-runner/astryx-journey/manual-at-report.json",
     ),
     "install-launcher-smoke": ("output/test-runner/install-launcher-smoke/install-launcher-report.json",),
+    "published-release-smoke": (
+        "output/test-runner/published-release-smoke/published-release-report.json",
+    ),
     "product-browser-webview2-evergreen": (
         "output/test-runner/product-browser-webview2-evergreen/webview2-product-smoke-report.json",
     ),
@@ -394,6 +397,24 @@ GATES: dict[str, Gate] = {
         commands=(
             command(("uv", "run", "python", "-X", "utf8", "tests/product/verifyInstallLauncherSmoke.py")),
             command(("cargo", "check"), cwd="launcher/codaro-launcher"),
+        ),
+        ci_required=False,
+    ),
+    "published-release-smoke": Gate(
+        tier="release",
+        description="발행된 릴리즈 아티팩트를 다른 환경에서 끝까지 받아 200, Content-Length, sha256, ranged 수신을 확인한다.",
+        commands=(
+            command(
+                (
+                    "uv",
+                    "run",
+                    "python",
+                    "-X",
+                    "utf8",
+                    "docs/skills/ops/tools/verifyPublishedRelease.py",
+                ),
+                timeoutSeconds=600,
+            ),
         ),
         ci_required=False,
     ),
@@ -1942,8 +1963,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 62:
-        failures.append(f"expected 62 gates, found {len(GATES)}")
+    if len(GATES) != 63:
+        failures.append(f"expected 63 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:
