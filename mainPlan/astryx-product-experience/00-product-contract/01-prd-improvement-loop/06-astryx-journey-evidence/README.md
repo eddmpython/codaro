@@ -47,7 +47,7 @@ hero와 제품 증명 figure를 분리한다.
 
 ## 영향 파일
 
-- `mainPlan/astryx-product-experience/05-local-studio/README.md`
+- `tests/automation/verifyLocalStudioCompletion.py`
 - `assets/brand/visuals/manifest.json`
 - `assets/brand/designSystem/fontManifest.json`
 - `tests/product/astryxVerticalSlice.matrix.json`

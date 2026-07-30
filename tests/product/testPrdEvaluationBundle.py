@@ -30,8 +30,9 @@ def testScopeAllowlistIncludesProductEvidenceAndRejectsHistory() -> None:
 
     assert builder.isPathIncluded(".github/workflows/ci.yml")
     assert builder.isPathIncluded("curricula/python/schema.yaml")
-    assert builder.isPathIncluded("mainPlan/astryx-product-experience/05-local-studio/README.md")
+    assert builder.isPathIncluded("tests/automation/verifyLocalStudioCompletion.py")
     assert not (ROOT / "mainPlan/astryx-product-experience/04-web-learning").exists()
+    assert not (ROOT / "mainPlan/astryx-product-experience/05-local-studio").exists()
     assert not builder.isPathIncluded(
         "mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/README.md"
     )

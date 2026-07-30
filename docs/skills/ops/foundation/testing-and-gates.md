@@ -138,7 +138,7 @@ uv run python -X utf8 tests/run.py gate attempts
 | `learning-efficacy-report` | fast | C0-C3 호환 종료와 E0-E3 경로별 효능 state machine, stale content, consent·철회·90일 삭제 receipt, redaction, 표본, causal-claim negative fixture를 확인한다. 실제 release·참가자 근거를 대신하지 않는다. |
 | `web-learning` | surface | Learn 검색·IME·keyboard와 결과 중심 6경로, canonical lesson의 제목→방향→섹션→목표→편집기→결과→feedback→다음 이동 의미·낭독 순서, Web Run 편집·자동 강검증·resume, archive tamper·conflict·legacy migration 부정 경로까지 설치 없는 흐름을 확인하고 machine completion report를 남긴다. 사람 사용성·수동 보조기술·release 승인을 대신하지 않는다. |
 | `landing-public` | surface | Landing·Learn의 실제 제품 media, Web-first CTA, lazy docs, SEO와 390/1440 responsive 렌더를 확인한다. |
-| `local-studio-browser` | surface | Local 학습, native file/zip/schedule 강검증, archive, 최소 창, Automation 표면을 확인한다. |
+| `local-studio-browser` | surface | Local Home·Notebook·Automation의 900/1024/1440 viewport, native file/zip/schedule practice 격리, 권한 승인 전 차단, E-Stop, 실행 결과, Web archive 원자 왕복과 자동화 10개 계약을 확인하고 machine completion report를 남긴다. Windows 10 Fixed Version·수동 보조기술·사람 검수·공개 release 왕복을 대신하지 않는다. |
 | `run-local-state-browser` | surface | 같은 editor bundle의 Web·Local 노트북을 320px 최소 폭과 실행 중·성공·오류 상태로 비교하고, Web 자동화의 Local 필요 안내와 Local 연결 후 가용 상태를 독립 report로 확인한다. |
 | `path-promotion-readiness` | fast | 대표 6경로의 구조, mastery·transfer·retrieval, capstone artifact, solution 실행과 저작 무결성을 경로별 M0로 판정한다. R10 round와 current-content 사람 근거가 없으면 green이어도 모두 provisional이며 공개 승격은 차단한다. |
 | `path-learning-signal` | release | 대표 6경로마다 current content hash의 E2 pre/post/unseen-transfer 사람 근거를 확인하며 한 경로 실패를 평균으로 숨기지 않는다. |

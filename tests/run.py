@@ -110,7 +110,10 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
         "output/test-runner/landing-public/landing-hydration-report.json",
         "output/test-runner/landing-public/landing-public-report.json",
     ),
-    "local-studio-browser": ("output/test-runner/local-studio-browser/local-studio-report.json",),
+    "local-studio-browser": (
+        "output/test-runner/local-studio-browser/local-studio-report.json",
+        "output/test-runner/local-studio-browser/local-studio-completion-report.json",
+    ),
     "run-local-state-browser": (
         "output/test-runner/run-local-state-browser/run-local-state-report.json",
     ),
@@ -789,13 +792,34 @@ GATES: dict[str, Gate] = {
     ),
     "local-studio-browser": Gate(
         tier="surface",
-        description="Local 학습·강검증·archive·native file/zip/schedule·Automation·최소 창을 실제 브라우저 fixture로 확인한다.",
+        description="Local 학습·강검증·archive·native file/zip/schedule·Automation·최소 창과 machine completion 계약을 확인한다.",
         commands=(
             command(("npm", "run", "build"), cwd="editor"),
+            command((
+                "uv", "run", "python", "-X", "utf8", "-m", "pytest",
+                "tests/automation/testLocalStudioCompletion.py",
+                "tests/automation/testAutomationTaskFlow.py",
+                "tests/automation/testAutomation.py",
+                "tests/automation/testAutomationLoop.py",
+                "tests/automation/testAutomationSession.py",
+                "tests/automation/testAutomationSessionCellFlow.py",
+                "tests/automation/testAutomationAuthoring.py",
+                "tests/contracts/testLearningArchiveContract.py",
+                "tests/learning/testLearningArchive.py",
+                "-q", "--tb=short",
+            )),
+            command((
+                "uv", "run", "python", "-X", "utf8",
+                "tests/automation/verifyAutomationIdeAudit.py",
+            )),
             command((
                 "uv", "run", "python", "-X", "utf8",
                 "tests/automation/verifyAutomationStudioPlaywright.py",
             ), timeoutSeconds=1200),
+            command((
+                "uv", "run", "python", "-X", "utf8",
+                "tests/automation/verifyLocalStudioCompletion.py",
+            )),
         ),
     ),
     "run-local-state-browser": Gate(

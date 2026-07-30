@@ -160,7 +160,7 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 | `removed-learning-concepts` | prediction/classroom/dead source/generated policy negative tests |
 | `repository-simplification` | dead Landing source, unused illustration, generated source policy, module boundary tests |
 | `product-experience-browser` | responsive matrix, accessibility, visual regression, performance, route/history, desktop/mobile 비학습 UI 노출 0 tests |
-| `local-studio-browser` | Local Home/Automation fixture, provider, recovery, archive tests |
+| `local-studio-browser` | Local Home·Notebook·Automation 28-case matrix, native practice 격리, 권한·E-Stop, archive 왕복, 자동화 10개 계약과 machine completion report |
 | `learning-efficacy-report` | protocol/report fixture와 hash/stale/privacy schema tests |
 | `path-promotion-readiness` | 경로 구조, mastery·transfer·retrieval, capstone artifact, solution 실행, 저작 무결성과 provisional 차단 |
 | `plan-quality` | 봉인된 raw report, rubric·scope hash, evaluator 독립성, P0/P1 ledger, link/path/symbol/gate `PlanFactAudit`; 점수 threshold 없음 |

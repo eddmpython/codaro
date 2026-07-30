@@ -43,6 +43,7 @@ RUNTIME_VERSION = "product-smoke-3.12"
 DEPLOYED_WEB_URL = os.environ.get("CODARO_DEPLOYED_WEB_URL", "").strip().rstrip("/")
 EXPECTED_SOCIAL_ORDER = ["github", "support", "youtube", "threads"]
 EXPECTED_ACCOUNT_NUMBER = "1002-0421-4626"
+COLD_CHECK_REQUEST_TIMEOUT_SECONDS = 180
 CREATE_NO_WINDOW = 0x08000000
 KEYEVENTF_KEYUP = 0x0002
 VK_BACK = 0x08
@@ -376,7 +377,7 @@ def post_json(url: str, payload: dict[str, Any]) -> dict[str, Any]:
         headers={"Content-Type": "application/json"},
         method="POST",
     )
-    with urlopen(request, timeout=30) as response:
+    with urlopen(request, timeout=COLD_CHECK_REQUEST_TIMEOUT_SECONDS) as response:
         value = json.loads(response.read().decode("utf-8"))
     if not isinstance(value, dict):
         raise VerificationError(f"installed product returned non-object JSON from {url}")

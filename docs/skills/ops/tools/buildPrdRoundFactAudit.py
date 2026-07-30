@@ -37,7 +37,7 @@ REQUIRED_BUNDLE_PATHS = (
     "evaluation-evidence/manifest.yml",
     "mainPlan/astryx-product-experience/README.md",
     "mainPlan/astryx-product-experience/02-learning-method/README.md",
-    "mainPlan/astryx-product-experience/05-local-studio/README.md",
+    "tests/automation/verifyLocalStudioCompletion.py",
     "curricula/python/schema.yaml",
     "editor/src/components/curriculum/curriculumSurface.tsx",
     "editor/src/lib/webLearningEvidence.ts",
