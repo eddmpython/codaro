@@ -10,16 +10,16 @@
   "inputFrozen": true,
   "roundSealEligible": false,
   "scope": {
-    "gitCommit": "e0cafedbe55e91fbacd6007fc2718122c4d48156",
+    "gitCommit": "5cb29543400c8572202a5f638dc23819e28a8aa4",
     "dirtyDiffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "manifestHash": "0de7cafb4974a3e68c02275875169d5219005c024036843253746411fdbca97d",
-    "evaluationBundleHash": "8ece7277faa99b18f6cefb2923252a637ed6bd9d06764ad5f15a3d8889e9bb43"
+    "manifestHash": "427d54d059173fa0fb0d8b93634db0abaa2caac9bf62b204cee5a7b34a62827a",
+    "evaluationBundleHash": "db51dddf2e26a4c86bb19fe520bc5cd3e6570a8f517f3b0097697ac131d34242"
   },
   "facts": {
     "bundleIntegrity": {
-      "fileCount": 3358,
-      "totalSourceBytes": 114864406,
-      "archiveBytes": 115558086,
+      "fileCount": 3361,
+      "totalSourceBytes": 114892431,
+      "archiveBytes": 115586573,
       "archiveEntriesReadOnly": true,
       "excludedHistoryPathCount": 0,
       "priorScoresIncluded": false,
@@ -47,7 +47,7 @@
       "rollbackCutoverImplemented": true
     },
     "qualityGates": {
-      "count": 40,
+      "count": 41,
       "names": [
         "root-clean",
         "docs",
@@ -74,6 +74,7 @@
         "pyproc-runtime-fs-browser",
         "pyproc-asgi-browser",
         "curriculum-quality-matrix",
+        "path-promotion-readiness",
         "repository-simplification",
         "curriculum-executability",
         "curriculum-top-tier-audit",
@@ -108,7 +109,7 @@
       "completionEligible": false
     },
     "machineEvidence": {
-      "scopeGitCommit": "e0cafedbe55e91fbacd6007fc2718122c4d48156",
+      "scopeGitCommit": "5cb29543400c8572202a5f638dc23819e28a8aa4",
       "scopeClean": true,
       "requiredReportCount": 9,
       "includedReportCount": 9,

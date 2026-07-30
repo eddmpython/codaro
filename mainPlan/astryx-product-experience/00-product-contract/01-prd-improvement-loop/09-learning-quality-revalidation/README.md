@@ -12,13 +12,14 @@
 
 Day 1 Web vertical slice에서는 mastery strong evidence 뒤 전이 과제가 자동 제공되고, 검색 과제는 유효한 원천 증거로부터 24시간 뒤 자동 제공된다. 현재 468레슨의 1,402개 solution variant는 1,400개 behavior와 2개 output 검증으로 실행됐고 실패는 0이다. 공식 `product-experience-browser` 83/83과 `local-studio-browser` 28/28은 Day 2·11·15·19·20·22·27·30의 오답→수정→격리 검증→근거 저장→전이 자동 해제, Seaborn semantic artifact capstone, pathlib·zip·schedule base·assessment, canonical `MasteryPolicy@1`, durable `RunRouteState@1`, full learning archive v2, Day 19 artifact transfer와 lessonRef 기반 시각 자료 배선을 포함해 green이다. Git 첫 사이클의 4개 실행 Lab과 첫 status 판독 Web strong check도 별도 브라우저 검증에서 통과했다. 최신 browser log의 `ConnectionReset`, `Proactor`, `Win10054`도 모두 0이다. 설치형 네이티브 WebView2 9/9도 current source commit에서 통과했다. 다만 identity/content 승인 각 0/472, taxonomy 승인 0/7, independent assessment 승인 0/468, 수동 접근성 0/6, 사용자 연구 0/12, 제품 디자인·접근성 독립 검토 0/2와 독립 R10 raw report가 없으므로 완료는 아니다.
 
+대표 6경로는 `path-promotion-readiness`에서 경로 구조, mastery·transfer·retrieval, capstone artifact, solution 실행, 저작 무결성의 M0 기계 준비 6/6을 통과했다. 이 결과는 효능 증거가 아니다. 현재 R10 round는 준비되지 않았고 사람 효능 근거도 없으므로 공개 승격은 0/6, provisional은 6/6이다. E0-E3 표본·독립성·연구 운영 조건은 `08-learning-content`, `10-quality-release`와 release gate가 계속 소유한다.
+
 ## 작업 패킷
 
 | 순서 | packet | 종료 조건 |
 | --- | --- | --- |
 | 01 | [day1-evidence-loop](01-day1-evidence-loop/) | acquisition·unseen transfer·24h retrieval이 Web에서 자동 판정·저장·재방문을 통과 |
 | 02 | [w0-local-parity](02-w0-local-parity/) | Local strong check와 artifact archive가 같은 event 계약으로 동작 |
-| 04 | [post-r10-path-review-and-promotion](04-post-r10-path-expansion/) | R10 green 뒤 선행 구현된 대표 경로의 author review·효능 검증·공개 승격 순서가 승인됨 |
 | 05 | [python-foundations-assessment](05-python-foundations-assessment/) | Day 1~30 mastery·transfer·retrieval이 저작 검수·실행 검산·브라우저 표본을 통과 |
 
 ## 루프
