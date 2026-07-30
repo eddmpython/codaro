@@ -127,6 +127,12 @@ const guidedPaths = pathDefinitions.map((item) => {
   };
 });
 
+function guidedPathAriaLabel(item) {
+  const localScope = item.localCount ? `Local ${item.localCount}개` : "Local 단계 없음";
+  const recommendedLesson = item.lesson?.title || "추천 레슨 없음";
+  return `${item.label}. 결과물: ${item.result}. ${item.detail} Web ${item.webCount}개, ${localScope}. 추천 레슨: ${recommendedLesson}.`;
+}
+
 const featuredLessons = [...new Map(
   guidedPaths
     .map((path) => path.lesson)
@@ -329,10 +335,21 @@ export function LearnPage({ search = "" }) {
               <Heading id="guided-path-title" level={2}>여섯 개의 결과 경로</Heading>
               <Text color="secondary">문법 목차가 아니라 실제로 남길 결과를 기준으로 필요한 개념을 연결합니다.</Text>
             </div>
-            <div className="learnPathRail">
+            <nav className="learnPathRail" aria-label="결과 경로 추천">
               {guidedPaths.map((item) =>
                 item.lesson ? (
-                  <a className="learnPathStep" href={interactiveLessonHref(item.lesson, item.pathId)} key={item.pathId}>
+                  <a
+                    aria-label={guidedPathAriaLabel(item)}
+                    className="learnPathStep"
+                    data-learn-path-detail={item.detail}
+                    data-learn-path-id={item.pathId}
+                    data-learn-path-lesson-ref={`${item.lesson.track}/${item.lesson.id}`}
+                    data-learn-path-local-count={item.localCount}
+                    data-learn-path-result={item.result}
+                    data-learn-path-web-count={item.webCount}
+                    href={interactiveLessonHref(item.lesson, item.pathId)}
+                    key={item.pathId}
+                  >
                     <ProductVisual assetId={item.assetId} className="learnPathVisual" width={420} />
                     <span className="learnPathNumber">{item.step}</span>
                     <span className="learnPathCopy">
@@ -349,7 +366,7 @@ export function LearnPage({ search = "" }) {
                   </a>
                 ) : null,
               )}
-            </div>
+            </nav>
           </div>
         </section>
       ) : null}
@@ -403,6 +420,7 @@ export function LearnPage({ search = "" }) {
           <p
             className="learnResultCount"
             id="learn-result-count"
+            aria-atomic="true"
             aria-live="polite"
             data-route-query-sensitive="true"
           >

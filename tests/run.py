@@ -101,6 +101,7 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "web-learning": (
         "output/test-runner/web-learning/web-learning-routes-report.json",
         "output/test-runner/web-learning/web-learning-report.json",
+        "output/test-runner/web-learning/web-learning-completion-report.json",
         "output/test-runner/run-route-state/report.json",
     ),
     "landing-public": (
@@ -734,7 +735,13 @@ GATES: dict[str, Gate] = {
             command(("npm", "run", "build"), cwd="landing"),
             command((
                 "uv", "run", "python", "-X", "utf8", "-m", "pytest",
-                "tests/learning/testGeneratedLearningCatalog.py", "-q", "--tb=short",
+                "tests/learning/testGeneratedLearningCatalog.py",
+                "tests/learning/testWebLearningCompletion.py",
+                "tests/contracts/testLearningArchiveContract.py",
+                "tests/learning/testLearningArchive.py",
+                "tests/product/testReleaseResearchCompatibility.py",
+                "tests/surface/testMobileShell.py::testServiceWorkerMigrationExecutesAgainstExactOwnedKeys",
+                "-q", "--tb=short",
             )),
             command(("uv", "run", "python", "-X", "utf8", "tests/learning/verifyWebLearningRoutes.py")),
             command(("npm", "run", "build"), cwd="editor"),
@@ -756,6 +763,10 @@ GATES: dict[str, Gate] = {
                 "uv", "run", "python", "-X", "utf8",
                 "tests/learning/verifyWebLearningPlaywright.py",
             ), timeoutSeconds=1200),
+            command((
+                "uv", "run", "python", "-X", "utf8",
+                "tests/learning/verifyWebLearningCompletion.py",
+            )),
         ),
     ),
     "landing-public": Gate(

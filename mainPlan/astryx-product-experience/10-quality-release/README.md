@@ -2,7 +2,7 @@
 
 상태: 진행
 
-남은 종료 조건은 Windows 10 22H2 Fixed Version lock, 200%·400% zoom, 실제 IME와 수동 screen-reader matrix, identity·content·taxonomy·independent assessment 승인, 독립 R10 raw report와 독립 보안 검수다.
+남은 종료 조건은 Windows 10 22H2 Fixed Version lock, 200%·400% zoom, 실제 IME와 수동 screen-reader matrix, 대표 학습자 사용성 근거, identity·content·taxonomy·independent assessment 승인, 정식 `/app/` C1~C3 두 release·tombstone·28일 telemetry 근거, 독립 R10 raw report와 archive·browser 경계 독립 보안 검수다.
 
 ## 목표
 
@@ -127,7 +127,7 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 | `path-promotion-readiness` | curriculum/product | yes | every change | 대표 6경로 M0와 R10·사람 근거 전 provisional 차단 |
 | `curriculum-top-tier-audit` | curriculum | no | human approval completion | 독립 assessment 승인과 top-tier completion eligibility |
 | `curriculum-executability` | runtime | no | curriculum audit | browser/local tier 실행 가능성 |
-| `web-learning` | learning frontend | yes | every change | route, browser check, resume, archive |
+| `web-learning` | learning frontend | yes | every change | Learn 검색·6경로·IME, canonical lesson 의미 순서, browser check, resume, archive와 tamper·conflict·legacy 부정 경로 |
 | `visual-assets` | brand/assets | yes | every change | manifest, purpose, budget, freshness |
 | `landing-public` | public frontend | yes | every change | hydration, SEO, prerender, actual media |
 | `local-studio-browser` | automation | yes | every change | Local UI와 backend fixture |
@@ -154,7 +154,7 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 | `learning-evidence-contract` | evidence uniqueness, canonical mastery, Python/TS conformance, legacy writer removal tests |
 | `learning-method` | method Playwright, flow friction, visible-element learning relevance, control intent, scheduler, meaningful attempt, sandbox tests |
 | `learning-content` | 472 identity, featured/remaining ledger, check strength, metadata, retrieval/transfer tests |
-| `web-learning` | generated routes, Web learning Playwright, browser/local check parity, progress/archive tests |
+| `web-learning` | generated routes, Learn 검색·6경로·IME, canonical lesson 의미·낭독 순서, Web learning Playwright, browser/local check parity, progress/archive tamper·conflict·legacy tests와 machine completion report |
 | `visual-assets` | manifest, instructional purpose, budget, capture freshness/redaction tests |
 | `landing-public` | `npm run build` lifecycle 뒤 landing experience, SEO, hydration tests |
 | `removed-learning-concepts` | prediction/classroom/dead source/generated policy negative tests |
@@ -192,7 +192,7 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 - 선행 산출물 소비 `tests/product/manual-at.matrix.yml`, `tests/product/verifyManualAtMatrix.py` (생성 owner는 00의 Astryx journey evidence packet)
 - 신규 `tests/surface/verifyProductVisualRegression.py`
 - 선행 산출물 소비 `tests/assets/verifyVisualAssetBudget.py` (영구 owner는 공용 visual manifest/capture pipeline)
-- 선행 산출물 소비 `tests/learning/verifyWebLearningPlaywright.py` (생성 owner는 `04-web-learning`)
+- 선행 산출물 소비 `tests/learning/verifyWebLearningPlaywright.py`, `tests/learning/verifyWebLearningCompletion.py` (영구 owner는 `web-learning` gate)
 - 선행 산출물 소비 `tests/learning/verifyLearningMethodPlaywright.py` (생성 owner는 `02-learning-method`)
 - 선행 산출물 소비 `tests/learning/verifyLearningFlowFriction.py` (생성 owner는 `02-learning-method`)
 - 선행 산출물 소비 `tests/learning/verifyLearningControlIntent.py` (생성 owner는 `02-learning-method`)

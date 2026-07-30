@@ -247,7 +247,31 @@ def testPublicLearningExplorerPersistsFiltersAndLessonVisualFillsItsFrame() -> N
     assert "Learn IME composition changed committed results before" in browserGate
     assert "Learn keyboard order did not reach the first lesson" in browserGate
     assert "Learn search state drifted across reload" in browserGate
+    assert 'data-learn-path-id={item.pathId}' in learn
+    assert 'aria-label={guidedPathAriaLabel(item)}' in learn
+    assert 'aria-atomic="true"' in learn
+    assert '"verifyLearnPathContent": True' in browserGate
+    assert "Learn outcome path content is incomplete" in browserGate
+    assert "Learn search accessibility relationship drifted" in browserGate
     assert '"expectedVisualAssetIds": [' in browserGate
+
+
+def testCanonicalLessonExposesMachineVerifiableReadingAndAnnouncementOrder() -> None:
+    overview = _read("editor/src/components/curriculum/curriculumOverview.tsx")
+    progress = _read("editor/src/components/curriculum/curriculumProgressBadge.tsx")
+    section = _read("editor/src/components/curriculum/curriculumSectionRenderer.tsx")
+    browserGate = _read("tests/surface/verifyProductExperiencePlaywright.py")
+
+    assert 'aria-labelledby="learning-lesson-title"' in overview
+    assert 'id="learning-lesson-title"' in overview
+    assert 'data-learning-section-goal="true"' in overview
+    assert "aria-label={`${label} ${safeCompleted}/${safeTotal}, ${percent}%`}" in progress
+    assert "aria-labelledby={sectionHeadingId}" in section
+    assert "id={sectionHeadingId}" in section
+    assert 'ariaLabel={`${blockLabel(exercise)} 실행 결과`}' in section
+    assert section.count('aria-atomic="true"') >= 2
+    assert '"verifyCanonicalSemantics": True' in browserGate
+    assert "canonical lesson semantic and announcement order drifted" in browserGate
 
 
 def testPublicSearchCommitsImeInputToUrlAndExposesResultRelationships() -> None:

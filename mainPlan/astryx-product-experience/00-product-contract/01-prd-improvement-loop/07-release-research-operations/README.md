@@ -40,7 +40,6 @@ research operations는 모집 전에 `researchOwner`, `privacyOwner`, 모집 채
 
 ## 영향 파일
 
-- `mainPlan/astryx-product-experience/04-web-learning/README.md`
 - `mainPlan/astryx-product-experience/08-learning-content/README.md`
 - `mainPlan/astryx-product-experience/10-quality-release/README.md`
 - `docs/skills/ops/product/learning-efficacy-operations.md`

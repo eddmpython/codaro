@@ -80,7 +80,6 @@ hint 0 deterministic feedback은 모든 실패 직후 자동 제공한다. 같�
 - `curricula/python/schema.yaml`
 - `docs/skills/architecture/learning-yaml-contract.md`
 - `mainPlan/astryx-product-experience/02-learning-method/README.md`
-- `mainPlan/astryx-product-experience/04-web-learning/README.md`
 - `mainPlan/astryx-product-experience/08-learning-content/README.md`
 - `mainPlan/astryx-product-experience/08-learning-content/04-file-automation/README.md`
 

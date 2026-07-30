@@ -1625,6 +1625,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
                 "officeAutomationOutcome",
                 "webMonitoringOutcome",
             ],
+            "verifyLearnPathContent": True,
         },
         {
             "name": "landing-learn-desktop",
@@ -1779,6 +1780,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "waitFor": "[data-learning-section-card]",
             "runLearningCell": True,
             "verifyCanonicalKeyboardJourney": True,
+            "verifyCanonicalSemantics": True,
             "initialCheckState": "mismatch",
             "solutionCode": "print('Hello Codaro')",
             "expectCompletedLessons": 1,
@@ -4057,6 +4059,11 @@ def runBrowserMatrix(
                     selectedNames = set(selectedCaseOrder)
                 elif selectedCase == "web-learning":
                     selectedNames = {
+                        "landing-learn-mobile",
+                        "landing-learn-desktop",
+                        "landing-public-lesson-desktop",
+                        "landing-search-desktop",
+                        "landing-search-mobile",
                         "web-learning-home-mobile",
                         "web-learning-home-desktop",
                         "web-zero-evidence-autosave-mobile",
@@ -4150,9 +4157,11 @@ def runBrowserMatrix(
                 checkCapabilityEvidence: dict[str, Any] | None = None
                 checkStateEvidence: dict[str, Any] | None = None
                 firstViewportEvidence: dict[str, Any] | None = None
+                learnPathEvidence: dict[str, Any] | None = None
                 learnSearchEvidence: dict[str, Any] | None = None
                 siteSearchEvidence: dict[str, Any] | None = None
                 canonicalKeyboardEvidence: dict[str, Any] | None = None
+                canonicalSemanticEvidence: dict[str, Any] | None = None
                 lessonNavigationEvidence: dict[str, Any] | None = None
                 localArchiveWebRoundTripEvidence: dict[str, Any] | None = None
                 learningHomeMinimumEvidence: dict[str, Any] | None = None
@@ -4439,6 +4448,92 @@ def runBrowserMatrix(
                                     "minimum Local learning home did not keep the first "
                                     f"goal choice visible beside its visual: {evidence}"
                                 )
+                    if case.get("verifyLearnPathContent"):
+                        learnPathEvidence = page.evaluate(
+                            """
+                            () => ({
+                              navigationLabel: document.querySelector(".learnPathRail")
+                                ?.getAttribute("aria-label") || "",
+                              paths: Array.from(
+                                document.querySelectorAll("[data-learn-path-id]")
+                              ).map((path) => ({
+                                accessibleName: path.getAttribute("aria-label") || "",
+                                detail: path.getAttribute("data-learn-path-detail") || "",
+                                href: path.getAttribute("href") || "",
+                                id: path.getAttribute("data-learn-path-id") || "",
+                                label: path.querySelector(".learnPathCopy strong")
+                                  ?.textContent?.trim() || "",
+                                lessonRef: path.getAttribute(
+                                  "data-learn-path-lesson-ref"
+                                ) || "",
+                                localCount: Number(path.getAttribute(
+                                  "data-learn-path-local-count"
+                                ) || 0),
+                                result: path.getAttribute("data-learn-path-result") || "",
+                                runtimeText: path.querySelector(".learnPathMeta")
+                                  ?.textContent?.replace(/\\s+/g, " ").trim() || "",
+                                step: path.querySelector(".learnPathNumber")
+                                  ?.textContent?.trim() || "",
+                                webCount: Number(path.getAttribute(
+                                  "data-learn-path-web-count"
+                                ) || 0),
+                              })),
+                            })
+                            """
+                        )
+                        expectedPathIds = [
+                            "pythonFoundation",
+                            "dataReporting",
+                            "dataVisualization",
+                            "fileAutomation",
+                            "officeAutomation",
+                            "webMonitoring",
+                        ]
+                        paths = learnPathEvidence.get("paths") or []
+                        if (
+                            learnPathEvidence.get("navigationLabel") != "결과 경로 추천"
+                            or [path.get("id") for path in paths] != expectedPathIds
+                        ):
+                            raise AssertionError(
+                                f"Learn outcome path order or navigation label drifted: {learnPathEvidence}"
+                            )
+                        for index, path in enumerate(paths, start=1):
+                            pathId = str(path.get("id") or "")
+                            expectedStep = f"{index:02d}"
+                            requiredAccessibleText = (
+                                str(path.get("label") or ""),
+                                str(path.get("result") or ""),
+                                str(path.get("detail") or ""),
+                                f"Web {path.get('webCount')}개",
+                                "추천 레슨:",
+                            )
+                            if (
+                                path.get("step") != expectedStep
+                                or not path.get("lessonRef")
+                                or int(path.get("webCount") or 0) < 1
+                                or int(path.get("localCount") or 0) < 0
+                                or f"/learn/lesson/" not in str(path.get("href") or "")
+                                or f"path={pathId}" not in str(path.get("href") or "")
+                                or f"Web {path.get('webCount')}" not in str(
+                                    path.get("runtimeText") or ""
+                                )
+                                or any(
+                                    not token or token not in str(path.get("accessibleName") or "")
+                                    for token in requiredAccessibleText
+                                )
+                            ):
+                                raise AssertionError(
+                                    f"Learn outcome path content is incomplete: {path}"
+                                )
+                            expectedLocalText = (
+                                f"Local {path.get('localCount')}개"
+                                if int(path.get("localCount") or 0)
+                                else "Local 단계 없음"
+                            )
+                            if expectedLocalText not in str(path.get("accessibleName") or ""):
+                                raise AssertionError(
+                                    f"Learn outcome path Local scope is incomplete: {path}"
+                                )
                     if case.get("verifyLearnSearch"):
                         expectedQuery = str(case["verifyLearnSearch"])
                         expectedRuntime = str(case.get("expectedLearnRuntime", "all"))
@@ -4460,6 +4555,46 @@ def runBrowserMatrix(
                             arg=[expectedQuery, expectedRuntime, expectedPath],
                             timeout=20_000,
                         )
+                        accessibility = page.evaluate(
+                            """
+                            () => {
+                              const input = document.querySelector(
+                                '[data-learn-search-input="true"]'
+                              );
+                              const catalog = document.querySelector("#learn-catalog");
+                              const results = document.querySelector(
+                                '[data-learn-search-results="true"]'
+                              );
+                              const count = document.querySelector("#learn-result-count");
+                              return {
+                                controls: input?.getAttribute("aria-controls") || "",
+                                describedBy: input?.getAttribute("aria-describedby") || "",
+                                catalogId: catalog?.id || "",
+                                resultsLabelledBy: results?.getAttribute(
+                                  "aria-labelledby"
+                                ) || "",
+                                resultsDescribedBy: results?.getAttribute(
+                                  "aria-describedby"
+                                ) || "",
+                                countLive: count?.getAttribute("aria-live") || "",
+                                countAtomic: count?.getAttribute("aria-atomic") || "",
+                              };
+                            }
+                            """
+                        )
+                        expectedAccessibility = {
+                            "controls": "learn-catalog",
+                            "describedBy": "learn-result-count",
+                            "catalogId": "learn-catalog",
+                            "resultsLabelledBy": "learn-search-results-title",
+                            "resultsDescribedBy": "learn-result-count",
+                            "countLive": "polite",
+                            "countAtomic": "true",
+                        }
+                        if accessibility != expectedAccessibility:
+                            raise AssertionError(
+                                f"Learn search accessibility relationship drifted: {accessibility}"
+                            )
                         searchInput.fill(expectedQuery)
                         page.wait_for_function(
                             """
@@ -4875,6 +5010,7 @@ def runBrowserMatrix(
                             }
                         learnSearchEvidence = {
                             **afterReload,
+                            "accessibility": accessibility,
                             "mobileLayout": mobileLayout,
                             "keyboard": keyboardEvidence,
                             "ime": imeEvidence,
@@ -5315,6 +5451,148 @@ def runBrowserMatrix(
                                 f"initial check expected {expectedInitialState}, got {firstState}: "
                                 f"{firstCheck.inner_text()[:500]}"
                             )
+                        if case.get("verifyCanonicalSemantics"):
+                            canonicalSemanticEvidence = page.evaluate(
+                                """
+                                () => {
+                                  const overview = document.querySelector(
+                                    '[data-learning-overview="true"]'
+                                  );
+                                  const title = document.querySelector(
+                                    '[data-learning-overview-part="title"]'
+                                  );
+                                  const direction = document.querySelector(
+                                    '[data-learning-overview-part="direction"]'
+                                  );
+                                  const progress = document.querySelector(
+                                    '[data-curriculum-header-progress="true"]'
+                                  );
+                                  const section = document.querySelector(
+                                    '[data-learning-section-card]'
+                                  );
+                                  const sectionTitle = section?.querySelector("h2");
+                                  const goal = section?.querySelector(
+                                    '[data-learning-section-goal="true"]'
+                                  );
+                                  const exercise = section?.querySelector(
+                                    '[data-learning-section-part="exercise"]'
+                                  );
+                                  const editor = exercise?.querySelector(".cm-content");
+                                  const output = exercise?.querySelector(
+                                    '[data-execution-output="true"]'
+                                  );
+                                  const feedback = exercise?.querySelector(
+                                    '[data-learning-check-result]'
+                                  );
+                                  const navigation = document.querySelector(
+                                    '[data-learning-lesson-navigation="true"]'
+                                  );
+                                  const all = Array.from(document.querySelectorAll("*"));
+                                  const position = (element) => element
+                                    ? all.indexOf(element)
+                                    : -1;
+                                  return {
+                                    overviewLabelledBy: overview?.getAttribute(
+                                      "aria-labelledby"
+                                    ) || "",
+                                    titleId: title?.id || "",
+                                    titleLevel: title?.tagName || "",
+                                    directionText: direction?.textContent?.trim() || "",
+                                    progressLabel: progress?.querySelector("[aria-label]")
+                                      ?.getAttribute("aria-label") || "",
+                                    sectionLabelledBy: section?.getAttribute(
+                                      "aria-labelledby"
+                                    ) || "",
+                                    sectionTitleId: sectionTitle?.id || "",
+                                    sectionTitleLevel: sectionTitle?.tagName || "",
+                                    goalText: goal?.textContent?.trim() || "",
+                                    editorRole: editor?.getAttribute("role") || "",
+                                    editorLabel: editor?.getAttribute("aria-label") || "",
+                                    outputRole: output?.getAttribute("role") || "",
+                                    outputLive: output?.getAttribute("aria-live") || "",
+                                    outputAtomic: output?.getAttribute("aria-atomic") || "",
+                                    outputLabel: output?.getAttribute("aria-label") || "",
+                                    feedbackRole: feedback?.getAttribute("role") || "",
+                                    feedbackLive: feedback?.getAttribute("aria-live") || "",
+                                    feedbackAtomic: feedback?.getAttribute("aria-atomic") || "",
+                                    feedbackText: feedback?.textContent?.trim() || "",
+                                    exerciseStatusCount: exercise?.querySelectorAll(
+                                      '[role="status"], [role="alert"]'
+                                    ).length || 0,
+                                    forbiddenControlCount: document.querySelectorAll(
+                                      '[data-learning-reveal], '
+                                      + '[data-learning-start-confirm], '
+                                      + '[data-learning-check-confirm]'
+                                    ).length,
+                                    order: {
+                                      title: position(title),
+                                      direction: position(direction),
+                                      section: position(section),
+                                      goal: position(goal),
+                                      editor: position(editor),
+                                      output: position(output),
+                                      feedback: position(feedback),
+                                      navigation: position(navigation),
+                                    },
+                                  };
+                                }
+                                """
+                            )
+                            semanticOrder = canonicalSemanticEvidence.get("order") or {}
+                            orderedPositions = [
+                                int(semanticOrder.get(key, -1))
+                                for key in (
+                                    "title",
+                                    "direction",
+                                    "section",
+                                    "goal",
+                                    "editor",
+                                    "output",
+                                    "feedback",
+                                    "navigation",
+                                )
+                            ]
+                            if (
+                                canonicalSemanticEvidence.get("overviewLabelledBy")
+                                != "learning-lesson-title"
+                                or canonicalSemanticEvidence.get("titleId")
+                                != "learning-lesson-title"
+                                or canonicalSemanticEvidence.get("titleLevel") != "H1"
+                                or not canonicalSemanticEvidence.get("directionText")
+                                or not str(
+                                    canonicalSemanticEvidence.get("progressLabel") or ""
+                                ).startswith("레슨 ")
+                                or canonicalSemanticEvidence.get("sectionLabelledBy")
+                                != canonicalSemanticEvidence.get("sectionTitleId")
+                                or canonicalSemanticEvidence.get("sectionTitleLevel") != "H2"
+                                or "이번 섹션의 목표" not in str(
+                                    canonicalSemanticEvidence.get("goalText") or ""
+                                )
+                                or canonicalSemanticEvidence.get("editorRole") != "textbox"
+                                or "직접 해보기 코드 편집기" not in str(
+                                    canonicalSemanticEvidence.get("editorLabel") or ""
+                                )
+                                or canonicalSemanticEvidence.get("outputRole") != "status"
+                                or canonicalSemanticEvidence.get("outputLive") != "polite"
+                                or canonicalSemanticEvidence.get("outputAtomic") != "true"
+                                or "실행 결과" not in str(
+                                    canonicalSemanticEvidence.get("outputLabel") or ""
+                                )
+                                or canonicalSemanticEvidence.get("feedbackRole") != "status"
+                                or canonicalSemanticEvidence.get("feedbackLive") != "polite"
+                                or canonicalSemanticEvidence.get("feedbackAtomic") != "true"
+                                or "다음 수정:" not in str(
+                                    canonicalSemanticEvidence.get("feedbackText") or ""
+                                )
+                                or canonicalSemanticEvidence.get("exerciseStatusCount") != 2
+                                or canonicalSemanticEvidence.get("forbiddenControlCount") != 0
+                                or any(position < 0 for position in orderedPositions)
+                                or orderedPositions != sorted(orderedPositions)
+                            ):
+                                raise AssertionError(
+                                    "canonical lesson semantic and announcement order drifted: "
+                                    f"{canonicalSemanticEvidence}"
+                                )
                         if case.get("captureCheckStates"):
                             checkStateEvidence = {"screenshots": {}}
                             firstCheck.scroll_into_view_if_needed(timeout=20_000)
@@ -6830,9 +7108,11 @@ def runBrowserMatrix(
                             "httpFailures": httpFailureSnapshot,
                             "assetFailures": assetFailureSnapshot,
                             "firstViewportEvidence": firstViewportEvidence,
+                            "learnPathEvidence": learnPathEvidence,
                             "learnSearchEvidence": learnSearchEvidence,
                             "siteSearchEvidence": siteSearchEvidence,
                             "canonicalKeyboardEvidence": canonicalKeyboardEvidence,
+                            "canonicalSemanticEvidence": canonicalSemanticEvidence,
                             "lessonNavigationEvidence": lessonNavigationEvidence,
                             "localArchiveWebRoundTripEvidence": localArchiveWebRoundTripEvidence,
                             "learningHomeMinimumEvidence": learningHomeMinimumEvidence,

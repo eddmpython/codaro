@@ -46,10 +46,11 @@ export function CurriculumSectionCard({
   onSelectBlock: (blockId: string) => void;
 }) {
   const structured = hasStructuredSectionBlocks(section);
+  const sectionHeadingId = `${cellDomId(section.anchorBlockId)}-title`;
 
   return (
     <section
-      aria-label={`${section.title} 학습 섹션`}
+      aria-labelledby={sectionHeadingId}
       className="border-y border-border bg-background text-card-foreground"
       data-learning-section-card={section.id}
       data-learning-section-mode={readPayloadText(section.contract?.assessmentMode) || "acquisition"}
@@ -71,7 +72,9 @@ export function CurriculumSectionCard({
           ) : readPayloadText(section.contract?.assessmentMode) === "retrieval" ? (
             <span className="mb-1 block text-xs font-medium text-accent-brand">기억에서 다시 풀기</span>
           ) : null}
-          <h2 className="max-w-3xl break-words text-lg font-bold text-foreground">{section.title}</h2>
+          <h2 className="max-w-3xl break-words text-lg font-bold text-foreground" id={sectionHeadingId}>
+            {section.title}
+          </h2>
           {section.subtitle ? <p className="mt-1 max-w-3xl text-sm font-normal leading-6 text-muted-foreground">{section.subtitle}</p> : null}
         </div>
       </header>
@@ -453,12 +456,18 @@ export function StructuredSectionLearningBody({
 
           {exerciseResult || exerciseRunning ? (
             <div className="astryxWorkCellOutput" data-learning-section-part="result">
-              {exerciseResult ? <ExecutionOutput result={exerciseResult} /> : <LoadingInline label="셀 실행 중" />}
+              {exerciseResult ? (
+                <ExecutionOutput
+                  ariaLabel={`${blockLabel(exercise)} 실행 결과`}
+                  result={exerciseResult}
+                />
+              ) : <LoadingInline label="셀 실행 중" />}
             </div>
           ) : null}
 
           {checkPending ? (
             <div
+              aria-atomic="true"
               aria-live="polite"
               className="mt-3 border-l-2 border-border py-0.5 pl-4"
               data-learning-check-result="checking"
@@ -469,6 +478,7 @@ export function StructuredSectionLearningBody({
             </div>
           ) : attemptCheck ? (
             <div
+              aria-atomic="true"
               aria-live="polite"
               className={cn(
                 "mt-3 rounded-r-md border-l-2 px-3 py-2 text-sm",

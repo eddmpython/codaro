@@ -375,6 +375,7 @@ export function LearningOverviewHeader({
 
   return (
     <header
+      aria-labelledby="learning-lesson-title"
       className="border-b bg-background text-card-foreground"
       data-learning-overview="true"
       id={introBlock ? cellDomId(introBlock.id) : undefined}
@@ -397,6 +398,7 @@ export function LearningOverviewHeader({
           className="mt-2 text-2xl font-bold tracking-normal text-foreground"
           data-learning-lesson-focus-target="true"
           data-learning-overview-part="title"
+          id="learning-lesson-title"
           tabIndex={-1}
         >
           {overview.title}
@@ -501,7 +503,10 @@ export function SectionNarrative({ contract }: { contract?: CurriculumSectionCon
   return (
     <div className="space-y-5 px-4 pt-5 sm:px-6" data-learning-section-part="overview">
       {goal || why ? (
-        <div className="min-w-0 max-w-[68ch] border-l-2 border-accent-brand pl-4">
+        <div
+          className="min-w-0 max-w-[68ch] border-l-2 border-accent-brand pl-4"
+          data-learning-section-goal="true"
+        >
           <div className="text-xs font-medium text-accent-brand">이번 섹션의 목표</div>
           {goal ? <p className="mt-1.5 text-md font-normal text-foreground">{goal}</p> : null}
           {why ? <p className={cn("text-sm font-normal leading-6 text-muted-foreground", goal && "mt-1.5")}>{why}</p> : null}
