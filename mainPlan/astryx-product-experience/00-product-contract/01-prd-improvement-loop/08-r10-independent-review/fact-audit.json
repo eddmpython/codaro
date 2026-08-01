@@ -10,16 +10,16 @@
   "inputFrozen": true,
   "roundSealEligible": false,
   "scope": {
-    "gitCommit": "e5bb3784c14ce40990bc3cc882694fbef8880780",
+    "gitCommit": "ac9d0ca7fd0b18980ed2c7bc979ed3f626eb3b92",
     "dirtyDiffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "manifestHash": "d28f3bad8f96c7bd34971fd0e9ca0d22fc3738f996161503eecd36a4b9fcb2da",
-    "evaluationBundleHash": "428aac10a11b0058b71b1a2742045f67f194b43f0d149173a7115bd9ed680b41"
+    "manifestHash": "8bcdfacaf62fe78c82d4b3d167de000abe92824beeb08ce45ccf9aca868108a2",
+    "evaluationBundleHash": "acf1bb7ae27d01cf394a6378d40826e91f30672c17a76bf91fed6f27a103f8a4"
   },
   "facts": {
     "bundleIntegrity": {
       "fileCount": 3361,
-      "totalSourceBytes": 114956799,
-      "archiveBytes": 115650721,
+      "totalSourceBytes": 114932835,
+      "archiveBytes": 115626725,
       "archiveEntriesReadOnly": true,
       "excludedHistoryPathCount": 0,
       "priorScoresIncluded": false,
@@ -109,7 +109,7 @@
       "completionEligible": false
     },
     "machineEvidence": {
-      "scopeGitCommit": "e5bb3784c14ce40990bc3cc882694fbef8880780",
+      "scopeGitCommit": "ac9d0ca7fd0b18980ed2c7bc979ed3f626eb3b92",
       "scopeClean": true,
       "requiredReportCount": 9,
       "includedReportCount": 9,
