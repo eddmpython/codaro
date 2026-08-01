@@ -166,7 +166,7 @@ W0의 공유 DACL mutex·ACL receipt v2·startup stale GC와 설치본 pinned wh
 - 신규 `tests/curriculum/verifyStrongAssessmentSolutions.py`: authored mastery·transfer·retrieval solution을 fixture와 case로 전수 실행
 - 신규 `tests/curriculum/testArtifactChecks.py`: 격리된 variable expected와 behavior file·directory·table·image descriptor, missing·malformed artifact false-pass 방지
 - 수정 `tests/learning/verifyLearningSectionCardContract.py`, `verifyLearningCardPlaywright.py`
-- 선행 산출물 소비 `tests/learning/verifyLearningFlowFriction.py`, `verifyLearningControlIntent.py` (생성 owner는 `02-learning-method`)
+- 영구 학습 경험 회귀 소비 `tests/learning/verifyLearningFlowFriction.py`, `verifyLearningControlIntent.py` (계약 owner는 `docs/skills/architecture/learning-experience.md`)
 - 수정 `tests/curriculum/verifyCardContract.py`, `verifyCurriculumQualityMatrix.py`
 - 실행: 신규 `uv run python -X utf8 tests/run.py gate learning-content` (aggregate gate 생성 owner는 이 workstream)
 - 실행: `uv run python -X utf8 tests/run.py gate curriculum-quality-matrix`

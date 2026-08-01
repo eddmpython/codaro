@@ -193,9 +193,9 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 - 신규 `tests/surface/verifyProductVisualRegression.py`
 - 선행 산출물 소비 `tests/assets/verifyVisualAssetBudget.py` (영구 owner는 공용 visual manifest/capture pipeline)
 - 선행 산출물 소비 `tests/learning/verifyWebLearningPlaywright.py`, `tests/learning/verifyWebLearningCompletion.py` (영구 owner는 `web-learning` gate)
-- 선행 산출물 소비 `tests/learning/verifyLearningMethodPlaywright.py` (생성 owner는 `02-learning-method`)
-- 선행 산출물 소비 `tests/learning/verifyLearningFlowFriction.py` (생성 owner는 `02-learning-method`)
-- 선행 산출물 소비 `tests/learning/verifyLearningControlIntent.py` (생성 owner는 `02-learning-method`)
+- 영구 학습 경험 회귀 소비 `tests/learning/verifyLearningMethodPlaywright.py` (계약 owner는 `docs/skills/architecture/learning-experience.md`)
+- 영구 학습 경험 회귀 소비 `tests/learning/verifyLearningFlowFriction.py` (계약 owner는 `docs/skills/architecture/learning-experience.md`)
+- 영구 학습 경험 회귀 소비 `tests/learning/verifyLearningControlIntent.py` (계약 owner는 `docs/skills/architecture/learning-experience.md`)
 - 선행 산출물 소비 `tests/learning/verifyRemovedLearningConcepts.py` (생성 owner는 `09-repository-simplification`)
 - 선행 산출물 소비 `tests/architecture/verifyClassroomRemoved.py` (생성 owner는 `09-repository-simplification`)
 - 선행 산출물 소비 `tests/curriculum/verifyScoredCheckStrength.py` (생성 owner는 `08-learning-content`)

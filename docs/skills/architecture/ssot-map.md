@@ -73,6 +73,16 @@ Codaro에서 기준 파일은 아래 순서로 본다. 같은 의미의 규칙�
 | exercise check dispatch | `src/codaro/curriculum/exerciseCheck.py` | curriculum API와 tool의 check type별 실행 분기, check response payload 기준 |
 | check primitives | `src/codaro/curriculum/checker.py` | output, variable, contains, noError 채점 구현 |
 
+## Learning Experience
+
+| 기준 | 파일 | 역할 |
+|---|---|---|
+| learning experience contract | `docs/skills/architecture/learning-experience.md` | Evidence Loop, 불필요한 확인 클릭 0회, strong check, mastery와 Web to Local continuation |
+| check specification | `editor/src/lib/learningCheckSpec.ts`, `src/codaro/curriculum/localStrongCheck.py` | browser와 Local executor가 함께 쓰는 versioned check payload와 parser |
+| check feasibility | `contracts/checkSandboxFeasibilityDecision.json` | runtime tier별 strong eligibility와 `localRequired` 판정 |
+| canonical learning evidence | `contracts/learningEvent.schema.json`, `editor/src/lib/canonicalLearningEvidence.ts` | 실행, check와 credit의 append-only transaction |
+| mastery policy | `src/codaro/curriculum/masteryPolicy.py`, `editor/src/lib/masteryPolicy.ts` | generated policy 기반 단일 mastery projection |
+
 ## Share Pack System
 
 | 기준 | 파일 | 역할 |

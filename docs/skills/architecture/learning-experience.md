@@ -1,0 +1,97 @@
+---
+id: learning-experience
+title: Learning Experience
+description: 실행, 자동 강검증, feedback, mastery와 Web to Local continuation의 영구 학습 경험 계약.
+category: architecture
+section: learning
+order: 214
+purpose: 학습 화면과 실행기가 불필요한 확인 클릭 없이 같은 evidence 계약을 따르게 한다.
+whenToUse: 학습 section, 실행 결과, check, hint, mastery, retrieval, Web 또는 Local 학습 흐름을 변경할 때.
+---
+
+# Learning Experience
+
+Codaro의 학습 단위는 카드나 페이지 열람이 아니라 `읽기 -> 직접 수정 -> 실행 -> 오류 수정 -> 자동 강검증 -> 증거 저장`의 Evidence Loop다. 실행 횟수와 자기평가가 아니라 도움을 줄여 가며 새 조건에서 코드를 만들고 결과물을 남긴 증거로 진도를 판정한다.
+
+## 불필요한 확인 클릭 0회
+
+- lesson route 진입 즉시 overview와 첫 학습 단위를 보여 준다.
+- code 실행 뒤 별도 `검증`, `완료`, `제출` 없이 strong check, feedback, progress와 같은 lesson의 다음 section을 갱신한다.
+- 오류 class와 시도 이력으로 필요한 hint를 판단할 수 있으면 결과 아래에 자동으로 제공한다.
+- `기억남`, `가물`, confidence 같은 자기평가만으로 mastery나 review 상태를 바꾸지 않는다.
+- multiple choice, true/false, badge 수집과 단순 page view를 학습 증거로 쓰지 않는다.
+- 목표 선택, 실행과 중지, route 이동, 도구 열기, 다시 시도, 결과물 열기, Local 전환처럼 학습자의 실제 의도가 필요한 control은 유지한다.
+- 파괴적인 Local 자동화의 안전 확인은 학습 확인과 다른 경계이므로 유지할 수 있다.
+
+모든 학습 control은 command, navigation, 명시적 choice 중 하나로 설명할 수 있어야 한다. 시스템이 이미 판단한 상태를 확인하기만 하는 control은 제품 결함이다.
+
+## Scaffold와 feedback
+
+Scaffold Ladder는 `observe`, `modify`, `complete`, `build`, `transfer` 순서로 도움을 줄인다. 첫 strong check를 도움 없이 통과하면 중간 단계를 줄일 수 있고, 의미 있는 실패가 반복되면 전체 정답을 공개하지 않은 채 한 단계 전 scaffold를 제공한다.
+
+의미 있는 시도는 normalized AST 또는 syntax-error token stream이 이전 시도와 달라야 한다. 공백, 주석, 사용되지 않는 node, 변수명만 바꾼 재실행은 hint level이나 credit을 올리지 않는다.
+
+feedback은 다음 순서를 따른다.
+
+1. 첫 의미 있는 실패에는 실패 target, 관련 line, observed와 expected 차이, error class를 즉시 보여 준다.
+2. 같은 misconception의 두 번째 의미 있는 실패에는 개념 단서인 hint level 1을 자동 제공한다.
+3. 세 번째 의미 있는 실패에는 worked step 일부인 hint level 2를 제공한다.
+4. 정답 공개는 학습자의 명시적 command로만 수행하며 mastery credit을 만들지 않는다.
+
+provider는 deterministic feedback 뒤 사용자가 요청할 때만 열고, 연결 여부가 실행과 검증을 막지 않는다. 승인되지 않은 misconception catalog는 저자 감사에만 쓰며 학습자 UI와 mastery에 반영하지 않는다.
+
+## 실행과 강검증
+
+학습 실행은 `ObservedRun -> CheckEngine -> EvidenceTransaction` 한 경로를 사용한다.
+
+1. `ObservedRun`은 source hash, stdout과 stderr, exception, 직렬화 가능한 변수, artifact descriptor, runtime과 package version을 수집한다.
+2. Web과 Local executor는 같은 versioned `CheckSpec`과 fixture를 소비한다.
+3. student source와 expected 판정은 같은 mutable namespace를 공유하지 않는다.
+4. 모든 run과 pass 또는 fail check event를 하나의 transaction으로 append한다.
+5. required strong check가 통과한 경우에만 같은 transaction에 `CreditGranted`를 추가한다.
+6. browser가 지원하지 않는 check는 약한 check로 바꾸지 않고 `localRequired`를 반환한다.
+
+`noError`와 `contains`는 weak evidence다. 설명용 feedback에는 쓸 수 있지만 completion, mastery, transfer, retrieval credit을 단독으로 만들지 않는다. structured strong kind는 `output`, `variable`, `file`, `table`, `image`, `behavior`다.
+
+현재 browser release subset은 `output`과 `variable`이다. browser strong check는 main 학습 kernel과 분리된 새 pyproc Worker에서 실행한다. `behavior`와 OS capability가 필요한 검사는 `localRequired`다. Local strong completion은 지원 OS의 launcher broker와 `contracts/checkSandboxFeasibilityDecision.json` 판정을 따라야 하며 일반 subprocess로 강등하지 않는다.
+
+artifact evidence는 상대 경로, media type, size, SHA-256 content hash와 type별 의미 필드를 저장한다. table은 format, columns, row count를, image는 실제 header의 media type, width, height를 포함한다. 실제 사용자 파일, 외부 사이트와 nondeterministic retry를 강검증 fixture에 사용하지 않는다.
+
+## Mastery와 retrieval
+
+mastery는 `contracts/masteryPolicy.v1.json`과 `MasteryPolicy@1`이 유일하게 계산한다. viewed, run success, weak check는 mastery를 올리지 않는다. acquisition, reinforcement, transfer, retrieval, capstone credit은 canonical `LearningEvent`를 reduce해 파생한다.
+
+- base lesson에는 mastery task만 먼저 제공한다.
+- transfer는 mastery evidence 직후 같은 outcome의 새 variant와 fixture로 제공한다.
+- retrieval은 source evidence가 정책의 시간 조건을 만족한 뒤 자동 queue에 나타난다.
+- 같은 `attemptFingerprint` replay와 같은 variant 반복은 새 credit이 아니다.
+- due retrieval의 실패는 과거 evidence를 지우지 않고 `reviewDue`로 전이한다.
+- Local 전용 outcome은 Web에서 false completion으로 바꾸지 않고 Local handoff로 표시한다.
+
+복습 queue는 outcome 단위이며 overdue duration, 낮은 mastery, lapse count 순으로 정렬한다. 최근 variant를 피하고 unseen variant를 우선한다. `occurredAt`만으로 delayed credit을 만들지 않으며 canonical evidence time과 append receipt를 함께 사용한다.
+
+## Web to Local continuation
+
+Web과 Local은 같은 `LessonRef`, document, draft, virtual file system, package bytes, evidence와 lineage를 full learning archive로 주고받는다. Local 전환은 Web에서 만든 결과물을 실제 파일과 상주 자동화로 확장하는 경로다. archive import와 merge는 학습 identity, tier와 evidence dedup 규칙을 보존해야 한다.
+
+## 구현 SSOT
+
+| 기준 | 파일 | 역할 |
+| --- | --- | --- |
+| check specification | `editor/src/lib/learningCheckSpec.ts`, `src/codaro/curriculum/localStrongCheck.py` | versioned check kind, payload와 tier별 parser 계약 |
+| runtime 판정 | `contracts/checkSandboxFeasibilityDecision.json` | browser와 Local strong eligibility |
+| browser executor | `editor/src/lib/browserLearningCheckExecutor.ts` | 격리된 Web strong check와 evidence 입력 |
+| Local executor | `src/codaro/curriculum/localStrongCheck.py` | Local check 판정과 sealed evidence 입력 |
+| canonical evidence | `contracts/learningEvent.schema.json`, `editor/src/lib/canonicalLearningEvidence.ts` | append-only event와 transaction 경계 |
+| mastery | `src/codaro/curriculum/masteryPolicy.py`, `editor/src/lib/masteryPolicy.ts` | 같은 generated policy를 쓰는 projection |
+| assessment queue | `editor/src/lib/curriculumAssessmentQueue.ts` | transfer와 retrieval 제공 시점 |
+| 학습 surface | `editor/src/components/curriculum/curriculumSurface.tsx`, `curriculumSectionRenderer.tsx` | 실행, inline feedback와 다음 section 흐름 |
+
+## 영구 회귀
+
+- `uv run python -X utf8 tests/run.py gate learning-method`
+- `uv run python -X utf8 tests/run.py gate app-runtime`
+- `uv run python -X utf8 tests/run.py gate learning-evidence-contract`
+- `uv run python -X utf8 tests/run.py gate removed-learning-concepts`
+
+레슨별 저작 품질, 472개 전수 browser evidence와 독립 assessment 승인은 `mainPlan/astryx-product-experience/08-learning-content/`가 완료 전까지 소유한다. Windows 10 설치본 sandbox, 실제 배포와 사용자 학습성 근거는 `mainPlan/astryx-product-experience/10-quality-release/`가 소유한다. 이 조건은 학습 방법 구현의 중복 TODO가 아니라 콘텐츠 승인과 release 증거 경계다.

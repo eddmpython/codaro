@@ -57,7 +57,7 @@ artifacts:
       - editor/src/lib/learningAttemptCheck.ts
       - tests/product/checkSandboxCapabilityProbe.py
       - tests/product/verifyCheckSandboxFeasibility.py
-      - mainPlan/astryx-product-experience/02-learning-method/README.md
+      - docs/skills/architecture/learning-experience.md
   - artifactId: check-sandbox-broker
     role: source
     owner: learning-runtime

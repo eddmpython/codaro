@@ -2,7 +2,7 @@
 
 상태: 진행
 
-전문 평가 입력은 [PRD improvement loop](00-product-contract/01-prd-improvement-loop/)가 제품 PRD와 분리해 관리한다. 과거 점수·결론은 blind evaluator 입력에 넣지 않으며, 어떤 역사 점수도 현재 완료 판정을 대신하지 않는다. 현재 top-level TODO는 5개다. R8의 100점은 동일 평가자 자기수렴으로 무효 처리한 역사 기록이며, 현재 PRD에는 독립 점수도 R10 통과 판정도 없다.
+전문 평가 입력은 [PRD improvement loop](00-product-contract/01-prd-improvement-loop/)가 제품 PRD와 분리해 관리한다. 과거 점수·결론은 blind evaluator 입력에 넣지 않으며, 어떤 역사 점수도 현재 완료 판정을 대신하지 않는다. 현재 top-level TODO는 4개다. R8의 100점은 동일 평가자 자기수렴으로 무효 처리한 역사 기록이며, 현재 PRD에는 독립 점수도 R10 통과 판정도 없다.
 
 ## 목표
 
@@ -58,9 +58,8 @@ Codaro를 다운로드 중심 랜딩과 별도 로컬 앱의 조합으로 보지
 | 순서 | 작업 폴더 | 의존 | 종료 조건 |
 | --- | --- | --- | --- |
 | 00 | [product-contract](00-product-contract/) | 없음 | B0~B3 packet의 구현·검증·사람 증거가 모두 충족됨 |
-| 02 | [learning-method](02-learning-method/) | B0 | 불필요한 진행 클릭 없는 Evidence Loop, 단일 mastery, browser/local check 계약이 고정됨 |
-| 08 | [learning-content](08-learning-content/) | W0는 B0·B1, 02와 `web-learning`·`local-studio-browser` 영구 계약. W1+ 사람 승인은 B3 | 대표 경로와 472레슨이 자동 검증, 전이, 결과물 기준으로 이관됨 |
-| 09 | [repository-simplification](09-repository-simplification/) | 남은 02·08과 공용 visual 계약 | prediction, classroom, dead source, unused asset, 거짓 gate가 제거됨 |
+| 08 | [learning-content](08-learning-content/) | W0는 B0·B1과 `learning-experience`·`web-learning`·`local-studio-browser` 영구 계약. W1+ 사람 승인은 B3 | 대표 경로와 472레슨이 자동 검증, 전이, 결과물 기준으로 이관됨 |
+| 09 | [repository-simplification](09-repository-simplification/) | 남은 08과 공용 visual 계약 | prediction, classroom, dead source, unused asset, 거짓 gate가 제거됨 |
 | 10 | [quality-release](10-quality-release/) | B3와 02·08·09, Web·Local 영구 gate | 접근성, 성능, 학습 효과, 반응형, 실제 배포 smoke가 통과함 |
 
 ## Artifact ownership
@@ -68,7 +67,7 @@ Codaro를 다운로드 중심 랜딩과 별도 로컬 앱의 조합으로 보지
 | 산출물 | 생성 owner | downstream 역할 |
 | --- | --- | --- |
 | `LessonRef`, `LearningEvent`, evidence store, mastery policy, route state | 00 | 02와 Web·Local surface adapter가 소비 |
-| `CheckSpec`, browser/local executor, sandbox, retrieval/scaffold | 02 | `web-learning`·`local-studio-browser`가 상태 표시와 회귀를 검증 |
+| `CheckSpec`, browser/local executor, sandbox, retrieval/scaffold | `editor/src/lib/learningCheckSpec.ts`, `src/codaro/curriculum/localStrongCheck.py`, `docs/skills/architecture/learning-experience.md` | `learning-method`·`web-learning`·`local-studio-browser`가 상태 표시와 회귀를 검증 |
 | learning archive schema, Web progress adapter, public lesson route | `contracts/learningArchive.schema.json`, `editor/src/lib/webLearningEvidence.ts`, `landing/src/routes/resolvePublicRoute.jsx` | `local-studio-browser`가 Local archive 소비와 왕복을 검증하고 10이 release gate membership을 소유 |
 | Astryx token·component·font manifest | `assets/brand/designSystem/` | Web·Local 제품 surface가 소비 |
 | removal verifier | 09 | 10은 release aggregate에 연결 |
