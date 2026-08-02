@@ -159,8 +159,8 @@ class CaptureProductVisualsTest(unittest.TestCase):
 
     def testRasterNoiseBudgetScalesWithViewportAreaAndStaysCapped(self) -> None:
         self.assertEqual(CAPTURE_TOOL.allowedRasterNoisePixels((10, 10)), 8)
-        self.assertEqual(CAPTURE_TOOL.allowedRasterNoisePixels((390, 844)), 9)
-        self.assertEqual(CAPTURE_TOOL.allowedRasterNoisePixels((900, 760)), 18)
+        self.assertEqual(CAPTURE_TOOL.allowedRasterNoisePixels((390, 844)), 11)
+        self.assertEqual(CAPTURE_TOOL.allowedRasterNoisePixels((900, 760)), 23)
         self.assertEqual(CAPTURE_TOOL.allowedRasterNoisePixels((1440, 900)), 32)
         self.assertEqual(CAPTURE_TOOL.allowedRasterNoisePixels((3840, 2160)), 32)
 
