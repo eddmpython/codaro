@@ -76,15 +76,25 @@ def main(argv: list[str] | None = None) -> int:
         cli = PlaywrightCli(cliPath=cliPath, cwd=workspace, session=session)
         cli.run("open", url)
         cli.run("resize", "1280", "900")
+        packageContentId = f"runtime-recovery-{api.activeCase}"
+        cli.waitEval(jsCurriculumCategoryPresent("30days"), "runtime recovery category entry")
+        cli.eval(jsClickCurriculumCategory("30days"))
+        cli.waitEval(jsCurriculumLessonPresent(packageContentId), "runtime recovery lesson entry")
+        cli.eval(jsClickCurriculumLesson(packageContentId))
         cli.waitEval(jsTextPresent(PACKAGE_FAILURE_TITLE), "runtime recovery curriculum")
-        cli.waitEval(jsTextPresent("직접 입력 실습"), "idle direct practice section")
+        cli.waitEval(jsDirectPracticeReady(), "idle direct practice section")
         idle = recordCheck(checks, "idle-runtime-copy", cli.eval(jsAssertIdleRuntimeRecovery()))
         cli.eval(jsClickFirstRunButton())
         cli.waitEval(jsTextPresent("라이브러리 준비 실패"), "package install failure notice")
         failure = recordCheck(checks, "package-install-failure", cli.eval(jsAssertPackageFailureRecovery()))
 
         api.activeCase = "cell-failure"
-        cli.run("reload")
+        cellContentId = f"runtime-recovery-{api.activeCase}"
+        cli.run("open", url)
+        cli.waitEval(jsCurriculumCategoryPresent("30days"), "cell failure category entry")
+        cli.eval(jsClickCurriculumCategory("30days"))
+        cli.waitEval(jsCurriculumLessonPresent(cellContentId), "cell failure lesson entry")
+        cli.eval(jsClickCurriculumLesson(cellContentId))
         cli.waitEval(jsTextPresent(CELL_FAILURE_SYMBOL), "cell failure direct practice section")
         cli.eval(jsClickFirstRunButton())
         cli.waitEval(jsTextPresent("셀 실행 실패"), "cell execution failure recovery")
@@ -380,6 +390,44 @@ def jsTextPresent(text: str) -> str:
     return f"document.body.innerText.includes({json.dumps(text, ensure_ascii=False)})"
 
 
+def jsCurriculumCategoryPresent(category: str) -> str:
+    return compactJs(f"""
+(() => [...document.querySelectorAll('[data-curriculum-home-category]')]
+  .some((item) => item.getAttribute('data-curriculum-home-category') === {json.dumps(category)}))()
+""")
+
+
+def jsClickCurriculumCategory(category: str) -> str:
+    return compactJs(f"""
+(() => {{
+  const entry = [...document.querySelectorAll('[data-curriculum-home-category]')]
+    .find((item) => item.getAttribute('data-curriculum-home-category') === {json.dumps(category)});
+  if (!(entry instanceof HTMLElement)) throw new Error('runtime recovery category entry missing');
+  entry.click();
+  return 'runtime-recovery-category-clicked';
+}})()
+""")
+
+
+def jsCurriculumLessonPresent(contentId: str) -> str:
+    return compactJs(f"""
+(() => [...document.querySelectorAll('[data-curriculum-content-id]')]
+  .some((item) => item.getAttribute('data-curriculum-content-id') === {json.dumps(contentId)}))()
+""")
+
+
+def jsClickCurriculumLesson(contentId: str) -> str:
+    return compactJs(f"""
+(() => {{
+  const entry = [...document.querySelectorAll('[data-curriculum-content-id]')]
+    .find((item) => item.getAttribute('data-curriculum-content-id') === {json.dumps(contentId)});
+  if (!(entry instanceof HTMLElement)) throw new Error('runtime recovery lesson entry missing');
+  entry.click();
+  return 'runtime-recovery-lesson-clicked';
+}})()
+""")
+
+
 def jsClickFirstRunButton() -> str:
     return compactJs("""
 (() => {
@@ -392,11 +440,18 @@ def jsClickFirstRunButton() -> str:
 """)
 
 
+def jsDirectPracticeReady() -> str:
+    return compactJs("""
+(() => document.body.innerText.includes('직접 해보기')
+  && Boolean(document.querySelector('[data-learning-exercise-input-role="student-practice"]')))()
+""")
+
+
 def jsAssertIdleRuntimeRecovery() -> str:
     return compactJs("""
 (() => {
   const text = document.body.innerText;
-  const required = ['직접 입력 실습'];
+  const required = ['직접 해보기'];
   const missing = required.filter((item) => !text.includes(item));
   if (missing.length) throw new Error('idle runtime recovery missing: ' + missing.join(', '));
   const forbidden = ['Python 실습 코드', '학습자가 작성', 'Ctrl+Enter 실행', '셀을 실행하면 결과와 오류가 여기에 표시됩니다.'];

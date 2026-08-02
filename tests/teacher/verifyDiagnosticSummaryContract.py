@@ -72,6 +72,13 @@ CHECKS = (
     (
         "editor/src/lib/api.ts",
         (
+            'import { systemApi } from "./api/systemApi"',
+            "...systemApi",
+        ),
+    ),
+    (
+        "editor/src/lib/api/systemApi.ts",
+        (
             "systemDiagnostics",
             "/api/system/diagnostics",
             "systemDiagnosticsExport",
@@ -118,6 +125,12 @@ CHECKS = (
     ),
     (
         "editor/src/types.ts",
+        (
+            'export type * from "./types/system"',
+        ),
+    ),
+    (
+        "editor/src/types/system.ts",
         (
             "DiagnosticSummary",
             "DiagnosticExportPayload",
@@ -244,6 +257,10 @@ def diagnosticContractSummary(results: list[dict[str, object]]) -> dict[str, obj
         "localDiagnosticsCovered": "src/codaro/system/localDiagnostics.py" in paths,
         "providerErrorRedactionCovered": "src/codaro/ai/providerErrors.py" in paths,
         "systemEndpointsCovered": "src/codaro/api/systemRouter.py" in paths,
+        "frontendSystemApiOwnerCovered": "editor/src/lib/api/systemApi.ts" in paths,
+        "frontendSystemApiPublicPathCovered": "editor/src/lib/api.ts" in paths,
+        "frontendSystemTypeOwnerCovered": "editor/src/types/system.ts" in paths,
+        "frontendSystemTypePublicPathCovered": "editor/src/types.ts" in paths,
         "frontendNoticeCovered": "editor/src/components/app/topBar.tsx" in paths,
         "onboardingExportCovered": "tests/surface/verifyOnboardingPlaywright.py" in paths,
         "docsCovered": "docs/skills/ops/product/service-candidate.md" in paths,

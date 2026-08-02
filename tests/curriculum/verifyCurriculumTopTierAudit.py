@@ -127,18 +127,18 @@ def main() -> int:
         if domain["score"] < MINIMUM_SCORE or domain["requirementFailures"]
     ]
     overallScore = round(sum(float(domain["score"]) for domain in domains) / len(domains), 2) if domains else 0.0
-    topTierEligible = not failedDomains
+    eligibility = eligibilityStatus(failedDomains, summary)
     payload = {
         "gate": "curriculum-top-tier-audit",
-        "passed": topTierEligible,
-        "status": "passed" if topTierEligible else "failed",
+        "passed": eligibility["machineAuditPassed"],
+        "status": "passed" if eligibility["machineAuditPassed"] else "failed",
         "score": overallScore,
         "scoreKind": "audit-requirement-coverage",
         "maxScore": 10,
         "minimumScore": MINIMUM_SCORE,
         "requiredScore": MINIMUM_SCORE,
         "curriculumQualityScore": None,
-        "topTierEligible": topTierEligible,
+        "topTierEligible": eligibility["topTierEligible"],
         "completionEligible": False,
         "startedAt": startedAt,
         "completedAt": utcTimestamp(),
@@ -153,6 +153,7 @@ def main() -> int:
             for domain in failedDomains
             for failure in domain["requirementFailures"]
         ],
+        "humanEvidenceGaps": eligibility["humanEvidenceGaps"],
         "actionableGaps": actionableGaps(lessons),
     }
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -161,8 +162,27 @@ def main() -> int:
     if failedDomains:
         print("FAIL: curriculum is not top-tier eligible; inspect requirementFailures", file=sys.stderr)
         return 1
-    print(f"ok: curriculum top-tier audit requirement coverage {overallScore}/10")
+    print(
+        f"ok: curriculum machine audit requirement coverage {overallScore}/10; "
+        f"topTierEligible={str(eligibility['topTierEligible']).lower()}"
+    )
     return 0
+
+
+def eligibilityStatus(failedDomains: list[dict[str, Any]], summary: dict[str, Any]) -> dict[str, Any]:
+    machineAuditPassed = not failedDomains
+    approved = int(summary.get("independentReviewApprovedLessonCount", 0))
+    total = int(summary.get("lessonCount", 0))
+    approvedRatio = ratio(approved, total)
+    humanEvidenceGaps = [] if total > 0 and approvedRatio >= 0.90 else [{
+        "label": "independent assessment review approval coverage",
+        "detail": f"{approved}/{total} = {approvedRatio:.3f} < 0.90",
+    }]
+    return {
+        "machineAuditPassed": machineAuditPassed,
+        "topTierEligible": machineAuditPassed and not humanEvidenceGaps,
+        "humanEvidenceGaps": humanEvidenceGaps,
+    }
 
 
 def evaluateLesson(path: Path) -> dict[str, Any]:
@@ -361,6 +381,8 @@ def learningEvidenceProfile(content: dict[str, Any]) -> dict[str, Any]:
     transferVariants = validAssessmentVariants(assessment.get("transferVariants"), "transfer")
     retrievalVariants = validAssessmentVariants(assessment.get("retrievalVariants"), "retrieval")
     authoredVariants = masteryVariants + transferVariants + retrievalVariants
+    authoring = assessment.get("authoring") if isinstance(assessment.get("authoring"), dict) else {}
+    independentReviewState = textValue(authoring.get("independentReview"))
     review = assessment.get("review") if isinstance(assessment.get("review"), dict) else {}
     independentReviewApproved = (
         review.get("status") == "approved"
@@ -387,6 +409,8 @@ def learningEvidenceProfile(content: dict[str, Any]) -> dict[str, Any]:
         "hasExplicitClaimScope": bool(authoredVariants) and all(
             bool(textValue(variant.get("claimScope"))) for variant in authoredVariants
         ),
+        "independentReviewStateDeclared": independentReviewState in {"pending", "approved"},
+        "independentReviewState": independentReviewState,
         "independentReviewApproved": independentReviewApproved,
     }
 
@@ -539,6 +563,11 @@ def summarizeLessons(lessons: list[dict[str, Any]]) -> dict[str, Any]:
     independentReviewLessons = [
         lesson for lesson in lessons if lesson.get("evidenceProfile", {}).get("independentReviewApproved") is True
     ]
+    independentReviewStateLessons = [
+        lesson
+        for lesson in lessons
+        if lesson.get("evidenceProfile", {}).get("independentReviewStateDeclared") is True
+    ]
     return {
         "lessonCount": len(lessons),
         "sectionCount": sum(int(lesson.get("sectionCount", 0)) for lesson in lessons),
@@ -597,6 +626,8 @@ def summarizeLessons(lessons: list[dict[str, Any]]) -> dict[str, Any]:
         "explicitClaimScopeLessonRatio": ratio(len(explicitClaimScopeLessons), len(lessons)),
         "independentReviewApprovedLessonCount": len(independentReviewLessons),
         "independentReviewApprovedLessonRatio": ratio(len(independentReviewLessons), len(lessons)),
+        "independentReviewStateDeclaredLessonCount": len(independentReviewStateLessons),
+        "independentReviewStateDeclaredLessonRatio": ratio(len(independentReviewStateLessons), len(lessons)),
         "directPipInstallLessonCount": sum(1 for lesson in lessons if lesson.get("directPipInstall")),
         "badInstallCopyLessonCount": sum(1 for lesson in lessons if lesson.get("badInstallCopy")),
         "misleadingImportSetupCopyLessonCount": sum(1 for lesson in lessons if lesson.get("misleadingImportSetupCopy")),
@@ -677,8 +708,8 @@ def buildDomains(summary: dict[str, Any], lessons: list[dict[str, Any]]) -> list
                 0.90,
             ),
             ratioAtLeast(
-                "independent assessment review approval coverage",
-                int(summary["independentReviewApprovedLessonCount"]),
+                "independent assessment review state declaration coverage",
+                int(summary["independentReviewStateDeclaredLessonCount"]),
                 int(summary["lessonCount"]),
                 0.90,
             ),
@@ -840,6 +871,11 @@ def actionableGaps(lessons: list[dict[str, Any]]) -> dict[str, Any]:
             lesson["path"]
             for lesson in lessons
             if lesson.get("evidenceProfile", {}).get("hasRetrievalAssessment") is True
+        ][:30],
+        "independentReviewPendingLessons": [
+            lesson["path"]
+            for lesson in lessons
+            if lesson.get("evidenceProfile", {}).get("independentReviewState") == "pending"
         ][:30],
         "legacyOnlyLessons": [
             lesson["path"]
