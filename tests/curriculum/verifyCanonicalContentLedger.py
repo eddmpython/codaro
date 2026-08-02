@@ -5,7 +5,7 @@ import time
 from typing import Any
 
 from learningLedgerAudit import (
-    LEARNING_CONTENT_ROOT,
+    CONTENT_LEDGER_ROOT,
     ROOT,
     contentRows,
     currentGitHead,
@@ -13,6 +13,7 @@ from learningLedgerAudit import (
     hasValidReviewMetadata,
     identityRows,
     loadYaml,
+    ownerRegistry,
     utcTimestamp,
     writeReport,
 )
@@ -37,6 +38,7 @@ def main() -> int:
         failures.append(f"content/identity sets differ: content={len(rows)} identity={len(identities)}")
 
     owners: dict[str, int] = {}
+    registeredOwners = ownerRegistry()
     approvedRows = 0
     for lessonRef, row in sorted(rows.items()):
         missing = sorted(REQUIRED_FIELDS - set(row))
@@ -55,8 +57,8 @@ def main() -> int:
             failures.append(f"{lessonRef}: reinforcement intersection differs")
         owner = str(row.get("ownerPacket", ""))
         owners[owner] = owners.get(owner, 0) + 1
-        if not (LEARNING_CONTENT_ROOT / owner).is_dir():
-            failures.append(f"{lessonRef}: owner packet is absent")
+        if owner not in registeredOwners:
+            failures.append(f"{lessonRef}: owner is not registered")
         expectedIdentityRef = f"identity-ledger/{lessonRef.split('/', 1)[0]}.yml"
         if row.get("identityLedgerRef") != expectedIdentityRef:
             failures.append(f"{lessonRef}: identity ledger reference differs")
@@ -64,7 +66,9 @@ def main() -> int:
             failures.append(f"{lessonRef}: author approval metadata is invalid")
         approvedRows += int(row.get("authorReviewStatus") == "approved")
 
-    summary = loadYaml(LEARNING_CONTENT_ROOT / "00-identity-integrity/content-ledger/summary.yml")
+    summary = loadYaml(CONTENT_LEDGER_ROOT / "summary.yml")
+    if dict(sorted(owners.items())) != dict(sorted(registeredOwners.items())):
+        failures.append("owner registry counts differ from canonical content rows")
     machinePassed = not failures
     completionEligible = (
         machinePassed

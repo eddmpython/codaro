@@ -2,7 +2,7 @@
 
 상태: 진행
 
-남은 종료 조건은 Windows 10 22H2 Fixed Version lock, 200%·400% zoom, 실제 IME와 수동 screen-reader matrix, 대표 학습자 사용성 근거, identity·content·taxonomy·independent assessment 승인, 정식 `/app/` C1~C3 두 release·tombstone·28일 telemetry 근거, 독립 R10 raw report와 archive·browser 경계 독립 보안 검수다.
+남은 종료 조건은 Windows 10 22H2 Fixed Version lock, 200%·400% zoom, 실제 IME와 수동 screen-reader matrix, 대표 학습자 사용성 근거, 정식 `/app/` C1~C3 두 release·tombstone·28일 telemetry 근거, 독립 R10 raw report와 archive·browser 경계 독립 보안 검수다. identity·content 472/472, taxonomy 전이와 independent assessment 468/468 승인은 `contracts/learning-content/`에서 완료됐다.
 
 ## 목표
 
@@ -122,7 +122,7 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 | `visual-accessibility-browser` | design system | yes | every change | 대표 3-engine responsive, font, contrast, forced-colors, keyboard dialog |
 | `learning-evidence-contract` | learning platform | yes | every change | 단일 evidence, dedup, mastery policy |
 | `learning-method` | learning product | yes | every change | 자동 feedback·hint·next, learning relevance와 control intent |
-| `learning-content` | curriculum | no | human approval completion | identity와 472개 ledger aggregate, 현재 identity/content 0/472·taxonomy 0/7·independent assessment 0/468 |
+| `learning-content` | curriculum | no | source or contract change | 영구 M0 계약, identity/content 472/472·path 31/31·independent assessment 468/468 |
 | `curriculum-quality-matrix` | curriculum | yes | every change | path metadata·check·visual coverage |
 | `path-promotion-readiness` | curriculum/product | yes | every change | 대표 6경로 M0와 R10·사람 근거 전 provisional 차단 |
 | `curriculum-top-tier-audit` | curriculum | no | human approval completion | 독립 assessment 승인과 top-tier completion eligibility |
@@ -198,7 +198,7 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 - 영구 학습 경험 회귀 소비 `tests/learning/verifyLearningControlIntent.py` (계약 owner는 `docs/skills/architecture/learning-experience.md`)
 - 선행 산출물 소비 `tests/learning/verifyRemovedLearningConcepts.py` (생성 owner는 `09-repository-simplification`)
 - 선행 산출물 소비 `tests/architecture/verifyClassroomRemoved.py` (생성 owner는 `09-repository-simplification`)
-- 선행 산출물 소비 `tests/curriculum/verifyScoredCheckStrength.py` (생성 owner는 `08-learning-content`)
+- 영구 회귀 소비 `tests/curriculum/verifyScoredCheckStrength.py` (계약 owner는 `contracts/learning-content/`)
 - 신규 `tests/learning/verifyLearningEfficacyReport.py`
 - 선행 산출물 소비 `tests/product/verifyPrdEvaluationReport.py`, `tests/product/verifyPlanFactAudit.py`
 - 선행 산출물 소비 `tests/plan/testMainPlanTodoPolicy.py`

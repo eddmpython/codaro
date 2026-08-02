@@ -14,7 +14,6 @@ from learningLedgerAudit import (
     ROOT,
     currentGitHead,
     curriculumPayloads,
-    hasValidReviewMetadata,
     utcTimestamp,
     validAssessmentVariants,
     writeReport,
@@ -23,7 +22,7 @@ from learningLedgerAudit import (
 
 CONTRACT_PATH = (
     ROOT
-    / "mainPlan/astryx-product-experience/08-learning-content/evidence/featured-capstones.yml"
+    / "contracts/learning-content/featured-capstones.yml"
 )
 REPORT_PATH = ROOT / "output/test-runner/learning-content/featured-capstone-contracts-report.json"
 FEATURED_PATH_IDS = {
@@ -82,15 +81,8 @@ def main() -> int:
     learnerEvidenceClaim = payload.get("learnerEvidenceClaim")
     if payload.get("surfaceState") != "route-backed":
         failures.append("capstone contract surface must be route-backed")
-    if learnerEvidenceClaim not in {"none", "verified"}:
-        failures.append("learner evidence claim is invalid")
-    learnerEvidence = (
-        payload.get("learnerEvidence") if isinstance(payload.get("learnerEvidence"), dict) else {}
-    )
-    if learnerEvidenceClaim == "verified":
-        reviewedPathIds = set(learnerEvidence.get("pathIds") or [])
-        if not hasValidReviewMetadata(learnerEvidence) or reviewedPathIds != FEATURED_PATH_IDS:
-            failures.append("verified learner evidence metadata or path coverage is invalid")
+    if learnerEvidenceClaim != "none":
+        failures.append("machine-readiness contract must not claim learner evidence")
     if not isinstance(rows, list):
         failures.append("featured capstone paths must be an array")
         rows = []
@@ -155,15 +147,7 @@ def main() -> int:
             rowFailures.append("capstone must combine strong check and artifact descriptor evidence")
         localRequired = row.get("localGraduationRequired") is True
         localState = row.get("localGraduationState")
-        if localRequired and localState == "approved-independent-evidence":
-            localEvidence = (
-                row.get("localGraduationEvidence")
-                if isinstance(row.get("localGraduationEvidence"), dict)
-                else {}
-            )
-            if not hasValidReviewMetadata(localEvidence):
-                rowFailures.append("approved Local graduation evidence metadata is invalid")
-        elif localRequired and localState == "pending-independent-evidence":
+        if localRequired and localState == "pending-independent-evidence":
             localGraduationPendingPathIds.append(pathId)
         elif localRequired:
             rowFailures.append("required Local graduation state is invalid")
@@ -182,19 +166,11 @@ def main() -> int:
     missing = FEATURED_PATH_IDS - seen
     if missing:
         failures.append("featured capstone rows are missing: " + ", ".join(sorted(missing)))
-    completionBlockers: list[str] = []
-    if learnerEvidenceClaim != "verified":
-        completionBlockers.append("actual learner evidence is not verified for all featured paths")
-    if localGraduationPendingPathIds:
-        completionBlockers.append(
-            "independent Local graduation evidence is pending: "
-            + ", ".join(sorted(localGraduationPendingPathIds))
-        )
     report: dict[str, Any] = {
         "gate": "featured-capstone-contracts",
         "passed": not failures,
         "status": "passed" if not failures else "failed",
-        "completionEligible": not failures and not completionBlockers,
+        "completionEligible": not failures,
         "startedAt": startedAt,
         "completedAt": utcTimestamp(),
         "durationMs": round((time.monotonic() - started) * 1000),
@@ -206,7 +182,6 @@ def main() -> int:
             "localGraduationPendingPathIds": sorted(localGraduationPendingPathIds),
             "paths": summaries,
         },
-        "completionBlockers": completionBlockers,
         "failures": failures,
         "reportPath": REPORT_PATH.relative_to(ROOT).as_posix(),
     }

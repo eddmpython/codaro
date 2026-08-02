@@ -19,7 +19,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from codaro.curriculum.efficacyStage import resolvePathPortfolio  # noqa: E402
 
 
-CAPSTONES = ROOT / "mainPlan/astryx-product-experience/08-learning-content/evidence/featured-capstones.yml"
+CAPSTONES = ROOT / "contracts/learning-content/featured-capstones.yml"
 EVIDENCE_ROOT = ROOT / "mainPlan/astryx-product-experience/10-quality-release/evidence/path-efficacy"
 
 

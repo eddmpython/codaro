@@ -18,14 +18,16 @@ from codaro.curriculum.taxonomy import CurriculumTaxonomy, loadTaxonomy
 
 
 ROOT = Path(__file__).resolve().parents[4]
-IDENTITY_ROOT = ROOT / "mainPlan" / "astryx-product-experience" / "08-learning-content" / "00-identity-integrity"
+LEARNING_CONTENT_ROOT = ROOT / "contracts" / "learning-content"
+IDENTITY_ROOT = LEARNING_CONTENT_ROOT
 CONTENT_ROOT = IDENTITY_ROOT / "content-ledger"
 IDENTITY_LEDGER_ROOT = IDENTITY_ROOT / "identity-ledger"
 IDENTITY_SUMMARY_PATH = IDENTITY_LEDGER_ROOT / "summary.yml"
 EVIDENCE_ROOT = IDENTITY_ROOT / "evidence"
 ALIAS_MIGRATION_PATH = EVIDENCE_ROOT / "legacy-alias-migration.yml"
 TAXONOMY_TRANSITION_PATH = EVIDENCE_ROOT / "taxonomy-transition.yml"
-LEARNING_CONTENT_ROOT = IDENTITY_ROOT.parent
+PATH_LEDGER_ROOT = LEARNING_CONTENT_ROOT / "path-ledgers"
+OWNER_REGISTRY_PATH = LEARNING_CONTENT_ROOT / "owner-registry.yml"
 SOURCE_ROOT = ROOT / "curricula" / "python"
 TAXONOMY_PATH = SOURCE_ROOT / "_taxonomy.yml"
 SUMMARY_PATH = CONTENT_ROOT / "summary.yml"
@@ -93,13 +95,36 @@ def contentRows() -> dict[str, tuple[Path, dict[str, Any]]]:
 
 def pathLedgers() -> dict[str, tuple[Path, dict[str, Any]]]:
     rows: dict[str, tuple[Path, dict[str, Any]]] = {}
-    for path in sorted(LEARNING_CONTENT_ROOT.rglob("lesson-ledger.yml")):
+    for path in sorted(PATH_LEDGER_ROOT.glob("*.yml")):
         payload = loadYaml(path)
         pathId = str(payload.get("pathId", ""))
         if not pathId or pathId in rows:
             raise ValueError(f"invalid or duplicate pathId: {pathId}")
         rows[pathId] = (path, payload)
     return rows
+
+
+def ownerRegistry() -> dict[str, int]:
+    payload = loadYaml(OWNER_REGISTRY_PATH)
+    owners = payload.get("owners")
+    if payload.get("schemaVersion") != 1 or not isinstance(owners, list):
+        raise ValueError("learning content owner registry is invalid")
+    registry: dict[str, int] = {}
+    for row in owners:
+        if not isinstance(row, dict):
+            raise ValueError("learning content owner registry row must be a mapping")
+        ownerId = str(row.get("id", ""))
+        reviewedRowCount = row.get("reviewedRowCount")
+        if (
+            not ownerId
+            or ownerId in registry
+            or not isinstance(reviewedRowCount, int)
+            or isinstance(reviewedRowCount, bool)
+            or reviewedRowCount <= 0
+        ):
+            raise ValueError(f"invalid learning content owner registry row: {ownerId}")
+        registry[ownerId] = reviewedRowCount
+    return registry
 
 
 def fileSha256(path: Path) -> str:
@@ -233,7 +258,7 @@ def expectedIdentitySummary(
         "globalDuplicateAliasCount": len(duplicateAliases),
         "globalDuplicateAliases": duplicateAliases,
         "missingLessonRefs": missing,
-        "migrationLedger": "00-identity-integrity/evidence/legacy-alias-migration.yml",
+        "migrationLedger": "evidence/legacy-alias-migration.yml",
         "completionRule": "registeredRows=472 and pendingHumanReviewRows=0 with evidence commits",
     }
 
@@ -423,6 +448,8 @@ def validateAppliedTransition(
         row = byPath[pathId]
         if row.get("toCount") != len(targetRefs) or row.get("toOrderHash") != orderHash(targetRefs):
             failures.append(f"applied taxonomy transition target differs: {pathId}")
+        if row.get("ledgerPath") != f"path-ledgers/{pathId}.yml":
+            failures.append(f"applied taxonomy transition ledger path differs: {pathId}")
     return failures
 
 
@@ -434,6 +461,7 @@ def evaluate(write: bool, applyTransition: bool = False) -> list[str]:
     sources = {lessonRef: str(row.get("sourcePath", "")) for lessonRef, (_, row) in identity.items()}
     rows = contentRows()
     paths = pathLedgers()
+    registeredOwners = ownerRegistry()
     failures: list[str] = []
     if set(sources) != set(rows):
         failures.append(
@@ -520,9 +548,9 @@ def evaluate(write: bool, applyTransition: bool = False) -> list[str]:
                 )
             else:
                 failures.append(f"reinforcesOutcomeIds mismatch: {lessonRef}")
-        ownerPacket = LEARNING_CONTENT_ROOT / str(row.get("ownerPacket", ""))
-        if not ownerPacket.is_dir():
-            failures.append(f"content owner packet is absent: {lessonRef} -> {row.get('ownerPacket')}")
+        ownerPacket = str(row.get("ownerPacket", ""))
+        if ownerPacket not in registeredOwners:
+            failures.append(f"content owner is not registered: {lessonRef} -> {ownerPacket}")
         entries.append({
             "lessonContentHash": expected,
             "lessonRef": lessonRef,
@@ -551,13 +579,25 @@ def evaluate(write: bool, applyTransition: bool = False) -> list[str]:
     if transitionApplied:
         expectedTransition = dict(proposedTransition)
         expectedTransition["applyState"] = "applied"
-        expectedTransition["pathDiffs"] = recordedTransition.get("pathDiffs", [])
+        expectedTransition["pathDiffs"] = [
+            {
+                **row,
+                "ledgerPath": f"path-ledgers/{row.get('pathId')}.yml",
+            }
+            for row in recordedTransition.get("pathDiffs", [])
+            if isinstance(row, dict)
+        ]
         failures.extend(validateAppliedTransition(expectedTransition, plans))
     else:
         expectedTransition = proposedTransition
     recordedIdentitySummary = loadYaml(IDENTITY_SUMMARY_PATH)
     snapshotDate = date.today().isoformat() if write else str(recordedIdentitySummary.get("snapshotDate", ""))
     expectedIdentity = expectedIdentitySummary(identity, graphKeys, snapshotDate)
+    actualOwnerCounts: dict[str, int] = defaultdict(int)
+    for _, row in rows.values():
+        actualOwnerCounts[str(row.get("ownerPacket", ""))] += 1
+    if dict(sorted(actualOwnerCounts.items())) != dict(sorted(registeredOwners.items())):
+        failures.append("learning content owner registry counts differ from canonical rows")
 
     forbiddenPathFields = {
         "outcomes", "prerequisites", "runtimeTier", "checkSpecId", "checkKinds", "artifactDecision",

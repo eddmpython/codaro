@@ -23,7 +23,7 @@ from codaro.curriculum.pathPromotion import (  # noqa: E402
 
 
 REPORT_PATH = ROOT / "output/test-runner/path-promotion-readiness/path-promotion-readiness-report.json"
-CAPSTONES = ROOT / "mainPlan/astryx-product-experience/08-learning-content/evidence/featured-capstones.yml"
+CAPSTONES = ROOT / "contracts/learning-content/featured-capstones.yml"
 EVIDENCE_ROOT = ROOT / "mainPlan/astryx-product-experience/10-quality-release/evidence/path-efficacy"
 R10_MANIFEST = (
     ROOT

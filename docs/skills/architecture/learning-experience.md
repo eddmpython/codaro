@@ -94,4 +94,4 @@ Web과 Local은 같은 `LessonRef`, document, draft, virtual file system, packag
 - `uv run python -X utf8 tests/run.py gate learning-evidence-contract`
 - `uv run python -X utf8 tests/run.py gate removed-learning-concepts`
 
-레슨별 저작 품질, 472개 전수 browser evidence와 독립 assessment 승인은 `mainPlan/astryx-product-experience/08-learning-content/`가 완료 전까지 소유한다. Windows 10 설치본 sandbox, 실제 배포와 사용자 학습성 근거는 `mainPlan/astryx-product-experience/10-quality-release/`가 소유한다. 이 조건은 학습 방법 구현의 중복 TODO가 아니라 콘텐츠 승인과 release 증거 경계다.
+레슨별 저작 품질, 472개 전수 source evidence, 31개 path ledger와 독립 assessment 승인은 `contracts/learning-content/`가 영구 회귀 계약으로 소유한다. Windows 10 설치본 sandbox, 실제 배포와 사용자 학습성 근거는 `mainPlan/astryx-product-experience/10-quality-release/`가 소유한다. 이 조건은 학습 방법 구현의 중복 TODO가 아니라 M0 콘텐츠 계약과 release 증거의 경계다.

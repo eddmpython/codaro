@@ -1,0 +1,60 @@
+schemaVersion: 1
+owners:
+  - id: 01-python-foundation
+    reviewedRowCount: 66
+  - id: 02-data-reporting
+    reviewedRowCount: 12
+  - id: 03-data-visualization
+    reviewedRowCount: 22
+  - id: 04-file-automation
+    reviewedRowCount: 20
+  - id: 05-office-automation
+    reviewedRowCount: 25
+  - id: 06-web-monitoring
+    reviewedRowCount: 11
+  - id: 07-remaining-domains/00-pdf-automation
+    reviewedRowCount: 11
+  - id: 07-remaining-domains/01-email-automation
+    reviewedRowCount: 11
+  - id: 07-remaining-domains/02-document-automation
+    reviewedRowCount: 11
+  - id: 07-remaining-domains/03-scripting-automation
+    reviewedRowCount: 11
+  - id: 07-remaining-domains/05-interactive-dashboards
+    reviewedRowCount: 22
+  - id: 07-remaining-domains/06-geo-visualization
+    reviewedRowCount: 11
+  - id: 07-remaining-domains/07-statistical-analysis
+    reviewedRowCount: 11
+  - id: 07-remaining-domains/08-machine-learning
+    reviewedRowCount: 11
+  - id: 07-remaining-domains/10-graph-analysis
+    reviewedRowCount: 11
+  - id: 07-remaining-domains/11-image-processing
+    reviewedRowCount: 11
+  - id: 07-remaining-domains/12-computer-vision
+    reviewedRowCount: 11
+  - id: 07-remaining-domains/13-vision-advanced
+    reviewedRowCount: 20
+  - id: 07-remaining-domains/14-deep-learning-vision
+    reviewedRowCount: 10
+  - id: 07-remaining-domains/15-vision-automation
+    reviewedRowCount: 10
+  - id: 07-remaining-domains/16-text-processing
+    reviewedRowCount: 11
+  - id: 07-remaining-domains/17-scientific-computing
+    reviewedRowCount: 33
+  - id: 07-remaining-domains/18-sql-analysis
+    reviewedRowCount: 12
+  - id: 07-remaining-domains/19-big-data-pipelines
+    reviewedRowCount: 11
+  - id: 07-remaining-domains/20-data-contracts
+    reviewedRowCount: 11
+  - id: 07-remaining-domains/21-desktop-automation
+    reviewedRowCount: 10
+  - id: 07-remaining-domains/22-system-monitoring
+    reviewedRowCount: 10
+  - id: 07-remaining-domains/23-standard-library-mastery
+    reviewedRowCount: 35
+  - id: 07-remaining-domains/24-ai-integration
+    reviewedRowCount: 11

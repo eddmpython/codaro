@@ -12,11 +12,13 @@ import yaml
 
 
 ROOT = Path(__file__).resolve().parents[2]
-LEARNING_CONTENT_ROOT = ROOT / "mainPlan/astryx-product-experience/08-learning-content"
-IDENTITY_ROOT = LEARNING_CONTENT_ROOT / "00-identity-integrity"
+LEARNING_CONTENT_ROOT = ROOT / "contracts/learning-content"
+IDENTITY_ROOT = LEARNING_CONTENT_ROOT
 IDENTITY_LEDGER_ROOT = IDENTITY_ROOT / "identity-ledger"
 CONTENT_LEDGER_ROOT = IDENTITY_ROOT / "content-ledger"
 EVIDENCE_ROOT = IDENTITY_ROOT / "evidence"
+PATH_LEDGER_ROOT = LEARNING_CONTENT_ROOT / "path-ledgers"
+OWNER_REGISTRY_PATH = LEARNING_CONTENT_ROOT / "owner-registry.yml"
 CURRICULA_ROOT = ROOT / "curricula/python"
 STRONG_CHECK_KINDS = {"output", "variable", "file", "table", "image", "behavior"}
 COMMIT_PATTERN = re.compile(r"[0-9a-f]{40}")
@@ -63,13 +65,36 @@ def contentRows() -> dict[str, dict[str, Any]]:
 
 def pathLedgers() -> dict[str, tuple[Path, dict[str, Any]]]:
     ledgers: dict[str, tuple[Path, dict[str, Any]]] = {}
-    for path in sorted(LEARNING_CONTENT_ROOT.rglob("lesson-ledger.yml")):
+    for path in sorted(PATH_LEDGER_ROOT.glob("*.yml")):
         payload = loadYaml(path)
         pathId = str(payload.get("pathId", ""))
         if not pathId or pathId in ledgers:
             raise ValueError(f"invalid or duplicate pathId: {pathId}")
         ledgers[pathId] = (path, payload)
     return ledgers
+
+
+def ownerRegistry() -> dict[str, int]:
+    payload = loadYaml(OWNER_REGISTRY_PATH)
+    rows = payload.get("owners")
+    if payload.get("schemaVersion") != 1 or not isinstance(rows, list):
+        raise ValueError("learning content owner registry is invalid")
+    owners: dict[str, int] = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            raise ValueError("learning content owner registry row must be a mapping")
+        ownerId = str(row.get("id", ""))
+        reviewedRowCount = row.get("reviewedRowCount")
+        if (
+            not ownerId
+            or ownerId in owners
+            or not isinstance(reviewedRowCount, int)
+            or isinstance(reviewedRowCount, bool)
+            or reviewedRowCount <= 0
+        ):
+            raise ValueError(f"invalid learning content owner registry row: {ownerId}")
+        owners[ownerId] = reviewedRowCount
+    return owners
 
 
 def fileSha256(path: Path) -> str:

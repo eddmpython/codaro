@@ -42,11 +42,8 @@ def curriculumLessonRefs() -> set[str]:
 
 
 def candidateLedgerRoots() -> list[Path]:
-    candidates: list[Path] = []
-    for path in (ROOT / "mainPlan").rglob("content-ledger"):
-        if path.is_dir() and path.parent.name == "00-identity-integrity":
-            candidates.append(path)
-    return sorted(candidates)
+    path = ROOT / "contracts" / "learning-content" / "content-ledger"
+    return [path] if path.is_dir() else []
 
 
 def rowsFromLedgers() -> list[dict[str, object]]:

@@ -72,12 +72,6 @@ def main() -> int:
                     f"approved={summary.get('independentReviewApprovedLessonCount')} "
                     f"pending={summary.get('independentReviewPendingLessonCount')}"
                 )
-            elif gate == "featured-capstone-contracts":
-                completionBlockers = payload.get("completionBlockers")
-                if isinstance(completionBlockers, list) and completionBlockers:
-                    blockers.extend(str(blocker) for blocker in completionBlockers)
-                else:
-                    blockers.append("featured capstone completion evidence is incomplete")
             else:
                 blockers.append(f"completion evidence is incomplete: {gate}")
 

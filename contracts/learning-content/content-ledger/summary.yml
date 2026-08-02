@@ -19,7 +19,7 @@ plannedTaxonomyOutcomeIds:
 - python.projectDelivery
 - viz.edaReport
 - automation.browser.audit
-taxonomyTransitionReport: 00-identity-integrity/evidence/taxonomy-transition.yml
+taxonomyTransitionReport: evidence/taxonomy-transition.yml
 targetTaxonomyHash: 67927af4d2aa372fe77d6e9c90dfc8ffd7355dc0bb40e6babd2b80e8f507fb84
 targetTaxonomyHashStatus: approved-and-applied
 ownerPacketCounts:

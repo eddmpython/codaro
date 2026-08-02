@@ -10,13 +10,7 @@ import yaml
 
 
 ROOT = Path(__file__).resolve().parents[4]
-INTEGRITY_ROOT = (
-    ROOT
-    / "mainPlan"
-    / "astryx-product-experience"
-    / "08-learning-content"
-    / "00-identity-integrity"
-)
+INTEGRITY_ROOT = ROOT / "contracts" / "learning-content"
 IDENTITY_LEDGER_ROOT = INTEGRITY_ROOT / "identity-ledger"
 CONTENT_LEDGER_ROOT = INTEGRITY_ROOT / "content-ledger"
 ALIAS_MIGRATION_PATH = INTEGRITY_ROOT / "evidence" / "legacy-alias-migration.yml"

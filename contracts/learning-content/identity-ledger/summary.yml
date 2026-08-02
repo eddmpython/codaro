@@ -26,5 +26,5 @@ globalDuplicateAliases:
   - advancedPython/35_동시성
   - builtins/35_zipfile
 missingLessonRefs: []
-migrationLedger: 00-identity-integrity/evidence/legacy-alias-migration.yml
+migrationLedger: evidence/legacy-alias-migration.yml
 completionRule: registeredRows=472 and pendingHumanReviewRows=0 with evidence commits
