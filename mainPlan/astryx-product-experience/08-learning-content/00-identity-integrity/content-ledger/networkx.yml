@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "networkx/00_networkx소개"
     identityLedgerRef: "identity-ledger/networkx.yml"
-    lessonContentHash: "5a38b3ccbd437227068f3a55b901e8b260df71977e16e233d6da736f91db9675"
+    lessonContentHash: "1a982cd4e75bd0cd0e8bcc80da67998bfc9c320217c507107313c8e58871b9b6"
     disposition: migrate
     ownerPacket: "07-remaining-domains/10-graph-analysis"
     eligiblePathIds: ["graphAnalysis"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "networkx/01_첫그래프만들기"
     identityLedgerRef: "identity-ledger/networkx.yml"
-    lessonContentHash: "e28b53256b5588329cf74f49a322803613982d7f8f7c7264088208a602a03bd5"
+    lessonContentHash: "8bde30ef586c88e17a603cc3a36c3e4bf739d66ecba9e9194b0fba96b7684f80"
     disposition: migrate
     ownerPacket: "07-remaining-domains/10-graph-analysis"
     eligiblePathIds: ["graphAnalysis"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "networkx/02_방향그래프와가중치"
     identityLedgerRef: "identity-ledger/networkx.yml"
-    lessonContentHash: "1004174813576401907602a026e9d9a804c7f88c686a0c3fa09f1f40b1b96023"
+    lessonContentHash: "a719bf02887bf8411b63c7ecc83c9bc8f232c462070acc9961fd6870d5860d36"
     disposition: migrate
     ownerPacket: "07-remaining-domains/10-graph-analysis"
     eligiblePathIds: ["graphAnalysis"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "networkx/03_최단경로찾기"
     identityLedgerRef: "identity-ledger/networkx.yml"
-    lessonContentHash: "c463ad92bb3dd266d84052378430653fb780378b9c60d352dffbfdd3a23805e9"
+    lessonContentHash: "f1a19e9c0502795f6c01f23e78498b3deff6e601ae2a1c76117a186cecb001ab"
     disposition: migrate
     ownerPacket: "07-remaining-domains/10-graph-analysis"
     eligiblePathIds: ["graphAnalysis"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "networkx/04_중심성분석"
     identityLedgerRef: "identity-ledger/networkx.yml"
-    lessonContentHash: "2d6d4fa6fe037de65f6367ec122921cb32319cc38920793c9d3858c803acd442"
+    lessonContentHash: "1595c2515788d381c228cec4c1dd3f3e94addd6687360f01ccead8035e966865"
     disposition: migrate
     ownerPacket: "07-remaining-domains/10-graph-analysis"
     eligiblePathIds: ["graphAnalysis"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "networkx/05_소셜네트워크분석"
     identityLedgerRef: "identity-ledger/networkx.yml"
-    lessonContentHash: "2bffa6525a8afb37f9706acabace9ae0e706f16e72ab58fd2aee8c25d5485dee"
+    lessonContentHash: "205a155e5e629326f0d4eb07a405e41e4350a1d97e9996e75b78e5cf9c1f7570"
     disposition: migrate
     ownerPacket: "07-remaining-domains/10-graph-analysis"
     eligiblePathIds: ["graphAnalysis"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "networkx/06_연결성분석"
     identityLedgerRef: "identity-ledger/networkx.yml"
-    lessonContentHash: "1721005d7d46043f4505a81afb6d453bb4593951a27fd4e2f8e367b3ab192a4f"
+    lessonContentHash: "39e5a5beb05a2a19be313cb508b2791a2724238c96b813c60dc1c95b10201978"
     disposition: migrate
     ownerPacket: "07-remaining-domains/10-graph-analysis"
     eligiblePathIds: ["graphAnalysis"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "networkx/07_커뮤니티탐지"
     identityLedgerRef: "identity-ledger/networkx.yml"
-    lessonContentHash: "5f94e6cde55553bc733f4e20c187ec572ef3afd003a30a4506356aba5bc6c867"
+    lessonContentHash: "a38d9d4e3094a3ec534cf74e760bf513857112030a26ccaf67e1b0a8af2c37d0"
     disposition: migrate
     ownerPacket: "07-remaining-domains/10-graph-analysis"
     eligiblePathIds: ["graphAnalysis"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "networkx/08_그래프알고리즘"
     identityLedgerRef: "identity-ledger/networkx.yml"
-    lessonContentHash: "5fa5ae6cb53bae4b925e6f4aa55e7d6ced3fb41ab54d1b90ff117ee0e075f831"
+    lessonContentHash: "669910e225ffe2c8fd0ecf72e64274553ae51c439c31ae2cae6f7c9751fc7bb9"
     disposition: migrate
     ownerPacket: "07-remaining-domains/10-graph-analysis"
     eligiblePathIds: ["graphAnalysis"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "networkx/09_랜덤그래프모델"
     identityLedgerRef: "identity-ledger/networkx.yml"
-    lessonContentHash: "157da30ad711203584c7552b5f42ad4b7ea671594ec60c388de874355bce4cc0"
+    lessonContentHash: "fa6aff284a02a6fb707a8e86c8f5ca39b6ca5ad8536f8e9922b10f44d7e9caab"
     disposition: migrate
     ownerPacket: "07-remaining-domains/10-graph-analysis"
     eligiblePathIds: ["graphAnalysis"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "networkx/10_종합네트워크프로젝트"
     identityLedgerRef: "identity-ledger/networkx.yml"
-    lessonContentHash: "b57e75787debdaa8f2943b07df4dbdb146c75c285579e0051be888dcddf940dc"
+    lessonContentHash: "14d57692ef00cf6f1424186126e65f9cd3fef90532215294663cef829f66938e"
     disposition: migrate
     ownerPacket: "07-remaining-domains/10-graph-analysis"
     eligiblePathIds: ["graphAnalysis"]
@@ -209,5 +239,8 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

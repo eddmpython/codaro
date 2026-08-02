@@ -4,7 +4,7 @@ canonicalRows: 3
 lessons:
   - lessonRef: "excel/01_xlwings란"
     identityLedgerRef: "identity-ledger/excel.yml"
-    lessonContentHash: "84c5459411e866304a14c7a2a5ae758b7c5700c90b0bfca9ca7a215363da9a67"
+    lessonContentHash: "3736ce235abaae2353a710628e3f900b830d11b46e6d1a2ad5df85d11c4f2800"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "excel/02_xlwings설치"
     identityLedgerRef: "identity-ledger/excel.yml"
-    lessonContentHash: "b22ae409b2873bcf0983c978dd32770383edda84be8357157e693cfa7e1779c7"
+    lessonContentHash: "e2488a90e1bb82d0178f5ec96e233364c9176487e0f68a42b4bae522d60d6f36"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "excel/03_xlwingsLite"
     identityLedgerRef: "identity-ledger/excel.yml"
-    lessonContentHash: "5f66ab5f50ffffa192922a79701db9f37864cbee8d266eb1f75641596d07a959"
+    lessonContentHash: "094a8e8192a54b53f3492b44016e2e3280e7d48d00cc26c5c76079356d53e689"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -57,5 +63,8 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

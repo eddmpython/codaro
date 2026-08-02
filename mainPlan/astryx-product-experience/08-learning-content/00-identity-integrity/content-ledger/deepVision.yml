@@ -4,7 +4,7 @@ canonicalRows: 10
 lessons:
   - lessonRef: "deepVision/01_torchvision입문"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "08539f1c174959d7f0e91eeccc7dda26c1bd65be3100ac24131784a892522f1d"
+    lessonContentHash: "f717444b4034a9a715063115992c04789acc1026ad25b0f2e4fa06932f6fcfbe"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "deepVision/02_ResNet분류"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "651b5f0fbd6eb59b2ecc9cfe57da7c435fcfe0ba65d02a319615e269ad2dd27a"
+    lessonContentHash: "c0f38a0c44fafe57d6bd445f32afea00b8574a5b2ac88bdbb11270417e7adc22"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "deepVision/03_임베딩벡터"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "0b7a8b9e4e93adfecb46f65780581ee84cf413610ed520b9c24266adc9eb5464"
+    lessonContentHash: "d0b98d11f3f3bc963bfda4bec550aafe21315f6f879d11424d85ce2639457baf"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "deepVision/04_유사도검색"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "3a263ae3ebf7f28b5fa6b42a7bd7e99c295faefd17319bd3ea171c5c701fa247"
+    lessonContentHash: "524d87ac842cb395d8663362ca82ab930a222f22d88691bd8c9f0c1959b7234e"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "deepVision/05_객체탐지"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "1f6237039fa61d2169da488a5f670b71b7cfe4514931c1f97fb109881519c0c9"
+    lessonContentHash: "7d8c645f7d1f3a3eb97378bbf64d2bddc6f33c30d31bc1d0c0e2ccaa2db619e0"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "deepVision/06_세그멘테이션"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "27121a50b61308c5c3752227fc72e105b2808a50db7a2f93c829364351fd2706"
+    lessonContentHash: "f1ad82eb7f51dd5a64c7c6a509cd2050277b8eba68cfaa072ae3efd3c2e83693"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "deepVision/07_포즈추정"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "bfcc4a625719320d60a15144858cbe09a93afa07650509e770abad646346d605"
+    lessonContentHash: "0e7ddeb98ca66c243363e0ed16d51c7f601ed6f8bb97bc806a2afbce6f342f83"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "deepVision/08_전이학습"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "97a5f40f76155c2a28e4f8a426575f735a2f40902eebe34f1e02bb411f1bac8c"
+    lessonContentHash: "bdb01256d3c730921fb3227671d23c4b9788460209a5456e32f8c0d904a7cac7"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "deepVision/09_모델비교"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "107dcb5499532527f02be6cbd1a46ee8df11ec1579913ddc3b96f068246068a3"
+    lessonContentHash: "08484de2e0255fab4ce4f8a562817252564206d0d570710e07c4c41919888b51"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "deepVision/10_종합사진태깅기"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "a41d80f1cc73777bb3073909fc133d1e62b615c1a5c54fa5631e05b074435462"
+    lessonContentHash: "ae4e8bd4a53c8111860a3506792c6ca7d366cc32b68b757590089c2264921cd9"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]
@@ -190,5 +217,8 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

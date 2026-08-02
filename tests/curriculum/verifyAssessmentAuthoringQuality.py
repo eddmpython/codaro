@@ -10,7 +10,7 @@ from typing import Any
 
 import yaml
 
-from learningLedgerAudit import currentGitHead
+from learningLedgerAudit import currentGitHead, hasValidReviewMetadata
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -57,7 +57,10 @@ def main() -> int:
                 ))
         authoring = assessment.get("authoring") if isinstance(assessment.get("authoring"), dict) else {}
         if authoring.get("independentReview") == "approved":
-            reviewedLessonCount += 1
+            if hasValidReviewMetadata(authoring):
+                reviewedLessonCount += 1
+            else:
+                failures.append(failure(rel, "authoring", "approved review metadata is invalid"))
         sections = [section for section in content.get("sections", []) if isinstance(section, dict)]
         sectionIds = {
             text(section.get("id") or section.get("name"))

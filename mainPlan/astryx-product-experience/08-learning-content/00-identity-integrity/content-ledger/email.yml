@@ -19,11 +19,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "email/01_첫메일발송"
     identityLedgerRef: "identity-ledger/email.yml"
-    lessonContentHash: "34217d2c5db41a35e820373d0ead7158be487be95e9a2737a2126e66d859b674"
+    lessonContentHash: "48a8c041ff16233923a890972fbbbfb13daa41d21c6fd0558b16396a9c7ccf28"
     disposition: migrate
     ownerPacket: "07-remaining-domains/01-email-automation"
     eligiblePathIds: ["emailAutomation"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "email/02_html과첨부"
     identityLedgerRef: "identity-ledger/email.yml"
-    lessonContentHash: "eb56b3a1d636481962913344d290e07dcb54b51243b85c8d0c1ea8f4634ad07b"
+    lessonContentHash: "3244b7485b0cec4b28aa1d20e092c3084bb47705a45b85be71c3b55964c604c3"
     disposition: migrate
     ownerPacket: "07-remaining-domains/01-email-automation"
     eligiblePathIds: ["emailAutomation"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "email/03_다수수신자와개인화"
     identityLedgerRef: "identity-ledger/email.yml"
-    lessonContentHash: "43b5bfdb3e01b1c85df78da72e16d43c6702f7c8fbbc63f7a1513532c286e01d"
+    lessonContentHash: "6a16a0bde9c904af39e9ecb50cfc375dc50e88890e30438373b45a4ebbd5b6ad"
     disposition: migrate
     ownerPacket: "07-remaining-domains/01-email-automation"
     eligiblePathIds: ["emailAutomation"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "email/04_표와차트삽입"
     identityLedgerRef: "identity-ledger/email.yml"
-    lessonContentHash: "4a2976f1180f25394360d437a3b5f9db03db1eb4cf2dc5491c2bde9282e805d7"
+    lessonContentHash: "12d822f30a2f1ac0c91b552fedcc3ae3b587c1c1442d392e597fcd7894998584"
     disposition: migrate
     ownerPacket: "07-remaining-domains/01-email-automation"
     eligiblePathIds: ["emailAutomation"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "email/05_imap으로받기"
     identityLedgerRef: "identity-ledger/email.yml"
-    lessonContentHash: "c04f04854008d899fcb24eef1b7330459208bf51603ff382c83c2c9c3afeba2e"
+    lessonContentHash: "805c23e65590f0a3ea6ef5d7b4c158e8af403da444ad9f8ed6973337607d015c"
     disposition: migrate
     ownerPacket: "07-remaining-domains/01-email-automation"
     eligiblePathIds: ["emailAutomation"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "email/06_첨부자동저장"
     identityLedgerRef: "identity-ledger/email.yml"
-    lessonContentHash: "754bd253c26fbc0a16ad776acf44294d140bb8b773681ba0011ab96da64abba1"
+    lessonContentHash: "a0af32f86cb7201e6fac20c65e7ce70d62c2a8dc11a58e91860f129fc281f57d"
     disposition: migrate
     ownerPacket: "07-remaining-domains/01-email-automation"
     eligiblePathIds: ["emailAutomation"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "email/07_규칙기반분류"
     identityLedgerRef: "identity-ledger/email.yml"
-    lessonContentHash: "f4d91c4e6891af7090ed792e38749f324e9c46a51f2e5d83e941b7d6607fa713"
+    lessonContentHash: "a9589e65228da50c845f7140a16a11946421ee4d7949512de6dacfc8ceed26ad"
     disposition: migrate
     ownerPacket: "07-remaining-domains/01-email-automation"
     eligiblePathIds: ["emailAutomation"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "email/08_스크립트결과알림"
     identityLedgerRef: "identity-ledger/email.yml"
-    lessonContentHash: "1440516cda8d755e7389da03321e7507f11353d336ca9af7bc9ae7891bd13d5b"
+    lessonContentHash: "dcf126a9b5b858ebc60357963c3dce37c5fbbe7a789fb9fe6ccaa9c5e86dfb4d"
     disposition: migrate
     ownerPacket: "07-remaining-domains/01-email-automation"
     eligiblePathIds: ["emailAutomation"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "email/09_안전한자격증명관리"
     identityLedgerRef: "identity-ledger/email.yml"
-    lessonContentHash: "00c9a2a94cdacf05f6850cbfeee8b1aa31b771a51d44af1935444b21006d70ab"
+    lessonContentHash: "8ef8d84931178825f42d6e6de2ca0235c4e77096dedd5ad03cb0f56e3ad7851e"
     disposition: migrate
     ownerPacket: "07-remaining-domains/01-email-automation"
     eligiblePathIds: ["emailAutomation"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "email/10_주간보고서발송기"
     identityLedgerRef: "identity-ledger/email.yml"
-    lessonContentHash: "569fc22f9c86cba2ea3182dcb8cb2f650bcc6b5acd35ddd998c102828d00a281"
+    lessonContentHash: "d89f5064a5abfca55006c1f6244b4d08efd7c8624a7f76611056a2c28e4617aa"
     disposition: migrate
     ownerPacket: "07-remaining-domains/01-email-automation"
     eligiblePathIds: ["emailAutomation"]
@@ -209,5 +239,8 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

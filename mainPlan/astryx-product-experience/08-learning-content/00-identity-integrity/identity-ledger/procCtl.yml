@@ -6,49 +6,79 @@ lessons:
     sourcePath: "curricula/python/automation/os/procCtl/01_subprocess기초.yaml"
     metaId: "procCtl_01"
     registryStatus: registered
-    reviewStatus: pending
+    reviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
   - lessonRef: "procCtl/02_인자전달과인용"
     sourcePath: "curricula/python/automation/os/procCtl/02_인자전달과인용.yaml"
     metaId: "procCtl_02"
     registryStatus: registered
-    reviewStatus: pending
+    reviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
   - lessonRef: "procCtl/03_타임아웃과예외"
     sourcePath: "curricula/python/automation/os/procCtl/03_타임아웃과예외.yaml"
     metaId: "procCtl_03"
     registryStatus: registered
-    reviewStatus: pending
+    reviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
   - lessonRef: "procCtl/04_파이프와스트리밍"
     sourcePath: "curricula/python/automation/os/procCtl/04_파이프와스트리밍.yaml"
     metaId: "procCtl_04"
     registryStatus: registered
-    reviewStatus: pending
+    reviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
   - lessonRef: "procCtl/05_환경변수와CWD"
     sourcePath: "curricula/python/automation/os/procCtl/05_환경변수와CWD.yaml"
     metaId: "procCtl_05"
     registryStatus: registered
-    reviewStatus: pending
+    reviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
   - lessonRef: "procCtl/06_외부도구래퍼"
     sourcePath: "curricula/python/automation/os/procCtl/06_외부도구래퍼.yaml"
     metaId: "procCtl_06"
     registryStatus: registered
-    reviewStatus: pending
+    reviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
   - lessonRef: "procCtl/07_psutil프로세스조회"
     sourcePath: "curricula/python/automation/os/procCtl/07_psutil프로세스조회.yaml"
     metaId: "procCtl_07"
     registryStatus: registered
-    reviewStatus: pending
+    reviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
   - lessonRef: "procCtl/08_시스템자원모니터링"
     sourcePath: "curricula/python/automation/os/procCtl/08_시스템자원모니터링.yaml"
     metaId: "procCtl_08"
     registryStatus: registered
-    reviewStatus: pending
+    reviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
   - lessonRef: "procCtl/09_프로세스종료와시그널"
     sourcePath: "curricula/python/automation/os/procCtl/09_프로세스종료와시그널.yaml"
     metaId: "procCtl_09"
     registryStatus: registered
-    reviewStatus: pending
+    reviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
   - lessonRef: "procCtl/10_종합빌드러너"
     sourcePath: "curricula/python/automation/os/procCtl/10_종합빌드러너.yaml"
     metaId: "procCtl_10"
     registryStatus: registered
-    reviewStatus: pending
+    reviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"

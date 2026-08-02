@@ -10,6 +10,7 @@ from learningLedgerAudit import (
     contentRows,
     currentGitHead,
     fileSha256,
+    hasValidReviewMetadata,
     identityRows,
     loadYaml,
     utcTimestamp,
@@ -59,6 +60,8 @@ def main() -> int:
         expectedIdentityRef = f"identity-ledger/{lessonRef.split('/', 1)[0]}.yml"
         if row.get("identityLedgerRef") != expectedIdentityRef:
             failures.append(f"{lessonRef}: identity ledger reference differs")
+        if row.get("authorReviewStatus") == "approved" and not hasValidReviewMetadata(row):
+            failures.append(f"{lessonRef}: author approval metadata is invalid")
         approvedRows += int(row.get("authorReviewStatus") == "approved")
 
     summary = loadYaml(LEARNING_CONTENT_ROOT / "00-identity-integrity/content-ledger/summary.yml")

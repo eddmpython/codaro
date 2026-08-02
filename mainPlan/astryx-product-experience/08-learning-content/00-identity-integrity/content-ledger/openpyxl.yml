@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "openpyxl/00_openpyxl소개"
     identityLedgerRef: "identity-ledger/openpyxl.yml"
-    lessonContentHash: "19cec5e67559389fe1303d0deda8d7b95f1f7ab418fb37296496eb2e675804b4"
+    lessonContentHash: "96e049ab67f8ee1452182ee9419bc7fd415a292d466f715cc13f8b96794425e4"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "openpyxl/01_워크북과시트만들기"
     identityLedgerRef: "identity-ledger/openpyxl.yml"
-    lessonContentHash: "f233da520bfde8723ef35b35a6946ebf99724be9529dc2f57aece41f38064467"
+    lessonContentHash: "00abf3847710a5346ebbad9910bb758f6518ed9b49e66abd2d1d55aa4190567a"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "openpyxl/02_셀읽기와쓰기"
     identityLedgerRef: "identity-ledger/openpyxl.yml"
-    lessonContentHash: "665608cc0321646eabf0a16fac672abe279aee6822b48524bad477bdc214e7d4"
+    lessonContentHash: "183d5d0358e363f773d7f0c345607ea86a52df310e3e122035d53a8c38ae13e7"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "openpyxl/03_범위와다중시트"
     identityLedgerRef: "identity-ledger/openpyxl.yml"
-    lessonContentHash: "0ee666065b5b0a941e2192899f22a17d7ec7c9777bb2b015dfb78a113bab489d"
+    lessonContentHash: "0ba992ace86cb8149c53f64358fea2b64dac2430e3395acc84b0e9647c9ecd2b"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "openpyxl/04_수식과이름영역"
     identityLedgerRef: "identity-ledger/openpyxl.yml"
-    lessonContentHash: "04bf1a3ba7bf174bfcf4219b3b129054482556985446bb2721511178a4ef1346"
+    lessonContentHash: "19dcb5929f0321c14bbf905a43eef6350a53fad198b9b1d6c8d6858a8c6fbc44"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "openpyxl/05_셀서식과숫자포맷"
     identityLedgerRef: "identity-ledger/openpyxl.yml"
-    lessonContentHash: "992397056d99c1fd4dc78e1e426661f07f14f73d131a935ae81645ab06ac5158"
+    lessonContentHash: "aa566a8fca2c366cec077a030243afc353767cf9a61510ae13c811ecc45ec845"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "openpyxl/06_조건부서식"
     identityLedgerRef: "identity-ledger/openpyxl.yml"
-    lessonContentHash: "8b7be6e352dd5ff937002b57a15976fa1bd056bdac361f61d83974956d63a03c"
+    lessonContentHash: "1c474f283adfb4c6869b9eab02977f1b47b4f880abdb0aa638374501fb1b1b81"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "openpyxl/07_차트삽입"
     identityLedgerRef: "identity-ledger/openpyxl.yml"
-    lessonContentHash: "f27d290a4a0a6e340e8e0051bd9aeae9b46e57b89b853486257fdfaec276e632"
+    lessonContentHash: "a1e9667145325cfdb9e75b60fc5270a381a7b83e637c4d44c25743d57377a243"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "openpyxl/08_이미지와하이퍼링크"
     identityLedgerRef: "identity-ledger/openpyxl.yml"
-    lessonContentHash: "825deec80a6ba40f6ef44022cfd9cda2fe75e2f15557ff53332d2f0ac4991aca"
+    lessonContentHash: "ff581fe44291f60139b79b6d0ea14d3653ac7274d9805ab13644fa84c4964180"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "openpyxl/09_표와데이터검증"
     identityLedgerRef: "identity-ledger/openpyxl.yml"
-    lessonContentHash: "7b888bc74f4a28c5ae2e9ffb229cfa45e3d37ece82a831348afa1e1bd2ca9aa2"
+    lessonContentHash: "244eae4a2bcd1c47b49b10e8380d6362cf6bd6d2b8c9e1072e3f9b91d56101b9"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "openpyxl/10_월간매출리포트생성기"
     identityLedgerRef: "identity-ledger/openpyxl.yml"
-    lessonContentHash: "759fdc87b4bbeaf9de8706257f68830e78e5f9bcaf81d0b2a708c8706101f94a"
+    lessonContentHash: "e55dc179045ec780a9ec30c56e4a432c749a83a7b15a98a516695a23cff531fe"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -209,5 +239,8 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

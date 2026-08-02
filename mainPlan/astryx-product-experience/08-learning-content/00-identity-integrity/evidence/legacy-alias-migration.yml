@@ -1,5 +1,5 @@
 schemaVersion: 1
-state: draft
+state: approved
 canonicalIdentity: category/contentId
 migrationRowCount: 441
 categoryScopedCollisionCount: 0
@@ -2683,7 +2683,7 @@ migrations:
   globalCollisionRefs: []
   migrationDisposition: canonicalize-on-read
 review:
-  status: pending
-  reviewerId: null
-  reviewedAt: null
-  evidenceCommit: null
+  status: approved
+  reviewerId: curriculum-integrity-review
+  reviewedAt: '2026-08-02T13:06:47+09:00'
+  evidenceCommit: 22505301c65a9621c9e3321759115562ffa5e136

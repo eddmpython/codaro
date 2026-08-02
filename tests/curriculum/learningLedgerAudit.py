@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 import hashlib
 import json
 from pathlib import Path
+import re
 import subprocess
 from typing import Any
 
@@ -18,6 +19,7 @@ CONTENT_LEDGER_ROOT = IDENTITY_ROOT / "content-ledger"
 EVIDENCE_ROOT = IDENTITY_ROOT / "evidence"
 CURRICULA_ROOT = ROOT / "curricula/python"
 STRONG_CHECK_KINDS = {"output", "variable", "file", "table", "image", "behavior"}
+COMMIT_PATTERN = re.compile(r"[0-9a-f]{40}")
 
 
 def loadYaml(path: Path) -> dict[str, Any]:
@@ -77,6 +79,23 @@ def fileSha256(path: Path) -> str:
 
 def utcTimestamp() -> str:
     return datetime.now(UTC).isoformat(timespec="seconds")
+
+
+def hasValidReviewMetadata(row: dict[str, Any]) -> bool:
+    reviewerId = row.get("reviewerId")
+    reviewedAt = row.get("reviewedAt")
+    evidenceCommit = row.get("evidenceCommit")
+    if not isinstance(reviewerId, str) or not reviewerId.strip():
+        return False
+    if not isinstance(reviewedAt, str) or not reviewedAt.strip():
+        return False
+    if not isinstance(evidenceCommit, str) or COMMIT_PATTERN.fullmatch(evidenceCommit) is None:
+        return False
+    try:
+        parsed = datetime.fromisoformat(reviewedAt)
+    except ValueError:
+        return False
+    return parsed.tzinfo is not None and parsed.utcoffset() is not None
 
 
 def currentGitHead() -> str:

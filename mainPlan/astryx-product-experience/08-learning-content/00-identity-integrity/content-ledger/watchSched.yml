@@ -4,7 +4,7 @@ canonicalRows: 10
 lessons:
   - lessonRef: "watchSched/01_watchdog첫감시"
     identityLedgerRef: "identity-ledger/watchSched.yml"
-    lessonContentHash: "9a79227232299e2477bdd1e6aeacfdb982bd912412bedf81797380a36b9bd0fa"
+    lessonContentHash: "e484840c4baa89e7ec71f8ee84890497cd0f2e169ee0e1ffc4f011331d2abf6c"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation","systemMonitoring"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "watchSched/02_이벤트타입구분"
     identityLedgerRef: "identity-ledger/watchSched.yml"
-    lessonContentHash: "0a72f9f86a0cfbdac69565bd2d0c384c099d9f9d39293035f7d2b8ad6de260a6"
+    lessonContentHash: "0bf30f7bc552f56f172c6ba03fa4c75fe6bcb1cb711acd46d2e36c432e041adf"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation","systemMonitoring"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "watchSched/03_디바운스와안정화"
     identityLedgerRef: "identity-ledger/watchSched.yml"
-    lessonContentHash: "c522ea10bad9c744b8baf819fd9cd2fecdcbc098488a13656b0ccc5aa9741e02"
+    lessonContentHash: "29d6c07d3676ed1feb77addb6c243560b3b5cf799d429011121e196d54f8468a"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation","systemMonitoring"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "watchSched/04_재귀감시와필터"
     identityLedgerRef: "identity-ledger/watchSched.yml"
-    lessonContentHash: "af79997a9a7f902ad61a2a5d107bab0767dc4a839e5fa85bcb51ac975d2af7af"
+    lessonContentHash: "b4142d6416250a31e80ff13580e2b6bfce29088229ecf9fcf7f19c53db3d8a83"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation","systemMonitoring"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "watchSched/05_schedule간단스케줄"
     identityLedgerRef: "identity-ledger/watchSched.yml"
-    lessonContentHash: "e382d79925f7068aea509828f00f2c130ec906a77c27599b170f4971da003940"
+    lessonContentHash: "85d79d69ebcb05afdbfcfb135e10c3ffd85b0453b9482213eb81008efc892386"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "watchSched/06_APScheduler소개"
     identityLedgerRef: "identity-ledger/watchSched.yml"
-    lessonContentHash: "0490df37274a37ac052d4193597b7550b841b94950adc44e0f2b8c0b5d3ad625"
+    lessonContentHash: "5886c95bcfcdc5092ec3d14e4fec87c01ea276106ee18ec20f2e25c52ee92fde"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "watchSched/07_cron표현식"
     identityLedgerRef: "identity-ledger/watchSched.yml"
-    lessonContentHash: "df9b9e916cafc49f39e325a9697b1a9ba30cdfe4c9b192e0c905f16ca55602d7"
+    lessonContentHash: "a9695a321e8ec7f4bcef5bef57a540ba5053540e2dfeaf1726204ac622ea9ad9"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "watchSched/08_영속스케줄"
     identityLedgerRef: "identity-ledger/watchSched.yml"
-    lessonContentHash: "b2c6f1134c855265f3db138f6eeb75fe11354f7f8927197f7d37ef9fb182bc71"
+    lessonContentHash: "167803f70ce21eb6092972d17177d40410ab37c3805350667c5f6ef896e48ab7"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "watchSched/09_실패와재시도"
     identityLedgerRef: "identity-ledger/watchSched.yml"
-    lessonContentHash: "e166427f776eac2ad50128b0346e6c6c00c82ef468d50cdcecf66da26568cd75"
+    lessonContentHash: "deafd8124d2f78e072a1e397219d67ad34fd484aa97c20eaf3a93cbeefa4011b"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "watchSched/10_종합폴더감시리포터"
     identityLedgerRef: "identity-ledger/watchSched.yml"
-    lessonContentHash: "44f99d43bc8e7567bb51c3de59c7c56d380e9d632d21053570a473a21e9393a3"
+    lessonContentHash: "3bbee983443ba1661ace2ec1694dda1e41dea806dc2da9e152e18d3f291d455a"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation"]
@@ -190,5 +217,8 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

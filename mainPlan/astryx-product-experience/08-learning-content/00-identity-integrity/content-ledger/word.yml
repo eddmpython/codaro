@@ -19,11 +19,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "word/01_첫문서만들기"
     identityLedgerRef: "identity-ledger/word.yml"
-    lessonContentHash: "71a78aa7fb0e89f1b21935e2f7911577afc8f0963cf3bd127e1a2c9fec69270c"
+    lessonContentHash: "3d385d5ee235c02ba353ecbc3bd2199dd3b5db88fbd8a556c9dca1c98c3ba635"
     disposition: migrate
     ownerPacket: "07-remaining-domains/02-document-automation"
     eligiblePathIds: ["documentAutomation"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "word/02_제목과목록"
     identityLedgerRef: "identity-ledger/word.yml"
-    lessonContentHash: "b19f59beb12ea4281ae3b90e4748de44038d681b3e83785dbb85d9a696cc4c15"
+    lessonContentHash: "5acfcea47d2b989e6cefc988ed9694074d0ffc4d767413a872ca209fbd26e9e5"
     disposition: migrate
     ownerPacket: "07-remaining-domains/02-document-automation"
     eligiblePathIds: ["documentAutomation"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "word/03_텍스트스타일링"
     identityLedgerRef: "identity-ledger/word.yml"
-    lessonContentHash: "253199bc4a0b2e0d323244e01eaf1fed7f5310ef9f7a6ccee5e0e74449b066ba"
+    lessonContentHash: "57d8e4e6d11087c09d9dd5fb125662cd9fdf2b721a742b97f7ab5d81749e8c09"
     disposition: migrate
     ownerPacket: "07-remaining-domains/02-document-automation"
     eligiblePathIds: ["documentAutomation"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "word/04_표만들기"
     identityLedgerRef: "identity-ledger/word.yml"
-    lessonContentHash: "4aa5a100f0f4f95c5493ed98c251b7218c309d1ea4acc83d9c59dd85695a4614"
+    lessonContentHash: "996bb51bb3f6d7cd0b9ab621f398491bba5683c63afc01b04bf8a299ed3ca47b"
     disposition: migrate
     ownerPacket: "07-remaining-domains/02-document-automation"
     eligiblePathIds: ["documentAutomation"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "word/05_이미지와머리말"
     identityLedgerRef: "identity-ledger/word.yml"
-    lessonContentHash: "3c60f4e9b8d7ee528fb03aeac47ee9528dcc8aa3bf8701c60f06f8e916763726"
+    lessonContentHash: "3aee66a0acd96861a3782bff9b5fe0a3437789f7b1f8b57e1ff0d8ee1f5ef684"
     disposition: migrate
     ownerPacket: "07-remaining-domains/02-document-automation"
     eligiblePathIds: ["documentAutomation"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "word/06_스타일과페이지설정"
     identityLedgerRef: "identity-ledger/word.yml"
-    lessonContentHash: "b84c6d4f9d7326e50f30721ba7aecf65e49e31310d8953ab2614634fd549e7f5"
+    lessonContentHash: "31566adbb06330967201cd474891eca32092ad4e72244be72d0a43bb1ebf26ea"
     disposition: migrate
     ownerPacket: "07-remaining-domains/02-document-automation"
     eligiblePathIds: ["documentAutomation"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "word/07_기존문서수정"
     identityLedgerRef: "identity-ledger/word.yml"
-    lessonContentHash: "328a57a36eb61b65cb73c5a0c697687bed6710fd4cbf5f8b67e97dd6cf72da5c"
+    lessonContentHash: "71f217d01b0fa1c759c9510b77fb33618a5297e81ef3beeb7e32e910dbe16d4e"
     disposition: migrate
     ownerPacket: "07-remaining-domains/02-document-automation"
     eligiblePathIds: ["documentAutomation"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "word/08_mailmerge_csv기반"
     identityLedgerRef: "identity-ledger/word.yml"
-    lessonContentHash: "c64663241e898e8f2e78918daa29b554a61f0b87e9754dc2f18d0e0c3b001821"
+    lessonContentHash: "163af0f4f5d1309bc7f45c16e55ce666c9a4ef6865e2edc74b2d732eda4b473c"
     disposition: migrate
     ownerPacket: "07-remaining-domains/02-document-automation"
     eligiblePathIds: ["documentAutomation"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "word/09_docxtpl템플릿엔진"
     identityLedgerRef: "identity-ledger/word.yml"
-    lessonContentHash: "75b9f991e767db91ba0144b6c8fe0a5fbdadb73932bfaf031e5bd09fa368db16"
+    lessonContentHash: "cbbbfd60e6c62f72621a87f0429124b0602bf36b91552467e1d33449e3918b29"
     disposition: migrate
     ownerPacket: "07-remaining-domains/02-document-automation"
     eligiblePathIds: ["documentAutomation"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "word/10_회의록자동생성기"
     identityLedgerRef: "identity-ledger/word.yml"
-    lessonContentHash: "fd0e358c8b3b8c0be99bfe95c883eec434a7c776beb3299f456d366f93177ccd"
+    lessonContentHash: "f241543a0420c933ce2d3ec477621be394c278082fff985a03b71bae0aff051f"
     disposition: migrate
     ownerPacket: "07-remaining-domains/02-document-automation"
     eligiblePathIds: ["documentAutomation"]
@@ -209,5 +239,8 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

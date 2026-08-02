@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "numpy/00_NumPy소개"
     identityLedgerRef: "identity-ledger/numpy.yml"
-    lessonContentHash: "6c865ed5868a0e5c9fba4a129785d04635bce93b728ace65c25bdcbf26904a47"
+    lessonContentHash: "d534fa18d5d074802409085c907db3171257b237531d1162da2b81f61c0cc8aa"
     disposition: migrate
     ownerPacket: "07-remaining-domains/17-scientific-computing"
     eligiblePathIds: ["machineLearning","scientificComputing","statisticalAnalysis"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "numpy/01_포켓몬스탯분석"
     identityLedgerRef: "identity-ledger/numpy.yml"
-    lessonContentHash: "3c353baa592797196947e824ad12977780f580c161c735ff827376e92e155d15"
+    lessonContentHash: "99595883cffcce8458d5b458ac8864322ec973437df439c3906fbb7ba6fc0cf6"
     disposition: migrate
     ownerPacket: "07-remaining-domains/17-scientific-computing"
     eligiblePathIds: ["computerVision","deepLearningVision","machineLearning","scientificComputing"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "numpy/02_기온데이터탐색"
     identityLedgerRef: "identity-ledger/numpy.yml"
-    lessonContentHash: "0ba1cb99f05700587ce3c3ca878af0cde610fe566a619e528d821178ee98c871"
+    lessonContentHash: "b1949fc007c7a2449d97422440eab4e4ddc11995c00f5505c79767853fb30529"
     disposition: migrate
     ownerPacket: "07-remaining-domains/17-scientific-computing"
     eligiblePathIds: ["scientificComputing","statisticalAnalysis"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "numpy/03_지진발생패턴"
     identityLedgerRef: "identity-ledger/numpy.yml"
-    lessonContentHash: "171fac243ddd6dc55e3dcf3a907ac730fde06c8281ca6ed92ef3d89a2bd849a1"
+    lessonContentHash: "d31b3916a7234daf40eb3431a1d4999e5d252bf79aeb13a54a594c22b02db20c"
     disposition: migrate
     ownerPacket: "07-remaining-domains/17-scientific-computing"
     eligiblePathIds: ["scientificComputing","statisticalAnalysis"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "numpy/04_음악특성분석"
     identityLedgerRef: "identity-ledger/numpy.yml"
-    lessonContentHash: "1e5f2b6a34a21dcb625ae8a9c3b46f0a77bcd1857d51cac34dbf12206617b938"
+    lessonContentHash: "d060f6246bb367e4375163bb494a1cbcd8df04803a84118226a42d165fb1fe52"
     disposition: migrate
     ownerPacket: "07-remaining-domains/17-scientific-computing"
     eligiblePathIds: ["computerVision","deepLearningVision","machineLearning","scientificComputing","statisticalAnalysis"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "numpy/05_BMI계산기"
     identityLedgerRef: "identity-ledger/numpy.yml"
-    lessonContentHash: "4826349047d756519739e87e0f7a19fa23a1c1fbd81df6ae108413b8deb07584"
+    lessonContentHash: "8d88b1fc6949fab4888addb04599f194c2bfabfd2460ade17a1851b334738cd2"
     disposition: migrate
     ownerPacket: "07-remaining-domains/17-scientific-computing"
     eligiblePathIds: ["computerVision","deepLearningVision","machineLearning","scientificComputing"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "numpy/06_심장병위험분석"
     identityLedgerRef: "identity-ledger/numpy.yml"
-    lessonContentHash: "16f6794d090a3fc567f0732450e4c448b382dde3a95c0098fb82ae42aac69a8f"
+    lessonContentHash: "cbea59966aebc6cc53daeddcaccf2355d77eb67a601ac29b4d0eecc53aa53c8a"
     disposition: migrate
     ownerPacket: "07-remaining-domains/17-scientific-computing"
     eligiblePathIds: ["scientificComputing","statisticalAnalysis"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "numpy/07_대기질시계열"
     identityLedgerRef: "identity-ledger/numpy.yml"
-    lessonContentHash: "8d287e1c18cb779d8b5527926218968aa177d281c9bf65d4e5c45e8696444c40"
+    lessonContentHash: "3b4cdad6d18a1dc3142b5520ab2c58cea1508eee799ab93b1f7dcee467a43833"
     disposition: migrate
     ownerPacket: "07-remaining-domains/17-scientific-computing"
     eligiblePathIds: ["scientificComputing","statisticalAnalysis"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "numpy/08_행복지수국가비교"
     identityLedgerRef: "identity-ledger/numpy.yml"
-    lessonContentHash: "968d4d31953afe5bcef74030acf9b036d86defc4a2da3e4fe1550b71e2170eab"
+    lessonContentHash: "08dc5a424a5edcf198f6aef20407537c60fe86ee89ece80435bc95b7cc7f5865"
     disposition: migrate
     ownerPacket: "07-remaining-domains/17-scientific-computing"
     eligiblePathIds: ["scientificComputing","statisticalAnalysis"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "numpy/09_전복나이예측"
     identityLedgerRef: "identity-ledger/numpy.yml"
-    lessonContentHash: "0469fdf7fc652ef872c2ecf2cc2c0a26a32a4a23d630ca10f7e0b4fe9d936871"
+    lessonContentHash: "ec972010824325cf2a5c3e484e08fb1abe0e5dc05de8e289fefd8b94aef2c0c3"
     disposition: migrate
     ownerPacket: "07-remaining-domains/17-scientific-computing"
     eligiblePathIds: ["scientificComputing"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "numpy/10_당뇨병종합분석"
     identityLedgerRef: "identity-ledger/numpy.yml"
-    lessonContentHash: "a908e5c80850e0e69c18f5ef21c1d42d8be14dda81a7d9f14be3306a42e7c070"
+    lessonContentHash: "cbfc67f2cdcba0f89888db653056e1032056ca642f9a1394bddd49eb623d1119"
     disposition: migrate
     ownerPacket: "07-remaining-domains/17-scientific-computing"
     eligiblePathIds: ["scientificComputing","statisticalAnalysis"]
@@ -209,5 +239,8 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

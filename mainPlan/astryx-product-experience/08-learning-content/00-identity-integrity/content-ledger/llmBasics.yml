@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "llmBasics/00_LLM통합소개"
     identityLedgerRef: "identity-ledger/llmBasics.yml"
-    lessonContentHash: "82168bb73fac6a7f6bece3ccb147f39cdd1ca9287471593b1e9b081e14802e28"
+    lessonContentHash: "285f8fa342b42136d63717f85694ce019c8dcf3e0fcf8258d4ddbe6beb64a5cb"
     disposition: migrate
     ownerPacket: "07-remaining-domains/24-ai-integration"
     eligiblePathIds: ["aiIntegration"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "llmBasics/01_첫Claude호출"
     identityLedgerRef: "identity-ledger/llmBasics.yml"
-    lessonContentHash: "22626041211689227c1b0d040003c87b07d5ce18c602bd01f365159650550e5e"
+    lessonContentHash: "abc6d9a6569a9dd03fe401a6eb874a766d6c5aade9c8b735439a09f249f1abfc"
     disposition: migrate
     ownerPacket: "07-remaining-domains/24-ai-integration"
     eligiblePathIds: ["aiIntegration"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "llmBasics/02_시스템프롬프트역할부여"
     identityLedgerRef: "identity-ledger/llmBasics.yml"
-    lessonContentHash: "1ada47a67921cafcbd0f2e19bac396aca5786346852decbfe4ffbafc8929de4e"
+    lessonContentHash: "e96d98ec8107860d029c52cd25c95986a515eb3f3f74166ad0016f932129d058"
     disposition: migrate
     ownerPacket: "07-remaining-domains/24-ai-integration"
     eligiblePathIds: ["aiIntegration"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "llmBasics/03_멀티턴대화만들기"
     identityLedgerRef: "identity-ledger/llmBasics.yml"
-    lessonContentHash: "79dc4d829c7e5cce3e03f73a03d0275c2278f6b4f6dfbbb7923c39a5b83f5b56"
+    lessonContentHash: "581e37c8584ae956acd1a3295dbf540e9beb738125e223bddea44419f0c45f05"
     disposition: migrate
     ownerPacket: "07-remaining-domains/24-ai-integration"
     eligiblePathIds: ["aiIntegration"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "llmBasics/04_토큰과비용추적"
     identityLedgerRef: "identity-ledger/llmBasics.yml"
-    lessonContentHash: "9609ff01c9d45af6ea716f92905c325f606b7c84649c61508b1b35824dcf0944"
+    lessonContentHash: "1174959b14b39c664c44f4b3699a67f37888a7c6fba419eb9444da040b06773d"
     disposition: migrate
     ownerPacket: "07-remaining-domains/24-ai-integration"
     eligiblePathIds: ["aiIntegration"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "llmBasics/05_스트리밍응답"
     identityLedgerRef: "identity-ledger/llmBasics.yml"
-    lessonContentHash: "07768e6c2e3a4cc733c5c8cc18e412be1e8fec91b4e095ba4c11c93df5e6300d"
+    lessonContentHash: "38d0433502ce8866a3c6dd324b3c2443f68c1a7397234589f2ff3b5bee56de6d"
     disposition: migrate
     ownerPacket: "07-remaining-domains/24-ai-integration"
     eligiblePathIds: ["aiIntegration"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "llmBasics/06_JSON구조화출력"
     identityLedgerRef: "identity-ledger/llmBasics.yml"
-    lessonContentHash: "3f38e80a47aa79d3ef45989c14b188d30e2178f26a78b097adf64b57df324467"
+    lessonContentHash: "6ced9670d296b7b6364c46e4a7af227287bb27c1bdadb8667122bc7bfc67da40"
     disposition: migrate
     ownerPacket: "07-remaining-domains/24-ai-integration"
     eligiblePathIds: ["aiIntegration"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "llmBasics/07_프롬프트캐싱"
     identityLedgerRef: "identity-ledger/llmBasics.yml"
-    lessonContentHash: "c9cef985ac509e9795c2b946108bdc338742217ef424fe32e0ffca22d3fae31f"
+    lessonContentHash: "273c8981aa2c2d1abb64aa6f43ec9179a3cc574085f8dc6d60cc216de3b70556"
     disposition: migrate
     ownerPacket: "07-remaining-domains/24-ai-integration"
     eligiblePathIds: ["aiIntegration"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "llmBasics/08_도구사용기초"
     identityLedgerRef: "identity-ledger/llmBasics.yml"
-    lessonContentHash: "4672ccf12e6f34897654c0a3534b20fb0503b70a63bb698749236596fde6d3e0"
+    lessonContentHash: "0b3dd61f2f40c75513ac8e66dd0aec976c1aea5fa83bf186912fd9e2472fb0d6"
     disposition: migrate
     ownerPacket: "07-remaining-domains/24-ai-integration"
     eligiblePathIds: ["aiIntegration"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "llmBasics/09_멀티도구라우팅"
     identityLedgerRef: "identity-ledger/llmBasics.yml"
-    lessonContentHash: "c0c062a5f921be54e49c6599bc5ca16eff09cf21cceb3f7fe50a898a586706c1"
+    lessonContentHash: "61414d2e9d71331a353c47e7e8d0068c995168745fe34a21836292853d2e6733"
     disposition: migrate
     ownerPacket: "07-remaining-domains/24-ai-integration"
     eligiblePathIds: ["aiIntegration"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "llmBasics/10_데이터분석봇"
     identityLedgerRef: "identity-ledger/llmBasics.yml"
-    lessonContentHash: "c6b83f8aad3d593e37d38cbad5e1a9175670fb08888086e1105b78342410d064"
+    lessonContentHash: "81bf725d094b359a4b25c21e869af82483d398fe19aa2017f0d342407c30f0a4"
     disposition: migrate
     ownerPacket: "07-remaining-domains/24-ai-integration"
     eligiblePathIds: ["aiIntegration"]
@@ -209,5 +239,8 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

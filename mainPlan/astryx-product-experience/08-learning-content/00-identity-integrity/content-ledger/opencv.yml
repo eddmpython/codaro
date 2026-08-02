@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "opencv/00_OpenCV소개"
     identityLedgerRef: "identity-ledger/opencv.yml"
-    lessonContentHash: "4690370b4b9c32c1ea4238a8c05560431a73be86f98d7da891f56d74ae077cde"
+    lessonContentHash: "232874d9cd31c28766c78fa7dedc4ca0b1ef3d82b5dfa0df1d40703b5cd8f647"
     disposition: migrate
     ownerPacket: "07-remaining-domains/12-computer-vision"
     eligiblePathIds: ["computerVision","deepLearningVision","visionAdvanced","visionAutomation"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "opencv/01_이미지구조탐색기"
     identityLedgerRef: "identity-ledger/opencv.yml"
-    lessonContentHash: "b07a06f4ce71becab687248831705a83cf59dfee9a5133f7e5ebeb86cd55d88e"
+    lessonContentHash: "46fd94b7ae9819c3812b9e57a8929cf7907bb6033cb57b59efbce5e93d77f298"
     disposition: migrate
     ownerPacket: "07-remaining-domains/12-computer-vision"
     eligiblePathIds: ["computerVision","deepLearningVision","visionAdvanced","visionAutomation"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "opencv/02_색공간변환기"
     identityLedgerRef: "identity-ledger/opencv.yml"
-    lessonContentHash: "e2f19595c0027a204e5ad212cc71df9ca58b42c865ffc8c531fb02d4e90e86f6"
+    lessonContentHash: "1c2206560184f8839881c73db1610472fb1f58b1c416133e239bf2fe4457e0b7"
     disposition: migrate
     ownerPacket: "07-remaining-domains/12-computer-vision"
     eligiblePathIds: ["computerVision","deepLearningVision","visionAdvanced","visionAutomation"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "opencv/03_기하학적변환기"
     identityLedgerRef: "identity-ledger/opencv.yml"
-    lessonContentHash: "c3b41755bb6a642a9cf0f92495873840f93e32048d2a059d11db157480cb4faa"
+    lessonContentHash: "41af536f66a5764c3eb30b80a8ceb169a024c151717697c0eb9a716f4888bf67"
     disposition: migrate
     ownerPacket: "07-remaining-domains/12-computer-vision"
     eligiblePathIds: ["computerVision","deepLearningVision","visionAdvanced","visionAutomation"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "opencv/04_이미지필터랩"
     identityLedgerRef: "identity-ledger/opencv.yml"
-    lessonContentHash: "6aa4c1ea796f1d586abe0a4873dc3f3ad65d2cccace570ad2d5cb7c3b54b9be8"
+    lessonContentHash: "c28f116bf96cb8e64326b41cc048c9bcbc332c5319760714e51d31577eb3bc37"
     disposition: migrate
     ownerPacket: "07-remaining-domains/12-computer-vision"
     eligiblePathIds: ["computerVision"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "opencv/05_에지검출기"
     identityLedgerRef: "identity-ledger/opencv.yml"
-    lessonContentHash: "26b8a630147fd36afac7b06ecaec22df18c1b8db5c41836c1d075ec99787c044"
+    lessonContentHash: "0a6c260a952381cc2e49f63b0bb8383da71a8c69fd8c798090d153c3a6069a48"
     disposition: migrate
     ownerPacket: "07-remaining-domains/12-computer-vision"
     eligiblePathIds: ["computerVision"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "opencv/06_이진화스튜디오"
     identityLedgerRef: "identity-ledger/opencv.yml"
-    lessonContentHash: "b40470475dd66ca0fcd16e53242ef3b0715f8986413b5834bb19e05d52a3c9df"
+    lessonContentHash: "ade81fcb6da073aeff44d7d5f8e2e2024a447f2cefb8afd3a1df7bdc9bfbf00e"
     disposition: migrate
     ownerPacket: "07-remaining-domains/12-computer-vision"
     eligiblePathIds: ["computerVision"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "opencv/07_모폴로지연산기"
     identityLedgerRef: "identity-ledger/opencv.yml"
-    lessonContentHash: "e611645f7d146de616408c50b725e6a5505dad01099434bb85a2f4fcc9ea919b"
+    lessonContentHash: "904f72eda4f7bc040697e756257bc48b1b543c7452567f7c04d6b0a379991767"
     disposition: migrate
     ownerPacket: "07-remaining-domains/12-computer-vision"
     eligiblePathIds: ["computerVision"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "opencv/08_히스토그램분석기"
     identityLedgerRef: "identity-ledger/opencv.yml"
-    lessonContentHash: "b284b02dd460ec9a90ef7ab78ef0995625527546280c5c950ab862bc8c26aa20"
+    lessonContentHash: "abdc095c73b99276291ff265de0802e4659d4ee1c798da2e8f9fa1199ee56db3"
     disposition: migrate
     ownerPacket: "07-remaining-domains/12-computer-vision"
     eligiblePathIds: ["computerVision","visionAdvanced","visionAutomation"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "opencv/09_컨투어탐지기"
     identityLedgerRef: "identity-ledger/opencv.yml"
-    lessonContentHash: "4388688d592db8050fda09c7c5a3ad863b0fd6c30c72b1318b80e7eb355f5070"
+    lessonContentHash: "9bebfde39bcd636be1bc079898536d18ce8739e84739c179a95ba4bd80d33602"
     disposition: migrate
     ownerPacket: "07-remaining-domains/12-computer-vision"
     eligiblePathIds: ["computerVision","visionAdvanced","visionAutomation"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "opencv/10_종합비전프로젝트"
     identityLedgerRef: "identity-ledger/opencv.yml"
-    lessonContentHash: "eedb9a9a7478cb37f35307e7dbc753511492407cfcec9e75b807f3539e6371b0"
+    lessonContentHash: "85cfec207c3093fa19e1cb3409459933529eaa0bdb19e955c5edecdce0109508"
     disposition: migrate
     ownerPacket: "07-remaining-domains/12-computer-vision"
     eligiblePathIds: ["computerVision"]
@@ -209,5 +239,8 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "seaborn/00_Seaborn소개"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "41323c0aa1c1f71c968343592e10ab041a68b581130dea460920c6838f1d52fc"
+    lessonContentHash: "e08f42e8b0103ec20625c6586808e912c956255216155f7a83999766bc04ce5f"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "seaborn/01_붓꽃품종산점도"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "896c8ce3c04180d91612c2f7b53cc6828c60d3e9fa1dbabb916a747a7df5a07d"
+    lessonContentHash: "000548ff1d711ae3b28c1e8ffc47bdaa7b74d635e67937551312fb2fe5ff759c"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "seaborn/02_팁데이터분포탐색"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "6982ae4a8318f60d9352dde1433440d434a1e67548f451cfe36d438687d70523"
+    lessonContentHash: "96f092979e9afe80170952da0c81d4b26951c38c8d67c3f6b0b35ac098eff8f8"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "seaborn/03_펭귄체중분포비교"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "75a83bf622e5ef579d3528ac17cffb4331d87b200e697f1165ba01bd832973ab"
+    lessonContentHash: "190edd155a9c12df285bdc27e0f3217dad66021be043578867796a2fdcad24db"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "seaborn/04_광고비판매액회귀"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "88b91b357d407f52be7e1bd917f7d216034106ec0f4c6f0d809658aa94e56309"
+    lessonContentHash: "97769c800be21e908a7511267e9d4ce2d5f70aa0b2bb9f44362ebf6fd0cafae6"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "seaborn/05_타이타닉생존분석"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "2e9fae0b47c87dfca7ed566f169da659ea680e448f22acdc8fcfc490c40aad5e"
+    lessonContentHash: "8bf2c40ae03b218ac83df299dfbe776ef7cd5a442b56e92327605091e0079494"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "seaborn/06_항공편승객시계열"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "c23b78762ded8584fa11edcd1073eda858414431b14a0c70569de046c0860cf9"
+    lessonContentHash: "5887b9d04c3519115d8f0aaf8c78584e6470cb1a41b65560509d7bc0779471e8"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "seaborn/07_세계기대수명분석"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "50aa52b5302360d04186418a79e5ba887343dcd2ae3a77ea0656f6b7d5514ed0"
+    lessonContentHash: "6ed2347e5da16a2f98c1f68e8419a5cc9efec5388933a30237b61f2c5dcdd2fd"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "seaborn/08_다이아몬드가격분석"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "a9249051e065c1750572e5d86df1b15fc8b5330a81113a0401ecf30c8a24674b"
+    lessonContentHash: "928ff74f6ddffafa72f44ad058ebe1979c91b3e1398183e517db5111c1d1f187"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "seaborn/09_자동차연비종합분석"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "9ac06fb3d240d385be0898dadfc567c1bbed6e2f384a0ca459b8d357c83265c4"
+    lessonContentHash: "589e80df7c0d2e51eaeaa0096f9e35515b56b817547df9e4c6fbf17a4de2e69d"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "seaborn/10_종합EDA리포트"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "d5a41c82bf05f09838c914cac1fb993fe3fefee5694d270b103e2eeb15050757"
+    lessonContentHash: "b1e6554a1615a2281c04ded321407a04b08261dd4fcc1585cc6dac23048763de"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -209,5 +239,8 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

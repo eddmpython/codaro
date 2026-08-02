@@ -4,7 +4,7 @@ canonicalRows: 10
 lessons:
   - lessonRef: "visionApps/01_문서스캐너"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "24abb78850fc1c2aaaa27f393c8afadb94f45795befa71f9df81c70ed453c729"
+    lessonContentHash: "b55e9086d11679dcddab17f985cf679eb94e48ad0680125a7dec6194637f8a21"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionApps/02_QR바코드리더"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "f4d5dbd967b63536aa12911c4b598841c3b07bebe37a62a4d24da32436ccf774"
+    lessonContentHash: "9f261a45a66c8464f91d7be15bebaab2299e313fb7da45775259aa231c6698cc"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionApps/03_OCR기초"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "2cb63e908f906cc1e66f5c4a7006459c96dee938f280bac4cabcfeb886fffe2d"
+    lessonContentHash: "36e8703a63e9394abb3e139e03d001f25f4b790d577f5afc550166c578c6638c"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionApps/04_한국어OCR"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "44d7fd6c812e51ccec0984ef94b8dbb39a63e604c39d84a5461e229e2585ae4d"
+    lessonContentHash: "af97cecf54e204930acf174126d4bfcb20aa66fea331983c213a58a8f74345ea"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionApps/05_얼굴검출모자이크"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "b12d5adf07947af45dc3f400294bce179b19bac2cda5b61ddda5d0514a998be1"
+    lessonContentHash: "71e0259358b6a6a9bb22eb3b78e50ecbb4b87f1c43f120bd6f142eecf2aa099e"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionApps/06_얼굴임베딩비교"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "c6a72d97069bf825f8da2a51574621094c5616153e9d930f86efeddd1bfd545d"
+    lessonContentHash: "cfa39ee5cee061aee973fb0c01d3333e52b3327cda5019bb8ba060481b6fe46a"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionApps/07_이미지중복검출"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "9692e29dba93bb4c1f49a59597bd3d2a5737f138f9afca07f20b1cd4abafae4f"
+    lessonContentHash: "8bd4d219ebbb9bb4fb6328a3ab894ae8e168dc8b6b51c8d9fa67b50eb0398a0f"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionApps/08_영상자동썸네일"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "802e8e1e2253e5c3b508f08e1f3c30ba149d86f68d8025abbc088b09904b3470"
+    lessonContentHash: "3508e9473ec9ebfcf7fdc1c3b801226b7f1b57569ec5349c4091f4dfeafc04c9"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionApps/09_화면캡처분석"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "43ca7318774a55d8ec345e5bf9de3ada5bbd05d0c2ed3d121c55d0de4deaf793"
+    lessonContentHash: "ccd36ebe766928fee52f8ab4f3caa836b4a12fb02e4a5f1c2e5f4114dc2f8fc9"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionApps/10_종합사진정리기"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "a4f3fa1a269b5a79ea853b35448693742972aa0d55ab2665482d08c8a099bf37"
+    lessonContentHash: "f9b1b2a35ce19ff7e83fd476adc8761ee386c7d11883a515d435ef0d2355f243"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]
@@ -190,5 +217,8 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

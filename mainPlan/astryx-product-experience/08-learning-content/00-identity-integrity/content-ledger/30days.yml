@@ -4,7 +4,7 @@ canonicalRows: 30
 lessons:
   - lessonRef: "30days/day01_헬로월드"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "5603b040d0f79a837df621361a4c381eb96d1ef4567096c4317fadc8dbbacaac"
+    lessonContentHash: "ca9c47135fcebe520b2e96845adc9b3d88684562bac01a6865f91cfce1da2c3c"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day02_변수와데이터타입"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "d2b819b24efc2feda35680a8f6acfb70c8944b3610e97475a3c8349df45b7ca5"
+    lessonContentHash: "4db1b198d1db612a87b72fa322a28b5cdff2aac207fc053272ba2799fe5b5fa7"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["computerVision","dataReporting","dataVisualization","geoVisualization","imageProcessing","officeAutomation","pythonFoundation","scriptingAutomation","sqlAnalysis","webMonitoring"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day03_연산자"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "808cc28f38117f47a24fe2ed4e8cf81fe16d51a5af15080f43cba011a0af7abf"
+    lessonContentHash: "20a31607802af577321dc40ce8b9580cf17ffd376563e40aa7e1270eccc1489d"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day04_문자열기초"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "15b0d62b2cbab8d4928bc042532b4f6217dd0579f2a741c26e822b46f4510316"
+    lessonContentHash: "8dc6c22ba36801c95c0cb2b6a016935927ab1414be85f5006041ff45648cd8eb"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation","textProcessing"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day05_문자열인덱싱슬라이싱"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "338dfe86065d3a77f4fb24b9743e661835f2ea5a51ac84db9419082ede435dda"
+    lessonContentHash: "065c5a969e9503d2252bc6032f253eff3de6ff3cbccd1ae36caeb3b8425db78b"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation","textProcessing"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day06_문자열메서드"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "83eb660e3d65164dd3cf3285f4a6fb3b32985e56c4639b783e933f67e9a98a36"
+    lessonContentHash: "166e3104834d5f28afe716f707b127b3acad373bbc2a0c69a6c8312cc8f729ba"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation","textProcessing"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day07_리스트기초"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "6dd516d82d2cb430456af4e80c9341978e4af6601169ec8325f98e15492290cc"
+    lessonContentHash: "0514cd5cec332b7f9905c9967af01caa2a90a1ae178199242c8b106ad89a7689"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day08_리스트메서드"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "97169d2f8b172f77424ce7f2dbc18a1870531559c1e06cd26c5f98a84ad58daa"
+    lessonContentHash: "79d1d35655405ee9ca9e12b67cd3d258dbdea693a2792277be76d545de0ba3e9"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day09_튜플"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "bef088b1a9dffcf464b5e4cf19fca60d1493731fa12ff0ce5ec8bd47d2ca9849"
+    lessonContentHash: "57b4a8b9acb3a58183762fe7e04b2de68c4b6db3481f5e28ce94665af23c5ac6"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day10_집합"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "5bac6babca94506dfeac82d363f8ce528270fddbe5ff26cf9d758e863390712e"
+    lessonContentHash: "ebf2d2c63e937135492e773ce7221fe676d2ee80dc5c7c6999f940da79219ecb"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day11_딕셔너리기초"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "de5e1a73b12ac2bc8082f82268a4e0245a05de75d9be5e5daa65580ad9a2a001"
+    lessonContentHash: "301b37138f7fd0a0ff287fd0df20cc214ff320d5851246d5f60ed1a5f2b4467b"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -209,11 +239,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day12_딕셔너리메서드"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "a30c89eac30d77d28a764faf0816e465d5af689a94dc7524eebb306f4f894526"
+    lessonContentHash: "ebe99241184e1f1d1a3c9a3fe5f701771e7d5f06e3692e3fcbb8da9dd77e47e3"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -228,11 +261,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day13_조건문"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "34a8556afae84ebd0ad8f206715b77d0d25d6fc61256a66576ae93ac53169281"
+    lessonContentHash: "69b50de374b7885aa53d65b4d641ee56b08154bc046ba037fd6e1881418abeb0"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["dataReporting","dataVisualization","officeAutomation","pythonFoundation","scriptingAutomation","webMonitoring"]
@@ -247,11 +283,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day14_반복문"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "5244d4302335658f607e9df7b1150f65ba43982bf030c162e5746a482402be64"
+    lessonContentHash: "c4b64bf53cf1401bdec5f4ddc98b07aff6e2641dd6e60cc90a6c4a5ee01025e2"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["dataReporting","dataVisualization","officeAutomation","pythonFoundation","scriptingAutomation","webMonitoring"]
@@ -266,11 +305,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day15_함수기초"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "63a4936bfc71909ca180134ebed87c84669845cea0dea14bacdea0aec80c50da"
+    lessonContentHash: "92dd7d74370e9dc46632b961623291cf5762ecef9bb79ce3596ba4beda2dcc00"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["aiIntegration","dataReporting","desktopAutomation","documentAutomation","emailAutomation","graphAnalysis","machineLearning","officeAutomation","pdfAutomation","pythonFoundation","scriptingAutomation","standardLibraryMastery","webMonitoring"]
@@ -285,11 +327,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day16_함수고급"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "8795e5782ea6fa30d672b42d5de62749d8fd3f775661a072da42f525413e36d9"
+    lessonContentHash: "7abae493204ca84a3339910c712cc0b030c5e740394515f1ce73ca5ff25c76fc"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["aiIntegration","dataReporting","desktopAutomation","documentAutomation","emailAutomation","graphAnalysis","machineLearning","officeAutomation","pdfAutomation","pythonFoundation","scriptingAutomation","standardLibraryMastery","webMonitoring"]
@@ -304,11 +349,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day17_스코프와클로저"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "6eb9e81c9834c5d51ec1191e3d8f9374a4f82a680a48ad3ec47fa945bd841cb9"
+    lessonContentHash: "0d85d5e06882508ac5ec73727cc47567315f44824ff80e9d5f608fd6cb26603c"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["aiIntegration","dataReporting","desktopAutomation","documentAutomation","emailAutomation","graphAnalysis","machineLearning","officeAutomation","pdfAutomation","pythonFoundation","scriptingAutomation","standardLibraryMastery","webMonitoring"]
@@ -323,11 +371,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day18_모듈과import"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "3f3543772db43f21d786fdfaa9a465b24837de0199dd9d63db8e913d726d1f3f"
+    lessonContentHash: "b1558c272fdee81a05c75c6eb5b81612059954423884d85e2eb8a2e1144c3327"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["aiIntegration","documentAutomation","emailAutomation","fileAutomation","imageProcessing","officeAutomation","pdfAutomation","pythonFoundation","scriptingAutomation","standardLibraryMastery"]
@@ -342,11 +393,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day19_파일입출력"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "5575d260403c92bae2c96dc0e6b1b5cc9747223047d2d77190c944331ec3b0cc"
+    lessonContentHash: "5a5c3e0afe93f45cabd661e356d11406c74b2d16aa8f099341ea5f9f5eda0171"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["aiIntegration","documentAutomation","emailAutomation","fileAutomation","imageProcessing","officeAutomation","pdfAutomation","pythonFoundation","scriptingAutomation","standardLibraryMastery"]
@@ -361,11 +415,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day20_예외처리"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "877c43e5a095b205ebe053aaac95384efc091991e7155ce92aaab54d71b85b67"
+    lessonContentHash: "82a95598fccd6cbbd9a3f613f0804ddfde74dba70eb8e3b7e706dae416cfc2ff"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["aiIntegration","desktopAutomation","emailAutomation","pdfAutomation","pythonFoundation","scriptingAutomation","systemMonitoring"]
@@ -380,11 +437,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day21_중간종합복습"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "751fd3b9a8e3de718757dd8633620f0056dabdff18980632baada34865f2e4a8"
+    lessonContentHash: "492cae1be777a63314552edbd4c41252079c643dbb387c7eae04fc15649585c8"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -399,11 +459,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day22_클래스기초"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "798532db07865d4ad280f3c2b69dc6d4af5e5536817edbe5e7bd276560c882de"
+    lessonContentHash: "80d1e5f75649c2bee9134a9fdc10d1190f723b971d9c9f34221ca91e475cbbf7"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["dataContracts","pythonFoundation"]
@@ -418,11 +481,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day23_클래스고급"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "f636c4bab9dd9c8af3b2ffeae06291512c0aad0f5e9cc2ce1ed13c4b4808fcb7"
+    lessonContentHash: "2646998f9a6baa9c290915131d6657fc833aa666d099c03141e9862cdd1bee0b"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["dataContracts","pythonFoundation"]
@@ -437,11 +503,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day24_특수메서드"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "010558931063ffea5a39d574c0fb21d31a3ae0c7ac90dc6f3d3d1885cc8c3cb9"
+    lessonContentHash: "ddadbf9f1c1349ccff4aa729f249f654a58a14b2dd6527a2d843b148a833f385"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["dataContracts","pythonFoundation"]
@@ -456,11 +525,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day25_프로퍼티와데코레이터"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "4f078aea50c48e3454b06a45e0c62cb66e1f85245a6854d2f83b5e465515337b"
+    lessonContentHash: "4c00f0185c34544a63e54964441cf2aacca52b33aa77eab3ae25f9b2d25e49e5"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -475,11 +547,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day26_컴프리헨션"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "6b329fde0c981bbe44d960f0c50c9c3b2579197b7f1556f4d571caeaed3ba6ff"
+    lessonContentHash: "5715b17098209dc88df74d8b06d67b3245a5afe6b9f12246a4c8d388f56b79f7"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -494,11 +569,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day27_제너레이터와이터레이터"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "aa9094ced2a5fa800edbacdbdabce1930fed329f98cdf183f18501992103947c"
+    lessonContentHash: "855a7e5153e72180d4d0d286823f30c2751878f63253a2a2a21de7aacf183046"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -513,11 +591,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day28_고급문법종합"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "a5f5bab6adfa9e73623969a0d20ec782db0a0c14f37a166057fbf8156440fac1"
+    lessonContentHash: "54bdaabc2ce0a21f8ac962a6eaec4da15f6543da8d9cf8278d5dd6b974f0ca2f"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -532,11 +613,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day29_알고리즘연습"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "b2c9d16b5ea95199c69c14a6ee0c3590615fce2bb1c0ce82ae2b002f8294b52f"
+    lessonContentHash: "1c668cebd3ad87f7ae5efa587833ff54b3274b9f01cec4b179d33d0e2549afa4"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -551,11 +635,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day30_최종프로젝트"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "9154961941736442aa2d13fcccb0f779982faf6ea20c4b7a36e19a52d1ba442f"
+    lessonContentHash: "571aac522e94537482b4b55aae23caf7343421716378d30715dfee8d3cbf89e6"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -570,5 +657,8 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

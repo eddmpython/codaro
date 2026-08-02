@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "sklearn/00_sklearn소개"
     identityLedgerRef: "identity-ledger/sklearn.yml"
-    lessonContentHash: "3cd24ae818e7af118e6458f7642e726f333bfada470e72d9d28dd4f36b418e52"
+    lessonContentHash: "63538d7660c2c07ae490af74c206b637de1e1865938aa5163b55b752ee4cbf5f"
     disposition: migrate
     ownerPacket: "07-remaining-domains/08-machine-learning"
     eligiblePathIds: ["machineLearning"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "sklearn/01_와인품질분류"
     identityLedgerRef: "identity-ledger/sklearn.yml"
-    lessonContentHash: "537ea1400cc98f5353233e1a2b64af0221c712182ee1a5b38af5481f79bf8058"
+    lessonContentHash: "f1b3e47dffed088785b765c49ad2476cd14befb4dc62100023534d16025a8b1c"
     disposition: migrate
     ownerPacket: "07-remaining-domains/08-machine-learning"
     eligiblePathIds: ["machineLearning"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "sklearn/02_유방암진단"
     identityLedgerRef: "identity-ledger/sklearn.yml"
-    lessonContentHash: "c6c2791f2ebf22af6bbfa3cc851ac74abc10fce26f406870d56da6a8192d9d87"
+    lessonContentHash: "7902d15c3191f6d20f2f32c42be8a0fd9c2ff11bb85be925ffa2e4818df39032"
     disposition: migrate
     ownerPacket: "07-remaining-domains/08-machine-learning"
     eligiblePathIds: ["machineLearning"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "sklearn/03_당뇨병진행도예측"
     identityLedgerRef: "identity-ledger/sklearn.yml"
-    lessonContentHash: "1e96d1b272130d1234ff1f5fbecfa43a0f3f50dd663f4acc401b8eb1d2e71971"
+    lessonContentHash: "8de701e924769b6f4690438501d7d4bc6caa6b5fcb523bba231d606a333a7f86"
     disposition: migrate
     ownerPacket: "07-remaining-domains/08-machine-learning"
     eligiblePathIds: ["machineLearning"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "sklearn/04_주택가격예측"
     identityLedgerRef: "identity-ledger/sklearn.yml"
-    lessonContentHash: "48f265286bd29e61d188959b67337a0c9e930560593a7f9deb418e06b4a0553c"
+    lessonContentHash: "09dd5487ca039d7adc73d7974cf27d1972e4557b8081f1810abd7dd4da0baf29"
     disposition: migrate
     ownerPacket: "07-remaining-domains/08-machine-learning"
     eligiblePathIds: ["machineLearning"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "sklearn/05_손글씨숫자인식"
     identityLedgerRef: "identity-ledger/sklearn.yml"
-    lessonContentHash: "24a95c6a81dc776513c3615e9d18a11761d10022515cba982a17ccd4e4bb562d"
+    lessonContentHash: "4a7c6d0bd0804c96cce0da510ccce5581feff7a11fbcfc8d100d06831f10d3b9"
     disposition: migrate
     ownerPacket: "07-remaining-domains/08-machine-learning"
     eligiblePathIds: ["machineLearning"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "sklearn/06_고객세분화"
     identityLedgerRef: "identity-ledger/sklearn.yml"
-    lessonContentHash: "748c3bf8a27493dae1b08166686292ca3790df043087d18cb751c0020bbabf5f"
+    lessonContentHash: "4e2d77eea59f1b6273ab8b802a2e02fec5ccb578c81805e205c7de7f4a217200"
     disposition: migrate
     ownerPacket: "07-remaining-domains/08-machine-learning"
     eligiblePathIds: ["machineLearning"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "sklearn/07_소나신호분류"
     identityLedgerRef: "identity-ledger/sklearn.yml"
-    lessonContentHash: "912851d558a81b094e496138d3e277b41fe7bb95810ffe76c3bd083b6baa0a09"
+    lessonContentHash: "e9c1feb50b3804f73d8d91bed3ef2fd05b1c9b44998322d07cd52221db042b30"
     disposition: migrate
     ownerPacket: "07-remaining-domains/08-machine-learning"
     eligiblePathIds: ["machineLearning"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "sklearn/08_심장병예측"
     identityLedgerRef: "identity-ledger/sklearn.yml"
-    lessonContentHash: "b040c8bcf8ede9c917cd472c28693fbe9de847aa5795b1ab66a1d6297f98a9e3"
+    lessonContentHash: "57ab08d8a93335ebbe4f507170c289d64cc1cac5060979fc4c00e724bfb8ed50"
     disposition: migrate
     ownerPacket: "07-remaining-domains/08-machine-learning"
     eligiblePathIds: ["machineLearning"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "sklearn/09_신호탐지최적화"
     identityLedgerRef: "identity-ledger/sklearn.yml"
-    lessonContentHash: "80abdbb39156ca2c0072db62e2f90107133a9e5a51b16d38c74d3cb5a1592ca2"
+    lessonContentHash: "453f7d3a92d8bd0cdcbe9c29cd4b39d9074b95a47cd6ffb53d5f8f736bfb1577"
     disposition: migrate
     ownerPacket: "07-remaining-domains/08-machine-learning"
     eligiblePathIds: ["machineLearning"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "sklearn/10_종합ML파이프라인"
     identityLedgerRef: "identity-ledger/sklearn.yml"
-    lessonContentHash: "0d15610f09c99b601a96f38cf98a02b8c1243dfa7877576c1086ed97f4665dfc"
+    lessonContentHash: "d96928f02acc6edc63d4d25da534bfcdca18fe3b75961d8c5dde6a48f63f1b91"
     disposition: migrate
     ownerPacket: "07-remaining-domains/08-machine-learning"
     eligiblePathIds: ["machineLearning"]
@@ -209,5 +239,8 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

@@ -4,7 +4,7 @@ canonicalRows: 5
 lessons:
   - lessonRef: "requests/00_requests소개"
     identityLedgerRef: "identity-ledger/requests.yml"
-    lessonContentHash: "093992f4bf555687d8d62422fe3e8417f2a39a58b8bec5b4fa172ef022c65e9a"
+    lessonContentHash: "3719129bf41754f1b588cc91d4ecac4c2e11af568f23afda8802338ca086368e"
     disposition: migrate
     ownerPacket: "07-remaining-domains/03-scripting-automation"
     eligiblePathIds: ["scriptingAutomation"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "requests/01_첫GET요청"
     identityLedgerRef: "identity-ledger/requests.yml"
-    lessonContentHash: "77fd612cd7895743a72d9b384dc5591a35c69cc72295bdf67f10223c94b0641c"
+    lessonContentHash: "f113733064a2752ac9c72f9c51f558bbdae38d2319f7ea09cdb88fc41513f8c5"
     disposition: migrate
     ownerPacket: "07-remaining-domains/03-scripting-automation"
     eligiblePathIds: ["scriptingAutomation"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "requests/11_사업자등록상태조회"
     identityLedgerRef: "identity-ledger/requests.yml"
-    lessonContentHash: "29548a6d0bd68fafac0d4214fdccdd44585ce4564909364b2821e4b15a4bedfa"
+    lessonContentHash: "b0fd1054b7d00c5339dd1f7bef3848bf0b25abd4effc1d3cb4879577013941bc"
     disposition: migrate
     ownerPacket: "07-remaining-domains/03-scripting-automation"
     eligiblePathIds: ["scriptingAutomation"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "requests/12_공휴일영업일계산"
     identityLedgerRef: "identity-ledger/requests.yml"
-    lessonContentHash: "6cf895e953c8dd36962296d37ea0ac1a47aad5a8c29a37fba6f9a71c47d85456"
+    lessonContentHash: "a6534e1aec96b6eb6de26e8c2da1ad451d70acde7df0717721752e48d00aaf19"
     disposition: migrate
     ownerPacket: "07-remaining-domains/03-scripting-automation"
     eligiblePathIds: ["scriptingAutomation"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "requests/13_환율조회환산"
     identityLedgerRef: "identity-ledger/requests.yml"
-    lessonContentHash: "bea9172ad563bb9131ee52f75ca8af85963b5697ad9f9d8774077a13041307aa"
+    lessonContentHash: "8dd24c3ec6b68e07dc267817b06d8c17171d116f90f97ce33f77ee5065a7279b"
     disposition: migrate
     ownerPacket: "07-remaining-domains/03-scripting-automation"
     eligiblePathIds: ["scriptingAutomation"]
@@ -95,5 +107,8 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

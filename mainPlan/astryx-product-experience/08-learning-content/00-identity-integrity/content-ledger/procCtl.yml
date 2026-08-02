@@ -4,7 +4,7 @@ canonicalRows: 10
 lessons:
   - lessonRef: "procCtl/01_subprocess기초"
     identityLedgerRef: "identity-ledger/procCtl.yml"
-    lessonContentHash: "4830379d175fc27f0d5c16db1be05f40e838ddb4ac18e02d9888d76e51172b3f"
+    lessonContentHash: "3a1accbc1c8b42345b4b3768b452565db79e608196bb5602d38c96d257fcfc2c"
     disposition: migrate
     ownerPacket: "07-remaining-domains/22-system-monitoring"
     eligiblePathIds: ["scriptingAutomation","systemMonitoring"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "procCtl/02_인자전달과인용"
     identityLedgerRef: "identity-ledger/procCtl.yml"
-    lessonContentHash: "a212be3e45b79bb34e0e497556b258559d831b003f68ef7ad346a55c556b05a5"
+    lessonContentHash: "21cd43aea91634528b089fa011f73bbe2016540b6a86c021447441115715be90"
     disposition: migrate
     ownerPacket: "07-remaining-domains/22-system-monitoring"
     eligiblePathIds: ["scriptingAutomation","systemMonitoring"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "procCtl/03_타임아웃과예외"
     identityLedgerRef: "identity-ledger/procCtl.yml"
-    lessonContentHash: "04caff394e26ee953fcfb6634a72df563cf6e3bafe99e72429624e912869a832"
+    lessonContentHash: "e199ed2f7273d0e2b008f705b2d33d0ff794d1828c40e5068c88372dc36a272a"
     disposition: migrate
     ownerPacket: "07-remaining-domains/22-system-monitoring"
     eligiblePathIds: ["scriptingAutomation","systemMonitoring"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "procCtl/04_파이프와스트리밍"
     identityLedgerRef: "identity-ledger/procCtl.yml"
-    lessonContentHash: "50c3236c005c0b2504e5f78de72eb7705cb8640a0de19fe7ef630d0b07944461"
+    lessonContentHash: "6b655f46c1046adb177a94955da702e84993eed3ba9a384423482b03d929e058"
     disposition: migrate
     ownerPacket: "07-remaining-domains/22-system-monitoring"
     eligiblePathIds: ["scriptingAutomation","systemMonitoring"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "procCtl/05_환경변수와CWD"
     identityLedgerRef: "identity-ledger/procCtl.yml"
-    lessonContentHash: "6a731a97a146ced50f7de63c5a2e30a9edf3d45e690988e86d9eeccb414ba8e8"
+    lessonContentHash: "c5afff3a69ba90702acb65a8f742ef14fca2cb7af1ee86056200d9efe76e85bd"
     disposition: migrate
     ownerPacket: "07-remaining-domains/22-system-monitoring"
     eligiblePathIds: ["scriptingAutomation","systemMonitoring"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "procCtl/06_외부도구래퍼"
     identityLedgerRef: "identity-ledger/procCtl.yml"
-    lessonContentHash: "bf8d5cf7a3f014697e046ac4c2b4c4cc0cbe9f322daea1f14be64871a5425024"
+    lessonContentHash: "8bf83e9a3b85a009cd07d8c414fe48fb2703e8dc0a2c74d47bfb22f90d617824"
     disposition: migrate
     ownerPacket: "07-remaining-domains/22-system-monitoring"
     eligiblePathIds: ["scriptingAutomation","systemMonitoring"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "procCtl/07_psutil프로세스조회"
     identityLedgerRef: "identity-ledger/procCtl.yml"
-    lessonContentHash: "e936d4f6405efdb7424972efd4118cacd0a33b1e4523cebc42a71e96adeb75d3"
+    lessonContentHash: "251137dbf902356106635242f870bfc1b6066ba8eb92d932066a672509db9d23"
     disposition: migrate
     ownerPacket: "07-remaining-domains/22-system-monitoring"
     eligiblePathIds: ["systemMonitoring"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "procCtl/08_시스템자원모니터링"
     identityLedgerRef: "identity-ledger/procCtl.yml"
-    lessonContentHash: "fed937bac02af4c99065ff40ab450bb376709fe963adc832ce44363fc09dd7b8"
+    lessonContentHash: "d3f7b0dbedac700915af2f082af6e1a395077d62edfda95a406caadfe2980941"
     disposition: migrate
     ownerPacket: "07-remaining-domains/22-system-monitoring"
     eligiblePathIds: ["systemMonitoring"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "procCtl/09_프로세스종료와시그널"
     identityLedgerRef: "identity-ledger/procCtl.yml"
-    lessonContentHash: "e275aca1157f295551830ba553b2608de05257958a971987c3037d23bd69eb6c"
+    lessonContentHash: "f87a3bfe59cd0845fb15239bcd1d36ef7b31a04cf4b1f337148a67a7bd863e2b"
     disposition: migrate
     ownerPacket: "07-remaining-domains/22-system-monitoring"
     eligiblePathIds: ["systemMonitoring"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "procCtl/10_종합빌드러너"
     identityLedgerRef: "identity-ledger/procCtl.yml"
-    lessonContentHash: "58e8aa80e717b476096c675bb09b6b60f05995d956cd972655e228a1ea4fc043"
+    lessonContentHash: "50785d064c195d98e549ce2004f7bf6702d2be76c668421a826be814459a60e9"
     disposition: migrate
     ownerPacket: "07-remaining-domains/22-system-monitoring"
     eligiblePathIds: ["systemMonitoring"]
@@ -190,5 +217,8 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

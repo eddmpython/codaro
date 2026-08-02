@@ -1,0 +1,36 @@
+schemaVersion: 1
+reviewId: learning-content-direct-review-2026-08-02
+status: approved
+reviewerId: curriculum-integrity-review
+reviewedAt: "2026-08-02T13:06:47+09:00"
+evidenceCommit: 22505301c65a9621c9e3321759115562ffa5e136
+scope:
+  identityRows: 472
+  aliasMigrationRows: 441
+  contentRows: 472
+  assessedLessons: 468
+  assessmentVariants: 1402
+  categories: 41
+  pathLedgers: 31
+reviewMethod:
+  - 레슨별 제목, 학습 결과, 소유 패킷, 경로 연결, 런타임 및 산출물 결정을 대조했다.
+  - 숙련, 전이, 인출 목표와 해답, 숨은 검사, 출처 절 연결을 레슨별로 검토했다.
+  - 범주 한정 별칭 441개와 전역 중복 별칭의 읽기 정책을 대조했다.
+resolvedFindings:
+  - asyncio 전이 평가의 오래된 출처 절 식별자를 실제 절 식별자로 교정했다.
+  - 시각화 레슨 55개의 부자연스러운 전이 및 인출 목표 문장을 교정했다.
+  - 비전 레슨 62개의 일반화된 목표를 레슨별 단계, 지표 및 책임이 드러나도록 구체화했다.
+  - 원장 생성기가 일반 YAML scalar의 해시를 갱신하지 못하던 문제를 교정했다.
+verification:
+  identitySourceMismatchCount: 0
+  aliasCategoryScopedCollisionCount: 0
+  sourceReferenceFailureCount: 0
+  duplicateGoalCount: 0
+  solutionFailureCount: 0
+  authoringFailureCount: 0
+limitations:
+  learnerEvidenceClaim: none
+  localGraduationPendingPathIds:
+    - fileAutomation
+    - officeAutomation
+    - webMonitoring

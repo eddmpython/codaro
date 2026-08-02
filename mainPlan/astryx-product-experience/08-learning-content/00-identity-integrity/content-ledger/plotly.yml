@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "plotly/00_Plotly소개"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "2d6d0ce084d0ec198fa69e08cfe3867d383b5417cf0b768b6c1280e997cedee0"
+    lessonContentHash: "e9ab009f0ccadf4c54fdba676a8e724508fc9e1276736b19a8c2850f917f7c4d"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "plotly/01_세계기대수명비교"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "2ec7817d06753f9f3e5833afb2559ac887816f4e30b031b633d809e0e195ecf9"
+    lessonContentHash: "7460836eef5ff9494817ba2e9f35e1da4a5c1a21b2407cfc14e675426d162693"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "plotly/02_팁데이터분포분석"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "600ec86136641c65627c347d709597ace9afaf846068993ceb6c781a193a397e"
+    lessonContentHash: "738c0547bc6247db60f530196be5fc00e748f85a4c6138f2d3a1e79544ae17af"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "plotly/03_붓꽃품종분류"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "a0282a54514c858f4855930bc62dfb0021fc4f6923c04b16676ad2f90a979887"
+    lessonContentHash: "c2a643a51056be14ca09890e35149db80d6c5d12298574f027a1e2ef41d377a1"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "plotly/04_GDP기대수명관계"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "4c73a1ddd9c3c5c13a65c3cffe99b48ae8762756313908f2168f6b61e7357933"
+    lessonContentHash: "beb355aa3593047423d4c732dc128190a3c4d8a17233936dc22112c7133174ba"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "plotly/05_세계인구지도"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "7bfb51785c760f1d822367d5fc24c36c7a44d08d050c5d0d3f94c1944f8120e0"
+    lessonContentHash: "98fdea6aa5eb40e2e6ab81d93f8b52cd42ddca42c32149b55a004af0ed291938"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["geoVisualization","interactiveDashboards"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "plotly/06_시간에따른세계변화"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "79f62be61e3c9312c5667f4d261f9f2996329fa80b825ef0d5b4d818e25af93d"
+    lessonContentHash: "bbd733f365e089d82f8247c4437c1966a567884f54df29b7db229689dff4f1da"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "plotly/07_레스토랑매출분석"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "12d8eba3f30fb86b98a39c4ba2b1ec0948bc5cf7585a80a0df5b10a798f8f254"
+    lessonContentHash: "6ab68dd6533fb696fa09c0bd506f1a658119b41257ce9afa4ea33fed9250a982"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "plotly/08_대륙별계층구조"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "a44f152e1cdd5f6a29bd88648d5e53932e7253a4b1e71b5ce239e6992d0e0558"
+    lessonContentHash: "8860dba45256f78bb24c672322824d8e8352ca4f9003533f73137a3abba9d1b0"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "plotly/09_주식시계열분석"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "5e01f021091d5f3466b9c57076d776bd873208f46ffa29b7771a62b4a1d1ebe5"
+    lessonContentHash: "f40d7386fd09901541aa848c4d143205245b4e87d85315029395ce320a64c8c6"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "plotly/10_종합대시보드"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "19690bae0882ae520d3334005ecb0d0c434078ffb564dfc9e47993d7e04b8e3f"
+    lessonContentHash: "f8588baee9d5073cc4918d783edc9bd67f5b1a9d176fda98d8c6da46cb886ccc"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -209,5 +239,8 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

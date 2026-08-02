@@ -4,7 +4,7 @@ canonicalRows: 1
 lessons:
   - lessonRef: "practical/00_실전파이썬소개"
     identityLedgerRef: "identity-ledger/practical.yml"
-    lessonContentHash: "a7f24514bb97f705875b24ac8e6d83eec3ac29be47083d5710c827622c0d8508"
+    lessonContentHash: "cce6824da94c9e62b9186adc4d1ccc501511e6e93fad48e4fb873239ee89401b"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -19,5 +19,8 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

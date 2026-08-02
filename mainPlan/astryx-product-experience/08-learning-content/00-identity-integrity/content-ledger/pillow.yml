@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "pillow/00_Pillow소개"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "cabe6f90e80618a1fcda7435cdbad3c1cda5801d1bc3861414cb208e146fe78f"
+    lessonContentHash: "e04a6537d83b50faa76a45c8314609665e1c24253ae6bc36244e826e96fcfd79"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pillow/01_꽃사진탐색기"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "e660b8c6b02de0bdeca69c9056f0dfc15207611442b97a9a39d678f3432c379e"
+    lessonContentHash: "af02c943a3992f291687504715ff174f37c80c8eb14bffba3569f555921ec8b6"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pillow/02_중국풍경편집기"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "d7c87b1d7002dabe1b8815d7cf7d2b79aaf5208c8392614555849fd89bbe0090"
+    lessonContentHash: "3204b4e53b34d32be2cec204c5f854a80707202814db2b1cf3e9810aadebd905"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pillow/03_흑백사진변환기"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "57fdc00e64a79f16f8e6d7e438f0ed23d3a8e4d1fba5f8778c83cd248e42fa1a"
+    lessonContentHash: "ceeb639512eae267ea3888e39ec01461049cab8ec631a570721b05e1b91361e4"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pillow/04_사진필터스튜디오"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "041afe3cd1a263a0b79c70e1e5abfeb89101384db22be8bd7d677bd8cd782e2d"
+    lessonContentHash: "26adef3bf6c5b0babcfd1dbcf69cf699510187a16e5f587aa6b189afe3e6784f"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pillow/05_밝기대비조절기"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "7ae713c9c457ecd0a98e1eb1fed4b2239c0f86afa179ea9d1708804497d535b9"
+    lessonContentHash: "6cfa6a45d31c2674a2f2f5f5c0884c1a0a55ebe94808f724c2053253242673d0"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pillow/06_RGB채널분석기"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "ecf01090abbb980aba1966d42fac084cd2d10f133c0f6cbbeaf6c700d7fd879c"
+    lessonContentHash: "001513347816181e846e227894dc8232ee69200eaf775101309781a5ba48230b"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pillow/07_워터마크생성기"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "ea486182b94f6cbcf4ee80d034fd7b815e226c6d145780c69d7be5f8f49f9aa0"
+    lessonContentHash: "81aaf5c709cc38e1bcce1a612aee4e3fbb1189220463d21eb0d9bebb41ea07cb"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pillow/08_도형아트생성기"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "7017a0d8808db58df12574fcfa56e6cacf3754499fabf9449c69f60e9a497145"
+    lessonContentHash: "a2ea83b786a79c98ba2e7f3109412b0d4e5a80c0e166c73ff35ab13b0bcdec86"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pillow/09_포토콜라주메이커"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "298719b8510b84db1e7f422a41f288373d64b73a661230942325d850149cb53c"
+    lessonContentHash: "7fbff43df36b8e341981b10d24972ce014c4d372ab26f4b8996fb49924684d41"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pillow/10_종합이미지에디터"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "ff1ce1ae07b4c257405f0d989e95a497d02611706ee90ee3ed7cd1816ff689bd"
+    lessonContentHash: "d39edbe4e09b3fa13983249ccdba14b5381bef18cbefb9c3bc58f739ea1407c9"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -209,5 +239,8 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

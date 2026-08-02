@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "xlwings/00_xlwings소개"
     identityLedgerRef: "identity-ledger/xlwings.yml"
-    lessonContentHash: "dc2b4cff660d438163937790f6b54d410ca25c932872e05b6d8a25e3aab79d3b"
+    lessonContentHash: "796831e324e426fc6e8ac2bbc886ca6d797e91cec9f71aef21f0d17a60fecb91"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "xlwings/01_첫엑셀연결"
     identityLedgerRef: "identity-ledger/xlwings.yml"
-    lessonContentHash: "96040a3389c1023a6181760d6a8e4f9df0b8f79ff04d5a3214fffba89a2fb272"
+    lessonContentHash: "0891cb3bb3adfb8ec64cabeeccb1b2c7064fdcc0a5a9c66ace8231120a78163d"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "xlwings/02_가격표일괄입력"
     identityLedgerRef: "identity-ledger/xlwings.yml"
-    lessonContentHash: "bb08d1ea292c72fafe43406ab4e3989a88c3f795bc2effbb12e644e4694228c4"
+    lessonContentHash: "5fd25137fc5c80631b449ee6dd5277e460d60a1c4fef5e5a43d8c111c3a8bac1"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "xlwings/03_시트탐색과확장"
     identityLedgerRef: "identity-ledger/xlwings.yml"
-    lessonContentHash: "21f5532eb86100b673cb8f3817ccd43249835bfeb9151c1b03f7f31616c1ad56"
+    lessonContentHash: "122ee5f62c2da47f3d4d0bda7626a0ee8c259af42eb18590b5743a772e73333e"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "xlwings/04_DataFrame왕복"
     identityLedgerRef: "identity-ledger/xlwings.yml"
-    lessonContentHash: "984b2afa3b56b39c9107945faa277bbdef17cb20c29b30688dced39189a09981"
+    lessonContentHash: "bd4b5e9d7cb3228cf7645126251dabfe50a11e434ff19e93688562f2b64976be"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "xlwings/05_수식과서식"
     identityLedgerRef: "identity-ledger/xlwings.yml"
-    lessonContentHash: "2c7eec37fdc4f36948a0a1f295a93aa74a8ae4a3f64ec7e05a284393bb756d8a"
+    lessonContentHash: "7fbb6905c9f10769288aea25b42864483df37efa16380753b0e8509de0113040"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "xlwings/06_막대차트자동생성"
     identityLedgerRef: "identity-ledger/xlwings.yml"
-    lessonContentHash: "802642829f8767516c6856e57b5e7a8b7272f1dead72b9ea9039b47ce99c42c4"
+    lessonContentHash: "5933391715a27a80ba82a3d0efd23ad5205140e5ab956eec82519acc6c2c365b"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "xlwings/07_표와동적합계"
     identityLedgerRef: "identity-ledger/xlwings.yml"
-    lessonContentHash: "9d367cd9af75f687861502375a17b8c562a17b78caf004a07042fe484d48e0bd"
+    lessonContentHash: "90e1db855edae7f0715dafcfbab658ce7b7906d4f252f5449ad072be386949f1"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "xlwings/08_월별파일분기합치기"
     identityLedgerRef: "identity-ledger/xlwings.yml"
-    lessonContentHash: "faf4615485b10f194e0157536a23105ad04fb10179ed863d8345e2cc3f9e31c1"
+    lessonContentHash: "59760a837287f7206928adbd24d3ff33e657f47d9ae0a3eb0cacaaa1a35513cc"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "xlwings/09_VBA매크로호출"
     identityLedgerRef: "identity-ledger/xlwings.yml"
-    lessonContentHash: "7560c4c290a5b47997206b3f3552a395b1d125258edf7672309521e6a141a35f"
+    lessonContentHash: "4f4e21a44c53bcecf90c913cc0f7521215a24d3408a6c6e7374dcd90170c2bbc"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "xlwings/10_UDF가격계산기"
     identityLedgerRef: "identity-ledger/xlwings.yml"
-    lessonContentHash: "ec7cbb881b16fbf676773f381f5029b386a0e4bfc754d4aa0c5450ff031e1240"
+    lessonContentHash: "687b9bf16b651307bbdbe429c6dc3cd180b82ded760f400120e68f538d39f407"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]
@@ -209,5 +239,8 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

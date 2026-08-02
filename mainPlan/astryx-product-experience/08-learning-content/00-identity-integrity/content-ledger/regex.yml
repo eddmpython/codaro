@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "regex/00_정규표현식소개"
     identityLedgerRef: "identity-ledger/regex.yml"
-    lessonContentHash: "6ceeee029d2478095be8ab4b0456f9ce79a8a515ab8e0c364f7a9f02a0c5bf82"
+    lessonContentHash: "beaedaec8e4f4c96e41738c302360371c29aa9aeda9dec32e651c8f0c04ceb78"
     disposition: migrate
     ownerPacket: "07-remaining-domains/16-text-processing"
     eligiblePathIds: ["textProcessing"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "regex/01_이메일주소추출"
     identityLedgerRef: "identity-ledger/regex.yml"
-    lessonContentHash: "39ad6def58d97f202bb2af2906e2e3dba6ebad86cb57699c700f4c2a15c4ef97"
+    lessonContentHash: "340dfe23d6e9fbe1c702c434b4828e55d47c73307cdee1a399327e47d1f45743"
     disposition: migrate
     ownerPacket: "07-remaining-domains/16-text-processing"
     eligiblePathIds: ["textProcessing"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "regex/02_전화번호형식통일"
     identityLedgerRef: "identity-ledger/regex.yml"
-    lessonContentHash: "077a99e951e24c7b09ade9c1da13ee0ea93247517e91f9a8cda33fb123965054"
+    lessonContentHash: "edd2f7e263c2ec3227cfb07a884b66b3ea1c848d4b28f776c9c208ffab5219ec"
     disposition: migrate
     ownerPacket: "07-remaining-domains/16-text-processing"
     eligiblePathIds: ["textProcessing"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "regex/03_URL구조분해"
     identityLedgerRef: "identity-ledger/regex.yml"
-    lessonContentHash: "b889c9e5170f977ab7c66d29e213466bf60db8b3b00ebd155aa7f2ccfec5573a"
+    lessonContentHash: "47330521680396a718c10b7b4d56313f81b6b85f7f9851e2215881d40b619590"
     disposition: migrate
     ownerPacket: "07-remaining-domains/16-text-processing"
     eligiblePathIds: ["textProcessing"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "regex/04_HTML태그제거"
     identityLedgerRef: "identity-ledger/regex.yml"
-    lessonContentHash: "ac3923216c47a0a50ef8e2f4837f36f64eb7d86e8ed3bc5a593fd54e8a43eb1e"
+    lessonContentHash: "6894b9e632ed379e65cc0a4db5929dbe38da592c93c9b5f4a339dc58de34d6e5"
     disposition: migrate
     ownerPacket: "07-remaining-domains/16-text-processing"
     eligiblePathIds: ["textProcessing"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "regex/05_로그파일분석"
     identityLedgerRef: "identity-ledger/regex.yml"
-    lessonContentHash: "7c3db39b1b6cfce09e523a4e7e0dd8a6b7e3389cca3c9d2d9e1986a282e931fb"
+    lessonContentHash: "567f4e72d8a1eef37f8096870715d81c0a5c9d08d1dc78b12e0fbc0625269a23"
     disposition: migrate
     ownerPacket: "07-remaining-domains/16-text-processing"
     eligiblePathIds: ["textProcessing"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "regex/06_날짜형식변환"
     identityLedgerRef: "identity-ledger/regex.yml"
-    lessonContentHash: "52f87ae0798cfaf87c908809d0b30b79f34296895518c3a8edfefa36cd68e592"
+    lessonContentHash: "3f0bf557827d3adea893e51aa8677e9a741cb308c8f62384c8b02040ab9ef584"
     disposition: migrate
     ownerPacket: "07-remaining-domains/16-text-processing"
     eligiblePathIds: ["textProcessing"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "regex/07_개인정보마스킹"
     identityLedgerRef: "identity-ledger/regex.yml"
-    lessonContentHash: "bce8e5db617cb8407c5d4a5a82a55cf7e9b14367507bb60968165654e965c4c8"
+    lessonContentHash: "55fec799617131ef19e1882a7fccb670ac73ce4b16b9c1e8ee0d61b045ebb10b"
     disposition: migrate
     ownerPacket: "07-remaining-domains/16-text-processing"
     eligiblePathIds: ["textProcessing"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "regex/08_텍스트정제토큰화"
     identityLedgerRef: "identity-ledger/regex.yml"
-    lessonContentHash: "49a18bed3c044c4cf7101b28d1a432147ab65c53fd21a6a4c6f9150840f1b201"
+    lessonContentHash: "022154dcdf5704899ef8c613cc8167bd511ccca255844cc16a6796b6e14a6bf4"
     disposition: migrate
     ownerPacket: "07-remaining-domains/16-text-processing"
     eligiblePathIds: ["textProcessing"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "regex/09_고급패턴매칭"
     identityLedgerRef: "identity-ledger/regex.yml"
-    lessonContentHash: "3f642e2cf7ff48f62b3a40d0d92a1e5bd29a744cac7e0547343602d631b84146"
+    lessonContentHash: "46c7c67bda905390bb1edd0ab8fa57c8bd3e98930a4bd2499e95123bd266b069"
     disposition: migrate
     ownerPacket: "07-remaining-domains/16-text-processing"
     eligiblePathIds: ["textProcessing"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "regex/10_LLM전처리파이프라인"
     identityLedgerRef: "identity-ledger/regex.yml"
-    lessonContentHash: "e9f49d493e1e42e9fb76d4d7197f100fdc9a0aebd3a2a89984f1a4d8102fdc93"
+    lessonContentHash: "300d9db989c72a803c2683077910e12373a373ea28d697d25d2bb3702c5b2e95"
     disposition: migrate
     ownerPacket: "07-remaining-domains/16-text-processing"
     eligiblePathIds: ["textProcessing"]
@@ -209,5 +239,8 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

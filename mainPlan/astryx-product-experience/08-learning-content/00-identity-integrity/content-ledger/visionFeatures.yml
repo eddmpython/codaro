@@ -4,7 +4,7 @@ canonicalRows: 10
 lessons:
   - lessonRef: "visionFeatures/01_코너검출"
     identityLedgerRef: "identity-ledger/visionFeatures.yml"
-    lessonContentHash: "28e029d64dd3ced82978d8e12d115f7854f8c06e7c846064aa7b5e30a8ac02ab"
+    lessonContentHash: "2cbc54761c30ea7c842f6e9b61b77eb6a34ee80461d633cd57e6f3ab00d25b11"
     disposition: migrate
     ownerPacket: "07-remaining-domains/13-vision-advanced"
     eligiblePathIds: ["visionAdvanced"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionFeatures/02_ORB특징점"
     identityLedgerRef: "identity-ledger/visionFeatures.yml"
-    lessonContentHash: "d3b31ad9a125b4176ea7c4813bb1e91e97350ddc2d82068b0a60346784b7a67b"
+    lessonContentHash: "a18fe5191569bed55ef4b07b0b98dd052259b0d0bb8a93a63dd591ac8a0fc9c7"
     disposition: migrate
     ownerPacket: "07-remaining-domains/13-vision-advanced"
     eligiblePathIds: ["visionAdvanced"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionFeatures/03_특징점매칭"
     identityLedgerRef: "identity-ledger/visionFeatures.yml"
-    lessonContentHash: "b80790f8281bf49bc4ea998f6b14067157de1ffe7873728c1645343dfac3d41b"
+    lessonContentHash: "f71c71bb72edee4cf7c46bbd82c30f1af42e7a6c44a5f86e996b3b4624ae734e"
     disposition: migrate
     ownerPacket: "07-remaining-domains/13-vision-advanced"
     eligiblePathIds: ["visionAdvanced"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionFeatures/04_호모그래피정렬"
     identityLedgerRef: "identity-ledger/visionFeatures.yml"
-    lessonContentHash: "6b63a6ca9230f8f6def99336ca91c8eb357009aa485f3a0264bf0454a33606c1"
+    lessonContentHash: "d0ac18d093c70e780c7ea1e0c570f409417e37d98500923e75ea91140e159c35"
     disposition: migrate
     ownerPacket: "07-remaining-domains/13-vision-advanced"
     eligiblePathIds: ["visionAdvanced"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionFeatures/05_파노라마스티칭"
     identityLedgerRef: "identity-ledger/visionFeatures.yml"
-    lessonContentHash: "a5fecad2025b85e1acd4779153296e947e62de7820af781da36be4894155f6ac"
+    lessonContentHash: "66c0392eef3dcc346eadf301a80fc19d9b19654e9a8674f90198f14013933a56"
     disposition: migrate
     ownerPacket: "07-remaining-domains/13-vision-advanced"
     eligiblePathIds: ["visionAdvanced"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionFeatures/06_비디오입출력"
     identityLedgerRef: "identity-ledger/visionFeatures.yml"
-    lessonContentHash: "6d30eb5d054eb8ef52b4966355f3ed50d14652bcc781449839bdb4e67b52adc5"
+    lessonContentHash: "be401a349c005b3990a8c9008ca9b5779b8298ac6abe955959a886a69a3c9cd6"
     disposition: migrate
     ownerPacket: "07-remaining-domains/13-vision-advanced"
     eligiblePathIds: ["visionAdvanced"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionFeatures/07_배경차분"
     identityLedgerRef: "identity-ledger/visionFeatures.yml"
-    lessonContentHash: "c85a4cef9f75f4ffb7f1b2a5a201a6c579d8ab0159731edbc5231ba153352896"
+    lessonContentHash: "2ad081599b62c2ce637586e11d85203d9446b4c7ec625160c88f27c3762c645b"
     disposition: migrate
     ownerPacket: "07-remaining-domains/13-vision-advanced"
     eligiblePathIds: ["visionAdvanced"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionFeatures/08_광학흐름"
     identityLedgerRef: "identity-ledger/visionFeatures.yml"
-    lessonContentHash: "e7a8e4a99193e456044e3a23643351ca10131d3821a9cb7a203b66793c579773"
+    lessonContentHash: "7b217d8d476794fc64ca20dff7bbf5bc58328b4e58489da8b39311fc8b41edcf"
     disposition: migrate
     ownerPacket: "07-remaining-domains/13-vision-advanced"
     eligiblePathIds: ["visionAdvanced"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionFeatures/09_객체트래커"
     identityLedgerRef: "identity-ledger/visionFeatures.yml"
-    lessonContentHash: "26b6ea6eac219d6658e95fa5f6b12dcf96e30624ac733e641fe26f3e5dc909db"
+    lessonContentHash: "58e8eb0c5008be2c99f9f23363e43e39e3ffade35efaa0e0defc1e137d31c4b4"
     disposition: migrate
     ownerPacket: "07-remaining-domains/13-vision-advanced"
     eligiblePathIds: ["visionAdvanced"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionFeatures/10_종합영상ROI추적기"
     identityLedgerRef: "identity-ledger/visionFeatures.yml"
-    lessonContentHash: "96c30fc6042d556e3aebdb46c1db45de03ef510bbbf459ed89386f5bb6519c30"
+    lessonContentHash: "868f4d62066b5827470722742fd9da8c52b3036e2dcf39b9c0d974ae777d79e2"
     disposition: migrate
     ownerPacket: "07-remaining-domains/13-vision-advanced"
     eligiblePathIds: ["visionAdvanced"]
@@ -190,5 +217,8 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

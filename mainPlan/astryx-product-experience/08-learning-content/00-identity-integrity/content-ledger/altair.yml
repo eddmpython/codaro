@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "altair/00_Altair소개"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "5fd813d2d5fde9eeac4765eda9c79a062692bb8ebee66da80874b36f21e11f05"
+    lessonContentHash: "e61ffac706d27f1288fb24cfaf7ab6426992f3a6cfd47c0738ed3677dd2dbcca"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "altair/01_자동차연비탐색"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "221ecee89dff59b6b9220c938d50a801d4f9224e659cbf350380604224d474af"
+    lessonContentHash: "668b1e4c8687f23ca4e4a53db3772827338fbe15153025a002ba072c7c96ef53"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "altair/02_붓꽃품종구분"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "65dc020d2ff1907a39c2887c3304f745e3a7c9f844dd3e9ffe16bbfe741ad79a"
+    lessonContentHash: "378f8cde088967b0d12ccabc74506a7787ffbc77b4a1e7f821fd972098caa96e"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "altair/03_팁데이터분석"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "17cd5daf97b7c18429e90777adc5b80a80fc8ce372a2d8ebee9352aa85d9d8cb"
+    lessonContentHash: "35e267076f148e9759ac9143e0d0aaf6fe65c79e57fa9e6706f19700af23cd33"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "altair/04_펭귄서식지분석"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "8c8197c81c066e0b30e38ff4fb8898a0cf8f0d4d2edae0eee2ad88baa3c29b65"
+    lessonContentHash: "7a0162508ceeddda8b205e64f27d4c8172654c2b36395e28dda2e8daf972d37c"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "altair/05_타이타닉생존분석"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "0ce4fc1ee8e080fb05af9db9acc5fef3766789d0827b8fb246cbe49d51d26552"
+    lessonContentHash: "89fbfb34fca32cc61eac8f59e7daeb141f1e1ecbe03f11d822e863f7592c9b94"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "altair/06_항공편분석"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "01cc16c335390d5e3337a8da3e3a79f49a27deb3cf208a149cec5801a61a9ba9"
+    lessonContentHash: "90525f1f3ff81e74df62a84a627770d40a667db420e1fbd908ac0ed9c65aebb4"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "altair/07_인터랙티브필터"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "ec58137efc6791003e6e7d16f817d474a18766c229a54859377c7f9aea9f91a4"
+    lessonContentHash: "f23b329a7f7d64d35d40b8d2b5e387a4dacd0e6852bc93531ee809c1e1460630"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "altair/08_다중뷰연결"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "271aa22d2c08846ec7a72686bc596952d4400338fdb1bebb7bacdd86236bfb3f"
+    lessonContentHash: "1bbdd68880c2a1b5678edf349f570abed2b4411f8afcae98081b358ed256c468"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "altair/09_고급데이터변환"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "1cd6a527d1bdedc2097891b9af806ea4838c60eb3c154e5663224838dabb8295"
+    lessonContentHash: "9be0215d0b16e68d1aa0642fc5f3780f3ed76d1834e3a081ef1d14a7a6912a28"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "altair/10_종합대시보드"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "8f121fa23b3d7ec8e1ce40f68265c882084c046e07d9f3d8239afc867e654043"
+    lessonContentHash: "68eb659529e27243ce75344f17830302ce0db1176140b80ca702dfd2ea4ddd68"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -209,5 +239,8 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

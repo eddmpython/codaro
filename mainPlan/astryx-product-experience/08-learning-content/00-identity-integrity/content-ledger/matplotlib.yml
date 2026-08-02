@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "matplotlib/00_Matplotlib소개"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "b4b527b5667d6fd7d660a77946d4153b790133cb5e65b1c6abd78d0e402df760"
+    lessonContentHash: "91fbb40c0fcfa501381fdf21a279eace3d6d9ecf5cb61d4651b473eb1b210d33"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization","timeSeriesAnalysis","timeSeriesForecasting"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "matplotlib/01_주가추세분석"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "9808a67788f579e4d966cef58642daa6d90f30eb650a54e1764369e73bc23f37"
+    lessonContentHash: "141da7121d7530663e3c7cab87071dcc905f64d03beca72fd9ed22b4e7fe14af"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization","timeSeriesAnalysis","timeSeriesForecasting"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "matplotlib/02_팁데이터분포탐색"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "6279a336600db1fa17aed67ed84ca2e8cec5ad9a388d52f14851446e65d688e8"
+    lessonContentHash: "861b1119b112c52a96e650f26b248509ecc52e195d7ce2f7e68f1667b8657624"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization","timeSeriesAnalysis","timeSeriesForecasting"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "matplotlib/03_붓꽃품종산점도"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "5e44c813a90a7267113d8045cce509fce97989520af9361cc6801988dc5484e8"
+    lessonContentHash: "b0fb631819f17efe438ac111cf986064e2f03fd14f2e53ea292311d1317ea556"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization","timeSeriesAnalysis","timeSeriesForecasting"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "matplotlib/04_대륙별인구비교"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "8e09f643624b7b72e177a6261ce614e9af3bbe3ca38edae4254ee03f1b85c7b3"
+    lessonContentHash: "d99a8e7b5f93c4ea87027b4703a0a98ef170a6e67c77363ea60e780d43712435"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization","timeSeriesAnalysis","timeSeriesForecasting"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "matplotlib/05_펭귄체중분석"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "26e3c2d9323f517f2caee88262b54316ba5a5845460b4716f3a72017f451da69"
+    lessonContentHash: "a2db980a47d0620610872b5acc4f6e48c008e1874c3fcc8910903a793375e1c3"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "matplotlib/06_상관관계히트맵"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "35e6ac9fda53ca2cd4d02b725218e34fe0570e2a78f720cd75d391abc0695f63"
+    lessonContentHash: "16e88630c356ca3e9d2fd348f69353bcc19d83b3e45803a89cabf86f82e37910"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "matplotlib/07_시계열다중축차트"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "a7ce3b212b92fe3690e72f10b960f555216cf0b7598316ce4b9142696bf32356"
+    lessonContentHash: "3ea4defd174ddfd81887bf127d094f0724292743036448d107497c5787283e44"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "matplotlib/08_다중패널대시보드"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "61cbab4e0b4e5380b38f41a74c13e9a6a21d95fa4c24219bbb94199088b6fcab"
+    lessonContentHash: "1d2d720622cf9756af730f912bb619048c66d82e1fb3b2633f01cb667d0ee33c"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "matplotlib/09_고급주석차트"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "0e6b7e1dabc7faf687cdbe880e211f228eb130284314ff5afe23bad36667bf02"
+    lessonContentHash: "103ad9b831ae5beadb5ff91add1767f4f55170236a8db141b37fb80588b54155"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "matplotlib/10_종합분석리포트"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "9ef494390205db849ad49c11cd6014423fb5c8158d461e64bc35630da16a615d"
+    lessonContentHash: "fbdce25a8b7a9840531c003dffbc6a7914bbccf259e3da48d1f37a39b08664c3"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -209,5 +239,8 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

@@ -4,7 +4,7 @@ canonicalRows: 3
 lessons:
   - lessonRef: "resilience/01_멱등성과처리원장"
     identityLedgerRef: "identity-ledger/resilience.yml"
-    lessonContentHash: "5604161f841dc286f615503b35b0dab3452e20d3079e55b6c5ebe39b6af2b35d"
+    lessonContentHash: "45d7dc8f412f9542d68bb3b48fb38762626d56b71895f245d0b25852ce911970"
     disposition: migrate
     ownerPacket: "07-remaining-domains/03-scripting-automation"
     eligiblePathIds: ["scriptingAutomation"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "resilience/02_재개가능체크포인트"
     identityLedgerRef: "identity-ledger/resilience.yml"
-    lessonContentHash: "786107065b6bb1dc85d23fc6a7b60d0045c4296986eb0b8f67f051b25c0ba4c1"
+    lessonContentHash: "d3c9a371c7eed3c7dc82ced107bd65a2b8d9f2935b4d91a312979e96879965ff"
     disposition: migrate
     ownerPacket: "07-remaining-domains/03-scripting-automation"
     eligiblePathIds: ["scriptingAutomation"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "resilience/03_원자적쓰기"
     identityLedgerRef: "identity-ledger/resilience.yml"
-    lessonContentHash: "710a194fa4aeaba92f5e7e7508c40659a661668344d66254a1138517e4e78f6a"
+    lessonContentHash: "9f49718bde857a34a1a9f353584a6041957d8bfd6ac351dd935df9a0a671b996"
     disposition: migrate
     ownerPacket: "07-remaining-domains/03-scripting-automation"
     eligiblePathIds: ["scriptingAutomation"]
@@ -57,5 +63,8 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

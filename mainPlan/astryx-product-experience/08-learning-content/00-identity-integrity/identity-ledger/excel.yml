@@ -6,14 +6,23 @@ lessons:
     sourcePath: "curricula/python/automation/office/excel/01_xlwings란.yaml"
     metaId: "excel_01"
     registryStatus: registered
-    reviewStatus: pending
+    reviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
   - lessonRef: "excel/02_xlwings설치"
     sourcePath: "curricula/python/automation/office/excel/02_xlwings설치.yaml"
     metaId: "excel_02"
     registryStatus: registered
-    reviewStatus: pending
+    reviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
   - lessonRef: "excel/03_xlwingsLite"
     sourcePath: "curricula/python/automation/office/excel/03_xlwingsLite.yaml"
     metaId: "excel_03"
     registryStatus: registered
-    reviewStatus: pending
+    reviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"

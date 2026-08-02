@@ -4,7 +4,7 @@ canonicalRows: 10
 lessons:
   - lessonRef: "inputCtl/01_pyautogui안전장치"
     identityLedgerRef: "identity-ledger/inputCtl.yml"
-    lessonContentHash: "128ee500c31219f0d80bb865f1a59062477b520e8bc6df3506f4fb84fd92b843"
+    lessonContentHash: "03a5eb9cddf1e01c7f85750b4b6092d202a06275098fc7b8c455bfe24c02a303"
     disposition: migrate
     ownerPacket: "07-remaining-domains/21-desktop-automation"
     eligiblePathIds: ["desktopAutomation"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "inputCtl/02_화면크기와좌표"
     identityLedgerRef: "identity-ledger/inputCtl.yml"
-    lessonContentHash: "5c2bb18ea3be7fbf2ac807642fcb303c652bd10994cd9a1d3cdc3154b6aee7ba"
+    lessonContentHash: "d2a7156cc20b00c8efd1d05c1738dec9924b049d79fa6881f2e735040b3c9a69"
     disposition: migrate
     ownerPacket: "07-remaining-domains/21-desktop-automation"
     eligiblePathIds: ["desktopAutomation"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "inputCtl/03_마우스이동과클릭"
     identityLedgerRef: "identity-ledger/inputCtl.yml"
-    lessonContentHash: "2a913f820970529f9eeff39876669632b5543a15e2a57b2686b8a8ae648ca545"
+    lessonContentHash: "dc6b2174b526e708d93e31bcf7b1ff882b11adfc60b0f4a173fed3b36d9379f2"
     disposition: migrate
     ownerPacket: "07-remaining-domains/21-desktop-automation"
     eligiblePathIds: ["desktopAutomation"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "inputCtl/04_키보드입력"
     identityLedgerRef: "identity-ledger/inputCtl.yml"
-    lessonContentHash: "0316cfe522af149134d84cb244bc68ed289fc83d9819fdce4a6c97baecbf82dd"
+    lessonContentHash: "93262ede19989b8a0d62ac84848aa0b918732cf0955b15451a838340d78ad767"
     disposition: migrate
     ownerPacket: "07-remaining-domains/21-desktop-automation"
     eligiblePathIds: ["desktopAutomation"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "inputCtl/05_스크린샷영역"
     identityLedgerRef: "identity-ledger/inputCtl.yml"
-    lessonContentHash: "6066052010bb2d404cfd208e80ca192bc001f978a1a2bd23a0a2d9187aae0dd6"
+    lessonContentHash: "ca42668a6ba362c4c4f64fa90abc8d045b2c386b3a24656985df1c18f008688d"
     disposition: migrate
     ownerPacket: "07-remaining-domains/21-desktop-automation"
     eligiblePathIds: ["desktopAutomation"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "inputCtl/06_이미지매치"
     identityLedgerRef: "identity-ledger/inputCtl.yml"
-    lessonContentHash: "07d90b33ce2054717035779a52bd41e83150b2d4e5f8b69a0baa8d8ed72e68b2"
+    lessonContentHash: "3bdeedb8fd2d3cda44ca10222471697b0010e8840c403fdf3fdbc74d257de9cb"
     disposition: migrate
     ownerPacket: "07-remaining-domains/21-desktop-automation"
     eligiblePathIds: ["desktopAutomation"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "inputCtl/07_클립보드"
     identityLedgerRef: "identity-ledger/inputCtl.yml"
-    lessonContentHash: "1027405beb24859048080ff5b85fad9f384f3d740ff5d7fb77decc6930114999"
+    lessonContentHash: "ab8fe963f4507ffeb76bb6da76fc0655a3cdcad49db6c3fa6581a21ccb16d02e"
     disposition: migrate
     ownerPacket: "07-remaining-domains/21-desktop-automation"
     eligiblePathIds: ["desktopAutomation"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "inputCtl/08_pynput리스너"
     identityLedgerRef: "identity-ledger/inputCtl.yml"
-    lessonContentHash: "7604b52d7306268bbd1efb8818cf671bc31edcc49ecd87ec8f996a2e6ef05109"
+    lessonContentHash: "d13e88e2b8950b91d933e6bad69203f8eed5b0fbe6b0bc497926c0d76ddc0331"
     disposition: migrate
     ownerPacket: "07-remaining-domains/21-desktop-automation"
     eligiblePathIds: ["desktopAutomation"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "inputCtl/09_상태기반자동화"
     identityLedgerRef: "identity-ledger/inputCtl.yml"
-    lessonContentHash: "58b7e9227f3c2cc733485ee6aed5b7beaf4a7636ad8a54a5330d21e156b8e435"
+    lessonContentHash: "5f7eca51697273abb7fcf3e6c5189f5582e3289090cc0b708e9e8bde6979e2df"
     disposition: migrate
     ownerPacket: "07-remaining-domains/21-desktop-automation"
     eligiblePathIds: ["desktopAutomation"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "inputCtl/10_종합화면점검"
     identityLedgerRef: "identity-ledger/inputCtl.yml"
-    lessonContentHash: "963528d70ee3a0b1b9af32673009a5b0182998c7500f9d1015f295cfb15262b6"
+    lessonContentHash: "3504f65ac235a25483451de487e2f8eeb5b4ccebe28d411911d3e8c5c8d029a4"
     disposition: migrate
     ownerPacket: "07-remaining-domains/21-desktop-automation"
     eligiblePathIds: ["desktopAutomation"]
@@ -190,5 +217,8 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

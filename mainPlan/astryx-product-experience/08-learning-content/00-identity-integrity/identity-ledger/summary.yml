@@ -5,8 +5,8 @@ sourceRows: 472
 categoryFiles: 41
 registeredRows: 472
 missingRegistryRows: 0
-pendingHumanReviewRows: 472
-approvedHumanReviewRows: 0
+pendingHumanReviewRows: 0
+approvedHumanReviewRows: 472
 metaIdMismatchRows: 441
 globalDuplicateAliasCount: 5
 globalDuplicateAliases:

@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "statsmodels/00_statsmodels소개"
     identityLedgerRef: "identity-ledger/statsmodels.yml"
-    lessonContentHash: "df501f22399cb6f14379f648e0b97378e0bcfc5f6233ee324274f4eff10ad1c8"
+    lessonContentHash: "94995ed27b2b9b6636536f9352d5537cdcb4a7a363cbed3301f1430e25a6b1dc"
     disposition: migrate
     ownerPacket: "07-remaining-domains/07-statistical-analysis"
     eligiblePathIds: ["statisticalAnalysis"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "statsmodels/01_광고비매출예측"
     identityLedgerRef: "identity-ledger/statsmodels.yml"
-    lessonContentHash: "a15339e10bf89aa9ecee79938baf2e19849de9da7a4de21381ecb72c982c46fd"
+    lessonContentHash: "e31f2658262d0202df84cef138ed9a4be8876338987d5e95186159149952dd1f"
     disposition: migrate
     ownerPacket: "07-remaining-domains/07-statistical-analysis"
     eligiblePathIds: ["statisticalAnalysis"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "statsmodels/02_부동산가격예측"
     identityLedgerRef: "identity-ledger/statsmodels.yml"
-    lessonContentHash: "01cb545fc6ef67ba3623951e85458ee8f70be7e1a69b584d7c883cfb62cda888"
+    lessonContentHash: "7a37502764a555070ff7e16864b633e20b2b23f4ef0b9f2cea4e3f46d451eb49"
     disposition: migrate
     ownerPacket: "07-remaining-domains/07-statistical-analysis"
     eligiblePathIds: ["statisticalAnalysis"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "statsmodels/03_의료보험비용예측"
     identityLedgerRef: "identity-ledger/statsmodels.yml"
-    lessonContentHash: "bf23fd0462f697934723115c79144bd9d6a09b55e730fb2011776544010a887f"
+    lessonContentHash: "3d6694e916f78929822138a7db5e8f76616ef618e4630a33745a2bcf44cece5f"
     disposition: migrate
     ownerPacket: "07-remaining-domains/07-statistical-analysis"
     eligiblePathIds: ["statisticalAnalysis"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "statsmodels/04_항공수요예측"
     identityLedgerRef: "identity-ledger/statsmodels.yml"
-    lessonContentHash: "154a0b0a9765025efb90952b11414e5fb9e91b60a47be42f0ac9859829d3bd70"
+    lessonContentHash: "a696ef79467854cf987eab6cef45a60c341273b96e0b2a6c36fd1f49468358b2"
     disposition: migrate
     ownerPacket: "07-remaining-domains/07-statistical-analysis"
     eligiblePathIds: ["statisticalAnalysis","timeSeriesForecasting"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "statsmodels/05_고객이탈예측"
     identityLedgerRef: "identity-ledger/statsmodels.yml"
-    lessonContentHash: "dcfb3c92a82673cdc62806a6e6c58316bd263420385d035ae4e0d99ad8493e04"
+    lessonContentHash: "721880dbc7651c4660d21afc62a3cdc2a09d79222e4f9055e6318e72ce80d589"
     disposition: migrate
     ownerPacket: "07-remaining-domains/07-statistical-analysis"
     eligiblePathIds: ["statisticalAnalysis"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "statsmodels/06_다중회귀심화"
     identityLedgerRef: "identity-ledger/statsmodels.yml"
-    lessonContentHash: "2b57fcfcea3edd0c0541efafcb7ab26578a14c1533b4e65112fed1164cb6ad86"
+    lessonContentHash: "1beaf811d8be09677e23ad2d77393b8c4a8d43d76793a015383ca40ddbc73458"
     disposition: migrate
     ownerPacket: "07-remaining-domains/07-statistical-analysis"
     eligiblePathIds: ["statisticalAnalysis"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "statsmodels/07_경제지표회귀분석"
     identityLedgerRef: "identity-ledger/statsmodels.yml"
-    lessonContentHash: "b0f1ab6ce8296ea9d4caa29d6133059824e1db5a77fc76783282be0aa1463a1b"
+    lessonContentHash: "6e4a7144c4a783691f8f1942f049bd486d47322cf5e643cc61d506aed73d19c9"
     disposition: migrate
     ownerPacket: "07-remaining-domains/07-statistical-analysis"
     eligiblePathIds: ["statisticalAnalysis"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "statsmodels/08_직원퇴사예측"
     identityLedgerRef: "identity-ledger/statsmodels.yml"
-    lessonContentHash: "cc9fcaf4387c25c5f2ba908d59b3cf023c5c6a1760685e8e37a1c1bbb94b6b4e"
+    lessonContentHash: "bb100b7e39ff1bd38ef73bc1a9ba0cf464f12cf9aaefa4a4a005e4ef89e7366f"
     disposition: migrate
     ownerPacket: "07-remaining-domains/07-statistical-analysis"
     eligiblePathIds: ["statisticalAnalysis"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "statsmodels/09_자전거수요예측"
     identityLedgerRef: "identity-ledger/statsmodels.yml"
-    lessonContentHash: "0ceefa25cd1bc3621c61b3c394e921d57b013d112b5c722e2e8c7ca129c2fe9e"
+    lessonContentHash: "5b0f830d1dfc77d71f09dd4f462cd5ef07d73ddfcb020b45148e4b9a1820e474"
     disposition: migrate
     ownerPacket: "07-remaining-domains/07-statistical-analysis"
     eligiblePathIds: ["statisticalAnalysis","timeSeriesForecasting"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "statsmodels/10_종합프로젝트"
     identityLedgerRef: "identity-ledger/statsmodels.yml"
-    lessonContentHash: "461757bff69cfe7254dc54c5edb1ef4914853e028aafdd2baf2b005a1e10c966"
+    lessonContentHash: "9be4ca26e12c4f8e2aae2131ffc513e7cac8c01546f25a5f86bfda761d5eea2e"
     disposition: migrate
     ownerPacket: "07-remaining-domains/07-statistical-analysis"
     eligiblePathIds: ["statisticalAnalysis"]
@@ -209,5 +239,8 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

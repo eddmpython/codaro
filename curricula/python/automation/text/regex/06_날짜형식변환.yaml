@@ -665,7 +665,10 @@ assessment:
   authoring:
     source: curated-blueprint
     solutionVerification: required
-    independentReview: pending
+    independentReview: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
   masteryVariants:
   - id: regex_06-date-format-normalization-mastery
     mode: mastery

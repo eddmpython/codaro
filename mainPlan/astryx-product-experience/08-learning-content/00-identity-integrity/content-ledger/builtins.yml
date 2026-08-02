@@ -4,7 +4,7 @@ canonicalRows: 35
 lessons:
   - lessonRef: "builtins/01_math"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "08b09de6b6c0b89ccd627d1fb0c4ab6ea8afe691ab23069e412a42f5739f7b46"
+    lessonContentHash: "206d3fe9b407bfa30b9f901596864a01b92e449dfb782fc303b18497bf9bfa71"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/02_random"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "365926c5c39c0b9a62e6bab91532c2b272f1872960b9e3cbfff0f2233d6c627d"
+    lessonContentHash: "61470ee19fb852d7eec1b5ed766cc27193b8dfa288747b630907eab80b2802dd"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/03_datetime"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "38a3c1240ecf47542d8d31c2b1025bc95ae0051c03d059393134d718f5221402"
+    lessonContentHash: "1adfb5eecac5b99542aa17b2d61454ee52fa9b9b5321bcd79cf1ec28fa40d949"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/04_time"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "1c5c9b44fb62a7351c1cee0ba508d179d1553ea18f399b6b5c0e20cf1069da1b"
+    lessonContentHash: "1673b8d6cb78e853f91500d9e00e0447a9daf0c63269a57832cf10f07f31cb8a"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/05_collections"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "2735cc8842a7535753d18909a7ad526b67f800100f57a0151a010ead2b3d8ffd"
+    lessonContentHash: "81b85c779e0f5641d37c660e659394d1b1df3f5e8e5f7bd728d4396910860b14"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/06_itertools"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "3e993b39de5294abf669c2c241797370e29088a06458256f06a1d7d7a8722496"
+    lessonContentHash: "13dec4c1437e2ca842393e85f42210e5b6c3d60677346ae03f51f8aedf9cb78a"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/07_functools"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "b2f6d9e9d7d4352e94f057bdce62d13e6c8808aaec9ead1c63a9b8f18d2353f1"
+    lessonContentHash: "e8df67abd1cfd2a32c96300b88016698f5a13cbd4d37ffd15c0af1eff7259201"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/08_os"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "84674d2f0a23bd581e4950cd997b107b13087cf9d674f82947956e22c6a43ccd"
+    lessonContentHash: "fc55d19628657ec6b8e44681aaf2919c976676a13594563a1b84e11b5f397e90"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["fileAutomation","standardLibraryMastery"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/09_pathlib"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "8f228e3424e51a67b12dacb266e13ba63931b0d2490892e296f64067cb6f5f3a"
+    lessonContentHash: "8badcfe6b81a255327fe5095e56ab83ec615e1dc4f75ef2c4deb1dcdad88684a"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["fileAutomation","standardLibraryMastery"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/10_sys"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "f6f8812803a1891999508058ae3a87e453dd3621261d9e04f52c4a42f92eeb56"
+    lessonContentHash: "542a778b839cea2f3dd144306c65fba962d205e956ed1fd187585ef491c7e78c"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/11_glob"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "86bd4f60ddfaa6d0013f8b3e30ff11f9c511c606eb592ee81f664e1ef1658d62"
+    lessonContentHash: "46036326412c1d53580913966292f10cb9ef3b7397c2331b9a0de582b090bf84"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["fileAutomation","standardLibraryMastery"]
@@ -209,11 +239,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/12_shutil"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "cdb75c44d5ec4c2554540fc9697001c57061c16d10f14eaa2e2b86d2acacb761"
+    lessonContentHash: "2b22d5516c2ef0272c78c29f5d392573f9bc432ae20d95ade86a7896ff88cdaa"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["fileAutomation","standardLibraryMastery"]
@@ -228,11 +261,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/13_json"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "6d8f59788cee30bf5a58684c2e8b3867be8337cf35a938beeb4cd3e931d3b45b"
+    lessonContentHash: "4b1071ae6345274ef81419ef98aebdca3d96ce8e4f3dc2175ca25a42c54a39e8"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -247,11 +283,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/14_csv"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "5234873cb34b3abfaa7c87d8c7efde399c5c40cd131a617a85766b6454b96720"
+    lessonContentHash: "3f1311150596a57f8795954f4eef3ed8bbb7a075a2f3d1fcf2e54003c0a88f38"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -266,11 +305,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/15_pickle"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "073226c7fa44043a62748e07b72699263261e1ca42866aa60841685cd86dada5"
+    lessonContentHash: "eea55f0ae881bcf68d8ca9c81f3222dc5e435416f0f6ac8aa115228dfa417fcf"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -285,11 +327,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/16_struct"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "2123aaff282babbcfb666588a04d5615e347031256b1fbe7157bb6a234dd6ab7"
+    lessonContentHash: "a9b8f79af42e6e6d834a5a1eacb3a5bf98f2b254993729f0a8307933c992d65f"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -304,11 +349,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/17_string"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "26280c2df357a4fc474de0755fde03936b3b953ed42e0726d627210ca3cb9db3"
+    lessonContentHash: "3eeda53692e0b112a3122c77f3a6aece7f6c8cc347c4d343b1e75b36ffbc11a5"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery","textProcessing"]
@@ -323,11 +371,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/18_textwrap"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "ccff6b1f5c6fc14aaeb82b117605c6a59760e61493b553546229abaa427de3f2"
+    lessonContentHash: "e0cc32fc88d57157a181c7d468af3b27bdab86fa11468631ca8dd684ff36660f"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery","textProcessing"]
@@ -342,11 +393,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/19_difflib"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "3f7371abdb60e9efb94167ba97bca01cd7878ddf28a03721bdff6f9cede580fa"
+    lessonContentHash: "ac869daf9e65dc9f8d47f839369eb4da4f54c4742eec4afb0bc27be795bfb20d"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery","textProcessing"]
@@ -361,11 +415,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/20_base64"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "48bab1f02f091439c8365dd73ac5082a4cd9c421e93b6407cc21bd16e973c4aa"
+    lessonContentHash: "ae097bf7ed4dbd3cf88407645d10983b666340bd9951fd54dca888c9ea4cf615"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery","textProcessing"]
@@ -380,11 +437,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/21_urllib"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "eec480e25280edd3a40a99ebc1a557d013c33df25e2b6de30d85cbc61d1652e8"
+    lessonContentHash: "60bf3131711dc5d2bab6d5304544aa8398a69164cce8155d62361d6bdc9b2947"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -399,11 +459,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/22_email"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "af8b58bf0d10d1b360e97ed20bd35856b5f0b579df59a56b562ee977bcbe1cf1"
+    lessonContentHash: "8b30298a1765bd124a8b23bb48f0f0e1a2035d7cc4a5b02f8dc183603c447114"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -418,11 +481,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/23_asyncio"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "fa5cbb9f7dfb06296fb02c2e242cb9b743370df613d5124d8f37e02af01b1acb"
+    lessonContentHash: "5af8c9c80d50741d352bc57dab4574e25254b60b02f7d64a4e45b2250f47dba2"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -437,11 +503,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/24_argparse"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "d98307291ce78d4f3d3f48e9bf9421791dfaf1f280612cd08aac71ef5d4a44e4"
+    lessonContentHash: "44bf9454124ccf9742f3b03cc726a696ba2068f87abc97fbf5008affbe976042"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -456,11 +525,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/25_logging"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "e0b8f5ccd1c9062138b2f64f8804ea1ff985d6621f22918f7db2a0fd7b1810b1"
+    lessonContentHash: "d50c29194c142e5e7f483d0328b9557829a668ece91f48fad843e06132e361a3"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery","systemMonitoring"]
@@ -475,11 +547,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/26_unittest"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "544981886683856e1c94a0b5adbfc57b65b712eea8e5e9bcf16d325b68eec4d2"
+    lessonContentHash: "1caf23600cc270c565126faaf29f7cbc707310c61f793f0cec40ea27cc661afc"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -494,11 +569,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/27_timeit"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "8cd32e2648be3317e6a6f5d69bb8c03c80893a8f6294c18f1c2e55e77e123a63"
+    lessonContentHash: "92b06e9e3f4fed057fba322c8d06ff601e64ae2767129f04b8d7c91264896ad7"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery","systemMonitoring"]
@@ -513,11 +591,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/28_copy"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "6ff6877658bcc97fcafff9b0f7ba26571f1a3033eb3a28f3438aa3bc8841b121"
+    lessonContentHash: "208de60cc673061b76f3563f4b4dd8fd80757e9ee8a5afa93766dbd421521e74"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["pythonFoundation","standardLibraryMastery"]
@@ -532,11 +613,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/29_pprint"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "a5fcd26eb58e4ea7857e9b55dca203d8213f7f8f2b5b58c6307aac5242f77855"
+    lessonContentHash: "230eedda0ce23a0358e0d9bd52ede91472acddd879335e4b321c209005b08f17"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery","systemMonitoring"]
@@ -551,11 +635,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/30_inspect"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "7e48a577c24b92fabe7a58dbf3dbe077fabc86335127bbbde99e887c90efc2c2"
+    lessonContentHash: "48f47e5694c0e0c9339dd448b487ca68f224b174dc01f7221a5b9a28693c9a02"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery","systemMonitoring"]
@@ -570,11 +657,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/31_subprocess"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "f534882a57d4fb4b3d8357df133f29c1ffb3f612c955500e5c25cdc29fb8e9b7"
+    lessonContentHash: "dad0fd127f32aff102d284e451fc90e12a9e3e077a0353098b09c78532d4eaef"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -589,11 +679,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/32_contextlib"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "d281855f09d778904d3c561590c25f39c8debb1493cc9101314854a0cc4e9ae4"
+    lessonContentHash: "89b61933223210f3666e3f9e07ab80e11f3aef3d9886a55f1bcd9270af6f26aa"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -608,11 +701,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/33_tempfile"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "bcaf4c7a33281878807089aeedc920b209f0bb4c40e2500a43d279f381c10e27"
+    lessonContentHash: "f7d5d6ed7e2406c9ea0aa46cf691d8b510d08a1b27cfc57be2eacc2e6150f1e5"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -627,11 +723,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/34_hashlib"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "60d9a0f17999e21607b75526ad0db4048b8df050c78f288fee04804c27ffb9f0"
+    lessonContentHash: "abc69318e8cffabc789346d0156d26ebc7241a1ac23744858491cfd84a1af237"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -646,11 +745,14 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/35_zipfile"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "34c92ae35a22286c92298184006926e02c0e5a294fa6bf14d77412fe832be54f"
+    lessonContentHash: "b8c7dba3af59cf05189877fe72f1ea4c5506b1a3d2db5082bdd562cc0121b1ab"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -665,5 +767,8 @@ lessons:
     artifactDecision: runtime-value
     visualDecision: not-required-code-output-sufficient
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

@@ -6,14 +6,23 @@ lessons:
     sourcePath: "curricula/python/automation/os/resilience/01_멱등성과처리원장.yaml"
     metaId: "resilience_01"
     registryStatus: registered
-    reviewStatus: pending
+    reviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
   - lessonRef: "resilience/02_재개가능체크포인트"
     sourcePath: "curricula/python/automation/os/resilience/02_재개가능체크포인트.yaml"
     metaId: "resilience_02"
     registryStatus: registered
-    reviewStatus: pending
+    reviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
   - lessonRef: "resilience/03_원자적쓰기"
     sourcePath: "curricula/python/automation/os/resilience/03_원자적쓰기.yaml"
     metaId: "resilience_03"
     registryStatus: registered
-    reviewStatus: pending
+    reviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"

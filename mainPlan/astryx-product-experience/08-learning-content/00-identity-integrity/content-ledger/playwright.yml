@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "playwright/00_playwright소개"
     identityLedgerRef: "identity-ledger/playwright.yml"
-    lessonContentHash: "f1a09af1eff9bc54cf10ee537106b2e1595014e5d98001c6555dbd937534bbe5"
+    lessonContentHash: "75a1f1d9b53e35f8c57a86a556c5dcd7699dc7f1221ecc7a82ed6daa90250527"
     disposition: migrate
     ownerPacket: "06-web-monitoring"
     eligiblePathIds: ["webMonitoring"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "playwright/01_첫브라우저실행"
     identityLedgerRef: "identity-ledger/playwright.yml"
-    lessonContentHash: "ff3435d0f600a96b9614af01e87adb0968db21c8bfabc00cf0afc604e9acb4dc"
+    lessonContentHash: "e8c9c3014c0f697f6ab487aecce98bde36a2243c6975494eaaf2d95268641230"
     disposition: migrate
     ownerPacket: "06-web-monitoring"
     eligiblePathIds: ["webMonitoring"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "playwright/02_locator와폼입력"
     identityLedgerRef: "identity-ledger/playwright.yml"
-    lessonContentHash: "348d26f580c5c68a4704ca91e1f573bb6b9ecee4a2fd4c25a570e92494471186"
+    lessonContentHash: "4c8ef9f5f8266a2b8a9610898d97edd536314a4761348f5a7e976c088901b52b"
     disposition: migrate
     ownerPacket: "06-web-monitoring"
     eligiblePathIds: ["webMonitoring"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "playwright/03_기다림과검증"
     identityLedgerRef: "identity-ledger/playwright.yml"
-    lessonContentHash: "a518cbdcc1868f9ea808f00f2e18aacbca48fd6a889b2ec9bba40ffcfa1e6bc4"
+    lessonContentHash: "925819afcbc20a48807e6e20be1dad7bc3fd01a09ecf5ebdf749116a5216be98"
     disposition: migrate
     ownerPacket: "06-web-monitoring"
     eligiblePathIds: ["webMonitoring"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "playwright/04_스크린샷과증거"
     identityLedgerRef: "identity-ledger/playwright.yml"
-    lessonContentHash: "8f75bedcc6fc71e856696b3ed825ee50b15c80594c30fa06c27bed2f1b76440d"
+    lessonContentHash: "f8eae858738f53143e9a88c087895abaeaf80b096718c167a5e3132734c59153"
     disposition: migrate
     ownerPacket: "06-web-monitoring"
     eligiblePathIds: ["webMonitoring"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "playwright/05_네트워크모킹"
     identityLedgerRef: "identity-ledger/playwright.yml"
-    lessonContentHash: "cdc6f38cc89c6f2cb089e195c0a948e92ecc9dfd702cd6f6cef016a376d7f1ee"
+    lessonContentHash: "6730665b4d09a47c6904f1b3a8d023f3fc5dc24efe38d84384c843bcdd1c52f6"
     disposition: migrate
     ownerPacket: "06-web-monitoring"
     eligiblePathIds: ["webMonitoring"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "playwright/06_로그인상태와스토리지"
     identityLedgerRef: "identity-ledger/playwright.yml"
-    lessonContentHash: "538471644a4057129176b4d601b89b014c14a4f6bb251eea2c57d21a9d2c6d21"
+    lessonContentHash: "0295762ac4725602526d8c320b6a6f6059e0fe7f5e2bf376fe9c3382f625df07"
     disposition: migrate
     ownerPacket: "06-web-monitoring"
     eligiblePathIds: ["webMonitoring"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "playwright/07_페이지객체와재사용"
     identityLedgerRef: "identity-ledger/playwright.yml"
-    lessonContentHash: "fd73bea8412fe448b2d153d28d8483e8a32a4eaec786bb17c5b857b31f3506e3"
+    lessonContentHash: "f77649c7d90fae8b8a611beb505586a4556cc6874d6b75445eb5cce0df6cb96d"
     disposition: migrate
     ownerPacket: "06-web-monitoring"
     eligiblePathIds: ["webMonitoring"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "playwright/08_pytest흐름"
     identityLedgerRef: "identity-ledger/playwright.yml"
-    lessonContentHash: "82100839c9e85725397c1acb4ab6bf1885cfb206117909aa31597289860fa0fd"
+    lessonContentHash: "1cab0cb9b788efa129e0d40b594314f148db1ae95a4efeabc7ff2ea93b757c04"
     disposition: migrate
     ownerPacket: "06-web-monitoring"
     eligiblePathIds: ["webMonitoring"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "playwright/09_트레이스와디버깅"
     identityLedgerRef: "identity-ledger/playwright.yml"
-    lessonContentHash: "1aa8dbc356eecd4a415d6b48940afc199a9d86c7d6ec938f202a9240457db266"
+    lessonContentHash: "1235b989511d71d09725378517d429156119299580695ec783d5e07714ee28f1"
     disposition: migrate
     ownerPacket: "06-web-monitoring"
     eligiblePathIds: ["webMonitoring"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "playwright/10_종합브라우저점검프로젝트"
     identityLedgerRef: "identity-ledger/playwright.yml"
-    lessonContentHash: "2d69a73f830d97ab3a18ae6a72a1bd9d32e34407b09785fe294be7db862436ca"
+    lessonContentHash: "712f450debc6f01822c46cd5bcd0a20710ab4ab7f36323bf29a36a58fd96bf0e"
     disposition: migrate
     ownerPacket: "06-web-monitoring"
     eligiblePathIds: ["webMonitoring"]
@@ -209,5 +239,8 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

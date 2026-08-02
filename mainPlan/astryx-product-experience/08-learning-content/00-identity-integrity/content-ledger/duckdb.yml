@@ -4,7 +4,7 @@ canonicalRows: 12
 lessons:
   - lessonRef: "duckdb/00_DuckDB소개"
     identityLedgerRef: "identity-ledger/duckdb.yml"
-    lessonContentHash: "c1d2199c3965bafc71a4bbed63013c0dfded8f7618f7b7604df563d9095a478d"
+    lessonContentHash: "1e3e591ba5aa4c87e43710c0589d90b66c7f7767b2df123ddbf1634ef11ad91d"
     disposition: migrate
     ownerPacket: "07-remaining-domains/18-sql-analysis"
     eligiblePathIds: ["sqlAnalysis"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "duckdb/00_MotherDuck소개"
     identityLedgerRef: "identity-ledger/duckdb.yml"
-    lessonContentHash: "4b8989bfba4b1c5e7ff1b2215d913ea2a6e96aee9c8268b73aac1b671bb7d673"
+    lessonContentHash: "7059841d9158e36c9af0aa5575d2a4931e5806b2a491ffb5e17769f370635aec"
     disposition: migrate
     ownerPacket: "07-remaining-domains/18-sql-analysis"
     eligiblePathIds: ["sqlAnalysis"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "duckdb/01_레스토랑팁기초"
     identityLedgerRef: "identity-ledger/duckdb.yml"
-    lessonContentHash: "94e88150c0186ad5cbf1a6846f20ae9c5b7881fa58de2a6dd340904d461bb58e"
+    lessonContentHash: "837aca98d006c83e03ec1fed7167129eee8a6687e178c31a39b2b99c40217dff"
     disposition: migrate
     ownerPacket: "07-remaining-domains/18-sql-analysis"
     eligiblePathIds: ["sqlAnalysis"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "duckdb/02_타이타닉생존통계"
     identityLedgerRef: "identity-ledger/duckdb.yml"
-    lessonContentHash: "f13f962582f6eeb756a8fe00adcc8a68a2cee98fb4cb06262ce670240c0b0bc8"
+    lessonContentHash: "756ef4765d08b96b2a38771fa5608009f7217e53726f0d86ca3983d7f7f05b9b"
     disposition: migrate
     ownerPacket: "07-remaining-domains/18-sql-analysis"
     eligiblePathIds: ["sqlAnalysis"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "duckdb/03_팁패턴분석"
     identityLedgerRef: "identity-ledger/duckdb.yml"
-    lessonContentHash: "51496b3caa40b844f37ae113440b5e4e4c58235226a15b916b4c38bc27ec3b1b"
+    lessonContentHash: "8352a504c9a04693f122e269844bfd481d8151a20017247ac5866e40a63cf3a5"
     disposition: migrate
     ownerPacket: "07-remaining-domains/18-sql-analysis"
     eligiblePathIds: ["sqlAnalysis"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "duckdb/04_타이타닉심층분석"
     identityLedgerRef: "identity-ledger/duckdb.yml"
-    lessonContentHash: "dee24696092e00b8ed93e2d47b375bf86b91eeb240c05f4f73366a4248fe88f8"
+    lessonContentHash: "99b8cc43159bc030751ea667945af0ac037a7c5ef4d75e94b6937f0ee1812271"
     disposition: migrate
     ownerPacket: "07-remaining-domains/18-sql-analysis"
     eligiblePathIds: ["sqlAnalysis"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "duckdb/05_팁서브쿼리분석"
     identityLedgerRef: "identity-ledger/duckdb.yml"
-    lessonContentHash: "fbee46e18264ac58b42865847138b2e03c5d90a38339a2c9c0a1ee9a2f76e233"
+    lessonContentHash: "85b4ce130afbf39f29c1e8f805addadafd8db9bd0a7f1e56f202362aa9804d77"
     disposition: migrate
     ownerPacket: "07-remaining-domains/18-sql-analysis"
     eligiblePathIds: ["sqlAnalysis"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "duckdb/06_CTE단계별분석"
     identityLedgerRef: "identity-ledger/duckdb.yml"
-    lessonContentHash: "7d690c9ede8f22c97566022e946785ad0ab4913334c8954e754b58c49a33071b"
+    lessonContentHash: "ecc0137775dd5c4699bf716465708e8e1a1a4272256f03a6bb6a8c542c3d40a8"
     disposition: migrate
     ownerPacket: "07-remaining-domains/18-sql-analysis"
     eligiblePathIds: ["sqlAnalysis"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "duckdb/07_윈도우함수기초"
     identityLedgerRef: "identity-ledger/duckdb.yml"
-    lessonContentHash: "5cd441f581db68655d02baa28dec02f85df17ad984807da98124a42617e86de9"
+    lessonContentHash: "c726be9c60b2af9c62d65319bf6eefc69643d9a0d0af9a869739b085c54b161b"
     disposition: migrate
     ownerPacket: "07-remaining-domains/18-sql-analysis"
     eligiblePathIds: ["sqlAnalysis"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "duckdb/08_고급윈도우분석"
     identityLedgerRef: "identity-ledger/duckdb.yml"
-    lessonContentHash: "8dfb6514ed79bb1d3a6a42a6470a1b3ad7372aa111a7b6b1e12b0946c5c94542"
+    lessonContentHash: "94ef1912ed0fbc45cc10df8ba13f16f4d45ef16de911a8a238ddbe19f66306f1"
     disposition: migrate
     ownerPacket: "07-remaining-domains/18-sql-analysis"
     eligiblePathIds: ["sqlAnalysis"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "duckdb/09_문자열과패턴"
     identityLedgerRef: "identity-ledger/duckdb.yml"
-    lessonContentHash: "91f9e4b883f0c7f40cd9fc96a22c3263d345dce8c9fe2a5e9b6e6ffe5c4b06d2"
+    lessonContentHash: "2ae90e770281729352336969eaee9b214584d5a90b560b3fe8e7915fd4b626df"
     disposition: migrate
     ownerPacket: "07-remaining-domains/18-sql-analysis"
     eligiblePathIds: ["sqlAnalysis"]
@@ -209,11 +239,14 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "duckdb/10_종합프로젝트"
     identityLedgerRef: "identity-ledger/duckdb.yml"
-    lessonContentHash: "53223035dc48ca1a0507200cb8cf42b6f9a77a2e012d1b3e6b0cad4a63ae99d0"
+    lessonContentHash: "899be457509e20cb3cddd8add83813288588d89cf99bb1d94f4ca6f7f30ae700"
     disposition: migrate
     ownerPacket: "07-remaining-domains/18-sql-analysis"
     eligiblePathIds: ["sqlAnalysis"]
@@ -228,5 +261,8 @@ lessons:
     artifactDecision: table-or-report
     visualDecision: required-data-shape-or-before-after
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

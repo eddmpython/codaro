@@ -15,6 +15,7 @@ from learningLedgerAudit import (
     ROOT,
     currentGitHead,
     fileSha256,
+    hasValidReviewMetadata,
     identityRows,
     loadYaml,
     utcTimestamp,
@@ -53,8 +54,12 @@ def main() -> int:
             failures.append(f"identity source mismatch: {lessonRef}")
         if row.get("registryStatus") != "registered":
             failures.append(f"identity registry status is not registered: {lessonRef}")
+        if row.get("reviewStatus") == "approved" and not hasValidReviewMetadata(row):
+            failures.append(f"identity approval metadata is invalid: {lessonRef}")
 
     review = aliasLedger.get("review") if isinstance(aliasLedger.get("review"), dict) else {}
+    if review.get("status") == "approved" and not hasValidReviewMetadata(review):
+        failures.append("legacy alias approval metadata is invalid")
     pendingRows = int(summary.get("pendingHumanReviewRows", len(rows)))
     machinePassed = not failures
     completionEligible = machinePassed and pendingRows == 0 and review.get("status") == "approved"

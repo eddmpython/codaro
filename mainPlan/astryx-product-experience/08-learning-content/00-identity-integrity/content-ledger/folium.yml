@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "folium/00_folium소개"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "693f424f4ee30cd6e0b535395eca307eac85f1cd254905b102446748e280e493"
+    lessonContentHash: "e230a7423245e1bcaa0045e6a83c69e124bb03c9797c57d9e4a7bdfd52f75407"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/01_첫지도만들기"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "20e98a786a9618ec84a16f66b07b7f379210dd04f77194fb3199d5a5271340a6"
+    lessonContentHash: "2bc32202a83bf227a0cee369dc64147c482ca5ee1c10ddaef20f5b9931af2632"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/02_다양한마커표현"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "6f04c2e58e758ad7c8d9e0d131420d0887532454a6fb2f8ce31ac47e8399bbae"
+    lessonContentHash: "6b9d7e571f3892ab84a5b4091848c28a84e2fd55f9d0dbf7527519e64b50a610"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/03_도형그리기"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "7798c5acd6bdd3bf7424523f191dba4a753e20bb18619f4ab4768821bf2209cc"
+    lessonContentHash: "50ef82f38078995f4d83854ac0fef986299fbfed4f7426b2cd1cb4c22937d4a4"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/04_지도스타일변경"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "de91f6f0540a53ae5a5a40557d7e1f570cd0253daa1ed32bf09423c2e52eff4d"
+    lessonContentHash: "6d0498eb4762ab6a78a497d0bb11e0e609f3d691d217f7c724ba5ef950537131"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/05_레이어관리"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "c2602fba54aa117365f5fd776938103dad46c27fcf69ce0f2202b8b680d3c63f"
+    lessonContentHash: "fd7ccea7242f214564cabd339220bd46d386a26f05cfeb14c5d1130558513bfe"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/06_GeoJSON활용"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "523262882f8180c43e2ac99d5cb9b3fc60612c0da90df19955b714a6ac56fa9a"
+    lessonContentHash: "b1657b4b2459311c42caed118f407e17f07cb40dec1d62b549d46acd69fa97d3"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/07_단계구분도"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "81c28b6c5a3ac2883c6ba6e804775cc518d69b3f98b1dd978d7e15a51163f271"
+    lessonContentHash: "9d43528339c56eca359da37f2204935b5b6f8c0e2024fa276567b0464f1f8f1a"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/08_히트맵"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "730b0ec4114068f7adcea99fac99d7e8136aa5cd4b959fc5e39c2eb35b1b74a7"
+    lessonContentHash: "1194d6ecdcf13ddcd4a84f511e12dd5839bf297fd80eec32354b4b304253da6f"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/09_마커클러스터"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "bbcec9f266b3abdc936badad068a4a5fa8bca8762f0565217627bf2bc8a4d3f1"
+    lessonContentHash: "d2566c9029532b92ebf3c508e264ca8d977414099cbe42999e179e2dd92ad1ac"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -190,11 +217,14 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/10_종합지도프로젝트"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "918f1e3a2ab5403ff62e2ecb20bda6e90ce93139e75542fab13738b7aa0d2236"
+    lessonContentHash: "ef4fba77a3cd4e7493efe4784476bf9cc95765faef7e77e92921728d60a17f83"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -209,5 +239,8 @@ lessons:
     artifactDecision: rendered-image
     visualDecision: required-result-and-encoding
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done

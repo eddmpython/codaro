@@ -4,7 +4,7 @@ canonicalRows: 10
 lessons:
   - lessonRef: "fileOps/01_pathlib경로감각"
     identityLedgerRef: "identity-ledger/fileOps.yml"
-    lessonContentHash: "f9e5a58ecd6af3763f1fd2b699ea613592fa0c5942d985c29530bd45253f567b"
+    lessonContentHash: "65ef857a18e59fa55b50b4a2792a2c337dc2b90840d4cbd8c0e572eea6931fab"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation","scriptingAutomation"]
@@ -19,11 +19,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "fileOps/02_파일읽고쓰기"
     identityLedgerRef: "identity-ledger/fileOps.yml"
-    lessonContentHash: "3d76d3314784a367a7748fa542fc5e383c772022325b032acb5975abe895b824"
+    lessonContentHash: "01dbf5cd944a5bb719fe3dfb5c60e706f8c35574556af07f51a23c568f2fa24b"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation","scriptingAutomation"]
@@ -38,11 +41,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "fileOps/03_디렉터리탐색"
     identityLedgerRef: "identity-ledger/fileOps.yml"
-    lessonContentHash: "c29ea5246913f3c943cb093751860712c0ba15d6d0bc99901394b4309b51e5b4"
+    lessonContentHash: "13cc0054c45148638c99807410712c0b5faa4de65e378d111c7efbee77b0b1b4"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation","scriptingAutomation"]
@@ -57,11 +63,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "fileOps/04_복사이동이름변경"
     identityLedgerRef: "identity-ledger/fileOps.yml"
-    lessonContentHash: "ccd65da0a925c92a33903e600037ee9a3c8f32eb3557c9ef795cc510c4b7490b"
+    lessonContentHash: "b245c29093cdfb9f559543745bda3d1446a932be2d6dae6415bbc00ece2f5cd1"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation","scriptingAutomation"]
@@ -76,11 +85,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "fileOps/05_안전삭제"
     identityLedgerRef: "identity-ledger/fileOps.yml"
-    lessonContentHash: "0aaaa48c1e1f65de6b660af7064f5b0506854ec3d7c7aa75ca8e9d5e4a6ec4d8"
+    lessonContentHash: "0a2f31d7a8e56eb8db25c1ddc94a96e8412e713e28e71ef50059a393ddc23ef0"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation","scriptingAutomation"]
@@ -95,11 +107,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "fileOps/06_zip압축"
     identityLedgerRef: "identity-ledger/fileOps.yml"
-    lessonContentHash: "64342e0c83d6ad83676fd606faac89c3df5a4708dd64b14159b57821fc88c047"
+    lessonContentHash: "30ebdad373772eda1baef6a8d24b17b0689208c8e12e197f4c72495db1fc6a81"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation"]
@@ -114,11 +129,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "fileOps/07_백업과동기화"
     identityLedgerRef: "identity-ledger/fileOps.yml"
-    lessonContentHash: "016a6d56e16b987edae64fceb6cfa52c25a02a1d1a72c094b91ee9eccdd6a8e1"
+    lessonContentHash: "286d030ac33e8678a88190e656c4aa2b50583f3baef1b1df4b68a7f00e0e8eb6"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation"]
@@ -133,11 +151,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "fileOps/08_디렉터리정리"
     identityLedgerRef: "identity-ledger/fileOps.yml"
-    lessonContentHash: "b2535e7cd07823780fe3b933efb49c087512d889a5e9b6db4662cd81fbd70500"
+    lessonContentHash: "87bf57327fc937c1d30bddaf8d082bffb0e6a0b33b05a50210c2e27d5602d711"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation"]
@@ -152,11 +173,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "fileOps/09_파일메타데이터"
     identityLedgerRef: "identity-ledger/fileOps.yml"
-    lessonContentHash: "c00abb860ad2f45f6744721b89905f47d45dd88750dc8a4c6b59a5165976ce4e"
+    lessonContentHash: "c1061e4a278637d86d18b0664e2f052c93b9f66c22f64067df7ad53f30a140ed"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation","scriptingAutomation"]
@@ -171,11 +195,14 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
   - lessonRef: "fileOps/10_종합다운로드폴더정리"
     identityLedgerRef: "identity-ledger/fileOps.yml"
-    lessonContentHash: "092e9bac7860fddb4665a2ef20bf5358a5ab4fb89f6eb6c2c87e140ae960e1a6"
+    lessonContentHash: "c7c08791859796e9145afcebe46a05051d9ac5bdb81874a904b82e7c096fa827"
     disposition: migrate
     ownerPacket: "04-file-automation"
     eligiblePathIds: ["fileAutomation"]
@@ -190,5 +217,8 @@ lessons:
     artifactDecision: file-or-audit
     visualDecision: required-before-after-or-state-flow
     reviewerRoles: [curriculum-owner, learning-qa, design-owner]
-    authorReviewStatus: planned
+    authorReviewStatus: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
     evidenceCommitRequirement: required-before-done
