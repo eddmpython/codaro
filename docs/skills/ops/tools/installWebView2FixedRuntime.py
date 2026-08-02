@@ -77,6 +77,7 @@ def installRuntime(payload: dict[str, object]) -> dict[str, object]:
     acl = grantAppContainerReadExecute(target)
     return {
         "status": "passed",
+        "gitHead": currentGitHead(),
         "installedAt": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
         "lockPath": displayPath(LOCK_PATH),
         "lockSha256": runtimeLockSha256(),
@@ -93,6 +94,20 @@ def installRuntime(payload: dict[str, object]) -> dict[str, object]:
         "runtimeReused": reused_runtime,
         "appContainerAcl": acl,
     }
+
+
+def currentGitHead() -> str:
+    completed = subprocess.run(
+        ("git", "rev-parse", "HEAD"),
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=30,
+        check=True,
+    )
+    return completed.stdout.strip()
 
 
 def downloadArchive(payload: dict[str, object], archive: Path) -> bool:

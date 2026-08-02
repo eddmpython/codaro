@@ -4,9 +4,11 @@ from copy import deepcopy
 from datetime import UTC, datetime
 import json
 from pathlib import Path
+import subprocess
 
 import pytest
 
+from docs.skills.ops.tools import installWebView2FixedRuntime as installer
 from product.webview2RuntimeLock import (
     LOCK_PATH,
     RuntimeLockError,
@@ -47,3 +49,51 @@ def testWebView2RuntimeLockBecomesRedAfterFreshnessWindow() -> None:
 
     with pytest.raises(RuntimeLockError, match="ageDays=31"):
         validateRuntimeLock(payload, now=datetime(2026, 8, 31, tzinfo=UTC))
+
+
+def testFixedRuntimeReceiptIsBoundToCurrentCommit(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    work_root = tmp_path / "fixed-gate"
+    download_root = work_root / "downloads"
+    target = work_root / "fixed-runtime" / "runtime"
+    payload = {
+        "archiveFileName": "runtime.cab",
+        "distributionMode": "fixed",
+        "version": "151.0.4129.59",
+        "architecture": "x64",
+    }
+
+    def download(_payload: dict[str, object], archive: Path) -> bool:
+        archive.write_bytes(b"locked archive")
+        return True
+
+    def extract(_payload: dict[str, object], _archive: Path, destination: Path) -> None:
+        destination.mkdir(parents=True)
+
+    monkeypatch.setattr(installer, "WORK_ROOT", work_root)
+    monkeypatch.setattr(installer, "DOWNLOAD_ROOT", download_root)
+    monkeypatch.setattr(installer, "runtimeInstallRoot", lambda _payload: target)
+    monkeypatch.setattr(installer, "downloadArchive", download)
+    monkeypatch.setattr(installer, "extractArchive", extract)
+    monkeypatch.setattr(
+        installer,
+        "verifyInstalledRuntime",
+        lambda _payload: {"version": payload["version"]},
+    )
+    monkeypatch.setattr(installer, "grantAppContainerReadExecute", lambda _target: [])
+    monkeypatch.setattr(installer, "runtimeLockSha256", lambda: "lock-sha256")
+    monkeypatch.setattr(installer, "sha256File", lambda _path: "archive-sha256")
+    monkeypatch.setattr(installer, "displayPath", lambda path: path.as_posix())
+
+    receipt = installer.installRuntime(payload)
+    expected_head = subprocess.run(
+        ("git", "rev-parse", "HEAD"),
+        cwd=installer.ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+
+    assert receipt["gitHead"] == expected_head
