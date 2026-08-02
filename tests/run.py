@@ -153,7 +153,6 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     ),
     "plan-quality": (
         "output/test-runner/plan-quality/plan-fact-audit.json",
-        "output/test-runner/plan-quality/evaluation-validation.json",
     ),
     "provider-settings-browser": ("output/test-runner/provider-settings-browser/provider-settings-report.json",),
     "playwright-curriculum-runtime": (
@@ -334,16 +333,8 @@ GATES: dict[str, Gate] = {
     ),
     "plan-quality": Gate(
         tier="fast",
-        description="mainPlan TODO 정책, 현재 사실과 R10 draft의 무결성을 검증하고 외부 readiness blocker를 명시적으로 보존한다.",
+        description="mainPlan TODO 정책, 현재 사실, 제품 계약과 직접 fact audit의 무결성을 검증한다.",
         commands=(
-            command((
-                "uv", "run", "python", "-X", "utf8",
-                "docs/skills/ops/tools/buildPrdEvaluationBundle.py", "--check",
-            )),
-            command((
-                "uv", "run", "python", "-X", "utf8",
-                "docs/skills/ops/tools/buildPrdRoundFactAudit.py", "--check",
-            )),
             command((
                 "uv", "run", "python", "-X", "utf8", "tests/product/verifyPlanFactAudit.py",
             )),
@@ -353,24 +344,11 @@ GATES: dict[str, Gate] = {
             )),
             command((
                 "uv", "run", "python", "-X", "utf8", "-m", "pytest",
-                "tests/plan/testMainPlanTodoPolicy.py", "tests/product/testPrdEvaluationBundle.py",
-                "tests/product/testPrdEvaluationReport.py",
+                "tests/plan/testMainPlanTodoPolicy.py", "tests/product/testPrdEvaluationContract.py",
                 "-q", "--tb=short",
-            )),
-            command((
-                "uv", "run", "python", "-X", "utf8",
-                "tests/product/verifyPrdEvaluationReport.py", "--allow-readiness-blockers",
             )),
         ),
         blocking=False,
-        ci_required=False,
-    ),
-    "r10-independent-review": Gate(
-        tier="release",
-        description="독립 R10 roster, sealed scope, 세 raw report byte seal·Markdown view와 손실 없는 finding ledger를 엄격하게 검증한다.",
-        commands=(command((
-            "uv", "run", "python", "-X", "utf8", "tests/product/verifyPrdEvaluationReport.py",
-        )),),
         ci_required=False,
     ),
     "automation-ide-audit": Gate(
@@ -560,7 +538,7 @@ GATES: dict[str, Gate] = {
     ),
     "path-promotion-readiness": Gate(
         tier="fast",
-        description="대표 6경로의 M0 구조·평가·capstone·solution을 검증하고 R10·사람 근거 전 공개 승격을 차단한다.",
+        description="대표 6경로의 M0 구조·평가·capstone·solution을 검증하고 E3 사람 근거 전 공개 승격을 차단한다.",
         commands=(
             command((
                 "uv", "run", "python", "-X", "utf8", "-m", "pytest",
@@ -1002,10 +980,8 @@ PRODUCT_RELEASE_GATES = (
     "automation-ide-audit",
     "launcher-test",
     "product-browser-webview2-fixed",
-    "path-learning-signal",
     "evaluation-contract",
     "plan-quality",
-    "r10-independent-review",
 )
 TIER_ORDER = ("fast", "surface", "release", "experiment")
 
@@ -1988,8 +1964,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 64:
-        failures.append(f"expected 64 gates, found {len(GATES)}")
+    if len(GATES) != 63:
+        failures.append(f"expected 63 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

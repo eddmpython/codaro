@@ -246,7 +246,7 @@ def main() -> int:
         "claimScope": "machine-verifiable Web learning implementation",
         "humanEvidenceClaimed": False,
         "releaseApprovalClaimed": False,
-        "deferredConditionsOwner": "quality-release",
+        "deferredConditionsOwner": "path-efficacy-and-platform-contracts",
         "deferredConditions": [
             "manual assistive-technology and representative learner evidence",
             "formal compatibility releases and telemetry retirement criteria",

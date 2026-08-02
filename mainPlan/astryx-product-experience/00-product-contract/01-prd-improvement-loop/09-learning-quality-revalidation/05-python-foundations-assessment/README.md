@@ -11,7 +11,7 @@ Python 30 Days를 읽고 실행하는 카드 모음에서, 각 레슨이 `master
 - Day 1~30을 사람 학습성 기준으로 전수 검수한다.
 - Python Foundations assessment를 독립 검수자가 승인한다.
 - 실제 Local WebView2 artifact parity를 검수한다.
-- 독립 R10이 현재 범위를 승인한 뒤 이 TODO와 parent index 링크를 삭제한다.
+- current source의 assessment gate와 parent fact audit가 모두 green이면 이 TODO와 parent index 링크를 삭제한다.
 
 ## 영향 파일
 

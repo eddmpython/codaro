@@ -115,11 +115,9 @@ def testEvaluationContractRejectsOpenFindingLedgerOrScoreThreshold() -> None:
     assert "finding ledger schema must forbid score thresholds" in failures
 
 
-def testEvaluationContractRunsRawReportAndBundleNegativeFixtures() -> None:
+def testEvaluationContractRunsContractNegativeFixtures() -> None:
     verifier = loadVerifier()
     commands = {name: command for name, command in verifier.checkCommands()}
     fixtureCommand = commands["evaluation-contract-fixtures"]
 
     assert "tests/product/testPrdEvaluationContract.py" in fixtureCommand
-    assert "tests/product/testPrdEvaluationReport.py" in fixtureCommand
-    assert "tests/product/testPrdEvaluationBundle.py" in fixtureCommand

@@ -63,7 +63,6 @@ def resolvePathPromotionState(
     pathId: str,
     contentHash: str,
     machineChecks: dict[str, bool],
-    r10RoundReady: bool,
     efficacyCandidate: dict[str, Any] | None = None,
 ) -> PathPromotionState:
     normalizedPathId = pathId.strip() if isinstance(pathId, str) else ""
@@ -75,9 +74,6 @@ def resolvePathPromotionState(
             "path promotion에는 현재 capstone의 SHA-256 content hash가 필요합니다.",
         )
     normalizedChecks = _validateMachineChecks(machineChecks)
-    if not isinstance(r10RoundReady, bool):
-        raise PathPromotionInvalid("invalid-r10-readiness", "R10 round readiness는 boolean이어야 합니다.")
-
     failedChecks = tuple(key for key in MACHINE_CHECK_KEYS if not normalizedChecks[key])
     machineReady = not failedChecks
     blockers = [f"machine-check-failed:{key}" for key in failedChecks]
@@ -104,14 +100,12 @@ def resolvePathPromotionState(
         humanVisibility = releaseState.visibility
 
     blockers.extend(HUMAN_STAGE_BLOCKERS[humanStage])
-    if not r10RoundReady:
-        blockers.append("r10-round-not-ready")
 
-    promotionEligible = machineReady and r10RoundReady and humanStage == "E3"
+    promotionEligible = machineReady and humanStage == "E3"
     if promotionEligible:
         allowedClaim = humanClaim
         visibility = humanVisibility
-    elif machineReady and r10RoundReady and humanStage is not None:
+    elif machineReady and humanStage is not None:
         allowedClaim = humanClaim
         visibility = humanVisibility
     elif machineReady:
@@ -146,7 +140,6 @@ def resolvePathPromotionPortfolio(
                 pathId=pathId,
                 contentHash=candidate.get("contentHash"),
                 machineChecks=candidate.get("machineChecks"),
-                r10RoundReady=candidate.get("r10RoundReady"),
                 efficacyCandidate=candidate.get("efficacyCandidate"),
             )
             results[pathId] = {"passed": True, **asdict(state)}

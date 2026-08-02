@@ -365,9 +365,8 @@ def main() -> int:
         "claimScope": "machine-verifiable Local Studio implementation",
         "humanEvidenceClaimed": False,
         "releaseApprovalClaimed": False,
-        "deferredConditionsOwner": "quality-release",
+        "deferredConditionsOwner": "path-efficacy-and-platform-contracts",
         "deferredConditions": [
-            "Windows 10 22H2 Fixed Version conformance",
             "manual assistive-technology and zoom evidence",
             "representative user and independent product review evidence",
             "public Web-to-installed-Local release round trip",

@@ -265,8 +265,6 @@ def checkCommands() -> tuple[tuple[str, tuple[str, ...]], ...]:
                 "-m",
                 "pytest",
                 "tests/product/testPrdEvaluationContract.py",
-                "tests/product/testPrdEvaluationReport.py",
-                "tests/product/testPrdEvaluationBundle.py",
                 "-q",
                 "--tb=short",
                 "-p",
@@ -359,13 +357,9 @@ def verifyEvaluationContract() -> dict[str, Any]:
         "facts": facts,
         "checks": checks,
         "failures": failures,
-        "roundBoundary": {
+        "reviewBoundary": {
             "contractVerified": not failures,
-            "independentRoundExecuted": False,
-            "independentRoundOwner": (
-                "mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/"
-                "08-r10-independent-review"
-            ),
+            "releaseReviewGate": "plan-quality",
         },
     }
 

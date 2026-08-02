@@ -108,7 +108,6 @@ artifacts:
     owner: product-architecture
     sourcePath: contracts/prdEvaluationRubric.yml
     surfacePaths:
-      - docs/skills/ops/tools/buildPrdEvaluationBundle.py
       - tests/product/verifyPlanFactAudit.py
   - artifactId: prd-evaluation-report
     role: source
@@ -116,4 +115,3 @@ artifacts:
     sourcePath: contracts/prdEvaluationReport.schema.yml
     surfacePaths:
       - tests/product/verifyPrdEvaluationContract.py
-      - tests/product/verifyPrdEvaluationReport.py

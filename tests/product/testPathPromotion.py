@@ -75,7 +75,6 @@ def testMachineReadyPathStaysProvisionalWithoutHumanEvidence() -> None:
         pathId="pythonFoundation",
         contentHash=CONTENT_HASH,
         machineChecks=machineChecks(),
-        r10RoundReady=False,
     )
 
     assert state.machineStage == "M0"
@@ -89,7 +88,6 @@ def testMachineReadyPathStaysProvisionalWithoutHumanEvidence() -> None:
         "formative-evidence-required",
         "learning-signal-evidence-required",
         "confirmatory-evidence-required",
-        "r10-round-not-ready",
     )
 
 
@@ -99,13 +97,11 @@ def testOneMachineFailureIsVisiblePerPath() -> None:
             "pathId": "passedPath",
             "contentHash": CONTENT_HASH,
             "machineChecks": machineChecks(),
-            "r10RoundReady": False,
         },
         {
             "pathId": "failedPath",
             "contentHash": CONTENT_HASH,
             "machineChecks": machineChecks(capstoneContract=False),
-            "r10RoundReady": False,
         },
     ])
 
@@ -115,28 +111,11 @@ def testOneMachineFailureIsVisiblePerPath() -> None:
     assert portfolio["failedPath"]["visibility"] == "provisional"
 
 
-def testR10BlockerPreventsSyntheticE3Promotion() -> None:
+def testE2AllowsBetaButNotFeaturedPromotion() -> None:
     state = resolvePathPromotionState(
         pathId="pythonFoundation",
         contentHash=CONTENT_HASH,
         machineChecks=machineChecks(),
-        r10RoundReady=False,
-        efficacyCandidate=efficacyCandidate("E3"),
-    )
-
-    assert state.humanEfficacyStage == "E3"
-    assert state.allowedClaim == "machineVerified"
-    assert state.visibility == "provisional"
-    assert state.promotionEligible is False
-    assert state.blockers == ("r10-round-not-ready",)
-
-
-def testReadyR10AllowsE2BetaButNotFeaturedPromotion() -> None:
-    state = resolvePathPromotionState(
-        pathId="pythonFoundation",
-        contentHash=CONTENT_HASH,
-        machineChecks=machineChecks(),
-        r10RoundReady=True,
         efficacyCandidate=efficacyCandidate("E2"),
     )
 
@@ -146,12 +125,11 @@ def testReadyR10AllowsE2BetaButNotFeaturedPromotion() -> None:
     assert state.blockers == ("confirmatory-evidence-required",)
 
 
-def testReadyR10AndE3AllowFeaturedPromotion() -> None:
+def testE3AllowsFeaturedPromotion() -> None:
     state = resolvePathPromotionState(
         pathId="pythonFoundation",
         contentHash=CONTENT_HASH,
         machineChecks=machineChecks(),
-        r10RoundReady=True,
         efficacyCandidate=efficacyCandidate("E3"),
     )
 
@@ -170,7 +148,6 @@ def testStaleEfficacyEvidenceIsRejected() -> None:
             pathId="pythonFoundation",
             contentHash=CONTENT_HASH,
             machineChecks=machineChecks(),
-            r10RoundReady=True,
             efficacyCandidate=candidate,
         )
 

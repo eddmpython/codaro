@@ -4,7 +4,7 @@
 
 2026-07-29 machine journey는 Landing Home mobile·desktop, Landing Learn catalog, public canonical lesson, Web Learn·Lesson·Chat·Automation·Run, Local Learn·native Lesson·Run·Automation의 14개 Chromium case를 Dark·Light 각각 통과한다. 28개 scheme별 evidence에서 Astryx theme, overflow·control overlap 0, accessible name, image load, 분리된 screenshot을 검사했고 두 lesson의 확인·제출·hint reveal control은 0개다. `reveal-only-control` negative fixture도 실행 상태로 이미 제공할 수 있는 내용을 클릭 뒤에 숨기는 계약으로 거부한다.
 
-실제 네이티브 WebView2 gate는 900x640 Home, 1024x768 Notebook, 1440x900 Automation과 상태별 screenshot, 접근성 tree, 한국어 IME, keyboard, forced-colors를 검사한다. 현재 저장된 9/9 통과 report는 current source commit과 연결되며 R10 blind bundle의 허용 목록 원본 증거에도 포함된다. 다만 이 report는 NVDA·Narrator 발화를 사람이 청취한 증거가 아니다. `manual-at.matrix.yml`은 Web Windows NVDA 2종, macOS·iOS VoiceOver, Android TalkBack, Windows 10 22H2 Narrator의 정확한 6개 조합과 12명 연구, 제품 디자인·접근성 독립 검토를 폐쇄형 schema로 고정했다. 현재 모든 사람 증거는 정직하게 `pending`이므로 `completionEligible=false`이며 이 TODO는 남아 있다.
+실제 네이티브 WebView2 gate는 900x640 Home, 1024x768 Notebook, 1440x900 Automation과 상태별 screenshot, 접근성 tree, 한국어 IME, keyboard, forced-colors를 검사한다. Evergreen과 Fixed Version의 10-case matrix는 실행 commit과 report를 직접 연결한다. 이 자동 report는 NVDA·Narrator 발화를 사람이 청취한 증거를 주장하지 않는다. `manual-at.matrix.yml`은 Web Windows NVDA 2종, macOS·iOS VoiceOver, Android TalkBack, Windows 10 22H2 Narrator의 정확한 6개 조합과 12명 연구, 제품 디자인·접근성 독립 검토를 폐쇄형 schema로 고정했다. 사람 근거는 제품 shell release가 아니라 경로 공개 효능 승격에 사용한다.
 
 ## 목표
 

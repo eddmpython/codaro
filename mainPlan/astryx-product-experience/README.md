@@ -2,7 +2,7 @@
 
 상태: 진행
 
-전문 평가 입력은 [PRD improvement loop](00-product-contract/01-prd-improvement-loop/)가 제품 PRD와 분리해 관리한다. 과거 점수·결론은 blind evaluator 입력에 넣지 않으며, 어떤 역사 점수도 현재 완료 판정을 대신하지 않는다. 현재 top-level TODO는 3개다. R8의 100점은 동일 평가자 자기수렴으로 무효 처리한 역사 기록이며, 현재 PRD에는 독립 점수도 R10 통과 판정도 없다.
+[PRD improvement loop](00-product-contract/01-prd-improvement-loop/)는 제품 PRD와 구현 근거를 분리해 관리한다. 평가는 목표 점수나 역사 점수 대신 현재 경로·심볼·gate와 실행 보고서를 직접 대조한다. 현재 top-level TODO는 2개다.
 
 ## 목표
 
@@ -44,7 +44,7 @@ Codaro를 다운로드 중심 랜딩과 별도 로컬 앱의 조합으로 보지
 
 ## 작업 지도
 
-`의존`은 아래 00 milestone의 증거 경계를 뜻한다. 이 표의 원래 의도는 B3 전 W1+ source 확장까지 막는 것이었지만 실제 구현은 그 순서를 지키지 않았다. R10 전에 strong assessment 468레슨, public route 472개, 대표 visual과 legacy 제거가 source에 들어왔다. 이미 구현된 코드를 없던 일로 하거나 되돌려 순서를 가장하지 않는다.
+`의존`은 아래 00 milestone의 증거 경계를 뜻한다. strong assessment 468레슨, public route 472개, 대표 visual과 legacy 제거는 현재 source와 상시 gate가 소유한다.
 
 따라서 B0~B3는 지금부터 **승인과 공개 승격 gate**로 적용한다. 선행 구현은 모두 provisional machine coverage이며, B3 전에는 W1+ 사람 승인, 경로 공개 승격, 독립 품질 주장에 사용할 수 없다. 구현 workstream은 범위의 제품 동작과 부정 경로를 상시 machine gate가 소유하고 남은 사람·배포 조건을 활성 owner로 이관한 경우에만 삭제한다. 결함 수정과 machine 검증은 계속하되 새 일괄 변환으로 사람 검수 부채를 늘리지 않는다.
 
@@ -52,14 +52,13 @@ Codaro를 다운로드 중심 랜딩과 별도 로컬 앱의 조합으로 보지
 | --- | --- | --- |
 | B0 bootstrap | evaluation contract, product contract, fact-audit gate의 red-to-green evidence | 영구 평가 계약은 `contracts/`가 소유한다. 나머지 product contract remediation은 별도 evidence 필요 |
 | B1 feasibility | downgrade-safe evidence migration과 browser·Windows check sandbox 실측 판정 | 구현된 check 범위는 provisional이며 미검증 tier를 strong completion으로 승격 불가 |
-| B2 W0 evidence | 세 레슨 Landing -> Web -> Local 여정, 자동 검사, 사람 검수, Astryx·AT matrix | machine W0만으로 대체 불가, current evidence bundle 봉인 전 R10 제출 불가 |
-| B3 independent review | 새 평가자 3명의 raw report, fact audit, P0·P1 response와 TODO 삭제 | 선행 구현된 W1+의 사람 승인·공개 승격. source 확장은 이미 provisional 상태로 발생 |
+| B2 W0 evidence | 세 레슨 Landing -> Web -> Local 여정과 자동 검사 | browser·native machine gate로 회귀를 고정하고 사람 연구는 경로 승격과 분리 |
+| B3 release review | current source fact audit, 제품 browser, Evergreen·Fixed WebView2와 부정 경로 | 직접 검토와 상시 machine gate로 출시 구현 경계를 판정 |
 
 | 순서 | 작업 폴더 | 의존 | 종료 조건 |
 | --- | --- | --- | --- |
 | 00 | [product-contract](00-product-contract/) | 없음 | B0~B3 packet의 구현·검증·사람 증거가 모두 충족됨 |
 | 09 | [repository-simplification](09-repository-simplification/) | 영구 learning-content와 공용 visual 계약 | prediction, classroom, dead source, unused asset, 거짓 gate가 제거됨 |
-| 10 | [quality-release](10-quality-release/) | B3와 02·09, learning-content·Web·Local 영구 gate | 접근성, 성능, 학습 효과, 반응형, 실제 배포 smoke가 통과함 |
 
 ## Artifact ownership
 
@@ -67,10 +66,10 @@ Codaro를 다운로드 중심 랜딩과 별도 로컬 앱의 조합으로 보지
 | --- | --- | --- |
 | `LessonRef`, `LearningEvent`, evidence store, mastery policy, route state | 00 | 02와 Web·Local surface adapter가 소비 |
 | `CheckSpec`, browser/local executor, sandbox, retrieval/scaffold | `editor/src/lib/learningCheckSpec.ts`, `src/codaro/curriculum/localStrongCheck.py`, `docs/skills/architecture/learning-experience.md` | `learning-method`·`web-learning`·`local-studio-browser`가 상태 표시와 회귀를 검증 |
-| learning archive schema, Web progress adapter, public lesson route | `contracts/learningArchive.schema.json`, `editor/src/lib/webLearningEvidence.ts`, `landing/src/routes/resolvePublicRoute.jsx` | `local-studio-browser`가 Local archive 소비와 왕복을 검증하고 10이 release gate membership을 소유 |
-| canonical lesson identity, content owner, path ledger, featured M0 capstone | `contracts/learning-content/` | `learning-content`, `curriculum-quality-matrix`, path promotion과 10 release aggregate가 소비 |
+| learning archive schema, Web progress adapter, public lesson route | `contracts/learningArchive.schema.json`, `editor/src/lib/webLearningEvidence.ts`, `landing/src/routes/resolvePublicRoute.jsx` | `local-studio-browser`가 Local archive 소비와 왕복을 검증 |
+| canonical lesson identity, content owner, path ledger, featured M0 capstone | `contracts/learning-content/` | `learning-content`, `curriculum-quality-matrix`, path promotion과 product release aggregate가 소비 |
 | Astryx token·component·font manifest | `assets/brand/designSystem/` | Web·Local 제품 surface가 소비 |
-| removal verifier | 09 | 10은 release aggregate에 연결 |
+| removal verifier | 09 | product release aggregate에 연결 |
 
 같은 path를 두 workstream이 동시에 `신규`로 소유할 수 없다. downstream 문서는 baseline 존재 여부에 따라 `소비` 또는 `선행 산출물 소비`로 표시하고, release aggregate 연결은 `gate membership`으로 표시한다.
 
@@ -78,7 +77,7 @@ path 상태 어휘는 다음처럼 고정한다. `기존`, `수정`, `소비`는
 
 ## TODO 삭제 조건
 
-작업 범위의 구현과 machine 검증이 완료되고 상시 gate와 활성 owner가 동작·회귀·남은 사람 및 배포 조건을 빠짐없이 소유하면 해당 구현 TODO 폴더와 parent 인덱스 행을 삭제한다. 이관된 사람 근거나 실제 release 조건을 통과했다고 추정하지 않는다. `10-quality-release`를 포함한 모든 TODO가 삭제되기 전에는 이니셔티브를 완료라고 부르지 않는다. 마지막 작업이 끝나면 이니셔티브 폴더와 `mainPlan/README.md`의 활성 행도 삭제한다.
+작업 범위의 구현과 machine 검증이 완료되고 상시 gate와 활성 owner가 동작·회귀를 소유하면 해당 구현 TODO 폴더와 parent 인덱스 행을 삭제한다. 사람 연구는 제품 구현 완료와 섞지 않고 해당 경로의 공개 효능 승격에서만 요구한다. 마지막 작업이 끝나면 이니셔티브 폴더와 `mainPlan/README.md`의 활성 행도 삭제한다.
 
 ## 영향 파일
 
@@ -102,7 +101,7 @@ path 상태 어휘는 다음처럼 고정한다. `기존`, `수정`, `소비`는
 ## 테스트
 
 - 모든 작업 폴더의 지정 테스트를 해당 TODO 삭제 전에 실행한다.
-- `PRODUCT_RELEASE_GATES` 순서는 `root-clean`, `docs`, `backend`, `architecture-boundary`, `editor-build`, `landing-build`, `mobile-layout`, `frontend-performance-budget`, `design-system-contract`, `theme-runtime-browser`, `visual-accessibility-browser`, `learning-method`, `curriculum-quality-matrix`, `path-promotion-readiness`, `repository-simplification`, `learning-content`, `web-learning`, `visual-assets`, `landing-public`, `removed-learning-concepts`, `product-experience-browser`, `astryx-journey`, `local-studio-browser`, `run-local-state-browser`, `learning-evidence-contract`, `learning-efficacy-report`, `automation-ide-audit`, `launcher-test`, `path-learning-signal`, `evaluation-contract`, `plan-quality`, `r10-independent-review`다. `learning-content` green은 472개 source와 31개 path의 M0 완료를 뜻한다. `path-promotion-readiness` green은 대표 6경로의 M0 기계 준비만 뜻하며 R10 round와 사람 근거가 없으면 모두 provisional이다. 이 release aggregate에는 사람 증거가 비어 있어 red인 `path-learning-signal`, `plan-quality`, `r10-independent-review`도 의도적으로 포함되며, `path-efficacy-confirmatory`는 featured path 승격 조건으로 별도 실행한다.
+- `PRODUCT_RELEASE_GATES`는 machine release sequence이며 `launcher-test` 뒤 `product-browser-webview2-fixed`, `evaluation-contract`, `plan-quality`로 끝난다. `learning-content` green은 472개 source와 31개 path의 M0 완료를 뜻한다. `path-learning-signal`과 `path-efficacy-confirmatory`는 featured path 승격 조건으로 별도 실행한다.
 - viewport 매트릭스는 Web 320x568·360x740·390x844·768x1024·1440x900·1680x1050, 실제 Local WebView2 900x640·1024x768·1440x900이며 light, dark와 forced-colors를 캡처한다.
 
 ## 롤백

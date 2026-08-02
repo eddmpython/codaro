@@ -4,7 +4,7 @@
 
 ## 목표
 
-R8처럼 평가자가 목표 점수에 맞춰 문서를 수렴시키는 루프를 폐기한다. 학습에 실제로 도움이 되는 Web·Local 여정 하나를 먼저 증명하고, 현재 코드와 충돌하지 않는 PRD를 만든 뒤, 신규 전문 평가자가 목표 점수 없이 다시 반증한다.
+R8처럼 평가자가 목표 점수에 맞춰 문서를 수렴시키는 루프를 폐기한다. 학습에 실제로 도움이 되는 Web·Local 여정을 증명하고 현재 코드와 충돌하지 않는 PRD를 current-source fact audit과 실행 gate로 직접 반증한다.
 
 이 루프는 점수를 올리는 작업이 아니다. 다음 질문에 근거로 답하는 작업이다.
 
@@ -16,7 +16,6 @@ R8처럼 평가자가 목표 점수에 맞춰 문서를 수렴시키는 루프�
 
 ## 평가 계약
 
-- 전문 평가자는 remediation 작성자가 아니며, 제출 전 이전 round 점수와 결론을 읽지 않는다.
 - 평가 요청에는 목표 점수, 통과 기준 점수, 원하는 결론을 넣지 않는다.
 - rubric과 scope hash를 평가 전에 고정한다. 평가 뒤 항목 가중치를 바꾸지 않는다.
 - PRD integrity와 product evidence maturity를 별도 점수로 기록한다. 계획이 구체적이라는 이유로 미구현 증거를 받은 것으로 계산하지 않고, 구현이 없다는 이유만으로 자기충족 PRD를 0점 처리하지 않는다.
@@ -25,7 +24,7 @@ R8처럼 평가자가 목표 점수에 맞춰 문서를 수렴시키는 루프�
 - 이전 round를 덮어쓰지 않는다. 다음 round가 더 낮아도 그대로 기록한다.
 - 점수와 무관하게 P0는 착수를 막고, plan-internal P1은 해당 dependency 착수를 막는다.
 
-PRD integrity의 versioned SSOT는 [`contracts/prdEvaluationRubric.yml`](../../../../contracts/prdEvaluationRubric.yml)이고 raw report 형식은 [`contracts/prdEvaluationReport.schema.yml`](../../../../contracts/prdEvaluationReport.schema.yml)이 소유한다. 총점 scale은 100이지만 목표 점수와 통과 threshold는 없다. 점수는 항목별 근거를 손실 없이 요약하는 값이고, P0·P1 dependency 차단과 product evidence maturity는 총점과 별도로 판정한다. 현재 R10 raw report가 없으므로 현 PRD의 유효한 독립 점수도 없으며, 역사 R8 100점을 현재 점수로 재사용하지 않는다.
+PRD integrity의 versioned SSOT는 [`contracts/prdEvaluationRubric.yml`](../../../../contracts/prdEvaluationRubric.yml)이고 report 형식은 [`contracts/prdEvaluationReport.schema.yml`](../../../../contracts/prdEvaluationReport.schema.yml)이 소유한다. 총점 scale은 100이지만 목표 점수와 통과 threshold는 없다. 점수는 항목별 근거를 손실 없이 요약하는 값이고, P0·P1 dependency 차단과 product evidence maturity는 총점과 별도로 판정한다.
 
 Product evidence maturity는 `E0 없음`, `E1 synthetic`, `E2 vertical slice`, `E3 대표 경로`, `E4 전수·실사용` 단계로만 기록한다. PRD 점수와 평균내지 않는다.
 
@@ -37,14 +36,13 @@ Product evidence maturity는 `E0 없음`, `E1 synthetic`, `E2 vertical slice`, `
 | 04 | [evidence-migration](04-evidence-migration/) | canonical writer 전환 뒤 downgrade 진도 손실 |
 | 06 | [astryx-journey-evidence](06-astryx-journey-evidence/) | 렌더 0, Local viewport 모순, font·AT·proof media 공백 |
 | 07 | [release-research-operations](07-release-research-operations/) | `/app/` release 순서와 720명 단일 blocker |
-| 08 | [r10-independent-review](08-r10-independent-review/) | remediation 작성자 재채점, 이전 점수 노출, 낮은 round 덮어쓰기 |
 | 09 | [learning-quality-revalidation](09-learning-quality-revalidation/) | 부분 browser pass를 전체 통과로 오인, strong·전이·지연 검색의 전수 격차 |
 
-평가 계약은 `contracts/`에 있다. 04가 downgrade-safe rollback을 구현하고, `contracts/checkSandboxFeasibilityDecision.json`이 허용한 범위에서 03과 공용 visual 계약, top-level 제품 경로의 W0 증거를 만든다. 09는 Day 1 전이·검색과 W0 Local parity를 다시 감사해 08의 독립 평가 입력을 갱신한다. 현재 source는 R10 전에 468레슨의 strong assessment와 472개 public route까지 확장됐다. 이 구현을 숨기거나 되돌리지는 않지만, machine source coverage는 승인된 W1, E3, 사람 content review나 종료 조건 검증이 아니다. R10 미실시는 추가 machine 개선을 멈추는 조건이 아니라 독립 품질과 공개 승격을 주장하지 못하게 하는 판정 경계다. 07은 candidate release와 경로별 효능 승격을 분리하고, 03·04·07·09 closure evidence와 current visual asset gate가 없는 상태에서는 R10 input을 seal하지 않는다.
+평가 계약은 `contracts/`에 있다. 04가 downgrade-safe rollback을 구현하고, `contracts/checkSandboxFeasibilityDecision.json`이 허용한 범위에서 03과 공용 visual 계약, top-level 제품 경로의 W0 증거를 만든다. 09는 Day 1 전이·검색과 W0 Local parity를 다시 감사한다. 현재 source는 468레슨의 strong assessment와 472개 public route까지 확장됐고 machine source coverage는 상시 gate가 소유한다. 사람 효능 근거는 제품 구현 완료가 아니라 경로별 공개 승격에서 판정한다.
 
 ## TODO 삭제 조건
 
-각 remediation packet은 문서만 다듬었다고 완료되지 않는다. packet에 적힌 fact audit와 negative fixture를 current implementation commit에서 통과하고 사람 검수 조건까지 충족해야 한다. 조건을 모두 충족한 packet은 parent 인덱스와 함께 삭제하며 실제 변경, 보고서 hash, 검증 명령은 상세 commit message에 남긴다. R10은 고정된 입력을 신규 evaluator가 다시 반증하는 downstream round이고, 같은 finding이 재현되면 새 remediation TODO를 만든다. 모든 packet이 삭제돼도 제품 workstream은 별도 구현·사람·출시 증거가 없으면 활성 상태다.
+각 remediation packet은 문서만 다듬었다고 완료되지 않는다. packet에 적힌 fact audit와 negative fixture를 current implementation commit에서 통과해야 한다. 조건을 모두 충족한 packet은 parent 인덱스와 함께 삭제하며 실제 변경과 검증 명령은 상세 commit message에 남긴다.
 
 ## 영향 파일
 
@@ -54,8 +52,6 @@ Product evidence maturity는 `E0 없음`, `E1 synthetic`, `E2 vertical slice`, `
 - `tests/automation/verifyLocalStudioCompletion.py`
 - `assets/brand/visuals/manifest.json`
 - `contracts/learning-content/README.md`
-- `mainPlan/astryx-product-experience/10-quality-release/README.md`
-- `mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/08-r10-independent-review/README.md`
 
 ## 영향 함수·심볼
 

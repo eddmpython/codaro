@@ -41,7 +41,7 @@ research operations는 모집 전에 `researchOwner`, `privacyOwner`, 모집 채
 ## 영향 파일
 
 - `contracts/learning-content/README.md`
-- `mainPlan/astryx-product-experience/10-quality-release/README.md`
+- `docs/skills/ops/product/learning-efficacy-operations.md`
 - `docs/skills/ops/product/learning-efficacy-operations.md`
 - `src/codaro/curriculum/efficacyStage.py`
 - `src/codaro/releaseResearch.py`

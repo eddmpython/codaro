@@ -10,9 +10,9 @@
 
 2026-07-28 audit의 과거 기준선은 independent assessment 승인 0/468로 실패였다. 현재는 472레슨 중 strong `CheckSpec` 레슨 468개와 1,402개 solution variant를 직접 검토·실행했고 independent assessment 468/468을 승인했다. 영구 `learning-content` 계약은 이 완료 상태를 회귀 검증한다. 이 machine/content 완료는 사용자 학습 효과나 공개 승격을 뜻하지 않는다.
 
-Day 1 Web vertical slice에서는 mastery strong evidence 뒤 전이 과제가 자동 제공되고, 검색 과제는 유효한 원천 증거로부터 24시간 뒤 자동 제공된다. 현재 468레슨의 1,402개 solution variant는 1,400개 behavior와 2개 output 검증으로 실행됐고 실패는 0이다. 공식 `product-experience-browser` 83/83과 `local-studio-browser` 28/28은 Day 2·11·15·19·20·22·27·30의 오답→수정→격리 검증→근거 저장→전이 자동 해제, Seaborn semantic artifact capstone, pathlib·zip·schedule base·assessment, canonical `MasteryPolicy@1`, durable `RunRouteState@1`, full learning archive v2, Day 19 artifact transfer와 lessonRef 기반 시각 자료 배선을 포함해 green이다. Git 첫 사이클의 4개 실행 Lab과 첫 status 판독 Web strong check도 별도 브라우저 검증에서 통과했다. 최신 browser log의 `ConnectionReset`, `Proactor`, `Win10054`도 모두 0이다. 설치형 네이티브 WebView2 9/9도 current source commit에서 통과했다. identity/content 472/472, taxonomy 전이, independent assessment 468/468은 승인됐다. 다만 수동 접근성 0/6, 사용자 연구 0/12, 제품 디자인·접근성 독립 검토 0/2와 독립 R10 raw report가 없으므로 release 완료는 아니다.
+Day 1 Web vertical slice에서는 mastery strong evidence 뒤 전이 과제가 자동 제공되고, 검색 과제는 유효한 원천 증거로부터 24시간 뒤 자동 제공된다. 현재 468레슨의 1,402개 solution variant는 1,400개 behavior와 2개 output 검증으로 실행됐고 실패는 0이다. 공식 `product-experience-browser` 83/83과 `local-studio-browser` 28/28은 Day 2·11·15·19·20·22·27·30의 오답→수정→격리 검증→근거 저장→전이 자동 해제, Seaborn semantic artifact capstone, pathlib·zip·schedule base·assessment, canonical `MasteryPolicy@1`, durable `RunRouteState@1`, full learning archive v2, Day 19 artifact transfer와 lessonRef 기반 시각 자료 배선을 포함해 green이다. Git 첫 사이클의 4개 실행 Lab과 첫 status 판독 Web strong check도 별도 브라우저 검증에서 통과했다. 최신 browser log의 `ConnectionReset`, `Proactor`, `Win10054`도 모두 0이다. 설치형 네이티브 WebView2 Evergreen 10/10과 Fixed Version 10/10도 실행 commit에서 통과했다. identity/content 472/472, taxonomy 전이, independent assessment 468/468은 승인됐다. 이 TODO의 남은 범위는 Local strong 졸업과 학습 품질 재검증이며 제품 shell release와 분리한다.
 
-대표 6경로는 `path-promotion-readiness`에서 경로 구조, mastery·transfer·retrieval, capstone artifact, solution 실행, 저작 무결성의 M0 기계 준비 6/6을 통과했다. 이 결과는 효능 증거가 아니다. 현재 R10 round는 준비되지 않았고 사람 효능 근거도 없으므로 공개 승격은 0/6, provisional은 6/6이다. M0 원장은 `contracts/learning-content/`가, E0-E3 표본·독립성·연구 운영 조건은 `10-quality-release`와 release gate가 계속 소유한다.
+대표 6경로는 `path-promotion-readiness`에서 경로 구조, mastery·transfer·retrieval, capstone artifact, solution 실행, 저작 무결성의 M0 기계 준비 6/6을 통과했다. 이 결과는 효능 증거가 아니다. 사람 효능 근거가 없으므로 공개 승격은 0/6, provisional은 6/6이다. M0 원장은 `contracts/learning-content/`가, E0-E3 표본·독립성·연구 운영 조건은 `docs/skills/ops/product/learning-efficacy-operations.md`와 `docs/evidence/path-efficacy/`가 소유한다.
 
 ## 작업 패킷
 
@@ -36,7 +36,7 @@ Day 1 Web vertical slice에서는 mastery strong evidence 뒤 전이 과제가 �
 - `strong-evidence-transfer-and-retrieval` domain이 실패한다.
 - Local-native Python provisional sandbox는 Day 1과 W0 filesystem·zip·schedule base·assessment solution을 판정한다. launcher AppContainer broker는 실행별 ACL receipt v2, 공유 DACL mutex, 회수 실패 보존과 startup stale GC를 구현했고 현재 Windows 11 직접 OS 경계 test와 동시 cold `schedule` package snapshot 검사가 통과한다. 목표 Windows 10 설치본 conformance가 없어 `practice` 피드백만 제공하고 Local strong event는 0건이다. Web behavior도 `localRequired`로 strong event 0을 유지한다. Web strong·legacy migration 2건의 archive를 Local이 가져오고 재내보내도 Web runtime identity와 exact event set이 보존된다.
 - schedule package asset descriptor와 document, drafts, 전체 virtual FS/package bytes는 full learning archive v2에 봉인된다. 현재 Windows 11 설치형 wheel·launcher·WebView2에서 Web-origin archive의 Local import, reload, re-export와 disabled automation adoption은 green이다. 다만 실제 공개 Web export에서 시작해 Local을 거쳐 Web에 재수입하는 round trip과 독립 보안 검수가 없다.
-- 독립 R10 원본 report와 fact audit가 없다.
+- current-content E3 사람 효능 근거가 없다.
 - 472개 확장이 내용 없는 자동 ID, 동일 문제 복제, weak check의 strong 재분류 방식이다.
 
 ## 테스트
@@ -80,4 +80,4 @@ Python과 TypeScript materializer가 같은 YAML을 다르게 해석하지 않�
 
 ## TODO 삭제 조건
 
-각 하위 packet은 자체 증거가 모두 green일 때만 해당 TODO를 삭제한다. 남은 하위 TODO가 모두 삭제되고 독립 R10이 현재 commit을 승인하기 전에는 이 packet도, 상위 PRD loop도 완료가 아니다.
+각 하위 packet은 자체 구현과 machine 증거가 모두 green일 때만 해당 TODO를 삭제한다. 사람 효능 근거는 이 packet 삭제 조건이 아니라 경로별 공개 승격 조건으로 유지한다. 남은 하위 TODO가 모두 삭제되기 전에는 이 packet과 상위 PRD loop를 완료로 부르지 않는다.

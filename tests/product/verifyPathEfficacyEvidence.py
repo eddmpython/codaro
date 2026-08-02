@@ -20,7 +20,7 @@ from codaro.curriculum.efficacyStage import resolvePathPortfolio  # noqa: E402
 
 
 CAPSTONES = ROOT / "contracts/learning-content/featured-capstones.yml"
-EVIDENCE_ROOT = ROOT / "mainPlan/astryx-product-experience/10-quality-release/evidence/path-efficacy"
+EVIDENCE_ROOT = ROOT / "docs/evidence/path-efficacy"
 
 
 def utcTimestamp() -> str:

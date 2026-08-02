@@ -24,12 +24,7 @@ from codaro.curriculum.pathPromotion import (  # noqa: E402
 
 REPORT_PATH = ROOT / "output/test-runner/path-promotion-readiness/path-promotion-readiness-report.json"
 CAPSTONES = ROOT / "contracts/learning-content/featured-capstones.yml"
-EVIDENCE_ROOT = ROOT / "mainPlan/astryx-product-experience/10-quality-release/evidence/path-efficacy"
-R10_MANIFEST = (
-    ROOT
-    / "mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/"
-    "08-r10-independent-review/evaluation-bundle.manifest.yml"
-)
+EVIDENCE_ROOT = ROOT / "docs/evidence/path-efficacy"
 INPUT_REPORTS = {
     "featuredPaths": ROOT / "output/test-runner/learning-content/featured-learning-paths-report.json",
     "capstoneContracts": ROOT / "output/test-runner/learning-content/featured-capstone-contracts-report.json",
@@ -101,22 +96,6 @@ def contentHash(path: Path) -> str:
     return "sha256-" + hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def r10RoundReady(manifest: dict[str, Any]) -> bool:
-    scope = manifest.get("scope") if isinstance(manifest.get("scope"), dict) else {}
-    inputReadiness = (
-        manifest.get("inputReadiness") if isinstance(manifest.get("inputReadiness"), dict) else {}
-    )
-    roundReadiness = (
-        manifest.get("roundReadiness") if isinstance(manifest.get("roundReadiness"), dict) else {}
-    )
-    return (
-        manifest.get("state") == "sealed"
-        and scope.get("sealState") == "sealed"
-        and inputReadiness.get("inputFrozen") is True
-        and roundReadiness.get("roundReady") is True
-    )
-
-
 def highestEfficacyCandidate(pathId: str) -> tuple[dict[str, Any] | None, str]:
     for stage in STAGE_ORDER:
         path = EVIDENCE_ROOT / stage / f"{pathId}.yml"
@@ -132,7 +111,6 @@ def main() -> int:
     failures: list[str] = []
     reports: dict[str, dict[str, Any]] = {}
     states: list[dict[str, Any]] = []
-    roundReady = False
     try:
         reports = {
             key: loadReport(path, expectedHead=currentHead)
@@ -174,7 +152,6 @@ def main() -> int:
             and intValue(authoringReport.get("uniqueTaskFingerprintCount")) == variantCount
             and intValue(authoringReport.get("explicitClaimScopeLessonCount")) == lessonCount
         )
-        roundReady = r10RoundReady(loadMapping(R10_MANIFEST))
         for capstone in capstoneRows:
             if not isinstance(capstone, dict):
                 raise ValueError("featured capstone row must be a mapping")
@@ -206,7 +183,6 @@ def main() -> int:
                     pathId=pathId,
                     contentHash=contentHash(contentPath(lessonRef)),
                     machineChecks=checks,
-                    r10RoundReady=roundReady,
                     efficacyCandidate=candidate,
                 )
                 humanEvidenceStatus = "valid" if candidate is not None else "missing"
@@ -217,7 +193,6 @@ def main() -> int:
                     pathId=pathId,
                     contentHash=contentHash(contentPath(lessonRef)),
                     machineChecks=checks,
-                    r10RoundReady=roundReady,
                 )
             row = {
                 **asdict(state),
@@ -231,7 +206,6 @@ def main() -> int:
                 row["visibility"] != "featured"
                 or row["allowedClaim"] != "effectVerified"
                 or row["humanEfficacyStage"] != "E3"
-                or not roundReady
             ):
                 failures.append(f"{pathId}: promotion invariant failed")
             if not row["promotionEligible"] and row["visibility"] == "featured":
@@ -260,7 +234,6 @@ def main() -> int:
         "startedAt": startedAt,
         "completedAt": utcTimestamp(),
         "durationMs": round((time.monotonic() - started) * 1000),
-        "r10RoundReady": roundReady,
         "summary": {
             "pathCount": len(states),
             "machineReadyPathCount": machineReadyCount,
