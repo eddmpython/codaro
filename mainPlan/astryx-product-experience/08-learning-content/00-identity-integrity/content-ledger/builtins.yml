@@ -631,7 +631,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/34_hashlib"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "896261dbd8ccbfa1f17999a258cd4048419f612fe304ef2d72d0af73666ca3a3"
+    lessonContentHash: "60d9a0f17999e21607b75526ad0db4048b8df050c78f288fee04804c27ffb9f0"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]

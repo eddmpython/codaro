@@ -3,6 +3,9 @@ meta:
   title: hashlib와 secrets
   day: 34
   category: builtins
+  outcomes: ["builtins.hashing"]
+  prerequisites: ["python.strings","builtins.fileSystem"]
+  estimatedMinutes: 40
   tags:
   - hashlib
   - sha256
