@@ -121,11 +121,11 @@ def validateRuntimeLock(
     if payload["executableRelativePath"] != "msedgewebview2.exe":
         raise RuntimeLockError("WebView2 executableRelativePath must be msedgewebview2.exe")
     expected_install_path = (
-        "output/test-runner/product-browser-webview2-win10/fixed-runtime/"
+        "output/test-runner/product-browser-webview2-fixed/fixed-runtime/"
         + expected_directory
     )
     if payload["installPath"] != expected_install_path:
-        raise RuntimeLockError("WebView2 installPath must remain inside the Win10 gate workspace")
+        raise RuntimeLockError("WebView2 installPath must remain inside the Fixed Version gate workspace")
 
 
 def runtimeInstallRoot(payload: dict[str, Any]) -> Path:
@@ -134,10 +134,10 @@ def runtimeInstallRoot(payload: dict[str, Any]) -> Path:
         raise RuntimeLockError("WebView2 installPath must be a safe repository-relative path")
     resolved = (ROOT / Path(*install_path.parts)).resolve()
     allowed_root = (
-        ROOT / "output" / "test-runner" / "product-browser-webview2-win10" / "fixed-runtime"
+        ROOT / "output" / "test-runner" / "product-browser-webview2-fixed" / "fixed-runtime"
     ).resolve()
     if resolved == allowed_root or allowed_root not in resolved.parents:
-        raise RuntimeLockError("WebView2 installPath escaped the Win10 gate runtime root")
+        raise RuntimeLockError("WebView2 installPath escaped the Fixed Version gate runtime root")
     return resolved
 
 

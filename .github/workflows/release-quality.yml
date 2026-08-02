@@ -11,7 +11,7 @@ env:
 
 jobs:
   product-release:
-    runs-on: [self-hosted, windows, x64, codaro-win10-22h2, interactive]
+    runs-on: windows-2025
     timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
@@ -54,7 +54,7 @@ jobs:
       - name: Cache locked WebView2 Fixed Version archive
         uses: actions/cache@v4
         with:
-          path: output/test-runner/product-browser-webview2-win10/downloads/
+          path: output/test-runner/product-browser-webview2-fixed/downloads/
           key: webview2-fixed-${{ hashFiles('tests/product/webview2-runtime.lock.json') }}
 
       - name: Run product release sequence

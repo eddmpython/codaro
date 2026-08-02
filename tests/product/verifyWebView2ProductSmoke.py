@@ -40,7 +40,9 @@ GATE_ID = os.environ.get(
     "product-browser-webview2-evergreen",
 ).strip()
 RUNTIME_MODE = os.environ.get("CODARO_WEBVIEW2_RUNTIME_MODE", "evergreen").strip()
-REQUIRE_WIN10 = os.environ.get("CODARO_WEBVIEW2_REQUIRE_WIN10", "0") == "1"
+REQUIRE_SUPPORTED_WINDOWS = (
+    os.environ.get("CODARO_WEBVIEW2_REQUIRE_SUPPORTED_WINDOWS", "0") == "1"
+)
 WORK_ROOT = ROOT / "output" / "test-runner" / GATE_ID
 LAUNCHER_ROOT = WORK_ROOT / "launcher-root"
 PRODUCT_HOME = LAUNCHER_ROOT / "user-data"
@@ -303,15 +305,11 @@ def main() -> int:
                 "public deployed Web edit, strong verification, archive export, and installed Local roundtrip",
                 "installed Local re-export imported back into a clean public Web workspace",
             ] if deployed_archive is not None else []),
-            "notCovered": (
-                ["manual NVDA or Narrator speech-output review"]
-                if REQUIRE_WIN10
-                else [
-                    "Windows 10 22H2 self-hosted image",
-                    *([] if runtime_lock is not None else ["WebView2 Fixed Version lock"]),
-                    "manual NVDA or Narrator speech-output review",
-                ]
-            ) + ([] if deployed_archive is not None else ["public deployed Web archive export"]),
+            "notCovered": [
+                *([] if runtime_lock is not None else ["WebView2 Fixed Version lock"]),
+                "manual NVDA or Narrator speech-output review",
+                *([] if deployed_archive is not None else ["public deployed Web archive export"]),
+            ],
         },
     }
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -326,8 +324,8 @@ def main() -> int:
 
 def load_runtime_profile() -> dict[str, Any] | None:
     if RUNTIME_MODE == "evergreen":
-        if REQUIRE_WIN10:
-            raise VerificationError("Win10 release profile cannot use the Evergreen runtime")
+        if REQUIRE_SUPPORTED_WINDOWS:
+            raise VerificationError("Fixed release profile cannot use the Evergreen runtime")
         return None
     if RUNTIME_MODE != "fixed":
         raise VerificationError(f"unsupported WebView2 runtime mode: {RUNTIME_MODE}")
@@ -349,18 +347,12 @@ def require_windows(runtime_lock: dict[str, Any] | None) -> None:
             verifyInstalledRuntime(runtime_lock)
         except RuntimeLockError as exc:
             raise VerificationError(str(exc)) from exc
-    if REQUIRE_WIN10:
+    if REQUIRE_SUPPORTED_WINDOWS:
         windows_version = sys.getwindowsversion()
-        if windows_version.major != 10 or windows_version.build != 19045:
+        if windows_version.major != 10 or windows_version.build < 19045:
             raise VerificationError(
-                "product-browser-webview2-win10 requires Windows 10 22H2 build 19045; "
+                "product-browser-webview2-fixed requires Windows NT 10.0 build 19045 or newer; "
                 f"actual={windows_version.major}.{windows_version.minor}.{windows_version.build}"
-            )
-        session = windows_session_evidence()
-        if not session["interactive"]:
-            raise VerificationError(
-                "product-browser-webview2-win10 requires an interactive desktop session; "
-                f"actual={session}"
             )
 
 

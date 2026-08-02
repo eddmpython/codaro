@@ -13,6 +13,6 @@
   "runtimeDirectoryName": "Microsoft.WebView2.FixedVersionRuntime.151.0.4129.59.x64",
   "executableRelativePath": "msedgewebview2.exe",
   "executableSha256": "e50db9cc5fba98e20e99ef46d4c259ae87df5bad69472822a789aa88a3d714c6",
-  "installPath": "output/test-runner/product-browser-webview2-win10/fixed-runtime/Microsoft.WebView2.FixedVersionRuntime.151.0.4129.59.x64",
+  "installPath": "output/test-runner/product-browser-webview2-fixed/fixed-runtime/Microsoft.WebView2.FixedVersionRuntime.151.0.4129.59.x64",
   "maximumAgeDays": 30
 }

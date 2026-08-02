@@ -29,7 +29,7 @@ from webview2RuntimeLock import (  # noqa: E402
 )
 
 
-WORK_ROOT = ROOT / "output" / "test-runner" / "product-browser-webview2-win10"
+WORK_ROOT = ROOT / "output" / "test-runner" / "product-browser-webview2-fixed"
 DOWNLOAD_ROOT = WORK_ROOT / "downloads"
 STAGING_ROOT = WORK_ROOT / "fixed-runtime-staging"
 RECEIPT_PATH = WORK_ROOT / "runtime-install-receipt.json"

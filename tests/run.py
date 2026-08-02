@@ -143,9 +143,9 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "product-browser-webview2-evergreen": (
         "output/test-runner/product-browser-webview2-evergreen/webview2-product-smoke-report.json",
     ),
-    "product-browser-webview2-win10": (
-        "output/test-runner/product-browser-webview2-win10/runtime-install-receipt.json",
-        "output/test-runner/product-browser-webview2-win10/webview2-product-smoke-report.json",
+    "product-browser-webview2-fixed": (
+        "output/test-runner/product-browser-webview2-fixed/runtime-install-receipt.json",
+        "output/test-runner/product-browser-webview2-fixed/webview2-product-smoke-report.json",
     ),
     "onboarding-browser": ("output/test-runner/onboarding-browser/onboarding-report.json",),
     "evaluation-contract": (
@@ -433,9 +433,9 @@ GATES: dict[str, Gate] = {
             ), timeoutSeconds=600),
         ),
     ),
-    "product-browser-webview2-win10": Gate(
+    "product-browser-webview2-fixed": Gate(
         tier="release",
-        description="Windows 10 22H2에서 locked WebView2 Fixed Version, 실제 launcher, 200% browser zoom과 400% text fixture를 검증한다.",
+        description="지원 Windows에서 locked WebView2 Fixed Version, 실제 launcher, 200% browser zoom과 400% text fixture를 검증한다.",
         commands=(
             command((
                 "uv", "run", "python", "-X", "utf8",
@@ -449,7 +449,7 @@ GATES: dict[str, Gate] = {
             ), timeoutSeconds=600),
             command((
                 "uv", "run", "python", "-X", "utf8",
-                "tests/product/verifyWebView2Win10Product.py",
+                "tests/product/verifyWebView2FixedProduct.py",
             ), timeoutSeconds=900),
         ),
         ci_required=False,
@@ -1001,7 +1001,7 @@ PRODUCT_RELEASE_GATES = (
     "learning-efficacy-report",
     "automation-ide-audit",
     "launcher-test",
-    "product-browser-webview2-win10",
+    "product-browser-webview2-fixed",
     "path-learning-signal",
     "evaluation-contract",
     "plan-quality",

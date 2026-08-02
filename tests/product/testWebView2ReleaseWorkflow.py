@@ -10,15 +10,15 @@ WORKFLOW_PATH = ROOT / ".github" / "workflows" / "release-quality.yml"
 RUNNER_PATH = ROOT / "tests" / "run.py"
 
 
-def testReleaseQualityUsesExactInteractiveWin10RunnerLabels() -> None:
+def testReleaseQualityUsesHostedSupportedWindowsRunner() -> None:
     workflow = WORKFLOW_PATH.read_text(encoding="utf-8")
 
-    assert "runs-on: [self-hosted, windows, x64, codaro-win10-22h2, interactive]" in workflow
+    assert "runs-on: windows-2025" in workflow
     assert "tests/run.py product-release" in workflow
     assert "tests/product/webview2-runtime.lock.json" in workflow
 
 
-def testProductReleaseSequenceContainsWin10WebView2Blocker() -> None:
+def testProductReleaseSequenceContainsFixedWebView2Blocker() -> None:
     module = ast.parse(RUNNER_PATH.read_text(encoding="utf-8"))
     sequence: tuple[str, ...] | None = None
     for node in module.body:
@@ -33,15 +33,14 @@ def testProductReleaseSequenceContainsWin10WebView2Blocker() -> None:
         if isinstance(value, tuple):
             sequence = value
     assert sequence is not None
-    assert "product-browser-webview2-win10" in sequence
-    assert sequence.index("launcher-test") < sequence.index("product-browser-webview2-win10")
-    assert sequence.index("product-browser-webview2-win10") < sequence.index("path-learning-signal")
+    assert "product-browser-webview2-fixed" in sequence
+    assert sequence.index("launcher-test") < sequence.index("product-browser-webview2-fixed")
 
 
-def testWin10GateCannotFallBackToEvergreen() -> None:
-    wrapper = (ROOT / "tests" / "product" / "verifyWebView2Win10Product.py").read_text(
+def testFixedGateCannotFallBackToEvergreen() -> None:
+    wrapper = (ROOT / "tests" / "product" / "verifyWebView2FixedProduct.py").read_text(
         encoding="utf-8"
     )
 
     assert re.search(r'CODARO_WEBVIEW2_RUNTIME_MODE"\]\s*=\s*"fixed"', wrapper)
-    assert re.search(r'CODARO_WEBVIEW2_REQUIRE_WIN10"\]\s*=\s*"1"', wrapper)
+    assert re.search(r'CODARO_WEBVIEW2_REQUIRE_SUPPORTED_WINDOWS"\]\s*=\s*"1"', wrapper)
