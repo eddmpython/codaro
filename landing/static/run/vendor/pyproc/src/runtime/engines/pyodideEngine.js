@@ -3,22 +3,58 @@
 // 뒤로 격리한다. 상위(Runtime/MemoryCapability/능력)는 계약만 보고 `_module.HEAPU8`,
 // `globals`, `_emscripten_stack_*` 같은 엔진 내부를 직접 만지지 않는다.
 // 승격 근거: tests/attempts/engineContract/contractProbe 8/8 - reactive 시간여행이 이 계약
-// 표면만으로 성립(엔진 내부 직접 접근 0). 정본: mainPlan/_done/engine-independence(P1 seam).
+// 표면만으로 성립(엔진 내부 직접 접근 0). 현재 정본은 runtime/engineContract.js와 index.d.ts다.
 //
 // 엔진 독립 설계: 각 메서드에 "다른 엔진(WASI CPython)이 어떻게 구현하나"를 명시해 계약이
 // Pyodide 어휘로 굳지 않게 한다. FFI(프록시)에 기대는 값 다리는 계약상 "직렬화 가능 값"이
 // 기본이고, 프록시는 Pyodide 어댑터의 편의다. 매핑 표: engineContract/README.md.
 
+import { ENGINE_CAPABILITIES, ENGINE_CONTRACT_VERSION } from "../engineContract.js";
+import { PyProcError } from "../errors.js";
+
+const PYODIDE_CAPABILITIES = Object.freeze(Object.values(ENGINE_CAPABILITIES));
+
 export class PyodideEngine {
-  constructor(py) { this._py = py; this._micropip = null; this._fs = null; }
+  constructor(py) { this._py = py; this._micropip = null; this._fs = null; this.hostProxyNames = new Set(); }
+  get engineContractVersion() { return ENGINE_CONTRACT_VERSION; }
+  get engineKind() { return "pyodide"; }
+  capabilities() { return PYODIDE_CAPABILITIES; }
 
   // --- 실행 --- (WASI: stdin 프레임 드라이버로 exec 후 stdout 프로토콜 회수)
   runSync(code) { return this._py.runPython(code); }
   runAsync(code) { return this._py.runPythonAsync(code); }
 
+
   // --- 값 다리 --- (Pyodide: FFI 프록시. WASI: JSON 직렬화 = 값 프로토콜, FFI 없음)
-  setGlobal(name, value) { this._py.globals.set(name, value); }
+  // 프록시가 되는 값(함수/객체)만 센다. 문자열·숫자는 값으로 건너가 힙에 핸들을 남기지 않는다.
+  // 이 카운터가 존재하는 이유는 실측이다(workerGuest 캠페인 A~O): 힙에 JS 핸들이 하나라도 있으면
+  // 그 힙 이미지로 부활한 커널은 프록시 경로 전부가 트랩한다. 그래서 "이미지를 뜰 수 있는가"는
+  // 이 숫자가 0인가와 같은 질문이고, 세는 곳은 핸들이 실제로 생기는 이 한 줄뿐이다.
+  setGlobal(name, value) {
+    if (typeof value === "function" || (value !== null && typeof value === "object")) this.hostProxyNames.add(String(name));
+    this._py.globals.set(name, value);
+  }
   getGlobal(name) { return this._py.globals.get(name); }
+  toHostValue(value, options = {}) {
+    const proxyMode = options.proxyMode || "copy";
+    if (proxyMode !== "copy" && proxyMode !== "preserve") {
+      throw new PyProcError("PYPROC_INPUT_INVALID", `toHostValue.proxyMode is unsupported: ${proxyMode}`);
+    }
+    const hasFallback = Object.prototype.hasOwnProperty.call(options, "fallback");
+    if (value === undefined) return hasFallback ? options.fallback : undefined;
+    if (value && typeof value === "object" && typeof value.toJs === "function") {
+      try {
+        return value.toJs({ create_pyproxies: proxyMode === "preserve" });
+      } catch (error) {
+        if (hasFallback) return options.fallback;
+        throw error;
+      }
+    }
+    return value;
+  }
+  destroyHostValue(value) {
+    if (value && typeof value === "object" && typeof value.destroy === "function") value.destroy();
+  }
 
   // --- 선형 메모리 --- (체크포인트/델타/fork의 전제. exports.memory는 wasm ABI가 강제)
   heapU8() { return this._py._module.HEAPU8; }

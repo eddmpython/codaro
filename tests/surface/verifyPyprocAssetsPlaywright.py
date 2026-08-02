@@ -32,7 +32,6 @@ EXPECTED_ROLES = (
     "machineWorker",
     "processWorker",
     "pyprocServiceWorker",
-    "sharedKernelHost",
     "wasiWorker",
 )
 

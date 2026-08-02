@@ -1,4 +1,4 @@
-// wasiReplDriver.js - pyproc이 소유하는 파이썬 엔진 드라이버(WASI CPython 위 반복 실행 REPL).
+// wasiReplDriver.js - Layer 0: pyproc이 소유하는 파이썬 엔진 드라이버(WASI CPython 위 반복 실행 REPL).
 // 정본을 .js 문자열로 둔다: naming 가드가 .py를 스캔하지 않아(기계 검사 사각) 파이썬 식별자의
 // camelCase를 강제하려면 .js 안의 소스여야 한다(가드가 def snake_case를 잡는다).
 // 외부 CPython(WASI 바이너리)은 참조만 하고, "인터프리터를 세워두고 코드 조각을 N회 실행"하게

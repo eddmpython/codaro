@@ -1,4 +1,4 @@
-// wasiWorker.js - WASI "프로세스": non-Pyodide CPython(WASI)을 vendored shim으로 워커에서
+// wasiWorker.js - Layer 0: WASI "프로세스": non-Pyodide CPython(WASI)을 vendored shim으로 워커에서
 // 부팅하고, pyproc이 소유한 드라이버(wasiReplDriver)를 세워 코드 조각을 반복 실행한다.
 // wasiSession.js가 이 파일을 new URL 상대경로로 spawn한다(위치 = 번들러 워커 emit 계약).
 // 값 채널 무상태화(완전 시간여행): 코드는 preopen 파일 /cmd(힙 밖), stdin은 신호 1바이트.
@@ -7,6 +7,8 @@
 import { WASI, File, OpenFile, ConsoleStdout, PreopenDirectory, Directory, wasi } from "./browserWasiShim.js";
 import { DRIVER_SOURCE } from "./wasiReplDriver.js";
 import { SIGNAL_META, EOT, CMD_PATH, DRIVER_PATH, SITE_PATH, FILETYPE_CHARACTER_DEVICE } from "./wasiProtocol.js";
+import { PyProcError, toErrorPayload } from "../../errors.js";
+import { bytesToMb } from "../../memoryLayout.js";
 
 // 결정적 부팅: WASI는 엔트로피/시간이 import 2개로 수렴한다(Pyodide 3소스 스텁보다 깨끗).
 function makeDeterministic(wasiInst, getInst) {
@@ -74,7 +76,7 @@ class SabStdin extends OpenFile {
         const cmd = new TextDecoder().decode(raw.subarray(1));
         if (cmd === "checkpoint") {
           this.snapshots.push(this._heapU8().slice());
-          postMessage({ type: "meta", kind: "checkpoint", idx: this.snapshots.length - 1, mb: +(this._heapU8().length / 1048576).toFixed(1) });
+          postMessage({ type: "meta", kind: "checkpoint", idx: this.snapshots.length - 1, mb: bytesToMb(this._heapU8().length) });
         } else if (cmd.startsWith("restore ")) {
           const i = +cmd.slice(8);
           // 파티션 복원: [0, stackTop)=shadow stack(라이브 fd_read 호출 체인)은 보존, [stackTop, end)=
@@ -129,6 +131,6 @@ onmessage = async (e) => {
     try { wasiInst.start(inst); } catch (err) { postMessage({ type: "out", stream: "stderr", line: String(err) }); }
     postMessage({ type: "exited" });
   } catch (err) {
-    postMessage({ type: "bootError", error: String(err).slice(-300) });
+    postMessage({ type: "bootError", ...toErrorPayload(new PyProcError("PYPROC_BOOT_FAILED", String(err).slice(-300), { retryable: true, cause: err })) });
   }
 };

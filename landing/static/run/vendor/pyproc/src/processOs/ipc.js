@@ -1,4 +1,4 @@
-// ipc.js - Layer 2: 프로세스 간 IPC 프리미티브(파이프/공유메모리/락/세마포어).
+// ipc.js - Layer 4: 프로세스 간 IPC 프리미티브(파이프/공유메모리/락/세마포어).
 // map은 배치고 파이프는 흐름이다: SAB 링버퍼 + Atomics로 진짜 블로킹 read와 backpressure를
 // 만든다. 워커(프로세스)는 Atomics.wait로 블로킹하되 **유한 슬라이스**(WAIT_SLICE_MS)로 끊어
 // 파이썬 eval 루프에 주기적으로 복귀시킨다: 블로킹 read 중에도 시그널(SIGTERM 등)이
@@ -7,6 +7,9 @@
 // 공유메모리는 "memcpy 1회" 계약이다: WASM 단일 선형 메모리 벽 때문에 SAB를 파이썬 힙에
 // 제로카피로 비출 수 없다(browser-os 안티 추천 4). read/write(offset, len)가 정직한 표면이다.
 // 실측: tests/attempts/pythonMachine/pipeShmProbe.html.
+import { PyProcError } from "../runtime/errors.js";
+import { requireCoi } from "../runtime/preflight.js";
+
 const HEADER_BYTES = 64; // Int32 16개(캐시라인 여유). [0]=head [1]=tail [2]=closed
 const HEAD = 0, TAIL = 1, CLOSED = 2;
 const WAIT_SLICE_MS = 50;
@@ -16,20 +19,24 @@ const WAIT_SLICE_MS = 50;
 const wrap = (v, cap) => (((v % cap) + cap) % cap);
 
 export function createPipe(capacity = 1 << 20) {
+  requireCoi("IPC pipe");
   const sab = new SharedArrayBuffer(HEADER_BYTES + capacity);
   return { kind: "pipe", sab, cap: capacity };
 }
 export function createLock() {
+  requireCoi("IPC lock");
   const sab = new SharedArrayBuffer(4);
   new Int32Array(sab)[0] = 1; // 락 = 세마포어(1): [0]=잔여 획득 가능 수(1 = 사용 가능)
   return { kind: "lock", sab };
 }
 export function createSemaphore(count = 1) {
+  requireCoi("IPC semaphore");
   const sab = new SharedArrayBuffer(4);
   new Int32Array(sab)[0] = count;
   return { kind: "semaphore", sab };
 }
 export function createShm(byteLength) {
+  requireCoi("IPC shared memory");
   return { kind: "shm", sab: new SharedArrayBuffer(byteLength) };
 }
 
@@ -101,7 +108,7 @@ export async function pipeWriteAsync(item, bytes) {
   let off = 0;
   while (off < bytes.byteLength) {
     const sent = ringWriteOnce(item, bytes.subarray(off), false);
-    if (sent < 0) throw new Error("pipe: 닫힌 파이프에 쓰기");
+    if (sent < 0) throw new PyProcError("PYPROC_PROCESS_UNAVAILABLE", "pipe: write to a closed pipe");
     off += sent;
     if (sent === 0) {
       const head = Atomics.load(i32, HEAD);

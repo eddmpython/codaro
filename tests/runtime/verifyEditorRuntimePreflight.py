@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -11,6 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 EDITOR_DIR = ROOT / "editor"
 EDITOR_PACKAGE = EDITOR_DIR / "package.json"
+EDITOR_PACKAGE_LOCK = EDITOR_DIR / "package-lock.json"
 PYPROC_ASSET_SCRIPT = EDITOR_DIR / "scripts" / "generatePyprocAssets.mjs"
 NOTEBOOK_RUNTIME = EDITOR_DIR / "src" / "lib" / "notebookRuntime.ts"
 BROWSER_RUNTIME = EDITOR_DIR / "src" / "lib" / "browserPythonRuntime.ts"
@@ -34,12 +36,9 @@ def main() -> int:
     nodeFailure, nodeOutput = runRuntimeProbe()
     if nodeFailure:
         failures.append(nodeFailure)
-    assetFailure, assetOutput = runPyprocAssetScriptProbe()
+    assetFailure, assetOutput = runInstalledPyprocAssetProbe()
     if assetFailure:
         failures.append(assetFailure)
-    installedAssetFailure, installedAssetOutput = runInstalledPyprocAssetProbe()
-    if installedAssetFailure:
-        failures.append(installedAssetFailure)
 
     if failures:
         for failure in failures:
@@ -48,11 +47,9 @@ def main() -> int:
             print(nodeOutput, file=sys.stderr)
         if assetOutput:
             print(assetOutput, file=sys.stderr)
-        if installedAssetOutput:
-            print(installedAssetOutput, file=sys.stderr)
         return 1
 
-    print(f"ok: editor runtime package preflight verified {nodeOutput} {assetOutput} {installedAssetOutput}")
+    print(f"ok: editor runtime package preflight verified {nodeOutput} {assetOutput}")
     return 0
 
 
@@ -60,6 +57,7 @@ def sourceContractFailures() -> list[str]:
     failures: list[str] = []
     for path in (
         EDITOR_PACKAGE,
+        EDITOR_PACKAGE_LOCK,
         PYPROC_ASSET_SCRIPT,
         NOTEBOOK_RUNTIME,
         BROWSER_RUNTIME,
@@ -83,6 +81,7 @@ def sourceContractFailures() -> list[str]:
         return failures
 
     packageText = EDITOR_PACKAGE.read_text(encoding="utf-8")
+    packageLockText = EDITOR_PACKAGE_LOCK.read_text(encoding="utf-8")
     assetScriptText = PYPROC_ASSET_SCRIPT.read_text(encoding="utf-8")
     runtimeText = NOTEBOOK_RUNTIME.read_text(encoding="utf-8")
     browserRuntimeText = BROWSER_RUNTIME.read_text(encoding="utf-8")
@@ -103,13 +102,13 @@ def sourceContractFailures() -> list[str]:
             "vite build && npm run pyproc:assets",
         ),
         PYPROC_ASSET_SCRIPT: (
-            "CODARO_PYPROC_PACKAGE_ROOT",
             "CODARO_WEB_OUT",
             "pyproc-assets.json",
             "vendor/pyproc",
-            "getPyProcAssetManifest",
-            "sha256-",
-            "collectGraph",
+            '"node_modules", ".bin"',
+            '"pyproc-assets.cmd"',
+            '"--copy-to"',
+            "rm(vendorPath",
         ),
         NOTEBOOK_RUNTIME: (
             "runAutomationSessionCell",
@@ -132,6 +131,8 @@ def sourceContractFailures() -> list[str]:
             "assetIntegrity",
             "loadAssetIntegrity",
             "fetch(assetIntegrityUrl()",
+            'import("pyproc/runtime")',
+            "bootRuntime",
             "fs: PyRuntimeFileSystem",
             "Runtime.fs",
             "/home/web/codaro",
@@ -229,98 +230,19 @@ def sourceContractFailures() -> list[str]:
         for token in tokens:
             if token not in text:
                 failures.append(f"{path.relative_to(ROOT)} missing {token}")
+    package = json.loads(packageText)
+    packageLock = json.loads(packageLockText)
+    pyprocPin = package.get("dependencies", {}).get("pyproc")
+    lockedPyproc = packageLock.get("packages", {}).get("node_modules/pyproc", {})
+    if not isinstance(pyprocPin, str) or not re.fullmatch(r"\d+\.\d+\.\d+", pyprocPin):
+        failures.append("editor/package.json pyproc dependency must be an exact registry version")
+    elif (
+        lockedPyproc.get("version") != pyprocPin
+        or lockedPyproc.get("resolved") != f"https://registry.npmjs.org/pyproc/-/pyproc-{pyprocPin}.tgz"
+        or not str(lockedPyproc.get("integrity") or "").startswith("sha512-")
+    ):
+        failures.append("editor/package-lock.json pyproc registry pin is not exact or lacks integrity")
     return failures
-
-
-def runPyprocAssetScriptProbe() -> tuple[str | None, str]:
-    node = shutil.which("node")
-    if not node:
-        return "node is required for pyproc asset script verification", ""
-
-    with tempfile.TemporaryDirectory(prefix="codaro-pyproc-assets-") as tempDir:
-        tempRoot = Path(tempDir)
-        packageRoot = tempRoot / "pkg"
-        outDir = tempRoot / "out"
-        (packageRoot / "src" / "runtime").mkdir(parents=True)
-        (packageRoot / "src" / "processOs").mkdir(parents=True)
-        (packageRoot / "src" / "runtime" / "assets.js").write_text(
-            """
-export function getPyProcAssetManifest(opts = {}) {
-  const root = String(opts.baseURL || "/vendor/pyproc/").replace(/\\/?$/, "/");
-  return {
-    version: 1,
-    packageRoot: root,
-    policy: {
-      sameOriginRequired: true,
-      preserveRelativeImports: true,
-      runtimePreflight: true,
-      note: "probe",
-    },
-    assets: [{
-      role: "processWorker",
-      path: "src/processOs/worker.js",
-      kind: "module-worker",
-      sameOrigin: true,
-      usedBy: ["probe"],
-      reason: "probe",
-      url: root + "src/processOs/worker.js",
-    }],
-  };
-}
-""".strip()
-            + "\n",
-            encoding="utf-8",
-        )
-        (packageRoot / "src" / "processOs" / "worker.js").write_text(
-            'import "./helper.js";\nexport const workerReady = true;\n',
-            encoding="utf-8",
-        )
-        (packageRoot / "src" / "processOs" / "helper.js").write_text(
-            "export const helperReady = true;\n",
-            encoding="utf-8",
-        )
-        result = subprocess.run(
-            [
-                node,
-                str(PYPROC_ASSET_SCRIPT),
-                "--package-root",
-                str(packageRoot),
-                "--out-dir",
-                str(outDir),
-                "--baseURL",
-                "/vendor/pyproc/",
-            ],
-            cwd=EDITOR_DIR,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            check=False,
-        )
-        output = result.stdout.strip()
-        if result.returncode != 0:
-            return "pyproc asset script probe failed", output
-
-        manifestPath = outDir / "pyproc-assets.json"
-        workerPath = outDir / "vendor" / "pyproc" / "src" / "processOs" / "worker.js"
-        helperPath = outDir / "vendor" / "pyproc" / "src" / "processOs" / "helper.js"
-        if not manifestPath.is_file():
-            return "pyproc asset script did not write pyproc-assets.json", output
-        if not workerPath.is_file() or not helperPath.is_file():
-            return "pyproc asset script did not copy the import graph", output
-        manifest = json.loads(manifestPath.read_text(encoding="utf-8"))
-        graph = manifest["entrypoints"][0]["graph"]
-        files = manifest["files"]
-        if graph != ["src/processOs/helper.js", "src/processOs/worker.js"]:
-            return f"pyproc asset script graph mismatch: {graph}", output
-        if sorted(file["path"] for file in files) != graph:
-            return "pyproc asset script files mismatch", output
-        if not all(file["url"].startswith("/vendor/pyproc/") for file in files):
-            return "pyproc asset script URL base mismatch", output
-        if not all(file["integrity"].startswith("sha256-") for file in files):
-            return "pyproc asset script did not write sha256 SRI", output
-        return None, json.dumps({"pyprocAssetFiles": len(files), "pyprocAssetGraph": graph}, ensure_ascii=False)
 
 
 def runInstalledPyprocAssetProbe() -> tuple[str | None, str]:
@@ -359,7 +281,6 @@ def runInstalledPyprocAssetProbe() -> tuple[str | None, str]:
             "machineWorker",
             "processWorker",
             "pyprocServiceWorker",
-            "sharedKernelHost",
             "wasiWorker",
         ]
         if roles != expectedRoles:

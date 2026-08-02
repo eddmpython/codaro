@@ -49,7 +49,7 @@ type PyProcAssetIntegrity = {
 };
 
 type PyProcModule = {
-  boot(opts: {
+  bootRuntime(opts: {
     stdout?: (line: string) => void;
     stderr?: (line: string) => void;
     assetIntegrity?: PyProcAssetIntegrity;
@@ -93,11 +93,11 @@ async function loadAssetIntegrity(): Promise<PyProcAssetIntegrity | null> {
 
 async function ensureRuntime(): Promise<PyRuntime> {
   if (!runtimePromise) {
-    runtimePromise = import("pyproc")
+    runtimePromise = import("pyproc/runtime")
       .then(async (module) => {
-        const { boot } = module as unknown as PyProcModule;
+        const { bootRuntime } = module as unknown as PyProcModule;
         const assetIntegrity = await loadAssetIntegrity();
-        return boot({
+        return bootRuntime({
           stdout: (line: string) => stdoutLines.push(line),
           stderr: (line: string) => stderrLines.push(line),
           ...(assetIntegrity ? { assetIntegrity } : {}),

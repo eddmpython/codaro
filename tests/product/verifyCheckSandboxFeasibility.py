@@ -34,7 +34,6 @@ PRODUCT_BROWSER_PATH = ROOT / "tests/surface/verifyProductExperiencePlaywright.p
 PRODUCT_BROWSER_REPORT_PATH = ROOT / "output/test-runner/check-sandbox-feasibility/product-experience-report.json"
 PYPROC_MANIFEST_PATH = ROOT / "src/codaro/webBuild/pyproc-assets.json"
 EDITOR_PACKAGE_PATH = ROOT / "editor/package.json"
-PYPROC_RUNTIME_PATH = ROOT / "editor/node_modules/pyproc/src/runtime/runtime.js"
 POLICY_PATH = ROOT / "contracts/checkSandboxFeasibilityDecision.json"
 EMPTY_FIXTURE = {
     "directories": [],
@@ -278,10 +277,7 @@ def supplyChainFacts() -> dict[str, Any]:
     manifest = json.loads(manifestBytes)
     package = json.loads(EDITOR_PACKAGE_PATH.read_text(encoding="utf-8"))
     pyprocPin = package.get("dependencies", {}).get("pyproc")
-    runtimeSource = PYPROC_RUNTIME_PATH.read_text(encoding="utf-8")
-    marker = 'export const DEFAULT_INDEX = "'
-    start = runtimeSource.index(marker) + len(marker)
-    coreIndex = runtimeSource[start:runtimeSource.index('"', start)]
+    coreIndex = installedPyprocDefaultIndex()
     browserRuntimeSource = (ROOT / "editor/src/lib/browserPythonRuntime.ts").read_text(encoding="utf-8")
     return {
         "coreCacheConfigured": "coreCacheDir:" in browserRuntimeSource,
@@ -291,6 +287,28 @@ def supplyChainFacts() -> dict[str, Any]:
         "manifestSha256": hashlib.sha256(manifestBytes).hexdigest(),
         "packagePin": pyprocPin,
     }
+
+
+def installedPyprocDefaultIndex() -> str:
+    result = subprocess.run(
+        [
+            "node",
+            "--input-type=module",
+            "--eval",
+            "import { DEFAULT_INDEX } from 'pyproc/runtime'; process.stdout.write(DEFAULT_INDEX);",
+        ],
+        cwd=ROOT / "editor",
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+    value = result.stdout.strip()
+    if result.returncode != 0 or not value.startswith("https://"):
+        raise ValueError(f"pyproc/runtime DEFAULT_INDEX public import failed: {value}")
+    return value
 
 
 def verifyPolicy(policy: dict[str, Any]) -> None:

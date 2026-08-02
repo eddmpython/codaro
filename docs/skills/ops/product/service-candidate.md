@@ -66,7 +66,7 @@ runtime failure는 한 덩어리 오류가 아니다.
 브라우저에 로컬급 Python runtime을 올리려면 editor build 산출물이 실제 배포 표면에서 같은 출처 자산으로 서빙되는지 검증해야 한다.
 
 - `pyproc-assets-browser`는 `/pyproc-assets.json` manifest와 `vendor/pyproc/**` 파일 전체를 실제 브라우저 page context에서 fetch한다.
-- manifest의 5개 entrypoint role, `sameOriginVendorUrls`, `sriVerified`, 검증 파일 수, 검증 바이트 수를 `output/test-runner/pyproc-assets-browser/pyproc-assets-report.json`에 남긴다.
+- manifest의 4개 entrypoint role, `sameOriginVendorUrls`, `sriVerified`, 검증 파일 수, 검증 바이트 수를 `output/test-runner/pyproc-assets-browser/pyproc-assets-report.json`에 남긴다.
 - 각 vendor 파일의 `sha256-` integrity는 브라우저 `crypto.subtle.digest`로 다시 계산한다.
 - process worker payload가 실행 가능한 module 형태를 잃으면 실패해야 한다.
 

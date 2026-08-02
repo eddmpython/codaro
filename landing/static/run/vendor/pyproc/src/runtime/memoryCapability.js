@@ -4,8 +4,9 @@
 // 완전 해시(Uint32 워드 전수)는 soundness의 열쇠 - 샘플링 금지(불완전 델타 -> 복원 크래시).
 // 페이지당 독립 32비트 해시 2개(실효 64비트)로 충돌 누락 확률을 ~2^-64로 억제한다.
 // 실측(attempts/reactiveSoundness, 2026-07-11): 단일 대비 1.54배, 30MB 힙 14.3ms.
+import { PAGE_SIZE } from "./memoryLayout.js";
 
-export const PAGE_SIZE = 65536;
+export { PAGE_SIZE } from "./memoryLayout.js";
 
 export class MemoryCapability {
   // engine: EngineContract. 선형 메모리·스택 접근을 계약 뒤에서 받는다(엔진 내부 직접 접근 0).

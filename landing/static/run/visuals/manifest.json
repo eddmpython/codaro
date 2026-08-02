@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "sourceManifestHash": "sha256-da8634e098ebc154fbde128c1bf4d3eabea46b26fb1b2ab2cfa63082ad65ca40",
+  "sourceManifestHash": "sha256-6d04035824d2b6569145315c1f8389ecf86e4ddbe5ba8504e4dea6aabd4d49b4",
   "assets": [
     {
       "id": "runLearningDetail",
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-detail-dark.png",
-      "sourceHash": "sha256-0e062b11ca1e500ee6d5e4227767fae9a3db8b719082febf2ec23e91f642fc77",
-      "sourceGitHead": "5f849c8e45180d96b3bac58443277d57d60b4e8f",
+      "sourceHash": "sha256-db225f8e2c7de948201e7b0d8f854e72ec0b7dd4b00a8ea1bb79782d2a098b3a",
+      "sourceGitHead": "282b4d2525f17ab2b881a618beb08675b40b434a",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -51,10 +51,10 @@
         "offlineIncluded": true
       },
       "learning": {
-        "alt": "Codaro 웹 학습 화면에서 헬로월드 목표, 개념 이미지, 학습 순서와 첫 실습이 한 문서 흐름에 표시된 모습",
-        "caption": "목표와 개념 이미지를 읽고 같은 화면 아래의 첫 실습으로 이어집니다.",
-        "learningQuestion": "학습자는 어떤 개념을 익힌 뒤 첫 실습으로 이동하는가?",
-        "decisionShown": "학습 목표, 개념 시각 자료, 학습 순서와 첫 실습의 연결",
+        "alt": "Codaro 웹 학습 화면에서 헬로월드 목표, 오늘 배우는 항목과 첫 실습이 한 문서 흐름에 표시된 모습",
+        "caption": "목표와 오늘 배우는 항목을 읽고 같은 화면 아래의 첫 실습으로 이어집니다.",
+        "learningQuestion": "학습자는 어떤 목표와 학습 항목을 확인한 뒤 첫 실습으로 이동하는가?",
+        "decisionShown": "학습 목표, 오늘 배우는 항목과 첫 실습의 연결",
         "lessonRefs": [
           "30일완성/헬로월드"
         ]
@@ -91,56 +91,56 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-8d92fe71d89caac86b637d0b04d35823d7a4b1311c7811563e83a73ad16c6527"
+        "sourceSetHash": "sha256-379aba9fc6e965b842ce0696c6473edbd6d70c385aa6115f17c3b881266c171d"
       },
       "themePairId": "runLearningDetailLight",
       "outputs": [
         {
-          "byteLength": 12477,
+          "byteLength": 13146,
           "format": "avif",
           "height": 405,
-          "integrity": "sha256-e784d11616529de37bf4d528d3acda0df2d3f8a11f24fe735170749e1fe26719",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-0e062b11ca1e.avif",
+          "integrity": "sha256-9ec2b1c3f93153311c092a0d6a8a58390ab3f56da8a685dec6581e857e17d6f3",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-db225f8e2c7d.avif",
           "width": 480
         },
         {
-          "byteLength": 13480,
+          "byteLength": 14686,
           "format": "webp",
           "height": 405,
-          "integrity": "sha256-7aed62b017739997895e5729b44c2fd2e1304df557df7e94acce5bb8deb43562",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-0e062b11ca1e.webp",
+          "integrity": "sha256-80a9b41d4dfa51ce4184d79c7bbcc478ef07e09f56cd74e1be56d1be1615457b",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-db225f8e2c7d.webp",
           "width": 480
         },
         {
-          "byteLength": 23370,
+          "byteLength": 26213,
           "format": "avif",
           "height": 608,
-          "integrity": "sha256-5d5fde6ccfac425de44f80c9171509685e4f78602f6f062e2fb2daa9c54b17b2",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-0e062b11ca1e.avif",
+          "integrity": "sha256-4e038cbd42042369b4a21e3ef2f9659a1b894eed21a6690a1fed22132847ef00",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-db225f8e2c7d.avif",
           "width": 720
         },
         {
-          "byteLength": 25438,
+          "byteLength": 29070,
           "format": "webp",
           "height": 608,
-          "integrity": "sha256-c1babe4a0fad9939eb37e755ea98bb8cea6d70997631a5dc4ee6f9f71d17682f",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-0e062b11ca1e.webp",
+          "integrity": "sha256-f0686632c23f02a13c6b6beb4fa05db4960c908ba36f44b95d829a45df721695",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-db225f8e2c7d.webp",
           "width": 720
         },
         {
-          "byteLength": 25692,
+          "byteLength": 28972,
           "format": "avif",
           "height": 760,
-          "integrity": "sha256-abf8806b02f1b40cf5c062db10c175d7d46fb30114298d1755f28e185addc882",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-0e062b11ca1e.avif",
+          "integrity": "sha256-19ce218a8cfc02c96b9783bb84c4af3c52ddcd6204dae06151be1132f5931868",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-db225f8e2c7d.avif",
           "width": 900
         },
         {
-          "byteLength": 37422,
+          "byteLength": 42704,
           "format": "webp",
           "height": 760,
-          "integrity": "sha256-c3b2c3b9d987060ea084962868e220f161f567ef089a9205de92ac9e480207a1",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-0e062b11ca1e.webp",
+          "integrity": "sha256-1c87b565c4eb2d0a9749973d27f4b991da19f84e1c240ebca41bb7d944b66e19",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-db225f8e2c7d.webp",
           "width": 900
         }
       ]
@@ -150,8 +150,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-detail-light.png",
-      "sourceHash": "sha256-45aa6e33dd61c5cd13907584dc37c1885f0ccea0b89569b83127015088cb411f",
-      "sourceGitHead": "5f849c8e45180d96b3bac58443277d57d60b4e8f",
+      "sourceHash": "sha256-f7d42c6aca6c13fbe4eef64ee0c3e77b2dd4cfa16c8325ad661c9e4ca1566caa",
+      "sourceGitHead": "282b4d2525f17ab2b881a618beb08675b40b434a",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -194,10 +194,10 @@
         "offlineIncluded": true
       },
       "learning": {
-        "alt": "Codaro 웹 학습 화면에서 헬로월드 목표, 개념 이미지, 학습 순서와 첫 실습이 한 문서 흐름에 표시된 모습",
-        "caption": "목표와 개념 이미지를 읽고 같은 화면 아래의 첫 실습으로 이어집니다.",
-        "learningQuestion": "학습자는 어떤 개념을 익힌 뒤 첫 실습으로 이동하는가?",
-        "decisionShown": "학습 목표, 개념 시각 자료, 학습 순서와 첫 실습의 연결",
+        "alt": "Codaro 웹 학습 화면에서 헬로월드 목표, 오늘 배우는 항목과 첫 실습이 한 문서 흐름에 표시된 모습",
+        "caption": "목표와 오늘 배우는 항목을 읽고 같은 화면 아래의 첫 실습으로 이어집니다.",
+        "learningQuestion": "학습자는 어떤 목표와 학습 항목을 확인한 뒤 첫 실습으로 이동하는가?",
+        "decisionShown": "학습 목표, 오늘 배우는 항목과 첫 실습의 연결",
         "lessonRefs": [
           "30일완성/헬로월드"
         ]
@@ -234,56 +234,56 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-8d92fe71d89caac86b637d0b04d35823d7a4b1311c7811563e83a73ad16c6527"
+        "sourceSetHash": "sha256-379aba9fc6e965b842ce0696c6473edbd6d70c385aa6115f17c3b881266c171d"
       },
       "themePairId": "runLearningDetail",
       "outputs": [
         {
-          "byteLength": 11000,
+          "byteLength": 11637,
           "format": "avif",
           "height": 405,
-          "integrity": "sha256-1c2676261d6e40b1501cf94021db1a42ad58cf2d11f9debc600f6ffe43d062a4",
-          "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-480-45aa6e33dd61.avif",
+          "integrity": "sha256-357936825a5f28baeb573bb2e4e84134aaeed7d55d5101f192e07ffb523afb86",
+          "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-480-f7d42c6aca6c.avif",
           "width": 480
         },
         {
-          "byteLength": 11888,
+          "byteLength": 12970,
           "format": "webp",
           "height": 405,
-          "integrity": "sha256-cf498ecfb751f8c01d2274e94f215748d95fe581867cfea18a7d5a872a2c588e",
-          "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-480-45aa6e33dd61.webp",
+          "integrity": "sha256-1cf0dbcc2e0bd192041509e0c2361f2128985ca8f3cfd4c3e45a3b006ee62c74",
+          "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-480-f7d42c6aca6c.webp",
           "width": 480
         },
         {
-          "byteLength": 20998,
+          "byteLength": 23205,
           "format": "avif",
           "height": 608,
-          "integrity": "sha256-ae587a34885aaa367e74f62c9af219ecdd676947a2855a642a0cecc6975632de",
-          "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-720-45aa6e33dd61.avif",
+          "integrity": "sha256-02582c436bdb6c1478bf1e040078c7a3ea43e355406a21d9bfaf47a68cc103b4",
+          "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-720-f7d42c6aca6c.avif",
           "width": 720
         },
         {
-          "byteLength": 23068,
+          "byteLength": 25662,
           "format": "webp",
           "height": 608,
-          "integrity": "sha256-7d6394442b1b67bb2bac969e2d2511fbaab122e7e71e1ac22937fec871b9ff68",
-          "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-720-45aa6e33dd61.webp",
+          "integrity": "sha256-09db44145bdd655db6f0b477337d17e371055ad4677b7617c6df05d15af9d452",
+          "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-720-f7d42c6aca6c.webp",
           "width": 720
         },
         {
-          "byteLength": 24059,
+          "byteLength": 26589,
           "format": "avif",
           "height": 760,
-          "integrity": "sha256-446d6c0eef8370ed45ac59173ad635fcebf72d3dad652849b712e7cc0391aa0c",
-          "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-900-45aa6e33dd61.avif",
+          "integrity": "sha256-975bead02b46f2b95f9ada411b58d855aa886fc478df552a34a6cb325895fbcf",
+          "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-900-f7d42c6aca6c.avif",
           "width": 900
         },
         {
-          "byteLength": 34386,
+          "byteLength": 39270,
           "format": "webp",
           "height": 760,
-          "integrity": "sha256-701b9c08b712bdbe9462c14ec032a4fd98c186f8e5d6dc3c9f1a5ef47c2ebfd9",
-          "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-900-45aa6e33dd61.webp",
+          "integrity": "sha256-37426753a082176fe82e0af31c52ee094da5129d3b387b447345f408c22ed7fa",
+          "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-900-f7d42c6aca6c.webp",
           "width": 900
         }
       ]
@@ -293,8 +293,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-mobile-dark.png",
-      "sourceHash": "sha256-b5f24da57bf66868a6096beaa38c118c909a6edd2e6d59ae016600019a75fec1",
-      "sourceGitHead": "5f849c8e45180d96b3bac58443277d57d60b4e8f",
+      "sourceHash": "sha256-560ce3c7217e189434ec7d5a45fd26c4515c4fd9e7b05460a8df13fbe5ee89be",
+      "sourceGitHead": "282b4d2525f17ab2b881a618beb08675b40b434a",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -334,10 +334,10 @@
         "offlineIncluded": true
       },
       "learning": {
-        "alt": "390픽셀 너비의 Codaro 웹 레슨에서 헬로월드 목표, 개념 이미지와 오늘 배울 순서가 이어지는 모습",
-        "caption": "모바일에서도 목표와 개념 자료를 읽고 오늘 배울 순서를 한 흐름에서 확인합니다.",
-        "learningQuestion": "작은 화면에서도 현재 학습 목표와 오늘 배울 순서를 찾을 수 있는가?",
-        "decisionShown": "모바일 레슨에서 목표, 개념 자료, 학습 순서의 우선순위",
+        "alt": "390픽셀 너비의 Codaro 웹 레슨에서 헬로월드 목표, 오늘 배우는 항목과 첫 실습이 이어지는 모습",
+        "caption": "모바일에서도 목표와 오늘 배우는 항목을 읽고 첫 실습으로 이어집니다.",
+        "learningQuestion": "작은 화면에서도 현재 학습 목표와 오늘 배우는 항목을 찾을 수 있는가?",
+        "decisionShown": "모바일 레슨에서 목표, 오늘 배우는 항목과 첫 실습의 우선순위",
         "lessonRefs": [
           "30일완성/헬로월드"
         ]
@@ -374,24 +374,24 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-8d92fe71d89caac86b637d0b04d35823d7a4b1311c7811563e83a73ad16c6527"
+        "sourceSetHash": "sha256-379aba9fc6e965b842ce0696c6473edbd6d70c385aa6115f17c3b881266c171d"
       },
       "themePairId": "runLearningMobileLight",
       "outputs": [
         {
-          "byteLength": 18776,
+          "byteLength": 21020,
           "format": "avif",
           "height": 844,
-          "integrity": "sha256-b86a3ab9119e0ed6455bb14cb55ffa395f302af3885d684d2e599a60fad80d71",
-          "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-b5f24da57bf6.avif",
+          "integrity": "sha256-d3c45128109f348d237fe435336bca7b78278ccdbdd5e939b3103e2aaf172975",
+          "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-560ce3c7217e.avif",
           "width": 390
         },
         {
-          "byteLength": 24750,
+          "byteLength": 30504,
           "format": "webp",
           "height": 844,
-          "integrity": "sha256-fa90bc011a0b0066049d0f6c1f710fe2ab188b4cd44d719b380630ada5271b2d",
-          "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-b5f24da57bf6.webp",
+          "integrity": "sha256-e1eccae4425dbf55fa3a3fcddc7c6b7e5f8a15c917417ee19413587119494914",
+          "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-560ce3c7217e.webp",
           "width": 390
         }
       ]
@@ -401,8 +401,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-mobile-light.png",
-      "sourceHash": "sha256-e6084381de822da82b3515af3d1ee653f76cd43bcaddfe5e80d0657589d618e5",
-      "sourceGitHead": "5f849c8e45180d96b3bac58443277d57d60b4e8f",
+      "sourceHash": "sha256-212f04693e95123025b0a5e7fc131077731d248f0ffd9d2c76bc6e46d4fe4779",
+      "sourceGitHead": "282b4d2525f17ab2b881a618beb08675b40b434a",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -442,10 +442,10 @@
         "offlineIncluded": true
       },
       "learning": {
-        "alt": "390픽셀 너비의 Codaro 웹 레슨에서 헬로월드 목표, 개념 이미지와 오늘 배울 순서가 이어지는 모습",
-        "caption": "모바일에서도 목표와 개념 자료를 읽고 오늘 배울 순서를 한 흐름에서 확인합니다.",
-        "learningQuestion": "작은 화면에서도 현재 학습 목표와 오늘 배울 순서를 찾을 수 있는가?",
-        "decisionShown": "모바일 레슨에서 목표, 개념 자료, 학습 순서의 우선순위",
+        "alt": "390픽셀 너비의 Codaro 웹 레슨에서 헬로월드 목표, 오늘 배우는 항목과 첫 실습이 이어지는 모습",
+        "caption": "모바일에서도 목표와 오늘 배우는 항목을 읽고 첫 실습으로 이어집니다.",
+        "learningQuestion": "작은 화면에서도 현재 학습 목표와 오늘 배우는 항목을 찾을 수 있는가?",
+        "decisionShown": "모바일 레슨에서 목표, 오늘 배우는 항목과 첫 실습의 우선순위",
         "lessonRefs": [
           "30일완성/헬로월드"
         ]
@@ -482,24 +482,24 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-8d92fe71d89caac86b637d0b04d35823d7a4b1311c7811563e83a73ad16c6527"
+        "sourceSetHash": "sha256-379aba9fc6e965b842ce0696c6473edbd6d70c385aa6115f17c3b881266c171d"
       },
       "themePairId": "runLearningMobile",
       "outputs": [
         {
-          "byteLength": 16833,
+          "byteLength": 19193,
           "format": "avif",
           "height": 844,
-          "integrity": "sha256-c138335059c53683d32f1b24959fb6d5d87f0cf8a60db812837297cb9d0f7a24",
-          "publicPath": "/visuals/files/runLearningMobileLight/runLearningMobileLight-390-e6084381de82.avif",
+          "integrity": "sha256-eafdaafbd7f2b0a19011e10350aa00ffbe2caecfe332ac4ae8d38f9212d0c129",
+          "publicPath": "/visuals/files/runLearningMobileLight/runLearningMobileLight-390-212f04693e95.avif",
           "width": 390
         },
         {
-          "byteLength": 22832,
+          "byteLength": 27954,
           "format": "webp",
           "height": 844,
-          "integrity": "sha256-03c74aa084a77ef40fa316ef3ae9d60895e80c454ee5b9a44e7b72135a441450",
-          "publicPath": "/visuals/files/runLearningMobileLight/runLearningMobileLight-390-e6084381de82.webp",
+          "integrity": "sha256-46d7f554709fd95bbb8b11f713e1848bcfac7be72ccb891482d53a736a61b61f",
+          "publicPath": "/visuals/files/runLearningMobileLight/runLearningMobileLight-390-212f04693e95.webp",
           "width": 390
         }
       ]
@@ -510,7 +510,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-hero-dark.png",
       "sourceHash": "sha256-ec95ae8add825b0270e09dea84157a9809c72f5e3c175e2217efb8fae3529b62",
-      "sourceGitHead": "5f849c8e45180d96b3bac58443277d57d60b4e8f",
+      "sourceGitHead": "282b4d2525f17ab2b881a618beb08675b40b434a",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -591,7 +591,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-329d0f827e407e9563c3c688f985e07f741a2aac53464a18f56bd3955f6a438c"
+        "sourceSetHash": "sha256-42d0dc02bbec8368a9cff1132378e9c9e0254f0e5192e32583bdfa2f411a73ac"
       },
       "themePairId": "runLearningHeroLight",
       "outputs": [
@@ -651,7 +651,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-hero-light.png",
       "sourceHash": "sha256-5b95612f02ef08633a78380ba7af10a578dcb4ed78bcef95a36043438777e94d",
-      "sourceGitHead": "5f849c8e45180d96b3bac58443277d57d60b4e8f",
+      "sourceGitHead": "282b4d2525f17ab2b881a618beb08675b40b434a",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -732,7 +732,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-329d0f827e407e9563c3c688f985e07f741a2aac53464a18f56bd3955f6a438c"
+        "sourceSetHash": "sha256-42d0dc02bbec8368a9cff1132378e9c9e0254f0e5192e32583bdfa2f411a73ac"
       },
       "themePairId": "runLearningHero",
       "outputs": [
@@ -792,7 +792,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/local-notebook-desktop-dark.png",
       "sourceHash": "sha256-4193c65fda8b6f17727e124ddc645f5e35d1d2cd9f764d54dfc3db2f2f06cce7",
-      "sourceGitHead": "5f849c8e45180d96b3bac58443277d57d60b4e8f",
+      "sourceGitHead": "282b4d2525f17ab2b881a618beb08675b40b434a",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -867,7 +867,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-329d0f827e407e9563c3c688f985e07f741a2aac53464a18f56bd3955f6a438c"
+        "sourceSetHash": "sha256-42d0dc02bbec8368a9cff1132378e9c9e0254f0e5192e32583bdfa2f411a73ac"
       },
       "themePairId": "localNotebookDesktopLight",
       "outputs": [
@@ -911,7 +911,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/local-notebook-desktop-light.png",
       "sourceHash": "sha256-0f7e9e1a96767bd6fd2482518e780e14ffe255f6a57454a7374a42641f2a92d2",
-      "sourceGitHead": "5f849c8e45180d96b3bac58443277d57d60b4e8f",
+      "sourceGitHead": "282b4d2525f17ab2b881a618beb08675b40b434a",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -986,7 +986,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-329d0f827e407e9563c3c688f985e07f741a2aac53464a18f56bd3955f6a438c"
+        "sourceSetHash": "sha256-42d0dc02bbec8368a9cff1132378e9c9e0254f0e5192e32583bdfa2f411a73ac"
       },
       "themePairId": "localNotebookDesktop",
       "outputs": [
@@ -1030,7 +1030,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/local-automation-desktop-dark.png",
       "sourceHash": "sha256-7b8a0ff9efc302167968e3477454d765f7969cba21ab5c923cc7495e18aa07a8",
-      "sourceGitHead": "5f849c8e45180d96b3bac58443277d57d60b4e8f",
+      "sourceGitHead": "282b4d2525f17ab2b881a618beb08675b40b434a",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1107,7 +1107,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-5519c78cc1647200328b765ce6fb550e869f729a2a606ebe26e83468ae032b39"
+        "sourceSetHash": "sha256-7bfeeda2b0433da39a5f88dca928950e1ff71de1a53813d5cea5deebd88d7bc8"
       },
       "themePairId": "localAutomationDesktopLight",
       "outputs": [
@@ -1166,8 +1166,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/local-automation-desktop-light.png",
-      "sourceHash": "sha256-721ed30622b6dd2944ba1c5827276bdf8c032df9441beca21e92b05816c87d53",
-      "sourceGitHead": "5f849c8e45180d96b3bac58443277d57d60b4e8f",
+      "sourceHash": "sha256-6fd5e3c9a45d85f3f0ca9648b9eab2f4100929312d0bd4f5e0757ca76a702c20",
+      "sourceGitHead": "282b4d2525f17ab2b881a618beb08675b40b434a",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1244,57 +1244,1537 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-5519c78cc1647200328b765ce6fb550e869f729a2a606ebe26e83468ae032b39"
+        "sourceSetHash": "sha256-7bfeeda2b0433da39a5f88dca928950e1ff71de1a53813d5cea5deebd88d7bc8"
       },
       "themePairId": "localAutomationDesktop",
       "outputs": [
         {
-          "byteLength": 16523,
+          "byteLength": 16569,
           "format": "avif",
           "height": 450,
-          "integrity": "sha256-51590674cbc152db3e788e95c5dc72b9547b004437fe82f996d5ca79fb298dbe",
-          "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-720-721ed30622b6.avif",
+          "integrity": "sha256-e9cfeb747ef0d6129f4af56b1066ebc98badc6affe27ed1db0f0d9df5fe2bffb",
+          "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-720-6fd5e3c9a45d.avif",
           "width": 720
         },
         {
-          "byteLength": 17160,
+          "byteLength": 17172,
           "format": "webp",
           "height": 450,
-          "integrity": "sha256-b1a37fc767d5ac1a688cf26075d5686cc1074b3a6c8bfbcfd24822d1b4fa50c8",
-          "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-720-721ed30622b6.webp",
+          "integrity": "sha256-0fc57fdcad729267ca4727b331c29a9f90003cc1613bf409c6a8d61f09503033",
+          "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-720-6fd5e3c9a45d.webp",
           "width": 720
         },
         {
-          "byteLength": 32194,
+          "byteLength": 32118,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-b6d22a5d36685c4359976bf8f7f23dfc2b19ef0d8f0cf5872ebbd037319d5e21",
-          "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1080-721ed30622b6.avif",
+          "integrity": "sha256-c774f3554bfed95e041c4a82d615e8d5a33d32901a8ccddb114b7b0de26f8975",
+          "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1080-6fd5e3c9a45d.avif",
           "width": 1080
         },
         {
-          "byteLength": 34000,
+          "byteLength": 33970,
           "format": "webp",
           "height": 675,
-          "integrity": "sha256-c0234441df15112af2a32e2d10ce10605395ef22973205a66769fd600e8324f8",
-          "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1080-721ed30622b6.webp",
+          "integrity": "sha256-1cd804afa629b5a18841185222ab384e5caaaf803a1ba0dca10db3598c153bdd",
+          "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1080-6fd5e3c9a45d.webp",
           "width": 1080
         },
         {
-          "byteLength": 39967,
+          "byteLength": 39937,
           "format": "avif",
           "height": 900,
-          "integrity": "sha256-3a2d1d247fd08b4677a97a502de296696624357ffcb7c15da5b9f773c2c43f3a",
-          "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1440-721ed30622b6.avif",
+          "integrity": "sha256-1ef6ef5b35225922654f0523248deb83f3f8c0e315483660bd9b457e199d3ba7",
+          "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1440-6fd5e3c9a45d.avif",
           "width": 1440
         },
         {
-          "byteLength": 56132,
+          "byteLength": 56116,
           "format": "webp",
           "height": 900,
-          "integrity": "sha256-9ac46dc40e0b5786b8f5eba7439df1df4ae01b0172307b2e629effbdd654539b",
-          "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1440-721ed30622b6.webp",
+          "integrity": "sha256-bb089231705fd1eaede876da09d87d5642a9b006359f9986d8b4eb37dfbd4014",
+          "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1440-6fd5e3c9a45d.webp",
           "width": 1440
+        }
+      ]
+    },
+    {
+      "id": "runStateReady",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run/ready-dark.png",
+      "sourceHash": "sha256-ec95ae8add825b0270e09dea84157a9809c72f5e3c175e2217efb8fae3529b62",
+      "sourceGitHead": "282b4d2525f17ab2b881a618beb08675b40b434a",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-run-ready-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1440,
+        "height": 900,
+        "aspectRatio": 1.6,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": {
+          "x": 0.2,
+          "y": 0.32,
+          "width": 0.48,
+          "height": 0.48
+        },
+        "fit": "cover",
+        "background": "surface",
+        "proofUsage": [
+          "run-state-matrix",
+          "run-state-ready"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200,
+          1440
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "브라우저 Run에서 편집 가능한 코드 셀이 실행 전 준비 상태로 열린 화면",
+        "caption": "설치 없이 코드 셀을 편집하고 실행을 시작할 수 있는 준비 상태입니다.",
+        "learningQuestion": "처음 진입한 학습자는 어디에 코드를 입력하고 실행을 시작하는가?",
+        "decisionShown": "편집 가능한 셀, 셀 실행과 전체 실행의 시작 위치",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/src/App.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/notebookSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/notebook",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-42d0dc02bbec8368a9cff1132378e9c9e0254f0e5192e32583bdfa2f411a73ac"
+      },
+      "themePairId": "runStateReadyLight",
+      "outputs": [
+        {
+          "byteLength": 1761,
+          "format": "avif",
+          "height": 300,
+          "integrity": "sha256-61e703d5c6f9be981f2d58167cac6a368d4806a5b7b1f20ea4f566134346d9d2",
+          "publicPath": "/visuals/files/runStateReady/runStateReady-480-ec95ae8add82.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 1594,
+          "format": "webp",
+          "height": 300,
+          "integrity": "sha256-63cebe191f22d7ddab1f9d8c191573555a110dc315c376f717c3955dd3a1ced2",
+          "publicPath": "/visuals/files/runStateReady/runStateReady-480-ec95ae8add82.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 3042,
+          "format": "avif",
+          "height": 450,
+          "integrity": "sha256-adc00f412b363cd2aefbfdc07fa078469ab0cbd4949efa5fd380059787ddf44d",
+          "publicPath": "/visuals/files/runStateReady/runStateReady-720-ec95ae8add82.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 2848,
+          "format": "webp",
+          "height": 450,
+          "integrity": "sha256-3ff3f50696210543603634cc4bdb5b8d1142b151336f702bdc57c3650fa82aa0",
+          "publicPath": "/visuals/files/runStateReady/runStateReady-720-ec95ae8add82.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 5789,
+          "format": "avif",
+          "height": 750,
+          "integrity": "sha256-acfe39005c181ae658badde3a7c0d4d6dbe0a3475e67005e224433db43f3b1db",
+          "publicPath": "/visuals/files/runStateReady/runStateReady-1200-ec95ae8add82.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 6896,
+          "format": "webp",
+          "height": 750,
+          "integrity": "sha256-4246e589f78605f1fbbb4fbf72658722c1d595657f880661bb5c919e26a11211",
+          "publicPath": "/visuals/files/runStateReady/runStateReady-1200-ec95ae8add82.webp",
+          "width": 1200
+        },
+        {
+          "byteLength": 6876,
+          "format": "avif",
+          "height": 900,
+          "integrity": "sha256-d2665e0a819ae2482c4cd4fcaa8742aa13e0126b9d4093c520ae5e10ae4e2a8f",
+          "publicPath": "/visuals/files/runStateReady/runStateReady-1440-ec95ae8add82.avif",
+          "width": 1440
+        },
+        {
+          "byteLength": 8792,
+          "format": "webp",
+          "height": 900,
+          "integrity": "sha256-6644048a076b43e89c637ed8d04ede38647130cc4a1a4c05dda654ea4731e5eb",
+          "publicPath": "/visuals/files/runStateReady/runStateReady-1440-ec95ae8add82.webp",
+          "width": 1440
+        }
+      ]
+    },
+    {
+      "id": "runStateReadyLight",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run/ready-light.png",
+      "sourceHash": "sha256-5b95612f02ef08633a78380ba7af10a578dcb4ed78bcef95a36043438777e94d",
+      "sourceGitHead": "282b4d2525f17ab2b881a618beb08675b40b434a",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-run-ready-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1440,
+        "height": 900,
+        "aspectRatio": 1.6,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": {
+          "x": 0.2,
+          "y": 0.32,
+          "width": 0.48,
+          "height": 0.48
+        },
+        "fit": "cover",
+        "background": "surface",
+        "proofUsage": [
+          "run-state-matrix",
+          "run-state-ready"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200,
+          1440
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "브라우저 Run에서 편집 가능한 코드 셀이 실행 전 준비 상태로 열린 화면",
+        "caption": "설치 없이 코드 셀을 편집하고 실행을 시작할 수 있는 준비 상태입니다.",
+        "learningQuestion": "처음 진입한 학습자는 어디에 코드를 입력하고 실행을 시작하는가?",
+        "decisionShown": "편집 가능한 셀, 셀 실행과 전체 실행의 시작 위치",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "theme": "light",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/src/App.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/notebookSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/notebook",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-42d0dc02bbec8368a9cff1132378e9c9e0254f0e5192e32583bdfa2f411a73ac"
+      },
+      "themePairId": "runStateReady",
+      "outputs": [
+        {
+          "byteLength": 1740,
+          "format": "avif",
+          "height": 300,
+          "integrity": "sha256-7859b0b3950cb864e9ad40edd9f8c9738e45b11ade51b5ccd9687f2c48255563",
+          "publicPath": "/visuals/files/runStateReadyLight/runStateReadyLight-480-5b95612f02ef.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 1636,
+          "format": "webp",
+          "height": 300,
+          "integrity": "sha256-7a87fa9c6a7435e77a4083bba65f90021b11c7cefeea2e0781448b3b05cfe81e",
+          "publicPath": "/visuals/files/runStateReadyLight/runStateReadyLight-480-5b95612f02ef.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 2955,
+          "format": "avif",
+          "height": 450,
+          "integrity": "sha256-05e1668b67230e063d910acb0068960824c1bd01b1f06bc238258d2e13278ceb",
+          "publicPath": "/visuals/files/runStateReadyLight/runStateReadyLight-720-5b95612f02ef.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 2894,
+          "format": "webp",
+          "height": 450,
+          "integrity": "sha256-e9744890f36547a885e6ebe4607f0081011e05f60099c9252ff77210ea81c8b5",
+          "publicPath": "/visuals/files/runStateReadyLight/runStateReadyLight-720-5b95612f02ef.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 5609,
+          "format": "avif",
+          "height": 750,
+          "integrity": "sha256-b5d156fbdc660ed209c1a68d48426bf948513fabb886050a5af993f43593594c",
+          "publicPath": "/visuals/files/runStateReadyLight/runStateReadyLight-1200-5b95612f02ef.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 6798,
+          "format": "webp",
+          "height": 750,
+          "integrity": "sha256-0a681971950a6afc1ab8d2e35f7a33703416a0cece4a912c9620a69d2f4e810d",
+          "publicPath": "/visuals/files/runStateReadyLight/runStateReadyLight-1200-5b95612f02ef.webp",
+          "width": 1200
+        },
+        {
+          "byteLength": 6883,
+          "format": "avif",
+          "height": 900,
+          "integrity": "sha256-5242ef4bd83b15074ec1c06c47c4165b0e0677cfe6ed9f73789be2ed4b779a03",
+          "publicPath": "/visuals/files/runStateReadyLight/runStateReadyLight-1440-5b95612f02ef.avif",
+          "width": 1440
+        },
+        {
+          "byteLength": 8546,
+          "format": "webp",
+          "height": 900,
+          "integrity": "sha256-4cf52c51b0a81db1d18d1b1b4ce0f3040805c5a3b3ebf8f997031fd579769e62",
+          "publicPath": "/visuals/files/runStateReadyLight/runStateReadyLight-1440-5b95612f02ef.webp",
+          "width": 1440
+        }
+      ]
+    },
+    {
+      "id": "runStateRunning",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run/running-dark.png",
+      "sourceHash": "sha256-6ef3033dc561645373c6aaa958fae653f6ca5b4a3c8fc6e92a357d75cbb17c27",
+      "sourceGitHead": "282b4d2525f17ab2b881a618beb08675b40b434a",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-run-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1440,
+        "height": 900,
+        "aspectRatio": 1.6,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": {
+          "x": 0.2,
+          "y": 0.32,
+          "width": 0.48,
+          "height": 0.48
+        },
+        "fit": "cover",
+        "background": "surface",
+        "proofUsage": [
+          "run-state-matrix",
+          "run-state-running"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200,
+          1440
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "브라우저 Run의 코드 셀이 실행 중이며 상단에 실행 상태가 표시된 화면",
+        "caption": "실행 중인 셀과 노트북 전체 상태를 같은 화면에서 확인합니다.",
+        "learningQuestion": "현재 어느 셀이 실행 중이고 노트북이 작업 중임을 어떻게 아는가?",
+        "decisionShown": "셀 실행 상태와 노트북 실행 표시의 동시 피드백",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/src/App.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/notebookSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/notebook",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-42d0dc02bbec8368a9cff1132378e9c9e0254f0e5192e32583bdfa2f411a73ac",
+        "evidencePath": "notebookStateEvidence.screenshots.running"
+      },
+      "themePairId": "runStateRunningLight",
+      "outputs": [
+        {
+          "byteLength": 3040,
+          "format": "avif",
+          "height": 300,
+          "integrity": "sha256-39e02f6cfb4c889e93b4b1c5d1d847cba7a26f9424fa9bc94c5e04dd39521093",
+          "publicPath": "/visuals/files/runStateRunning/runStateRunning-480-6ef3033dc561.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 3124,
+          "format": "webp",
+          "height": 300,
+          "integrity": "sha256-fb84b0f57dcbc7cad186ed111f653303bc5aa94ecfdcaf9f99db8f1096713b99",
+          "publicPath": "/visuals/files/runStateRunning/runStateRunning-480-6ef3033dc561.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 5206,
+          "format": "avif",
+          "height": 450,
+          "integrity": "sha256-c65a88ed25a408420f965ef6c4e41c28cd89cbb8a12d7da47b25a1a4241bde94",
+          "publicPath": "/visuals/files/runStateRunning/runStateRunning-720-6ef3033dc561.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 5600,
+          "format": "webp",
+          "height": 450,
+          "integrity": "sha256-9fac2db588cc92dce47583f51c8c39748b7e6ae3151c9ab173544cd2da392c3c",
+          "publicPath": "/visuals/files/runStateRunning/runStateRunning-720-6ef3033dc561.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 10546,
+          "format": "avif",
+          "height": 750,
+          "integrity": "sha256-a72130fbbd8d19cbb59e3b92266e0ed6600657762472c6df03ee1297a5ac9ce4",
+          "publicPath": "/visuals/files/runStateRunning/runStateRunning-1200-6ef3033dc561.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 13152,
+          "format": "webp",
+          "height": 750,
+          "integrity": "sha256-b4e8902a967bd2f3c8ce52e9f42d38b5f0c4c7ea32439b5f32951c8f4cd957e1",
+          "publicPath": "/visuals/files/runStateRunning/runStateRunning-1200-6ef3033dc561.webp",
+          "width": 1200
+        },
+        {
+          "byteLength": 10667,
+          "format": "avif",
+          "height": 900,
+          "integrity": "sha256-612d8a1f742900d0dee93d7e86bfe301e06b32e6e964856a7c6a5a426f8b4787",
+          "publicPath": "/visuals/files/runStateRunning/runStateRunning-1440-6ef3033dc561.avif",
+          "width": 1440
+        },
+        {
+          "byteLength": 16382,
+          "format": "webp",
+          "height": 900,
+          "integrity": "sha256-34a168e2b443770f81cf71f97155cf10580487b993cbdd260900d4bdbcabbfba",
+          "publicPath": "/visuals/files/runStateRunning/runStateRunning-1440-6ef3033dc561.webp",
+          "width": 1440
+        }
+      ]
+    },
+    {
+      "id": "runStateRunningLight",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run/running-light.png",
+      "sourceHash": "sha256-d40539709513476c0b2998ccc8e1909eee624f7adcae0b87bf6bea3849e998d6",
+      "sourceGitHead": "282b4d2525f17ab2b881a618beb08675b40b434a",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-run-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1440,
+        "height": 900,
+        "aspectRatio": 1.6,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": {
+          "x": 0.2,
+          "y": 0.32,
+          "width": 0.48,
+          "height": 0.48
+        },
+        "fit": "cover",
+        "background": "surface",
+        "proofUsage": [
+          "run-state-matrix",
+          "run-state-running"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          1200,
+          1440
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "브라우저 Run의 코드 셀이 실행 중이며 상단에 실행 상태가 표시된 화면",
+        "caption": "실행 중인 셀과 노트북 전체 상태를 같은 화면에서 확인합니다.",
+        "learningQuestion": "현재 어느 셀이 실행 중이고 노트북이 작업 중임을 어떻게 아는가?",
+        "decisionShown": "셀 실행 상태와 노트북 실행 표시의 동시 피드백",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "theme": "light",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/src/App.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/notebookSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/notebook",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-42d0dc02bbec8368a9cff1132378e9c9e0254f0e5192e32583bdfa2f411a73ac",
+        "evidencePath": "notebookStateEvidence.screenshots.running"
+      },
+      "themePairId": "runStateRunning",
+      "outputs": [
+        {
+          "byteLength": 2958,
+          "format": "avif",
+          "height": 300,
+          "integrity": "sha256-3c2296fb5ef76fdf1102df4884ea4c31ce9e26dbce9f85ac51c765f03b572255",
+          "publicPath": "/visuals/files/runStateRunningLight/runStateRunningLight-480-d40539709513.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 2986,
+          "format": "webp",
+          "height": 300,
+          "integrity": "sha256-ac29e5b45bc79236713995bdd5cc6ba5ab3c29df64ab3b6aab1e957fdcd20b14",
+          "publicPath": "/visuals/files/runStateRunningLight/runStateRunningLight-480-d40539709513.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 4911,
+          "format": "avif",
+          "height": 450,
+          "integrity": "sha256-fb7adfdac740d519ec14458e71b210dcab9dc49751e3f1e329dde1be445d66d9",
+          "publicPath": "/visuals/files/runStateRunningLight/runStateRunningLight-720-d40539709513.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 5250,
+          "format": "webp",
+          "height": 450,
+          "integrity": "sha256-dfa773b257d053716de1624157b34e4a88083e8f232ccb339dd9d45a532f7629",
+          "publicPath": "/visuals/files/runStateRunningLight/runStateRunningLight-720-d40539709513.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 9820,
+          "format": "avif",
+          "height": 750,
+          "integrity": "sha256-e2bc3f714c71e30a77609b79ef70dae3294fdc107a083e494ec6b2063d0239e6",
+          "publicPath": "/visuals/files/runStateRunningLight/runStateRunningLight-1200-d40539709513.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 12672,
+          "format": "webp",
+          "height": 750,
+          "integrity": "sha256-3af5001e56e6dc0a5f3a6b3842a11518dc3657df40a5a38f5df825cddda3e1e5",
+          "publicPath": "/visuals/files/runStateRunningLight/runStateRunningLight-1200-d40539709513.webp",
+          "width": 1200
+        },
+        {
+          "byteLength": 10586,
+          "format": "avif",
+          "height": 900,
+          "integrity": "sha256-e505332b8bff45c9e5bdfa57e4731498fc988f19fb79fbb0e4cbbbde6d8712a1",
+          "publicPath": "/visuals/files/runStateRunningLight/runStateRunningLight-1440-d40539709513.avif",
+          "width": 1440
+        },
+        {
+          "byteLength": 15882,
+          "format": "webp",
+          "height": 900,
+          "integrity": "sha256-90682a8a979770a31f8bf481e68e13f9ce89ccbcf5a66dfebcd2eed445f9f17e",
+          "publicPath": "/visuals/files/runStateRunningLight/runStateRunningLight-1440-d40539709513.webp",
+          "width": 1440
+        }
+      ]
+    },
+    {
+      "id": "runStateCheckFail",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run/check-fail-dark.png",
+      "sourceHash": "sha256-f2fa5716a8c3e24e9c782c0e4eddfb06060bc624706f8c4585777fd43eb34b11",
+      "sourceGitHead": "282b4d2525f17ab2b881a618beb08675b40b434a",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-day1-transfer-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 900,
+        "height": 760,
+        "aspectRatio": 1.184211,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "run-state-matrix",
+          "run-state-check-fail"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          900
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "웹 레슨에서 첫 실행 결과가 기대와 달라 수정 단서가 바로 표시된 화면",
+        "caption": "틀린 실행은 진도를 올리지 않고 코드 가까이에 다음 수정 단서를 보여 줍니다.",
+        "learningQuestion": "실행 결과가 기준과 다를 때 학습자는 무엇을 바로 수정해야 하는가?",
+        "decisionShown": "검증 실패, 진도 미반영과 인라인 수정 단서",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 900,
+          "height": 760
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "assets/brand/visuals/learning/python-fundamentals-v1.png",
+          "curricula/python/basics/30days",
+          "editor/src/App.tsx",
+          "editor/src/components/app/curriculumSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/curriculum",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/curriculaRegistry.ts",
+          "editor/src/lib/learningVisualAssets.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-379aba9fc6e965b842ce0696c6473edbd6d70c385aa6115f17c3b881266c171d",
+        "evidencePath": "checkStateEvidence.screenshots.mismatch"
+      },
+      "themePairId": "runStateCheckFailLight",
+      "outputs": [
+        {
+          "byteLength": 14386,
+          "format": "avif",
+          "height": 405,
+          "integrity": "sha256-ad194e0a532afd6346b0a5805f56dfae74206e241e60995fc59b61e7a153b358",
+          "publicPath": "/visuals/files/runStateCheckFail/runStateCheckFail-480-f2fa5716a8c3.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 15936,
+          "format": "webp",
+          "height": 405,
+          "integrity": "sha256-6cdfef236930278e0514c2f51cbfbab6eb7751a939459233da4478a9eae93c9f",
+          "publicPath": "/visuals/files/runStateCheckFail/runStateCheckFail-480-f2fa5716a8c3.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 28107,
+          "format": "avif",
+          "height": 608,
+          "integrity": "sha256-39cfa1a07de923012440a4c4ef3bf00683c1f216f4c0b67c7c4a3c0633535b43",
+          "publicPath": "/visuals/files/runStateCheckFail/runStateCheckFail-720-f2fa5716a8c3.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 31092,
+          "format": "webp",
+          "height": 608,
+          "integrity": "sha256-4341237c2cb71036a13ad6d033686abef2e6c5740df9871a631f98d5956c6f45",
+          "publicPath": "/visuals/files/runStateCheckFail/runStateCheckFail-720-f2fa5716a8c3.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 29701,
+          "format": "avif",
+          "height": 760,
+          "integrity": "sha256-4166a475eb57530d0939fc4e5d029f12069fd4bcd238901fb4648d5f4aa6f200",
+          "publicPath": "/visuals/files/runStateCheckFail/runStateCheckFail-900-f2fa5716a8c3.avif",
+          "width": 900
+        },
+        {
+          "byteLength": 43604,
+          "format": "webp",
+          "height": 760,
+          "integrity": "sha256-655459a4873cc0b533fe6e9c6f00f41a045eb392788c7be4365b61bd785a52e1",
+          "publicPath": "/visuals/files/runStateCheckFail/runStateCheckFail-900-f2fa5716a8c3.webp",
+          "width": 900
+        }
+      ]
+    },
+    {
+      "id": "runStateCheckFailLight",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run/check-fail-light.png",
+      "sourceHash": "sha256-1b4fccd60745595e0ba3d683c65894bdc583cd54b4183449b5342df7900958db",
+      "sourceGitHead": "282b4d2525f17ab2b881a618beb08675b40b434a",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-day1-transfer-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 900,
+        "height": 760,
+        "aspectRatio": 1.184211,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "run-state-matrix",
+          "run-state-check-fail"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          900
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "웹 레슨에서 첫 실행 결과가 기대와 달라 수정 단서가 바로 표시된 화면",
+        "caption": "틀린 실행은 진도를 올리지 않고 코드 가까이에 다음 수정 단서를 보여 줍니다.",
+        "learningQuestion": "실행 결과가 기준과 다를 때 학습자는 무엇을 바로 수정해야 하는가?",
+        "decisionShown": "검증 실패, 진도 미반영과 인라인 수정 단서",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 900,
+          "height": 760
+        },
+        "theme": "light",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "assets/brand/visuals/learning/python-fundamentals-v1.png",
+          "curricula/python/basics/30days",
+          "editor/src/App.tsx",
+          "editor/src/components/app/curriculumSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/curriculum",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/curriculaRegistry.ts",
+          "editor/src/lib/learningVisualAssets.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-379aba9fc6e965b842ce0696c6473edbd6d70c385aa6115f17c3b881266c171d",
+        "evidencePath": "checkStateEvidence.screenshots.mismatch"
+      },
+      "themePairId": "runStateCheckFail",
+      "outputs": [
+        {
+          "byteLength": 12741,
+          "format": "avif",
+          "height": 405,
+          "integrity": "sha256-ae2eaca8e713981638bf78f4fe66f3633f0f14e4caed4bf552c16a25a1b3774a",
+          "publicPath": "/visuals/files/runStateCheckFailLight/runStateCheckFailLight-480-1b4fccd60745.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 14156,
+          "format": "webp",
+          "height": 405,
+          "integrity": "sha256-7fce0982c5219e40eccbe0e0efa3f0cd5c8086acb9649e78f772882bd773da5b",
+          "publicPath": "/visuals/files/runStateCheckFailLight/runStateCheckFailLight-480-1b4fccd60745.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 25074,
+          "format": "avif",
+          "height": 608,
+          "integrity": "sha256-9dc5850f524c28874ea5492d4b52f81ea8484ac8ecb87b4600d4f887d85bec09",
+          "publicPath": "/visuals/files/runStateCheckFailLight/runStateCheckFailLight-720-1b4fccd60745.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 27818,
+          "format": "webp",
+          "height": 608,
+          "integrity": "sha256-7544e9faec1acd2c5681dc636e7190157547aaed99f181fccebf166af3d15334",
+          "publicPath": "/visuals/files/runStateCheckFailLight/runStateCheckFailLight-720-1b4fccd60745.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 27879,
+          "format": "avif",
+          "height": 760,
+          "integrity": "sha256-97e0c1489e11b2c1519e5d8a939da8231729d37d36b4c5d3b1377fe2ee5cbf3e",
+          "publicPath": "/visuals/files/runStateCheckFailLight/runStateCheckFailLight-900-1b4fccd60745.avif",
+          "width": 900
+        },
+        {
+          "byteLength": 40392,
+          "format": "webp",
+          "height": 760,
+          "integrity": "sha256-d332a7b9d31b2bb3d0e54a7a04f46939f304ba1cba54e51be757817dbf70729b",
+          "publicPath": "/visuals/files/runStateCheckFailLight/runStateCheckFailLight-900-1b4fccd60745.webp",
+          "width": 900
+        }
+      ]
+    },
+    {
+      "id": "runStateCheckPass",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run/check-pass-dark.png",
+      "sourceHash": "sha256-c0c4fb2df3ba50ac5da75d5056440069a27805545d5190867af4723dbce736e9",
+      "sourceGitHead": "282b4d2525f17ab2b881a618beb08675b40b434a",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-day1-transfer-tablet",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 768,
+        "height": 1024,
+        "aspectRatio": 0.75,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "run-state-matrix",
+          "run-state-check-pass"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          768
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "웹 레슨에서 수정한 코드가 강한 검증을 통과하고 학습 증거가 저장된 화면",
+        "caption": "정답 코드를 다시 실행하면 검증 통과와 저장된 학습 증거가 함께 표시됩니다.",
+        "learningQuestion": "실행 성공과 검증 통과, 학습 증거 저장을 어떻게 구분하는가?",
+        "decisionShown": "검증 통과 상태와 저장된 증거의 분리된 표시",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "assets/brand/visuals/learning/python-fundamentals-v1.png",
+          "curricula/python/basics/30days",
+          "editor/src/App.tsx",
+          "editor/src/components/app/curriculumSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/curriculum",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/curriculaRegistry.ts",
+          "editor/src/lib/learningVisualAssets.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-379aba9fc6e965b842ce0696c6473edbd6d70c385aa6115f17c3b881266c171d",
+        "evidencePath": "checkStateEvidence.screenshots.verified"
+      },
+      "themePairId": "runStateCheckPassLight",
+      "outputs": [
+        {
+          "byteLength": 22083,
+          "format": "avif",
+          "height": 640,
+          "integrity": "sha256-0c72556a1d3976c11eedbbe4073d3784d2121a8c9ace34bc26dec848457295a5",
+          "publicPath": "/visuals/files/runStateCheckPass/runStateCheckPass-480-c0c4fb2df3ba.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 24368,
+          "format": "webp",
+          "height": 640,
+          "integrity": "sha256-56ccd44b3294993f8b1485be8aee9c28f2a91c6d09d410de1a23b50d94b5be5d",
+          "publicPath": "/visuals/files/runStateCheckPass/runStateCheckPass-480-c0c4fb2df3ba.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 41585,
+          "format": "avif",
+          "height": 960,
+          "integrity": "sha256-7f466172808dc14b891abead7ce26c15fcb8d13daa32ca96426e4698f8ef8d8c",
+          "publicPath": "/visuals/files/runStateCheckPass/runStateCheckPass-720-c0c4fb2df3ba.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 48118,
+          "format": "webp",
+          "height": 960,
+          "integrity": "sha256-45a8c26b68e2bc14b17ae4384dbcc6abc2a48c3cc8effe7ea92120e4f8e831de",
+          "publicPath": "/visuals/files/runStateCheckPass/runStateCheckPass-720-c0c4fb2df3ba.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 34944,
+          "format": "avif",
+          "height": 1024,
+          "integrity": "sha256-895ab4739df5693ab148124090f01dc13e13432d12fc8ad5dbec8d0dc69f1440",
+          "publicPath": "/visuals/files/runStateCheckPass/runStateCheckPass-768-c0c4fb2df3ba.avif",
+          "width": 768
+        },
+        {
+          "byteLength": 51288,
+          "format": "webp",
+          "height": 1024,
+          "integrity": "sha256-1aba97ccc60e9d5a662a0f6dbc1ce90ebf4d091d6775a636ab7e2dd20a4692b3",
+          "publicPath": "/visuals/files/runStateCheckPass/runStateCheckPass-768-c0c4fb2df3ba.webp",
+          "width": 768
+        }
+      ]
+    },
+    {
+      "id": "runStateCheckPassLight",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run/check-pass-light.png",
+      "sourceHash": "sha256-3e189558489a1791bee5e195fc90f9e0943c4953a8d3ffa7a8eda0b376626d95",
+      "sourceGitHead": "282b4d2525f17ab2b881a618beb08675b40b434a",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-day1-transfer-tablet",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 768,
+        "height": 1024,
+        "aspectRatio": 0.75,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "run-state-matrix",
+          "run-state-check-pass"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          768
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "웹 레슨에서 수정한 코드가 강한 검증을 통과하고 학습 증거가 저장된 화면",
+        "caption": "정답 코드를 다시 실행하면 검증 통과와 저장된 학습 증거가 함께 표시됩니다.",
+        "learningQuestion": "실행 성공과 검증 통과, 학습 증거 저장을 어떻게 구분하는가?",
+        "decisionShown": "검증 통과 상태와 저장된 증거의 분리된 표시",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        },
+        "theme": "light",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "assets/brand/visuals/learning/python-fundamentals-v1.png",
+          "curricula/python/basics/30days",
+          "editor/src/App.tsx",
+          "editor/src/components/app/curriculumSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/curriculum",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/curriculaRegistry.ts",
+          "editor/src/lib/learningVisualAssets.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-379aba9fc6e965b842ce0696c6473edbd6d70c385aa6115f17c3b881266c171d",
+        "evidencePath": "checkStateEvidence.screenshots.verified"
+      },
+      "themePairId": "runStateCheckPass",
+      "outputs": [
+        {
+          "byteLength": 19147,
+          "format": "avif",
+          "height": 640,
+          "integrity": "sha256-40fcac59d163bd12a22cab360a273cc4500fa1ae37268f50f2944304d5052933",
+          "publicPath": "/visuals/files/runStateCheckPassLight/runStateCheckPassLight-480-3e189558489a.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 21086,
+          "format": "webp",
+          "height": 640,
+          "integrity": "sha256-837680c76f17cfdf9bbeece5d8207335dcee59a256f5e28a424acd45345b7a53",
+          "publicPath": "/visuals/files/runStateCheckPassLight/runStateCheckPassLight-480-3e189558489a.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 35983,
+          "format": "avif",
+          "height": 960,
+          "integrity": "sha256-c7c8cae02ec5b9ff6108069e24b3bc667c56c0f92eb2eb626f6822604cc0361e",
+          "publicPath": "/visuals/files/runStateCheckPassLight/runStateCheckPassLight-720-3e189558489a.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 42080,
+          "format": "webp",
+          "height": 960,
+          "integrity": "sha256-1068ceda4ebebd09274476e289bad7cb49bfa09bf6fa71c669d91a2005f794ee",
+          "publicPath": "/visuals/files/runStateCheckPassLight/runStateCheckPassLight-720-3e189558489a.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 32294,
+          "format": "avif",
+          "height": 1024,
+          "integrity": "sha256-dc0909be8fa7ef8ddf176076f5a2fd9037db6eb6e41b36da3027097dba55aa31",
+          "publicPath": "/visuals/files/runStateCheckPassLight/runStateCheckPassLight-768-3e189558489a.avif",
+          "width": 768
+        },
+        {
+          "byteLength": 47214,
+          "format": "webp",
+          "height": 1024,
+          "integrity": "sha256-33db8714443a7d9c16cc0a31d910477c6e23fb34592350997f87d9dc2843ee5d",
+          "publicPath": "/visuals/files/runStateCheckPassLight/runStateCheckPassLight-768-3e189558489a.webp",
+          "width": 768
+        }
+      ]
+    },
+    {
+      "id": "runStateLocalRequired",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run/local-required-dark.png",
+      "sourceHash": "sha256-a725a726cfe329abcbb477af3e73b4d92984848da6044ebdacd22f54ae6dae2e",
+      "sourceGitHead": "282b4d2525f17ab2b881a618beb08675b40b434a",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-day2-progression-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 900,
+        "height": 760,
+        "aspectRatio": 1.184211,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "run-state-matrix",
+          "run-state-local-required"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          900
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "브라우저 레슨의 로컬 동작 검증이 Local 필요 상태와 전환 이유를 표시한 화면",
+        "caption": "파일과 운영체제 접근이 필요한 검증은 실패로 가장하지 않고 Local 전환 이유를 설명합니다.",
+        "learningQuestion": "브라우저에서 끝낼 수 없는 검증을 학습자는 어떻게 구분하는가?",
+        "decisionShown": "지원되지 않음 상태, Local 필요 범위와 전환 근거",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 900,
+          "height": 760
+        },
+        "theme": "dark",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "assets/brand/visuals/learning/python-fundamentals-v1.png",
+          "curricula/python/basics/30days",
+          "editor/src/App.tsx",
+          "editor/src/components/app/curriculumSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/curriculum",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/curriculaRegistry.ts",
+          "editor/src/lib/learningVisualAssets.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-379aba9fc6e965b842ce0696c6473edbd6d70c385aa6115f17c3b881266c171d",
+        "evidencePath": "checkCapabilityEvidence.screenshot"
+      },
+      "themePairId": "runStateLocalRequiredLight",
+      "outputs": [
+        {
+          "byteLength": 15402,
+          "format": "avif",
+          "height": 405,
+          "integrity": "sha256-d64baa11ed1b71a79633d6c30f42265dcf3954d14a1e9adcb928dd64210513c3",
+          "publicPath": "/visuals/files/runStateLocalRequired/runStateLocalRequired-480-a725a726cfe3.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 16572,
+          "format": "webp",
+          "height": 405,
+          "integrity": "sha256-809f3a945d2bfeaa95d28c8dfb6e2ed56493053072acdd9acf312401f450945a",
+          "publicPath": "/visuals/files/runStateLocalRequired/runStateLocalRequired-480-a725a726cfe3.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 30679,
+          "format": "avif",
+          "height": 608,
+          "integrity": "sha256-38cdf7741b0c08705ab8e2bc0c5c4ee341c314c2bd887997573244f2ac960f02",
+          "publicPath": "/visuals/files/runStateLocalRequired/runStateLocalRequired-720-a725a726cfe3.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 33358,
+          "format": "webp",
+          "height": 608,
+          "integrity": "sha256-2fb34440f65bd31781b89c74e69f8bf017a801c89086dae2b1dc56e45aa570a4",
+          "publicPath": "/visuals/files/runStateLocalRequired/runStateLocalRequired-720-a725a726cfe3.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 32582,
+          "format": "avif",
+          "height": 760,
+          "integrity": "sha256-24a7c86b8cd531d98d1566878da55a883c97e3ccbbafb5e7a4aa3462f65213c7",
+          "publicPath": "/visuals/files/runStateLocalRequired/runStateLocalRequired-900-a725a726cfe3.avif",
+          "width": 900
+        },
+        {
+          "byteLength": 47746,
+          "format": "webp",
+          "height": 760,
+          "integrity": "sha256-07a8b2b65ba7b4e0c552fd0596e9c71a2685818d4c89f82de1d400d87055d59a",
+          "publicPath": "/visuals/files/runStateLocalRequired/runStateLocalRequired-900-a725a726cfe3.webp",
+          "width": 900
+        }
+      ]
+    },
+    {
+      "id": "runStateLocalRequiredLight",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run/local-required-light.png",
+      "sourceHash": "sha256-3a1d79775ef6715a7d79f8522ac48761415f5a5ccce851e2572b815254f7f865",
+      "sourceGitHead": "282b4d2525f17ab2b881a618beb08675b40b434a",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-day2-progression-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 900,
+        "height": 760,
+        "aspectRatio": 1.184211,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "run-state-matrix",
+          "run-state-local-required"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          900
+        ],
+        "lightDark": "paired",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "브라우저 레슨의 로컬 동작 검증이 Local 필요 상태와 전환 이유를 표시한 화면",
+        "caption": "파일과 운영체제 접근이 필요한 검증은 실패로 가장하지 않고 Local 전환 이유를 설명합니다.",
+        "learningQuestion": "브라우저에서 끝낼 수 없는 검증을 학습자는 어떻게 구분하는가?",
+        "decisionShown": "지원되지 않음 상태, Local 필요 범위와 전환 근거",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 900,
+          "height": 760
+        },
+        "theme": "light",
+        "locale": "ko-KR",
+        "sourcePaths": [
+          "assets/brand/designSystem/socialLinks.json",
+          "assets/brand/designSystem/tokens.json",
+          "assets/brand/mascot/work/avatar-small.png",
+          "assets/brand/tools/viteLayerOrder.mjs",
+          "assets/brand/visuals/learning/python-fundamentals-v1.png",
+          "curricula/python/basics/30days",
+          "editor/src/App.tsx",
+          "editor/src/components/app/curriculumSidebarTree.tsx",
+          "editor/src/components/app/mainSurface.tsx",
+          "editor/src/components/app/productSidebar.tsx",
+          "editor/src/components/app/topBar.tsx",
+          "editor/src/components/curriculum",
+          "editor/src/components/ui",
+          "editor/src/index.css",
+          "editor/src/lib/curriculaRegistry.ts",
+          "editor/src/lib/learningVisualAssets.ts",
+          "editor/src/main.tsx",
+          "editor/src/styles",
+          "editor/vite.config.ts",
+          "tests/assets/captureProductVisuals.py",
+          "tests/surface/verifyProductExperiencePlaywright.py"
+        ],
+        "sourceSetHash": "sha256-379aba9fc6e965b842ce0696c6473edbd6d70c385aa6115f17c3b881266c171d",
+        "evidencePath": "checkCapabilityEvidence.screenshot"
+      },
+      "themePairId": "runStateLocalRequired",
+      "outputs": [
+        {
+          "byteLength": 13845,
+          "format": "avif",
+          "height": 405,
+          "integrity": "sha256-7d66f4d8b07905a2270e8f9c23e1d7104522fbc2fef4f2ad607c1f9b1146a042",
+          "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-480-3a1d79775ef6.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 14696,
+          "format": "webp",
+          "height": 405,
+          "integrity": "sha256-3f2c56210f3baa45242c6f7951a30ff893c4e2c977c2dc2648e0b6228b95431f",
+          "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-480-3a1d79775ef6.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 27071,
+          "format": "avif",
+          "height": 608,
+          "integrity": "sha256-eff357d7b73536f090edd38de6ba7aa2456132a2061571c0f3b5153fc0bb61c0",
+          "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-720-3a1d79775ef6.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 30674,
+          "format": "webp",
+          "height": 608,
+          "integrity": "sha256-88009925f36ba330bb0bdd250ddd6f605f9b53c55f26988f9c8cb38eb15cc502",
+          "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-720-3a1d79775ef6.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 30269,
+          "format": "avif",
+          "height": 760,
+          "integrity": "sha256-a655f6e9a4d4f15b0e76398ff7a5eb7acda02d90bced86ad3795ab3b09f73309",
+          "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-900-3a1d79775ef6.avif",
+          "width": 900
+        },
+        {
+          "byteLength": 44038,
+          "format": "webp",
+          "height": 760,
+          "integrity": "sha256-2e2ca7ff3c2b0b00407c3cc45ad7e13799bb8e95400a14298b9c93c5fc3ba811",
+          "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-900-3a1d79775ef6.webp",
+          "width": 900
         }
       ]
     },
@@ -2060,8 +3540,9 @@
         "license": "proprietary-project",
         "licenseUrl": null,
         "fixtureId": "python-fundamentals-domain-v1",
+        "promptPath": "assets/brand/visuals/prompts/python-fundamentals-v1.txt",
         "promptHash": "sha256-45246801d7843b7af2cc0174e818e81a9d9e0d1925a4e7b738222dce3e4e5d38",
-        "lessonContentHash": null
+        "lessonContentHash": "sha256-d2b819b24efc2feda35680a8f6acfb70c8944b3610e97475a3c8349df45b7ca5"
       },
       "rendering": {
         "width": 1672,
@@ -2103,8 +3584,7 @@
         "learningQuestion": "하나의 값은 어떤 과정을 거쳐 컬렉션과 반복 흐름으로 확장되는가?",
         "decisionShown": "변수, 자료형, 컬렉션, 제어 흐름의 선후 관계",
         "lessonRefs": [
-          "30days/day02_변수와데이터타입",
-          "30days/day07_리스트기초"
+          "30days/day02_변수와데이터타입"
         ]
       },
       "outputs": [
@@ -2186,8 +3666,9 @@
         "license": "proprietary-project",
         "licenseUrl": null,
         "fixtureId": "data-analysis-domain-v1",
+        "promptPath": "assets/brand/visuals/prompts/data-analysis-v1.txt",
         "promptHash": "sha256-c737f07e956cf2e3c97cdec7ff696187f3585c3d665865623c2873a344bba484",
-        "lessonContentHash": null
+        "lessonContentHash": "sha256-d30dd89318821971b9d46a93ea26ae1aaa39e58a8b92ceff6b66bb7433c202b2"
       },
       "rendering": {
         "width": 1672,
@@ -2228,7 +3709,9 @@
         "caption": "원본 데이터를 정리하고 묶어 비교 가능한 결과로 바꾸는 분석 흐름입니다.",
         "learningQuestion": "원본 행은 어떤 변환을 거쳐 비교 가능한 결과가 되는가?",
         "decisionShown": "정리, 그룹화, 비교, 보고의 분석 순서",
-        "lessonRefs": []
+        "lessonRefs": [
+          "pandas/01_레스토랑팁분석"
+        ]
       },
       "outputs": [
         {
@@ -2309,8 +3792,9 @@
         "license": "proprietary-project",
         "licenseUrl": null,
         "fixtureId": "data-visualization-domain-v1",
+        "promptPath": "assets/brand/visuals/prompts/data-visualization-v1.txt",
         "promptHash": "sha256-e850f31ca2c0d2bb88f54fe8d763a0bdeec70ed29732a5d466f8746a04ed35f1",
-        "lessonContentHash": null
+        "lessonContentHash": "sha256-c463b087a6303000e5e5104616469bb2310ef33769763cd5154c2c02664f4273"
       },
       "rendering": {
         "width": 1672,
@@ -2351,7 +3835,9 @@
         "caption": "같은 값도 질문에 따라 적합한 시각적 표현이 달라집니다.",
         "learningQuestion": "비교, 변화, 관계, 분포에는 각각 어떤 차트가 맞는가?",
         "decisionShown": "데이터 질문과 시각적 인코딩의 대응",
-        "lessonRefs": []
+        "lessonRefs": [
+          "matplotlib/00_Matplotlib소개"
+        ]
       },
       "outputs": [
         {
@@ -2432,8 +3918,9 @@
         "license": "proprietary-project",
         "licenseUrl": null,
         "fixtureId": "statistics-machine-learning-domain-v1",
+        "promptPath": "assets/brand/visuals/prompts/statistics-ml-v1.txt",
         "promptHash": "sha256-882f948c62f95971f176cc50ee33b87daead4134ea0bcd2130c9bcba9ac4d0a5",
-        "lessonContentHash": null
+        "lessonContentHash": "sha256-3cd24ae818e7af118e6458f7642e726f333bfada470e72d9d28dd4f36b418e52"
       },
       "rendering": {
         "width": 1672,
@@ -2474,7 +3961,9 @@
         "caption": "표본의 불확실성을 모델에 반영하고 별도 데이터로 판단을 검증합니다.",
         "learningQuestion": "모델의 적합과 일반화는 어떤 서로 다른 근거로 판단하는가?",
         "decisionShown": "표본, 적합, 분리, 평가의 모델링 순서",
-        "lessonRefs": []
+        "lessonRefs": [
+          "sklearn/00_sklearn소개"
+        ]
       },
       "outputs": [
         {
@@ -2555,8 +4044,9 @@
         "license": "proprietary-project",
         "licenseUrl": null,
         "fixtureId": "image-vision-domain-v1",
+        "promptPath": "assets/brand/visuals/prompts/image-vision-v1.txt",
         "promptHash": "sha256-73fc05ae505bab09936dba44d712c45d882f7bafe4b9634a5b0bdb4055abd3ab",
-        "lessonContentHash": null
+        "lessonContentHash": "sha256-a97d12d4b49dfe02735b4d21da8f93921230fc190fee90ff76eb5ce71f29f08d"
       },
       "rendering": {
         "width": 1672,
@@ -2597,7 +4087,9 @@
         "caption": "하나의 이미지를 픽셀 수준에서 변환하고 경계와 객체로 해석하는 흐름입니다.",
         "learningQuestion": "원본 픽셀은 어떤 변환을 거쳐 측정 가능한 객체가 되는가?",
         "decisionShown": "픽셀, 변환, 윤곽, 분할, 측정의 처리 순서",
-        "lessonRefs": []
+        "lessonRefs": [
+          "opencv/01_이미지구조탐색기"
+        ]
       },
       "outputs": [
         {
@@ -2678,8 +4170,9 @@
         "license": "proprietary-project",
         "licenseUrl": null,
         "fixtureId": "learning-automation-domain-v1",
+        "promptPath": "assets/brand/visuals/prompts/automation-v1.txt",
         "promptHash": "sha256-2f378e592935ce87e9eed1ae357053602f5e9a625cf8a656d28f5dbff71165b7",
-        "lessonContentHash": null
+        "lessonContentHash": "sha256-e382d79925f7068aea509828f00f2c130ec906a77c27599b170f4971da003940"
       },
       "rendering": {
         "width": 1672,
@@ -2720,7 +4213,9 @@
         "caption": "검증된 코드는 안전 점검과 기록을 포함한 반복 작업으로 확장됩니다.",
         "learningQuestion": "반복 실행 전에 어떤 검증과 안전 경계가 필요한가?",
         "decisionShown": "입력, dry-run, 예약, 산출물, 감사의 자동화 흐름",
-        "lessonRefs": []
+        "lessonRefs": [
+          "watchSched/05_schedule간단스케줄"
+        ]
       },
       "outputs": [
         {
@@ -2801,8 +4296,9 @@
         "license": "proprietary-project",
         "licenseUrl": null,
         "fixtureId": "developer-literacy-domain-v1",
+        "promptPath": "assets/brand/visuals/prompts/developer-literacy-v1.txt",
         "promptHash": "sha256-85e38fd1ca4b81e80c950874eb38b7ad64a9fe79549dc36514be63d4bed709aa",
-        "lessonContentHash": null
+        "lessonContentHash": "sha256-dfc775be321c59045d342af4f129587c9105fb46b0d7bf18fcbec3d9b27de7c0"
       },
       "rendering": {
         "width": 1672,
@@ -2843,7 +4339,9 @@
         "caption": "작은 소프트웨어 프로젝트를 구성하는 파일, 실행, 검증, 배포의 관계입니다.",
         "learningQuestion": "소스 변경은 어떤 검증과 패키징 단계를 거쳐 공유되는가?",
         "decisionShown": "저장소, 실행, 테스트, 패키지, 문서의 프로젝트 구조",
-        "lessonRefs": []
+        "lessonRefs": [
+          "devTools/gitFirstSteps"
+        ]
       },
       "outputs": [
         {
@@ -2924,8 +4422,9 @@
         "license": "proprietary-project",
         "licenseUrl": null,
         "fixtureId": "ai-integration-domain-v1",
+        "promptPath": "assets/brand/visuals/prompts/ai-integration-v1.txt",
         "promptHash": "sha256-51f558f4635cfe113f30a3771b3d16437bd96f712cb726b65347c3f0e32c7479",
-        "lessonContentHash": null
+        "lessonContentHash": "sha256-4672ccf12e6f34897654c0a3534b20fb0503b70a63bb698749236596fde6d3e0"
       },
       "rendering": {
         "width": 1672,
@@ -2966,7 +4465,9 @@
         "caption": "출처와 도구 경계를 유지하면서 모델 응답을 실제 작업과 평가로 연결합니다.",
         "learningQuestion": "모델의 응답을 근거와 도구 실행, 평가에 어떻게 묶는가?",
         "decisionShown": "입력, 검색, 모델, 도구, 출처, 평가의 통합 경계",
-        "lessonRefs": []
+        "lessonRefs": [
+          "llmBasics/08_도구사용기초"
+        ]
       },
       "outputs": [
         {

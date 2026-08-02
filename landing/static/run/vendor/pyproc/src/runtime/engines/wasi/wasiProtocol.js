@@ -1,4 +1,4 @@
-// wasiProtocol.js - WASI 엔진의 메인<->워커 와이어 계약(한 곳). 하드코딩 금지 원칙의 준수:
+// wasiProtocol.js - Layer 0: WASI 엔진의 메인<->워커 와이어 계약(한 곳). 하드코딩 금지 원칙의 준수:
 // 신호 바이트/EOT/코드 경로/SAB 상한이 여러 파일에 흩어지지 않게 명명 상수로 모은다.
 // SIGNAL 표(processOs)의 WASI판. 값 채널은 무상태화돼 있다(코드=파일, stdin=신호 1바이트).
 

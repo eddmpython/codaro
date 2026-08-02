@@ -1,20 +1,19 @@
-// runtime.js - Layer 0: Pyodide 엔진 래퍼(boot/Runtime).
-// 설계 원칙: 엔진 내부 접근은 memoryCapability.js 계약 뒤에 격리하고, Layer 1 능력은
-// enableReactive()/enableSyscallBridge()로 opt-in 등록한다. 빌드 단계 없음(네이티브 ESM).
+// runtime.js - Layer 0: Pyodide 엔진 래퍼(boot/Runtime core).
+// 설계 원칙: 엔진 내부 접근은 memoryCapability.js 계약 뒤에 격리하고, 선택 능력 등록은
+// runtimeApi.js의 public binding이 주입한다. 빌드 단계 없음(네이티브 ESM).
 // 지원: Chromium/Edge (JSPI + SharedArrayBuffer + crossOriginIsolated).
 import { MemoryCapability } from "./memoryCapability.js";
 import { PyodideEngine } from "./engines/pyodideEngine.js";
-import { ReactiveController } from "../capabilities/reactive.js";
-import { SyscallBridge } from "../capabilities/syscallBridge.js";
-import { SocketBridge } from "../capabilities/socketBridge.js";
-import { AsgiServer } from "../capabilities/asgiServer.js";
-import { WheelCache } from "../capabilities/wheelCache.js";
-import { Terminal } from "../capabilities/terminal.js";
-import { DeviceFs } from "../capabilities/deviceFs.js";
-import { Init } from "../capabilities/init.js";
-import { MachineJournal } from "../capabilities/machineJournal.js";
-import { GpuBridge } from "../capabilities/gpuCompute.js";
-import { FileSystem } from "../capabilities/fileSystem.js";
+import { FileSystem } from "./fileSystem.js";
+import { PyProcError } from "./errors.js";
+import { runWithGlobalPatch } from "./globalPatch.js";
+import { verifySri } from "./contentDigest.js";
+import {
+  ENGINE_CAPABILITIES,
+  assertEngineContract,
+  requireEngineCapability,
+} from "./engineContract.js";
+import { RUNTIME_CAPABILITIES, RUNTIME_CONTRACT_VERSION } from "./runtimeContract.js";
 
 export { MemoryCapability, PAGE_SIZE } from "./memoryCapability.js";
 export { checkEnvironment } from "./preflight.js";
@@ -22,17 +21,6 @@ export { checkEnvironment } from "./preflight.js";
 // 기본 엔진 배포 지점(출처: docs/consuming/contract.md의 Pyodide 버전 계약). 이 상수의
 // 유일한 정의처다: boot/bootEnv/PyProc이 여기서 가져간다. 버전 변경 = 릴리즈 사유.
 export const DEFAULT_INDEX = "https://cdn.jsdelivr.net/pyodide/v314.0.2/full/";
-
-function base64FromBytes(bytes) {
-  let s = "";
-  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
-  return btoa(s);
-}
-
-async function sha256Sri(data) {
-  const buf = data instanceof ArrayBuffer ? data : data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
-  return "sha256-" + base64FromBytes(new Uint8Array(await crypto.subtle.digest("SHA-256", buf)));
-}
 
 function normalizeCoreIntegrity(policy) {
   if (!policy) return null;
@@ -56,16 +44,8 @@ function expectedCoreIntegrity(policy, url, name) {
     || null;
 }
 
-async function verifyIntegrity(data, expected, label) {
-  const entries = String(expected || "").trim().split(/\s+/).filter((v) => v.startsWith("sha256-"));
-  if (!entries.length) throw new Error(`integrity: ${label}의 sha256 SRI 값이 없다`);
-  const actual = await sha256Sri(data);
-  if (!entries.includes(actual)) throw new Error(`integrity: ${label} 해시 불일치(expected ${entries[0].slice(0, 19)}..., actual ${actual.slice(0, 19)}...)`);
-  return actual;
-}
-
 function failIntegrity(cache, err) {
-  const e = err instanceof Error ? err : new Error(String(err));
+  const e = err instanceof Error ? err : new PyProcError("PYPROC_ASSET_INTEGRITY", String(err));
   if (cache.rejectIntegrity) cache.rejectIntegrity(e);
   throw e;
 }
@@ -80,7 +60,7 @@ export function ensureEngineScript(indexURL, opts = {}) {
   const integrity = opts.integrity || null;
   if (globalThis.loadPyodide) {
     if (integrity && engineScriptState?.integrity !== integrity) {
-      return Promise.reject(new Error("pyodide.js는 이미 다른 integrity 상태로 로드됐다. engineScriptIntegrity 검증은 첫 부팅 전에만 강제할 수 있다."));
+      return Promise.reject(new PyProcError("PYPROC_ASSET_INTEGRITY", "pyodide.js is already loaded with a different integrity value. engineScriptIntegrity can only be enforced before the first boot."));
     }
     return Promise.resolve();
   }
@@ -94,11 +74,11 @@ export function ensureEngineScript(indexURL, opts = {}) {
         s.crossOrigin = opts.crossOrigin || "anonymous";
       }
       s.onload = () => { engineScriptState = engineScriptPending; engineScriptPending = null; res(); };
-      s.onerror = () => { engineScriptLoad = null; engineScriptPending = null; rej(new Error("pyodide.js 로드 실패: " + indexURL)); };
+      s.onerror = () => { engineScriptLoad = null; engineScriptPending = null; rej(new PyProcError("PYPROC_BOOT_FAILED", "failed to load pyodide.js from " + indexURL, { retryable: true })); };
       document.head.appendChild(s);
     });
   } else if (integrity && engineScriptPending?.integrity !== integrity) {
-    return Promise.reject(new Error("pyodide.js 로드가 이미 다른 integrity 상태로 진행 중이다."));
+    return Promise.reject(new PyProcError("PYPROC_ASSET_INTEGRITY", "a pyodide.js load with a different integrity value is already in flight."));
   }
   return engineScriptLoad;
 }
@@ -125,14 +105,14 @@ export async function boot(opts = {}) {
     const expected = expectedCoreIntegrity(cache.integrity, url, name);
     if (cache.integrity?.required && !expected) {
       cache.integrityMissing++;
-      failIntegrity(cache, new Error(`integrity: ${name}의 coreIntegrity 항목이 없다`));
+      failIntegrity(cache, new PyProcError("PYPROC_ASSET_INTEGRITY", `integrity: ${name} is not listed in coreIntegrity`));
     }
     if (cache.dir) {
       try {
         const f = await (await cache.dir.getFileHandle(name)).getFile();
         const data = await f.arrayBuffer();
         if (expected) {
-          try { await verifyIntegrity(data, expected, name); cache.verified++; }
+          try { await verifySri(data, expected, name); cache.verified++; }
           catch (e) { failIntegrity(cache, e); }
         }
         cache.hits++;
@@ -146,7 +126,7 @@ export async function boot(opts = {}) {
     if (!resp.ok) return resp;
     const data = await resp.arrayBuffer();
     if (expected) {
-      try { await verifyIntegrity(data, expected, name); cache.verified++; }
+      try { await verifySri(data, expected, name); cache.verified++; }
       catch (e) { failIntegrity(cache, e); }
     }
     if (cache.dir) {
@@ -168,9 +148,13 @@ export async function boot(opts = {}) {
   const doLoad = opts.loadPyodide
     ? () => opts.loadPyodide(cfg)
     : async () => { await ensureEngineScript(indexURL, { integrity: opts.engineScriptIntegrity }); return loadPyodide(cfg); };
-  if (opts.loadPyodide && opts.engineScriptIntegrity) throw new Error("engineScriptIntegrity는 pyproc이 pyodide.js를 로드하는 경로에서만 검증할 수 있다.");
+  if (opts.loadPyodide && opts.engineScriptIntegrity) throw new PyProcError("PYPROC_INPUT_INVALID", "engineScriptIntegrity applies only when pyproc loads pyodide.js itself.");
   let py;
   if (cache) {
+    // 코어 캐시의 fetch 랩은 전역 패치 창이다: 단독 boot는 공용 체인으로 직렬화하고,
+    // 이미 열린 창(bootSession의 엔트로피 스텁) 안에서는 그 창이 넘겨준 patchScope로 중첩한다.
+    const patchScope = opts.patchScope || runWithGlobalPatch;
+    py = await patchScope(async () => {
     const fetchOrig = globalThis.fetch;
     cache.orig = fetchOrig;
     const integrityFailure = new Promise((_, reject) => { cache.rejectIntegrity = reject; });
@@ -184,8 +168,9 @@ export async function boot(opts = {}) {
       return u.startsWith(indexURL) ? cachedFetch(u) : fetchOrig(input, init);
     };
     try {
-      py = await Promise.race([loadAll(), integrityFailure]);
+      return await Promise.race([loadAll(), integrityFailure]);
     } finally { globalThis.fetch = fetchOrig; }
+    });
   } else {
     py = await doLoad();
     if (opts.packages && opts.packages.length) await py.loadPackage(opts.packages);
@@ -201,7 +186,10 @@ export class Runtime {
   // Pyodide를 `new Runtime(py)`로 채택하는 라이브 소비자를 지원한다. EngineContract seam(계약
   // 격리) 도입 시 `Runtime(py)` 채택 경로가 깨질 뻔한 회귀를 이 판별로 복원한다(runSync 유무로 구분).
   constructor(engineOrPy, indexURL, opts = {}) {
-    this._engine = engineOrPy && typeof engineOrPy.runSync === "function" ? engineOrPy : new PyodideEngine(engineOrPy);
+    const engine = engineOrPy?.engineContractVersion === 1 ? engineOrPy : new PyodideEngine(engineOrPy);
+    this._engine = assertEngineContract(engine);
+    this.runtimeContractVersion = RUNTIME_CONTRACT_VERSION;
+    this.runtimeKind = this._engine.engineKind;
     // 이 커널이 어느 배포 지점에서 부팅됐는지. 자식 워커(subprocess 등)가 같은 지점을
     // 쓰게 하는 근거다(자가호스팅/오프라인 배포에서 자식만 CDN으로 새는 결함 방지).
     this.indexURL = indexURL || DEFAULT_INDEX;
@@ -210,47 +198,84 @@ export class Runtime {
     this.fs = new FileSystem(this); // 엔진-무관 일반 파일 IO(상시 능력, memory와 동급). 미지원 엔진이면 호출 시 에러.
     this.execSeq = 0; // 상태 변이 카운터. 리액티브가 실행 경계 위반을 O(1)로 감지하는 근거.
   }
+  // 실행 API 밖의 상태 변이를 경계 카운터에 기록한다. 소비자: 리액티브의 복원(restore도
+  // 힙 변이다 = 저널 유휴 감시 같은 외부 관찰자에게 보여야 한다)과 markDirty(라이브 PyProxy
+  // 호출처럼 계측 불가능한 변이의 신고 채널).
+  noteStateMutation() { this.execSeq++; }
+  capabilities() {
+    const engine = new Set(this._engine.capabilities());
+    const runtime = [
+      RUNTIME_CAPABILITIES.asyncExecution,
+      RUNTIME_CAPABILITIES.syncExecution,
+      RUNTIME_CAPABILITIES.globals,
+      RUNTIME_CAPABILITIES.hostValues,
+      RUNTIME_CAPABILITIES.memory,
+    ];
+    if (engine.has(ENGINE_CAPABILITIES.fileSystem)) runtime.push(RUNTIME_CAPABILITIES.fileSystem);
+    if (engine.has(ENGINE_CAPABILITIES.packages)) runtime.push(RUNTIME_CAPABILITIES.packages);
+    return Object.freeze(runtime);
+  }
+  // 이 런타임의 힙에 JS 핸들이 심겼는가. 이미지 이식성의 전제라 세션이 이것을 보고 판정한다
+  // (엔진마다 값 다리가 다르므로 미지원 엔진은 0 = 핸들 없음이 참이다: WASI는 JSON 값 프로토콜).
+  hostProxySurfaces() { return [...(this._engine.hostProxyNames || [])]; }
+
   run(code) { this.execSeq++; return this._engine.runSync(code); }
   runAsync(code) { this.execSeq++; return this._engine.runAsync(code); }
   setGlobal(name, value) { this.execSeq++; this._engine.setGlobal(name, value); }
-  // getGlobal은 엔진 프록시(Pyodide면 PyProxy)를 그대로 반환한다. 소비자는 call/toJs로 값을
-  // 회수하고 destroy로 파기할 수 있다(재사용 프록시 캐시 패턴). 이 프록시는 계약이 축복한다.
+  // getGlobal은 엔진 프록시(Pyodide면 PyProxy)를 그대로 반환한다. 소비자는 `toHostValue`로
+  // host 값으로 정규화하고 `destroyHostValue`로 파기한다(재사용 프록시 캐시 패턴).
   getGlobal(name) { return this._engine.getGlobal(name); }
+  // 엔진별 값 브리지를 계약 메서드로 통일: Pyodide 값을 host 타입으로 정규화하고, 필요 시
+  // pyodide 해제 경로를 한 곳에 모은다. (WASI는 pass-through + no-op destroy).
+  toHostValue(value, options = {}) { return this._engine.toHostValue(value, options); }
+  destroyHostValue(value) { if (this._engine.destroyHostValue) this._engine.destroyHostValue(value); }
   // 인터럽트 SAB 배선: 이 버퍼의 [0]에 시그널 번호를 쓰면 실행 중 파이썬이 반응한다
   // (2=SIGINT=KeyboardInterrupt). 워커에서 파이썬을 돌리는 소비자(예: 동기 UDF의 무한 실행
   // 취소)의 계약. 미지원 엔진이면 false. 엔진 내부(setInterruptBuffer)를 raw로 만지지 않게 한다.
-  setInterruptBuffer(sab) { return this._engine.setInterruptBuffer(sab); }
-  async install(pkg) { this.execSeq++; return this._engine.install(pkg); }
-  async loadPackages(pkgs) { this.execSeq++; return this._engine.loadPackages(pkgs); }
+  setInterruptBuffer(sab) {
+    if (!new Set(this._engine.capabilities()).has(ENGINE_CAPABILITIES.interrupts)) return false;
+    return this._engine.setInterruptBuffer(sab);
+  }
+  async install(pkg) {
+    requireEngineCapability(this._engine, ENGINE_CAPABILITIES.install, "Runtime.install");
+    this.execSeq++; return this._engine.install(pkg);
+  }
+  async loadPackages(pkgs) {
+    requireEngineCapability(this._engine, ENGINE_CAPABILITIES.packages, "Runtime.loadPackages");
+    this.execSeq++; return this._engine.loadPackages(pkgs);
+  }
   // 셀 코드의 import 문을 스캔해 필요한 패키지를 자동 로드. 미지원 엔진(WASI)은 no-op(명시 loadPackages 폴백).
-  async loadPackagesFromImports(code) { this.execSeq++; return this._engine.loadPackagesFromImports(code); }
+  async loadPackagesFromImports(code) {
+    requireEngineCapability(this._engine, ENGINE_CAPABILITIES.importDiscovery, "Runtime.loadPackagesFromImports");
+    this.execSeq++; return this._engine.loadPackagesFromImports(code);
+  }
   // 실행 출력 캡처(셀별 가변 싱크). handler는 문자열 청크 수신, null = 기본 복원. 엔진 setStdout를 raw로 안 만지게.
-  setStdout(handler) { return this._engine.setStdout(handler); }
-  setStderr(handler) { return this._engine.setStderr(handler); }
+  setStdout(handler) {
+    requireEngineCapability(this._engine, ENGINE_CAPABILITIES.output, "Runtime.setStdout");
+    return this._engine.setStdout(handler);
+  }
+  setStderr(handler) {
+    requireEngineCapability(this._engine, ENGINE_CAPABILITIES.output, "Runtime.setStderr");
+    return this._engine.setStderr(handler);
+  }
 
   // 현재 환경을 pyodide-lock 형식 락(JSON 문자열)으로 고정한다(uv lock 등가).
   // boot({ lockFileURL })에 되먹이면 같은 버전이 해석 0으로 재현된다. 실측: freezeLockProbe.
-  async freeze() { this.execSeq++; return this._engine.freeze(); }
-
-  // Layer 1 능력 등록(opt-in). 소비자는 능력 계약만 받고 엔진 내부는 만지지 않는다.
-  enableReactive() { return new ReactiveController(this); }
-  enableSyscallBridge(cfg = {}) { return new SyscallBridge(this, { ...cfg, assetIntegrity: cfg.assetIntegrity || this.assetIntegrity }); }
-  enableSocketBridge(cfg = {}) { return new SocketBridge(this, cfg); }
-  enableAsgiServer(cfg = {}) { return new AsgiServer(this, cfg); }
-  enableTerminal(cfg = {}) { return new Terminal(this, cfg); }
-  enableWheelCache(cfg = {}) { return new WheelCache(this, cfg); }
-  enableDeviceFs(cfg = {}) { return new DeviceFs(this, cfg); }
-  enableInit(cfg = {}) { return new Init(this, cfg); }
-  enableJournal(cfg = {}) { return new MachineJournal(this, cfg); }
-  // Python numpy -> GPU 직결(install()로 pyprocGpu 모듈 배선). 실 GPU + 창 모드 + numpy 필요.
-  enableGpu(cfg = {}) { return new GpuBridge(this); }
+  async freeze() {
+    requireEngineCapability(this._engine, ENGINE_CAPABILITIES.freeze, "Runtime.freeze");
+    this.execSeq++; return this._engine.freeze();
+  }
 
   // 영속 디스크: OPFS 등 디렉터리 핸들을 파이썬 파일시스템 경로로 마운트한다.
   // 파이썬 open()이 진짜 지속 파일을 읽고 쓴다. 변경 반영은 반환된 sync() 호출(핸들은 소비자 제공).
   async mountHome(dirHandle, path = "/home/web") {
+    requireEngineCapability(this._engine, ENGINE_CAPABILITIES.mount, "Runtime.mountHome");
     this.execSeq++;
     return this._engine.mountDir(path, dirHandle);
   }
 
-  get raw() { return this._engine.raw(); }  // 탈출구(권장 안 함). 미이관 접점(deviceFs의 FS 등)용
+  get raw() {
+    requireEngineCapability(this._engine, ENGINE_CAPABILITIES.raw, "Runtime.raw");
+    return this._engine.raw();
+  }
 }

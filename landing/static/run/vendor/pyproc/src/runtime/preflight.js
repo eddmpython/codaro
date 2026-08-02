@@ -7,14 +7,16 @@
 // 정확히 무엇을 어떻게 고치는지 구조화해 돌려준다. 준비 안 된 능력을 실제로 쓰면 requireCoi가
 // 암호 같은 실패(SharedArrayBuffer is not defined) 대신 실행 가능한 에러를 던진다.
 
+import { PyProcError } from "./errors.js";
+
 const HEADER_SNIPPET =
   "Cross-Origin-Opener-Policy: same-origin\n  Cross-Origin-Embedder-Policy: require-corp";
 const SETUP_URL = "https://github.com/eddmpython/pyproc#setup";
 
-export function hasCrossOriginIsolation() {
+function hasCrossOriginIsolation() {
   return typeof globalThis.crossOriginIsolated === "boolean" ? globalThis.crossOriginIsolated : false;
 }
-export function hasSharedArrayBuffer() {
+function hasSharedArrayBuffer() {
   return typeof globalThis.SharedArrayBuffer === "function";
 }
 export function hasJspi() {
@@ -35,17 +37,17 @@ export function checkEnvironment() {
     issues.push({
       code: "no-cross-origin-isolation",
       need: "SharedArrayBuffer (crossOriginIsolated)",
-      why: "PyProc(스냅샷-fork/map/interrupt), IPC(pipe/shm/lock), 소켓 블로킹 recv가 SAB를 쓴다.",
-      fix: "페이지를 서빙하는 응답에 다음 두 헤더를 달아라:\n  " + HEADER_SNIPPET +
-        "\n헤더를 못 다는 정적 호스팅이면 pyprocSw.js를 ?coi=1로 등록하고 1회 새로고침(가상 COI). 상세: " + SETUP_URL,
+      why: "PyProc (snapshot-fork / map / interrupt), IPC (pipe / shm / lock), and blocking socket recv all use SharedArrayBuffer.",
+      fix: "Serve the page with these two response headers:\n  " + HEADER_SNIPPET +
+        "\nOn static hosting that cannot set headers, register pyprocSw.js with ?coi=1 and reload once (virtual COI). Details: " + SETUP_URL,
     });
   }
   if (!jspi) {
     issues.push({
       code: "no-jspi",
       need: "JSPI (WebAssembly.Suspending)",
-      why: "subprocess/블로킹 input/소켓 블로킹 recv가 JSPI로 파이썬을 서스펜드한다.",
-      fix: "Chromium/Edge 137+ 를 쓰라(JSPI 기본 출시). 구버전이면 최신 Chrome/Edge로 갱신. 상세: " + SETUP_URL,
+      why: "subprocess, blocking input, and blocking socket recv suspend Python through JSPI.",
+      fix: "Use Chromium or Edge 137+ (JSPI ships on by default there). On an older build, update to the current Chrome or Edge. Details: " + SETUP_URL,
     });
   }
 
@@ -53,12 +55,25 @@ export function checkEnvironment() {
 }
 
 // 능력 사용 지점의 가드: crossOriginIsolated가 아니면 암호 에러 대신 실행 가능한 에러를 던진다.
-// feature = 안내에 쓸 능력 이름(예: "PyProc(프로세스 OS)").
+// feature = 안내에 쓸 능력 이름(예: "PyProc (process OS)"). 메시지는 영문이다: 이 문장은
+// 소비자가 읽는 표면이고 README/api.md와 같은 언어라야 온보딩 장치로 실제 작동한다.
 export function requireCoi(feature) {
   if (hasCrossOriginIsolation() && hasSharedArrayBuffer()) return;
-  throw new Error(
-    `${feature}는 SharedArrayBuffer(crossOriginIsolated)가 필요하다. 지금 페이지는 crossOriginIsolated=${hasCrossOriginIsolation()}다.\n` +
-    "페이지 응답에 다음 헤더를 달아라:\n  " + HEADER_SNIPPET + "\n" +
-    "헤더를 못 다는 호스팅이면 pyprocSw.js를 ?coi=1로 등록(가상 COI). 기본 표면(boot/run/enableReactive)은 헤더 없이도 된다. 상세: " + SETUP_URL,
+  throw new PyProcError(
+    "PYPROC_ENV_UNSUPPORTED",
+    `${feature} needs SharedArrayBuffer (crossOriginIsolated). This page has crossOriginIsolated=${hasCrossOriginIsolation()}.\n` +
+    "Serve the page with these headers:\n  " + HEADER_SNIPPET + "\n" +
+    "On hosting that cannot set headers, register pyprocSw.js with ?coi=1 (virtual COI). The base surface (boot / run / history) works without them. Details: " + SETUP_URL,
+  );
+}
+
+// JSPI 가드. 이 능력이 없으면 파이썬 서스펜드가 성립하지 않으므로, 실패를 엔진 깊은 곳의
+// 암호 같은 트랩이 아니라 여기서 실행 가능한 문장으로 만든다(COI 가드와 같은 규율).
+export function requireJspi(feature) {
+  if (hasJspi()) return;
+  throw new PyProcError(
+    "PYPROC_ENV_UNSUPPORTED",
+    `${feature} needs JSPI (WebAssembly.Suspending), which this browser does not expose.\n` +
+    "Use Chromium or Edge 137+ (JSPI ships on by default there). Details: " + SETUP_URL,
   );
 }
