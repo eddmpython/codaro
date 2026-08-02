@@ -2273,7 +2273,7 @@
         "fixtureId": "python-fundamentals-domain-v1",
         "promptPath": "assets/brand/visuals/prompts/python-fundamentals-v1.txt",
         "promptHash": "sha256-45246801d7843b7af2cc0174e818e81a9d9e0d1925a4e7b738222dce3e4e5d38",
-        "lessonContentHash": "sha256-d2b819b24efc2feda35680a8f6acfb70c8944b3610e97475a3c8349df45b7ca5"
+        "lessonContentHash": "sha256-4db1b198d1db612a87b72fa322a28b5cdff2aac207fc053272ba2799fe5b5fa7"
       },
       "rendering": {
         "width": 1672,
@@ -2333,7 +2333,7 @@
         "fixtureId": "data-analysis-domain-v1",
         "promptPath": "assets/brand/visuals/prompts/data-analysis-v1.txt",
         "promptHash": "sha256-c737f07e956cf2e3c97cdec7ff696187f3585c3d665865623c2873a344bba484",
-        "lessonContentHash": "sha256-d30dd89318821971b9d46a93ea26ae1aaa39e58a8b92ceff6b66bb7433c202b2"
+        "lessonContentHash": "sha256-3b62c6e575229d80413624306debeb79218bdfe9d18d3a6198a6e67c5dc26bfd"
       },
       "rendering": {
         "width": 1672,
@@ -2393,7 +2393,7 @@
         "fixtureId": "data-visualization-domain-v1",
         "promptPath": "assets/brand/visuals/prompts/data-visualization-v1.txt",
         "promptHash": "sha256-e850f31ca2c0d2bb88f54fe8d763a0bdeec70ed29732a5d466f8746a04ed35f1",
-        "lessonContentHash": "sha256-c463b087a6303000e5e5104616469bb2310ef33769763cd5154c2c02664f4273"
+        "lessonContentHash": "sha256-91fbb40c0fcfa501381fdf21a279eace3d6d9ecf5cb61d4651b473eb1b210d33"
       },
       "rendering": {
         "width": 1672,
@@ -2453,7 +2453,7 @@
         "fixtureId": "statistics-machine-learning-domain-v1",
         "promptPath": "assets/brand/visuals/prompts/statistics-ml-v1.txt",
         "promptHash": "sha256-882f948c62f95971f176cc50ee33b87daead4134ea0bcd2130c9bcba9ac4d0a5",
-        "lessonContentHash": "sha256-3cd24ae818e7af118e6458f7642e726f333bfada470e72d9d28dd4f36b418e52"
+        "lessonContentHash": "sha256-63538d7660c2c07ae490af74c206b637de1e1865938aa5163b55b752ee4cbf5f"
       },
       "rendering": {
         "width": 1672,
@@ -2513,7 +2513,7 @@
         "fixtureId": "image-vision-domain-v1",
         "promptPath": "assets/brand/visuals/prompts/image-vision-v1.txt",
         "promptHash": "sha256-73fc05ae505bab09936dba44d712c45d882f7bafe4b9634a5b0bdb4055abd3ab",
-        "lessonContentHash": "sha256-a97d12d4b49dfe02735b4d21da8f93921230fc190fee90ff76eb5ce71f29f08d"
+        "lessonContentHash": "sha256-46fd94b7ae9819c3812b9e57a8929cf7907bb6033cb57b59efbce5e93d77f298"
       },
       "rendering": {
         "width": 1672,
@@ -2573,7 +2573,7 @@
         "fixtureId": "learning-automation-domain-v1",
         "promptPath": "assets/brand/visuals/prompts/automation-v1.txt",
         "promptHash": "sha256-2f378e592935ce87e9eed1ae357053602f5e9a625cf8a656d28f5dbff71165b7",
-        "lessonContentHash": "sha256-e382d79925f7068aea509828f00f2c130ec906a77c27599b170f4971da003940"
+        "lessonContentHash": "sha256-85d79d69ebcb05afdbfcfb135e10c3ffd85b0453b9482213eb81008efc892386"
       },
       "rendering": {
         "width": 1672,
@@ -2633,7 +2633,7 @@
         "fixtureId": "developer-literacy-domain-v1",
         "promptPath": "assets/brand/visuals/prompts/developer-literacy-v1.txt",
         "promptHash": "sha256-85e38fd1ca4b81e80c950874eb38b7ad64a9fe79549dc36514be63d4bed709aa",
-        "lessonContentHash": "sha256-dfc775be321c59045d342af4f129587c9105fb46b0d7bf18fcbec3d9b27de7c0"
+        "lessonContentHash": "sha256-2368f672e1d4e77180de695c9597506708b71bbad7d38ec762d635e639be25a1"
       },
       "rendering": {
         "width": 1672,
@@ -2693,7 +2693,7 @@
         "fixtureId": "ai-integration-domain-v1",
         "promptPath": "assets/brand/visuals/prompts/ai-integration-v1.txt",
         "promptHash": "sha256-51f558f4635cfe113f30a3771b3d16437bd96f712cb726b65347c3f0e32c7479",
-        "lessonContentHash": "sha256-4672ccf12e6f34897654c0a3534b20fb0503b70a63bb698749236596fde6d3e0"
+        "lessonContentHash": "sha256-0b3dd61f2f40c75513ac8e66dd0aec976c1aea5fa83bf186912fd9e2472fb0d6"
       },
       "rendering": {
         "width": 1672,
