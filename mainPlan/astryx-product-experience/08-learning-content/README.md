@@ -23,7 +23,7 @@
 
 2026-07-28 `curriculum-top-tier-audit`는 현재 `scoreKind: audit-requirement-coverage`, `score: 9.69/10`, `curriculumQualityScore: null`, `topTierEligible: false`, `completionEligible: false`다. strong CheckSpec은 1,419개/468레슨, weak-only는 0, mastery·unseen transfer·delayed retrieval과 performance claim·명시적 scope는 각각 468/472이다. 유일한 실패 domain은 `assessment-claim-and-independent-review`이며 independent assessment 승인은 0/468이다. 이 감사 점수는 요구사항 항목 커버리지일 뿐 제품 품질 점수나 실제 학습 효과가 아니며 완료 근거로 사용할 수 없다.
 
-`buildLearningLedgers.py --check`는 현재 identity 472행, registry 472행, content owner·outcome·source hash, 31개 path의 canonical reference를 source에서 다시 계산한다. taxonomy transition draft는 baseline `b5e9...def2`에서 target `6792...fb84`, graph 469에서 472, 신규 outcome·lesson 각 6개, 변경 path 7개를 exact diff로 고정했다. 변경 경로에는 대표 6경로의 명시적 project capstone과 `standardLibraryMastery`가 포함된다. `learning-content` gate는 identity, canonical content, path membership, featured metadata, scored check strength, retrieval/transfer 분리, featured path, featured capstone, 1,402개 solution 실행, assessment authoring의 열 report를 현재 `gitHead`로 다시 만든다. assessed lesson 기준은 structured practice가 있는 canonical YAML에서 계산하며 현재 468개다. machine audit 통과와 사람 승인 완료를 분리하며 identity review 0/472, content review 0/472, taxonomy transition approval 0/7, independent assessment review 0/468이므로 마지막 completion verifier가 네 blocker를 기록하고 실패한다.
+`buildLearningLedgers.py --check`는 현재 identity 472행, registry 472행, content owner·outcome·source hash, 31개 path의 canonical reference를 source에서 다시 계산한다. taxonomy transition은 baseline `b5e9...def2`에서 target `6792...fb84`, graph 469에서 472, 신규 outcome·lesson 각 6개, 변경 path 7개를 exact diff로 고정해 승인·적용했다. 변경 경로에는 대표 6경로의 명시적 project capstone과 `standardLibraryMastery`가 포함된다. `learning-content` gate는 identity, canonical content, path membership, featured metadata, scored check strength, retrieval/transfer 분리, featured path, featured capstone, 1,402개 solution 실행, assessment authoring의 열 report를 현재 `gitHead`로 다시 만든다. assessed lesson 기준은 structured practice가 있는 canonical YAML에서 계산하며 현재 468개다. machine audit 통과와 사람 승인 완료를 분리하며 identity review 0/472와 alias review pending, content review 0/472, independent assessment review 0/468이므로 마지막 completion verifier는 남은 세 검토 영역을 blocker로 기록한다.
 
 실제 Day 1 desktop·mobile canonical lesson 감사에서 `prompt: 첫 줄은 # ...`의 `#` 뒤가 YAML 주석으로 해석되어 화면에 `첫 줄은`만 남는 결함을 확인했다. prompt 전체를 인용 scalar로 바꾸고 472개 curricula의 `title`, `subtitle`, `goal`, `why`, `explanation`, `prompt`, `description`, `resultCheck` plain scalar를 검사해 같은 의미 손실을 차단했다. 이 수정은 학습자 노출 결함과 source hash를 바로잡은 것이며 content review 0/472나 독립 평가 승인 상태를 올리지 않는다.
 
@@ -91,7 +91,7 @@ public catalog와 route generator는 472개 canonical `LessonRef`를 모두 공�
 
 ## 증분 출시선
 
-W1~W5는 이제 source 생성 순서가 아니라 사람 승인과 공개 승격 순서다. R10 전에 468레슨 assessment와 472개 public route가 이미 구현됐지만 identity review 0/472, content review 0/472, taxonomy approval 0/7, independent assessment approval 0/468이므로 어떤 후속 wave도 출시된 상태가 아니다. 기존 source는 provisional로 유지하고, wave 종료는 author review·실행 증거·사람 검수와 TODO 삭제으로만 판정한다.
+W1~W5는 이제 source 생성 순서가 아니라 사람 승인과 공개 승격 순서다. R10 전에 468레슨 assessment와 472개 public route가 이미 구현됐고 taxonomy transition도 적용됐지만 identity review 0/472, content review 0/472, independent assessment approval 0/468이므로 어떤 후속 wave도 출시된 상태가 아니다. 기존 source는 provisional로 유지하고, wave 종료는 author review·실행 증거·사람 검수와 TODO 삭제으로만 판정한다.
 
 | Wave | 범위 | 종료 조건 |
 | --- | --- | --- |
@@ -125,11 +125,11 @@ W0의 공유 DACL mutex·ACL receipt v2·startup stale GC와 설치본 pinned wh
 
 `outcomes`는 이 레슨의 strong check가 증명할 mastery target이고 `prerequisites`는 진입 전에 필요한 outcome이다. 두 집합의 교집합은 반드시 `reinforcesOutcomeIds`와 정확히 같아야 하며, 이는 새 개념 도입이 아니라 이미 배운 outcome을 더 독립적인 조건에서 강화한다는 뜻이다. scheduler는 prerequisite 충족 여부와 reinforcement credit을 별도로 보고하고 같은 evidence를 신규 습득과 복습으로 중복 계산하지 않는다.
 
-현재 runtime graph는 `builtins.tempFiles`, `builtins.hashing`, `builtins.archives`와 세 레슨을 편입해 filesystem과 같은 472 key가 됐다. checked-in path ledger는 아직 2026-07-18 baseline graph 469와 `baselineTaxonomyHash`에서 계산한 membership 원장이므로 구현 완료를 원장 승인으로 오해하지 않는다. `evidence/taxonomy-transition.yml`은 `fromHash`, `toHash`, exact added outcome·lesson IDs, composer/source hash, add/drop/order diff와 reviewer 승인을 기록해야 한다. 그 승인 commit에서 31개 path header의 `taxonomySnapshotHash`와 summary `targetTaxonomyHash`를 새 hash로 함께 갱신한 뒤 membership을 재산출한다. 이전 hash를 동일하다고 가장하거나 승인 없이 baseline을 덮어쓰면 gate가 실패한다. canonical ledger의 `planned`는 해야 할 일이 명시된 상태이지 완료 증거가 아니며, author review·transition evidence commit이 채워져야 packet gate를 통과한다.
+현재 runtime graph는 `builtins.tempFiles`, `builtins.hashing`, `builtins.archives`와 세 레슨을 편입해 filesystem과 같은 472 key가 됐다. `evidence/taxonomy-transition.yml`은 baseline `b5e9...def2`와 target `6792...fb84`, exact added outcome·lesson ID, composer/source hash, 31개 path의 add/drop/order diff, reviewer와 evidence commit을 기록한다. 승인 적용 결과 31개 path header의 `taxonomySnapshotHash`와 canonical summary의 `targetTaxonomyHash`는 target hash로 동기화됐다. canonical ledger의 `planned`는 해야 할 일이 명시된 상태이지 완료 증거가 아니며, 각 row의 author review와 evidence commit은 여전히 채워야 한다.
 
 `buildLearningLedgers.py --write`는 `planComposer` output과 source metadata를 mainPlan ledger에만 기록하고 `curricula/`를 쓰지 않는다. path ledger header와 canonical summary에 `composerVersionHash`, `taxonomySnapshotHash` 또는 baseline/target taxonomy hash, `sourceSetHash`, schema version을 남긴다. `--check`는 재계산 결과와 byte-level diff, 승인된 taxonomy transition, canonical 472 ownership, outcome 공백 0, `reinforcesOutcomeIds=outcomes∩prerequisites`, path reverse membership, path 금지 field 0, source hash를 검사하며 불일치 시 non-zero다. 콘텐츠 문장, check answer, visual은 이 도구가 생성하지 않는다.
 
-`docs/skills/ops/tools/buildLearningLedgers.py --write`와 `--check`는 현재 source에서 byte-identical ledger를 재생성·검사한다. 그러나 이 재현성은 ownership·범위와 source hash의 기계 증거일 뿐 reviewer 승인이나 종료 조건 검증이 아니다. negative fixture, taxonomy transition 승인, packet별 content review가 함께 통과하기 전에는 W0 lesson edit, path TODO 삭제, R10 closure evidence로 사용할 수 없다.
+`docs/skills/ops/tools/buildLearningLedgers.py --write`와 `--check`는 현재 source에서 byte-identical ledger를 재생성·검사한다. 그러나 이 재현성은 ownership·범위와 source hash의 기계 증거일 뿐 전체 reviewer 승인이나 종료 조건 검증이 아니다. identity·alias review, packet별 content review, independent assessment review가 함께 통과하기 전에는 path TODO 삭제나 R10 closure evidence로 사용할 수 없다.
 
 패킷 구현, 콘텐츠 검수, 테스트와 증거 commit이 끝나면 해당 TODO를 삭제한다. 8개 패킷이 모두 삭제되기 전에는 `08-learning-content` TODO를 유지한다.
 

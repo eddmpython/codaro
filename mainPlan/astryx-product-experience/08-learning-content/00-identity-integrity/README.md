@@ -10,7 +10,7 @@ runtime graph는 `builtins/33_tempfile`, `34_hashlib`, `35_zipfile`을 각각 �
 
 legacy lessonRef가 들어온 Web IndexedDB archive와 Local SQLite import는 원본 hash를 먼저 검증한 뒤 canonical stem으로 다시 봉인하고, UI는 이관 건수를 자동 알린다. Day 1 Web strong event와 non-credit migration event를 Local로 가져오고 다시 Web으로 내보내도 exact Web runtime identity와 event set이 실제 Chromium에서 왕복한다. 목표 Windows 10 설치본 AppContainer conformance 전의 Local provisional 판정은 이 archive에 Local strong event를 추가하지 않는다. `buildLearningLedgers.py --write`는 실제 registry와 원장을 472/472로 동기화했고 `meta.id != stem` 441행, 전역 중복 alias 5개의 exact migration ledger를 생성했다. category-scoped collision은 0이고 category 없는 중복 alias는 migration error다.
 
-taxonomy transition proposal은 baseline `b5e9...def2`와 target `6792...fb84`, graph 469에서 472, 신규 outcome·lesson 각 6개, 31개 path의 add/drop/order hash를 기록한다. 실제 변경 path는 `dataReporting`, `dataVisualization`, `fileAutomation`, `officeAutomation`, `pythonFoundation`, `standardLibraryMastery`, `webMonitoring` 일곱 개다. review는 아직 pending이고 apply state는 proposed이므로 31개 path header와 target hash는 갱신하지 않았다. `--apply-taxonomy-transition`은 승인 전 실행을 거부한다. identity·content review 0/472, alias·taxonomy 승인과 apply가 남아 있으므로 이 packet은 TODO가 남아 있다.
+taxonomy transition은 baseline `b5e9...def2`와 target `6792...fb84`, graph 469에서 472, 신규 outcome·lesson 각 6개, 31개 path의 add/drop/order hash를 기록해 승인·적용했다. 실제 변경 path는 `dataReporting`, `dataVisualization`, `fileAutomation`, `officeAutomation`, `pythonFoundation`, `standardLibraryMastery`, `webMonitoring` 일곱 개이며 모든 path header와 target hash가 새 taxonomy에 동기화됐다. identity·content review 0/472와 alias review가 남아 있으므로 이 packet은 TODO가 남아 있다.
 
 ## 영향 파일
 
