@@ -8,7 +8,7 @@
 
 Web은 sandbox workbook 생성과 구조 검증을 제공하고 OS/Office 연동이 필요한 단계만 Local로 넘긴다. capstone은 sheet, cell formula, table, style rule, chart, report artifact를 구조적으로 검증한다.
 
-현재 featured capstone `openpyxl/10_월간매출리포트생성기`는 reconciled, gap, unexpected-month 조건을 분리한 JSON table 3개를 만들고 대표 경로 aggregate의 `featured-capstone-contracts` machine 판정은 6/6이다. 이 경로는 Local 졸업 독립 증거가 pending이고 packet 소유 25개 canonical row의 사람 review와 실제 learner evidence도 완료되지 않았으므로 TODO가 남아 있다.
+packet 소유 25개 canonical row와 assessment의 직접 검토는 승인됐다. 남은 blocker는 실제 학습자 Web 완주와 `openpyxl/10_월간매출리포트생성기` workbook handoff의 Local 졸업 독립 증거다.
 
 ## 영향 파일
 

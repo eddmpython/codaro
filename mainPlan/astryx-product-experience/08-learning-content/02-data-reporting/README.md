@@ -8,7 +8,7 @@
 
 각 레슨은 서로 다른 업무형 dataset을 사용하고, capstone은 dataframe schema와 저장된 report artifact를 함께 검증한다. 설명용 `contains`나 실행 성공만으로 통과시키지 않는다.
 
-현재 featured capstone `pandas/10_실전종합프로젝트`는 정상·빈 입력을 분리한 CSV table 2개를 만들고 columns와 row count를 검증한다. 대표 경로 aggregate의 `featured-capstone-contracts` machine 판정은 6/6이며 이 경로는 Local 졸업이 필요하지 않다. 그러나 packet 소유 12개 canonical row의 사람 review, 실제 learner evidence와 독립 assessment 승인은 완료되지 않았으므로 이 machine 판정만으로 TODO가 남아 있다.
+packet 소유 12개 canonical row와 assessment의 직접 검토는 승인됐다. 남은 blocker는 실제 학습자가 unseen transfer와 `pandas/10_실전종합프로젝트`의 정상·빈 입력 CSV table 2개 생성을 완주한 원본 증거다.
 
 ## 영향 파일
 

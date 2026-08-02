@@ -612,17 +612,26 @@ def evaluate(write: bool, applyTransition: bool = False) -> list[str]:
         currentComposerHash = fileSha256(ROOT / "src/codaro/curriculum/planComposer.py")
         for path, payload in paths.values():
             recordedComposerHash = str(payload.get("composerVersionHash", ""))
-            if recordedComposerHash == currentComposerHash:
-                continue
             text = path.read_text(encoding="utf-8")
-            text = replaceScalar(
-                text,
-                "composerVersionHash",
-                recordedComposerHash,
-                currentComposerHash,
-                f"path ledger {payload.get('pathId')}",
-            )
-            path.write_text(text, encoding="utf-8")
+            if recordedComposerHash != currentComposerHash:
+                text = replaceScalar(
+                    text,
+                    "composerVersionHash",
+                    recordedComposerHash,
+                    currentComposerHash,
+                    f"path ledger {payload.get('pathId')}",
+                )
+            recordedSourceSetHash = str(payload.get("sourceSetHash", ""))
+            if recordedSourceSetHash != expectedAggregate:
+                text = replaceScalar(
+                    text,
+                    "sourceSetHash",
+                    recordedSourceSetHash,
+                    expectedAggregate,
+                    f"path ledger {payload.get('pathId')}",
+                )
+            if text != path.read_text(encoding="utf-8"):
+                path.write_text(text, encoding="utf-8")
         for ledgerPath, changes in identityUpdates.items():
             text = ledgerPath.read_text(encoding="utf-8")
             for lessonRef, key, old, new in changes:
@@ -655,6 +664,13 @@ def evaluate(write: bool, applyTransition: bool = False) -> list[str]:
             failures.append(f"canonicalRows mismatch: {summary.get('canonicalRows')} != {len(rows)}")
         if recordedAggregate != expectedAggregate:
             failures.append("content-ledger sourceSetHash is stale")
+        if transitionApplied:
+            targetHash = str(expectedTransition.get("toHash", ""))
+            for pathId, (_, payload) in sorted(paths.items()):
+                if payload.get("sourceSetHash") != expectedAggregate:
+                    failures.append(f"path sourceSetHash is stale: {pathId}")
+                if payload.get("taxonomySnapshotHash") != targetHash:
+                    failures.append(f"path taxonomySnapshotHash is stale: {pathId}")
         if summary.get("ledgerToolStatus") != "implemented-check-and-write":
             failures.append("content-ledger summary does not mark the ledger tool implemented")
         if recordedIdentitySummary != expectedIdentity:

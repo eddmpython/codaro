@@ -14,6 +14,7 @@ from learningLedgerAudit import (
     ROOT,
     currentGitHead,
     curriculumPayloads,
+    hasValidReviewMetadata,
     utcTimestamp,
     validAssessmentVariants,
     writeReport,
@@ -78,8 +79,18 @@ def main() -> int:
     if not isinstance(payload, dict) or payload.get("schemaVersion") != 1:
         failures.append("featured capstone contract schemaVersion is invalid")
         rows = []
-    if payload.get("surfaceState") != "route-backed" or payload.get("learnerEvidenceClaim") != "none":
-        failures.append("capstone contract must distinguish route backing from learner evidence")
+    learnerEvidenceClaim = payload.get("learnerEvidenceClaim")
+    if payload.get("surfaceState") != "route-backed":
+        failures.append("capstone contract surface must be route-backed")
+    if learnerEvidenceClaim not in {"none", "verified"}:
+        failures.append("learner evidence claim is invalid")
+    learnerEvidence = (
+        payload.get("learnerEvidence") if isinstance(payload.get("learnerEvidence"), dict) else {}
+    )
+    if learnerEvidenceClaim == "verified":
+        reviewedPathIds = set(learnerEvidence.get("pathIds") or [])
+        if not hasValidReviewMetadata(learnerEvidence) or reviewedPathIds != FEATURED_PATH_IDS:
+            failures.append("verified learner evidence metadata or path coverage is invalid")
     if not isinstance(rows, list):
         failures.append("featured capstone paths must be an array")
         rows = []
@@ -88,6 +99,7 @@ def main() -> int:
     taxonomy = loadTaxonomy(CURRICULA_ROOT / "_taxonomy.yml")
     seen: set[str] = set()
     summaries: list[dict[str, Any]] = []
+    localGraduationPendingPathIds: list[str] = []
     for row in rows:
         if not isinstance(row, dict):
             failures.append("capstone row is not an object")
@@ -143,8 +155,18 @@ def main() -> int:
             rowFailures.append("capstone must combine strong check and artifact descriptor evidence")
         localRequired = row.get("localGraduationRequired") is True
         localState = row.get("localGraduationState")
-        if localRequired and localState != "pending-independent-evidence":
-            rowFailures.append("required Local graduation cannot be claimed without independent evidence")
+        if localRequired and localState == "approved-independent-evidence":
+            localEvidence = (
+                row.get("localGraduationEvidence")
+                if isinstance(row.get("localGraduationEvidence"), dict)
+                else {}
+            )
+            if not hasValidReviewMetadata(localEvidence):
+                rowFailures.append("approved Local graduation evidence metadata is invalid")
+        elif localRequired and localState == "pending-independent-evidence":
+            localGraduationPendingPathIds.append(pathId)
+        elif localRequired:
+            rowFailures.append("required Local graduation state is invalid")
         if not localRequired and localState not in {"not-required", "optional"}:
             rowFailures.append("optional Local graduation state is invalid")
         failures.extend(f"{pathId}: {failure}" for failure in rowFailures)
@@ -160,23 +182,31 @@ def main() -> int:
     missing = FEATURED_PATH_IDS - seen
     if missing:
         failures.append("featured capstone rows are missing: " + ", ".join(sorted(missing)))
+    completionBlockers: list[str] = []
+    if learnerEvidenceClaim != "verified":
+        completionBlockers.append("actual learner evidence is not verified for all featured paths")
+    if localGraduationPendingPathIds:
+        completionBlockers.append(
+            "independent Local graduation evidence is pending: "
+            + ", ".join(sorted(localGraduationPendingPathIds))
+        )
     report: dict[str, Any] = {
         "gate": "featured-capstone-contracts",
         "passed": not failures,
         "status": "passed" if not failures else "failed",
-        "completionEligible": not failures,
+        "completionEligible": not failures and not completionBlockers,
         "startedAt": startedAt,
         "completedAt": utcTimestamp(),
         "durationMs": round((time.monotonic() - started) * 1000),
         "gitHead": currentGitHead(),
         "summary": {
             "routeBackedCapstoneCount": len(summaries),
-            "learnerEvidenceClaim": payload.get("learnerEvidenceClaim"),
-            "localGraduationPendingCount": sum(
-                1 for row in summaries if row["localGraduationRequired"]
-            ),
+            "learnerEvidenceClaim": learnerEvidenceClaim,
+            "localGraduationPendingCount": len(localGraduationPendingPathIds),
+            "localGraduationPendingPathIds": sorted(localGraduationPendingPathIds),
             "paths": summaries,
         },
+        "completionBlockers": completionBlockers,
         "failures": failures,
         "reportPath": REPORT_PATH.relative_to(ROOT).as_posix(),
     }

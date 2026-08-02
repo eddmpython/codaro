@@ -8,7 +8,7 @@
 
 Web 단계는 deterministic local fixture page에서 selector, form, state, screenshot/trace evidence를 검증한다. 장시간 실행, credential, 외부 사이트 정책이 필요한 capstone은 Local capability와 명시적 안전 경계로 옮긴다.
 
-현재 featured capstone `playwright/10_종합브라우저점검프로젝트`는 ready, coverage-gap, accessibility-network 조건을 분리한 JSON table 3개를 만들고 대표 경로 aggregate의 `featured-capstone-contracts` machine 판정은 6/6이다. 이 경로는 Local 졸업 독립 증거가 pending이고 packet 소유 11개 canonical row의 사람 review와 실제 learner evidence도 완료되지 않았으므로 TODO가 남아 있다.
+packet 소유 11개 canonical row와 assessment의 직접 검토는 승인됐다. 남은 blocker는 실제 학습자 Web 완주와 `playwright/10_종합브라우저점검프로젝트`의 Local automation 졸업 독립 증거다.
 
 ## 영향 파일
 
