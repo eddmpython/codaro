@@ -112,11 +112,17 @@ def aggregateHash(entries: list[dict[str, str]]) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
-def replaceQuotedScalar(text: str, key: str, old: str, new: str, context: str) -> str:
-    token = f'{key}: "{old}"'
-    if text.count(token) != 1:
+def replaceScalar(text: str, key: str, old: str, new: str, context: str) -> str:
+    candidates = (
+        (f'{key}: "{old}"', f'{key}: "{new}"'),
+        (f"{key}: '{old}'", f"{key}: '{new}'"),
+        (f"{key}: {old}", f"{key}: {new}"),
+    )
+    matches = [(token, replacement) for token, replacement in candidates if text.count(token) == 1]
+    if len(matches) != 1:
         raise ValueError(f"cannot update {key} for {context}: expected one exact scalar")
-    return text.replace(token, f'{key}: "{new}"', 1)
+    token, replacement = matches[0]
+    return text.replace(token, replacement, 1)
 
 
 def replaceRowField(
@@ -609,7 +615,7 @@ def evaluate(write: bool, applyTransition: bool = False) -> list[str]:
             if recordedComposerHash == currentComposerHash:
                 continue
             text = path.read_text(encoding="utf-8")
-            text = replaceQuotedScalar(
+            text = replaceScalar(
                 text,
                 "composerVersionHash",
                 recordedComposerHash,
@@ -625,7 +631,7 @@ def evaluate(write: bool, applyTransition: bool = False) -> list[str]:
         for ledgerPath, changes in hashUpdates.items():
             text = ledgerPath.read_text(encoding="utf-8")
             for lessonRef, old, new in changes:
-                text = replaceQuotedScalar(text, "lessonContentHash", old, new, lessonRef)
+                text = replaceScalar(text, "lessonContentHash", old, new, lessonRef)
             ledgerPath.write_text(text, encoding="utf-8")
         for ledgerPath, changes in contentFieldUpdates.items():
             text = ledgerPath.read_text(encoding="utf-8")
@@ -633,11 +639,11 @@ def evaluate(write: bool, applyTransition: bool = False) -> list[str]:
                 text = replaceRowField(text, lessonRef, key, old, new)
             ledgerPath.write_text(text, encoding="utf-8")
         summaryText = SUMMARY_PATH.read_text(encoding="utf-8")
-        summaryText = replaceQuotedScalar(
+        summaryText = replaceScalar(
             summaryText, "sourceSetHash", recordedAggregate, expectedAggregate, "content-ledger summary"
         )
         oldDate = str(summary.get("snapshotDate", ""))
-        summaryText = replaceQuotedScalar(
+        summaryText = replaceScalar(
             summaryText, "snapshotDate", oldDate, date.today().isoformat(), "content-ledger summary"
         )
         SUMMARY_PATH.write_text(summaryText, encoding="utf-8")

@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "folium/00_folium소개"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "6a6ac4edf49139ea7545a69adab0a519aa8d2e25bd3e6ee94f3548fde3b8d8b5"
+    lessonContentHash: "693f424f4ee30cd6e0b535395eca307eac85f1cd254905b102446748e280e493"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -23,7 +23,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/01_첫지도만들기"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "9dfcee78977e7626cf779dd7ef6d209a7cd218791704f142606bd3781e576773"
+    lessonContentHash: "20e98a786a9618ec84a16f66b07b7f379210dd04f77194fb3199d5a5271340a6"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -42,7 +42,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/02_다양한마커표현"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "c9299a0fab68467dcdb34d5483f1b3fad86a470923d1a657fa46e10d91393dc3"
+    lessonContentHash: "6f04c2e58e758ad7c8d9e0d131420d0887532454a6fb2f8ce31ac47e8399bbae"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -61,7 +61,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/03_도형그리기"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "d8678c29ca1f4d3b06ba62f2e476886c3262aaf1a125f9f9c3de6f89b1a8f33e"
+    lessonContentHash: "7798c5acd6bdd3bf7424523f191dba4a753e20bb18619f4ab4768821bf2209cc"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -80,7 +80,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/04_지도스타일변경"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "47566dd42d10e4f2146d3fde198f8d7e844ed84ca05e8f7e9a61f0083c886dff"
+    lessonContentHash: "de91f6f0540a53ae5a5a40557d7e1f570cd0253daa1ed32bf09423c2e52eff4d"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -99,7 +99,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/05_레이어관리"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "c71a9e5077d7447e28e4a28d96437fcc3c5c494ecdb7c82f217f6fb8b635de39"
+    lessonContentHash: "c2602fba54aa117365f5fd776938103dad46c27fcf69ce0f2202b8b680d3c63f"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -118,7 +118,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/06_GeoJSON활용"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "fe129a62d920c43e80c4520f323aafe983b4a4373e80d80028d5b5a1836eea5a"
+    lessonContentHash: "523262882f8180c43e2ac99d5cb9b3fc60612c0da90df19955b714a6ac56fa9a"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -137,7 +137,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/07_단계구분도"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "106ee042a48e3785ab7076e3e850854132bcb79f531820edd96e453b2eb6bff8"
+    lessonContentHash: "81c28b6c5a3ac2883c6ba6e804775cc518d69b3f98b1dd978d7e15a51163f271"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -156,7 +156,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/08_히트맵"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "94cdf7cc5a0b872e4f5c60e53f011f230e8d977a997a84ce5722adc5f69eb399"
+    lessonContentHash: "730b0ec4114068f7adcea99fac99d7e8136aa5cd4b959fc5e39c2eb35b1b74a7"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -175,7 +175,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/09_마커클러스터"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "ff3714de19fcbf70b65044cffb7618a0696b7a9a82112a67ec239329c82c0aee"
+    lessonContentHash: "bbcec9f266b3abdc936badad068a4a5fa8bca8762f0565217627bf2bc8a4d3f1"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]
@@ -194,7 +194,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/10_종합지도프로젝트"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "028d131b86ddff8a8fab123fc5fc02c1c0cee7afebdbc9ee24759a57df5058ac"
+    lessonContentHash: "918f1e3a2ab5403ff62e2ecb20bda6e90ce93139e75542fab13738b7aa0d2236"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]

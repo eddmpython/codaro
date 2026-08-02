@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "matplotlib/00_Matplotlib소개"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "c463b087a6303000e5e5104616469bb2310ef33769763cd5154c2c02664f4273"
+    lessonContentHash: "b4b527b5667d6fd7d660a77946d4153b790133cb5e65b1c6abd78d0e402df760"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization","timeSeriesAnalysis","timeSeriesForecasting"]
@@ -23,7 +23,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "matplotlib/01_주가추세분석"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "3a005a018b66252b6f6e16d843b2c50e68bd96abb5627da4ca655fdff533b2f1"
+    lessonContentHash: "9808a67788f579e4d966cef58642daa6d90f30eb650a54e1764369e73bc23f37"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization","timeSeriesAnalysis","timeSeriesForecasting"]
@@ -42,7 +42,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "matplotlib/02_팁데이터분포탐색"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "d8e80091b30e19d574c1dc8f51e80316873d01362680983ceb3eea712ebd857a"
+    lessonContentHash: "6279a336600db1fa17aed67ed84ca2e8cec5ad9a388d52f14851446e65d688e8"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization","timeSeriesAnalysis","timeSeriesForecasting"]
@@ -61,7 +61,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "matplotlib/03_붓꽃품종산점도"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "baf361323f89823edb79ee092dccdd7c377951aaae626f7a33c467ac3c84742f"
+    lessonContentHash: "5e44c813a90a7267113d8045cce509fce97989520af9361cc6801988dc5484e8"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization","timeSeriesAnalysis","timeSeriesForecasting"]
@@ -80,7 +80,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "matplotlib/04_대륙별인구비교"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "6dab850925c3dbeaa7564e680b935ea99f3edb05f84a80876f9e0a65f43e13ae"
+    lessonContentHash: "8e09f643624b7b72e177a6261ce614e9af3bbe3ca38edae4254ee03f1b85c7b3"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization","timeSeriesAnalysis","timeSeriesForecasting"]
@@ -99,7 +99,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "matplotlib/05_펭귄체중분석"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "b1a2576828975654b6758cb08a333b4bd7e1e003526eaac9f6cf9db748980a73"
+    lessonContentHash: "26e3c2d9323f517f2caee88262b54316ba5a5845460b4716f3a72017f451da69"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -118,7 +118,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "matplotlib/06_상관관계히트맵"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "541446e470eb801204501da55ee2092606e63bfb0253836cb65bec5c7f95c958"
+    lessonContentHash: "35e6ac9fda53ca2cd4d02b725218e34fe0570e2a78f720cd75d391abc0695f63"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -137,7 +137,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "matplotlib/07_시계열다중축차트"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "084550ab0e35cebddd2be86dfcb6979049b422fe2a433206b3a7f98430213df4"
+    lessonContentHash: "a7ce3b212b92fe3690e72f10b960f555216cf0b7598316ce4b9142696bf32356"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -156,7 +156,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "matplotlib/08_다중패널대시보드"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "d49f4ab199b8359415e9ec0ad86c367c085197da61da1c11d282ef3909a360cc"
+    lessonContentHash: "61cbab4e0b4e5380b38f41a74c13e9a6a21d95fa4c24219bbb94199088b6fcab"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -175,7 +175,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "matplotlib/09_고급주석차트"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "eb8523ac41337b9e163978b3c93c2f83c7988a65e00ce9de81fdc171154b33f0"
+    lessonContentHash: "0e6b7e1dabc7faf687cdbe880e211f228eb130284314ff5afe23bad36667bf02"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -194,7 +194,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "matplotlib/10_종합분석리포트"
     identityLedgerRef: "identity-ledger/matplotlib.yml"
-    lessonContentHash: "ba7dd9d81b7958fdcac26f2d33645d55751eaf6f98c93c88e71ce4d05a7a0821"
+    lessonContentHash: "9ef494390205db849ad49c11cd6014423fb5c8158d461e64bc35630da16a615d"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]

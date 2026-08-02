@@ -631,7 +631,7 @@ assessment:
     - plotly_08-continent-hierarchy-data-evidence-mastery
     title: 대륙별 계층 인코딩 계약을 새 문맥에 전이하기
     subtitle: 다른 업무 문맥으로 판단 전이
-    goal: 부서와 팀의 예산 계층을 parent 검증과 hover exact value가 있는 treemap으로 본다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    goal: '다음 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다: 부서와 팀의 예산 계층을 parent 검증과 hover exact value가 있는 treemap으로 본다.'
     why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
     explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
     tips: &id002
@@ -741,7 +741,7 @@ assessment:
     - plotly_08-continent-hierarchy-encoding-transfer-transfer
     title: 대륙별 계층 해석 위험 회상하기
     subtitle: 7일 뒤 기준을 기억에서 복원
-    goal: parent 합계와 child 합계가 일치하고 면적 해석이 가능한가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    goal: parent 합계와 child 합계가 일치하고 면적 해석이 가능한가 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
     why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
     explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
     tips: &id003

@@ -29,6 +29,7 @@ def main() -> int:
     failures: list[dict[str, str]] = []
     fingerprints: dict[str, str] = {}
     checkIds: dict[str, str] = {}
+    goals: dict[str, str] = {}
     lessonCount = 0
     variantCount = 0
     reviewedLessonCount = 0
@@ -57,6 +58,32 @@ def main() -> int:
         authoring = assessment.get("authoring") if isinstance(assessment.get("authoring"), dict) else {}
         if authoring.get("independentReview") == "approved":
             reviewedLessonCount += 1
+        sections = [section for section in content.get("sections", []) if isinstance(section, dict)]
+        sectionIds = {
+            text(section.get("id") or section.get("name"))
+            for section in sections
+            if text(section.get("id") or section.get("name"))
+        }
+        masterySectionIds = {
+            text(section.get("id") or section.get("name"))
+            for section in sections
+            if section.get("assessmentMode") == "mastery" and text(section.get("id") or section.get("name"))
+        }
+        masteryVariantIds = {
+            text(variant.get("id"))
+            for variant in assessment.get("masteryVariants", [])
+            if isinstance(variant, dict) and text(variant.get("id"))
+        }
+        transferVariantIds = {
+            text(variant.get("id"))
+            for variant in assessment.get("transferVariants", [])
+            if isinstance(variant, dict) and text(variant.get("id"))
+        }
+        allowedSourceIds = {
+            "mastery": sectionIds,
+            "transfer": sectionIds | masterySectionIds | masteryVariantIds,
+            "retrieval": transferVariantIds,
+        }
         lessonHasClaimScope = True
         modePrompts: dict[str, set[str]] = {}
         modeSolutions: dict[str, set[str]] = {}
@@ -80,11 +107,27 @@ def main() -> int:
                 prompt = text(exercise.get("prompt")).strip()
                 starter = text(exercise.get("starterCode")).strip()
                 solution = text(exercise.get("solution")).strip()
+                goal = text(variant.get("goal")).strip()
+                sourceSectionIds = {text(value) for value in variant.get("sourceSectionIds") or [] if text(value)}
                 if not text(variant.get("claimScope")):
                     lessonHasClaimScope = False
-                if not variantId or not prompt or not starter or not solution:
-                    failures.append(failure(rel, mode, "id, prompt, starter, and solution are required", variantId))
+                if not variantId or not goal or not prompt or not starter or not solution:
+                    failures.append(failure(rel, mode, "id, goal, prompt, starter, and solution are required", variantId))
                     continue
+                if not sourceSectionIds:
+                    failures.append(failure(rel, mode, "sourceSectionIds must not be empty", variantId))
+                elif not sourceSectionIds <= allowedSourceIds[mode]:
+                    missingSourceIds = sorted(sourceSectionIds - allowedSourceIds[mode])
+                    failures.append(failure(
+                        rel,
+                        mode,
+                        f"sourceSectionIds reference unknown section or prior variant: {missingSourceIds}",
+                        variantId,
+                    ))
+                if goal in goals:
+                    failures.append(failure(rel, mode, f"authored goal duplicates {goals[goal]}", variantId))
+                else:
+                    goals[goal] = f"{rel}:{variantId}"
                 if starter == solution or solution in starter:
                     failures.append(failure(rel, mode, "starter exposes the authored solution", variantId))
                 if prompt in modePrompts[mode] or solution in modeSolutions[mode]:
@@ -120,15 +163,10 @@ def main() -> int:
             failures.append(failure(rel, "progression", "mastery, transfer, and retrieval reuse the same prompt"))
         if all(solutionSets) and set.intersection(*solutionSets):
             failures.append(failure(rel, "progression", "mastery, transfer, and retrieval reuse the same solution"))
-        transferIds = {
-            text(variant.get("id"))
-            for variant in assessment.get("transferVariants", [])
-            if isinstance(variant, dict) and text(variant.get("id"))
-        }
         for variant in assessment.get("retrievalVariants", []):
             if not isinstance(variant, dict):
                 continue
-            if set(variant.get("sourceSectionIds") or []) != transferIds:
+            if set(variant.get("sourceSectionIds") or []) != transferVariantIds:
                 failures.append(failure(
                     rel,
                     "retrieval",
@@ -149,6 +187,7 @@ def main() -> int:
         "variantCount": variantCount,
         "uniqueCheckIdCount": len(checkIds),
         "uniqueTaskFingerprintCount": len(fingerprints),
+        "uniqueGoalCount": len(goals),
         "explicitClaimScopeLessonCount": explicitClaimScopeLessonCount,
         "independentReviewApprovedLessonCount": reviewedLessonCount,
         "independentReviewPendingLessonCount": lessonCount - reviewedLessonCount,

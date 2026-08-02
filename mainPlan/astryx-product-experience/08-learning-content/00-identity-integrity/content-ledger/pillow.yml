@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "pillow/00_Pillow소개"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "fc6374035aee98d7ebdd0e5581088058c34354bfb5f33231b26913b61e112f31"
+    lessonContentHash: "cabe6f90e80618a1fcda7435cdbad3c1cda5801d1bc3861414cb208e146fe78f"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -23,7 +23,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pillow/01_꽃사진탐색기"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "413aefea9cbdaf53cc0e51beefe611d246654e2aef7405ffc5081113d39af689"
+    lessonContentHash: "e660b8c6b02de0bdeca69c9056f0dfc15207611442b97a9a39d678f3432c379e"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -42,7 +42,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pillow/02_중국풍경편집기"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "32d703d3b0396434700b8d06dc26671dda5918ff8e21f8a07e54b0ec7f1e4093"
+    lessonContentHash: "d7c87b1d7002dabe1b8815d7cf7d2b79aaf5208c8392614555849fd89bbe0090"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -61,7 +61,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pillow/03_흑백사진변환기"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "11646590412555f550b4ed8747b230f96803328fc09f1667a54c86b25074f50d"
+    lessonContentHash: "57fdc00e64a79f16f8e6d7e438f0ed23d3a8e4d1fba5f8778c83cd248e42fa1a"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -80,7 +80,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pillow/04_사진필터스튜디오"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "50c950e46f3e2523e1b548ffbfd67cd512a9950f74c23fad1192b9a76f7a4c22"
+    lessonContentHash: "041afe3cd1a263a0b79c70e1e5abfeb89101384db22be8bd7d677bd8cd782e2d"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -99,7 +99,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pillow/05_밝기대비조절기"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "933e018c9897a39f1b143512dcc5ea33558ff424c9e1faeaec37ed1fcdc19f3f"
+    lessonContentHash: "7ae713c9c457ecd0a98e1eb1fed4b2239c0f86afa179ea9d1708804497d535b9"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -118,7 +118,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pillow/06_RGB채널분석기"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "ed524bbef5a3d59f4f1b5c6eb1ea7dfef7117f35f18895c6b66171ee0442abc5"
+    lessonContentHash: "ecf01090abbb980aba1966d42fac084cd2d10f133c0f6cbbeaf6c700d7fd879c"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -137,7 +137,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pillow/07_워터마크생성기"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "a24cf67a8219416a0cd2517c9a63f486f06b5611dd72861dfecc65f335472aab"
+    lessonContentHash: "ea486182b94f6cbcf4ee80d034fd7b815e226c6d145780c69d7be5f8f49f9aa0"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -156,7 +156,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pillow/08_도형아트생성기"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "241f0323985cc83d7e20c213a002a218b3988b83656894d80923541f95fb7e09"
+    lessonContentHash: "7017a0d8808db58df12574fcfa56e6cacf3754499fabf9449c69f60e9a497145"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -175,7 +175,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pillow/09_포토콜라주메이커"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "eed73fc6ab8420acc482248be99453a3a6c8c25b218e12ee12460a5d73105e12"
+    lessonContentHash: "298719b8510b84db1e7f422a41f288373d64b73a661230942325d850149cb53c"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]
@@ -194,7 +194,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pillow/10_종합이미지에디터"
     identityLedgerRef: "identity-ledger/pillow.yml"
-    lessonContentHash: "3ea0d86c4d31cce4072993398e29fec0b5783b10386d7eb429687bc548551819"
+    lessonContentHash: "ff1ce1ae07b4c257405f0d989e95a497d02611706ee90ee3ed7cd1816ff689bd"
     disposition: migrate
     ownerPacket: "07-remaining-domains/11-image-processing"
     eligiblePathIds: ["imageProcessing"]

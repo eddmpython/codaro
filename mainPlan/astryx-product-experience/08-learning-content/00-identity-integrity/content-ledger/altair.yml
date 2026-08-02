@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "altair/00_Altair소개"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "d829030d669bd301f6ee8764eed6d97825d9896c1ea745009b11761dc736d4d0"
+    lessonContentHash: "5fd813d2d5fde9eeac4765eda9c79a062692bb8ebee66da80874b36f21e11f05"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -23,7 +23,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "altair/01_자동차연비탐색"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "9db085adf9f66a4802956c6cb0139eebef67ac1c413d20680d91b64ace53f9c8"
+    lessonContentHash: "221ecee89dff59b6b9220c938d50a801d4f9224e659cbf350380604224d474af"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -42,7 +42,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "altair/02_붓꽃품종구분"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "50f2621eb5eefd038087be49845574d0c7d18c81fadb77bdfee2a5c7e79b8503"
+    lessonContentHash: "65dc020d2ff1907a39c2887c3304f745e3a7c9f844dd3e9ffe16bbfe741ad79a"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -61,7 +61,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "altair/03_팁데이터분석"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "5fb2de5d3e12e695759251b90b503e9f247843741a9fac2c038f80f611d796ba"
+    lessonContentHash: "17cd5daf97b7c18429e90777adc5b80a80fc8ce372a2d8ebee9352aa85d9d8cb"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -80,7 +80,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "altair/04_펭귄서식지분석"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "c21b889574cc6c32ea1626cce6f401dd2f11ea1b975a66141297b02c55ae4d51"
+    lessonContentHash: "8c8197c81c066e0b30e38ff4fb8898a0cf8f0d4d2edae0eee2ad88baa3c29b65"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -99,7 +99,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "altair/05_타이타닉생존분석"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "be34cabab0246b71cf48ce93a344f5363a5befe507320b4753440d47b4fed42c"
+    lessonContentHash: "0ce4fc1ee8e080fb05af9db9acc5fef3766789d0827b8fb246cbe49d51d26552"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -118,7 +118,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "altair/06_항공편분석"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "f5cfea7e249f92e2d21fea571ce8365ec1446e4862301cc618289d29c69d8cc1"
+    lessonContentHash: "01cc16c335390d5e3337a8da3e3a79f49a27deb3cf208a149cec5801a61a9ba9"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -137,7 +137,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "altair/07_인터랙티브필터"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "7fb6e450fdb6a0fa4d680dbbef35e3cc8d046ed10264c30b42f64ab7886b445f"
+    lessonContentHash: "ec58137efc6791003e6e7d16f817d474a18766c229a54859377c7f9aea9f91a4"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -156,7 +156,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "altair/08_다중뷰연결"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "dd52859b051389b210558e34f37822c220601ec929acaa8a2efb28e332b1004d"
+    lessonContentHash: "271aa22d2c08846ec7a72686bc596952d4400338fdb1bebb7bacdd86236bfb3f"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -175,7 +175,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "altair/09_고급데이터변환"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "cb3a62b3a49fb71dcc7047e99cd6329b480096e9079593ead85553dcd020bfdc"
+    lessonContentHash: "1cd6a527d1bdedc2097891b9af806ea4838c60eb3c154e5663224838dabb8295"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -194,7 +194,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "altair/10_종합대시보드"
     identityLedgerRef: "identity-ledger/altair.yml"
-    lessonContentHash: "9f48b9d8087283404528fa1babbf5bc2ceef8911be6c68a9f723a081e60384d7"
+    lessonContentHash: "8f121fa23b3d7ec8e1ce40f68265c882084c046e07d9f3d8239afc867e654043"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]

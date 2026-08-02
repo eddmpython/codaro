@@ -387,7 +387,7 @@ assessment:
     - visionFeatures_01-corner_detection-contract-audit-mastery
     title: 코너 검출 결과를 새 입력에 대조하기
     subtitle: 다른 업무 문맥으로 판단 전이
-    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    goal: 코너 검출 결과의 sourceHash, detectorHash identity와 cornerCount metric을 허용 오차 안에서 함께 검증한다.
     why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
     explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
     tips: &id002
@@ -501,7 +501,7 @@ assessment:
     - visionFeatures_01-corner_detection-result-reconciliation-transfer
     title: 코너 검출 검증 원칙 회상하기
     subtitle: 7일 뒤 기준을 기억에서 복원
-    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    goal: 코너 검출의 source, estimate, verify 단계별 action, evidence, risk를 기억에서 복원한다.
     why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
     explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
     tips: &id003

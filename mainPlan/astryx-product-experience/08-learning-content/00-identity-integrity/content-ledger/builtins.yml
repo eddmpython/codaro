@@ -422,7 +422,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/23_asyncio"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "fa0970d24e3c72254b9da5ab243d4e88fc1804494a1684305d4e25128b5bc8fc"
+    lessonContentHash: "fa5cbb9f7dfb06296fb02c2e242cb9b743370df613d5124d8f37e02af01b1acb"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]

@@ -160,6 +160,9 @@ def make_vision_lesson(config: VisionConfig) -> dict[str, TaskBlueprint]:
     identity = config["identity"]
     metrics = config["metrics"]
     stages = config["stages"]
+    identity_summary = ", ".join(identity)
+    metric_summary = ", ".join(metrics)
+    stage_summary = ", ".join(stages)
 
     audit_solution = f'''def {audit_entry}(value):
     required = {required!r}
@@ -246,7 +249,7 @@ def make_vision_lesson(config: VisionConfig) -> dict[str, TaskBlueprint]:
         "transfer": T(
             f"{slug}-result-reconciliation",
             f"{config['title']} 결과를 새 입력에 대조하기",
-            "artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.",
+            f"{config['title']} 결과의 {identity_summary} identity와 {metric_summary} metric을 허용 오차 안에서 함께 검증한다.",
             f"{reconcile_entry}(expected, observed)를 완성하세요.",
             f"def {reconcile_entry}(expected, observed):\n    raise NotImplementedError",
             reconcile_solution,
@@ -264,7 +267,7 @@ def make_vision_lesson(config: VisionConfig) -> dict[str, TaskBlueprint]:
         "retrieval": T(
             f"{slug}-evidence-recall",
             f"{config['title']} 검증 원칙 회상하기",
-            "입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.",
+            f"{config['title']}의 {stage_summary} 단계별 action, evidence, risk를 기억에서 복원한다.",
             f"{recall_entry}(stage)를 완성하세요.",
             f"def {recall_entry}(stage):\n    raise NotImplementedError",
             recall_solution,

@@ -480,7 +480,7 @@ assessment:
     - altair_01-car-efficiency-encoding-data-evidence-mastery
     title: 자동차 연비 탐색 인코딩 계약을 새 문맥에 전이하기
     subtitle: 다른 업무 문맥으로 판단 전이
-    goal: 장비 출력과 효율 관계를 제조 지역 색과 hover 모델 정보로 탐색한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    goal: '다음 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다: 장비 출력과 효율 관계를 제조 지역 색과 hover 모델 정보로 탐색한다.'
     why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
     explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
     tips: &id002
@@ -590,7 +590,7 @@ assessment:
     - altair_01-car-efficiency-encoding-encoding-transfer-transfer
     title: 자동차 연비 탐색 해석 위험 회상하기
     subtitle: 7일 뒤 기준을 기억에서 복원
-    goal: 마력·연비 관계에서 origin과 model year 역할이 분리되는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    goal: 마력·연비 관계에서 origin과 model year 역할이 분리되는가 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
     why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
     explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
     tips: &id003

@@ -634,7 +634,7 @@ assessment:
     mode: transfer
     unseen: true
     sourceSectionIds:
-    - timeouts
+    - timeout_cancel
     - concurrent_tasks
     title: 비동기 작업별 timeout 결과를 순서대로 요약하기
     subtitle: wait_for와 gather

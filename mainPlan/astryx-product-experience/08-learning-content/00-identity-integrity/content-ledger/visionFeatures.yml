@@ -4,7 +4,7 @@ canonicalRows: 10
 lessons:
   - lessonRef: "visionFeatures/01_코너검출"
     identityLedgerRef: "identity-ledger/visionFeatures.yml"
-    lessonContentHash: "059a8171bcafa1b9a0148ec54996ee5c08fd4d2207e11f023eed1424e5f252bb"
+    lessonContentHash: "28e029d64dd3ced82978d8e12d115f7854f8c06e7c846064aa7b5e30a8ac02ab"
     disposition: migrate
     ownerPacket: "07-remaining-domains/13-vision-advanced"
     eligiblePathIds: ["visionAdvanced"]
@@ -23,7 +23,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionFeatures/02_ORB특징점"
     identityLedgerRef: "identity-ledger/visionFeatures.yml"
-    lessonContentHash: "e5165ff15b62c35c1fe5907d0639b9a98bad0b9867f21bb17c3989cd3cbb7df4"
+    lessonContentHash: "d3b31ad9a125b4176ea7c4813bb1e91e97350ddc2d82068b0a60346784b7a67b"
     disposition: migrate
     ownerPacket: "07-remaining-domains/13-vision-advanced"
     eligiblePathIds: ["visionAdvanced"]
@@ -42,7 +42,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionFeatures/03_특징점매칭"
     identityLedgerRef: "identity-ledger/visionFeatures.yml"
-    lessonContentHash: "47781259356f7600e5bb801152bef5e40bd43ae017db9123199ca0b84c4ab894"
+    lessonContentHash: "b80790f8281bf49bc4ea998f6b14067157de1ffe7873728c1645343dfac3d41b"
     disposition: migrate
     ownerPacket: "07-remaining-domains/13-vision-advanced"
     eligiblePathIds: ["visionAdvanced"]
@@ -61,7 +61,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionFeatures/04_호모그래피정렬"
     identityLedgerRef: "identity-ledger/visionFeatures.yml"
-    lessonContentHash: "b3d8f178f81aa0d6b8264b65115b15398bc1091137a121e902c87ec2cbb7b7c2"
+    lessonContentHash: "6b63a6ca9230f8f6def99336ca91c8eb357009aa485f3a0264bf0454a33606c1"
     disposition: migrate
     ownerPacket: "07-remaining-domains/13-vision-advanced"
     eligiblePathIds: ["visionAdvanced"]
@@ -80,7 +80,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionFeatures/05_파노라마스티칭"
     identityLedgerRef: "identity-ledger/visionFeatures.yml"
-    lessonContentHash: "ead014b61a26ade1b01f21e25a00e7940c8e0be944b274cb50cebd06b341038c"
+    lessonContentHash: "a5fecad2025b85e1acd4779153296e947e62de7820af781da36be4894155f6ac"
     disposition: migrate
     ownerPacket: "07-remaining-domains/13-vision-advanced"
     eligiblePathIds: ["visionAdvanced"]
@@ -99,7 +99,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionFeatures/06_비디오입출력"
     identityLedgerRef: "identity-ledger/visionFeatures.yml"
-    lessonContentHash: "a0a27d5ab829cf449e151338087f65a08c119e2e283147d27085a20a511cb6c5"
+    lessonContentHash: "6d30eb5d054eb8ef52b4966355f3ed50d14652bcc781449839bdb4e67b52adc5"
     disposition: migrate
     ownerPacket: "07-remaining-domains/13-vision-advanced"
     eligiblePathIds: ["visionAdvanced"]
@@ -118,7 +118,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionFeatures/07_배경차분"
     identityLedgerRef: "identity-ledger/visionFeatures.yml"
-    lessonContentHash: "65bf889c24d06ba8e16a3ee321a4a19ebd83d0e73571996d34a2aa5c499bfb54"
+    lessonContentHash: "c85a4cef9f75f4ffb7f1b2a5a201a6c579d8ab0159731edbc5231ba153352896"
     disposition: migrate
     ownerPacket: "07-remaining-domains/13-vision-advanced"
     eligiblePathIds: ["visionAdvanced"]
@@ -137,7 +137,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionFeatures/08_광학흐름"
     identityLedgerRef: "identity-ledger/visionFeatures.yml"
-    lessonContentHash: "7ebb3a4930c9955f018c7f61e56d62d3315bfc5805281d6592380250bfeea433"
+    lessonContentHash: "e7a8e4a99193e456044e3a23643351ca10131d3821a9cb7a203b66793c579773"
     disposition: migrate
     ownerPacket: "07-remaining-domains/13-vision-advanced"
     eligiblePathIds: ["visionAdvanced"]
@@ -156,7 +156,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionFeatures/09_객체트래커"
     identityLedgerRef: "identity-ledger/visionFeatures.yml"
-    lessonContentHash: "06e89dc863fabc2982e9d0dffc6a2b512d56677855b415576a76c3e9f3a5dd3a"
+    lessonContentHash: "26b6ea6eac219d6658e95fa5f6b12dcf96e30624ac733e641fe26f3e5dc909db"
     disposition: migrate
     ownerPacket: "07-remaining-domains/13-vision-advanced"
     eligiblePathIds: ["visionAdvanced"]
@@ -175,7 +175,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionFeatures/10_종합영상ROI추적기"
     identityLedgerRef: "identity-ledger/visionFeatures.yml"
-    lessonContentHash: "872f134d640b2b5e075c9c3854a925d172616a9858813cb43e5d38f2f2a04b67"
+    lessonContentHash: "96c30fc6042d556e3aebdb46c1db45de03ef510bbbf459ed89386f5bb6519c30"
     disposition: migrate
     ownerPacket: "07-remaining-domains/13-vision-advanced"
     eligiblePathIds: ["visionAdvanced"]

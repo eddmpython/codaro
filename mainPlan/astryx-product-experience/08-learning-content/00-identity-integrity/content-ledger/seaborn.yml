@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "seaborn/00_Seaborn소개"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "5786bff53435a659192b7b948b80c66b84078640d59f946da9b362e3baa6c645"
+    lessonContentHash: "41323c0aa1c1f71c968343592e10ab041a68b581130dea460920c6838f1d52fc"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -23,7 +23,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "seaborn/01_붓꽃품종산점도"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "ed6407413b0728837556fb803d64429d0e1b02b7d4d6d08252e58012fcbc33c2"
+    lessonContentHash: "896c8ce3c04180d91612c2f7b53cc6828c60d3e9fa1dbabb916a747a7df5a07d"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -42,7 +42,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "seaborn/02_팁데이터분포탐색"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "ed8e52cd4aaf6f8de611ab2f90edb30a01bdbc1e731658382e41241a988ee2ab"
+    lessonContentHash: "6982ae4a8318f60d9352dde1433440d434a1e67548f451cfe36d438687d70523"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -61,7 +61,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "seaborn/03_펭귄체중분포비교"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "cfaa70077a789759d7e189cef5f68872f2a470c3cd54e9e5bd2a74a9262cfa11"
+    lessonContentHash: "75a83bf622e5ef579d3528ac17cffb4331d87b200e697f1165ba01bd832973ab"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -80,7 +80,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "seaborn/04_광고비판매액회귀"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "5e0e37ef4c78523fbd85828dbc948193dc07f26fe5a13109a49b63fdebaa9eb1"
+    lessonContentHash: "88b91b357d407f52be7e1bd917f7d216034106ec0f4c6f0d809658aa94e56309"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -99,7 +99,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "seaborn/05_타이타닉생존분석"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "f39f33baf3a50641129e25601c24fc8477dd419757c044039ff3e9e97ae397a7"
+    lessonContentHash: "2e9fae0b47c87dfca7ed566f169da659ea680e448f22acdc8fcfc490c40aad5e"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -118,7 +118,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "seaborn/06_항공편승객시계열"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "23ade73dcbf96a57898f8498c31e7f361c3d7750372014f7caaee8df2ed58c69"
+    lessonContentHash: "c23b78762ded8584fa11edcd1073eda858414431b14a0c70569de046c0860cf9"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -137,7 +137,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "seaborn/07_세계기대수명분석"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "9c1a29018d6f023e93e73e9ace8b8f9c4c6502880e5d8d9499cbf17b7d605f14"
+    lessonContentHash: "50aa52b5302360d04186418a79e5ba887343dcd2ae3a77ea0656f6b7d5514ed0"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -156,7 +156,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "seaborn/08_다이아몬드가격분석"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "8291096893266d00b86739d6a83d1ee5c59cea8dfbea8aeafec86cb5e14396f3"
+    lessonContentHash: "a9249051e065c1750572e5d86df1b15fc8b5330a81113a0401ecf30c8a24674b"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -175,7 +175,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "seaborn/09_자동차연비종합분석"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "ca1923715b264d9e63ada78fd616663c83b0c80ed4ad90785b895b7b79db7fd3"
+    lessonContentHash: "9ac06fb3d240d385be0898dadfc567c1bbed6e2f384a0ca459b8d357c83265c4"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]
@@ -194,7 +194,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "seaborn/10_종합EDA리포트"
     identityLedgerRef: "identity-ledger/seaborn.yml"
-    lessonContentHash: "5a1d95d457e348af71dfb118d6a9a773547a565fa1faa6a97ffca0ceff770920"
+    lessonContentHash: "d5a41c82bf05f09838c914cac1fb993fe3fefee5694d270b103e2eeb15050757"
     disposition: migrate
     ownerPacket: "03-data-visualization"
     eligiblePathIds: ["dataVisualization"]

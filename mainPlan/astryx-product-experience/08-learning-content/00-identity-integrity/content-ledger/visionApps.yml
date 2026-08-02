@@ -4,7 +4,7 @@ canonicalRows: 10
 lessons:
   - lessonRef: "visionApps/01_문서스캐너"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "76e5a0ba56d376ec1393ac7b93b520b6d208be533b875dd72eb71ae571f82421"
+    lessonContentHash: "24abb78850fc1c2aaaa27f393c8afadb94f45795befa71f9df81c70ed453c729"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]
@@ -23,7 +23,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionApps/02_QR바코드리더"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "02482e60b560a809397fbb3ea89abe2b1b3058c635eb7750adb71e9b971cf203"
+    lessonContentHash: "f4d5dbd967b63536aa12911c4b598841c3b07bebe37a62a4d24da32436ccf774"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]
@@ -42,7 +42,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionApps/03_OCR기초"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "26141af95996a5e42026a53bb0a1de5a3337cce987a1bda24150455844ab659b"
+    lessonContentHash: "2cb63e908f906cc1e66f5c4a7006459c96dee938f280bac4cabcfeb886fffe2d"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]
@@ -61,7 +61,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionApps/04_한국어OCR"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "730cdadf4e3b78b3401e4574cedfb261aaa9e1446fe5da7ce7a8a5e48bad3e08"
+    lessonContentHash: "44d7fd6c812e51ccec0984ef94b8dbb39a63e604c39d84a5461e229e2585ae4d"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]
@@ -80,7 +80,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionApps/05_얼굴검출모자이크"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "135ca3868349defe10e8da739a5dd7cf8aeec8875a0dfc3d92eb6bcaba4f72bd"
+    lessonContentHash: "b12d5adf07947af45dc3f400294bce179b19bac2cda5b61ddda5d0514a998be1"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]
@@ -99,7 +99,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionApps/06_얼굴임베딩비교"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "922e086a898f32ef627702558bd6ed2691f5e24bc5d527395698a583e66c0f7f"
+    lessonContentHash: "c6a72d97069bf825f8da2a51574621094c5616153e9d930f86efeddd1bfd545d"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]
@@ -118,7 +118,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionApps/07_이미지중복검출"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "fa2318a7b74f1a335a165699211a22b99042eeed514fa236ec5fa14f0df429b3"
+    lessonContentHash: "9692e29dba93bb4c1f49a59597bd3d2a5737f138f9afca07f20b1cd4abafae4f"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]
@@ -137,7 +137,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionApps/08_영상자동썸네일"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "35cb2a7b44190c1caf5fc923785d9c7df6cbb5f2767e84d381b9e1f998f9b9ae"
+    lessonContentHash: "802e8e1e2253e5c3b508f08e1f3c30ba149d86f68d8025abbc088b09904b3470"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]
@@ -156,7 +156,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionApps/09_화면캡처분석"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "621ccb0630e6f2bddf86d8709a872dee17af9a6936ba3ddb4b7475727e70e039"
+    lessonContentHash: "43ca7318774a55d8ec345e5bf9de3ada5bbd05d0c2ed3d121c55d0de4deaf793"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]
@@ -175,7 +175,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionApps/10_종합사진정리기"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "354a172b21411f28952b80848b905422fa7185b5cddd624cfaa12a0de8f4ebd1"
+    lessonContentHash: "a4f3fa1a269b5a79ea853b35448693742972aa0d55ab2665482d08c8a099bf37"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]

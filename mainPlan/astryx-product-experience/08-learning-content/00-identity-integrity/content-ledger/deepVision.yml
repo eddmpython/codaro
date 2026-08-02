@@ -4,7 +4,7 @@ canonicalRows: 10
 lessons:
   - lessonRef: "deepVision/01_torchvision입문"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "b0147e3da23e904c00af118218f1d0fb29b7ca72dd39922a358d9d2b24511b8f"
+    lessonContentHash: "08539f1c174959d7f0e91eeccc7dda26c1bd65be3100ac24131784a892522f1d"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]
@@ -23,7 +23,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "deepVision/02_ResNet분류"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "269f76dae097dba11ddbb00238efbd2f49029ff3f0c6a1fc897f726b598081a4"
+    lessonContentHash: "651b5f0fbd6eb59b2ecc9cfe57da7c435fcfe0ba65d02a319615e269ad2dd27a"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]
@@ -42,7 +42,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "deepVision/03_임베딩벡터"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "3ee6e16e41d1c61b5821047ab62ddb083411f36fdb32556dd09b0dc3125a2206"
+    lessonContentHash: "0b7a8b9e4e93adfecb46f65780581ee84cf413610ed520b9c24266adc9eb5464"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]
@@ -61,7 +61,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "deepVision/04_유사도검색"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "3c4287908b697987773ef685504a4a978cee00d9c631503084086087fc5f2530"
+    lessonContentHash: "3a263ae3ebf7f28b5fa6b42a7bd7e99c295faefd17319bd3ea171c5c701fa247"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]
@@ -80,7 +80,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "deepVision/05_객체탐지"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "9c6297e7943730f173c0fa4b74d9aedf023d6a2b032c62d9a44023c77868be2b"
+    lessonContentHash: "1f6237039fa61d2169da488a5f670b71b7cfe4514931c1f97fb109881519c0c9"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]
@@ -99,7 +99,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "deepVision/06_세그멘테이션"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "9006056ab8aa020189624d6349c2ec0c82a523817c81207abd5b8f77fffe9687"
+    lessonContentHash: "27121a50b61308c5c3752227fc72e105b2808a50db7a2f93c829364351fd2706"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]
@@ -118,7 +118,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "deepVision/07_포즈추정"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "edee57095908339b18f5efdd574aba3f345e237b7e5205c8cc96224924d23899"
+    lessonContentHash: "bfcc4a625719320d60a15144858cbe09a93afa07650509e770abad646346d605"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]
@@ -137,7 +137,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "deepVision/08_전이학습"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "dc3f7ed9e7743aeb1a7b4bf932cc973310fa8092b03d05249962a0806bbb5f31"
+    lessonContentHash: "97a5f40f76155c2a28e4f8a426575f735a2f40902eebe34f1e02bb411f1bac8c"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]
@@ -156,7 +156,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "deepVision/09_모델비교"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "33647d345c23583c15fed839e9279822523312f6312b6e1ea041daad3fa4d114"
+    lessonContentHash: "107dcb5499532527f02be6cbd1a46ee8df11ec1579913ddc3b96f068246068a3"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]
@@ -175,7 +175,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "deepVision/10_종합사진태깅기"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "dfa58f8792b84ec89367eb6c8f5b752e71d89645e8ca8b99a539fa662b6b9e5f"
+    lessonContentHash: "a41d80f1cc73777bb3073909fc133d1e62b615c1a5c54fa5631e05b074435462"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]

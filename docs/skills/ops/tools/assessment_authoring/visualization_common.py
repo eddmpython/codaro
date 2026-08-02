@@ -107,7 +107,9 @@ def _transfer(spec: VisualLessonSpec) -> TaskBlueprint:
     return task(
         spec["slug"] + "-encoding-transfer",
         spec["title"] + " 인코딩 계약을 새 문맥에 전이하기",
-        spec["transferContext"] + "라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.",
+        "다음 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다: "
+        + spec["transferContext"]
+        + ".",
         f"{entry}(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.",
         f"def {entry}(candidate):\n    raise NotImplementedError",
         solution,
@@ -137,7 +139,7 @@ def _retrieval(spec: VisualLessonSpec) -> TaskBlueprint:
     return task(
         spec["slug"] + "-interpretation-retrieval",
         spec["title"] + " 해석 위험 회상하기",
-        spec["question"] + "을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.",
+        spec["question"] + " 다시 판단할 때 차트 선택과 증거 한계를 구분한다.",
         f"{entry}(situation)를 완성해 encoding, evidence, risk를 반환하세요.",
         f"def {entry}(situation):\n    raise NotImplementedError",
         solution,

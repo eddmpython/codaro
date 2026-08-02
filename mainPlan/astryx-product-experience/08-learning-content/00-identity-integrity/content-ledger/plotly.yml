@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "plotly/00_Plotly소개"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "ad39e18428ee05f147ea8768b07a79a5bfc071c653d51e8817b4f6e8ba0c6514"
+    lessonContentHash: "2d6d0ce084d0ec198fa69e08cfe3867d383b5417cf0b768b6c1280e997cedee0"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -23,7 +23,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "plotly/01_세계기대수명비교"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "2cc4786bb9c528f0b6e0e9acc05f4e2450b0263fe4672f8659e7bfc27d85ec5c"
+    lessonContentHash: "2ec7817d06753f9f3e5833afb2559ac887816f4e30b031b633d809e0e195ecf9"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -42,7 +42,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "plotly/02_팁데이터분포분석"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "1e7c84dbe9487b0b908c7fd25feee654640dd903fcce09212c30f6197f1825bc"
+    lessonContentHash: "600ec86136641c65627c347d709597ace9afaf846068993ceb6c781a193a397e"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -61,7 +61,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "plotly/03_붓꽃품종분류"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "eef0f6c5a36b5200f377943014e827a7f4e3dd02901827c83181b4bc058bc077"
+    lessonContentHash: "a0282a54514c858f4855930bc62dfb0021fc4f6923c04b16676ad2f90a979887"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -80,7 +80,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "plotly/04_GDP기대수명관계"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "a2256bbf8635cd5ac919cd6074b595cecb0f30e6b5baffae1786990cb49a486b"
+    lessonContentHash: "4c73a1ddd9c3c5c13a65c3cffe99b48ae8762756313908f2168f6b61e7357933"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -99,7 +99,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "plotly/05_세계인구지도"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "dd1840aa81d531a4daef9733d67dc9eec795b94a05c874250997a82b57f136bd"
+    lessonContentHash: "7bfb51785c760f1d822367d5fc24c36c7a44d08d050c5d0d3f94c1944f8120e0"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["geoVisualization","interactiveDashboards"]
@@ -118,7 +118,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "plotly/06_시간에따른세계변화"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "843089ff081f4e89c8c8257bfb7862d44f7e1f071c274b640fa2c74724a9f6ba"
+    lessonContentHash: "79f62be61e3c9312c5667f4d261f9f2996329fa80b825ef0d5b4d818e25af93d"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -137,7 +137,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "plotly/07_레스토랑매출분석"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "9a1178ee1dbeebd2f8d284f4122ffbc2652a1800d807287f6f2d697362f61ff4"
+    lessonContentHash: "12d8eba3f30fb86b98a39c4ba2b1ec0948bc5cf7585a80a0df5b10a798f8f254"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -156,7 +156,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "plotly/08_대륙별계층구조"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "766941678ac2f9f8707f579a99f78081382756ab32b054fcd7cf349738ab269f"
+    lessonContentHash: "a44f152e1cdd5f6a29bd88648d5e53932e7253a4b1e71b5ce239e6992d0e0558"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -175,7 +175,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "plotly/09_주식시계열분석"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "1202932c3f8778c4945d95c9f729264b8d735096b35ee9638fd1ccf916bf9d9b"
+    lessonContentHash: "5e01f021091d5f3466b9c57076d776bd873208f46ffa29b7771a62b4a1d1ebe5"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
@@ -194,7 +194,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "plotly/10_종합대시보드"
     identityLedgerRef: "identity-ledger/plotly.yml"
-    lessonContentHash: "783296bb16c0f12661609c89ff86db25a422a7b264def5f3c13d0869814e33e2"
+    lessonContentHash: "19690bae0882ae520d3334005ecb0d0c434078ffb564dfc9e47993d7e04b8e3f"
     disposition: migrate
     ownerPacket: "07-remaining-domains/05-interactive-dashboards"
     eligiblePathIds: ["interactiveDashboards"]
