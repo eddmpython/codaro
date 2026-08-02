@@ -167,7 +167,7 @@ export function ProductSidebar({
                   className="size-8 rounded-md object-contain group-data-[collapsible=icon]:size-8!"
                   src={resolvePublicAsset("/brand/avatar-small.png")}
                 />
-                <div className="grid flex-1 text-left leading-tight">
+                <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
                   <span className="break-all font-semibold">Codaro</span>
                 </div>
               </button>
