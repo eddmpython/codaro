@@ -462,7 +462,7 @@ def testLongNotebookKeyboardNavigationSharesCodeAndMarkdownBoundaries() -> None:
         "selectionAnchor !== selectionHead",
         'key === "ArrowUp" && selectionHead === 0',
         'key === "ArrowDown" && selectionHead === textLength',
-        "NOTEBOOK_IME_BOUNDARY_GUARD_MS = 120",
+        "NOTEBOOK_IME_BOUNDARY_GUARD_MS = 500",
         "compositionEndedAt",
     ):
         assert marker in navigation

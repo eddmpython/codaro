@@ -1487,7 +1487,7 @@ def verifyNotebookCompositionGuards(page: Any, cells: Any) -> dict[str, Any]:
             f"{codeDuringComposition}"
         )
     codeEditor.dispatch_event("compositionend", {"data": "한글"})
-    page.wait_for_timeout(160)
+    page.wait_for_timeout(550)
     page.keyboard.press("Control+End")
     page.keyboard.press("ArrowDown")
     page.wait_for_function(
@@ -1537,7 +1537,7 @@ def verifyNotebookCompositionGuards(page: Any, cells: Any) -> dict[str, Any]:
             f"{markdownDuringComposition}"
         )
     markdownEditor.dispatch_event("compositionend", {"data": "한글"})
-    page.wait_for_timeout(160)
+    page.wait_for_timeout(550)
     page.keyboard.press("ArrowDown")
     page.wait_for_function(
         """

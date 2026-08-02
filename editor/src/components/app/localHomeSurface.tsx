@@ -77,7 +77,7 @@ export function LocalHomeSurface({
         </header>
 
         <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
-          <section className="grid border-b border-border lg:grid-cols-2" data-local-home-resume="true">
+          <section className="grid min-w-0 border-b border-border lg:grid-cols-2" data-local-home-resume="true">
             <ResumeRow
               detail={learningLabel || t("local.home.learningFallback")}
               icon={BookOpen}
@@ -175,7 +175,7 @@ function ResumeRow({
 }) {
   return (
     <button
-      className={cn("group grid min-h-24 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 py-4 text-left", className)}
+      className={cn("group grid min-h-24 w-full min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 py-4 text-left", className)}
       type="button"
       onClick={onClick}
     >
@@ -184,7 +184,7 @@ function ResumeRow({
       </span>
       <span className="min-w-0">
         <span className="block text-xs font-medium text-muted-foreground">{title}</span>
-        <span className="mt-1 block truncate text-sm font-semibold text-foreground">{detail}</span>
+        <span className="mt-1 block break-words text-sm font-semibold text-foreground">{detail}</span>
       </span>
       <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground" />
     </button>
@@ -211,8 +211,8 @@ function RecentRunRow({ locale, task }: { locale: "ko" | "en"; task: TaskDefinit
     <div className="grid min-h-14 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 py-2.5" data-local-home-run-status={run.status}>
       <Play className={cn("size-3.5", failed ? "text-destructive" : "text-muted-foreground")} />
       <div className="min-w-0">
-        <div className="truncate text-sm font-medium">{task.name || task.documentPath}</div>
-        <div className="mt-0.5 truncate font-mono text-[11px] text-muted-foreground">{run.output || run.error || task.documentPath}</div>
+        <div className="break-words text-sm font-medium">{task.name || task.documentPath}</div>
+        <div className="mt-0.5 break-words font-mono text-[11px] text-muted-foreground">{run.output || run.error || task.documentPath}</div>
       </div>
       <div className="text-right text-[11px] text-muted-foreground">
         <div className={cn("font-medium", failed && "text-destructive")}>{statusLabel}</div>
@@ -235,15 +235,15 @@ function LocalCommand({
 }) {
   return (
     <Button
-      className="h-10 justify-start gap-2 px-3 xl:h-auto xl:min-h-16 xl:items-start xl:py-3"
+      className="min-h-10 justify-start gap-2 px-3 py-2 xl:min-h-16 xl:items-start xl:py-3"
       type="button"
       variant="outline"
       onClick={onClick}
     >
       <Icon className="size-4 shrink-0 xl:mt-0.5" />
       <span className="min-w-0 text-left">
-        <span className="block truncate">{label}</span>
-        <span className="mt-1 hidden truncate text-[11px] font-normal text-muted-foreground xl:block">{detail}</span>
+        <span className="block break-words">{label}</span>
+        <span className="mt-1 hidden break-words text-[11px] font-normal text-muted-foreground xl:block">{detail}</span>
       </span>
     </Button>
   );

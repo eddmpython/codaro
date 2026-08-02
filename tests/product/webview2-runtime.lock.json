@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "distributionMode": "fixed",
+  "architecture": "x64",
+  "version": "151.0.4129.59",
+  "releaseDate": "2026-07-31",
+  "sourcePageUrl": "https://developer.microsoft.com/en-us/microsoft-edge/webview2",
+  "officialArchiveUrl": "https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/3cb717d2-b86d-4160-a13e-f3860141dc7f/Microsoft.WebView2.FixedVersionRuntime.151.0.4129.59.x64.cab",
+  "archiveFileName": "Microsoft.WebView2.FixedVersionRuntime.151.0.4129.59.x64.cab",
+  "archiveBytes": 304114944,
+  "archiveSha256": "056858a027a7bf29893b6013c0eb0c6ea7e29755a20c9d043be469d9d78657dc",
+  "archiveLastModified": "2026-07-31T20:25:12Z",
+  "runtimeDirectoryName": "Microsoft.WebView2.FixedVersionRuntime.151.0.4129.59.x64",
+  "executableRelativePath": "msedgewebview2.exe",
+  "executableSha256": "e50db9cc5fba98e20e99ef46d4c259ae87df5bad69472822a789aa88a3d714c6",
+  "installPath": "output/test-runner/product-browser-webview2-win10/fixed-runtime/Microsoft.WebView2.FixedVersionRuntime.151.0.4129.59.x64",
+  "maximumAgeDays": 30
+}

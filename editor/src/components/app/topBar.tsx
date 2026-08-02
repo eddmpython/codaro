@@ -77,7 +77,7 @@ export function TopControls({
 
       {surface === "editor" ? (
         <div
-          className="absolute left-11 top-1/2 z-20 hidden -translate-y-1/2 items-baseline gap-1.5 sm:flex"
+          className="absolute left-11 top-1/2 z-20 hidden -translate-y-1/2 items-baseline gap-1.5 xl:flex"
           data-notebook-brand="codaro"
         >
           <span className="text-[13px] font-semibold tracking-tight text-foreground">Codaro</span>

@@ -624,7 +624,7 @@ fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
 
     let mut web_ctx = wry::WebContext::new(Some(paths.root().join("webview2")));
     let launch_html = LAUNCH_HTML.replace("{{AVATAR_SRC}}", &avatar_data_uri());
-    let webview_builder = WebViewBuilder::with_web_context(&mut web_ctx);
+    let webview_builder = WebViewBuilder::with_web_context(&mut web_ctx).with_hotkeys_zoom(true);
     #[cfg(target_os = "windows")]
     let webview_builder = {
         use wry::WebViewBuilderExtWindows;
@@ -680,6 +680,10 @@ fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
             let _ = proxy.send_event(AppEvent::ShowWindow);
         }
     });
+
+    if let Some(path) = test_zoom_control_path() {
+        watch_test_zoom_requests(path, event_loop.create_proxy());
+    }
 
     let child_slot: Arc<Mutex<Option<Child>>> = Arc::new(Mutex::new(None));
 
@@ -741,6 +745,9 @@ fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
                 window.set_visible(true);
                 window.set_minimized(false);
                 window.set_focus();
+            }
+            Event::UserEvent(AppEvent::SetTestZoom(scale_factor)) => {
+                let _ = webview.zoom(scale_factor);
             }
             Event::UserEvent(AppEvent::TrayMenu(id)) => match tray_handle.action_for(&id) {
                 Some(tray::TrayAction::Open) => {
@@ -849,7 +856,39 @@ enum AppEvent {
     Progress(ipc::ProgressPayload),
     Fail(failure::FailureCard),
     ShowWindow,
+    SetTestZoom(f64),
     TrayMenu(String),
+}
+
+fn test_zoom_control_path() -> Option<PathBuf> {
+    std::env::var_os("CODARO_WEBVIEW2_TEST_ZOOM_CONTROL_FILE")
+        .filter(|value| !value.is_empty())
+        .map(PathBuf::from)
+}
+
+fn watch_test_zoom_requests(path: PathBuf, proxy: tao::event_loop::EventLoopProxy<AppEvent>) {
+    std::thread::spawn(move || {
+        let mut previous = String::new();
+        loop {
+            if let Ok(value) = std::fs::read_to_string(&path) {
+                let trimmed = value.trim();
+                if trimmed != previous {
+                    previous = trimmed.to_string();
+                    if let Ok(scale_factor) = trimmed.parse::<f64>() {
+                        if scale_factor.is_finite() && (0.25..=5.0).contains(&scale_factor) {
+                            if proxy
+                                .send_event(AppEvent::SetTestZoom(scale_factor))
+                                .is_err()
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            std::thread::sleep(Duration::from_millis(50));
+        }
+    });
 }
 
 /// 다운로드 진행 콜백 `(artifact_label, received, total)`을 사용자용 IPC 진행률로 변환한다.

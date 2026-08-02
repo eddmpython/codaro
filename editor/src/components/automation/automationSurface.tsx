@@ -198,9 +198,9 @@ export function AutomationView({
                           >
                             <FileCode2 className="mt-0.5 size-3.5 text-muted-foreground" />
                             <span className="min-w-0">
-                              <span className="block truncate text-xs font-semibold">{task.name || task.documentPath}</span>
+                              <span className="block break-words text-xs font-semibold">{task.name || task.documentPath}</span>
                               <span className="mt-1 flex min-w-0 items-center gap-1.5 text-[10px] text-muted-foreground">
-                                <span className="truncate">{scheduleLabel(task, t)}</span>
+                                <span className="break-words">{scheduleLabel(task, t)}</span>
                                 <span aria-hidden="true">·</span>
                                 <span className="shrink-0">{lastRunLabel(task, t, locale)}</span>
                               </span>
@@ -319,7 +319,7 @@ function AutomationTemplateList({ localRuntime }: { localRuntime: boolean }) {
           <Workflow className="mt-0.5 size-3.5 text-muted-foreground" />
           <div className="min-w-0">
             <div className="flex min-w-0 items-center gap-1.5">
-              <span className="truncate text-xs font-medium">{t(template.titleKey)}</span>
+              <span className="break-words text-xs font-medium">{t(template.titleKey)}</span>
               <Badge
                 className="ml-auto"
                 data-runtime-requirement-label={template.runtime}
@@ -330,7 +330,7 @@ function AutomationTemplateList({ localRuntime }: { localRuntime: boolean }) {
                   : t(template.tagKey)}
               </Badge>
             </div>
-            <p className="mt-1 line-clamp-2 text-[10px] leading-4 text-muted-foreground">
+            <p className="mt-1 text-[10px] leading-4 text-muted-foreground">
               {t(template.descriptionKey)}
             </p>
           </div>
@@ -367,7 +367,7 @@ function TaskDetail({
       <header className="border-b border-border px-4 py-3">
         <div className="flex min-w-0 items-start gap-3">
           <div className="min-w-0 flex-1">
-            <h2 className="truncate text-md font-semibold outline-none" ref={headingRef} tabIndex={-1}>
+            <h2 className="break-words text-md font-semibold outline-none" ref={headingRef} tabIndex={-1}>
               {task.name || task.documentPath}
             </h2>
             <p className="mt-1 max-w-3xl text-xs leading-5 text-muted-foreground">
@@ -395,7 +395,7 @@ function TaskDetail({
             <dl className="divide-y divide-border/70">
               {inputs.map(([key, value]) => (
                 <div className="grid grid-cols-[minmax(80px,0.45fr)_minmax(0,1fr)] gap-3 py-1.5" key={key}>
-                  <dt className="truncate font-mono text-[10px] text-muted-foreground">{key}</dt>
+                  <dt className="break-all font-mono text-[10px] text-muted-foreground">{key}</dt>
                   <dd className="break-words font-mono text-[10px] text-foreground">{formatValue(value)}</dd>
                 </div>
               ))}
@@ -448,7 +448,7 @@ function SectionHeading({ count, description, title }: { count: number; descript
         <h2 className="text-xs font-semibold">{title}</h2>
         <span className="ml-auto text-[10px] tabular-nums text-muted-foreground">{count}</span>
       </div>
-      <p className="mt-1 line-clamp-2 text-[10px] leading-4 text-muted-foreground">{description}</p>
+      <p className="mt-1 text-[10px] leading-4 text-muted-foreground">{description}</p>
     </header>
   );
 }

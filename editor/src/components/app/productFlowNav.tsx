@@ -44,7 +44,7 @@ export function ProductFlowNav({ runtimeTier, surface, onSurfaceChange }: Produc
             >
               <SidebarMenuButton
                 className={cn(
-                  "h-8 px-2 text-[13px] [&>svg]:size-3.5",
+                  "min-h-8 px-2 py-1 text-[13px] [&>svg]:size-3.5",
                   flowStep === 1 && "font-medium",
                   flowRole === "secondLoop" && "border-t border-sidebar-border/60 bg-sidebar-accent/20",
                 )}

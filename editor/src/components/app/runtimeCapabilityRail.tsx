@@ -47,9 +47,9 @@ export function RuntimeCapabilityRail({
         </span>
         <div className="min-w-0">
           <div className="text-[10px] font-semibold uppercase text-muted-foreground">{copy.eyebrow}</div>
-          <div className="flex min-w-0 items-baseline gap-2">
+          <div className="flex min-w-0 flex-wrap items-baseline gap-2">
             <strong className="shrink-0 text-sm">{copy.title}</strong>
-            <span className="min-w-0 truncate text-xs text-muted-foreground">{copy.detail}</span>
+            <span className="min-w-0 break-words text-xs text-muted-foreground">{copy.detail}</span>
           </div>
         </div>
       </div>
@@ -59,7 +59,7 @@ export function RuntimeCapabilityRail({
           key={label}
         >
           <Icon className="size-3.5 shrink-0 text-accent-brand" aria-hidden="true" />
-          <span className="min-w-0 break-keep">{label}</span>
+          <span className="min-w-0 break-words">{label}</span>
         </div>
       ))}
     </section>

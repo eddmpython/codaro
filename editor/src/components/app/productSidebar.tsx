@@ -156,7 +156,7 @@ export function ProductSidebar({
             <SidebarMenuItem>
               <button
                 aria-label={runtimeTier === "local" ? "Codaro 홈으로 이동" : "Codaro 도구로 이동"}
-                className="flex h-10 w-full min-w-0 items-center gap-2 rounded-md px-2 text-left text-[13px] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:p-1!"
+                className="flex min-h-10 w-full min-w-0 items-center gap-2 rounded-md px-2 py-1 text-left text-[13px] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:p-1!"
                 data-product-brand="escape"
                 title={runtimeTier === "local" ? "Codaro 홈으로 이동" : "Codaro 도구로 이동"}
                 type="button"
@@ -168,7 +168,7 @@ export function ProductSidebar({
                   src={resolvePublicAsset("/brand/avatar-small.png")}
                 />
                 <div className="grid flex-1 text-left leading-tight">
-                  <span className="truncate font-semibold">Codaro</span>
+                  <span className="break-all font-semibold">Codaro</span>
                 </div>
               </button>
             </SidebarMenuItem>
@@ -309,7 +309,7 @@ export function ProductSidebar({
                   <SidebarMenu>
                     <SidebarMenuItem>
                       <SidebarMenuButton
-                        className="h-8 px-2 text-[13px] [&>svg]:size-3.5"
+                        className="min-h-8 px-2 py-1 text-[13px] [&>svg]:size-3.5"
                         isActive={terminalOpen}
                         tooltip={t("terminal.title")}
                         onClick={onToggleTerminal}

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "floating-version",
+    "overrides": {
+      "version": "latest"
+    },
+    "message": "exact four-part version"
+  },
+  {
+    "id": "unofficial-archive-host",
+    "overrides": {
+      "officialArchiveUrl": "https://example.com/Microsoft.WebView2.FixedVersionRuntime.151.0.4129.59.x64.cab"
+    },
+    "message": "official Microsoft delivery host"
+  },
+  {
+    "id": "stale-release",
+    "overrides": {
+      "releaseDate": "2026-01-01",
+      "archiveLastModified": "2026-01-01T00:00:00Z"
+    },
+    "message": "lock is stale"
+  },
+  {
+    "id": "install-path-escape",
+    "overrides": {
+      "installPath": "../fixed-runtime"
+    },
+    "message": "Win10 gate workspace"
+  },
+  {
+    "id": "uppercase-sha256",
+    "overrides": {
+      "archiveSha256": "056858A027A7BF29893B6013C0EB0C6EA7E29755A20C9D043BE469D9D78657DC"
+    },
+    "message": "lowercase SHA-256"
+  }
+]

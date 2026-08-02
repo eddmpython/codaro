@@ -50,13 +50,13 @@ export function AutomationSidebarTree({
 
   return (
     <SidebarGroup className="py-0.5">
-      <SidebarGroupLabel className="h-6 px-2 text-[11px]">{text.automation}</SidebarGroupLabel>
+      <SidebarGroupLabel className="min-h-6 px-2 py-1 text-[11px]">{text.automation}</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map(({ Icon, label, section }) => (
             <SidebarMenuItem key={section}>
               <SidebarMenuButton
-                className="h-7 px-2 text-[13px] [&>svg]:size-3.5"
+                className="min-h-7 px-2 py-1 text-[13px] [&>svg]:size-3.5"
                 isActive={selectedSection === section}
                 tooltip={label}
                 onClick={() => onSelectSection(section)}

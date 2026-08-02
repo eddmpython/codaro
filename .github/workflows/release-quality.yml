@@ -11,15 +11,10 @@ env:
 
 jobs:
   product-release:
-    runs-on: ubuntu-latest
-    timeout-minutes: 120
+    runs-on: [self-hosted, windows, x64, codaro-win10-22h2, interactive]
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install Linux launcher dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -54,10 +49,16 @@ jobs:
 
       - name: Install locked browser matrix
         timeout-minutes: 15
-        run: uv run python -m playwright install --with-deps chromium firefox webkit
+        run: uv run python -m playwright install chromium firefox webkit
+
+      - name: Cache locked WebView2 Fixed Version archive
+        uses: actions/cache@v4
+        with:
+          path: output/test-runner/product-browser-webview2-win10/downloads/
+          key: webview2-fixed-${{ hashFiles('tests/product/webview2-runtime.lock.json') }}
 
       - name: Run product release sequence
-        timeout-minutes: 90
+        timeout-minutes: 150
         run: uv run python -X utf8 tests/run.py product-release
 
       - name: Upload release quality evidence

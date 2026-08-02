@@ -34,11 +34,11 @@ export function AutomationOperationStrip({
   const { t } = useLocale();
   return (
     <section
-      className="sticky top-0 z-20 min-h-14 overflow-x-auto border-y border-border bg-background"
+      className="sticky top-0 z-20 min-h-14 border-y border-border bg-background"
       data-automation-estop-state={eStop.active ? "active" : "clear"}
       data-automation-operation-strip="true"
     >
-      <div className="grid min-w-[600px] grid-cols-[repeat(4,minmax(84px,1fr))_auto]">
+      <div className="grid min-w-0 grid-cols-2 sm:grid-cols-[repeat(4,minmax(84px,1fr))_auto]">
         <OperationMetric
           icon={Activity}
           label={t("automation.operation.tasks")}
@@ -62,7 +62,7 @@ export function AutomationOperationStrip({
             ? t("automation.task.statusStopped")
             : apiOnline ? t("automation.operation.online") : t("automation.operation.offline")}
         />
-        <div className="flex items-center gap-2 border-l border-border px-3 py-2">
+        <div className="col-span-2 flex min-w-0 flex-wrap items-center gap-2 border-t border-border px-3 py-2 sm:col-span-1 sm:flex-nowrap sm:border-l sm:border-t-0">
           <IconButton
             className="size-8"
             disabled={!apiOnline}
@@ -73,7 +73,7 @@ export function AutomationOperationStrip({
           </IconButton>
           <Button
             aria-pressed={eStop.active}
-            className="h-8 min-w-32 gap-2 px-3 text-xs"
+            className="min-h-8 min-w-0 flex-1 gap-2 px-3 py-1.5 text-xs sm:min-w-32"
             data-automation-estop-control="true"
             disabled={!apiOnline}
             size="sm"
@@ -114,10 +114,10 @@ function OperationMetric({
     <div className="min-w-0 border-l border-border px-3 py-2 first:border-l-0" data-automation-operation-metric={label}>
       <div className="flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground">
         <Icon className="size-3" />
-        <span className="truncate">{label}</span>
+        <span className="break-words">{label}</span>
       </div>
       <div className={cn(
-        "mt-1 truncate text-sm font-semibold",
+        "mt-1 break-words text-sm font-semibold",
         tone === "danger" && "text-destructive",
         tone === "ready" && "text-success",
       )}>

@@ -1,6 +1,6 @@
 export type NotebookCellNavigationDirection = "next" | "previous";
 
-export const NOTEBOOK_IME_BOUNDARY_GUARD_MS = 120;
+export const NOTEBOOK_IME_BOUNDARY_GUARD_MS = 500;
 
 export function shouldSuppressNotebookCellBoundaryDuringComposition({
   key,

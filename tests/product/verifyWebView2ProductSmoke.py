@@ -24,9 +24,24 @@ from urllib.request import Request, urlopen
 from playwright.sync_api import Locator, Page, sync_playwright
 import yaml
 
+from webview2RuntimeLock import (
+    RuntimeLockError,
+    loadRuntimeLock,
+    runtimeExecutable,
+    runtimeInstallRoot,
+    runtimeLockSha256,
+    verifyInstalledRuntime,
+)
+
 
 ROOT = Path(__file__).resolve().parents[2]
-WORK_ROOT = ROOT / "output" / "test-runner" / "product-browser-webview2-evergreen"
+GATE_ID = os.environ.get(
+    "CODARO_WEBVIEW2_GATE_ID",
+    "product-browser-webview2-evergreen",
+).strip()
+RUNTIME_MODE = os.environ.get("CODARO_WEBVIEW2_RUNTIME_MODE", "evergreen").strip()
+REQUIRE_WIN10 = os.environ.get("CODARO_WEBVIEW2_REQUIRE_WIN10", "0") == "1"
+WORK_ROOT = ROOT / "output" / "test-runner" / GATE_ID
 LAUNCHER_ROOT = WORK_ROOT / "launcher-root"
 PRODUCT_HOME = LAUNCHER_ROOT / "user-data"
 WORKSPACE_ROOT = WORK_ROOT / "workspace"
@@ -38,6 +53,7 @@ DEPLOYED_WEB_ARCHIVE_PATH = WORK_ROOT / "deployed-web-learning-archive.json"
 DEPLOYED_LOCAL_REEXPORT_PATH = WORK_ROOT / "deployed-local-reexport-learning-archive.json"
 CARGO_TARGET_ROOT = WORK_ROOT / "cargo-target"
 LAUNCHER_EXE = CARGO_TARGET_ROOT / "debug" / "codaro-launcher.exe"
+ZOOM_CONTROL_PATH = WORK_ROOT / "zoom-control.txt"
 PYTHON_EXE = ROOT / ".venv" / "Scripts" / "python.exe"
 RUNTIME_VERSION = "product-smoke-3.12"
 DEPLOYED_WEB_URL = os.environ.get("CODARO_DEPLOYED_WEB_URL", "").strip().rstrip("/")
@@ -69,17 +85,29 @@ def main() -> int:
     cdp_port: int | None = None
     deployed_archive: dict[str, Any] | None = None
     resource_failures: list[dict[str, Any]] = []
+    runtime_lock: dict[str, Any] | None = None
 
     try:
-        require_windows()
+        runtime_lock = load_runtime_profile()
+        require_windows(runtime_lock)
         prepare_product_install()
         app_port = free_tcp_port()
         cdp_port = free_tcp_port(exclude={app_port})
-        launcher_process, launcher_log = launch_native_product(app_port, cdp_port)
+        launcher_process, launcher_log = launch_native_product(
+            app_port,
+            cdp_port,
+            runtime_lock=runtime_lock,
+        )
         hwnd = wait_for_launcher_window(launcher_process.pid)
         cdp_version = wait_for_json(f"http://127.0.0.1:{cdp_port}/json/version", timeout_seconds=45)
         wait_for_json(f"http://127.0.0.1:{app_port}/api/health", timeout_seconds=45)
-        runtime = runtime_evidence(cdp_version, hwnd, launcher_process.pid)
+        runtime = runtime_evidence(
+            cdp_version,
+            hwnd,
+            launcher_process.pid,
+            runtime_lock=runtime_lock,
+        )
+        assert_runtime_profile(runtime, runtime_lock)
 
         with sync_playwright() as playwright:
             if DEPLOYED_WEB_URL:
@@ -134,6 +162,13 @@ def main() -> int:
                         )
                     )
 
+                cases.append(
+                    verify_native_zoom_matrix(
+                        page,
+                        hwnd=hwnd,
+                        app_port=app_port,
+                    )
+                )
                 cases.append(verify_installed_schedule_cold_concurrency(app_port))
                 cases.append(
                     verify_native_automation_state_matrix(
@@ -212,7 +247,7 @@ def main() -> int:
         for failure in case.get("failures", [])
     )
     payload = {
-        "gate": "product-browser-webview2-evergreen",
+        "gate": GATE_ID,
         "passed": not failures,
         "status": "passed" if not failures else "failed",
         "startedAt": started_at,
@@ -229,6 +264,7 @@ def main() -> int:
             "runtimePython": display_path(
                 LAUNCHER_ROOT / "installs" / "_runtimes" / RUNTIME_VERSION / "python.exe"
             ),
+            "webView2Runtime": runtime_install_evidence(runtime_lock),
         },
         "caseCount": len(cases),
         "cases": cases,
@@ -239,7 +275,11 @@ def main() -> int:
                 "current Windows session",
                 "installed current-commit wheel",
                 "native launcher window",
-                "WebView2 Evergreen runtime",
+                (
+                    f"WebView2 Fixed Version {runtime_lock['version']} runtime"
+                    if runtime_lock is not None
+                    else "WebView2 Evergreen runtime"
+                ),
                 "900x640 Local Home",
                 "1024x768 Local Notebook",
                 "1440x900 Local Automation",
@@ -254,6 +294,8 @@ def main() -> int:
                 "Code and Markdown composition-event shortcut guards",
                 "Code and Markdown native Korean IME input and composition-boundary arrow guards",
                 "WebView2 forced-colors control boundaries and keyboard focus order",
+                "native 200% browser zoom at the 900x640 Local minimum",
+                "400% text-only fixture at the 900x640 Local minimum",
                 "isolated installed-product user data",
                 "concurrent installed AppContainer checks using the unchanged pinned schedule wheel",
                 "Web-origin learning archive Local import, reload, re-export, and disabled automation adoption",
@@ -261,31 +303,65 @@ def main() -> int:
                 "public deployed Web edit, strong verification, archive export, and installed Local roundtrip",
                 "installed Local re-export imported back into a clean public Web workspace",
             ] if deployed_archive is not None else []),
-            "notCovered": [
-                "Windows 10 22H2 self-hosted image",
-                "WebView2 Fixed Version lock",
-                "manual NVDA or Narrator speech-output review",
-                "200% and 400% zoom",
-            ] + ([] if deployed_archive is not None else ["public deployed Web archive export"]),
+            "notCovered": (
+                ["manual NVDA or Narrator speech-output review"]
+                if REQUIRE_WIN10
+                else [
+                    "Windows 10 22H2 self-hosted image",
+                    *([] if runtime_lock is not None else ["WebView2 Fixed Version lock"]),
+                    "manual NVDA or Narrator speech-output review",
+                ]
+            ) + ([] if deployed_archive is not None else ["public deployed Web archive export"]),
         },
     }
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     REPORT_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(payload, ensure_ascii=False, indent=2))
     if failures:
-        print("FAIL: native WebView2 product smoke failed", file=sys.stderr)
+        print(f"FAIL: {GATE_ID} native WebView2 product smoke failed", file=sys.stderr)
         return 1
-    print("ok: native WebView2 product smoke verified")
+    print(f"ok: {GATE_ID} native WebView2 product smoke verified")
     return 0
 
 
-def require_windows() -> None:
+def load_runtime_profile() -> dict[str, Any] | None:
+    if RUNTIME_MODE == "evergreen":
+        if REQUIRE_WIN10:
+            raise VerificationError("Win10 release profile cannot use the Evergreen runtime")
+        return None
+    if RUNTIME_MODE != "fixed":
+        raise VerificationError(f"unsupported WebView2 runtime mode: {RUNTIME_MODE}")
+    try:
+        return loadRuntimeLock()
+    except RuntimeLockError as exc:
+        raise VerificationError(str(exc)) from exc
+
+
+def require_windows(runtime_lock: dict[str, Any] | None) -> None:
     if sys.platform != "win32":
-        raise VerificationError("product-browser-webview2-evergreen requires Windows")
+        raise VerificationError(f"{GATE_ID} requires Windows")
     if not PYTHON_EXE.is_file():
         raise VerificationError(f"project Python is missing: {PYTHON_EXE}")
     if not LAUNCHER_EXE.is_file():
         raise VerificationError(f"built launcher is missing: {LAUNCHER_EXE}")
+    if runtime_lock is not None:
+        try:
+            verifyInstalledRuntime(runtime_lock)
+        except RuntimeLockError as exc:
+            raise VerificationError(str(exc)) from exc
+    if REQUIRE_WIN10:
+        windows_version = sys.getwindowsversion()
+        if windows_version.major != 10 or windows_version.build != 19045:
+            raise VerificationError(
+                "product-browser-webview2-win10 requires Windows 10 22H2 build 19045; "
+                f"actual={windows_version.major}.{windows_version.minor}.{windows_version.build}"
+            )
+        session = windows_session_evidence()
+        if not session["interactive"]:
+            raise VerificationError(
+                "product-browser-webview2-win10 requires an interactive desktop session; "
+                f"actual={session}"
+            )
 
 
 def verify_installed_schedule_cold_concurrency(app_port: int) -> dict[str, Any]:
@@ -637,12 +713,20 @@ def seed_native_automation_fixture() -> None:
 
 def reset_work_paths() -> None:
     work_root = WORK_ROOT.resolve()
-    for path in (LAUNCHER_ROOT, WORKSPACE_ROOT, DIST_ROOT, SCREENSHOT_ROOT):
+    for path in (
+        LAUNCHER_ROOT,
+        WORKSPACE_ROOT,
+        DIST_ROOT,
+        SCREENSHOT_ROOT,
+        ZOOM_CONTROL_PATH,
+    ):
         resolved = path.resolve()
         if work_root != resolved and work_root not in resolved.parents:
             raise VerificationError(f"unsafe WebView2 work path: {resolved}")
-        if path.exists():
+        if path.is_dir():
             remove_tree(path)
+        elif path.exists():
+            path.unlink()
 
 
 def remove_tree(path: Path) -> None:
@@ -651,7 +735,12 @@ def remove_tree(path: Path) -> None:
     shutil.rmtree(extended)
 
 
-def launch_native_product(app_port: int, cdp_port: int) -> tuple[subprocess.Popen[str], Any]:
+def launch_native_product(
+    app_port: int,
+    cdp_port: int,
+    *,
+    runtime_lock: dict[str, Any] | None,
+) -> tuple[subprocess.Popen[str], Any]:
     log_path = WORK_ROOT / "launcher.log"
     log_path.parent.mkdir(parents=True, exist_ok=True)
     log_handle = log_path.open("w", encoding="utf-8")
@@ -661,6 +750,9 @@ def launch_native_product(app_port: int, cdp_port: int) -> tuple[subprocess.Pope
         "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection "
         f"--remote-debugging-port={cdp_port} --remote-allow-origins=*"
     )
+    env["CODARO_WEBVIEW2_TEST_ZOOM_CONTROL_FILE"] = str(ZOOM_CONTROL_PATH)
+    if runtime_lock is not None:
+        env["WEBVIEW2_BROWSER_EXECUTABLE_FOLDER"] = str(runtimeInstallRoot(runtime_lock))
     command = (
         str(LAUNCHER_EXE),
         "--root",
@@ -838,6 +930,396 @@ def verify_surface_case(
     }
 
 
+def verify_native_zoom_matrix(
+    page: Page,
+    *,
+    hwnd: int,
+    app_port: int,
+) -> dict[str, Any]:
+    surface_specs = (
+        ("home", "[data-local-home-surface='true']"),
+        ("editor", "[data-notebook-studio='true']"),
+        ("automation", "[data-automation-studio-layout='true']"),
+    )
+    snapshots: list[dict[str, Any]] = []
+    failures: list[str] = []
+    baseline_dpr = 0.0
+    try:
+        first_url = f"http://127.0.0.1:{app_port}/?surface=home&runtime=local#home"
+        page.goto(first_url, wait_until="domcontentloaded", timeout=45_000)
+        page.wait_for_selector(surface_specs[0][1], state="visible", timeout=45_000)
+        reset_native_browser_zoom(page)
+        baseline_dpr = float(page.evaluate("window.devicePixelRatio"))
+        resize_native_client(hwnd, 900, 640, baseline_dpr)
+        set_native_browser_zoom(page, baseline_dpr=baseline_dpr, percent=200)
+
+        for surface, ready_selector in surface_specs:
+            navigate_zoom_surface(page, app_port, surface, ready_selector)
+            snapshot = capture_zoom_snapshot(
+                page,
+                mode="browser",
+                percent=200,
+                surface=surface,
+                baseline_dpr=baseline_dpr,
+            )
+            screenshot_path = SCREENSHOT_ROOT / f"local-{surface}-browser-zoom-200-900x640.png"
+            page.screenshot(path=str(screenshot_path), full_page=False)
+            snapshot["screenshot"] = display_path(screenshot_path)
+            snapshots.append(snapshot)
+            failures.extend(
+                f"browser-zoom-200/{surface}: {message}"
+                for message in snapshot["failures"]
+            )
+
+        reset_native_browser_zoom(page)
+        resize_native_client(hwnd, 900, 640, baseline_dpr)
+        for surface, ready_selector in surface_specs:
+            navigate_zoom_surface(page, app_port, surface, ready_selector)
+            apply_text_only_zoom_fixture(page, factor=4.0)
+            page.wait_for_timeout(250)
+            snapshot = capture_zoom_snapshot(
+                page,
+                mode="text-only-fixture",
+                percent=400,
+                surface=surface,
+                baseline_dpr=baseline_dpr,
+            )
+            screenshot_path = SCREENSHOT_ROOT / f"local-{surface}-text-zoom-400-900x640.png"
+            page.screenshot(path=str(screenshot_path), full_page=False)
+            snapshot["screenshot"] = display_path(screenshot_path)
+            snapshots.append(snapshot)
+            failures.extend(
+                f"text-zoom-400/{surface}: {message}"
+                for message in snapshot["failures"]
+            )
+            remove_text_only_zoom_fixture(page)
+    finally:
+        if baseline_dpr > 0:
+            reset_native_browser_zoom(page)
+            resize_native_client(hwnd, 900, 640, baseline_dpr)
+        remove_text_only_zoom_fixture(page)
+    return {
+        "id": "local-native-zoom-matrix",
+        "surface": "home-editor-automation",
+        "actualMinimumClientCssAt100Percent": {"width": 900, "height": 640},
+        "baselineDevicePixelRatio": baseline_dpr,
+        "snapshots": snapshots,
+        "checks": {
+            "browserZoom200AllSurfaces": all(
+                snapshot["passed"]
+                for snapshot in snapshots
+                if snapshot["mode"] == "browser"
+            ) and len([snapshot for snapshot in snapshots if snapshot["mode"] == "browser"]) == 3,
+            "textOnly400AllSurfaces": all(
+                snapshot["passed"]
+                for snapshot in snapshots
+                if snapshot["mode"] == "text-only-fixture"
+            ) and len([
+                snapshot for snapshot in snapshots
+                if snapshot["mode"] == "text-only-fixture"
+            ]) == 3,
+        },
+        "passed": not failures,
+        "failures": failures,
+    }
+
+
+def navigate_zoom_surface(
+    page: Page,
+    app_port: int,
+    surface: str,
+    ready_selector: str,
+) -> None:
+    url = f"http://127.0.0.1:{app_port}/?surface={surface}&runtime=local#{surface}"
+    response = page.goto(url, wait_until="domcontentloaded", timeout=45_000)
+    if response is not None and response.status >= 400:
+        raise VerificationError(f"zoom matrix {surface} returned HTTP {response.status}")
+    page.wait_for_selector(ready_selector, state="visible", timeout=45_000)
+    page.wait_for_function(
+        "surface => document.querySelector('[data-active-product-surface]')?.getAttribute('data-active-product-surface') === surface",
+        arg=surface,
+        timeout=45_000,
+    )
+    page.wait_for_timeout(250)
+
+
+def apply_text_only_zoom_fixture(page: Page, *, factor: float) -> None:
+    if factor != 4.0:
+        raise VerificationError(f"unsupported text-only zoom factor: {factor}")
+    applied = page.evaluate(
+        """factor => {
+          document.documentElement.setAttribute(
+            "data-codaro-text-zoom-fixture",
+            String(Math.round(factor * 100)),
+          );
+          const excluded = new Set(["SCRIPT", "STYLE", "SVG", "PATH"]);
+          const candidates = [...document.body.querySelectorAll("*")];
+          let count = 0;
+          for (const element of candidates) {
+            if (!(element instanceof HTMLElement) || excluded.has(element.tagName)) continue;
+            const hasDirectText = [...element.childNodes].some(
+              (node) => node.nodeType === Node.TEXT_NODE && (node.textContent || "").trim(),
+            );
+            const hasFormText = element.matches("input, textarea, select");
+            if (!hasDirectText && !hasFormText) continue;
+            const style = getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            if (style.display === "none" || style.visibility === "hidden"
+              || rect.width <= 0 || rect.height <= 0) continue;
+            if (element.classList.contains("sr-only")
+              || style.clip === "rect(0px, 0px, 0px, 0px)"
+              || style.clipPath === "inset(50%)") continue;
+            const baselineFontSize = Number.parseFloat(style.fontSize);
+            if (!Number.isFinite(baselineFontSize) || baselineFontSize <= 0) continue;
+            element.dataset.codaroTextZoomBaselineFontSize = String(baselineFontSize);
+            element.dataset.codaroTextZoomOriginalFontSize = element.style.getPropertyValue("font-size");
+            element.dataset.codaroTextZoomOriginalFontSizePriority = element.style.getPropertyPriority("font-size");
+            element.dataset.codaroTextZoomOriginalLineHeight = element.style.getPropertyValue("line-height");
+            element.dataset.codaroTextZoomOriginalLineHeightPriority = element.style.getPropertyPriority("line-height");
+            element.style.setProperty(
+              "font-size",
+              `${baselineFontSize * factor}px`,
+              "important",
+            );
+            const baselineLineHeight = Number.parseFloat(style.lineHeight);
+            if (Number.isFinite(baselineLineHeight) && baselineLineHeight > 0) {
+              element.style.setProperty(
+                "line-height",
+                `${baselineLineHeight * factor}px`,
+                "important",
+              );
+            }
+            count += 1;
+          }
+          return count;
+        }""",
+        factor,
+    )
+    if not isinstance(applied, int) or applied < 1:
+        raise VerificationError("text-only zoom fixture did not find visible text")
+
+
+def remove_text_only_zoom_fixture(page: Page) -> None:
+    page.evaluate(
+        """() => {
+          const elements = [...document.querySelectorAll(
+            "[data-codaro-text-zoom-baseline-font-size]"
+          )];
+          for (const element of elements) {
+            const fontSize = element.dataset.codaroTextZoomOriginalFontSize || "";
+            const fontPriority = element.dataset.codaroTextZoomOriginalFontSizePriority || "";
+            const lineHeight = element.dataset.codaroTextZoomOriginalLineHeight || "";
+            const linePriority = element.dataset.codaroTextZoomOriginalLineHeightPriority || "";
+            if (fontSize) element.style.setProperty("font-size", fontSize, fontPriority);
+            else element.style.removeProperty("font-size");
+            if (lineHeight) element.style.setProperty("line-height", lineHeight, linePriority);
+            else element.style.removeProperty("line-height");
+            delete element.dataset.codaroTextZoomBaselineFontSize;
+            delete element.dataset.codaroTextZoomOriginalFontSize;
+            delete element.dataset.codaroTextZoomOriginalFontSizePriority;
+            delete element.dataset.codaroTextZoomOriginalLineHeight;
+            delete element.dataset.codaroTextZoomOriginalLineHeightPriority;
+          }
+          document.documentElement.removeAttribute("data-codaro-text-zoom-fixture");
+        }"""
+    )
+
+
+def capture_zoom_snapshot(
+    page: Page,
+    *,
+    mode: str,
+    percent: int,
+    surface: str,
+    baseline_dpr: float,
+) -> dict[str, Any]:
+    snapshot = page.evaluate(
+        """({mode, percent, surface, baselineDpr}) => {
+          const visible = (element) => {
+            if (!(element instanceof HTMLElement)) return false;
+            const style = getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            return style.display !== "none"
+              && style.visibility !== "hidden"
+              && rect.width > 0
+              && rect.height > 0;
+          };
+          const controls = [...document.querySelectorAll("button, a[href], input, textarea, select")]
+            .filter(visible)
+            .map((element) => {
+              const rect = element.getBoundingClientRect();
+              return {
+                label: element.getAttribute("aria-label")
+                  || element.getAttribute("title")
+                  || (element.textContent || "").replace(/\\s+/g, " ").trim().slice(0, 80),
+                left: rect.left,
+                right: rect.right,
+                top: rect.top,
+                bottom: rect.bottom,
+              };
+            });
+          const horizontallyClippedControls = controls.filter((control) => (
+            control.bottom > 0
+            && control.top < window.innerHeight
+            && (control.left < -1 || control.right > window.innerWidth + 1)
+          ));
+          const topControls = [...document.querySelectorAll(
+            "[data-topbar-controls] button, [data-topbar-controls] a"
+          )].filter(visible).map((element) => {
+            const rect = element.getBoundingClientRect();
+            return {
+              label: element.getAttribute("aria-label") || element.getAttribute("title") || "",
+              left: rect.left,
+              right: rect.right,
+              top: rect.top,
+              bottom: rect.bottom,
+            };
+          });
+          const topControlOverlaps = [];
+          for (let index = 0; index < topControls.length; index += 1) {
+            for (let candidate = index + 1; candidate < topControls.length; candidate += 1) {
+              const a = topControls[index];
+              const b = topControls[candidate];
+              if (Math.min(a.right, b.right) - Math.max(a.left, b.left) > 1
+                && Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 1) {
+                topControlOverlaps.push([a.label, b.label]);
+              }
+            }
+          }
+          const root = document.documentElement;
+          const textZoomElements = [...document.querySelectorAll(
+            "[data-codaro-text-zoom-baseline-font-size]"
+          )].filter(visible);
+          const textZoomRatios = textZoomElements.map((element) => {
+            const baseline = Number.parseFloat(
+              element.getAttribute("data-codaro-text-zoom-baseline-font-size") || "0"
+            );
+            return baseline > 0 ? Number.parseFloat(getComputedStyle(element).fontSize) / baseline : 0;
+          }).filter((ratio) => Number.isFinite(ratio) && ratio > 0);
+          const clippedTextElements = textZoomElements.filter((element) => {
+            const style = getComputedStyle(element);
+            const clipsX = ["auto", "clip", "hidden", "scroll"].includes(style.overflowX);
+            const clipsY = ["auto", "clip", "hidden", "scroll"].includes(style.overflowY);
+            return (clipsX && element.scrollWidth > element.clientWidth + 1)
+              || (clipsY && element.scrollHeight > element.clientHeight + 1);
+          }).map((element) => ({
+            text: (element.textContent || "").replace(/\\s+/g, " ").trim().slice(0, 80),
+            clientWidth: element.clientWidth,
+            scrollWidth: element.scrollWidth,
+            clientHeight: element.clientHeight,
+            scrollHeight: element.scrollHeight,
+          })).slice(0, 25);
+          const visibleTextRects = textZoomElements.map((element) => ({
+            element,
+            rect: element.getBoundingClientRect(),
+            text: (element.textContent || "").replace(/\\s+/g, " ").trim().slice(0, 60),
+          })).filter(({rect}) => rect.bottom > 0 && rect.top < window.innerHeight
+            && rect.right > 0 && rect.left < window.innerWidth);
+          const textOverlaps = [];
+          for (let index = 0; index < visibleTextRects.length; index += 1) {
+            for (let candidate = index + 1; candidate < visibleTextRects.length; candidate += 1) {
+              const a = visibleTextRects[index];
+              const b = visibleTextRects[candidate];
+              if (a.element.contains(b.element) || b.element.contains(a.element)) continue;
+              if (Math.min(a.rect.right, b.rect.right) - Math.max(a.rect.left, b.rect.left) > 2
+                && Math.min(a.rect.bottom, b.rect.bottom) - Math.max(a.rect.top, b.rect.top) > 2) {
+                textOverlaps.push([a.text, b.text]);
+                if (textOverlaps.length >= 25) break;
+              }
+            }
+            if (textOverlaps.length >= 25) break;
+          }
+          return {
+            mode,
+            percent,
+            surface,
+            activeSurface: document.querySelector("[data-active-product-surface]")
+              ?.getAttribute("data-active-product-surface"),
+            runtimeTier: document.querySelector('meta[name="codaro-runtime-tier"]')
+              ?.getAttribute("content"),
+            innerWidth: window.innerWidth,
+            innerHeight: window.innerHeight,
+            devicePixelRatio: window.devicePixelRatio,
+            zoomRatio: window.devicePixelRatio / baselineDpr,
+            rootFontSize: Number.parseFloat(getComputedStyle(root).fontSize),
+            textZoomElementCount: textZoomRatios.length,
+            minimumTextZoomRatio: textZoomRatios.length ? Math.min(...textZoomRatios) : 0,
+            maximumTextZoomRatio: textZoomRatios.length ? Math.max(...textZoomRatios) : 0,
+            clippedTextElements,
+            textOverlaps,
+            horizontalOverflow: Math.max(0, root.scrollWidth - root.clientWidth),
+            horizontallyClippedControls,
+            topControlOverlaps,
+          };
+        }""",
+        {
+            "mode": mode,
+            "percent": percent,
+            "surface": surface,
+            "baselineDpr": baseline_dpr,
+        },
+    )
+    checks = {
+        "surface": snapshot["activeSurface"] == surface,
+        "runtimeTier": snapshot["runtimeTier"] == "local",
+        "actualMinimumClient": (
+            abs(snapshot["innerWidth"] - 450) <= 4
+            if mode == "browser"
+            else abs(snapshot["innerWidth"] - 900) <= 2
+        ),
+        "zoomFactor": (
+            abs(snapshot["zoomRatio"] - 2.0) <= 0.08
+            if mode == "browser"
+            else (
+                snapshot["textZoomElementCount"] > 0
+                and abs(snapshot["minimumTextZoomRatio"] - 4.0) <= 0.02
+                and abs(snapshot["maximumTextZoomRatio"] - 4.0) <= 0.02
+                and abs(snapshot["rootFontSize"] - 16.0) <= 1.0
+            )
+        ),
+        "horizontalOverflow": snapshot["horizontalOverflow"] == 0,
+        "controlClipping": not snapshot["horizontallyClippedControls"],
+        "topControlOverlap": not snapshot["topControlOverlaps"],
+        "textClipping": mode == "browser" or not snapshot["clippedTextElements"],
+        "textOverlap": mode == "browser" or not snapshot["textOverlaps"],
+    }
+    failures = [f"{name} check failed" for name, passed in checks.items() if not passed]
+    return {
+        **snapshot,
+        "checks": checks,
+        "passed": not failures,
+        "failures": failures,
+    }
+
+
+def reset_native_browser_zoom(page: Page) -> None:
+    request_native_browser_zoom(1.0)
+    page.wait_for_timeout(300)
+
+
+def set_native_browser_zoom(
+    page: Page,
+    *,
+    baseline_dpr: float,
+    percent: int,
+) -> None:
+    if percent != 200:
+        raise VerificationError(f"unsupported native browser zoom target: {percent}")
+    request_native_browser_zoom(2.0)
+    page.wait_for_function(
+        "baseline => Math.abs((window.devicePixelRatio / baseline) - 2) <= 0.08",
+        arg=baseline_dpr,
+        timeout=10_000,
+    )
+
+
+def request_native_browser_zoom(scale_factor: float) -> None:
+    ZOOM_CONTROL_PATH.parent.mkdir(parents=True, exist_ok=True)
+    pending = ZOOM_CONTROL_PATH.with_suffix(".pending")
+    pending.write_text(f"{scale_factor:.2f}\n", encoding="utf-8")
+    os.replace(pending, ZOOM_CONTROL_PATH)
+
+
 def verify_native_automation_state_matrix(
     page: Page,
     *,
@@ -889,7 +1371,7 @@ def verify_native_automation_state_matrix(
         state="visible",
         timeout=20_000,
     )
-    page.locator("[data-automation-run-stream='stderr']").scroll_into_view_if_needed()
+    page.locator("[data-automation-run-variables='true']").scroll_into_view_if_needed()
     page.wait_for_timeout(200)
     captures["failed"] = capture_native_automation_state(page, "failed")
     page.locator("[data-automation-estop-control='true']").click()
@@ -1106,9 +1588,9 @@ def capture_native_automation_state(page: Page, state_name: str) -> dict[str, An
             hasFailureCause: [...document.querySelectorAll("[data-automation-run-stream='stderr']")]
               .some((element) => isVisibleInViewport(element)
                 && (element.textContent || "").includes("입력 워크북이 없어 실행을 중단했습니다.")),
-            hasArtifact: [...document.querySelectorAll("code, [data-slot='badge'], span")]
+            hasArtifact: [...document.querySelectorAll("[data-automation-run-variables]")]
               .some((element) => isVisibleInViewport(element)
-                && (element.textContent || "").trim() === "summary.json"),
+                && (element.textContent || "").includes("summary.json")),
             redactionSignals: {
               windowsUserPath: /[A-Za-z]:\\\\Users\\\\[^\\s\\\\]+/i.test(visibleText),
               macUserPath: /\\/Users\\/[^\\s/]+/i.test(visibleText),
@@ -1379,7 +1861,7 @@ def verify_notebook_composition_guards(page: Page, cells: Locator) -> dict[str, 
             f"{code_during_composition}"
         )
     code_editor.dispatch_event("compositionend", {"data": "한글"})
-    page.wait_for_timeout(160)
+    page.wait_for_timeout(550)
     page.keyboard.press("Control+End")
     page.keyboard.press("ArrowDown")
     page.wait_for_function(
@@ -1428,7 +1910,7 @@ def verify_notebook_composition_guards(page: Page, cells: Locator) -> dict[str, 
             f"{markdown_during_composition}"
         )
     markdown_editor.dispatch_event("compositionend", {"data": "한글"})
-    page.wait_for_timeout(160)
+    page.wait_for_timeout(550)
     page.keyboard.press("ArrowDown")
     page.wait_for_function(
         """
@@ -2931,15 +3413,41 @@ def configure_dpi_awareness() -> None:
 
 def activate_native_window(hwnd: int) -> None:
     user32 = ctypes.windll.user32
+    kernel32 = ctypes.windll.kernel32
+    target_pid = wintypes.DWORD()
+    user32.GetWindowThreadProcessId(hwnd, ctypes.byref(target_pid))
     user32.ShowWindow(hwnd, 5)
-    user32.SetForegroundWindow(hwnd)
-    deadline = time.monotonic() + 2
+    deadline = time.monotonic() + 5
     while time.monotonic() < deadline:
-        if user32.GetForegroundWindow() == hwnd:
+        foreground = user32.GetForegroundWindow()
+        foreground_thread = (
+            user32.GetWindowThreadProcessId(foreground, None)
+            if foreground
+            else 0
+        )
+        current_thread = kernel32.GetCurrentThreadId()
+        attached = bool(
+            foreground_thread
+            and foreground_thread != current_thread
+            and user32.AttachThreadInput(current_thread, foreground_thread, True)
+        )
+        user32.BringWindowToTop(hwnd)
+        user32.SetForegroundWindow(hwnd)
+        user32.SetActiveWindow(hwnd)
+        user32.SetFocus(hwnd)
+        if attached:
+            user32.AttachThreadInput(current_thread, foreground_thread, False)
+        active_hwnd = user32.GetForegroundWindow()
+        active_pid = wintypes.DWORD()
+        if active_hwnd:
+            user32.GetWindowThreadProcessId(active_hwnd, ctypes.byref(active_pid))
+        if active_hwnd == hwnd or user32.GetAncestor(active_hwnd, 2) == hwnd or (
+            target_pid.value != 0 and active_pid.value == target_pid.value
+        ):
             return
-        time.sleep(0.05)
+        time.sleep(0.1)
     raise VerificationError(
-        f"native launcher window {hwnd} did not become the foreground window"
+        f"native launcher window {hwnd} (pid={target_pid.value}) did not become foreground"
     )
 
 
@@ -2951,20 +3459,90 @@ def native_key_tap(virtual_key: int) -> None:
     time.sleep(0.06)
 
 
-def runtime_evidence(cdp_version: dict[str, Any], hwnd: int, pid: int) -> dict[str, Any]:
-    windows_version = sys.getwindowsversion()
+def windows_session_evidence() -> dict[str, Any]:
+    kernel32 = ctypes.windll.kernel32
+    user32 = ctypes.windll.user32
+    session_id = wintypes.DWORD()
+    success = kernel32.ProcessIdToSessionId(os.getpid(), ctypes.byref(session_id))
+    foreground_window = int(user32.GetForegroundWindow())
+    shell_window = int(user32.GetShellWindow())
     return {
+        "sessionId": int(session_id.value) if success else None,
+        "sessionName": os.environ.get("SESSIONNAME"),
+        "foregroundWindowPresent": foreground_window != 0,
+        "shellWindowPresent": shell_window != 0,
+        "interactive": bool(
+            success
+            and session_id.value > 0
+            and foreground_window != 0
+            and shell_window != 0
+        ),
+    }
+
+
+def runtime_evidence(
+    cdp_version: dict[str, Any],
+    hwnd: int,
+    pid: int,
+    *,
+    runtime_lock: dict[str, Any] | None,
+) -> dict[str, Any]:
+    windows_version = sys.getwindowsversion()
+    browser = str(cdp_version.get("Browser") or "")
+    evidence = {
         "platform": platform.platform(),
         "windowsBuild": windows_version.build,
         "windowsVersion": f"{windows_version.major}.{windows_version.minor}.{windows_version.build}",
-        "sessionName": os.environ.get("SESSIONNAME"),
+        "session": windows_session_evidence(),
         "launcherPid": pid,
         "nativeWindowHandle": hwnd,
-        "browser": cdp_version.get("Browser"),
+        "distributionMode": "fixed" if runtime_lock is not None else "evergreen",
+        "browser": browser,
         "userAgent": cdp_version.get("User-Agent"),
         "protocolVersion": cdp_version.get("Protocol-Version"),
         "webSocketDebuggerUrlPresent": bool(cdp_version.get("webSocketDebuggerUrl")),
     }
+    if runtime_lock is not None:
+        expected_version = str(runtime_lock["version"])
+        executable = runtimeExecutable(runtime_lock)
+        evidence["fixedVersion"] = {
+            "expectedVersion": expected_version,
+            "browserVersionMatches": browser == f"Edg/{expected_version}",
+            "browserExecutableFolder": display_path(runtimeInstallRoot(runtime_lock)),
+            "browserExecutable": display_path(executable),
+            "executableSha256": hashlib.sha256(executable.read_bytes()).hexdigest(),
+            "lockSha256": runtimeLockSha256(),
+        }
+    return evidence
+
+
+def assert_runtime_profile(
+    runtime: dict[str, Any],
+    runtime_lock: dict[str, Any] | None,
+) -> None:
+    if runtime_lock is None:
+        if runtime.get("distributionMode") != "evergreen":
+            raise VerificationError("Evergreen WebView2 runtime profile was not preserved")
+        return
+    fixed = runtime.get("fixedVersion")
+    if not isinstance(fixed, dict) or fixed.get("browserVersionMatches") is not True:
+        raise VerificationError(
+            "native launcher did not use the locked WebView2 Fixed Version runtime: "
+            f"runtime={runtime}"
+        )
+
+
+def runtime_install_evidence(runtime_lock: dict[str, Any] | None) -> dict[str, Any]:
+    if runtime_lock is None:
+        return {"distributionMode": "evergreen"}
+    try:
+        return verifyInstalledRuntime(runtime_lock)
+    except RuntimeLockError as exc:
+        return {
+            "distributionMode": "fixed",
+            "status": "failed",
+            "failure": str(exc),
+        }
 
 
 def packaged_wheel_evidence() -> dict[str, Any] | None:
