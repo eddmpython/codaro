@@ -2,7 +2,7 @@
 
 상태: 진행
 
-[PRD improvement loop](00-product-contract/01-prd-improvement-loop/)는 제품 PRD와 구현 근거를 분리해 관리한다. 평가는 목표 점수나 역사 점수 대신 현재 경로·심볼·gate와 실행 보고서를 직접 대조한다. 현재 top-level TODO는 2개다.
+제품 계약과 학습 근거는 영구 `contracts/`, `docs/skills/`, 상시 gate가 소유한다. 현재 top-level TODO는 호환 release 뒤 제거할 repository simplification 1개다.
 
 ## 목표
 
@@ -44,27 +44,17 @@ Codaro를 다운로드 중심 랜딩과 별도 로컬 앱의 조합으로 보지
 
 ## 작업 지도
 
-`의존`은 아래 00 milestone의 증거 경계를 뜻한다. strong assessment 468레슨, public route 472개, 대표 visual과 legacy 제거는 현재 source와 상시 gate가 소유한다.
-
-따라서 B0~B3는 지금부터 **승인과 공개 승격 gate**로 적용한다. 선행 구현은 모두 provisional machine coverage이며, B3 전에는 W1+ 사람 승인, 경로 공개 승격, 독립 품질 주장에 사용할 수 없다. 구현 workstream은 범위의 제품 동작과 부정 경로를 상시 machine gate가 소유하고 남은 사람·배포 조건을 활성 owner로 이관한 경우에만 삭제한다. 결함 수정과 machine 검증은 계속하되 새 일괄 변환으로 사람 검수 부채를 늘리지 않는다.
-
-| 00 milestone | 원래 unlock evidence | 현재 적용 |
-| --- | --- | --- |
-| B0 bootstrap | evaluation contract, product contract, fact-audit gate의 red-to-green evidence | 영구 평가 계약은 `contracts/`가 소유한다. 나머지 product contract remediation은 별도 evidence 필요 |
-| B1 feasibility | downgrade-safe evidence migration과 browser·Windows check sandbox 실측 판정 | 구현된 check 범위는 provisional이며 미검증 tier를 strong completion으로 승격 불가 |
-| B2 W0 evidence | 세 레슨 Landing -> Web -> Local 여정과 자동 검사 | browser·native machine gate로 회귀를 고정하고 사람 연구는 경로 승격과 분리 |
-| B3 release review | current source fact audit, 제품 browser, Evergreen·Fixed WebView2와 부정 경로 | 직접 검토와 상시 machine gate로 출시 구현 경계를 판정 |
+strong assessment 468레슨, public route 472개, evidence migration, Web·Local strong check, Astryx 제품 여정은 현재 source와 영구 계약 및 상시 gate가 소유한다. 사람 대상 학습 효과와 수동 접근성 근거는 구현 TODO가 아니라 경로별 공개 승격 gate가 관리한다.
 
 | 순서 | 작업 폴더 | 의존 | 종료 조건 |
 | --- | --- | --- | --- |
-| 00 | [product-contract](00-product-contract/) | 없음 | B0~B3 packet의 구현·검증·사람 증거가 모두 충족됨 |
 | 09 | [repository-simplification](09-repository-simplification/) | 영구 learning-content와 공용 visual 계약 | prediction, classroom, dead source, unused asset, 거짓 gate가 제거됨 |
 
 ## Artifact ownership
 
 | 산출물 | 생성 owner | downstream 역할 |
 | --- | --- | --- |
-| `LessonRef`, `LearningEvent`, evidence store, mastery policy, route state | 00 | 02와 Web·Local surface adapter가 소비 |
+| `LessonRef`, `LearningEvent`, evidence store, mastery policy, route state | `contracts/`, `editor/src/lib/`, `src/codaro/curriculum/` | Web·Local surface adapter가 소비 |
 | `CheckSpec`, browser/local executor, sandbox, retrieval/scaffold | `editor/src/lib/learningCheckSpec.ts`, `src/codaro/curriculum/localStrongCheck.py`, `docs/skills/architecture/learning-experience.md` | `learning-method`·`web-learning`·`local-studio-browser`가 상태 표시와 회귀를 검증 |
 | learning archive schema, Web progress adapter, public lesson route | `contracts/learningArchive.schema.json`, `editor/src/lib/webLearningEvidence.ts`, `landing/src/routes/resolvePublicRoute.jsx` | `local-studio-browser`가 Local archive 소비와 왕복을 검증 |
 | canonical lesson identity, content owner, path ledger, featured M0 capstone | `contracts/learning-content/` | `learning-content`, `curriculum-quality-matrix`, path promotion과 product release aggregate가 소비 |
@@ -95,8 +85,8 @@ path 상태 어휘는 다음처럼 고정한다. `기존`, `수정`, `소비`는
 - 랜딩: `App`, `HomePage`, `LearnPage`, `generateCurriculum`, `renderShell`, `writeRoute`
 - 제품 셸: `App`, `MainSurface`, `ProductSidebar`, `CurrentLearningSurface`
 - 학습 렌더러: `CurriculumView`, `LearningOverviewHeader`, `CurriculumSectionCard`, `StructuredSectionLearningBody`, `CurriculumMarkdownBody`
-- 실행과 진행: `runNotebookBlock`, `runBrowserNotebook`, 신규 `recordLearningEvent`; 기존 `recordLessonMissionComplete`, `ProgressTracker.completeMission`, `updateCurriculumProgress` writer 제거
-- 신규 공용 계약: `RuntimeTier`, `SurfaceCapability`, `LearningEvent`, `LearningEvidenceStore`, `resolveSurfaceCapability`, `resolveLearningCompletion`
+- 실행과 진행: `runNotebookBlock`, `runBrowserNotebook`, `recordLearningEvent`; 제거 대상이었던 legacy writer의 재유입 금지
+- 공용 계약: `RuntimeTier`, `SurfaceCapability`, `LearningEvent`, `LearningEvidenceStore`, `resolveSurfaceCapability`, `resolveLearningCompletion`
 
 ## 테스트
 

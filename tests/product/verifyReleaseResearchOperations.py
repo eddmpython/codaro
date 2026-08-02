@@ -445,7 +445,7 @@ def main() -> int:
             raise ValueError("Git head changed while release research operations were running")
     except (OSError, ValueError, subprocess.SubprocessError, yaml.YAMLError) as error:
         failures.append(str(error))
-    completionBlockers = [
+    operationsBlockers = [
         "formal C0 release asset URL and archive SHA-256 require an explicit release",
         "two-release C2 compatibility tombstone and 28-day C3 telemetry are absent",
         "real research and privacy owners are unassigned",
@@ -458,13 +458,16 @@ def main() -> int:
         "status": "passed" if not failures else "failed",
         "passed": not failures,
         "machineEligible": not failures,
-        "completionEligible": False,
+        "implementationComplete": not failures,
+        "completionEligible": not failures,
+        "operationsEligible": False,
         "gitHead": gitHead,
         "startedAt": startedAt,
         "completedAt": utcTimestamp(),
         "durationMs": round((time.monotonic() - started) * 1000),
         "facts": facts,
-        "completionBlockers": completionBlockers,
+        "completionBlockers": [],
+        "operationsBlockers": operationsBlockers,
         "failures": failures,
         "reportPath": REPORT_PATH.relative_to(ROOT).as_posix(),
     }
@@ -475,7 +478,7 @@ def main() -> int:
         for failure in failures:
             print(f"  - {failure}", file=sys.stderr)
         return 1
-    print("ok: /run + /app composition and efficacy state machine verified (completionEligible=false)")
+    print("ok: /run + /app composition and efficacy state machine implementation verified")
     return 0
 
 

@@ -218,6 +218,13 @@ def main() -> int:
                             deployed_archive=deployed_archive,
                         )
                     )
+                cases.append(
+                    verify_installed_local_learning_strong_credit(
+                        page,
+                        hwnd=hwnd,
+                        app_port=app_port,
+                    )
+                )
                 if console_errors:
                     failures.extend(f"WebView2 console: {message}" for message in console_errors)
                 if resource_failures:
@@ -433,6 +440,167 @@ def verify_installed_schedule_cold_concurrency(app_port: int) -> dict[str, Any]:
             "results": results,
         },
         "checks": checks,
+        "passed": not failures,
+        "failures": failures,
+    }
+
+
+def verify_installed_local_learning_strong_credit(
+    page: Page,
+    *,
+    hwnd: int,
+    app_port: int,
+) -> dict[str, Any]:
+    case_id = "local-installed-learning-strong-credit"
+    url = (
+        f"http://127.0.0.1:{app_port}/?surface=curriculum"
+        "&category=30days&lesson=day01&runtime=local#curriculum"
+    )
+    response = page.goto(url, wait_until="domcontentloaded", timeout=45_000)
+    if response is not None and response.status >= 400:
+        raise VerificationError(f"{case_id} returned HTTP {response.status}")
+    page.wait_for_selector("[data-learning-section-part='exercise']", state="visible", timeout=45_000)
+    dpr = float(page.evaluate("window.devicePixelRatio"))
+    resize_native_client(hwnd, 900, 760, dpr)
+    page.wait_for_timeout(500)
+    before_evidence = page.evaluate(
+        """
+        async () => {
+          const response = await fetch('/api/curriculum/evidence/archive');
+          if (!response.ok) throw new Error(`evidence archive failed: ${response.status}`);
+          return await response.json();
+        }
+        """
+    )
+    before_events = before_evidence.get("events") if isinstance(before_evidence, dict) else None
+    before_event_ids = {
+        str(event.get("eventId"))
+        for event in before_events or []
+        if isinstance(event, dict) and event.get("eventId")
+    }
+
+    exercise = page.locator("[data-learning-section-part='exercise']").first
+    editor = exercise.locator(".cm-content").first
+    run_button = exercise.locator("button[aria-label='셀 실행']").first
+    local_check_responses: list[Any] = []
+    local_check_request_failures: list[str] = []
+    page.on(
+        "response",
+        lambda candidate: local_check_responses.append(candidate)
+        if "/api/curriculum/check/strong/local" in candidate.url
+        else None,
+    )
+    page.on(
+        "requestfailed",
+        lambda candidate: local_check_request_failures.append(str(candidate.failure))
+        if "/api/curriculum/check/strong/local" in candidate.url
+        else None,
+    )
+    before_execution_count = int(
+        exercise.get_attribute("data-learning-execution-count") or "0"
+    )
+    editor.fill("name = 'Codaro'\nprint('Hello', name)", timeout=20_000)
+    run_button.click(timeout=20_000)
+    page.wait_for_function(
+        """
+        (before) => Number(
+          document.querySelector("[data-learning-section-part='exercise']")
+            ?.getAttribute('data-learning-execution-count') || '0'
+        ) > before
+        """,
+        arg=before_execution_count,
+        timeout=120_000,
+    )
+    check_result = exercise.locator("[data-learning-check-result]")
+    check_result.wait_for(state="visible", timeout=120_000)
+    page.wait_for_function(
+        """
+        () => ['verified', 'error', 'mismatch', 'unsupported'].includes(
+          document.querySelector("[data-learning-section-part='exercise'] [data-learning-check-result]")
+            ?.getAttribute('data-learning-check-result') || ''
+        )
+        """,
+        timeout=120_000,
+    )
+    check_state = check_result.get_attribute("data-learning-check-result")
+    check_detail = check_result.inner_text()[:1_000]
+    if check_state != "verified":
+        raise VerificationError(
+            f"{case_id} did not verify: state={check_state}, detail={check_detail!r}, "
+            f"requestFailures={local_check_request_failures}"
+        )
+    if not local_check_responses:
+        raise VerificationError(
+            f"{case_id} emitted no Local strong-check response; "
+            f"state={check_state}, detail={check_detail!r}, "
+            f"requestFailures={local_check_request_failures}"
+        )
+    check_response = local_check_responses[-1].json()
+    if not isinstance(check_response, dict):
+        raise VerificationError(f"{case_id} returned a non-object Local strong-check response")
+    verified = check_result
+    stored = exercise.locator("[data-learning-evidence-state='stored']")
+    stored.wait_for(state="visible", timeout=20_000)
+
+    evidence = page.evaluate(
+        """
+        async () => {
+          const response = await fetch('/api/curriculum/evidence/archive');
+          if (!response.ok) throw new Error(`evidence archive failed: ${response.status}`);
+          return await response.json();
+        }
+        """
+    )
+    events = evidence.get("events") if isinstance(evidence, dict) else None
+    added_events = [
+        event
+        for event in events or []
+        if isinstance(event, dict) and str(event.get("eventId")) not in before_event_ids
+    ]
+    event = added_events[0] if len(added_events) == 1 else None
+    snapshot = {
+        "checkResponseIsolation": check_response.get("isolation"),
+        "checkResponseWindowsBuild": check_response.get("windowsBuild"),
+        "evidence": verified.get_attribute("data-learning-check-evidence"),
+        "evidenceState": stored.get_attribute("data-learning-evidence-state"),
+        "eventCountBefore": len(before_event_ids),
+        "eventCount": len(events) if isinstance(events, list) else -1,
+        "eventDeltaCount": len(added_events),
+        "eventId": event.get("eventId") if isinstance(event, dict) else None,
+        "manifestRuntimeTier": evidence.get("manifest", {}).get("runtimeTier")
+        if isinstance(evidence, dict)
+        else None,
+        "runtimeTier": event.get("runtimeTier") if isinstance(event, dict) else None,
+    }
+    checks = {
+        "nativeAppContainerResponse": (
+            check_response.get("passed") is True
+            and check_response.get("isolation") == "windows-appcontainer"
+            and int(check_response.get("windowsBuild") or 0) >= 19045
+        ),
+        "strongEvidencePresented": snapshot["evidence"] == "strong",
+        "strongEvidenceStored": snapshot["evidenceState"] == "stored",
+        "singleNativeEventAdded": (
+            snapshot["eventCount"] == snapshot["eventCountBefore"] + 1
+            and snapshot["eventDeltaCount"] == 1
+            and str(snapshot["eventId"] or "").startswith("local-strong:")
+            and snapshot["runtimeTier"] == "local"
+            and snapshot["manifestRuntimeTier"] == (
+                "mixed" if snapshot["eventCountBefore"] else "local"
+            )
+        ),
+    }
+    failures = [f"{name} check failed" for name, passed in checks.items() if not passed]
+    screenshot_path = SCREENSHOT_ROOT / f"{case_id}.png"
+    screenshot_path.parent.mkdir(parents=True, exist_ok=True)
+    page.screenshot(path=str(screenshot_path), full_page=False)
+    return {
+        "id": case_id,
+        "surface": "local-learning",
+        "viewport": {"width": 900, "height": 760},
+        "snapshot": snapshot,
+        "checks": checks,
+        "screenshot": display_path(screenshot_path),
         "passed": not failures,
         "failures": failures,
     }

@@ -53,7 +53,7 @@ provider는 deterministic feedback 뒤 사용자가 요청할 때만 열고, 연
 
 `noError`와 `contains`는 weak evidence다. 설명용 feedback에는 쓸 수 있지만 completion, mastery, transfer, retrieval credit을 단독으로 만들지 않는다. structured strong kind는 `output`, `variable`, `file`, `table`, `image`, `behavior`다.
 
-현재 browser release subset은 `output`과 `variable`이다. browser strong check는 main 학습 kernel과 분리된 새 pyproc Worker에서 실행한다. `behavior`와 OS capability가 필요한 검사는 `localRequired`다. Local strong completion은 지원 OS의 launcher broker와 `contracts/checkSandboxFeasibilityDecision.json` 판정을 따라야 하며 일반 subprocess로 강등하지 않는다.
+현재 browser release subset은 `output`과 `variable`이다. browser strong check는 main 학습 kernel과 분리된 새 pyproc Worker에서 실행한다. `behavior`와 OS capability가 필요한 검사는 `localRequired`다. Local strong completion은 지원 OS의 launcher broker와 `contracts/checkSandboxFeasibilityDecision.json` 판정을 따라야 한다. 응답의 AppContainer isolation과 지원 Windows build가 확인되지 않은 일반 subprocess 결과는 practice로 유지한다.
 
 artifact evidence는 상대 경로, media type, size, SHA-256 content hash와 type별 의미 필드를 저장한다. table은 format, columns, row count를, image는 실제 header의 media type, width, height를 포함한다. 실제 사용자 파일, 외부 사이트와 nondeterministic retry를 강검증 fixture에 사용하지 않는다.
 
@@ -94,4 +94,4 @@ Web과 Local은 같은 `LessonRef`, document, draft, virtual file system, packag
 - `uv run python -X utf8 tests/run.py gate learning-evidence-contract`
 - `uv run python -X utf8 tests/run.py gate removed-learning-concepts`
 
-레슨별 저작 품질, 472개 전수 source evidence, 31개 path ledger와 독립 assessment 승인은 `contracts/learning-content/`가 영구 회귀 계약으로 소유한다. Windows Local sandbox 졸업 판정은 `contracts/checkSandboxFeasibilityDecision.json`과 learning quality revalidation이 소유하고, 사용자 학습성 근거는 `docs/skills/ops/product/learning-efficacy-operations.md`와 `docs/evidence/path-efficacy/`가 경로별 공개 승격 조건으로 소유한다. 이 조건은 학습 방법 구현의 중복 TODO가 아니라 M0 콘텐츠 계약과 공개 효능 승격의 경계다.
+레슨별 저작 품질, 472개 전수 source evidence, 31개 path ledger와 독립 assessment 승인은 `contracts/learning-content/`가 영구 회귀 계약으로 소유한다. Windows Local sandbox 졸업 판정은 `contracts/checkSandboxFeasibilityDecision.json`, `launcher-test`, `product-browser-webview2-fixed`가 소유하고, 사용자 학습성 근거는 `docs/skills/ops/product/learning-efficacy-operations.md`와 `docs/evidence/path-efficacy/`가 경로별 공개 승격 조건으로 소유한다. 이 조건은 학습 방법 구현의 중복 TODO가 아니라 M0 콘텐츠 계약과 공개 효능 승격의 경계다.

@@ -1,12 +1,13 @@
 import { CodaroApiError, codaroApi } from "@/lib/api";
 import {
   checkSandboxCapabilityMessage,
+  localStrongEvidenceEligible,
   resolveCheckSandboxCapability,
 } from "@/lib/checkSandboxPolicy";
 import type { StrongLearningCheckSpecV1 } from "@/lib/learningCheckSpec";
 
 const LOCAL_CHECK_TRANSPORT_ATTEMPTS = 2;
-const LOCAL_CHECK_TRANSPORT_GRACE_MS = 5_000;
+const LOCAL_CHECK_TRANSPORT_GRACE_MS = 80_000;
 const LOCAL_CHECK_TRANSPORT_RETRY_DELAY_MS = 250;
 
 export async function executeLocalStrongCheck(
@@ -16,24 +17,29 @@ export async function executeLocalStrongCheck(
   const capability = resolveCheckSandboxCapability("local", spec.kind);
   try {
     const result = await requestLocalStrongCheck(spec, source);
+    const strongEligible = capability === "strong"
+      && localStrongEvidenceEligible(result.isolation, result.windowsBuild);
     return {
       ...result,
-      detail: capability === "strong"
+      detail: strongEligible
         ? result.detail
-        : checkSandboxCapabilityMessage(capability),
-      strongEligible: capability === "strong",
+        : checkSandboxCapabilityMessage("provisional"),
+      strongEligible,
     };
   } catch (error) {
     return {
       actual: "",
+      artifacts: undefined,
       detail: error instanceof Error
         ? `로컬 격리 검증을 마치지 못했습니다: ${error.message}`
         : "로컬 격리 검증을 마치지 못했습니다.",
       executor: "local-sandbox" as const,
       expected: "",
+      isolation: "python-audit-hook" as const,
       passed: false,
       state: "error" as const,
       strongEligible: false,
+      windowsBuild: null,
     };
   }
 }

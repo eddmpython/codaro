@@ -10,13 +10,19 @@
     ]
   },
   "localWindows": {
-    "decision": "unsupported",
-    "provisionalExecutorMayGrantStrongCredit": false
+    "decision": "supported",
+    "minimumBuild": 19045,
+    "nativeExecutorMayGrantStrongCredit": true,
+    "requiredIsolation": "windows-appcontainer",
+    "requiredNativeGates": [
+      "launcher-test",
+      "product-browser-webview2-fixed"
+    ]
   },
   "offline": {
     "cold": "unsupported",
     "warm": "unsupported"
   },
   "enforcementState": "enforced",
-  "policyVersion": 1
+  "policyVersion": 2
 }

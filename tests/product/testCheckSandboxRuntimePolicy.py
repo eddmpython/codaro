@@ -18,9 +18,10 @@ LEARNING_ATTEMPT = EDITOR / "src/lib/learningAttemptCheck.ts"
 def test_generated_sandbox_decision_matches_source() -> None:
     assert GENERATED.read_bytes() == CONTRACT.read_bytes()
     assert json.loads(CONTRACT.read_text(encoding="utf-8"))["enforcementState"] == "enforced"
+    assert "LOCAL_CHECK_TRANSPORT_GRACE_MS = 80_000" in LOCAL_EXECUTOR.read_text(encoding="utf-8")
 
 
-def test_runtime_policy_blocks_unsupported_credit_paths_before_evidence() -> None:
+def test_runtime_policy_requires_native_isolation_before_local_strong_evidence() -> None:
     script = f"""
 (async () => {{
   const assert = require("node:assert/strict");
@@ -56,7 +57,7 @@ def test_runtime_policy_blocks_unsupported_credit_paths_before_evidence() -> Non
   assert.equal(policy.resolveCheckSandboxCapability("web", "output"), "strong");
   assert.equal(policy.resolveCheckSandboxCapability("web", "variable"), "strong");
   assert.equal(policy.resolveCheckSandboxCapability("web", "behavior"), "localRequired");
-  assert.equal(policy.resolveCheckSandboxCapability("local", "output"), "provisional");
+  assert.equal(policy.resolveCheckSandboxCapability("local", "output"), "strong");
 
   const behaviorSpec = {{
     executor: "browser-worker",
@@ -99,6 +100,8 @@ def test_runtime_policy_blocks_unsupported_credit_paths_before_evidence() -> Non
   assert.equal(browserBootCalls, 0);
 
   let localCalls = 0;
+  let localIsolation = "python-audit-hook";
+  let localWindowsBuild = null;
   const localExecutor = load({json.dumps(str(LOCAL_EXECUTOR))}, (specifier) => {{
     if (specifier === "@/lib/api") return {{
       CodaroApiError: class CodaroApiError extends Error {{}},
@@ -110,8 +113,10 @@ def test_runtime_policy_blocks_unsupported_credit_paths_before_evidence() -> Non
             detail: "provisional pass",
             executor: "local-sandbox",
             expected: "ok",
+            isolation: localIsolation,
             passed: true,
             state: "verified",
+            windowsBuild: localWindowsBuild,
           }};
         }},
       }},
@@ -126,6 +131,26 @@ def test_runtime_policy_blocks_unsupported_credit_paths_before_evidence() -> Non
   assert.match(provisional.detail, /강한 학습 증거/);
   assert.equal(localCalls, 1);
 
+  localIsolation = "windows-appcontainer";
+  localWindowsBuild = 19045;
+  const native = await localExecutor.executeLocalStrongCheck({{ ...behaviorSpec, kind: "output" }}, "print('ok')");
+  assert.equal(native.passed, true);
+  assert.equal(native.strongEligible, true);
+  assert.equal(native.detail, "provisional pass");
+  assert.equal(localCalls, 2);
+
+  localWindowsBuild = 19044;
+  const unsupportedBuild = await localExecutor.executeLocalStrongCheck(
+    {{ ...behaviorSpec, kind: "output" }},
+    "print('ok')",
+  );
+  assert.equal(unsupportedBuild.passed, true);
+  assert.equal(unsupportedBuild.strongEligible, false);
+  assert.match(unsupportedBuild.detail, /강한 학습 증거/);
+  assert.equal(localCalls, 3);
+  localWindowsBuild = 19045;
+
+  let localAttemptResult = provisional;
   const attempt = load({json.dumps(str(LEARNING_ATTEMPT))}, (specifier) => {{
     if (specifier === "@/lib/browserLearningCheckExecutor") return {{
       executeBrowserStrongCheck: async () => {{ throw new Error("unexpected browser executor"); }},
@@ -133,7 +158,7 @@ def test_runtime_policy_blocks_unsupported_credit_paths_before_evidence() -> Non
     if (specifier === "@/lib/displayFormat") return {{ stringifyData: String }};
     if (specifier === "@/lib/learningCheckSpec") return {{ parseStrongLearningCheckSpec: () => behaviorSpec }};
     if (specifier === "@/lib/localLearningCheckExecutor") return {{
-      executeLocalStrongCheck: async () => provisional,
+      executeLocalStrongCheck: async () => localAttemptResult,
     }};
     if (specifier === "@/types" || specifier === "@/lib/webLearningEvidence") return {{}};
     return require(specifier);
@@ -147,6 +172,17 @@ def test_runtime_policy_blocks_unsupported_credit_paths_before_evidence() -> Non
   assert.equal(checked.passed, true);
   assert.equal(checked.evidence, "practice");
   assert.match(checked.feedback, /강한 학습 증거/);
+
+  localAttemptResult = native;
+  const nativeChecked = await attempt.evaluateLearningAttempt(
+    {{}},
+    {{ data: "", status: "ok", stdout: "", type: "text" }},
+    "print('ok')",
+    "local",
+  );
+  assert.equal(nativeChecked.passed, true);
+  assert.equal(nativeChecked.evidence, "strong");
+  assert.equal(nativeChecked.feedback, "목표대로 동작했습니다.");
 }})().catch((error) => {{
   console.error(error);
   process.exit(1);

@@ -15,8 +15,15 @@ def testCapabilityDecisionFallsBackWithoutOpaqueFrameSupport() -> None:
         "strongKinds": ["output", "variable"],
     }
     assert decision["localWindows"]["decision"] == "unsupported"
-    assert decision["localWindows"]["provisionalExecutorMayGrantStrongCredit"] is False
+    assert decision["localWindows"]["minimumBuild"] == 19045
+    assert decision["localWindows"]["nativeExecutorMayGrantStrongCredit"] is False
+    assert decision["localWindows"]["requiredIsolation"] == "windows-appcontainer"
+    assert decision["localWindows"]["requiredNativeGates"] == [
+        "launcher-test",
+        "product-browser-webview2-fixed",
+    ]
     assert decision["enforcementState"] == "enforced"
+    assert decision["policyVersion"] == 2
 
 
 def testCapabilityDecisionDoesNotHideSupportedCandidate() -> None:
@@ -29,6 +36,7 @@ def testCapabilityDecisionDoesNotHideSupportedCandidate() -> None:
     assert decision["browser"]["localRequiredKinds"] == []
     assert decision["browser"]["strongKinds"] == ["behavior", "output", "variable"]
     assert decision["localWindows"]["decision"] == "supported"
+    assert decision["localWindows"]["nativeExecutorMayGrantStrongCredit"] is True
 
 
 def testPercentileUsesObservedUpperSample() -> None:

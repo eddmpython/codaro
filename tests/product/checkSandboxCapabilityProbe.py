@@ -5,6 +5,7 @@ import ctypes
 import hashlib
 import json
 import platform
+import re
 from pathlib import Path
 import statistics
 import time
@@ -15,6 +16,8 @@ from playwright.sync_api import sync_playwright
 
 BROWSER_ENGINES = ("chromium", "firefox", "webkit")
 PROBE_ITERATIONS = 5
+SUPPORTED_WINDOWS_MIN_BUILD = 19045
+REQUIRED_NATIVE_GATES = ("launcher-test", "product-browser-webview2-fixed")
 FRAME_BOOTSTRAP = r'''(async () => {
   const result = {
     counter: (globalThis.__codaroProbeCounter = (globalThis.__codaroProbeCounter || 0) + 1),
@@ -188,29 +191,53 @@ def windowsCapabilityProbe(root: Path) -> dict[str, Any]:
             "CreateRestrictedToken": hasattr(ctypes.windll.advapi32, "CreateRestrictedToken"),
         }
     version = platform.version()
-    targetWin10_22h2 = platform.system() == "Windows" and version.startswith("10.0.19045")
+    versionParts = [int(value) for value in re.findall(r"\d+", version)[:3]]
+    while len(versionParts) < 3:
+        versionParts.append(0)
+    supportedWindowsHost = (
+        platform.system() == "Windows"
+        and versionParts[0] == 10
+        and versionParts[2] >= SUPPORTED_WINDOWS_MIN_BUILD
+    )
     implementationPresent = all(path.is_file() for path in implementationFiles.values())
+    runnerSource = (root / "tests/run.py").read_text(encoding="utf-8")
+    workflowSource = (root / ".github/workflows/release-quality.yml").read_text(encoding="utf-8")
+    nativeGateWiringPresent = (
+        all(f'"{gate}"' in runnerSource for gate in REQUIRED_NATIVE_GATES)
+        and "runs-on: windows-2025" in workflowSource
+        and "tests/run.py product-release" in workflowSource
+    )
     blockers = []
-    if not targetWin10_22h2:
-        blockers.append("win10-22h2-target-not-present")
+    if not supportedWindowsHost:
+        blockers.append("supported-windows-host-not-present")
     if not implementationPresent:
         blockers.append("appcontainer-job-broker-implementation-absent")
+    if not nativeGateWiringPresent:
+        blockers.append("required-native-release-gates-not-wired")
     return {
         "apiAvailability": apiAvailability,
         "blockers": blockers,
-        "candidateEligible": targetWin10_22h2 and implementationPresent and all(apiAvailability.values()),
+        "candidateEligible": (
+            supportedWindowsHost
+            and implementationPresent
+            and nativeGateWiringPresent
+            and all(apiAvailability.values())
+        ),
         "implementationFiles": {
             key: path.relative_to(root).as_posix()
             for key, path in implementationFiles.items()
         },
         "implementationPresent": implementationPresent,
+        "nativeGateWiringPresent": nativeGateWiringPresent,
         "os": {
             "platform": platform.system(),
             "release": platform.release(),
             "version": version,
         },
-        "target": "Windows 10 22H2 build 19045",
-        "targetPresent": targetWin10_22h2,
+        "requiredNativeGates": list(REQUIRED_NATIVE_GATES),
+        "supportPolicyEligible": implementationPresent and nativeGateWiringPresent,
+        "target": "Windows NT 10.0 build 19045 or newer",
+        "targetPresent": supportedWindowsHost,
     }
 
 
@@ -223,6 +250,10 @@ def capabilityDecision(browser: dict[str, Any], windows: dict[str, Any]) -> dict
         browserDecision = "candidate-b-supported-subset"
         browserStrongKinds = ["output", "variable"]
         browserLocalRequiredKinds = ["behavior"]
+    windowsSupported = windows.get(
+        "supportPolicyEligible",
+        windows.get("candidateEligible"),
+    ) is True
     return {
         "browser": {
             "decision": browserDecision,
@@ -230,13 +261,16 @@ def capabilityDecision(browser: dict[str, Any], windows: dict[str, Any]) -> dict
             "strongKinds": browserStrongKinds,
         },
         "localWindows": {
-            "decision": "supported" if windows.get("candidateEligible") is True else "unsupported",
-            "provisionalExecutorMayGrantStrongCredit": windows.get("candidateEligible") is True,
+            "decision": "supported" if windowsSupported else "unsupported",
+            "minimumBuild": SUPPORTED_WINDOWS_MIN_BUILD,
+            "nativeExecutorMayGrantStrongCredit": windowsSupported,
+            "requiredIsolation": "windows-appcontainer",
+            "requiredNativeGates": list(REQUIRED_NATIVE_GATES),
         },
         "offline": {
             "cold": "unsupported",
             "warm": "unsupported",
         },
         "enforcementState": "enforced",
-        "policyVersion": 1,
+        "policyVersion": 2,
     }

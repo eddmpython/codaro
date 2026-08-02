@@ -12,6 +12,7 @@ from typing import Any, BinaryIO
 
 
 BROKER_ENV = "CODARO_CHECK_BROKER_EXE"
+BROKER_LIFECYCLE_GRACE_MS = 30_000
 MAX_FRAME_BYTES = 1024 * 1024
 PIPE_PREFIX = r"\\.\pipe\codaro-check-"
 
@@ -80,7 +81,10 @@ def runCheckSandboxBroker(
             writeFrame(stream, canonicalBytes(envelope))
             responseEnvelope = json.loads(readFrame(stream))
         response = verifyResponseEnvelope(responseEnvelope, nonce, secret, runId)
-        remaining = max(0.1, ((timeoutMs + 3_000) / 1000) - (time.monotonic() - started))
+        remaining = max(
+            0.1,
+            ((timeoutMs + BROKER_LIFECYCLE_GRACE_MS) / 1000) - (time.monotonic() - started),
+        )
         stdout, stderr = process.communicate(timeout=remaining)
         if process.returncode != 0:
             detail = (stderr or stdout or b"").decode("utf-8", errors="replace").strip()

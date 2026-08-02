@@ -339,7 +339,7 @@ def main() -> int:
         not failures
         and matrix.get("engineCount") == len(BROWSER_ENGINES)
         and isinstance(windows.get("candidateEligible"), bool)
-        and facts.get("decision", {}).get("policyVersion") == 1
+        and facts.get("decision", {}).get("policyVersion") == 2
     )
     payload = {
         "schemaVersion": 1,
@@ -363,7 +363,7 @@ def main() -> int:
         for failure in failures:
             print(f"  - {failure}", file=sys.stderr)
         return 1
-    print("ok: check sandbox feasibility measured and unsupported tiers were preserved")
+    print("ok: check sandbox feasibility measured and native strong-credit policy was preserved")
     return 0
 
 

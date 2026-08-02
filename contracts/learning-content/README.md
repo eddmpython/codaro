@@ -11,7 +11,7 @@
 - `featured-capstones.yml`: 대표 6경로의 route-backed capstone과 산출물 계약
 - `owner-registry.yml`: 완료된 작업 패킷에서 승계한 안정적인 콘텐츠 owner id와 승인 row 수
 
-`learnerEvidenceClaim: none`과 `pending-independent-evidence`는 M0 계약이 실제 사용자 효능이나 Local 졸업을 주장하지 않는다는 뜻이다. E0-E3 사용자 연구는 `docs/skills/ops/product/learning-efficacy-operations.md`와 `docs/evidence/path-efficacy/`가, Windows Local 졸업 판정은 `contracts/checkSandboxFeasibilityDecision.json`과 `mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/09-learning-quality-revalidation/`이 소유한다.
+`learnerEvidenceClaim: none`과 `pending-independent-evidence`는 M0 계약이 실제 사용자 효능을 주장하지 않는다는 뜻이다. E0-E3 사용자 연구는 `docs/skills/ops/product/learning-efficacy-operations.md`와 `docs/evidence/path-efficacy/`가 소유한다. Windows Local strong 졸업 판정은 `contracts/checkSandboxFeasibilityDecision.json`, `launcher-test`, `product-browser-webview2-fixed`가 소유한다.
 
 ## 갱신과 검증
 

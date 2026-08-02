@@ -44,6 +44,7 @@ def testBrokerSchemaIsClosedAndBounded() -> None:
     assert definitions["Environment"]["maxProperties"] == 32
     assert definitions["Hex256"]["pattern"] == "^[0-9a-f]{64}$"
     assert definitions["Nonce"]["pattern"] == "^[0-9a-f]{32}$"
+    assert brokerClient.BROKER_LIFECYCLE_GRACE_MS == 30_000
 
 
 def testSignedEnvelopeUsesCanonicalUnicodePayload() -> None:

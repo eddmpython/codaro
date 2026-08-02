@@ -171,6 +171,7 @@ def runLocalStrongCheckAttempt(
                 "isolation": "windows-appcontainer" if usedAppContainer else "python-audit-hook",
                 "passed": True,
                 "state": "verified",
+                "windowsBuild": sys.getwindowsversion().build if usedAppContainer and os.name == "nt" else None,
             },
             False,
         )

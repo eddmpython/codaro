@@ -12,7 +12,7 @@ export function resolveCheckSandboxCapability(
 ): CheckSandboxCapability {
   if (decision.enforcementState !== "enforced") return "provisional";
   if (runtimeTier === "local") {
-    return decision.localWindows.provisionalExecutorMayGrantStrongCredit
+    return decision.localWindows.nativeExecutorMayGrantStrongCredit
       ? "strong"
       : "provisional";
   }
@@ -29,4 +29,13 @@ export function checkSandboxCapabilityMessage(capability: CheckSandboxCapability
     return "동작은 확인했지만 OS 격리 검증기가 준비되지 않아 강한 학습 증거로 저장하지 않았습니다.";
   }
   return "";
+}
+
+export function localStrongEvidenceEligible(
+  isolation: string,
+  windowsBuild: number | null,
+): boolean {
+  return decision.localWindows.nativeExecutorMayGrantStrongCredit
+    && isolation === decision.localWindows.requiredIsolation
+    && Number(windowsBuild) >= decision.localWindows.minimumBuild;
 }

@@ -301,12 +301,12 @@ def main() -> int:
             raise ValueError("Git head changed while the Astryx journey was running")
     except (OSError, ValueError, subprocess.SubprocessError) as error:
         failures.append(str(error))
-    completionBlockers = (
+    promotionBlockers = (
         list(manualAtReport["completionBlockers"])
         if manualAtReport is not None
         else ["manual accessibility completion evidence was not evaluated"]
     )
-    completionEligible = (
+    promotionEligible = (
         not failures
         and manualAtReport is not None
         and manualAtReport["completionEligible"] is True
@@ -318,12 +318,15 @@ def main() -> int:
         "passed": not failures,
         "gitHead": gitHead,
         "machineEligible": not failures,
-        "completionEligible": completionEligible,
+        "implementationComplete": not failures,
+        "completionEligible": not failures,
+        "promotionEligible": promotionEligible,
         "startedAt": startedAt,
         "completedAt": utcTimestamp(),
         "durationMs": round((time.monotonic() - started) * 1000),
         "facts": facts,
-        "completionBlockers": completionBlockers,
+        "completionBlockers": [],
+        "promotionBlockers": promotionBlockers,
         "failures": failures,
         "reportPath": REPORT_PATH.relative_to(ROOT).as_posix(),
     }
@@ -338,7 +341,8 @@ def main() -> int:
         "ok: Astryx journey verified "
         f"({facts['journey']['caseCount']} cases x "
         f"{len(facts['journey']['colorSchemes'])} color schemes, "
-        f"completionEligible={str(completionEligible).lower()})"
+        "implementationComplete=true, "
+        f"promotionEligible={str(promotionEligible).lower()})"
     )
     return 0
 

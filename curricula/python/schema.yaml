@@ -122,11 +122,9 @@
 #     source: "curated-blueprint"
 #     solutionVerification: "required"
 #     independentReview: "pending"
-#   review:                       # 독립 사람이 실제 검수한 뒤에만 작성
-#     status: "approved"
-#     reviewerRole: "learning-qa"
-#     evidenceRef: "mainPlan/.../evidence/review.yml"
-#     reviewedContentHash: "64자리 sha256"
+#     reviewerId: "learning-qa"  # approved일 때 필수
+#     reviewedAt: "timezone 포함 ISO-8601 시각"
+#     evidenceCommit: "검수한 40자리 Git commit"
 #   masteryVariants:
 #     - id: "report-status-mastery"
 #       mode: "mastery"

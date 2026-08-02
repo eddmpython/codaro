@@ -14,6 +14,7 @@ from typing import Any
 import yaml
 
 from codaro.curriculum.converter import yamlToDocument
+from learningLedgerAudit import hasValidReviewMetadata
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -139,7 +140,7 @@ def main() -> int:
         "requiredScore": MINIMUM_SCORE,
         "curriculumQualityScore": None,
         "topTierEligible": eligibility["topTierEligible"],
-        "completionEligible": False,
+        "completionEligible": eligibility["topTierEligible"],
         "startedAt": startedAt,
         "completedAt": utcTimestamp(),
         "durationMs": round((time.monotonic() - started) * 1000),
@@ -383,12 +384,9 @@ def learningEvidenceProfile(content: dict[str, Any]) -> dict[str, Any]:
     authoredVariants = masteryVariants + transferVariants + retrievalVariants
     authoring = assessment.get("authoring") if isinstance(assessment.get("authoring"), dict) else {}
     independentReviewState = textValue(authoring.get("independentReview"))
-    review = assessment.get("review") if isinstance(assessment.get("review"), dict) else {}
     independentReviewApproved = (
-        review.get("status") == "approved"
-        and bool(textValue(review.get("reviewerRole")))
-        and bool(textValue(review.get("evidenceRef")))
-        and bool(re.fullmatch(r"[0-9a-f]{64}", textValue(review.get("reviewedContentHash"))))
+        independentReviewState == "approved"
+        and hasValidReviewMetadata(authoring)
     )
     sectionMasteryChecks = [
         section.get("check")

@@ -2,7 +2,7 @@
 // 같은 노트북이 로컬 백엔드(apiOnline)와 브라우저(WASM CPython)를 모두 쓴다. 백엔드가 없으면
 // notebookRuntime이 이 커널로 셀을 진짜 실행한다(과거 print 정규식 시뮬레이션 대체).
 // Web Run과 Local은 같은 학습 문서와 evidence 계약을 쓴다. 설계 근거:
-// mainPlan/astryx-product-experience/00-product-contract/README.md.
+// docs/skills/architecture/learning-experience.md와 contracts/learningEvent.schema.json.
 // pyproc은 첫 실행에서 lazy import(런타임 다운로드 지연 + 코드 스플릿). 단일 boot 경로는
 // SharedArrayBuffer/COOP-COEP가 필요 없어 정적 호스팅에서도 돈다.
 import analysisSource from "../../../src/codaro/document/analysis.py?raw";

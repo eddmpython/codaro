@@ -321,24 +321,27 @@ def main() -> int:
     assessmentCounts = facts.get("verticalSlice", {}).get("assessmentVariants", {})
     missingAssessmentModes = [key for key in ASSESSMENT_KEYS if assessmentCounts.get(key, 0) < 3]
     machineEligible = not failures and not missingAssessmentModes
-    completionBlockers = [
+    implementationBlockers = [
         f"W0 assessment mode has fewer than three authored variants: {key}"
         for key in missingAssessmentModes
     ]
-    completionBlockers.append("W0 vertical slice has no independent human learning review")
+    promotionBlockers = ["W0 vertical slice has no independent human learning review"]
     payload = {
         "schemaVersion": 1,
         "audit": "learning-vertical-slice",
         "status": "passed" if not failures else "failed",
         "passed": not failures,
         "machineEligible": machineEligible,
-        "completionEligible": False,
+        "implementationComplete": machineEligible,
+        "completionEligible": machineEligible,
+        "promotionEligible": False,
         "gitHead": gitHead,
         "startedAt": startedAt,
         "completedAt": utcTimestamp(),
         "durationMs": round((time.monotonic() - started) * 1000),
         "facts": facts,
-        "completionBlockers": completionBlockers,
+        "completionBlockers": implementationBlockers,
+        "promotionBlockers": promotionBlockers,
         "failures": failures,
         "reportPath": REPORT_PATH.relative_to(ROOT).as_posix(),
     }
@@ -352,7 +355,8 @@ def main() -> int:
     print(
         "ok: W0 vertical slice facts verified "
         f"({facts['verticalSlice']['strongSectionCount']} strong sections, "
-        f"completionEligible={str(payload['completionEligible']).lower()})"
+        f"implementationComplete={str(payload['implementationComplete']).lower()}, "
+        "promotionEligible=false)"
     )
     return 0
 

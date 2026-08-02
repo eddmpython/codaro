@@ -111,8 +111,10 @@ localStrongCheck: (checkSpec: Record<string, unknown>, source: string, signal?: 
       detail: string;
       executor: "local-sandbox";
       expected: string;
+      isolation: "python-audit-hook" | "windows-appcontainer";
       passed: boolean;
       state: "error" | "mismatch" | "verified";
+      windowsBuild: number | null;
     }>("/api/curriculum/check/strong/local", { checkSpec, source }, { signal }),
 updateProgress: (category: string, contentId: string, missionId: string, totalMissions: number) =>
     postJson<Record<string, unknown>>("/api/curriculum/progress", {

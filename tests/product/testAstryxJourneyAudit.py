@@ -191,5 +191,8 @@ def testAuditMainBuildsBeforeJourneyAndBindsGitHead(
     assert calls == ["build", "fixture", "journey", "manual"]
     assert payload["gitHead"] == "a" * 40
     assert payload["facts"]["builds"]["landing"]["passed"] is True
-    assert payload["completionEligible"] is False
-    assert payload["completionBlockers"] == ["manual evidence remains"]
+    assert payload["implementationComplete"] is True
+    assert payload["completionEligible"] is True
+    assert payload["completionBlockers"] == []
+    assert payload["promotionEligible"] is False
+    assert payload["promotionBlockers"] == ["manual evidence remains"]
