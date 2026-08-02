@@ -10,16 +10,16 @@
   "inputFrozen": true,
   "roundSealEligible": false,
   "scope": {
-    "gitCommit": "ac9d0ca7fd0b18980ed2c7bc979ed3f626eb3b92",
+    "gitCommit": "b820d43b15c6289e7f9139fc51ae5c757201b658",
     "dirtyDiffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "manifestHash": "8bcdfacaf62fe78c82d4b3d167de000abe92824beeb08ce45ccf9aca868108a2",
-    "evaluationBundleHash": "acf1bb7ae27d01cf394a6378d40826e91f30672c17a76bf91fed6f27a103f8a4"
+    "manifestHash": "98acd2f7d750d047ad7ec019b8f72074a0b04b40a30c417c155df32a9c8ca2ae",
+    "evaluationBundleHash": "c3f002430e705cf97400fa3ff8e37d790a01da8ecf628c760aa90e17c2c54432"
   },
   "facts": {
     "bundleIntegrity": {
-      "fileCount": 3361,
-      "totalSourceBytes": 114932835,
-      "archiveBytes": 115626725,
+      "fileCount": 3409,
+      "totalSourceBytes": 116433453,
+      "archiveBytes": 117127005,
       "archiveEntriesReadOnly": true,
       "excludedHistoryPathCount": 0,
       "priorScoresIncluded": false,
@@ -102,18 +102,16 @@
       "masteryAssessmentLessonCount": 468,
       "transferAssessmentLessonCount": 468,
       "retrievalAssessmentLessonCount": 468,
-      "failedDomains": [
-        "assessment-claim-and-independent-review"
-      ],
-      "topTierEligible": false,
+      "failedDomains": [],
+      "topTierEligible": true,
       "completionEligible": false
     },
     "machineEvidence": {
-      "scopeGitCommit": "ac9d0ca7fd0b18980ed2c7bc979ed3f626eb3b92",
+      "scopeGitCommit": "b820d43b15c6289e7f9139fc51ae5c757201b658",
       "scopeClean": true,
       "requiredReportCount": 9,
       "includedReportCount": 9,
-      "artifactCount": 187,
+      "artifactCount": 193,
       "allCurrent": true,
       "blockingReasons": [],
       "currentReportIds": [
