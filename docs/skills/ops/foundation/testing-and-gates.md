@@ -168,7 +168,7 @@ uv run python -X utf8 tests/run.py gate attempts
 | `curriculum-top-tier-audit` | fast | 작성·의존성·구조 커버리지와 strong evidence·전이·회상 coverage를 분리해 검사하며, 하나라도 top-tier 필수 영역을 충족하지 못하면 실패한다. |
 | `curriculum-weakness-audit` | fast | 레슨 단위 약점(plan orphan, exercise/check 누락, hint 부재 등)을 Curriculum OS taxonomy 위에서 점검한다. |
 | `curriculum-executability` | fast | 모든 레슨의 snippet/solution을 누적 namespace에서 실행해 환경 무관 코드 결함(real-bug, yaml-load-error, undeclared-package)이 0인지 검사한다. missing-package/cascade/runtime-other는 정보성. |
-| `removed-learning-concepts` | fast | 제거된 학습자 예측과 active classroom 구현이 다시 들어오지 않고 로컬 archive migration과 410 호환 안내만 남는지 검사한다. |
+| `removed-learning-concepts` | fast | 제거된 학습자 예측과 active classroom 구현이 다시 들어오지 않고 로컬 archive migration이 남는지, `contracts/classroomRetirement.json`이 선언한 호환 창 phase대로 410 안내가 존재하거나 제거됐는지 검사한다. |
 | `repository-simplification` | fast | legacy 랜딩 수기 HTML·가짜 product frame, 미사용 curriculum illustration source, 추적된 landing 생성 module, Landing/editor 조립 파일의 도메인 ownership 재유입을 검사한다. |
 | `playwright-curriculum-runtime` | fast | Playwright 학습 트랙의 structured YAML 계약과 예제/정답 코드가 실제 Chromium에서 실행되는지 확인한다. |
 | `onboarding-browser` | surface | 브라우저에서 첫 화면 fallback, Provider 연결 행동, provider 연결 후 실제 응답 상태를 확인한다. |

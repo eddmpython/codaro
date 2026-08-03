@@ -99,8 +99,9 @@ Codaro에서 기준 파일은 아래 순서로 본다. 같은 의미의 규칙�
 | classroom archive migration | `src/codaro/migrations/classroomArchive.py` | 기존 `~/.codaro/classroom` audit, export, verify, purge와 crash recovery |
 | classroom archive schemas | `contracts/classroomArchive.schema.json`, `contracts/classroomMigrationLedger.schema.json` | archive와 purge ledger 형식 |
 | classroom retirement router | `src/codaro/api/classroomRetirementRouter.py` | 한 호환 release의 HTTP `410 Gone` 안내 경계 |
+| classroom compatibility window | `contracts/classroomRetirement.json`, `src/codaro/classroomRetirement.py` | tombstone 존치·제거를 가르는 release 사실 선언과 phase 판정 |
 | classroom migration regression | `tests/migrations/testClassroomArchive.py` | count/hash, redaction, exact-hash purge, lock과 crash recovery 회귀 |
-| classroom removal regression | `tests/architecture/verifyClassroomRemoved.py`, `tests/learning/verifyRemovedLearningConcepts.py` | active backend/frontend/source와 학습 side effect 재유입 차단 |
+| classroom removal regression | `tests/architecture/verifyClassroomRemoved.py`, `tests/architecture/testClassroomRetirementWindow.py`, `tests/learning/verifyRemovedLearningConcepts.py` | active backend/frontend/source와 학습 side effect 재유입 차단, 호환 창 양쪽 phase 계약 |
 
 ## Automation System
 

@@ -6,6 +6,12 @@ from pathlib import Path
 import subprocess
 import sys
 
+from codaro.classroomRetirement import (
+    ClassroomRetirementContractInvalid,
+    evaluateRetirementState,
+    loadRetirementContract,
+)
+
 
 ROOT = Path(__file__).resolve().parents[2]
 REPORT_PATH = ROOT / "output" / "test-runner" / "removed-learning-concepts" / "classroom-removed-report.json"
@@ -26,12 +32,12 @@ FORBIDDEN_SYMBOLS = (
     "assignmentStore",
 )
 SOURCE_PATHS = (
-    ROOT / "src" / "codaro" / "server.py",
-    ROOT / "src" / "codaro" / "system" / "serverState.py",
-    ROOT / "src" / "codaro" / "api" / "__init__.py",
-    ROOT / "src" / "codaro" / "api" / "requestModels.py",
-    ROOT / "editor" / "src" / "lib" / "api.ts",
-    ROOT / "editor" / "src" / "types.ts",
+    "src/codaro/server.py",
+    "src/codaro/system/serverState.py",
+    "src/codaro/api/__init__.py",
+    "src/codaro/api/requestModels.py",
+    "editor/src/lib/api.ts",
+    "editor/src/types.ts",
 )
 
 
@@ -46,79 +52,125 @@ def currentGitHead() -> str:
     return result.stdout.strip()
 
 
-def main() -> int:
-    startedAt = datetime.now(UTC)
-    existingPaths = [
-        relative
-        for relative in REMOVED_PATHS
-        if (ROOT / relative).is_file()
-        or (
-            (ROOT / relative).is_dir()
-            and any(
-                path.is_file() and "__pycache__" not in path.parts
-                for path in (ROOT / relative).rglob("*")
-            )
-        )
-    ]
+def _git(*arguments: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", *arguments],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+
+def collectReleaseHistory(markerPath: str, routerPath: str) -> dict[str, list[str]] | None:
+    """게시된 release tag에 각 path가 들어 있었는지 조사한다.
+
+    tag를 fetch하지 않는 shallow checkout에서는 이력을 알 수 없으므로 `None`을 준다.
+    이때 계약 선언이 유일한 판정 근거가 되며 drift 검사만 생략된다.
+    """
+    listed = _git("tag", "--list")
+    if listed.returncode != 0:
+        return None
+    tags = [line.strip() for line in listed.stdout.splitlines() if line.strip()]
+    if not tags:
+        return None
+    return {
+        "tags": tags,
+        "releasesWithActiveClassroom": [tag for tag in tags if _pathExistsAtTag(tag, markerPath)],
+        "releasesWithTombstone": [tag for tag in tags if _pathExistsAtTag(tag, routerPath)],
+    }
+
+
+def _pathExistsAtTag(tag: str, relativePath: str) -> bool:
+    listed = _git("ls-tree", "-r", "--name-only", f"{tag}^{{tree}}", "--", relativePath)
+    return listed.returncode == 0 and bool(listed.stdout.strip())
+
+
+def _pathHasContent(relative: str) -> bool:
+    target = ROOT / relative
+    if target.is_file():
+        return True
+    return target.is_dir() and any(
+        path.is_file() and "__pycache__" not in path.parts for path in target.rglob("*")
+    )
+
+
+def _readText(relative: str) -> str:
+    target = ROOT / relative
+    return target.read_text(encoding="utf-8") if target.is_file() else ""
+
+
+def collectObservedState(contract: dict[str, object]) -> dict[str, object]:
+    tombstone = contract["tombstone"]
+    window = contract["compatibilityWindow"]
+    migration = contract["retainedLocalMigration"]
+    routerPath = tombstone["routerPath"]
+
     symbolReferences: list[dict[str, object]] = []
-    for path in SOURCE_PATHS:
-        text = path.read_text(encoding="utf-8")
-        for lineNumber, line in enumerate(text.splitlines(), start=1):
+    for relative in SOURCE_PATHS:
+        for lineNumber, line in enumerate(_readText(relative).splitlines(), start=1):
             symbols = [symbol for symbol in FORBIDDEN_SYMBOLS if symbol in line]
             if symbols:
-                symbolReferences.append({
-                    "path": path.relative_to(ROOT).as_posix(),
-                    "line": lineNumber,
-                    "symbols": symbols,
-                })
-    retirementRouter = ROOT / "src" / "codaro" / "api" / "classroomRetirementRouter.py"
-    retirementText = retirementRouter.read_text(encoding="utf-8") if retirementRouter.is_file() else ""
-    migration = ROOT / "src" / "codaro" / "migrations" / "classroomArchive.py"
-    migrationText = migration.read_text(encoding="utf-8") if migration.is_file() else ""
-    requiredRetirementTokens = (
-        'status_code=410',
-        '"codaro classroom audit"',
-        '"codaro classroom export --output <archive.zip>"',
-    )
-    requiredMigrationSymbols = (
-        "auditClassroomArchive",
-        "exportClassroomArchive",
-        "verifyClassroomArchive",
-        "purgeClassroomArchive",
-        "resumeClassroomPurge",
-    )
-    failures = [
-        *[f"removed classroom path still exists: {path}" for path in existingPaths],
-        *[
-            f"active classroom symbol remains: {row['path']}:{row['line']}"
-            for row in symbolReferences
-        ],
-        *[
-            f"classroom retirement response missing: {token}"
-            for token in requiredRetirementTokens
-            if token not in retirementText
-        ],
-        *[
-            f"classroom migration operation missing: {symbol}"
-            for symbol in requiredMigrationSymbols
-            if symbol not in migrationText
-        ],
+                symbolReferences.append({"path": relative, "line": lineNumber, "symbols": symbols})
+
+    scanPaths = dict.fromkeys((*tombstone["wiringPaths"], *SOURCE_PATHS))
+    wiringPaths = [
+        relative for relative in scanPaths if tombstone["factory"] in _readText(relative)
     ]
+
+    return {
+        "existingRemovedPaths": [
+            relative for relative in REMOVED_PATHS if _pathHasContent(relative)
+        ],
+        "activeSymbolReferences": symbolReferences,
+        "tombstonePresent": (ROOT / routerPath).is_file(),
+        "tombstoneText": _readText(routerPath),
+        "tombstoneWiringPaths": wiringPaths,
+        "migrationText": _readText(migration["modulePath"]),
+        "releaseHistory": collectReleaseHistory(window["activeClassroomMarkerPath"], routerPath),
+    }
+
+
+def main() -> int:
+    startedAt = datetime.now(UTC)
+    try:
+        contract = loadRetirementContract(ROOT)
+    except ClassroomRetirementContractInvalid as exc:
+        print(f"FAIL: {exc.code}: {exc}", file=sys.stderr)
+        return 1
+
+    observed = collectObservedState(contract)
+    evaluation = evaluateRetirementState(contract, observed)
+    failures = evaluation["failures"]
+    history = observed["releaseHistory"]
+    migrationOperations = contract["retainedLocalMigration"]["operations"]
     completedAt = datetime.now(UTC)
     report = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "status": "passed" if not failures else "failed",
         "completionEligible": not failures,
         "gitHead": currentGitHead(),
         "startedAt": startedAt.isoformat(),
         "completedAt": completedAt.isoformat(),
         "durationMs": round((completedAt - startedAt).total_seconds() * 1000),
+        "phase": evaluation["phase"],
+        "tombstoneRequired": evaluation["tombstoneRequired"],
+        "tombstonePresent": observed["tombstonePresent"],
+        "tombstoneWiringPaths": observed["tombstoneWiringPaths"],
+        "lastReleaseWithActiveClassroom": evaluation["lastReleaseWithActiveClassroom"],
+        "firstReleaseWithTombstone": evaluation["firstReleaseWithTombstone"],
+        "releaseHistoryChecked": evaluation["releaseHistoryChecked"],
+        "releasesWithTombstone": history["releasesWithTombstone"] if history else [],
         "removedPathCount": len(REMOVED_PATHS),
-        "existingRemovedPaths": existingPaths,
-        "activeSymbolReferenceCount": len(symbolReferences),
-        "activeSymbolReferences": symbolReferences,
-        "retirementHttpStatus": 410 if "status_code=410" in retirementText else None,
-        "migrationOperationCount": sum(symbol in migrationText for symbol in requiredMigrationSymbols),
+        "existingRemovedPaths": observed["existingRemovedPaths"],
+        "activeSymbolReferenceCount": len(observed["activeSymbolReferences"]),
+        "activeSymbolReferences": observed["activeSymbolReferences"],
+        "retirementHttpStatus": (
+            contract["tombstone"]["httpStatus"] if observed["tombstonePresent"] else None
+        ),
+        "migrationOperationCount": sum(
+            symbol in observed["migrationText"] for symbol in migrationOperations
+        ),
         "failures": failures,
     }
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -127,7 +179,10 @@ def main() -> int:
         for failure in failures:
             print(f"FAIL: {failure}", file=sys.stderr)
         return 1
-    print("ok: active classroom implementation is removed and local migration remains")
+    print(
+        f"ok: classroom retirement is in {evaluation['phase']} phase, "
+        "active implementation removed and local migration retained"
+    )
     return 0
 
 

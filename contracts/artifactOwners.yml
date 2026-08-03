@@ -84,6 +84,14 @@ artifacts:
       - .github/workflows/pages.yml
       - docs/skills/ops/tools/verifyWebCompatibilityC0.py
       - tests/product/verifyReleaseResearchOperations.py
+  - artifactId: classroom-retirement
+    role: source
+    owner: product-release
+    sourcePath: contracts/classroomRetirement.json
+    surfacePaths:
+      - src/codaro/classroomRetirement.py
+      - tests/architecture/verifyClassroomRemoved.py
+      - tests/architecture/testClassroomRetirementWindow.py
   - artifactId: learning-event
     role: source
     owner: learning-runtime
