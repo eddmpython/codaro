@@ -66,10 +66,16 @@ THRESHOLDS: dict[str, int] = {
     "sectionIdMissing": 0,
     "categoryWithoutProject": 0,
     "weakSignalRegression": 0,
+    # 산문만 있는 레슨은 어떤 엔진도 실행할 수 없다. 현재 부채를 ratchet 으로 고정해
+    # 새 레슨이 이 상태로 들어오는 것만 막는다. 줄어들면 이 값을 함께 내린다.
+    "proseOnlyCheck": 236,
 }
 
-# 강한 신호 체크 타입 — noError 는 "예외 안 남"이라 약한 신호로 분류.
-STRONG_CHECK_TYPES: frozenset[str] = frozenset({"output", "variable", "contains"})
+# 정답 여부를 판정하는 체크 타입. noError 는 "예외 안 남"만 보므로 제외한다.
+# outputExact 는 editor/src/lib/learningAttemptCheck.ts 가 실행하는 결정적 출력 비교이고,
+# output/variable/contains 는 src/codaro/curriculum/exerciseCheck.py 가 실행한다.
+# 두 런타임의 어휘가 겹치지 않는 것이 현재 알려진 부채다.
+STRONG_CHECK_TYPES: frozenset[str] = frozenset({"output", "variable", "contains", "outputExact"})
 # predict 기대값 placeholder 마커 — "(직접 실행해 본 값을 적어주세요)" 류.
 PLACEHOLDER_MARKERS: tuple[str, ...] = ("직접", "주세요")
 # 강한 신호로 정리 완료된 카테고리(회귀 차단). tests/_strongSignalCategories.txt.
@@ -86,15 +92,38 @@ def _loadStrongSignalCategories() -> frozenset[str]:
     )
 
 
-def _sectionCheckTypes(section: dict[str, Any]) -> list[str]:
-    types: list[str] = []
+def _sectionCheckBlocks(section: dict[str, Any]) -> list[dict[str, Any]]:
+    blocks: list[dict[str, Any]] = []
     for blockKey in ("check", "checks"):
         block = section.get(blockKey)
-        if isinstance(block, dict) and isinstance(block.get("type"), str):
-            types.append(block["type"])
+        if isinstance(block, dict):
+            blocks.append(block)
         elif isinstance(block, list):
-            types.extend(c["type"] for c in block if isinstance(c, dict) and isinstance(c.get("type"), str))
-    return types
+            blocks.extend(entry for entry in block if isinstance(entry, dict))
+    return blocks
+
+
+def _isStrongCheckSpec(check: dict[str, Any]) -> bool:
+    """CheckSpec v2 — kind/executor 를 갖춘 sandbox 실행 계약."""
+    return bool(check.get("kind")) and bool(check.get("executor"))
+
+
+def _isExecutableCheck(check: dict[str, Any]) -> bool:
+    """실행 엔진이 해석할 수 있는 체크인지 판정한다.
+
+    `{noError: "...", resultCheck: "..."}` 처럼 type 도 kind 도 없는 항목은 사람이 읽는
+    설명문이며 어떤 런타임도 실행하지 않는다. 이런 산문을 "체크 있음"으로 세면 감사가
+    검증 부채를 0으로 잘못 보고한다.
+    """
+    return _isStrongCheckSpec(check) or bool(isinstance(check.get("type"), str) and check["type"])
+
+
+def _sectionCheckTypes(section: dict[str, Any]) -> list[str]:
+    return [
+        check["type"]
+        for check in _sectionCheckBlocks(section)
+        if isinstance(check.get("type"), str) and check["type"]
+    ]
 
 
 def _sectionHasPlaceholderPredict(section: dict[str, Any]) -> bool:
@@ -176,6 +205,8 @@ def auditCurriculum() -> dict[str, Any]:
             sections = data.get("sections") or []
             exerciseSections = 0
             checkSections = 0
+            proseCheckSections = 0
+            strongSpecSections = 0
             hintMissing = 0
             shortGoals = 0
             sectionIds: set[str] = set()
@@ -196,8 +227,12 @@ def auditCurriculum() -> dict[str, Any]:
                     hints = exercise.get("hints") or []
                     if not hints:
                         hintMissing += 1
-                if section.get("check") or section.get("checks"):
+                checkBlocks = _sectionCheckBlocks(section)
+                if any(_isExecutableCheck(check) for check in checkBlocks):
                     checkSections += 1
+                elif checkBlocks:
+                    proseCheckSections += 1
+                strongSpecSections += sum(1 for check in checkBlocks if _isStrongCheckSpec(check))
                 lessonCheckTypes.extend(_sectionCheckTypes(section))
                 if _sectionHasPlaceholderPredict(section):
                     lessonHasPlaceholder = True
@@ -217,9 +252,14 @@ def auditCurriculum() -> dict[str, Any]:
             if sections and exerciseSections == 0 and not isReadingLesson:
                 flags.append("noExercise")
 
-            # 3. exerciseWithoutCheck: exercise는 있는데 check가 하나도 없음
-            if exerciseSections > 0 and checkSections == 0:
+            # 3. exerciseWithoutCheck: exercise는 있는데 체크 블록이 아예 없음
+            if exerciseSections > 0 and checkSections == 0 and proseCheckSections == 0:
                 flags.append("exerciseWithoutCheck")
+
+            # 3b. proseOnlyCheck: 체크 블록은 있지만 전부 산문이라 실행 엔진이 없음.
+            #     학습자는 자동 확인을 받지 못하는데 감사는 오래 "체크 있음"으로 세어 왔다.
+            if exerciseSections > 0 and checkSections == 0 and proseCheckSections > 0:
+                flags.append("proseOnlyCheck")
 
             # 4. noHint: 모든 exercise에 hints가 비어 있음
             if exerciseSections > 0 and hintMissing == exerciseSections:
@@ -231,7 +271,10 @@ def auditCurriculum() -> dict[str, Any]:
 
             # 약한 신호(정보성) — 강한 체크가 0개이거나 predict가 placeholder.
             hasExerciseCheck = exerciseSections > 0 and checkSections > 0
-            hasStrongCheck = hasExerciseCheck and any(t in STRONG_CHECK_TYPES for t in lessonCheckTypes)
+            hasStrongCheck = hasExerciseCheck and (
+                strongSpecSections > 0
+                or any(t in STRONG_CHECK_TYPES for t in lessonCheckTypes)
+            )
             isWeakCheck = hasExerciseCheck and not hasStrongCheck
             if hasExerciseCheck:
                 exerciseCheckLessonCount += 1
@@ -255,6 +298,8 @@ def auditCurriculum() -> dict[str, Any]:
                     "sections": len(sections),
                     "exercises": exerciseSections,
                     "checks": checkSections,
+                    "proseChecks": proseCheckSections,
+                    "strongSpecs": strongSpecSections,
                     "flags": flags,
                 })
 
@@ -418,11 +463,14 @@ def main() -> int:
             )
         strongCount = audit["flagCounts"].get("strongCheckSignal", 0)
         exerciseCheckLessons = audit["flagCounts"].get("exerciseCheckLessons", 0)
-        coveragePct = round(100.0 * strongCount / exerciseCheckLessons, 1) if exerciseCheckLessons else 0.0
+        proseOnly = audit["flagCounts"].get("proseOnlyCheck", 0)
+        verifiable = exerciseCheckLessons + proseOnly
+        coveragePct = round(100.0 * strongCount / verifiable, 1) if verifiable else 0.0
         signalNote = (
-            f" · signal: {audit['flagCounts'].get('weakCheckSignal', 0)} weak-check lessons, "
+            f" · signal: {proseOnly} prose-only lessons (실행 엔진 없음), "
+            f"{audit['flagCounts'].get('weakCheckSignal', 0)} weak-check lessons, "
             f"{audit['flagCounts'].get('placeholderPredict', 0)} placeholder-predict lessons"
-            f" · strong-check coverage {strongCount}/{exerciseCheckLessons} ({coveragePct}%)"
+            f" · strong-check coverage {strongCount}/{verifiable} ({coveragePct}%)"
         )
         print(
             "ok: curriculum weakness audit passed "

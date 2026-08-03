@@ -156,10 +156,24 @@ unknown domain/outcome ID는 400 + `curriculum_unknown_domain` / `curriculum_unk
 - API 엔드포인트 통합 테스트 (FastAPI TestClient)
 
 `tests/curriculum/auditCurriculumWeakness.py`가 영구 게이트로 등록되어 있다 (`tests/run.py gate curriculum-weakness-audit`):
-- 정적 신호: `orphanInPlan`, `noExercise` (intro `00_*` 제외), `exerciseWithoutCheck`, `noHint`, `shortGoal`, `sectionIdMissing` (Phase 2b)
+- 정적 신호: `orphanInPlan`, `noExercise` (intro `00_*` 제외), `exerciseWithoutCheck`, `proseOnlyCheck`, `noHint`, `shortGoal`, `sectionIdMissing` (Phase 2b)
 - 카테고리 신호: `categoryWithoutProject` (Phase 2d). 면제 카테고리는 `PROJECT_EXEMPT_CATEGORIES`가 소유하며 현재 `builtins`, `excel`, `practical`, `devTools`, `resilience`다. 나머지 카테고리는 `lessonRole: project` 레슨을 최소 1개 가져야 한다.
-- 각 신호별 임계치(현재 모두 0)를 넘으면 게이트 실패
+- 각 신호별 임계치를 넘으면 게이트 실패. 대부분 0이고 `proseOnlyCheck`만 현재 부채를 고정한 ratchet이다.
 - 리포트: `output/test-runner/curriculum-weakness-audit/curriculum-weakness-report.json`
+
+## 검증 실태와 수렴 방향
+
+exercise를 가진 468개 레슨의 실제 검증 상태다. 숫자보다 중요한 것은 세 상태가 서로 다른 문제라는 점이다.
+
+| 상태 | 레슨 | 뜻 |
+| --- | --- | --- |
+| 산문만 (`proseOnlyCheck`) | 236 | `{noError: "...", resultCheck: "..."}`처럼 `type`도 `kind`도 없다. 사람이 읽는 설명문이고 어떤 엔진도 실행하지 않는다 |
+| 약한 실행 검사 | 225 | `type: noError`뿐. 예외만 안 나면 통과하고 정답 여부는 보지 않는다 |
+| 정답 판정 검사 | 7 | `outputExact`, `contains`, 또는 CheckSpec v2 |
+
+체크 어휘가 두 런타임으로 갈라져 있는 것이 현재 가장 큰 부채다. `src/codaro/curriculum/exerciseCheck.py`는 `output`/`variable`/`contains`/`noError`를 실행하고, `editor/src/lib/learningAttemptCheck.ts`는 CheckSpec v2와 `outputExact`를 실행한다. 두 집합은 겹치지 않는다. `learningAttemptCheck.ts`의 `evidence` 등급(`none`/`practice`/`strong`)이 학습자에게 실제로 보이는 계약이므로, 수렴 목표는 CheckSpec v2 하나이며 나머지는 마이그레이션 대상이다.
+
+작업 순서는 지표 정직화, 계약 수렴, 커버리지 상승이다. 커버리지 상승은 레슨 콘텐츠 작업이라 사람이 직접 쓴다. 앞의 두 단계가 끝나야 어느 레슨에 어떤 검사를 써야 하는지가 기계적으로 정해진다.
 
 ## 확장 가이드
 

@@ -19,7 +19,11 @@ from dataclasses import dataclass, field
 from typing import Any
 
 
-STRONG_CHECK_TYPES = ("output", "variable", "contains")
+# 정답 여부를 판정하는 체크 타입. 게이트와 어긋나면 authoring 제안이 이미 강한 체크를
+# 약한 것으로 오인한다. 판정 기준 SSOT 는 curriculum/auditCurriculumWeakness.py 이고,
+# 실행 owner 는 src/codaro/curriculum/exerciseCheck.py 와
+# editor/src/lib/learningAttemptCheck.ts 다.
+from curriculum.auditCurriculumWeakness import STRONG_CHECK_TYPES
 PROPOSAL_CONFIDENCE = 0.6  # 기본 제안 신뢰도 — brittleness 인지. 1.0은 사람이 대안검증 후.
 
 
