@@ -133,7 +133,7 @@ sections:
     print('두 번째 줄')
     print('세 번째 줄')
   exercise:
-    prompt: 두 번째 줄의 빈칸을 바꿔 세 줄을 정확한 순서로 출력하세요.
+    prompt: 두 번째 줄의 빈칸을 "바꾼 두 번째 줄"로 바꿔 세 줄을 정확한 순서로 출력하세요.
     starterCode: |-
       print('첫 번째 줄')
       print('____')
@@ -161,7 +161,7 @@ sections:
     \n을 사용하면 print() 한 번으로 여러 줄을 출력할 수 있어 편리합니다.
   snippet: print('첫 번째 줄\n두 번째 줄\n세 번째 줄')
   exercise:
-    prompt: 가운데 빈칸을 채워 줄바꿈 문자 하나의 print()로 세 줄을 정확히 출력하세요.
+    prompt: 가운데 빈칸을 "두 번째 줄"로 채워 줄바꿈 문자 하나의 print()로 세 줄을 정확히 출력하세요.
     starterCode: print('첫 번째 줄\n____\n세 번째 줄')
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.

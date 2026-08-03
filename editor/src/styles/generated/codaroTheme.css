@@ -520,7 +520,7 @@
     --chart-3: var(--color-text-orange);
     --chart-4: var(--color-text-purple);
     --chart-5: var(--color-error);
-    --sidebar: var(--color-background-surface);
+    --sidebar: var(--color-background-body);
     --sidebar-foreground: var(--color-text-primary);
     --sidebar-primary: var(--color-accent);
     --sidebar-primary-foreground: var(--color-on-accent);

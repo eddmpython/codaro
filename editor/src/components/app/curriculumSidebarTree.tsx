@@ -243,7 +243,8 @@ function CurriculumTreeNodeItem({
 
   if (depth === 0) {
     return (
-      <SidebarMenuItem>
+      // 접힌 레일에서는 카테고리 트리를 숨긴다. 펼침 화살표만 남으면 뜻을 알 수 없다.
+      <SidebarMenuItem className="group-data-[collapsible=icon]:hidden">
         <SidebarMenuButton
           aria-expanded={isExpanded}
           className="h-7 px-2 pr-10 text-[13px] [&>svg]:size-3.5"

@@ -122,6 +122,11 @@ export function ProductSidebar({
   const learningLessonRef = selectedCategory && selectedContentId
     ? `${selectedCategory}/${selectedContentId}`
     : "";
+  const brandLabel = runtimeTier === "local"
+    ? "Codaro 홈으로 이동"
+    : surface === "editor"
+      ? "Codaro 홈페이지로 이동"
+      : "Codaro 도구로 이동";
   const themeLabel = themeMode === "system" ? "시스템 테마" : themeMode === "dark" ? "다크 테마" : "라이트 테마";
   const localeLabel = locale === "en" ? t("locale.switchToKorean") : t("locale.switchToEnglish");
 
@@ -154,13 +159,25 @@ export function ProductSidebar({
         <div className="flex flex-wrap items-center gap-0.5 sm:gap-1">
           <SidebarMenu className="min-w-0 flex-1">
             <SidebarMenuItem>
+              {/* 웹에서 이미 노트북 표면이면 브랜드는 랜딩으로 나가는 유일한 출구다.
+                  학습 모드에서는 기존 계약대로 도구(노트북)로 탈출한다. */}
               <button
-                aria-label={runtimeTier === "local" ? "Codaro 홈으로 이동" : "Codaro 도구로 이동"}
+                aria-label={brandLabel}
                 className="flex min-h-10 w-full min-w-0 items-center gap-2 rounded-md px-2 py-1 text-left text-[13px] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:p-1!"
                 data-product-brand="escape"
-                title={runtimeTier === "local" ? "Codaro 홈으로 이동" : "Codaro 도구로 이동"}
+                title={brandLabel}
                 type="button"
-                onClick={() => onSurfaceChange(runtimeTier === "local" ? "home" : "editor")}
+                onClick={() => {
+                  if (runtimeTier === "local") {
+                    onSurfaceChange("home");
+                    return;
+                  }
+                  if (surface === "editor") {
+                    window.location.assign("/");
+                    return;
+                  }
+                  onSurfaceChange("editor");
+                }}
               >
                 <img
                   alt=""
@@ -173,7 +190,8 @@ export function ProductSidebar({
               </button>
             </SidebarMenuItem>
           </SidebarMenu>
-          {learningMode ? null : (
+          {/* 웹 빌드에는 로컬 provider 런타임이 없어 이 버튼은 경고만 띄운다. 실패만 하는 컨트롤은 노출하지 않는다. */}
+          {learningMode || runtimeTier !== "local" ? null : (
             <button
               aria-label={t("provider.openSettings.title")}
               className="flex size-8 shrink-0 items-center justify-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:hidden"
@@ -327,7 +345,7 @@ export function ProductSidebar({
             )}
 
             {surface === "curriculum" ? (
-              <div className="group-data-[collapsible=icon]:hidden">
+              <div>
                 <CurriculumSidebarTree
                   categories={categories}
                   categoryGroups={categoryGroups}

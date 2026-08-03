@@ -335,6 +335,12 @@
     height: 14px;
   }
 
+  /* 닫힌 메뉴는 자리를 차지하지 않는다. absolute만 걸면 닫힌 상태에서도 좌표가 잡혀
+     아래 셀 추가 버튼과 겹친다. */
+  [data-astryx-theme="codaro"] .notebookCellMore:not([open]) .notebookCellMoreMenu {
+    display: none;
+  }
+
   [data-astryx-theme="codaro"] .notebookCellMoreMenu {
     position: absolute;
     top: calc(100% + 4px);

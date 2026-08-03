@@ -560,7 +560,7 @@ function App() {
         <div
           className={surface === "editor"
             ? "relative h-12 shrink-0 bg-background"
-            : "relative h-9 shrink-0 border-b border-border bg-background"}
+            : "relative h-9 shrink-0 bg-background"}
           data-top-control-lane="true"
         >
           <TopControls

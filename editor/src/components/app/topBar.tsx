@@ -56,7 +56,7 @@ export function TopControls({
     <>
       {showSidebarTrigger ? (
         <div
-          className="absolute left-1.5 top-1.5 z-30"
+          className="absolute left-1.5 top-1/2 z-30 -translate-y-1/2"
           data-topbar-sidebar-trigger={surface}
         >
           <SidebarTrigger />

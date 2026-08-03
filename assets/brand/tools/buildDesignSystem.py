@@ -415,7 +415,8 @@ def renderAppBridge(appName: str) -> str:
             "--chart-3": "var(--color-text-orange)",
             "--chart-4": "var(--color-text-purple)",
             "--chart-5": "var(--color-error)",
-            "--sidebar": "var(--color-background-surface)",
+            # 사이드바는 본문과 같은 바탕을 쓴다. 경계선 없이 한 화면으로 이어 붙인다.
+            "--sidebar": "var(--color-background-body)",
             "--sidebar-foreground": "var(--color-text-primary)",
             "--sidebar-primary": "var(--color-accent)",
             "--sidebar-primary-foreground": "var(--color-on-accent)",

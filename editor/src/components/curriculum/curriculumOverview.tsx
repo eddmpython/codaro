@@ -376,7 +376,7 @@ export function LearningOverviewHeader({
   return (
     <header
       aria-labelledby="learning-lesson-title"
-      className="border-b bg-background text-card-foreground"
+      className="bg-background text-card-foreground"
       data-learning-overview="true"
       id={introBlock ? cellDomId(introBlock.id) : undefined}
     >

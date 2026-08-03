@@ -51,7 +51,7 @@ export function CurriculumSectionCard({
   return (
     <section
       aria-labelledby={sectionHeadingId}
-      className="border-y border-border bg-background text-card-foreground"
+      className="border-t border-border bg-background text-card-foreground"
       data-learning-section-card={section.id}
       data-learning-section-mode={readPayloadText(section.contract?.assessmentMode) || "acquisition"}
       data-learning-section-structured={structured ? "true" : "false"}

@@ -460,7 +460,7 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
         and 'data-top-control-lane="true"' in app
         and '{surface === "curriculum" ? null : (' in app
         and '? "relative h-12 shrink-0 bg-background"' in app
-        and ': "relative h-9 shrink-0 border-b border-border bg-background"' in app
+        and ': "relative h-9 shrink-0 bg-background"' in app
         and 'surface === "editor" ? "left-36 max-w-sm"' in topBar
         and 'data-topbar-status-notice={surface}' in topBar
         and 'data-topbar-controls={surface}' in topBar

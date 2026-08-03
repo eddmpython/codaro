@@ -122,16 +122,16 @@ const codeCellEditorTheme = EditorView.theme({
     padding: "0.375rem 0",
   },
   ".cm-line": {
-    padding: "0 0.75rem",
+    padding: "0 0.5rem",
   },
   ".cm-gutters": {
     backgroundColor: "transparent",
     borderRight: "0",
     color: "var(--color-text-secondary, var(--muted-foreground))",
-    minWidth: "34px",
+    minWidth: "24px",
   },
   ".cm-lineNumbers .cm-gutterElement": {
-    padding: "0 0.5rem",
+    padding: "0 0.375rem",
   },
   ".cm-activeLine, .cm-activeLineGutter": {
     backgroundColor: "transparent",
@@ -151,16 +151,18 @@ const codeCellEditorTheme = EditorView.theme({
   ".cm-codaroErrorLine": {
     backgroundColor: "color-mix(in oklch, var(--destructive) 18%, transparent)",
   },
+  // 표시가 있을 때만 자리를 차지한다. 고정 width를 주면 빈 셀에서도 줄번호와 코드가 벌어진다.
   ".cm-codaroErrorGutter": {
-    width: "0.875rem",
     textAlign: "center",
+  },
+  ".cm-codaroErrorGutter .cm-gutterElement": {
+    padding: "0 2px",
   },
   ".cm-codaroAiCommentLine": {
     backgroundColor: "color-mix(in oklch, var(--primary, currentColor) 8%, transparent)",
     borderLeft: "2px solid color-mix(in oklch, var(--primary, currentColor) 45%, transparent)",
   },
   ".cm-codaroAiCommentGutter": {
-    width: "1.125rem",
     textAlign: "center",
   },
 });
@@ -438,10 +440,10 @@ const errorLineDecorationField = StateField.define<DecorationSet>({
   provide: (field) => EditorView.decorations.from(field),
 });
 
+// initialSpacer를 두면 표시가 없어도 폭이 예약되어 줄번호와 코드가 멀어진다.
 const errorGutter = gutter({
   class: "cm-codaroErrorGutter",
   markers: (view) => view.state.field(errorMarkerField),
-  initialSpacer: () => errorMarkerInstance,
 });
 
 
@@ -537,7 +539,6 @@ const aiCommentLineDecorationField = StateField.define<DecorationSet>({
 const aiCommentGutter = gutter({
   class: "cm-codaroAiCommentGutter",
   markers: (view) => view.state.field(aiCommentMarkerField),
-  initialSpacer: () => new AiCommentGutterMarker(""),
 });
 
 export function CodeCellEditor({
