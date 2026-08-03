@@ -6,11 +6,72 @@ in this file (see `docs/skills/ops/release/git-and-release.md`).
 
 ## Unreleased
 
+## 0.0.13 - 2026-08-04
+
+두 달 치 학습 경험·노트북 UX·검증 파이프라인 정리를 묶은 릴리즈다. 학습 진행을 레슨 검증
+지점 단위로 정직하게 세고, 노트북 셀 UI를 컴팩트 툴바로 재정렬했으며, Web 학습·Local
+Studio·WebView2 설치 경계를 완결하고 의존성 취약점을 전부 패치했다.
+
+### Added
+
+- 레슨 검증 진행 - `editor/src/lib/curriculumLearningProjection.ts`에 `creditedSectionIds`,
+  `editor/src/hooks/useLessonSectionProgress.ts` 훅, 레슨 헤더 "검증 n/m" 배지와
+  `editor/src/components/curriculum/curriculumToc.tsx` 목차 레일 고정 진행·섹션 체크 표시.
+- 노트북 셀 이동·복제 - `editor/src/hooks/useNotebookDocumentState.ts`의
+  `moveNotebookCell`/`duplicateNotebookCell`과 셀 툴바 위로/아래로/복제 버튼.
+- Web 학습 완결 - 공개 레슨 라우트 472개 생성·검증(`tests/learning/verifyWebLearningRoutes.py`),
+  브라우저 강한 검증 증거 계약과 Local 왕복(`tests/learning/verifyWebLearningCompletion.py`).
+- Windows 설치 경계 - WebView2 릴리스 경계와 실제 설치본 검증
+  (`tests/product/verifyWebView2ProductSmoke.py`), Fixed Version 설치 receipt 결속,
+  런처 상주 트레이(단일 인스턴스·부팅 자동 시작·창 닫기 유지) 구성.
+- 시각 자산 파이프라인 - `tests/assets/captureProductVisuals.py` 재현 가능한 캡처·manifest
+  결속(`sourceSetHash`)과 라이트·다크 페어 캡처, 결과 증명(outcome proof) 자산 교체.
+- 커리큘럼 - requests 실무 project 레슨 지정과 taxonomy 원장 갱신, Git 실습, 스케줄링
+  레슨 실행 의존성 `schedule`을 `pyproject.toml` curriculum extra로 정식 선언.
+
+### Changed
+
+- 노트북 셀 툴바를 컴팩트 아이콘 줄(실행·이동·복제·더보기·삭제)로 교체하고 셀 높이·코드
+  폰트·줄번호 gutter를 축소했다(`editor/src/components/notebook/notebookPanel.tsx`, `.css`).
+- 학습 표면 이름을 "현재 학습"에서 "학습"으로 통일했다(`editor/src/lib/surfaceModel.ts`,
+  `localeCopy.ts`, `docs/skills` 9개 문서, 관련 게이트 pin).
+- 사이드바 집중 모드를 레슨 화면으로 한정해 학습 홈에는 제품 네비를 노출하고, 사이드바
+  경계선을 제거해 본문과 같은 바탕으로 통일했다(`editor/src/components/app/productSidebar.tsx`,
+  `assets/brand/tools/buildDesignSystem.py`).
+- 웹 노트북의 브랜드 버튼이 GitHub Pages 프로젝트 경로를 고려한 랜딩 홈으로 이동한다
+  (`editor/src/lib/publicAsset.ts`의 `resolveLandingHomePath`).
+- mainPlan을 완료 상태 없는 임시 TODO 트리로 전환하고 완료 항목 삭제를 원칙화했다.
+
 ### Fixed
 
-- product-release 워크플로우가 GitHub 자동 릴리즈 노트를 붙여 `0.0.x` 릴리즈의 비교 링크를 잘못 생성하지 않도록 `CHANGELOG.md` 섹션만 Release 본문으로 쓰게 고정했다.
-- PyPI Trusted Publisher environment를 비워둔 설정과 맞도록 publish workflow의 `environment:` 선언을 제거했다.
-- PyPI publisher에 `publish.yml` 파일명으로 등록된 경우도 Actions Trusted Publisher로 발행할 수 있도록 `.github/workflows/publish.yml` alias를 추가했다.
+- day01 실습 두 곳의 지문이 채점 기대 문자열을 명시하지 않아 정답을 알 수 없던 결함을
+  고쳤다(`curricula/python/basics/30days/day01_헬로월드.yaml`).
+- 노트북 왼쪽 셀 추가(+) 버튼이 셀 경계를 벗어나면 사라져 클릭 불가하던 hover 단절,
+  닫힌 셀 메뉴가 좁은 화면에서 다른 버튼과 겹치던 문제, 상단바 토글·브랜드 4px 어긋남,
+  빈 셀에서 에러/코멘트 gutter가 자리를 예약해 줄번호와 코드가 40px 벌어지던 문제를 고쳤다.
+- 웹 빌드에서 동작하지 않는 provider 설정 버튼을 로컬 런타임 전용으로 숨겼다.
+- product-release 워크플로우가 GitHub 자동 릴리즈 노트를 붙여 `0.0.x` 릴리즈의 비교 링크를
+  잘못 생성하지 않도록 `CHANGELOG.md` 섹션만 Release 본문으로 쓰게 고정했다.
+- PyPI Trusted Publisher environment를 비워둔 설정과 맞도록 publish workflow의
+  `environment:` 선언을 제거했고, `publish.yml` 파일명 등록도 지원하도록 alias를 추가했다.
+
+### Removed
+
+- 과제방(classroom) HTTP surface를 제거하고 repository simplification을 종료했다.
+
+### Security
+
+- Pillow 12.3.0(uv.lock, 12건), postcss 8.5.25(editor·landing package-lock, 2건),
+  quinn-proto 0.11.16(launcher/Cargo.lock, 1건)으로 올려 Dependabot open alert를 모두
+  해소했다.
+
+### Verification
+
+- `tests/run.py quality-cycle` 41/41 게이트 green(soft 1건 = OAuth 미로그인 ai-live-smoke),
+  product-experience-browser 83케이스, onboarding-browser 14체크, web-learning 472 라우트.
+- 의존성 패치 후 `npm audit` 0건(editor·landing), `cargo check` 에러 0,
+  `uv run python -c "import PIL, schedule, watchdog"` 확인, preflight·landing-build·
+  launcher-test 게이트 재실행.
 
 ## 0.0.12 - 2026-06-06
 

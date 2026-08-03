@@ -1,6 +1,6 @@
 [project]
 name = "codaro"
-version = "0.0.12"
+version = "0.0.13"
 description = "Programmable studio — interactive editor runtime for code, learning, and automation"
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -48,7 +48,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "httpx>=0.28.1",
-    "pillow>=12.2.0",
+    "pillow>=12.3.0",
     "playwright==1.61.0",
     "pytest>=9.0.2",
     "watchdog>=6.0.0",
@@ -56,10 +56,12 @@ dev = [
 curriculum = [
     "matplotlib>=3.10.9",
     "openpyxl>=3.1.5",
-    "pillow>=12.2.0",
+    "pillow>=12.3.0",
     "plotly>=6.7.0",
     "polars>=1.41.1",
     "python-docx>=1.2.0",
+    # 스케줄링 레슨(자동화 트랙)의 실행 코드가 로컬 커널에서 import한다.
+    "schedule>=1.2.2",
     "scikit-learn>=1.8.0",
     "scipy>=1.17.1",
     "seaborn>=0.13.2",

@@ -96,10 +96,10 @@
       "themePairId": "runLearningDetailLight",
       "outputs": [
         {
-          "byteLength": 13324,
+          "byteLength": 13491,
           "format": "avif",
           "height": 405,
-          "integrity": "sha256-01e4af6c080f246b3e9d7a7a7863c7ecb8d204d3a0ea321ac630e0f259a02fa2",
+          "integrity": "sha256-e2b50d6b0cb1e19130e43a1d135e92751f0057ffc68dbebec6e731c75b6f6cd9",
           "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-086aef8fbe08.avif",
           "width": 480
         },
@@ -112,10 +112,10 @@
           "width": 480
         },
         {
-          "byteLength": 26686,
+          "byteLength": 27018,
           "format": "avif",
           "height": 608,
-          "integrity": "sha256-032b3062866e399ad0825c4419c8515bb03db96316ff724895088f95065e7482",
+          "integrity": "sha256-54b768f810596adf305ce48cc0bd4aca89414460520e9a4fc2ee766bda314fa9",
           "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-086aef8fbe08.avif",
           "width": 720
         },
@@ -128,10 +128,10 @@
           "width": 720
         },
         {
-          "byteLength": 28649,
+          "byteLength": 28818,
           "format": "avif",
           "height": 760,
-          "integrity": "sha256-95b5bdc06a40f5682f295521452e4edc3a54c6a050c9cbeb24a99af50150d091",
+          "integrity": "sha256-d707188aece1edb3f9e9851940be09e9cc28ee8f92689c8094c9e2b66632bb00",
           "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-086aef8fbe08.avif",
           "width": 900
         },
@@ -239,10 +239,10 @@
       "themePairId": "runLearningDetail",
       "outputs": [
         {
-          "byteLength": 11868,
+          "byteLength": 11998,
           "format": "avif",
           "height": 405,
-          "integrity": "sha256-3f5ad2ff8eb8e2acd3d311dae0112cc5021fa0840d45e7784816a07a7e50efeb",
+          "integrity": "sha256-e0bec9ed47db1c09c65623dd672166a824968d5e83bca07130b129ebed32c58d",
           "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-480-24929234ea03.avif",
           "width": 480
         },
@@ -255,10 +255,10 @@
           "width": 480
         },
         {
-          "byteLength": 23509,
+          "byteLength": 23738,
           "format": "avif",
           "height": 608,
-          "integrity": "sha256-96852c7da273b3443e672a3433f4f81de4dd4c406f7b606b1cf75a195fc6579e",
+          "integrity": "sha256-29b821378e6eb6e2107f835a8281106795e78f8c5f444cc78ea9c41161b1f67c",
           "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-720-24929234ea03.avif",
           "width": 720
         },
@@ -271,10 +271,10 @@
           "width": 720
         },
         {
-          "byteLength": 26256,
+          "byteLength": 26410,
           "format": "avif",
           "height": 760,
-          "integrity": "sha256-7be2d2e8a7ee4c191bda18c45cf654131026f5b35a47b3bea7a1f5a62dab46b1",
+          "integrity": "sha256-25baa70b0704ef6646833e0a41a2e1af0a9f5ca20333a4fb81e382fe0aa77214",
           "publicPath": "/visuals/files/runLearningDetailLight/runLearningDetailLight-900-24929234ea03.avif",
           "width": 900
         },
@@ -379,10 +379,10 @@
       "themePairId": "runLearningMobileLight",
       "outputs": [
         {
-          "byteLength": 20786,
+          "byteLength": 20914,
           "format": "avif",
           "height": 844,
-          "integrity": "sha256-469b8ca99cf1eddd87d8b944a852bd2532dba1ce3e8e843715e39a679d392780",
+          "integrity": "sha256-221cefafc2316fb82e4e37601edcaf2c32368052a644fead4851a5e1e57ab18e",
           "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-5b19c1a1704e.avif",
           "width": 390
         },
@@ -487,10 +487,10 @@
       "themePairId": "runLearningMobile",
       "outputs": [
         {
-          "byteLength": 18991,
+          "byteLength": 19118,
           "format": "avif",
           "height": 844,
-          "integrity": "sha256-4edebc19f6c55de9628b4bd60e4e391799235a32e6a204a906f04d21641f2b09",
+          "integrity": "sha256-0851b2dea467779dd5eef5ac29190a00dfe3050a842659e58d0959f4c82ab06d",
           "publicPath": "/visuals/files/runLearningMobileLight/runLearningMobileLight-390-03f32c7d3671.avif",
           "width": 390
         },
@@ -596,10 +596,10 @@
       "themePairId": "runLearningHeroLight",
       "outputs": [
         {
-          "byteLength": 2911,
+          "byteLength": 2967,
           "format": "avif",
           "height": 450,
-          "integrity": "sha256-a8742498cf2a855100f2c0f8a103ee41ac0b8d0641b3c6e639176426ea2dd0e6",
+          "integrity": "sha256-88dd78285c47cc45346e7d9052efe55782ad2e4902c4b2f8f6187c27ab990657",
           "publicPath": "/visuals/files/runLearningHero/runLearningHero-720-86d7e77f1b5f.avif",
           "width": 720
         },
@@ -612,10 +612,10 @@
           "width": 720
         },
         {
-          "byteLength": 4865,
+          "byteLength": 4978,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-43533d32d8b040f9f734b2dc124f85650dabe2a8dbcc74c48d11b27e3da2166b",
+          "integrity": "sha256-a79e9d9768da7f7f282345a2962f25f7f852b9aa524c883cedbd4d4b997b6c39",
           "publicPath": "/visuals/files/runLearningHero/runLearningHero-1080-86d7e77f1b5f.avif",
           "width": 1080
         },
@@ -628,10 +628,10 @@
           "width": 1080
         },
         {
-          "byteLength": 6602,
+          "byteLength": 6773,
           "format": "avif",
           "height": 900,
-          "integrity": "sha256-913218eda74af41a8fc93092cbf5618664f57a42b440b3450316bf2456fb7140",
+          "integrity": "sha256-c114b13291519541ecd68274d34959d7981537b7eaaa0f458e7816ac26ac0d3d",
           "publicPath": "/visuals/files/runLearningHero/runLearningHero-1440-86d7e77f1b5f.avif",
           "width": 1440
         },
@@ -737,10 +737,10 @@
       "themePairId": "runLearningHero",
       "outputs": [
         {
-          "byteLength": 2848,
+          "byteLength": 2915,
           "format": "avif",
           "height": 450,
-          "integrity": "sha256-6f25f481541ca8524b384e5204d7bcfe2823ebc59b4820fa956f170933fac3ef",
+          "integrity": "sha256-f511a73d89e1b94c14c73ec4ed6f6f7daf305db187d80dd7f36ab060d835b701",
           "publicPath": "/visuals/files/runLearningHeroLight/runLearningHeroLight-720-4b40f26d3849.avif",
           "width": 720
         },
@@ -753,10 +753,10 @@
           "width": 720
         },
         {
-          "byteLength": 4712,
+          "byteLength": 4876,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-5dc726cb8841acc7a1e5ced44154a7292fac448f9659217a3990006cf1c3f2f9",
+          "integrity": "sha256-12a4494d1c4469ea8bf56050beb78a1ec0620403ca5004d7226e8466d4af178d",
           "publicPath": "/visuals/files/runLearningHeroLight/runLearningHeroLight-1080-4b40f26d3849.avif",
           "width": 1080
         },
@@ -769,10 +769,10 @@
           "width": 1080
         },
         {
-          "byteLength": 6516,
+          "byteLength": 6557,
           "format": "avif",
           "height": 900,
-          "integrity": "sha256-29260e60db146d859d39b40fd4f66eeeafc1a1418ef2789cce49a71c1b76e148",
+          "integrity": "sha256-6d597ee8253c7347d8b8db2943d370691b94a2c23932d37991d68d084456b2ba",
           "publicPath": "/visuals/files/runLearningHeroLight/runLearningHeroLight-1440-4b40f26d3849.avif",
           "width": 1440
         },
@@ -872,10 +872,10 @@
       "themePairId": "localNotebookDesktopLight",
       "outputs": [
         {
-          "byteLength": 3670,
+          "byteLength": 3735,
           "format": "avif",
           "height": 427,
-          "integrity": "sha256-b13628079abd96a8e206375d3d53e996616d883acbfff746a8b0f4933952e19f",
+          "integrity": "sha256-72023cc9eedeb6fbcef921c567e90d6edbc0f01151a7ad1be7cd87362a8927e4",
           "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-600-539f28fc0658.avif",
           "width": 600
         },
@@ -888,10 +888,10 @@
           "width": 600
         },
         {
-          "byteLength": 4446,
+          "byteLength": 4528,
           "format": "avif",
           "height": 640,
-          "integrity": "sha256-298bef63daadce82dba1483931c23713c7a514913fc369677598797f96f33898",
+          "integrity": "sha256-73c6c635184d39ce37ce9fd988e5a256953fa096760306f9483f2c33d6cc02d0",
           "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-900-539f28fc0658.avif",
           "width": 900
         },
@@ -991,10 +991,10 @@
       "themePairId": "localNotebookDesktop",
       "outputs": [
         {
-          "byteLength": 3589,
+          "byteLength": 3633,
           "format": "avif",
           "height": 427,
-          "integrity": "sha256-b7fa23cfa336362a91443e7c784bc8cb5fdfdc7c3936d0c9dc0ce78988043864",
+          "integrity": "sha256-52a3008c619de307aefde18750bd4b474898028a1cc76437fd28d33d29ef576e",
           "publicPath": "/visuals/files/localNotebookDesktopLight/localNotebookDesktopLight-600-40f765d6f3ed.avif",
           "width": 600
         },
@@ -1007,10 +1007,10 @@
           "width": 600
         },
         {
-          "byteLength": 4323,
+          "byteLength": 4412,
           "format": "avif",
           "height": 640,
-          "integrity": "sha256-0fad80293e77f9b22eecd8b303e1df3bb4939e26d5ecf5e613f7b8e70e6d6d13",
+          "integrity": "sha256-bb70456573ca515c27b5cedcb98d0a6bd692b80453c5a59adb05f8b7de3e1577",
           "publicPath": "/visuals/files/localNotebookDesktopLight/localNotebookDesktopLight-900-40f765d6f3ed.avif",
           "width": 900
         },
@@ -1112,10 +1112,10 @@
       "themePairId": "localAutomationDesktopLight",
       "outputs": [
         {
-          "byteLength": 17620,
+          "byteLength": 17850,
           "format": "avif",
           "height": 450,
-          "integrity": "sha256-57f70e1e6c551566d960d21191bbf315f70326143a931aaf524db6dce7e0c8e0",
+          "integrity": "sha256-94abd8ce24c28b57a4c6bf692f62af1a0c05bcda3be4aff4f50efbaff2ede993",
           "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-720-765e0d261d16.avif",
           "width": 720
         },
@@ -1128,10 +1128,10 @@
           "width": 720
         },
         {
-          "byteLength": 34336,
+          "byteLength": 34919,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-78fe52fe8a336f4949d13298dfa4ceab6b031a524f5e14ca81b759d59ae9ce5f",
+          "integrity": "sha256-5d5ba41f47be3ed1707984304617aa22664a290639b55429d7f90504a6037ec7",
           "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-765e0d261d16.avif",
           "width": 1080
         },
@@ -1144,10 +1144,10 @@
           "width": 1080
         },
         {
-          "byteLength": 40880,
+          "byteLength": 41118,
           "format": "avif",
           "height": 900,
-          "integrity": "sha256-d522c668bf11081f3ac936a5d1d8cac7a348e7bbd3732f128652a0d7b1e927e5",
+          "integrity": "sha256-21f73860e4f0ea1e5785f313a804a2537e58153a0ea09eeb67d433e03cf973a3",
           "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-765e0d261d16.avif",
           "width": 1440
         },
@@ -1249,10 +1249,10 @@
       "themePairId": "localAutomationDesktop",
       "outputs": [
         {
-          "byteLength": 16466,
+          "byteLength": 16683,
           "format": "avif",
           "height": 450,
-          "integrity": "sha256-492f23f71f9b7574ecce964e40c0e67dc8b14b2f2d3ea3037384a7bd5897cd05",
+          "integrity": "sha256-919b83e4531f5c909b3ee9725486610863edee41e618ef624822f9d9ad6105af",
           "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-720-18282805477c.avif",
           "width": 720
         },
@@ -1265,10 +1265,10 @@
           "width": 720
         },
         {
-          "byteLength": 31846,
+          "byteLength": 32399,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-446e97a7c1b7fefb1ad8473bf56f85c169434ef9de48a3f81aece7ef74493c20",
+          "integrity": "sha256-5d7630aa790011ff1633b2e491c6ffee33aa61f31ed1f9802e63cc506b6b73ee",
           "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1080-18282805477c.avif",
           "width": 1080
         },
@@ -1281,10 +1281,10 @@
           "width": 1080
         },
         {
-          "byteLength": 39485,
+          "byteLength": 39753,
           "format": "avif",
           "height": 900,
-          "integrity": "sha256-ca26a4bf0861b5bc99c5d07ac5ef7d5b29fccb2fe5d9e705314c8268b04f5fcc",
+          "integrity": "sha256-240fea1dcc15f108efe845aa35d461167340f1185607a88b33947b9686c1d658",
           "publicPath": "/visuals/files/localAutomationDesktopLight/localAutomationDesktopLight-1440-18282805477c.avif",
           "width": 1440
         },
@@ -1391,10 +1391,10 @@
       "themePairId": "runStateReadyLight",
       "outputs": [
         {
-          "byteLength": 1763,
+          "byteLength": 1783,
           "format": "avif",
           "height": 300,
-          "integrity": "sha256-15cb5199a265c8a4eefb3301123cfa03c1c58f3e5eb727fc1c9cd1ff4de30478",
+          "integrity": "sha256-dd4c2ef7b254764d2124186c845fb6be4d2faab51858be99e7110e4e2df5996e",
           "publicPath": "/visuals/files/runStateReady/runStateReady-480-86d7e77f1b5f.avif",
           "width": 480
         },
@@ -1407,10 +1407,10 @@
           "width": 480
         },
         {
-          "byteLength": 2911,
+          "byteLength": 2967,
           "format": "avif",
           "height": 450,
-          "integrity": "sha256-a8742498cf2a855100f2c0f8a103ee41ac0b8d0641b3c6e639176426ea2dd0e6",
+          "integrity": "sha256-88dd78285c47cc45346e7d9052efe55782ad2e4902c4b2f8f6187c27ab990657",
           "publicPath": "/visuals/files/runStateReady/runStateReady-720-86d7e77f1b5f.avif",
           "width": 720
         },
@@ -1423,10 +1423,10 @@
           "width": 720
         },
         {
-          "byteLength": 5559,
+          "byteLength": 5669,
           "format": "avif",
           "height": 750,
-          "integrity": "sha256-eb6540d2540b30e74c9fface8085ae4137f804ccd1fc17e12b47ba7a79346db9",
+          "integrity": "sha256-c740a5ad262e46bc80bd2995702e60ca5d0167fb3c80c427ba91f5e85c159aa4",
           "publicPath": "/visuals/files/runStateReady/runStateReady-1200-86d7e77f1b5f.avif",
           "width": 1200
         },
@@ -1439,10 +1439,10 @@
           "width": 1200
         },
         {
-          "byteLength": 6602,
+          "byteLength": 6773,
           "format": "avif",
           "height": 900,
-          "integrity": "sha256-913218eda74af41a8fc93092cbf5618664f57a42b440b3450316bf2456fb7140",
+          "integrity": "sha256-c114b13291519541ecd68274d34959d7981537b7eaaa0f458e7816ac26ac0d3d",
           "publicPath": "/visuals/files/runStateReady/runStateReady-1440-86d7e77f1b5f.avif",
           "width": 1440
         },
@@ -1549,10 +1549,10 @@
       "themePairId": "runStateReady",
       "outputs": [
         {
-          "byteLength": 1671,
+          "byteLength": 1692,
           "format": "avif",
           "height": 300,
-          "integrity": "sha256-2b347e719b80b0e6b0548ff5296cc251ff8e38f47a2f06092744a4e9b8956282",
+          "integrity": "sha256-c3387d164b5c40425b3f972539cf06e9958325021538419f15a3e2e31cdf8fb8",
           "publicPath": "/visuals/files/runStateReadyLight/runStateReadyLight-480-4b40f26d3849.avif",
           "width": 480
         },
@@ -1565,10 +1565,10 @@
           "width": 480
         },
         {
-          "byteLength": 2848,
+          "byteLength": 2915,
           "format": "avif",
           "height": 450,
-          "integrity": "sha256-6f25f481541ca8524b384e5204d7bcfe2823ebc59b4820fa956f170933fac3ef",
+          "integrity": "sha256-f511a73d89e1b94c14c73ec4ed6f6f7daf305db187d80dd7f36ab060d835b701",
           "publicPath": "/visuals/files/runStateReadyLight/runStateReadyLight-720-4b40f26d3849.avif",
           "width": 720
         },
@@ -1581,10 +1581,10 @@
           "width": 720
         },
         {
-          "byteLength": 5294,
+          "byteLength": 5467,
           "format": "avif",
           "height": 750,
-          "integrity": "sha256-405250fc9eb4d593c0a31756d0e75cf0efe489e1ae5987d1cee91a2e5d32c293",
+          "integrity": "sha256-ac5a29f4c150f26be1346b481deeb612136a1f966b15c5cf75dfb33834fd886c",
           "publicPath": "/visuals/files/runStateReadyLight/runStateReadyLight-1200-4b40f26d3849.avif",
           "width": 1200
         },
@@ -1597,10 +1597,10 @@
           "width": 1200
         },
         {
-          "byteLength": 6516,
+          "byteLength": 6557,
           "format": "avif",
           "height": 900,
-          "integrity": "sha256-29260e60db146d859d39b40fd4f66eeeafc1a1418ef2789cce49a71c1b76e148",
+          "integrity": "sha256-6d597ee8253c7347d8b8db2943d370691b94a2c23932d37991d68d084456b2ba",
           "publicPath": "/visuals/files/runStateReadyLight/runStateReadyLight-1440-4b40f26d3849.avif",
           "width": 1440
         },
@@ -1708,10 +1708,10 @@
       "themePairId": "runStateRunningLight",
       "outputs": [
         {
-          "byteLength": 2891,
+          "byteLength": 2971,
           "format": "avif",
           "height": 300,
-          "integrity": "sha256-e5f5236503dcdd0a0eaa09afe9fe1521f991bcee629be88dcaf0e89a7b207f80",
+          "integrity": "sha256-ff18bb6965489129ef8bdf2136327a01ba35e6f3c0a5ce4a0cf5953ad935d913",
           "publicPath": "/visuals/files/runStateRunning/runStateRunning-480-3b5c4442b574.avif",
           "width": 480
         },
@@ -1724,10 +1724,10 @@
           "width": 480
         },
         {
-          "byteLength": 5220,
+          "byteLength": 5348,
           "format": "avif",
           "height": 450,
-          "integrity": "sha256-0553106f0adf88fd3fcd67e4f32c1062480d119757ee7d45a3169cb613fe5210",
+          "integrity": "sha256-c488e71788d4b56935c29af892bacc7162d4d1d2436eec01bd772f1b7252e971",
           "publicPath": "/visuals/files/runStateRunning/runStateRunning-720-3b5c4442b574.avif",
           "width": 720
         },
@@ -1740,10 +1740,10 @@
           "width": 720
         },
         {
-          "byteLength": 10326,
+          "byteLength": 10685,
           "format": "avif",
           "height": 750,
-          "integrity": "sha256-4042246f4bd9e644500b79ffebaf4ece6d7b765a95fa78fb4dc71de9275c6878",
+          "integrity": "sha256-825177f375267bc20f5c5648d05302ad992d9dc8ca1b7a5f83f617c1e8d69a6f",
           "publicPath": "/visuals/files/runStateRunning/runStateRunning-1200-3b5c4442b574.avif",
           "width": 1200
         },
@@ -1756,10 +1756,10 @@
           "width": 1200
         },
         {
-          "byteLength": 10138,
+          "byteLength": 10283,
           "format": "avif",
           "height": 900,
-          "integrity": "sha256-c20f01865a27fad9fabf79bd0235d044b73ab81a1b6762f9656095d14254b7f0",
+          "integrity": "sha256-79f721c8b514584c6e6b9331d2a804271a6ae2efc6037267c270f09483bf8f85",
           "publicPath": "/visuals/files/runStateRunning/runStateRunning-1440-3b5c4442b574.avif",
           "width": 1440
         },
@@ -1867,10 +1867,10 @@
       "themePairId": "runStateRunning",
       "outputs": [
         {
-          "byteLength": 2842,
+          "byteLength": 2913,
           "format": "avif",
           "height": 300,
-          "integrity": "sha256-10587f8d468348b12a20927622abe3efb265396c94813791004ab062baf1cbce",
+          "integrity": "sha256-ee22567d3d5f8ed8e05829968a37a3f4be7dfd2ca05d71dfbd6ebd9396f1cc45",
           "publicPath": "/visuals/files/runStateRunningLight/runStateRunningLight-480-6e0e396f4388.avif",
           "width": 480
         },
@@ -1883,10 +1883,10 @@
           "width": 480
         },
         {
-          "byteLength": 4918,
+          "byteLength": 5046,
           "format": "avif",
           "height": 450,
-          "integrity": "sha256-a99bd8f84320b06be6c179882fb7445317bdff7eec33d99be4646c49400a54a4",
+          "integrity": "sha256-93d0cc24858cfbc709fa602152ed64be575c9bbdbd53bf2eeab1cffb312b6166",
           "publicPath": "/visuals/files/runStateRunningLight/runStateRunningLight-720-6e0e396f4388.avif",
           "width": 720
         },
@@ -1899,10 +1899,10 @@
           "width": 720
         },
         {
-          "byteLength": 9727,
+          "byteLength": 9978,
           "format": "avif",
           "height": 750,
-          "integrity": "sha256-9361173f33057b1dea05d32a661f2414748a8054ba41f5158d097ecaaabfe09d",
+          "integrity": "sha256-45e6a0723d6501e5880ea3015675709370e6304bb5d20043baaeb3bc53faf8b1",
           "publicPath": "/visuals/files/runStateRunningLight/runStateRunningLight-1200-6e0e396f4388.avif",
           "width": 1200
         },
@@ -1915,10 +1915,10 @@
           "width": 1200
         },
         {
-          "byteLength": 9686,
+          "byteLength": 9840,
           "format": "avif",
           "height": 900,
-          "integrity": "sha256-93c44248af71b591afed09c3b4704bcac798be69e7e32f775e3d03386d1cbef6",
+          "integrity": "sha256-bd4d18ea066a9228a810aba23c5785be0fb205aea8d423e54173ce378d6d0a5b",
           "publicPath": "/visuals/files/runStateRunningLight/runStateRunningLight-1440-6e0e396f4388.avif",
           "width": 1440
         },
@@ -2024,10 +2024,10 @@
       "themePairId": "runStateCheckFailLight",
       "outputs": [
         {
-          "byteLength": 14383,
+          "byteLength": 14617,
           "format": "avif",
           "height": 405,
-          "integrity": "sha256-119a81d4fd017c8cb146cebccd8e0e768efdc0b37d6dcf1b110b08b915abf2ca",
+          "integrity": "sha256-c7ecb4895ac37572c1267549d406a526682a3013d2e04f90acfbed3e98771f7d",
           "publicPath": "/visuals/files/runStateCheckFail/runStateCheckFail-480-9c4c22578ea3.avif",
           "width": 480
         },
@@ -2040,10 +2040,10 @@
           "width": 480
         },
         {
-          "byteLength": 29101,
+          "byteLength": 29327,
           "format": "avif",
           "height": 608,
-          "integrity": "sha256-1277fccbad912c7ddfe283677705c69249036581b40440174f2f0b023a9ff352",
+          "integrity": "sha256-18416e186bdacd16ed57fa3fd0256783307a58c3e7b6043fd64d4a682d4f4e64",
           "publicPath": "/visuals/files/runStateCheckFail/runStateCheckFail-720-9c4c22578ea3.avif",
           "width": 720
         },
@@ -2056,10 +2056,10 @@
           "width": 720
         },
         {
-          "byteLength": 29408,
+          "byteLength": 29621,
           "format": "avif",
           "height": 760,
-          "integrity": "sha256-9d4a5d2097535e8bae9909b75ade0fc89b532f595871959f0c67121ac5781722",
+          "integrity": "sha256-20e332e45ee77bcd2ad017b8b5d1fc33ef03944ad3626ef55ac79c7fae654552",
           "publicPath": "/visuals/files/runStateCheckFail/runStateCheckFail-900-9c4c22578ea3.avif",
           "width": 900
         },
@@ -2165,10 +2165,10 @@
       "themePairId": "runStateCheckFail",
       "outputs": [
         {
-          "byteLength": 12460,
+          "byteLength": 12518,
           "format": "avif",
           "height": 405,
-          "integrity": "sha256-d312d6110a1368f80d014a728534d5ba48917926b2098ccde8f1fcf82ec5f723",
+          "integrity": "sha256-020c6eb5ceb043201fc2b02d621c35245e600baf9f2522555b9b2d3350a7c95a",
           "publicPath": "/visuals/files/runStateCheckFailLight/runStateCheckFailLight-480-835a10cf0509.avif",
           "width": 480
         },
@@ -2181,10 +2181,10 @@
           "width": 480
         },
         {
-          "byteLength": 25568,
+          "byteLength": 25858,
           "format": "avif",
           "height": 608,
-          "integrity": "sha256-31e0667dbe98f9d0cf92e57d54e33a44970de20c614d043d41850ff938dff1f2",
+          "integrity": "sha256-51cef02f71cf0a7d5178a3fd3b04059273576f4cd4f5ef8dc47dcb83ab1c351f",
           "publicPath": "/visuals/files/runStateCheckFailLight/runStateCheckFailLight-720-835a10cf0509.avif",
           "width": 720
         },
@@ -2197,10 +2197,10 @@
           "width": 720
         },
         {
-          "byteLength": 27381,
+          "byteLength": 27608,
           "format": "avif",
           "height": 760,
-          "integrity": "sha256-21446286b32b77eb07181b97ea674b004300a522e308a2a1de37640fa260e73e",
+          "integrity": "sha256-af1d58ff661663796ecd0daa139e4ba297fd00f7e73073a3891afaabea2de402",
           "publicPath": "/visuals/files/runStateCheckFailLight/runStateCheckFailLight-900-835a10cf0509.avif",
           "width": 900
         },
@@ -2306,10 +2306,10 @@
       "themePairId": "runStateCheckPassLight",
       "outputs": [
         {
-          "byteLength": 22077,
+          "byteLength": 22277,
           "format": "avif",
           "height": 640,
-          "integrity": "sha256-fd158a18ccbc27a7302d23c6d14cd36fe537bbfdacbde439ab39b293831fe216",
+          "integrity": "sha256-03e91f518b062549a3dd542633e6d2c4a8953acfa0f28c258c5c3e7125420b0e",
           "publicPath": "/visuals/files/runStateCheckPass/runStateCheckPass-480-31e0a64f8a5e.avif",
           "width": 480
         },
@@ -2322,10 +2322,10 @@
           "width": 480
         },
         {
-          "byteLength": 42276,
+          "byteLength": 42718,
           "format": "avif",
           "height": 960,
-          "integrity": "sha256-15dde2f8f4cf6fd7d24526c1933f8b8c4df42066038b8379b83dcf2cae587405",
+          "integrity": "sha256-3f97be4ab70401f6c66994347e1d976800c677e5466076485091e434843386de",
           "publicPath": "/visuals/files/runStateCheckPass/runStateCheckPass-720-31e0a64f8a5e.avif",
           "width": 720
         },
@@ -2338,10 +2338,10 @@
           "width": 720
         },
         {
-          "byteLength": 34813,
+          "byteLength": 35079,
           "format": "avif",
           "height": 1024,
-          "integrity": "sha256-0f8f09fb923e9d0ecdc0ce4b1a7ee9b2bbbdf3d6fbd4d630d435d753bbbd4211",
+          "integrity": "sha256-ffddd7517c65e0340b41f2aa4bb5af118048a9cba9b6cbda92b110c15540148b",
           "publicPath": "/visuals/files/runStateCheckPass/runStateCheckPass-768-31e0a64f8a5e.avif",
           "width": 768
         },
@@ -2447,10 +2447,10 @@
       "themePairId": "runStateCheckPass",
       "outputs": [
         {
-          "byteLength": 19139,
+          "byteLength": 19274,
           "format": "avif",
           "height": 640,
-          "integrity": "sha256-d7719a10692bad39bae9620e52437033b64acddfa54389eeb9abf17262bc3948",
+          "integrity": "sha256-1e3634962b7dbad73e2a6843a0275602c39540d35eec1d394c7861f9f8425cc3",
           "publicPath": "/visuals/files/runStateCheckPassLight/runStateCheckPassLight-480-13a854b2d3a7.avif",
           "width": 480
         },
@@ -2463,10 +2463,10 @@
           "width": 480
         },
         {
-          "byteLength": 36913,
+          "byteLength": 37133,
           "format": "avif",
           "height": 960,
-          "integrity": "sha256-ad6cb2ae8e286feed46c864c73f170ab0d3dcad48c334ac7e9798fff12312d1e",
+          "integrity": "sha256-e8dfc1eaf354cd2cdf56f909980ba0271a0b23961b26d1a92249356720e2c48c",
           "publicPath": "/visuals/files/runStateCheckPassLight/runStateCheckPassLight-720-13a854b2d3a7.avif",
           "width": 720
         },
@@ -2479,10 +2479,10 @@
           "width": 720
         },
         {
-          "byteLength": 31897,
+          "byteLength": 32234,
           "format": "avif",
           "height": 1024,
-          "integrity": "sha256-16eec66743d964c901f407895b23a32d06bed0c0b3a54839e286368e9c6cfe6c",
+          "integrity": "sha256-0ba9797fdb9e17c6d89d0903d7c9d389e1112313a0b6b3e54cf058da949cc88e",
           "publicPath": "/visuals/files/runStateCheckPassLight/runStateCheckPassLight-768-13a854b2d3a7.avif",
           "width": 768
         },
@@ -2588,10 +2588,10 @@
       "themePairId": "runStateLocalRequiredLight",
       "outputs": [
         {
-          "byteLength": 15857,
+          "byteLength": 16050,
           "format": "avif",
           "height": 405,
-          "integrity": "sha256-6f7e30e9de9b656f80354a5c7270731365e7f5ca5dcce19e547ddf8c5a5e918a",
+          "integrity": "sha256-c5e01217816d1884084446b142f9bf3f7864d44a9b3728a77a356c5ea7f9a168",
           "publicPath": "/visuals/files/runStateLocalRequired/runStateLocalRequired-480-6dd08134e35f.avif",
           "width": 480
         },
@@ -2604,10 +2604,10 @@
           "width": 480
         },
         {
-          "byteLength": 30542,
+          "byteLength": 30994,
           "format": "avif",
           "height": 608,
-          "integrity": "sha256-373348ebf6e70373e6dda0d1c3259c7a4dd33157a34465b788e6dbdec33a9bd1",
+          "integrity": "sha256-75fb009656603d497bba2cfdf708517422d41d12e1c2077333cc1e8121188a7f",
           "publicPath": "/visuals/files/runStateLocalRequired/runStateLocalRequired-720-6dd08134e35f.avif",
           "width": 720
         },
@@ -2620,10 +2620,10 @@
           "width": 720
         },
         {
-          "byteLength": 31943,
+          "byteLength": 32136,
           "format": "avif",
           "height": 760,
-          "integrity": "sha256-3a06e37360776a088ce2e4b778c6b72e4eeeb119f6f5d43b42422958d5cfb9f9",
+          "integrity": "sha256-d85cd02470aaca7d6d9159f38a329252b92ec9b05539fbf89d97931cd12dabe2",
           "publicPath": "/visuals/files/runStateLocalRequired/runStateLocalRequired-900-6dd08134e35f.avif",
           "width": 900
         },
@@ -2729,10 +2729,10 @@
       "themePairId": "runStateLocalRequired",
       "outputs": [
         {
-          "byteLength": 14074,
+          "byteLength": 14174,
           "format": "avif",
           "height": 405,
-          "integrity": "sha256-f5b78ae14b2d1cda9a43d0ba7d1a17f824f4a3bfb61c3d176c6abcc05710427d",
+          "integrity": "sha256-dfde96fafadc50adac298d267ff6291d2990ca143a58d3ae46acfdf97b4cc046",
           "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-480-1912ba74d889.avif",
           "width": 480
         },
@@ -2745,10 +2745,10 @@
           "width": 480
         },
         {
-          "byteLength": 27179,
+          "byteLength": 27450,
           "format": "avif",
           "height": 608,
-          "integrity": "sha256-d81eef1aca9fc7f531faf6228ae17accd5bbfce9fd411a946f7650d4b1dfabc5",
+          "integrity": "sha256-5b352929b42fcd9edaafa558898f5cfe58f6376a9e3ffbfee7400a8f2ccd4cd7",
           "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-720-1912ba74d889.avif",
           "width": 720
         },
@@ -2761,10 +2761,10 @@
           "width": 720
         },
         {
-          "byteLength": 29671,
+          "byteLength": 29838,
           "format": "avif",
           "height": 760,
-          "integrity": "sha256-4ca0a9723b97d0bc44a2629ade83347a5d75f537e5f3ba4a2bdad98812ddc72b",
+          "integrity": "sha256-6c45f1c49c4763560ba379f37840c14a7d1a9d5a19ad98dac10a7c567a0e0dae",
           "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-900-1912ba74d889.avif",
           "width": 900
         },
@@ -2854,10 +2854,10 @@
       },
       "outputs": [
         {
-          "byteLength": 4384,
+          "byteLength": 4500,
           "format": "avif",
           "height": 270,
-          "integrity": "sha256-ad4cfd2da09c0937368b52fe592e541f3ff8abbbf99dc767872271bf6945ead0",
+          "integrity": "sha256-a8ea43fd0374ffd5fb3523a1a36a86490c137fc4a46893381a55fc91ccc4053c",
           "publicPath": "/visuals/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.avif",
           "width": 480
         },
@@ -2870,10 +2870,10 @@
           "width": 480
         },
         {
-          "byteLength": 7581,
+          "byteLength": 7766,
           "format": "avif",
           "height": 405,
-          "integrity": "sha256-3fd5b0b2ad1c37bf60dcb394522ddefe58c2e6e04839e7583f25e15de2d7adec",
+          "integrity": "sha256-cb68667934463b1d4a921abb84b7ff3c0029de91e3dccc2a091f1ac4f8ca6099",
           "publicPath": "/visuals/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.avif",
           "width": 720
         },
@@ -2886,10 +2886,10 @@
           "width": 720
         },
         {
-          "byteLength": 12151,
+          "byteLength": 12309,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-45dbbdd22708a81ce366c4d4dd245959e94c0002accc47fdc33f1619af22baa8",
+          "integrity": "sha256-ecb34282e73f1f79a388a158f9b23a492f3eb5aa972c65a3ebab998f1180a637",
           "publicPath": "/visuals/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.avif",
           "width": 1200
         },
@@ -2979,10 +2979,10 @@
       },
       "outputs": [
         {
-          "byteLength": 3966,
+          "byteLength": 4016,
           "format": "avif",
           "height": 270,
-          "integrity": "sha256-2afd0380e6d521d0b45e28e4b927e566e1ab485b31f1236d781c6079d7f8547c",
+          "integrity": "sha256-a6453c3ab81f8d80d521499842eee097224ff3595f511acc99ff47e4d9ce0e00",
           "publicPath": "/visuals/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.avif",
           "width": 480
         },
@@ -2995,10 +2995,10 @@
           "width": 480
         },
         {
-          "byteLength": 6698,
+          "byteLength": 6778,
           "format": "avif",
           "height": 405,
-          "integrity": "sha256-9eb0c6a6494dd8f70c34db0adb78000815213842a3db6011f05e272e324dbcd4",
+          "integrity": "sha256-58db660eb8baa39cc0187ff2c88d2b60bdeebbc2bbaffca134cc4a93629aac5e",
           "publicPath": "/visuals/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.avif",
           "width": 720
         },
@@ -3011,10 +3011,10 @@
           "width": 720
         },
         {
-          "byteLength": 11598,
+          "byteLength": 11765,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-94eb73ae689d6e1db7f20bf345b1115508ae71b1b85f9c8811bd4e85bc526a6b",
+          "integrity": "sha256-357731b13fac7c6cfa9c825afaa468021d20a5411212dc8f0c50e483545e837a",
           "publicPath": "/visuals/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.avif",
           "width": 1200
         },
@@ -3104,10 +3104,10 @@
       },
       "outputs": [
         {
-          "byteLength": 5322,
+          "byteLength": 5427,
           "format": "avif",
           "height": 270,
-          "integrity": "sha256-44c9bed4b2cf597c90182b63aa2d231de0d48a897dcd0f36f0a43ba5327b5881",
+          "integrity": "sha256-ae695b8a8ad0697487583bb709c61e1908c88dbfce3d59c2bf7f4425868122eb",
           "publicPath": "/visuals/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.avif",
           "width": 480
         },
@@ -3120,10 +3120,10 @@
           "width": 480
         },
         {
-          "byteLength": 9103,
+          "byteLength": 9243,
           "format": "avif",
           "height": 405,
-          "integrity": "sha256-a755d1f1aac03b7847bb4adbd920fd336e17337fc451b1bfb161247e03c5c488",
+          "integrity": "sha256-f16e0c5eb69afca5433df4455a09d7426b6f7c113d9660cf17c8108bd930d202",
           "publicPath": "/visuals/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.avif",
           "width": 720
         },
@@ -3136,10 +3136,10 @@
           "width": 720
         },
         {
-          "byteLength": 15691,
+          "byteLength": 15897,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-e1c1747baa5415975d0cb3cbfb3623c7d56be54a03b351e9bfb2af72ea5e49b2",
+          "integrity": "sha256-09b7db69bd475c6181d029ec4ae9bb9ae8745a2c41c17d4cdad1f4b622f6b3f1",
           "publicPath": "/visuals/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.avif",
           "width": 1200
         },
@@ -3229,10 +3229,10 @@
       },
       "outputs": [
         {
-          "byteLength": 3970,
+          "byteLength": 4065,
           "format": "avif",
           "height": 270,
-          "integrity": "sha256-3fcbe8f5d1b392a04cc508d9d188582ef75cf18cf739cc31bf59793c9a3007ba",
+          "integrity": "sha256-c51f1e3a81074f4fdd2c4a4b6fa008aea2b44960ad52b7ac94169b0679c554a0",
           "publicPath": "/visuals/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.avif",
           "width": 480
         },
@@ -3245,10 +3245,10 @@
           "width": 480
         },
         {
-          "byteLength": 6866,
+          "byteLength": 7059,
           "format": "avif",
           "height": 405,
-          "integrity": "sha256-4feaed9dbba456df71745dcb3ab0986c39c9e74b86963b6799ab718e338540e7",
+          "integrity": "sha256-7dd772967686510556c555f74c1b1c2baf2affac1435a0fd3511391d9410a602",
           "publicPath": "/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.avif",
           "width": 720
         },
@@ -3261,10 +3261,10 @@
           "width": 720
         },
         {
-          "byteLength": 11895,
+          "byteLength": 12077,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-32d5c78b289a61e9f5c4cfce017064cf9f20698eb5009a4b112539b6000432ac",
+          "integrity": "sha256-52713866038c4e4a619b6612d827803cd65026a08aec142a17c6a4725cd0a782",
           "publicPath": "/visuals/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.avif",
           "width": 1200
         },
@@ -3354,10 +3354,10 @@
       },
       "outputs": [
         {
-          "byteLength": 4909,
+          "byteLength": 5045,
           "format": "avif",
           "height": 270,
-          "integrity": "sha256-d58c81a2efd8710fa1f250fb14a856128754a4d85d2f707227223dc40a04a41b",
+          "integrity": "sha256-c955cd66858497bd31a52775278b38f5232412c3f0e13ee1ad8f8d056e89ddc0",
           "publicPath": "/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.avif",
           "width": 480
         },
@@ -3370,10 +3370,10 @@
           "width": 480
         },
         {
-          "byteLength": 8415,
+          "byteLength": 8603,
           "format": "avif",
           "height": 405,
-          "integrity": "sha256-df3e6a090930b2f16abe391e9bb2337c6e56cc56a2912e6635c576b60ed9c69f",
+          "integrity": "sha256-88d000639ed506230411d82fd225ee79b94c184fd9d8945db0733fecc9a00662",
           "publicPath": "/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.avif",
           "width": 720
         },
@@ -3386,10 +3386,10 @@
           "width": 720
         },
         {
-          "byteLength": 14760,
+          "byteLength": 14874,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-458bd6022191cd84cf00c6d4b6ed0aff8e4abbf0729a3b25e38c2486dc7578be",
+          "integrity": "sha256-690099b29c220a10d6e52de822e36a03a10a80f371ef7b25aef9c1f687557e42",
           "publicPath": "/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.avif",
           "width": 1200
         },
@@ -3479,10 +3479,10 @@
       },
       "outputs": [
         {
-          "byteLength": 4115,
+          "byteLength": 4178,
           "format": "avif",
           "height": 270,
-          "integrity": "sha256-8de5cb1f7bb344fff9c57316e28442315b414a39220ea82e6ec8a2c16be3831a",
+          "integrity": "sha256-004f266988cacf9c41aa771f8cb80001799fae40c141d90b1c35f41b02778a84",
           "publicPath": "/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.avif",
           "width": 480
         },
@@ -3495,10 +3495,10 @@
           "width": 480
         },
         {
-          "byteLength": 7133,
+          "byteLength": 7257,
           "format": "avif",
           "height": 405,
-          "integrity": "sha256-dce23a4c47832f5b517bdf7a65bc4e103f522ffa7ba93520cb103987ea43f133",
+          "integrity": "sha256-972c2fb77900bd082381f4609ee41629a11dd4ba86c045335061e7df85fdeaf3",
           "publicPath": "/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.avif",
           "width": 720
         },
@@ -3511,10 +3511,10 @@
           "width": 720
         },
         {
-          "byteLength": 12185,
+          "byteLength": 12279,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-1709289a37ee0049f4cb502cd3b0a9f0c484e0fdb448c34793386f9827ededbf",
+          "integrity": "sha256-aba6ca94c830550d5d00ab404b019578f7f91283a64ebf3f7a86af05f8f719af",
           "publicPath": "/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.avif",
           "width": 1200
         },
@@ -3589,10 +3589,10 @@
       },
       "outputs": [
         {
-          "byteLength": 11504,
+          "byteLength": 11567,
           "format": "avif",
           "height": 270,
-          "integrity": "sha256-e301f55fab41699e4745282a8038e6830e028804eb69bce49fbe10ae400bb388",
+          "integrity": "sha256-da08b1a8fc130d2373c6cf9488beb60ea08cb7c16cf305202b0ceb4cc873d06a",
           "publicPath": "/visuals/files/pythonFundamentals/pythonFundamentals-480-209adca76258.avif",
           "width": 480
         },
@@ -3605,10 +3605,10 @@
           "width": 480
         },
         {
-          "byteLength": 26158,
+          "byteLength": 26612,
           "format": "avif",
           "height": 473,
-          "integrity": "sha256-16cdfc1e1427035a58236359168c50b1850ee4390efbc91630efe04b976db179",
+          "integrity": "sha256-14dd4505cd1531b525462928d198f8ed8f49fd7f74d4e32fe5df4ef86ec840c1",
           "publicPath": "/visuals/files/pythonFundamentals/pythonFundamentals-840-209adca76258.avif",
           "width": 840
         },
@@ -3621,10 +3621,10 @@
           "width": 840
         },
         {
-          "byteLength": 46892,
+          "byteLength": 47276,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-628cc31e5e6cf5c0cdf9329e8c058b3aa0f428bb4779fb39138550a9cd0667b9",
+          "integrity": "sha256-b5a72f6e42651df811323c650589d62980e70ebd651c2ad7c3ba38f3b661ae97",
           "publicPath": "/visuals/files/pythonFundamentals/pythonFundamentals-1200-209adca76258.avif",
           "width": 1200
         },
@@ -3637,10 +3637,10 @@
           "width": 1200
         },
         {
-          "byteLength": 81676,
+          "byteLength": 82333,
           "format": "avif",
           "height": 941,
-          "integrity": "sha256-72991a39ea7aeafee7e778687807a1dfba69b802cc94cf25b1c36fd62998978e",
+          "integrity": "sha256-ebef3158e187686a078ceabe0262d7ae10454082c563c9db1c268fa12fca0b77",
           "publicPath": "/visuals/files/pythonFundamentals/pythonFundamentals-1672-209adca76258.avif",
           "width": 1672
         },
@@ -3715,10 +3715,10 @@
       },
       "outputs": [
         {
-          "byteLength": 11281,
+          "byteLength": 11459,
           "format": "avif",
           "height": 270,
-          "integrity": "sha256-615dfb198d1a13fd82f4ea75fcad0a68989723a421fbdcb86901c6eb995096e7",
+          "integrity": "sha256-8536d46a85b04d660e640cb9b938cdd9e73430adfc09b7be3267b20807d296be",
           "publicPath": "/visuals/files/dataAnalysis/dataAnalysis-480-b0ac8b2e6692.avif",
           "width": 480
         },
@@ -3731,10 +3731,10 @@
           "width": 480
         },
         {
-          "byteLength": 25442,
+          "byteLength": 25738,
           "format": "avif",
           "height": 473,
-          "integrity": "sha256-5416761f91d9a2a069506e6ea3414b07c857573f674e70cfee4c2840602b6207",
+          "integrity": "sha256-43cf74d829ab2709d24de2eac7f7a1357bed3cffa35a187a0734ed59dc95fbc9",
           "publicPath": "/visuals/files/dataAnalysis/dataAnalysis-840-b0ac8b2e6692.avif",
           "width": 840
         },
@@ -3747,10 +3747,10 @@
           "width": 840
         },
         {
-          "byteLength": 44129,
+          "byteLength": 44618,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-e257c79b3fe12bab5361cf68f21d369a8f50933cf55f160559ac75e0d34b30eb",
+          "integrity": "sha256-005327627b95d65a9d6a4414d316d8f23feafcf68210d005917758bb3f5ad33b",
           "publicPath": "/visuals/files/dataAnalysis/dataAnalysis-1200-b0ac8b2e6692.avif",
           "width": 1200
         },
@@ -3763,10 +3763,10 @@
           "width": 1200
         },
         {
-          "byteLength": 76155,
+          "byteLength": 77282,
           "format": "avif",
           "height": 941,
-          "integrity": "sha256-44569cc141aecedad12160a5c4ea662680dc8ac16c566f82ddc0918e93bb2583",
+          "integrity": "sha256-62d8d91bc8676579efc1a8b8c92827c9dcd6cf303437e884d93ea16d4671f5bf",
           "publicPath": "/visuals/files/dataAnalysis/dataAnalysis-1672-b0ac8b2e6692.avif",
           "width": 1672
         },
@@ -3841,10 +3841,10 @@
       },
       "outputs": [
         {
-          "byteLength": 9259,
+          "byteLength": 9418,
           "format": "avif",
           "height": 270,
-          "integrity": "sha256-b83e1f53a6e0e802c7715d3bfa0f917b9178fcaacbee7b124b2016a3ec53e0d2",
+          "integrity": "sha256-4744786a552c37df5ef9d8d940a7074ec910a475e5d21c106fe8a288d2124fc1",
           "publicPath": "/visuals/files/dataVisualization/dataVisualization-480-5248dc1b6fb1.avif",
           "width": 480
         },
@@ -3857,10 +3857,10 @@
           "width": 480
         },
         {
-          "byteLength": 19738,
+          "byteLength": 20076,
           "format": "avif",
           "height": 473,
-          "integrity": "sha256-2f8ada81eeaa68893bd90aab89fe6bcbeec3ada3a13802bcd89e8b882734c173",
+          "integrity": "sha256-aec74e2ed481ab9fd063e09e588be1c6098a0bbf133d2d4f3a0ab673e3072c89",
           "publicPath": "/visuals/files/dataVisualization/dataVisualization-840-5248dc1b6fb1.avif",
           "width": 840
         },
@@ -3873,10 +3873,10 @@
           "width": 840
         },
         {
-          "byteLength": 32610,
+          "byteLength": 33243,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-e2ce17f156b4c4d4440d77bad6413f2c063cede019ccf08a5877d3e66ff978ba",
+          "integrity": "sha256-71864887478dcb34833a4711b4a9f390d29fec523ef7f0fbe579b1326e73552f",
           "publicPath": "/visuals/files/dataVisualization/dataVisualization-1200-5248dc1b6fb1.avif",
           "width": 1200
         },
@@ -3889,10 +3889,10 @@
           "width": 1200
         },
         {
-          "byteLength": 56904,
+          "byteLength": 57953,
           "format": "avif",
           "height": 941,
-          "integrity": "sha256-d2e25e0420922475b97eddd072946295beaa7770e9f6a00f439f18eb14bea516",
+          "integrity": "sha256-c0e0afb5e4c30754c440be523951d297bdf5753806598b0f0f66a69a3396071f",
           "publicPath": "/visuals/files/dataVisualization/dataVisualization-1672-5248dc1b6fb1.avif",
           "width": 1672
         },
@@ -3967,10 +3967,10 @@
       },
       "outputs": [
         {
-          "byteLength": 11922,
+          "byteLength": 12044,
           "format": "avif",
           "height": 270,
-          "integrity": "sha256-1314621abbc7ade0c95eb9a1354a51066def15ebc782f065eb6435c61148f298",
+          "integrity": "sha256-2763ff3b7d917e3728daf7534168ac7448cad714ea921e376f1ececf59558f80",
           "publicPath": "/visuals/files/statisticsMachineLearning/statisticsMachineLearning-480-d6e581dafc4f.avif",
           "width": 480
         },
@@ -3983,10 +3983,10 @@
           "width": 480
         },
         {
-          "byteLength": 27472,
+          "byteLength": 27815,
           "format": "avif",
           "height": 473,
-          "integrity": "sha256-65952ad98de804835e65ca404a3594051bb45602e18efa465c3ec6555eca4ad9",
+          "integrity": "sha256-a9b791e34e795ffae1b7bc622b3919c5ec06089d9b1ef670fb84fc2cdbc27104",
           "publicPath": "/visuals/files/statisticsMachineLearning/statisticsMachineLearning-840-d6e581dafc4f.avif",
           "width": 840
         },
@@ -3999,10 +3999,10 @@
           "width": 840
         },
         {
-          "byteLength": 48588,
+          "byteLength": 49017,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-15b2d32c93f92023c2b208e56d91b4c12ce022c216af232b3616f0be5182dfbc",
+          "integrity": "sha256-2eadeee37a3e2252f57525f90f64a1778508b074b134524f5a349d44a2960542",
           "publicPath": "/visuals/files/statisticsMachineLearning/statisticsMachineLearning-1200-d6e581dafc4f.avif",
           "width": 1200
         },
@@ -4015,10 +4015,10 @@
           "width": 1200
         },
         {
-          "byteLength": 86267,
+          "byteLength": 87164,
           "format": "avif",
           "height": 941,
-          "integrity": "sha256-289b26c21d6c2d4d1c478ab80ad309088622378ca42546c41f29bd34823c1c9f",
+          "integrity": "sha256-9b55ec4a6ff38e4a39113d07db32ee3ac9e7214533f24c7d919437421ee46c85",
           "publicPath": "/visuals/files/statisticsMachineLearning/statisticsMachineLearning-1672-d6e581dafc4f.avif",
           "width": 1672
         },
@@ -4093,10 +4093,10 @@
       },
       "outputs": [
         {
-          "byteLength": 14421,
+          "byteLength": 14525,
           "format": "avif",
           "height": 270,
-          "integrity": "sha256-0ce6e6300a1f31a1416431431e13d99612939bb2b082abc70551dd75e6bc4374",
+          "integrity": "sha256-6c98b59744dbab86b0bde13a133c15244755403696dd1373ec567c79d36b87b9",
           "publicPath": "/visuals/files/imageVision/imageVision-480-1b1922d95f3d.avif",
           "width": 480
         },
@@ -4109,10 +4109,10 @@
           "width": 480
         },
         {
-          "byteLength": 32974,
+          "byteLength": 33234,
           "format": "avif",
           "height": 473,
-          "integrity": "sha256-a162917dbfeb4c125bc531586f428137ae5620364f6eaa5f88544e5be9cbf69b",
+          "integrity": "sha256-15ee46d6c842dc58724cd452b0d294269fe7f5b003a20f5bd1fd95920468a2e0",
           "publicPath": "/visuals/files/imageVision/imageVision-840-1b1922d95f3d.avif",
           "width": 840
         },
@@ -4125,10 +4125,10 @@
           "width": 840
         },
         {
-          "byteLength": 56217,
+          "byteLength": 56812,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-1d40c9fb17521e19cdf91c0f13941aafedb12e0cb35fb9f6d3931519f528cfa5",
+          "integrity": "sha256-212947a56c30eec2d56168942436801793ac9a80b07386adad0da0eb6d5801cc",
           "publicPath": "/visuals/files/imageVision/imageVision-1200-1b1922d95f3d.avif",
           "width": 1200
         },
@@ -4141,10 +4141,10 @@
           "width": 1200
         },
         {
-          "byteLength": 90697,
+          "byteLength": 91772,
           "format": "avif",
           "height": 941,
-          "integrity": "sha256-81fc84b76a58ec50da73d90ef48786f46f115fb0e2a3f68c4ff0f8223cfaedab",
+          "integrity": "sha256-0fb2a9e708bf6a55b47cab6474b6b9563483af1783d8ba03c326b817ae15eece",
           "publicPath": "/visuals/files/imageVision/imageVision-1672-1b1922d95f3d.avif",
           "width": 1672
         },
@@ -4219,10 +4219,10 @@
       },
       "outputs": [
         {
-          "byteLength": 10173,
+          "byteLength": 10286,
           "format": "avif",
           "height": 270,
-          "integrity": "sha256-fc5aa25d690eac16c33aa5b3d48915adaea4aff47ef717348c6866fb1b5e89fc",
+          "integrity": "sha256-1ebca9ca6067e242af2919d4f3f85e7555aeff3ca5db0b62a2694ea319abd33a",
           "publicPath": "/visuals/files/learningAutomation/learningAutomation-480-a21d2e976646.avif",
           "width": 480
         },
@@ -4235,10 +4235,10 @@
           "width": 480
         },
         {
-          "byteLength": 21616,
+          "byteLength": 21979,
           "format": "avif",
           "height": 473,
-          "integrity": "sha256-1a5ee27465d6f03216f2b14fa50b824179c797cc597fe8b2d4426cb84ece8d87",
+          "integrity": "sha256-405602c114a68b345e1c98b66dc009033e7595c712afa3ed268b29fcb490eaa6",
           "publicPath": "/visuals/files/learningAutomation/learningAutomation-840-a21d2e976646.avif",
           "width": 840
         },
@@ -4251,10 +4251,10 @@
           "width": 840
         },
         {
-          "byteLength": 39915,
+          "byteLength": 40717,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-815bba1701824f2e2b0d52f38ae920a91a8fa142bf2f965d4e49ccd58f4f1bde",
+          "integrity": "sha256-c2edca55af909a156438ed74ea668df98ea82b973fcdd678cc64d74c17871801",
           "publicPath": "/visuals/files/learningAutomation/learningAutomation-1200-a21d2e976646.avif",
           "width": 1200
         },
@@ -4267,10 +4267,10 @@
           "width": 1200
         },
         {
-          "byteLength": 81422,
+          "byteLength": 82735,
           "format": "avif",
           "height": 941,
-          "integrity": "sha256-3ee3472a88c1ce22fe59ae03b0aa23d471cc5742e41182459ef4c53d8f27d885",
+          "integrity": "sha256-ec52de4e045607fdc16e041107564bc9295009e8a4b693fde78782e9d0cf9f2d",
           "publicPath": "/visuals/files/learningAutomation/learningAutomation-1672-a21d2e976646.avif",
           "width": 1672
         },
@@ -4345,10 +4345,10 @@
       },
       "outputs": [
         {
-          "byteLength": 9979,
+          "byteLength": 10096,
           "format": "avif",
           "height": 270,
-          "integrity": "sha256-0905d56585552ada51d01246a8366eb988810e361e36039d41bfa1ae9df94db8",
+          "integrity": "sha256-2239c8b346f7ab22926c5b32e8d9703f00936336eb3b4e826429eca9b5091529",
           "publicPath": "/visuals/files/developerLiteracy/developerLiteracy-480-9990255713da.avif",
           "width": 480
         },
@@ -4361,10 +4361,10 @@
           "width": 480
         },
         {
-          "byteLength": 20194,
+          "byteLength": 20438,
           "format": "avif",
           "height": 473,
-          "integrity": "sha256-b99f90899d9b4900f861dc1c8e4c26dbdd2fd6a08a7142980b58bd9c497368ca",
+          "integrity": "sha256-0508c73b8f436d741f0fcd67b49803531c22e3a29966ce8b59fc7c568609770e",
           "publicPath": "/visuals/files/developerLiteracy/developerLiteracy-840-9990255713da.avif",
           "width": 840
         },
@@ -4377,10 +4377,10 @@
           "width": 840
         },
         {
-          "byteLength": 32719,
+          "byteLength": 33445,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-eb3d7a35d4976f5abf5d20b126ccb2fa41014dc0c53495e20cb70c197de305f4",
+          "integrity": "sha256-74d2041a921c9b1edf2181d76d405f7ff428672db3f9ede75be9aba826ac096e",
           "publicPath": "/visuals/files/developerLiteracy/developerLiteracy-1200-9990255713da.avif",
           "width": 1200
         },
@@ -4393,10 +4393,10 @@
           "width": 1200
         },
         {
-          "byteLength": 56732,
+          "byteLength": 57529,
           "format": "avif",
           "height": 941,
-          "integrity": "sha256-92bbc46f2fac5202abeb17b6394d1f3922382b3b5a45875bc753990e7bbbf9da",
+          "integrity": "sha256-27b5853303108f935181b8476719d964602e5177cea3f89ed481e8fe3429901d",
           "publicPath": "/visuals/files/developerLiteracy/developerLiteracy-1672-9990255713da.avif",
           "width": 1672
         },
@@ -4471,10 +4471,10 @@
       },
       "outputs": [
         {
-          "byteLength": 9552,
+          "byteLength": 9718,
           "format": "avif",
           "height": 270,
-          "integrity": "sha256-487e8b063b2e0ae51904d09726f1d7fb3e84b65152176fc932325fe54d54ba8b",
+          "integrity": "sha256-d2b97d576526385ab579bd5372888bb2a6f1a775e157873fbdfb576675b3ac37",
           "publicPath": "/visuals/files/aiIntegration/aiIntegration-480-37e84d22dbb9.avif",
           "width": 480
         },
@@ -4487,10 +4487,10 @@
           "width": 480
         },
         {
-          "byteLength": 18226,
+          "byteLength": 18608,
           "format": "avif",
           "height": 473,
-          "integrity": "sha256-6c0f92b0edb93e78a489b119835e2a2573f5c21bd32778d01806e61e5165a1be",
+          "integrity": "sha256-fbf5956f84aa240b85f8fd18348782a5309f761590a9e76ddde7740b57988d83",
           "publicPath": "/visuals/files/aiIntegration/aiIntegration-840-37e84d22dbb9.avif",
           "width": 840
         },
@@ -4503,10 +4503,10 @@
           "width": 840
         },
         {
-          "byteLength": 30314,
+          "byteLength": 30917,
           "format": "avif",
           "height": 675,
-          "integrity": "sha256-3e66bb9877bdb37e9ec300aff4053d1d628afb324ea2fbaf4e297f1d997a383b",
+          "integrity": "sha256-151098b6dd29c53f8c5d3242bd53dfdf969d5f8869cd9650693446b5b41f340d",
           "publicPath": "/visuals/files/aiIntegration/aiIntegration-1200-37e84d22dbb9.avif",
           "width": 1200
         },
@@ -4519,10 +4519,10 @@
           "width": 1200
         },
         {
-          "byteLength": 50577,
+          "byteLength": 51384,
           "format": "avif",
           "height": 941,
-          "integrity": "sha256-625c4658d09cdda578b789aa135b5bb3c844a3500a6ac4fbc687cec45c7d118c",
+          "integrity": "sha256-07deeb221bb944f5dc60e33c4bd50d74578a7519180002eb708f16b39bf1b481",
           "publicPath": "/visuals/files/aiIntegration/aiIntegration-1672-37e84d22dbb9.avif",
           "width": 1672
         },
