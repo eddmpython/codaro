@@ -185,7 +185,7 @@ def checkNotebookInsertControls() -> CheckResult:
         ".notebookCellMeta {",
         ".notebookCellMoreMenu {",
         ".notebookInsertControl {",
-        "min-height: 40px;",
+        "min-height: 34px;",
     )
     missing.extend(fragment for fragment in styleRequired if fragment not in styles)
     forbidden = (

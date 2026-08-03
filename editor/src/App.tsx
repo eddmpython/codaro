@@ -104,7 +104,9 @@ function App() {
     deleteNotebookCell,
     document,
     drafts,
+    duplicateNotebookCell,
     loadNotebookDocument,
+    moveNotebookCell,
     persistence: notebookPersistence,
     renameNotebookDocument,
     replaceDocument,
@@ -621,6 +623,8 @@ function App() {
                 cleanupCellDefinitions(blockId);
                 deleteNotebookCell(blockId);
               }}
+              onDuplicateCell={duplicateNotebookCell}
+              onMoveCell={moveNotebookCell}
               onNewChat={startNewChat}
               onPromptChange={setPrompt}
               onRejectPendingBlocks={rejectPendingBlocks}

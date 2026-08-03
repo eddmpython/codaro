@@ -35,6 +35,9 @@ import { combineErrorSources } from "@/lib/tracebackParser";
 import "@/components/notebook/notebookPanel.css";
 import "@/components/app/workCell.css";
 import {
+  ChevronDown,
+  ChevronUp,
+  Copy,
   Loader2,
   MessageSquare,
   MoreHorizontal,
@@ -58,6 +61,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { fetchCodeCompletions, type CompletionContextProvider } from "@/lib/codeCompletion";
 import {
   executionKindLabel,
@@ -102,20 +106,20 @@ const codeCellEditorTheme = EditorView.theme({
   "&": {
     backgroundColor: "var(--color-syntax-background, var(--code))",
     color: "var(--color-syntax-variable, var(--code-foreground))",
-    fontSize: "14px",
+    fontSize: "13px",
   },
   "&.cm-focused": {
     outline: "none",
   },
   ".cm-scroller": {
     fontFamily: "var(--font-family-code)",
-    lineHeight: "1.65",
-    minHeight: "40px",
+    lineHeight: "1.55",
+    minHeight: "32px",
     overflow: "auto",
   },
   ".cm-content": {
     minHeight: "0",
-    padding: "0.5rem 0",
+    padding: "0.375rem 0",
   },
   ".cm-line": {
     padding: "0 0.75rem",
@@ -124,7 +128,7 @@ const codeCellEditorTheme = EditorView.theme({
     backgroundColor: "transparent",
     borderRight: "0",
     color: "var(--color-text-secondary, var(--muted-foreground))",
-    minWidth: "38px",
+    minWidth: "34px",
   },
   ".cm-lineNumbers .cm-gutterElement": {
     padding: "0 0.5rem",
@@ -171,7 +175,7 @@ const contentFitCodeCellEditorTheme = EditorView.theme({
   },
   ".cm-content": {
     minHeight: "0",
-    padding: "0.5rem 0",
+    padding: "0.375rem 0",
   },
 });
 
@@ -228,6 +232,8 @@ export function NotebookPanel({
   onCellAsk,
   onDeleteCell,
   onDraftChange,
+  onDuplicateCell,
+  onMoveCell,
   onRejectPendingBlocks,
   onRunBlock,
   onRunNotebook,
@@ -253,6 +259,8 @@ export function NotebookPanel({
   onCellAsk: (action: CellAiAction, block: BlockConfig, question?: string) => void;
   onDeleteCell: (blockId: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
+  onDuplicateCell: (blockId: string) => void;
+  onMoveCell: (blockId: string, direction: "up" | "down") => void;
   onRejectPendingBlocks: () => void;
   onRunBlock: (block: BlockConfig, sourceOverride?: string) => void;
   onRunNotebook: () => void;
@@ -326,7 +334,9 @@ export function NotebookPanel({
                   onCellAsk={(action, question) => onCellAsk(action, block, question)}
                   onDelete={() => onDeleteCell(block.id)}
                   onDraftChange={(value) => onDraftChange(block.id, value)}
+                  onDuplicate={() => onDuplicateCell(block.id)}
                   onInsertCell={(type, placement) => onAddCell(type, block.id, placement)}
+                  onReorderCell={(direction) => onMoveCell(block.id, direction)}
                   onMoveCell={(direction) => {
                     const targetIndex = direction === "previous"
                       ? blockIndex - 1
@@ -847,8 +857,10 @@ function DocumentBlock({
   cellHelp,
   onDraftChange,
   onDelete,
+  onDuplicate,
   onInsertCell,
   onMoveCell,
+  onReorderCell,
   onRun,
   onRunAndAdvance,
   onSelect,
@@ -871,8 +883,10 @@ function DocumentBlock({
   onCellAsk: (action: CellAiAction, question?: string) => void;
   onDelete: () => void;
   onDraftChange: (value: string) => void;
+  onDuplicate: () => void;
   onInsertCell: (type: "code" | "markdown", placement: "before" | "after") => void;
   onMoveCell: (direction: NotebookCellNavigationDirection) => boolean;
+  onReorderCell: (direction: "up" | "down") => void;
   onRun: (sourceOverride?: string) => void;
   onRunAndAdvance: (sourceOverride?: string) => void;
   onSelect: () => void;
@@ -1013,6 +1027,8 @@ function DocumentBlock({
         </div>
         <CellMetaBar
           cellLabel={cellAriaLabel}
+          canMoveUp={position > 1}
+          canMoveDown={position < total}
           status={resultStatus}
           type="markdown"
           selected={isSelected}
@@ -1020,6 +1036,8 @@ function DocumentBlock({
           diagnosticChips={diagnosticChips}
           onCellAsk={onCellAsk}
           onDelete={onDelete}
+          onDuplicate={onDuplicate}
+          onReorder={onReorderCell}
         />
       </section>
     );
@@ -1082,6 +1100,8 @@ function DocumentBlock({
       ) : null}
       <CellMetaBar
         cellLabel={cellAriaLabel}
+        canMoveUp={position > 1}
+        canMoveDown={position < total}
         canRun={canRun}
         running={isRunning}
         status={resultStatus}
@@ -1091,6 +1111,8 @@ function DocumentBlock({
         diagnosticChips={diagnosticChips}
         onCellAsk={onCellAsk}
         onDelete={onDelete}
+        onDuplicate={onDuplicate}
+        onReorder={onReorderCell}
         onRun={runCurrentDraft}
       />
     </section>
@@ -1099,6 +1121,8 @@ function DocumentBlock({
 
 function CellMetaBar({
   cellLabel,
+  canMoveUp = false,
+  canMoveDown = false,
   canRun = false,
   running = false,
   status,
@@ -1108,9 +1132,13 @@ function CellMetaBar({
   diagnosticChips = [],
   onCellAsk,
   onDelete,
+  onDuplicate,
+  onReorder,
   onRun,
 }: {
   cellLabel: string;
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
   canRun?: boolean;
   running?: boolean;
   status: string;
@@ -1120,8 +1148,29 @@ function CellMetaBar({
   diagnosticChips?: CellDiagnosticChip[];
   onCellAsk: (action: CellAiAction, question?: string) => void;
   onDelete: () => void;
+  onDuplicate: () => void;
+  onReorder: (direction: "up" | "down") => void;
   onRun?: () => void;
 }) {
+  // 삭제 버튼은 항상 DOM에 1개만 둔다. 모바일은 더보기 메뉴 안(기본 접힘 계약),
+  // 데스크톱은 dartlab처럼 툴바에 직접 노출한다.
+  const isMobile = useIsMobile();
+  const deleteButton = (
+    <IconButton
+      className={cn(
+        "notebookCellToolButton notebookCellDeleteButton",
+        isMobile ? "notebookCellDeleteMenuItem size-11" : "notebookCellDeleteInline",
+      )}
+      label={`${cellLabel} 삭제`}
+      variant="ghost"
+      onClick={(event) => {
+        event.stopPropagation();
+        onDelete();
+      }}
+    >
+      <Trash2 />
+    </IconButton>
+  );
   return (
     <div className="notebookCellMeta">
       <div className="notebookCellActions">
@@ -1151,7 +1200,7 @@ function CellMetaBar({
         {type === "code" ? (
           <IconButton
             className={cn(
-              "astryxWorkCellAction notebookCellRunButton size-11 sm:size-8 [&_svg]:size-4",
+              "notebookCellToolButton notebookCellRunButton size-11 min-[761px]:size-6",
               selected && "notebookCellRunButtonSelected",
             )}
             disabled={!canRun}
@@ -1165,6 +1214,41 @@ function CellMetaBar({
             {running ? <Loader2 className="animate-spin" /> : <Play />}
           </IconButton>
         ) : null}
+        <IconButton
+          className="notebookCellToolButton notebookCellMoveButton max-[760px]:hidden"
+          disabled={!canMoveUp}
+          label={`${cellLabel} 위로 이동`}
+          variant="ghost"
+          onClick={(event) => {
+            event.stopPropagation();
+            onReorder("up");
+          }}
+        >
+          <ChevronUp />
+        </IconButton>
+        <IconButton
+          className="notebookCellToolButton notebookCellMoveButton max-[760px]:hidden"
+          disabled={!canMoveDown}
+          label={`${cellLabel} 아래로 이동`}
+          variant="ghost"
+          onClick={(event) => {
+            event.stopPropagation();
+            onReorder("down");
+          }}
+        >
+          <ChevronDown />
+        </IconButton>
+        <IconButton
+          className="notebookCellToolButton notebookCellDuplicateButton max-[760px]:hidden"
+          label={`${cellLabel} 복제`}
+          variant="ghost"
+          onClick={(event) => {
+            event.stopPropagation();
+            onDuplicate();
+          }}
+        >
+          <Copy />
+        </IconButton>
         <details
           className="notebookCellMore"
           data-notebook-cell-menu="true"
@@ -1180,19 +1264,10 @@ function CellMetaBar({
           </summary>
           <div className="notebookCellMoreMenu">
             <CellAiActions compact helpState={cellHelp} selected={selected} onAsk={onCellAsk} />
-            <IconButton
-              className="notebookCellDeleteButton size-9 sm:size-8 [&_svg]:size-4"
-              label={`${cellLabel} 삭제`}
-              variant="ghost"
-              onClick={(event) => {
-                event.stopPropagation();
-                onDelete();
-              }}
-            >
-              <Trash2 />
-            </IconButton>
+            {isMobile ? deleteButton : null}
           </div>
         </details>
+        {isMobile ? null : deleteButton}
       </div>
     </div>
   );

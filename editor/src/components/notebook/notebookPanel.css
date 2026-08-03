@@ -200,21 +200,21 @@
 
   [data-astryx-theme="codaro"] .notebookCellBody,
   [data-astryx-theme="codaro"] .notebookCodeFrame {
-    min-height: 40px;
+    min-height: 34px;
   }
 
   [data-astryx-theme="codaro"] .notebookCellMeta {
     position: absolute;
     top: -13px;
-    right: 8px;
+    right: 10px;
     z-index: 16;
     display: flex;
     width: auto;
-    min-height: 28px;
+    min-height: 26px;
     align-items: center;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-element);
-    padding: 2px var(--spacing-1);
+    padding: 2px;
     background: var(--color-background-popover);
     box-shadow: var(--shadow-low);
     opacity: 0;
@@ -232,7 +232,7 @@
     display: flex;
     min-width: 0;
     align-items: center;
-    gap: var(--spacing-1);
+    gap: 2px;
   }
 
   [data-astryx-theme="codaro"] .notebookCellDiagnostic,
@@ -269,16 +269,37 @@
     color: var(--color-text-secondary);
   }
 
-  [data-astryx-theme="codaro"] .notebookCellRunButton,
-  [data-astryx-theme="codaro"] .notebookCellDeleteButton {
-    width: 28px;
-    height: 28px;
+  [data-astryx-theme="codaro"] .notebookCellToolButton {
     border-radius: var(--radius-element);
     color: var(--color-icon-secondary);
   }
 
+  [data-astryx-theme="codaro"] .notebookCellToolButton:hover:not(:disabled),
+  [data-astryx-theme="codaro"] .notebookCellToolButton:focus-visible {
+    background: var(--color-background-muted);
+    color: var(--color-icon-primary);
+  }
+
+  [data-astryx-theme="codaro"] .notebookCellRunButton:not(:disabled) {
+    color: var(--color-icon-accent);
+  }
+
+  [data-astryx-theme="codaro"] .notebookCellRunButton:hover:not(:disabled) {
+    background: var(--color-accent-muted);
+    color: var(--color-icon-accent);
+  }
+
+  [data-astryx-theme="codaro"] .notebookCellDeleteButton {
+    color: var(--color-error);
+  }
+
+  [data-astryx-theme="codaro"] .notebookCellDeleteButton:hover,
+  [data-astryx-theme="codaro"] .notebookCellDeleteButton:focus-visible {
+    background: var(--color-error-muted);
+    color: var(--color-error);
+  }
+
   [data-astryx-theme="codaro"] .notebookCellRunButtonSelected {
-    border-color: var(--color-accent);
     background: var(--color-accent-muted);
     color: var(--color-icon-accent);
   }
@@ -289,8 +310,8 @@
 
   [data-astryx-theme="codaro"] .notebookCellMoreTrigger {
     display: grid;
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     place-items: center;
     border-radius: var(--radius-element);
     color: var(--color-icon-secondary);
@@ -310,8 +331,8 @@
   }
 
   [data-astryx-theme="codaro"] .notebookCellMoreTrigger svg {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
   }
 
   [data-astryx-theme="codaro"] .notebookCellMoreMenu {
@@ -359,8 +380,8 @@
   [data-astryx-theme="codaro"] .notebookMarkdownPreview,
   [data-astryx-theme="codaro"] .notebookMarkdownEditor {
     width: 100%;
-    min-height: 42px;
-    padding: var(--spacing-2) var(--spacing-3);
+    min-height: 36px;
+    padding: var(--spacing-1-5) var(--spacing-3);
     color: var(--color-text-primary);
     font-family: var(--font-family-body);
     font-size: 14px;
@@ -377,21 +398,26 @@
     resize: vertical;
   }
 
+  /* 셀 왼쪽 바깥의 + 버튼. padding-right가 셀 프레임까지 hover 브리지를 만들어
+     셀 경계를 벗어나는 순간 버튼이 사라져 클릭이 불가능해지는 문제를 막는다. */
   [data-astryx-theme="codaro"] .notebookInsertControl {
     position: absolute;
-    left: -36px;
+    left: -34px;
     z-index: 12;
+    display: flex;
+    align-items: center;
+    padding: 6px 12px 6px 0;
     opacity: 0;
     pointer-events: none;
     transition: opacity var(--duration-fast) ease;
   }
 
   [data-astryx-theme="codaro"] .notebookInsertBefore {
-    top: -10px;
+    top: -16px;
   }
 
   [data-astryx-theme="codaro"] .notebookInsertAfter {
-    bottom: -10px;
+    bottom: -16px;
   }
 
   [data-astryx-theme="codaro"] .notebookCell:hover .notebookInsertControl,
@@ -402,8 +428,8 @@
 
   [data-astryx-theme="codaro"] .notebookInsertPrimary {
     display: flex;
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
     align-items: center;
     justify-content: center;
     border: 1px solid var(--color-border);

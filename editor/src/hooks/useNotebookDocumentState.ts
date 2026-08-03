@@ -104,6 +104,39 @@ export function useNotebookDocumentState({
     setSelectedBlockId(id);
   }, []);
 
+  const moveNotebookCell = useCallback((blockId: string, direction: "up" | "down") => {
+    setDocument((current) => {
+      const index = current.blocks.findIndex((block) => block.id === blockId);
+      const targetIndex = direction === "up" ? index - 1 : index + 1;
+      if (index < 0 || targetIndex < 0 || targetIndex >= current.blocks.length) {
+        return current;
+      }
+      const nextBlocks = [...current.blocks];
+      const [movedBlock] = nextBlocks.splice(index, 1);
+      nextBlocks.splice(targetIndex, 0, movedBlock);
+      return { ...current, blocks: nextBlocks };
+    });
+    setSelectedBlockId(blockId);
+  }, []);
+
+  const duplicateNotebookCell = useCallback((blockId: string) => {
+    const sourceBlock = document.blocks.find((block) => block.id === blockId);
+    if (!sourceBlock) return;
+
+    const content = drafts[blockId] ?? sourceBlock.content;
+    const nextBlock: BlockConfig = {
+      ...sourceBlock,
+      id: `${sourceBlock.type}-${Date.now()}`,
+      content,
+    };
+    setDocument((current) => ({
+      ...current,
+      blocks: insertNotebookBlock(current.blocks, nextBlock, blockId, "after"),
+    }));
+    setDrafts((current) => ({ ...current, [nextBlock.id]: content }));
+    setSelectedBlockId(nextBlock.id);
+  }, [document, drafts]);
+
   const renameNotebookDocument = useCallback((title: string) => {
     setDocument((current) => ({
       ...current,
@@ -182,7 +215,9 @@ export function useNotebookDocumentState({
     deleteNotebookCell,
     document,
     drafts,
+    duplicateNotebookCell,
     loadNotebookDocument,
+    moveNotebookCell,
     persistence,
     renameNotebookDocument,
     replaceDocument,
