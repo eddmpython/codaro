@@ -197,7 +197,7 @@ def validateCompletionEvidence(
     if (
         not isinstance(archiveAudit, dict)
         or int(archiveAudit.get("webStrongEvidenceEventCount") or 0) < 1
-        or int(archiveAudit.get("webCompletedLessonCount") or 0) != 1
+        or int(archiveAudit.get("webVerifiedSectionCount") or 0) != 1
         or archiveAudit.get("webLegacyReaderRejected") is not True
     ):
         failures.append("Web strong evidence, resume, or archive cutover evidence is incomplete")

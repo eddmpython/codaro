@@ -90,7 +90,7 @@ def passingReports(verifier: ModuleType) -> tuple[dict, dict]:
     }
     cases["web-lesson-mobile"]["audit"] = {
         "webStrongEvidenceEventCount": 1,
-        "webCompletedLessonCount": 1,
+        "webVerifiedSectionCount": 1,
         "webLegacyReaderRejected": True,
     }
     browserReport = {

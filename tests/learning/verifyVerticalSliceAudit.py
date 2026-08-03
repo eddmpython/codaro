@@ -252,7 +252,7 @@ def verifyBrowserProgression() -> dict[str, Any]:
                 and audit.get("transferSectionCount") == 0
                 and audit.get("webStrongEvidenceEventCount") == 0
                 and audit.get("webEvidenceSummaryCount") == 0
-                and audit.get("webCompletedLessonCount") == 0
+                and audit.get("webVerifiedSectionCount") == 0
                 and audit.get("forbiddenLearningControls") == []
                 and isinstance(capabilityEvidence, dict)
                 and capabilityEvidence.get("checkKind") == "behavior"
@@ -272,7 +272,7 @@ def verifyBrowserProgression() -> dict[str, Any]:
                 and audit.get("retrievalSectionCount") == 0
                 and audit.get("webStrongEvidenceEventCount") == 0
                 and audit.get("webEvidenceSummaryCount") == 0
-                and audit.get("webCompletedLessonCount") == 0
+                and audit.get("webVerifiedSectionCount") == 0
                 and audit.get("forbiddenLearningControls") == []
                 and isinstance(capabilityEvidence, dict)
                 and capabilityEvidence.get("checkKind") == "behavior"
