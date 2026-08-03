@@ -14,7 +14,7 @@ whenToUse: 새 레슨 추가, 학습 UX 디자인, AI 교사 행동 설계, 진�
 - **기둥 1: 이어지는 실행 표면** - Web에서는 설치 없이 읽기·편집·실행·강검증·진도 저장을 제공하고, Local에서는 같은 문서를 파일·패키지·터미널·일정·자동화로 확장한다.
 - **기둥 2: canonical 커리큘럼** - `curricula/`의 YAML 레슨을 하나의 공개 catalog, 경로, outcome, runtime tier, CheckSpec 계약으로 제공한다.
   - 정적 레슨뿐 아니라 AI가 채팅에서 만든 임시 curriculum YAML도 같은 변환기(`yamlToDocument`)를 통과해 커리큘럼 학습 셀이 된다.
-  - 사용자가 커리큘럼을 먼저 고르지 않아도, AI가 목표를 해석하고 기존 레슨을 추천·조합한 뒤, 실제 gap에만 YAML 명세를 만들고 `write-curriculum-yaml`로 현재 학습 셀을 전개한다.
+  - 사용자가 커리큘럼을 먼저 고르지 않아도, AI가 목표를 해석하고 기존 레슨을 추천·조합한 뒤, 실제 gap에만 YAML 명세를 만들고 `write-curriculum-yaml`로 학습 셀을 전개한다.
 - **기둥 3: 학습 사상** - 코드로 정의된 교육 철학. AI도 사람도 이 사상을 따른다.
   - 목표와 쓰임을 먼저 밝히고, 완성된 입력·출력 예제를 즉시 보여준다.
   - 설명 뒤에는 편집 가능한 코드가 자연스럽게 이어진다. 학습자가 별도 펼치기·확인 버튼을 누르게 하지 않는다.
@@ -79,6 +79,6 @@ AI가 없어도 전체 공개 catalog와 Web 지원 학습 흐름은 완결된�
 ## 관련
 
 - [[ai-integration]] - AI가 같은 사상으로 가르친다
-- [[multi-editor-modes]] - 대화, 현재 학습, 노트북, 자동화 제품 표면
+- [[multi-editor-modes]] - 대화, 학습, 노트북, 자동화 제품 표면
 - [[curriculum-registry]] - 기본 curriculum YAML의 제품 자산 경계
 - [[curriculum-authoring]] - 커리큘럼 작성 절차와 lazy uv 의존성 기준

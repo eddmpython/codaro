@@ -2663,7 +2663,7 @@ def verify_native_shell_keyboard_and_forced_colors(
     required_focus_names = (
         "Codaro 홈으로 이동",
         "홈",
-        "현재 학습",
+        "학습",
         "노트북",
         "자동화",
     )

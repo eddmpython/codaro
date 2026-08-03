@@ -78,7 +78,7 @@ def main(argv: list[str] | None = None) -> int:
         fallbackSettings = recordCheck(checks, "provider-fallback-settings", cli.eval(jsAssertProviderFallbackSettings()))
         cli.eval(jsCloseProviderSettings())
         cli.waitEval(jsProviderSettingsClosed(), "provider settings closed after onboarding CTA")
-        cli.eval(jsOpenSurface("현재 학습"))
+        cli.eval(jsOpenSurface("학습"))
         cli.waitEval(jsTextPresent("Codaro 커리큘럼"), "curriculum sidebar")
         cli.waitEval(jsTextPresent("Hello World"), "default curriculum lesson")
         defaultLesson = recordCheck(checks, "curriculum-default-lesson", cli.eval(jsAssertCurriculumDefaultLesson()))

@@ -14,24 +14,25 @@ whenToUse: 편집기/학습기 화면 추가, 제품 UI 컴포넌트 선택, 제
 Codaro의 프론트는 두 폴더 경계로 나눈다.
 
 - `landing/` - GitHub Pages 문서와 글쓰기 표면. React + Vite 정적 사이트 기준.
-- `editor/` - Codaro 제품 표면. 대화, 현재 학습, 노트북, 자동화 UI를 모두 포함한다. React + shadcn/ui 기준.
+- `editor/` - Codaro 제품 표면. 대화, 학습, 노트북, 자동화 UI를 모두 포함한다. React + shadcn/ui 기준.
 
 폐기된 이전 편집기 앱은 더 이상 제품 표면의 기준이 아니다. 현재 제품 표면의 source of truth는 `editor/` 하나다.
 
 ## 제품 표면 계약
 
 - `editor/`가 Codaro의 실제 제품 UI 표면이다.
-- 사용자에게 보이는 제품 표면은 **대화**, **현재 학습**, **노트북**, **자동화** 네 가지다.
-- 사이드바 표면 순서는 `현재 학습 → 노트북 → 자동화 → 대화`다. 이 순서는 네 앱을 동급으로 늘어놓는 메뉴가 아니라, 학습에서 검증한 작업을 노트북과 자동화로 확장하고 대화를 지원 도구로 쓰는 흐름이다.
+- 사용자에게 보이는 제품 표면은 **대화**, **학습**, **노트북**, **자동화** 네 가지다.
+- 사이드바 표면 순서는 `학습 → 노트북 → 자동화 → 대화`다. 이 순서는 네 앱을 동급으로 늘어놓는 메뉴가 아니라, 학습에서 검증한 작업을 노트북과 자동화로 확장하고 대화를 지원 도구로 쓰는 흐름이다.
 - `editor/src/lib/surfaceModel.ts`의 `PRODUCT_SURFACE_NAV`가 표면 순서, 표시 이름 key, 제품 흐름 역할(`entry`/`learning`/`notebook`/`secondLoop`/`support`), 사이드바 노출 여부의 기준이다. `PRODUCT_SIDEBAR_NAV`는 보이는 표면만, `PRODUCT_SIDEBAR_FLOW_ITEMS`는 여기서 파생한 사이드바 흐름 단계다. 컴포넌트가 별도 배열로 표면 순서, 숨김 정책, 단계 번호를 복사하면 실패다.
 - `editor/src/components/app/productSidebar.tsx`는 sidebar shell이다. flow nav는 `productFlowNav.tsx`, 학습 tree는 `curriculumSidebarTree.tsx`, 자동화 tree는 `automationSidebarTree.tsx`가 맡는다.
-- 768px 미만의 제품 화면은 `productMobileNav.tsx`가 `surfaceModel.ts`에서 파생한 Web 네 표면을 safe-area 하단 내비게이션으로 보여준다. 현재 학습은 집중 모드이므로 이 내비게이션을 숨기고 공용 상단 SNS와 사이드바 진입만 유지한다.
+- 768px 미만의 제품 화면은 `productMobileNav.tsx`가 `surfaceModel.ts`에서 파생한 Web 네 표면을 safe-area 하단 내비게이션으로 보여준다. 학습은 집중 모드이므로 이 내비게이션을 숨기고 공용 상단 SNS와 사이드바 진입만 유지한다.
+- 사이드바 집중 모드(제품 flow nav·설정 숨김)는 레슨이 선택된 학습 화면에서만 켠다. 학습 홈은 코스를 고르는 허브라 flow nav와 설정 진입을 그대로 노출한다.
 - `/m/chat`은 별도 route 컴포넌트가 아니라 `runRouteState.ts`가 공용 ProductShell의 `chat` surface로 정규화하는 호환 alias다.
 - 제품 내부 실행/편집 단위는 notebook과 cell로 구분한다. 제품 UI와 프론트 코드의 기본 명칭도 노트북/셀을 기준으로 둔다.
 - 폐기된 이전 편집기는 참고/레거시 판단 대상일 뿐, 현재 저장소의 제품 기준으로 보지 않는다.
-- 제품 기본 진입은 **현재 학습**이다.
-- 대화 요청 범위는 `editor/src/lib/teacherScope.ts`가 분류한다. 학습 요청은 현재 학습으로, 셀 질문은 노트북/현재 셀로, 자동화 작성 요청은 커리큘럼 저장이 아니라 노트북 pending 변경으로 먼저 간다.
-- 제품 흐름은 `대화 → YAML curriculum → 현재 학습 카드 → 셀 read/write/call → 노트북 검증 → 자동화/태스크`다.
+- 제품 기본 진입은 **학습**이다.
+- 대화 요청 범위는 `editor/src/lib/teacherScope.ts`가 분류한다. 학습 요청은 학습으로, 셀 질문은 노트북/현재 셀로, 자동화 작성 요청은 커리큘럼 저장이 아니라 노트북 pending 변경으로 먼저 간다.
+- 제품 흐름은 `대화 → YAML curriculum → 학습 카드 → 셀 read/write/call → 노트북 검증 → 자동화/태스크`다.
 - 분할 모드는 1급 표면에서 제외한다. 필요하면 특정 화면 안의 고급 레이아웃으로만 다룬다.
 
 따라서 새 UI 판단 기준은 "편집기 앱을 어떻게 꾸밀까"가 아니라 "채팅, 노트북, 학습 셀, 자동화가 어떻게 하나의 셀 모델로 이어지는가"다.
@@ -39,36 +40,36 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 ## 현재 구조 평가
 
 - 표면 순서, 제품 흐름 역할, 사이드바 노출, 사이드바 흐름 단계, 기본 진입점은 `editor/src/lib/surfaceModel.ts`에 모여 있다. 이 파일이 제품 표면 모델의 SSOT다.
-- `editor/src/components/app/productSidebar.tsx`는 sidebar shell로 남아 있다. 흐름 nav는 `productFlowNav.tsx`, 현재 학습 tree는 `curriculumSidebarTree.tsx`, 자동화 tree는 `automationSidebarTree.tsx`가 맡는다.
-- `editor/src/components/app/mainSurface.tsx`는 표면 선택과 큰 레이아웃 조립만 맡는다. 현재 학습 화면 조립은 `editor/src/components/app/currentLearningSurface.tsx`, 노트북 화면 조립은 `editor/src/components/app/notebookSurface.tsx`가 맡는다. 요청 범위 분류는 `editor/src/lib/teacherScope.ts`, assistant 산출물 라우팅은 `editor/src/lib/assistantArtifactRouting.ts`, 응답 적용 계획은 `editor/src/lib/assistantResponsePlan.ts`, pending 적용은 `editor/src/lib/pendingChanges.ts`가 맡는다.
+- `editor/src/components/app/productSidebar.tsx`는 sidebar shell로 남아 있다. 흐름 nav는 `productFlowNav.tsx`, 학습 tree는 `curriculumSidebarTree.tsx`, 자동화 tree는 `automationSidebarTree.tsx`가 맡는다.
+- `editor/src/components/app/mainSurface.tsx`는 표면 선택과 큰 레이아웃 조립만 맡는다. 학습 화면 조립은 `editor/src/components/app/currentLearningSurface.tsx`, 노트북 화면 조립은 `editor/src/components/app/notebookSurface.tsx`가 맡는다. 요청 범위 분류는 `editor/src/lib/teacherScope.ts`, assistant 산출물 라우팅은 `editor/src/lib/assistantArtifactRouting.ts`, 응답 적용 계획은 `editor/src/lib/assistantResponsePlan.ts`, pending 적용은 `editor/src/lib/pendingChanges.ts`가 맡는다.
 - `editor/src/components/chat/chatSurface.tsx`는 대화 입구, provider 연결 버튼, 시작 예시, pending notebook bar만 다룬다. 커리큘럼 tree, 자동화 tree, YAML 카드, 패키지 준비 내부를 직접 알면 실패다.
 - 자동화는 보이는 표면이지만 기본 입구가 아니다. `secondLoop` 역할로 유지하고, 검증된 셀/recipe가 생긴 뒤 태스크 저장과 예약으로 이어진다.
 
-현재 점수 판단은 8.7/10이다. 제품 흐름과 파일 경계는 한 방향으로 정리됐고, 현재 학습 화면 조립은 `currentLearningSurface.tsx`, 노트북 화면 조립은 `notebookSurface.tsx`로 분리됐다. 남은 리스크는 `mainSurface.tsx`가 여전히 많은 props를 전달하는 중앙 표면이라는 점이다. 라우팅·분류·pending 변경 책임이 다시 붙지 않게 gate를 유지하고, 채팅 화면이 입구 역할을 넘어서 학습/자동화 세부 구현을 끌어오지 않게 막아야 한다.
+현재 점수 판단은 8.7/10이다. 제품 흐름과 파일 경계는 한 방향으로 정리됐고, 학습 화면 조립은 `currentLearningSurface.tsx`, 노트북 화면 조립은 `notebookSurface.tsx`로 분리됐다. 남은 리스크는 `mainSurface.tsx`가 여전히 많은 props를 전달하는 중앙 표면이라는 점이다. 라우팅·분류·pending 변경 책임이 다시 붙지 않게 gate를 유지하고, 채팅 화면이 입구 역할을 넘어서 학습/자동화 세부 구현을 끌어오지 않게 막아야 한다.
 
 ## 목표 구조와 영향 파일
 
 | 파일 | 책임 |
 | --- | --- |
-| `editor/src/lib/surfaceModel.ts` | `현재 학습 → 노트북 → 자동화 → 대화` 순서, flow role, visible/hidden, 기본 표면 |
+| `editor/src/lib/surfaceModel.ts` | `학습 → 노트북 → 자동화 → 대화` 순서, flow role, visible/hidden, 기본 표면 |
 | `editor/src/lib/runRouteState.ts` | lesson/path/runtime을 포함한 `/run/` URL, 저장소 resume, push/replace/popstate 복원 |
 | `editor/src/components/app/productFlowNav.tsx` | `PRODUCT_SIDEBAR_FLOW_ITEMS`만 읽어 사이드바 흐름 nav 렌더링 |
 | `editor/src/components/app/productMobileNav.tsx` | `surfaceModel.ts`에서 파생한 Web 네 표면을 모바일 safe-area 내비게이션으로 렌더링. 학습 집중 모드와 키보드 열림 상태에서는 숨김 |
 | `editor/src/components/app/productSurfaceVisuals.ts` | 데스크톱 사이드바와 모바일 내비게이션이 공유하는 표면 아이콘 projection |
 | `editor/src/components/app/productSidebar.tsx` | sidebar shell, terminal utility, 현재 표면의 focused tree 배치 |
-| `editor/src/components/app/mainSurface.tsx` | 표면 선택과 큰 레이아웃 조립. 요청 분류, assistant 산출물 라우팅, pending 적용 로직, 현재 학습/노트북 내부 조립 금지 |
+| `editor/src/components/app/mainSurface.tsx` | 표면 선택과 큰 레이아웃 조립. 요청 분류, assistant 산출물 라우팅, pending 적용 로직, 학습/노트북 내부 조립 금지 |
 | `editor/src/components/app/notebookSurface.tsx` | 노트북 표면 조립. 빈 노트북 편집, 셀 실행, pending notebook bar, 우측 teacher panel 배치 |
-| `editor/src/components/app/currentLearningSurface.tsx` | 현재 학습 표면 조립. 목표 입력 fallback, 커리큘럼 학습 카드, 셀 TOC, 우측 teacher panel 배치 |
+| `editor/src/components/app/currentLearningSurface.tsx` | 학습 표면 조립. 목표 입력 fallback, 커리큘럼 학습 카드, 셀 TOC, 우측 teacher panel 배치 |
 | `editor/src/components/chat/chatSurface.tsx` | 채팅 입구와 provider 연결 행동. curriculum/automation 내부 구현 import 금지 |
-| `editor/src/hooks/useProductSurfaceSelection.ts` | 사이드바 표면 선택 정책. 현재 학습 재진입 시 유효한 현재 카테고리 유지, 없을 때만 기본 레지스트리 카테고리 fallback, 자동화 섹션 선택 뒤 자동화 표면 열기 |
+| `editor/src/hooks/useProductSurfaceSelection.ts` | 사이드바 표면 선택 정책. 학습 재진입 시 유효한 현재 카테고리 유지, 없을 때만 기본 레지스트리 카테고리 fallback, 자동화 섹션 선택 뒤 자동화 표면 열기 |
 | `editor/src/lib/teacherScope.ts` | 대화 요청 범위 분류 |
-| `editor/src/lib/assistantArtifactRouting.ts` | assistant 산출물이 현재 학습 또는 노트북으로 먼저 열리게 하는 표면 결정과 application payload shape |
+| `editor/src/lib/assistantArtifactRouting.ts` | assistant 산출물이 학습 또는 노트북으로 먼저 열리게 하는 표면 결정과 application payload shape |
 | `editor/src/lib/assistantResponsePlan.ts` | 응답에서 curriculum 저장 또는 notebook pending 변경을 만드는 계획 |
 | `editor/src/lib/pendingChanges.ts` | pending 변경 승인/거절과 승인 뒤 열 표면 결정 |
-| `editor/src/lib/chatStartExamples.ts` | 빈 채팅 시작 예시와 현재 학습 목표 예시. `surfaceModel.ts`의 target surface/flow role을 붙여 기존 레슨 추천과 검증된 셀 recipe가 먼저 보이게 유지 |
-| `editor/src/lib/customCurricula.ts` | 나만의 커리큘럼 저장 모델, 저장 후 현재 학습 열기 정책, 적용 계획, 사이드바 표시용 projection |
+| `editor/src/lib/chatStartExamples.ts` | 빈 채팅 시작 예시와 학습 목표 예시. `surfaceModel.ts`의 target surface/flow role을 붙여 기존 레슨 추천과 검증된 셀 recipe가 먼저 보이게 유지 |
+| `editor/src/lib/customCurricula.ts` | 나만의 커리큘럼 저장 모델, 저장 후 학습 열기 정책, 적용 계획, 사이드바 표시용 projection |
 | `editor/src/components/curriculum/curriculumDependencyPanel.tsx` | 현재 레슨의 `meta.packages` 기반 라이브러리 준비 패널. 필요한 패키지명, 준비 진행, 한 번의 준비·재시도 동작만 보여주며 명령 문자열·환경 경로·터미널 제어는 학습 표면에 노출하지 않는다 |
-| `editor/src/components/app/curriculumSidebarTree.tsx` | 현재 학습 tree ownership |
+| `editor/src/components/app/curriculumSidebarTree.tsx` | 학습 tree ownership |
 | `editor/src/components/app/automationSidebarTree.tsx` | 자동화 tree ownership |
 | `tests/surface/testProductSurfaceContract.py` | 제품 표면, 문서, 경계 regression gate |
 | `tests/product/verifyDogfoodAlphaAudit.py` | provider 연결부터 학습 요청, 카드, 셀 실행, 실패 복구까지 dogfood evidence gate |
@@ -77,10 +78,10 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 
 - 표면 순서, 노출 정책, 흐름 단계 번호를 `surfaceModel.ts` 밖에서 별도 배열이나 index 계산으로 복사하면 실패다. 컴포넌트는 `PRODUCT_SURFACE_NAV`가 아니라 필요한 파생값만 읽는다.
 - `productSidebar.tsx`가 커리큘럼 tree 생성, 자동화 tree 생성, 삭제 dialog, 표면 icon map까지 직접 품으면 실패다. focused 파일로 되돌린다.
-- `App.tsx`가 기본 커리큘럼 카테고리 선택, 현재 학습 재진입 fallback, 자동화 섹션 선택 후 표면 전환 정책을 직접 품으면 실패다. 표면 선택 정책은 `useProductSurfaceSelection.ts`가 맡는다.
-- `mainSurface.tsx`에 요청 분류, assistant 산출물 라우팅, pending 승인/거절 결정, 현재 학습 라벨 계산, 커리큘럼 카드/TOC 조립, 노트북 패널/teacher panel 조립이 들어오면 실패다. `editor/src/lib/*`, 전용 hook, 또는 `currentLearningSurface.tsx`/`notebookSurface.tsx` 같은 focused surface 파일로 이동한다.
+- `App.tsx`가 기본 커리큘럼 카테고리 선택, 학습 재진입 fallback, 자동화 섹션 선택 후 표면 전환 정책을 직접 품으면 실패다. 표면 선택 정책은 `useProductSurfaceSelection.ts`가 맡는다.
+- `mainSurface.tsx`에 요청 분류, assistant 산출물 라우팅, pending 승인/거절 결정, 학습 라벨 계산, 커리큘럼 카드/TOC 조립, 노트북 패널/teacher panel 조립이 들어오면 실패다. `editor/src/lib/*`, 전용 hook, 또는 `currentLearningSurface.tsx`/`notebookSurface.tsx` 같은 focused surface 파일로 이동한다.
 - 빈 채팅 시작 예시가 target surface나 flow role을 직접 문자열로 흩뿌리면 실패다. 예시는 `chatStartExamples.ts`에서 정의하고, 표면 역할은 `surfaceModel.ts`에서 조회한다.
-- assistant 응답과 pending 승인 hook이 나만의 커리큘럼 저장/열기 절차를 각자 복붙하면 실패다. 저장 후 현재 학습 열기 정책은 `customCurricula.ts`의 `saveAndOpenCustomCurriculum`이 맡는다.
+- assistant 응답과 pending 승인 hook이 나만의 커리큘럼 저장/열기 절차를 각자 복붙하면 실패다. 저장 후 학습 열기 정책은 `customCurricula.ts`의 `saveAndOpenCustomCurriculum`이 맡는다.
 - assistant 응답, local fallback, turn hook이 적용 payload shape를 각자 다시 정의하면 실패다. `assistantArtifactRouting.ts`의 `AssistantArtifactApplication`과 `buildAssistantArtifactApplication`을 기준으로 쓴다.
 - `chatSurface.tsx`가 `curriculumSidebarTree`, `automationSidebarTree`, YAML 카드 렌더러, 패키지 준비 내부를 import하면 실패다. 채팅은 입구와 provider 연결만 책임진다.
 - `curriculumSurface.tsx`가 패키지 준비 상태나 누락 패키지 준비 loop를 직접 품으면 실패다. 섹션 카드 렌더러는 YAML/셀 흐름을 맡고, 패키지 준비 표면은 `curriculumDependencyPanel.tsx`가 맡는다.
@@ -95,7 +96,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 `editor/`는 표면별로 아래 정보를 우선 보여준다. 디버그성 정보는 기본 패널로 고정하지 않는다.
 
 - 대화: conversation, 생성된 curriculum/automation 초안, 적용 대기 중인 노트북 변경
-- 현재 학습: `curricula/` 레슨 트리, YAML에서 전개된 학습 셀, 셀 바로가기 TOC, 접을 수 있는 Codaro 패널
+- 학습: `curricula/` 레슨 트리, YAML에서 전개된 학습 셀, 셀 바로가기 TOC, 접을 수 있는 Codaro 패널
 - 노트북: 빈 코드 셀, Python/Markdown 셀, 셀 바로 아래 실행 결과, 필요할 때 여는 Codaro 패널
 - 자동화: 검증된 셀/recipe를 저장하고 예약하는 두 번째 loop. `Codaro 자동화`, `나만의 자동화`, 태스크 예약과 실행 상태를 보여준다.
 - 과제방의 frontend와 active backend 도메인은 제거했다. 학습 실행·검증·진도 event는 classroom API, session, outbox를 import하지 않는다. `/api/classroom` HTTP surface도 없으며 local-owner archive migration만 제품 밖 경계에 남는다.
@@ -113,14 +114,14 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 
 - 에디터는 빈 노트북에서 시작한다.
 - 기본 생성 버튼은 Python 셀과 Markdown 셀만 둔다.
-- 자유 노트북은 예제 코드를 자동 삽입하지 않는다. 설명과 starter code는 현재 학습이 소유하고, 노트북은 사용자가 바로 입력할 수 있는 빈 코드 셀 하나로 시작한다.
+- 자유 노트북은 예제 코드를 자동 삽입하지 않는다. 설명과 starter code는 학습이 소유하고, 노트북은 사용자가 바로 입력할 수 있는 빈 코드 셀 하나로 시작한다.
 - 노트북 첫 화면은 가운데 정렬한 파일명, 입력 셀, 하단 셀 추가, 가장자리 전체 실행만 기본 노출한다. 셀 종류, 삭제, 셀 실행, 도움 요청은 셀 hover·focus 문맥에서 드러낸다.
 - runtime과 저장 방식은 `data-notebook-*` 계약으로 계속 측정하되, 정상·저장 완료 상태를 상시 배지나 rail로 장식하지 않는다. 실행 중, 저장 중, 저장 실패처럼 사용자의 다음 행동에 영향을 주는 상태만 화면에 표시한다.
 - `Shift+Enter`는 현재 코드 셀을 실행하고 다음 셀로 이동한다. 마지막 셀이면 빈 코드 셀을 하나 만들고 그 셀로 이동한다. `Ctrl+Enter`와 `Mod+Enter`는 현재 셀에 머문 채 실행한다.
 - 학습셀, 타이틀셀, 설명셀, 실행셀, 시각화셀 같은 전용 의미는 별도 물리 타입을 남발하지 않고 셀 메타데이터(`role`, `displayKind`, `executionKind`, `payload`)로 표현한다.
 - 에디터는 코드 셀, 실행 결과, 런타임 상태가 한 화면에서 끊기지 않아야 한다.
 - 실행 버튼, 셀 추가, 검색, 명령 팔레트 같은 기본 행동은 shadcn 버튼/탭/패널 패턴 위에서 만든다. 저장/동기화는 명확한 제품 흐름이 생기기 전까지 전역 헤더 액션으로 두지 않는다.
-- 노트북과 현재 학습의 실행 셀 frame, 선택 상태, output, action은 `editor/src/components/app/workCell.css`의 `astryxWorkCell*` primitive를 함께 사용한다. 각 표면이 border, radius, output 계층을 따로 복제하면 실패다.
+- 노트북과 학습의 실행 셀 frame, 선택 상태, output, action은 `editor/src/components/app/workCell.css`의 `astryxWorkCell*` primitive를 함께 사용한다. 각 표면이 border, radius, output 계층을 따로 복제하면 실패다.
 - Web Run과 Local은 모두 `NotebookSurface → NotebookPanel → DocumentBlock` 컴포넌트 트리를 사용한다. `apiOnline`은 실행·저장 capability만 바꾸며 별도 로컬 노트북 디자인을 만들지 않는다.
 - 코드 편집 영역은 별도 엔진 영역으로 보고, 주변 크롬은 shadcn/ui 컴포넌트로 구성한다.
 - 출력은 셀 바로 아래에 붙이며, 실행 상태는 셀 안에서 먼저 확인할 수 있어야 한다.
@@ -156,7 +157,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 ## 자동화 기준
 
 - 자동화는 에디터에서 만든 셀 조합과 스크립트를 모아두는 표면이다.
-- 자동화는 기본 입구가 아니라 대화, 현재 학습, 노트북에서 검증된 셀/recipe가 넘어오는 두 번째 loop다.
+- 자동화는 기본 입구가 아니라 대화, 학습, 노트북에서 검증된 셀/recipe가 넘어오는 두 번째 loop다.
 - `Codaro 자동화`와 `나만의 자동화`를 분리한다.
 - 태스크는 자동화 스크립트를 몇 시 몇 분에 실행할지 정하는 예약이다.
 - 자동화 셀은 OS, 브라우저, 이미지, 마우스, 스킬 실행까지 확장될 수 있지만, 기본 셀 모델은 notebook/cell 계약을 유지한다.

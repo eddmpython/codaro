@@ -240,7 +240,7 @@ AUTOMATION_REQUIREMENTS = (
                 "Codaro 자동화",
                 "나만의 자동화",
                 "검증된 셀과 recipe를 태스크로 키울 때",
-                "대화, 현재 학습, 노트북에서 검증한 자동화 셀과 스크립트",
+                "대화, 학습, 노트북에서 검증한 자동화 셀과 스크립트",
                 "Reference templates for turning validated cells and recipes into tasks.",
                 "긴급 정지",
                 "실행 인스펙터",

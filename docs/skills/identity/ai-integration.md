@@ -25,13 +25,13 @@ whenToUse: AI Provider 추가/교체, 새 tool_use 추가, AI 교사 시스템 �
 
 ## 추천·조합 우선 학습 절차
 
-AI가 학습 흐름을 만들 때 기본값은 `editor/`의 **채팅에서 목표를 해석한 뒤 현재 학습으로 전개**하는 것이다. 사용자가 "pandas 3일 과정 만들어줘"처럼 말하면 아래 절차를 따른다.
+AI가 학습 흐름을 만들 때 기본값은 `editor/`의 **채팅에서 목표를 해석한 뒤 학습으로 전개**하는 것이다. 사용자가 "pandas 3일 과정 만들어줘"처럼 말하면 아래 절차를 따른다.
 
 1. **목표 해석** - `resolve-learning-goal`로 자연어 목표를 커리큘럼 도메인 후보에 매핑한다.
 2. **기존 레슨 검색** - `search-curricula`로 이미 있는 레슨과 outcome을 먼저 찾는다.
 3. **학습 경로 조합** - `compose-master-plan`으로 기존 레슨을 순서 있는 경로로 조합하고 gap을 확인한다.
 4. **gap-only YAML 작성** - 기존 레슨이 덮지 못하는 실제 gap일 때만 `meta`, `intro`, `sections` 구조의 curriculum YAML을 만든다. 신규 레슨은 `intro.diagram.steps`, `intro.diagram.runtime`, `sections[].title/subtitle/goal/why/explanation/tips/snippet/exercise/check` 계약을 쓰고, `sections[].blocks[]`는 기존 curriculum 변환용이다.
-5. **커리큘럼 전개** - gap YAML은 반드시 `write-curriculum-yaml`로 `yamlToDocument` 변환기에 보내고, 결과 document를 현재 학습 셀로 로드한다.
+5. **커리큘럼 전개** - gap YAML은 반드시 `write-curriculum-yaml`로 `yamlToDocument` 변환기에 보내고, 결과 document를 학습 셀로 로드한다.
 6. **라이브러리 확인** - 실행할 셀에 외부 패키지가 필요하면 `packages-check`를 먼저 호출하고, 누락된 항목만 `packages-install`로 uv 설치한다.
 7. **셀 단위 수정** - 추가 설명, 빈칸, 예측, 체크 셀은 `write-cell`로 한 셀씩 삽입/수정/삭제한다.
 8. **셀 단위 호출** - 실행과 검증은 `cell-call`을 기본으로 한다. 하위 호환이 필요할 때만 `execute-reactive`, `check-exercise`를 직접 쓴다.
@@ -39,7 +39,7 @@ AI가 학습 흐름을 만들 때 기본값은 `editor/`의 **채팅에서 목�
 
 이 절차의 핵심은 "기존 커리큘럼 추천·조합이 먼저이고, YAML은 gap을 채우는 SSOT이며, 셀이 실행/학습 단위, tool call이 셀별 조작 로그"라는 구조다. AI 응답 텍스트가 커리큘럼이 아니라, 추천 경로와 gap YAML, 셀 단위 조작이 실제 학습 상태를 만든다.
 
-여기서 `editor/`는 제품 표면 폴더명이다. 사용자에게 보이는 표면은 대화, 현재 학습, 노트북, 자동화이며, 내부 실행/학습 단위는 notebook과 cell이다.
+여기서 `editor/`는 제품 표면 폴더명이다. 사용자에게 보이는 표면은 대화, 학습, 노트북, 자동화이며, 내부 실행/학습 단위는 notebook과 cell이다.
 
 ## Tool action 계약
 

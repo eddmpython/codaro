@@ -39,5 +39,5 @@ whenToUse: 스케줄러 설계, 워크플로우 DAG 구현, audit trail 포맷 �
 ## 관련
 
 - [[external-channels-mobile]] - Webhook/Slack 트리거
-- [[multi-editor-modes]] - 대화, 현재 학습, 노트북, 자동화 네 제품 표면
+- [[multi-editor-modes]] - 대화, 학습, 노트북, 자동화 네 제품 표면
 - [[percent-format]] - .py가 곧 태스크

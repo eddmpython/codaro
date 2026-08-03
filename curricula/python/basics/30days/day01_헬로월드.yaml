@@ -216,7 +216,7 @@ sections:
     '''
     print('주석 후')
   exercise:
-    prompt: 삼중 따옴표 설명은 그대로 두고 마지막 빈칸을 채워 두 줄만 출력하세요.
+    prompt: 삼중 따옴표 설명은 그대로 두고 마지막 빈칸을 "주석 후"로 채워 두 줄만 출력하세요.
     starterCode: |-
       print('주석 전')
       '''

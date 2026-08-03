@@ -117,7 +117,9 @@ export function ProductSidebar({
   onToggleTerminal,
 }: ProductSidebarProps) {
   const { locale, t, toggleLocale } = useLocale();
-  const learningMode = surface === "curriculum";
+  // 집중 모드는 레슨 안에서만. 학습 홈은 코스를 고르는 허브라 제품 네비를 숨기면
+  // 좌측 레일이 비어 보이고 다른 표면으로 갈 길이 없어진다.
+  const learningMode = surface === "curriculum" && Boolean(selectedContentId);
   const [deleteTarget, setDeleteTarget] = useState<SidebarCustomCurriculum | null>(null);
   const learningLessonRef = selectedCategory && selectedContentId
     ? `${selectedCategory}/${selectedContentId}`

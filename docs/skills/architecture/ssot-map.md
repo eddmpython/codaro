@@ -26,13 +26,13 @@ Codaro에서 기준 파일은 아래 순서로 본다. 같은 의미의 규칙�
 | local diagnostic collection | `src/codaro/system/localDiagnostics.py` | provider/runtime/package/frontend 로컬 상태를 `DiagnosticItem`으로 수집하고 export context를 조립하는 기준 |
 | system health flow | `src/codaro/system/healthFlow.py` | process/session/conversation/runtime health payload의 system 경계 |
 | server state | `src/codaro/system/serverState.py` | process/session/curriculum/runtime 공유 상태와 생성 factory의 system 경계 |
-| 제품 표면 | `docs/skills/architecture/frontend-product-surface.md` | 대화, 현재 학습, 노트북, 자동화의 의미와 UX 경계 |
-| 표면 라우팅 | `editor/src/lib/surfaceModel.ts`, `editor/src/lib/runRouteState.ts`, `contracts/runRouteState.schema.json` | 프론트 surface enum과 `현재 학습 → 노트북 → 자동화 → 대화` 사이드바 순서, lesson/path/runtime URL, resume, history 복원 |
+| 제품 표면 | `docs/skills/architecture/frontend-product-surface.md` | 대화, 학습, 노트북, 자동화의 의미와 UX 경계 |
+| 표면 라우팅 | `editor/src/lib/surfaceModel.ts`, `editor/src/lib/runRouteState.ts`, `contracts/runRouteState.schema.json` | 프론트 surface enum과 `학습 → 노트북 → 자동화 → 대화` 사이드바 순서, lesson/path/runtime URL, resume, history 복원 |
 | 대화 요청 범위 | `editor/src/lib/teacherScope.ts` | 학습/셀/자동화 요청 분류와 자동화 작성 요청의 노트북 pending 경로 |
 | 표면 route state | `editor/src/hooks/useSurfaceRoute.ts` | URL hash와 surface state 동기화 |
 | 표면 조립 | `editor/src/components/app/mainSurface.tsx` | surface별 화면 조립 |
 | 제품 사이드바 shell | `editor/src/components/app/productSidebar.tsx` | provider/theme/locale/search/utility와 표면별 sidebar tree를 조립하는 shell |
-| 제품 flow nav | `editor/src/components/app/productFlowNav.tsx` | `PRODUCT_SIDEBAR_FLOW_ITEMS`를 렌더링하는 `현재 학습 → 노트북 → 자동화 → 대화` flow nav |
+| 제품 flow nav | `editor/src/components/app/productFlowNav.tsx` | `PRODUCT_SIDEBAR_FLOW_ITEMS`를 렌더링하는 `학습 → 노트북 → 자동화 → 대화` flow nav |
 | Astryx 제품 토큰과 cascade | `assets/brand/designSystem/tokens.json`, `assets/brand/tools/buildDesignSystem.py`, `assets/brand/tools/viteLayerOrder.mjs` | landing과 editor가 공유하는 색상, 반지름, typography, density, accent, production CSS layer 순서와 생성 mirror 기준 |
 | 제품·학습 시각 증명 | `assets/brand/visuals/manifest.json`, `tests/assets/captureProductVisuals.py`, `assets/brand/visuals/outcomes/fixtures.json`, `assets/brand/tools/captureOutcomeProofs.py` | 제품 screenshot과 실제 결과 fixture, source provenance, responsive variant, Landing·Editor mirror의 SSOT |
 | 공용 SNS rail | `assets/brand/designSystem/socialLinks.json`, `assets/brand/tools/buildDesignSystem.py`, 양쪽 `src/styles/generated/socialLinks.tsx` | 링크 순서·라벨·URL·SVG path와 동일 byte Astryx `IconButton` component의 SSOT |
@@ -203,7 +203,7 @@ Codaro에서 기준 파일은 아래 순서로 본다. 같은 의미의 규칙�
 | assistant message state | `editor/src/lib/assistantConversationState.ts` | stream event와 response를 assistant message state로 변환 |
 | assistant provider turn | `editor/src/lib/assistantProviderTurn.ts` | provider stream 호출과 stream event를 message state에 연결 |
 | mobile chat alias | `editor/src/lib/runRouteState.ts` | `/m/chat`을 별도 화면 트리 없이 공용 ProductShell의 chat surface로 정규화 |
-| assistant artifact routing | `editor/src/lib/assistantArtifactRouting.ts` | provider/local 답변 산출물을 현재 학습 또는 노트북으로 여는 surface, pending target, application payload shape 결정 |
+| assistant artifact routing | `editor/src/lib/assistantArtifactRouting.ts` | provider/local 답변 산출물을 학습 또는 노트북으로 여는 surface, pending target, application payload shape 결정 |
 | assistant response plan | `editor/src/lib/assistantResponsePlan.ts` | provider 응답과 tool 결과를 에디터 적용, pending blocks, 나만의 커리큘럼 저장/표면 전환 계획으로 변환하되 직접 저장하지 않는다 |
 | assistant local turn | `editor/src/lib/assistantLocalTurn.ts` | provider 미연결 시 local fallback 저장, notice, pending reset 결정 |
 | assistant turn state hook | `editor/src/hooks/useAssistantTurnState.ts` | 대화 prompt/message/conversation 상태와 provider/local turn 실행 UI 상태 |
@@ -224,13 +224,13 @@ Codaro에서 기준 파일은 아래 순서로 본다. 같은 의미의 규칙�
 | code completion | `editor/src/lib/codeCompletion.ts` | 노트북 코드 자동완성 API 호출과 completion context payload 경계 |
 | widget UI events | `editor/src/lib/widgetUiEvents.ts` | 위젯 callback을 kernel ui-event API와 reactive trigger 이벤트로 연결하는 경계 |
 | workloop state | `editor/src/lib/workLoop.ts` | tool_start/tool_results와 response trace summary를 UI state, group label, payload text로 변환 |
-| custom curricula | `editor/src/lib/customCurricula.ts` | 나만의 커리큘럼 저장/로드, 저장 후 현재 학습 열기 정책, 선택 상태 적용 |
+| custom curricula | `editor/src/lib/customCurricula.ts` | 나만의 커리큘럼 저장/로드, 저장 후 학습 열기 정책, 선택 상태 적용 |
 | custom curricula state hook | `editor/src/hooks/useCustomCurriculaState.ts` | 나만의 커리큘럼 저장소 persistence와 선택 상태 |
-| curriculum progress | `editor/src/lib/curriculumProgress.ts` | 현재 학습 진행률 조회 API 경계 |
+| curriculum progress | `editor/src/lib/curriculumProgress.ts` | 학습 진행률 조회 API 경계 |
 | curriculum selection | `editor/src/lib/curriculumSelection.ts` | 기본 커리큘럼 fallback, 콘텐츠/레슨 로딩, 선택 상태 |
-| curriculum package preparation | `editor/src/lib/curriculumPackagePreparation.ts` | 현재 학습 dependency panel의 패키지 조회/설치 API 경계 |
+| curriculum package preparation | `editor/src/lib/curriculumPackagePreparation.ts` | 학습 dependency panel의 패키지 조회/설치 API 경계 |
 | share pack operations | `editor/src/lib/sharePackOperations.ts` | 숨겨진 공유 팩 표면의 pack 조회/검사/설치/자동화 task API 경계 |
-| curriculum library state hook | `editor/src/hooks/useCurriculumLibraryState.ts` | 커리큘럼 목록/레슨 로딩과 현재 학습 셀 선택 상태 |
+| curriculum library state hook | `editor/src/hooks/useCurriculumLibraryState.ts` | 커리큘럼 목록/레슨 로딩과 학습 셀 선택 상태 |
 | curriculum navigation state hook | `editor/src/hooks/useCurriculumNavigationState.ts` | 기본/나만의 커리큘럼 선택과 사이드바 검색/목록 상태 |
 | automation state | `editor/src/lib/automationState.ts` | 자동화/태스크 상태 |
 | automation state hook | `editor/src/hooks/useAutomationState.ts` | 자동화 snapshot refresh, 긴급 정지, 태스크 실행 UI 상태 |

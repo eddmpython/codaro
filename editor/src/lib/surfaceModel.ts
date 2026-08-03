@@ -82,7 +82,7 @@ export function surfaceTitle(surface: SurfaceMode) {
   const en = getActiveLocale() === "en";
   if (surface === "home") return en ? "Local Home" : "로컬 홈";
   if (surface === "editor") return en ? "Notebook" : "노트북";
-  if (surface === "curriculum") return en ? "Current Learning" : "현재 학습";
+  if (surface === "curriculum") return en ? "Learning" : "학습";
   if (surface === "automation") return en ? "Automation" : "자동화";
   if (surface === "share") return en ? "Share Packs" : "공유 팩";
   return en ? "Chat" : "대화";

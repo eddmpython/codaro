@@ -4,7 +4,7 @@ canonicalRows: 30
 lessons:
   - lessonRef: "30days/day01_헬로월드"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "330d4b7a819fd62e99a4c61ef923044fc9a821ad041049ffa45a39f367d20790"
+    lessonContentHash: "ebce98c771741e2a0de67e8a6b976c4c1e44e1b851ebd1f190920f200a7f207c"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]

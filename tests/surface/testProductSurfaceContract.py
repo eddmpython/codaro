@@ -719,7 +719,7 @@ def testProductSurfaceCopyMatchesFocusedFlow() -> None:
 
     for expected in (
         '"nav.chat": "대화"',
-        '"nav.curriculum": "현재 학습"',
+        '"nav.curriculum": "학습"',
         '"nav.editor": "노트북"',
         '"nav.automation": "자동화"',
     ):
@@ -727,11 +727,11 @@ def testProductSurfaceCopyMatchesFocusedFlow() -> None:
 
     for expected in (
         "검증된 셀과 recipe를 태스크로 키울 때",
-        "대화, 현재 학습, 노트북에서 검증한 자동화 셀과 스크립트",
+        "대화, 학습, 노트북에서 검증한 자동화 셀과 스크립트",
         "채팅에서 반복 작업을 말하고 셀 또는 recipe를 검증하면",
         "기존 레슨을 먼저 찾아 학습 경로를 짜줘",
         "검증된 노트북 셀을 dry-run 자동화 recipe로 정리",
-        "Automation stores cells and recipes validated from chat, current learning, or notebooks.",
+        "Automation stores cells and recipes validated from chat, learning, or notebooks.",
         "First find existing lessons and compose a learning path",
         "Turn validated notebook cells into a dry-run automation recipe",
     ):
@@ -868,17 +868,17 @@ def testProductSurfaceDocsNameTheSameFlow() -> None:
     identityDoc = _read("docs/skills/identity/multi-editor-modes.md")
     ssotMap = _read("docs/skills/architecture/ssot-map.md")
 
-    assert "대화, 현재 학습, 노트북, 자동화" in skillsReadme
+    assert "대화, 학습, 노트북, 자동화" in skillsReadme
     assert "기존 커리큘럼 추천·조합" in skillsReadme
     assert "자동화는 검증된 스크립트를 태스크로 예약 실행" in skillsReadme
-    assert "`현재 학습 → 노트북 → 자동화 → 대화`" in frontendDoc
+    assert "`학습 → 노트북 → 자동화 → 대화`" in frontendDoc
     assert "`PRODUCT_SURFACE_NAV`" in frontendDoc
     assert "`entry`/`learning`/`notebook`/`secondLoop`/`support`" in frontendDoc
     assert "`editor/src/lib/teacherScope.ts`" in frontendDoc
     assert "`editor/src/lib/chatStartExamples.ts`" in ssotMap
-    assert "`현재 학습 → 노트북 → 자동화 → 대화`" in dogfoodDoc
-    assert "`현재 학습 → 노트북 → 자동화 → 대화`" in identityDoc
-    assert "`현재 학습 → 노트북 → 자동화 → 대화` 사이드바 순서" in ssotMap
+    assert "`학습 → 노트북 → 자동화 → 대화`" in dogfoodDoc
+    assert "`학습 → 노트북 → 자동화 → 대화`" in identityDoc
+    assert "`학습 → 노트북 → 자동화 → 대화` 사이드바 순서" in ssotMap
     assert "`editor/src/lib/teacherScope.ts`" in ssotMap
 
 
@@ -898,10 +898,10 @@ def testProductSurfaceDocsCarryConvergenceAssessmentAndRiskControls() -> None:
         "`editor/src/components/app/notebookSurface.tsx`",
         "노트북 표면 조립",
         "`editor/src/components/app/currentLearningSurface.tsx`",
-        "현재 학습 표면 조립",
+        "학습 표면 조립",
         "`editor/src/components/chat/chatSurface.tsx`",
         "`editor/src/hooks/useProductSurfaceSelection.ts`",
-        "현재 학습 재진입",
+        "학습 재진입",
         "`editor/src/lib/assistantArtifactRouting.ts`",
         "`editor/src/lib/assistantResponsePlan.ts`",
         "`editor/src/lib/pendingChanges.ts`",
