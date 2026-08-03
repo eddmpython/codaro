@@ -1,7 +1,7 @@
 ---
 id: assignment-room
 title: Retired Assignment Room
-description: Removed classroom feature boundary, local archive migration, and one-release HTTP retirement contract.
+description: Removed classroom feature boundary, retired HTTP surface, and local archive migration contract.
 category: architecture
 section: learning
 order: 216
@@ -17,28 +17,16 @@ whenToUse: classroom 참조를 발견했거나 기존 `~/.codaro/classroom` 데�
 
 ## 남아 있는 경계
 
-- `/api/classroom`과 모든 하위 HTTP 경로는 한 호환 release 동안 `410 Gone`만 반환한다.
-- 응답은 local-owner CLI의 audit, export, verify, purge 명령만 안내한다.
-- HTTP로 archive를 만들거나 내려받지 않는다.
-- `src/codaro/api/classroomRetirementRouter.py`는 호환 안내만 담당한다.
-- `tests/architecture/verifyClassroomRemoved.py`가 active classroom source, symbol, frontend import 재유입을 차단한다.
+- `/api/classroom`과 모든 하위 HTTP 경로는 존재하지 않는다. 제품은 이 접두사로 어떤 route도 서비스하지 않는다.
+- 기존 데이터는 HTTP가 아니라 local-owner CLI의 audit, export, verify, purge 명령으로만 다룬다.
+- `tests/architecture/verifyClassroomRemoved.py`가 active classroom source, symbol, HTTP surface 재유입을 차단한다.
+- `tests/migrations/testClassroomArchive.py`가 실제 `createServerApp()` route table에 classroom 경로가 없는지 확인하고 migration 동작을 회귀한다.
 
-## 호환 창 phase
+## HTTP 호환 창 처리 기록
 
-tombstone을 언제 지워도 되는지는 code 상태가 아니라 release 사건이 결정한다. 그 사건은 `contracts/classroomRetirement.json`이 저장소 사실로 선언하고, `src/codaro/classroomRetirement.py`가 phase를 판정한다.
+과제방 제거 당시 한 release 동안 HTTP `410 Gone` 안내를 유지하는 호환 창을 계획했다. 실제로는 그 안내를 담은 release가 게시되지 않았고, tombstone router는 게시 전에 제거했다. active classroom을 마지막으로 게시한 release는 `v0.0.12`이며, 그 버전의 URL을 그대로 호출하면 안내 응답 대신 `404`를 받는다. 기존 로컬 데이터 이관 경로는 이 결정과 무관하게 CLI로 유지된다.
 
-| phase | 선언 | gate가 요구하는 것 |
-| --- | --- | --- |
-| `compatibility` | `firstReleaseWithTombstone: null` | tombstone router가 존재하고 `server.py`와 `api/__init__.py`에 등록돼 있으며 410·`classroom_retired`·CLI 안내를 담는다 |
-| `removal` | `firstReleaseWithTombstone: "<게시된 tag>"` | tombstone router와 모든 wiring이 없다 |
-
-두 phase 모두 active classroom 재유입 금지와 local archive migration 보존을 똑같이 요구한다.
-
-호환 창을 닫는 절차는 하나다. 410 안내가 포함된 release가 실제로 게시된 뒤, `firstReleaseWithTombstone`에 그 tag를 적고 같은 commit에서 router와 wiring을 지운다. 필드를 채우는 행위가 제거를 허용하는 동시에 요구하므로 선언과 tree가 어긋난 중간 상태는 gate가 막는다.
-
-release tag를 읽을 수 있는 환경에서는 선언과 실제 이력의 drift도 검사한다. 아직 게시되지 않은 tag를 미리 적으면 실패하고, 반대로 tombstone이 이미 게시됐는데 선언이 `null`로 남아 있어도 실패한다. tag를 fetch하지 않는 shallow checkout에서는 선언이 유일한 판정 근거가 되며 drift 검사만 생략된다.
-
-현재 상태는 `compatibility`다. active classroom은 `v0.0.12`가 마지막으로 게시했고, 410 안내를 포함한 release는 아직 없다.
+호환 안내를 다시 넣지 않는다. 재유입은 gate 실패로 처리한다.
 
 ## 로컬 데이터 이관
 
@@ -70,12 +58,8 @@ codaro classroom purge --archive <archive.zip> --confirm-hash <sha256> --reason 
 | archive audit/export/verify/purge | `src/codaro/migrations/classroomArchive.py` |
 | archive schema | `contracts/classroomArchive.schema.json` |
 | migration ledger schema | `contracts/classroomMigrationLedger.schema.json` |
-| HTTP 410 경계 | `src/codaro/api/classroomRetirementRouter.py` |
-| 호환 창 선언 | `contracts/classroomRetirement.json` |
-| 호환 창 phase 판정 | `src/codaro/classroomRetirement.py` |
-| migration 회귀 | `tests/migrations/testClassroomArchive.py` |
+| migration 회귀와 HTTP surface 부재 | `tests/migrations/testClassroomArchive.py` |
 | 제거 회귀 | `tests/architecture/verifyClassroomRemoved.py` |
-| phase 회귀 | `tests/architecture/testClassroomRetirementWindow.py` |
 
 ## 재도입 규칙
 

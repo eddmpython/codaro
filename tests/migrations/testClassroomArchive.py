@@ -6,11 +6,9 @@ import json
 from pathlib import Path
 import zipfile
 
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
 import pytest
 
-from codaro.api.classroomRetirementRouter import createClassroomRetirementRouter
+from codaro.server import createServerApp
 from codaro.migrations.classroomArchive import (
     ClassroomMigrationError,
     _exclusiveMigrationLock,
@@ -193,18 +191,13 @@ def testMigrationLockRejectsSecondOwner(tmp_path: Path) -> None:
                 pass
 
 
-def testRetiredHttpSurfaceReturnsGoneWithoutArchiveData() -> None:
-    app = FastAPI()
-    app.include_router(createClassroomRetirementRouter())
-    client = TestClient(app)
+def testProductServesNoClassroomHttpSurface() -> None:
+    app = createServerApp()
 
-    for method, path in (("get", "/api/classroom/status"), ("post", "/api/classroom/events")):
-        response = client.post(path, json={}) if method == "post" else client.get(path)
-        assert response.status_code == 410
-        payload = response.json()["error"]
-        assert payload["code"] == "classroom_retired"
-        assert "codaro classroom export" in " ".join(payload["localCommands"])
-        assert "archivePath" not in response.text
+    servedPaths = sorted({getattr(route, "path", "") for route in app.routes})
+
+    assert [path for path in servedPaths if "classroom" in path] == []
+    assert len(servedPaths) > 1
 
 
 def testArchiveHashMatchesActualBytes(tmp_path: Path) -> None:

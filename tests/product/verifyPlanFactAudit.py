@@ -15,7 +15,7 @@ import yaml
 
 
 ROOT = Path(__file__).resolve().parents[2]
-INITIATIVE = ROOT / "mainPlan" / "astryx-product-experience"
+MAIN_PLAN = ROOT / "mainPlan"
 RUBRIC_PATH = ROOT / "contracts" / "prdEvaluationRubric.yml"
 EVALUATION_SCHEMA_PATH = ROOT / "contracts" / "prdEvaluationReport.schema.yml"
 REPORT_PATH = ROOT / "output" / "test-runner" / "plan-quality" / "plan-fact-audit.json"
@@ -72,16 +72,30 @@ def utcTimestamp() -> str:
     return datetime.now(UTC).isoformat(timespec="seconds")
 
 
+def activeInitiatives() -> tuple[Path, ...]:
+    """`mainPlan/` 아래 현재 살아 있는 initiative를 모두 감사 대상으로 삼는다.
+
+    특정 initiative 이름을 고정하면 그 폴더가 삭제된 뒤 감사 대상이 0건이 되어 조용히
+    통과한다. 남은 initiative가 없으면 없는 대로 사실이며, 새 initiative가 생기면 등록
+    없이 바로 감사된다.
+    """
+    if not MAIN_PLAN.is_dir():
+        return ()
+    return tuple(sorted(path for path in MAIN_PLAN.iterdir() if path.is_dir()))
+
+
 def activeReadmes() -> tuple[Path, ...]:
-    return tuple(sorted(INITIATIVE.rglob("README.md")))
+    return tuple(
+        sorted(readme for initiative in activeInitiatives() for readme in initiative.rglob("README.md"))
+    )
 
 
 def packetReadmes(readmes: tuple[Path, ...]) -> tuple[Path, ...]:
+    initiativeRoots = {initiative / "README.md" for initiative in activeInitiatives()}
     return tuple(
         path
         for path in readmes
-        if path != INITIATIVE / "README.md"
-        and re.match(r"^[0-9]{2}-", path.parent.name)
+        if path not in initiativeRoots and re.match(r"^[0-9]{2}-", path.parent.name)
     )
 
 
@@ -111,7 +125,14 @@ def markdownLinkFacts(readmes: tuple[Path, ...]) -> tuple[int, list[str]]:
 
 
 def yamlFacts() -> tuple[int, list[str]]:
-    paths = tuple(sorted(INITIATIVE.rglob("*.yml"))) + tuple(sorted(INITIATIVE.rglob("*.yaml")))
+    paths = tuple(
+        sorted(
+            path
+            for initiative in activeInitiatives()
+            for pattern in ("*.yml", "*.yaml")
+            for path in initiative.rglob(pattern)
+        )
+    )
     failures: list[str] = []
     for path in paths:
         try:
@@ -236,8 +257,9 @@ def verifyPlanFacts() -> dict[str, Any]:
     )
     return {
         "passed": not failures,
-        "scope": relativePath(INITIATIVE),
+        "scope": relativePath(MAIN_PLAN),
         "facts": {
+            "activeInitiatives": len(activeInitiatives()),
             "activeReadmes": len(readmes),
             "packetReadmes": len(packets),
             "localLinks": linkCount,
@@ -266,7 +288,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         result = verifyPlanFacts()
     except PlanFactError as exc:
-        result = {"passed": False, "scope": relativePath(INITIATIVE), "facts": {}, "failures": [str(exc)]}
+        result = {"passed": False, "scope": relativePath(MAIN_PLAN), "facts": {}, "failures": [str(exc)]}
     payload = {
         "schemaVersion": 1,
         "gate": "plan-quality",

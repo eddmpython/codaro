@@ -1,6 +1,5 @@
 from .aiRouter import createAiRouter
 from .automationRouter import createAutomationRouter
-from .classroomRetirementRouter import createClassroomRetirementRouter
 from .extensionRouter import createExtensionRouter
 from .bootstrapRouter import createBootstrapRouter
 from .curriculumRouter import createCurriculumRouter
@@ -47,7 +46,6 @@ __all__ = [
     "createAiRouter",
     "createAutomationRouter",
     "createBootstrapRouter",
-    "createClassroomRetirementRouter",
     "createCurriculumRouter",
     "createDocumentRouter",
     "createExtensionRouter",

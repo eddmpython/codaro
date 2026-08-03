@@ -590,11 +590,11 @@ GATES: dict[str, Gate] = {
     ),
     "removed-learning-concepts": Gate(
         tier="fast",
-        description="제거된 학습자 예측과 active classroom 구현이 다시 들어오지 않고 로컬 archive migration이 남는지, 선언한 호환 창 phase대로 410 안내가 존재하거나 제거됐는지 검사한다.",
+        description="제거된 학습자 예측, active classroom 구현과 `/api/classroom` HTTP surface가 다시 들어오지 않고 로컬 archive migration만 남는지 검사한다.",
         commands=(
             command(("uv", "run", "python", "-X", "utf8", "tests/learning/verifyRemovedLearningConcepts.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/architecture/verifyClassroomRemoved.py")),
-            command(("uv", "run", "pytest", "-q", "tests/architecture/testClassroomRetirementWindow.py")),
+            command(("uv", "run", "pytest", "-q", "tests/migrations/testClassroomArchive.py")),
         ),
     ),
     "repository-simplification": Gate(

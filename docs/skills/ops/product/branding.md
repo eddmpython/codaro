@@ -39,7 +39,7 @@ whenToUse: 새 UI 컴포넌트 추가, 색/반지름/그림자 변경, 랜딩/�
 
 # Astryx 전환 규칙
 
-- 활성 설계 SSOT는 `mainPlan/astryx-product-experience/README.md`다.
+- 설계 SSOT는 `assets/brand/designSystem/`의 토큰·컴포넌트 manifest와 `docs/skills/architecture/`의 제품 표면 계약이다. 임시 TODO 트리가 아니라 이 영구 계약과 상시 gate가 규칙을 소유한다.
 - 전환 순서는 product contract → design foundation → product shell → surface migration → quality release다.
 - migration이 끝나기 전 현재 editor의 shadcn token은 호환 기준으로만 유지한다. 새 색상, 반지름, 그림자, 별도 UI primitive를 이 layer에 추가하지 않는다.
 - 목표 공용 source는 `assets/brand/designSystem/tokens.json`이며 landing과 editor는 생성된 mirror를 사용한다. 한 제품 표면이 다른 표면의 내부 CSS나 컴포넌트를 직접 import하지 않는다.

@@ -63,6 +63,7 @@ mainPlan/
 
 ## 활성 이니셔티브
 
+현재 활성 이니셔티브가 없다. 남은 제품 작업이 생기면 이 표에 행을 추가하고 위 디렉터리 계약대로 폴더를 만든다. 끝난 작업의 기록은 이 트리가 아니라 commit message와 `git log`가 소유한다.
+
 | 이니셔티브 | 상태 | 목표 |
 | --- | --- | --- |
-| [astryx-product-experience](astryx-product-experience/) | 진행 | Astryx 공용 디자인 시스템으로 Landing, Learn, Run, Local을 하나의 고품질 제품군으로 통합한다. |

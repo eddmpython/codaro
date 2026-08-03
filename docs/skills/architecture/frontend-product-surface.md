@@ -98,7 +98,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 - 현재 학습: `curricula/` 레슨 트리, YAML에서 전개된 학습 셀, 셀 바로가기 TOC, 접을 수 있는 Codaro 패널
 - 노트북: 빈 코드 셀, Python/Markdown 셀, 셀 바로 아래 실행 결과, 필요할 때 여는 Codaro 패널
 - 자동화: 검증된 셀/recipe를 저장하고 예약하는 두 번째 loop. `Codaro 자동화`, `나만의 자동화`, 태스크 예약과 실행 상태를 보여준다.
-- 과제방의 frontend와 active backend 도메인은 제거했다. 학습 실행·검증·진도 event는 classroom API, session, outbox를 import하지 않는다. 한 호환 release의 HTTP `410 Gone` 안내와 local-owner archive migration만 제품 밖 경계에 남는다.
+- 과제방의 frontend와 active backend 도메인은 제거했다. 학습 실행·검증·진도 event는 classroom API, session, outbox를 import하지 않는다. `/api/classroom` HTTP surface도 없으며 local-owner archive migration만 제품 밖 경계에 남는다.
 - tool call과 컨텍스트는 사용자가 검토해야 할 때 action log/diff/detail로 열 수 있게 한다. 학습 화면의 기본 우측 패널로 고정하지 않는다.
 
 ## 결정

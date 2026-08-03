@@ -25,7 +25,6 @@
 | `masteryPolicy.v1.json` | 단계 전이, retrieval window, clock anomaly 허용 오차 계약 | Python reference reducer와 TypeScript 동형 reducer |
 | `runRouteState.schema.json` | 공개 레슨, Web Run, Local 사이의 lesson identity, path, runtime, durable history 계약 | Landing handoff와 공용 editor route adapter |
 | `webCompatibilityC0.json` | 기존 `/codaro/app/` 제품 tree의 source·build·hash·response type 고정 계약 | Pages C0 build, C1 조립, deployed crawl |
-| `classroomRetirement.json` | 제거된 `/api/classroom`의 HTTP 410 호환 창이 열려 있는지 닫혔는지 고정하는 release 사실 | `verifyClassroomRemoved.py`의 phase 판정 |
 
 학습 실행 증거는 `learningArtifactDescriptor.schema.json`을 공용 진입점으로 사용한다. 일반 파일·폴더와 달리 표와 이미지는 전용 schema에서 내용 구조까지 검증한다.
 
@@ -36,5 +35,3 @@
 `CreditGranted.evidenceTime`은 실행 증거가 관측한 시각이고 `appendReceiptAt`은 canonical writer가 처음 수락한 시각이다. import는 두 값을 다시 쓰지 않는다. delayed retrieval은 두 시간축이 모두 window 안에 있고 경과 차이가 `masteryPolicy.v1.json`의 허용 오차 안일 때만 credit을 받는다. 역행·future skew·경과 불일치는 `ClockAnomaly`로 projection에 남고 해당 credit은 보류된다.
 
 `webCompatibilityC0.json`은 `/codaro/app/`의 source commit, LF build 조건, deployed tree hash와 response type을 고정한다. Pages는 이 commit만 별도 checkout해 `/app/`을 만들고 `verifyWebCompatibilityC0.py`가 632개 파일의 exact tree identity와 배포 crawl을 검사한다. 정식 release archive URL·SHA-256은 명시적 release가 실행될 때만 채운다.
-
-`classroomRetirement.json`은 tombstone을 언제 지워도 되는지가 code가 아니라 release 사건에 달려 있다는 사실을 저장소 안에 고정한다. `firstReleaseWithTombstone`이 `null`이면 호환 창이 열려 있어 410 router와 wiring이 있어야 하고, 게시된 release tag를 채우면 창이 닫혀 router와 모든 wiring이 없어야 한다. 그래서 이 필드를 채우는 commit이 곧 tombstone 제거 commit이다. tag를 fetch하지 않는 CI checkout에서는 선언이 유일한 판정 근거이며, tag를 읽을 수 있는 환경에서는 선언과 실제 release 이력의 drift까지 검사한다.
