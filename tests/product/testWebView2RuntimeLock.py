@@ -2,13 +2,26 @@ from __future__ import annotations
 
 from copy import deepcopy
 from datetime import UTC, datetime
+import importlib.util
 import json
 from pathlib import Path
 import subprocess
 
 import pytest
 
-from docs.skills.ops.tools import installWebView2FixedRuntime as installer
+
+def _loadInstallerModule():
+    # docs/ 트리는 패키지가 아니다. `from docs...` import는 repo 루트가 sys.path에 있을
+    # 때만 우연히 동작해(python -m pytest) CI의 pytest 콘솔 스크립트 실행에서 깨진다.
+    path = Path(__file__).resolve().parents[2] / "docs" / "skills" / "ops" / "tools" / "installWebView2FixedRuntime.py"
+    spec = importlib.util.spec_from_file_location("installWebView2FixedRuntime", path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+installer = _loadInstallerModule()
 from product.webview2RuntimeLock import (
     LOCK_PATH,
     RuntimeLockError,
