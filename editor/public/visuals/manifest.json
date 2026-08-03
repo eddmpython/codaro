@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sourceManifestHash": "sha256-d95af3fe115b65924efa4c6158505fcbabf7d41dfef0160bd0ac33345ae0b7b3",
+  "sourceManifestHash": "sha256-76782bf3bc0e73f2870c56282d07c9e61d6c24b1b18641d7247cef6a9ecd3af2",
   "assets": [
     {
       "id": "runLearningDetail",
@@ -401,8 +401,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-mobile-light.png",
-      "sourceHash": "sha256-298b19ca578688755c1dc3f9561d4b1005ec44a8285842faaf1db315d3e7ac7e",
-      "sourceGitHead": "d65db38a7c305b5ad80ce05fb2a5251216030578",
+      "sourceHash": "sha256-03f32c7d3671f801bc10d95685a55cbcff48aac7212fa87ec92a80230c84e5e3",
+      "sourceGitHead": "b2ffc414a3da06e2f4456c52932feb638240f2ec",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -487,19 +487,19 @@
       "themePairId": "runLearningMobile",
       "outputs": [
         {
-          "byteLength": 18992,
+          "byteLength": 18991,
           "format": "avif",
           "height": 844,
-          "integrity": "sha256-af392f083f7d47615a3c2e30cda0d30c3da370372c7d585d0470a7afc088619c",
-          "publicPath": "/visuals/files/runLearningMobileLight/runLearningMobileLight-390-298b19ca5786.avif",
+          "integrity": "sha256-4edebc19f6c55de9628b4bd60e4e391799235a32e6a204a906f04d21641f2b09",
+          "publicPath": "/visuals/files/runLearningMobileLight/runLearningMobileLight-390-03f32c7d3671.avif",
           "width": 390
         },
         {
           "byteLength": 27080,
           "format": "webp",
           "height": 844,
-          "integrity": "sha256-12425a345e07baaf32facfc87fd557894f18ac66a6bed9f8b008c78ff1515994",
-          "publicPath": "/visuals/files/runLearningMobileLight/runLearningMobileLight-390-298b19ca5786.webp",
+          "integrity": "sha256-7b50a000258ed6155d95d931d48dd784132ff622138916d0f385b7eec05c376f",
+          "publicPath": "/visuals/files/runLearningMobileLight/runLearningMobileLight-390-03f32c7d3671.webp",
           "width": 390
         }
       ]

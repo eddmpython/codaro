@@ -157,6 +157,41 @@ class CaptureProductVisualsTest(unittest.TestCase):
                 )["equivalent"]
             )
 
+    def testPixelComparisonRelaxesBudgetOnlyForLowDeltaAntialiasNoise(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="codaro-aa-noise-") as directory:
+            root = Path(directory)
+            expectedPath = root / "expected.png"
+            expected = Image.new("RGBA", (10, 10), (20, 21, 24, 255))
+            expected.save(expectedPath)
+            aaBudget = (
+                CAPTURE_TOOL.MIN_RASTER_NOISE_PIXELS
+                * CAPTURE_TOOL.AA_RASTER_PIXEL_MULTIPLIER
+            )
+
+            def comparisonWith(pixelCount: int, delta: int) -> dict:
+                actual = expected.copy()
+                for index in range(pixelCount):
+                    actual.putpixel(
+                        (index % 10, index // 10),
+                        (20 + delta, 21, 24, 255),
+                    )
+                actualPath = root / f"actual-{pixelCount}-{delta}.png"
+                actual.save(actualPath)
+                return CAPTURE_TOOL.pngPixelComparison(expectedPath, actualPath)
+
+            # 글리프 안티앨리어싱 노이즈(저델타)는 기본 허용치를 넘어도 완화 범위 안이면 동등.
+            lowDeltaShimmer = comparisonWith(aaBudget - 4, CAPTURE_TOOL.AA_RASTER_CHANNEL_DELTA)
+            self.assertTrue(lowDeltaShimmer["equivalent"])
+            # 같은 픽셀 수라도 델타가 완화 기준을 넘으면 실제 드리프트로 본다.
+            highDeltaChange = comparisonWith(
+                aaBudget - 4,
+                CAPTURE_TOOL.AA_RASTER_CHANNEL_DELTA + 1,
+            )
+            self.assertFalse(highDeltaChange["equivalent"])
+            # 저델타라도 완화 허용치를 넘으면 실패한다.
+            oversizedShimmer = comparisonWith(aaBudget + 1, CAPTURE_TOOL.AA_RASTER_CHANNEL_DELTA)
+            self.assertFalse(oversizedShimmer["equivalent"])
+
     def testRasterNoiseBudgetScalesWithViewportAreaAndStaysCapped(self) -> None:
         self.assertEqual(CAPTURE_TOOL.allowedRasterNoisePixels((10, 10)), 8)
         self.assertEqual(CAPTURE_TOOL.allowedRasterNoisePixels((390, 844)), 11)

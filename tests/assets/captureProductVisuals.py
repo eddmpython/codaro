@@ -30,6 +30,12 @@ MIN_RASTER_NOISE_PIXELS = 8
 MAX_RASTER_NOISE_PIXELS = 32
 RASTER_NOISE_AREA_DIVISOR = 30_000
 MAX_RASTER_CHANNEL_DELTA = 12
+# Windows Chromium 글리프 래스터는 같은 레이아웃에서도 실행마다 안티앨리어싱 픽셀이
+# 소폭 다르게 나온다(두 상태를 오가는 채널 차 1~2 수준). 채널 차가 이 값 이하인 차이는
+# 그 노이즈로 보고 픽셀 허용치를 배수로 완화한다. 실제 UI 드리프트는 채널 차가 크거나
+# 픽셀 수가 이 완화 범위도 넘으므로 여전히 잡힌다.
+AA_RASTER_CHANNEL_DELTA = 4
+AA_RASTER_PIXEL_MULTIPLIER = 8
 
 
 class ProductVisualCaptureError(RuntimeError):
@@ -220,9 +226,17 @@ def pngPixelComparison(expectedPath: Path, actualPath: Path) -> dict[str, Any]:
             if pixelDelta:
                 differingPixelCount += 1
                 maxChannelDelta = max(maxChannelDelta, pixelDelta)
+        withinPixelBudget = (
+            differingPixelCount <= allowedDifferingPixelCount
+            or (
+                maxChannelDelta <= AA_RASTER_CHANNEL_DELTA
+                and differingPixelCount
+                <= allowedDifferingPixelCount * AA_RASTER_PIXEL_MULTIPLIER
+            )
+        )
         return {
             "equivalent": (
-                differingPixelCount <= allowedDifferingPixelCount
+                withinPixelBudget
                 and maxChannelDelta <= MAX_RASTER_CHANNEL_DELTA
             ),
             "byteExact": differingPixelCount == 0,

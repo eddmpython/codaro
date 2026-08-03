@@ -282,8 +282,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-mobile-light.png",
-      "sourceHash": "sha256-298b19ca578688755c1dc3f9561d4b1005ec44a8285842faaf1db315d3e7ac7e",
-      "sourceGitHead": "d65db38a7c305b5ad80ce05fb2a5251216030578",
+      "sourceHash": "sha256-03f32c7d3671f801bc10d95685a55cbcff48aac7212fa87ec92a80230c84e5e3",
+      "sourceGitHead": "b2ffc414a3da06e2f4456c52932feb638240f2ec",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
