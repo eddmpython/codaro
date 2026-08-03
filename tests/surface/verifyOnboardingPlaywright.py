@@ -670,6 +670,9 @@ def jsAssertCurriculumSidebarGroups() -> str:
 
 
 def jsAssertCurriculumHome() -> str:
+    # 신규 사용자 홈은 빈 상태가 정직하다. 증거가 없으면 mastery 통계, 이어서 학습,
+    # 복습 블록을 만들지 않고 시작 CTA만 노출한다. 증거 기반 상태는 실제 증거를 만드는
+    # product-experience와 web-learning 게이트가 검증한다.
     return compactJs("""
 (async () => {
   const entry = document.querySelector('[data-curriculum-home-entry="true"]');
@@ -683,13 +686,18 @@ def jsAssertCurriculumHome() -> str:
   }
   if (!home) throw new Error('curriculum home did not render after clicking home entry');
   const text = home.innerText;
-  if (!text.includes('코드로 증명')) throw new Error('curriculum home outcome-first heading missing');
-  const mastery = document.querySelector('[data-curriculum-home-mastery="true"]');
-  if (!mastery) throw new Error('curriculum home mastery stat missing');
-  if (!mastery.textContent || !mastery.textContent.includes('강한 검증')) throw new Error('curriculum home strong evidence label missing');
-  const resume = document.querySelector('[data-curriculum-home-resume="true"]');
-  if (!resume) throw new Error('curriculum home resume CTA missing');
-  if (!resume.textContent || !resume.textContent.includes('이어서 학습')) throw new Error('curriculum home resume label missing');
+  if (!text.includes('오늘 완성할 결과를 선택하세요')) throw new Error('curriculum home outcome-first heading missing');
+  if (document.querySelector('[data-curriculum-home-mastery="true"]')) {
+    throw new Error('fresh onboarding home fabricated mastery stats without evidence');
+  }
+  if (document.querySelector('[data-curriculum-home-resume="true"]')) {
+    throw new Error('fresh onboarding home fabricated a resume target without evidence');
+  }
+  if (document.querySelector('[data-curriculum-home-reviews="true"]')) {
+    throw new Error('fresh onboarding home fabricated due reviews without evidence');
+  }
+  const startCta = document.querySelector('[data-curriculum-home-start="true"]');
+  if (!startCta) throw new Error('curriculum home start CTA missing');
   const goals = document.querySelector('[data-curriculum-home-goals="true"]');
   if (!goals) throw new Error('curriculum home goal map missing');
   const goalGroups = goals.querySelectorAll('[data-curriculum-home-goal-group]');
@@ -699,14 +707,7 @@ def jsAssertCurriculumHome() -> str:
   if (document.querySelector('[data-curriculum-home-progress="true"]')) {
     throw new Error('bulk lesson progress must not dominate the learning home');
   }
-  const reviews = document.querySelector('[data-curriculum-home-reviews="true"]');
-  if (!reviews) throw new Error('curriculum home review section missing');
-  if (!reviews.textContent || !reviews.textContent.includes('다시 풀 문제')) throw new Error('curriculum home retrieval-task label missing');
-  const reviewItems = reviews.querySelectorAll('[data-curriculum-home-review]');
-  if (reviewItems.length < 1) throw new Error('curriculum home review items missing');
-  const reviewOpen = reviews.querySelector('[data-curriculum-home-review-open="true"]');
-  if (!reviewOpen || reviewOpen.disabled) throw new Error('runnable retrieval-task navigation missing');
-  if (reviews.querySelector('[data-curriculum-home-review-pass], [data-curriculum-home-review-lapse]')) {
+  if (document.querySelector('[data-curriculum-home-review-pass], [data-curriculum-home-review-lapse]')) {
     throw new Error('self-rating controls must not change review state');
   }
   if (document.querySelector('[data-curriculum-home-weak-areas="true"]')) {
@@ -761,7 +762,7 @@ def jsAssertAutomationOutput() -> str:
 (async () => {
   const cell = document.querySelector('[data-automation-session-cell="true"]');
   if (!cell) throw new Error('automation session cell missing');
-  const runButton = cell.querySelector('button[aria-label="셀 실행"]');
+  const runButton = cell.querySelector('button.notebookCellRunButton, button[aria-label$="실행"]');
   if (!runButton) throw new Error('automation run button missing');
   runButton.click();
   let output = null;
@@ -835,7 +836,7 @@ def jsAssertAutomationCancelledOutput() -> str:
   const cells = [...document.querySelectorAll('[data-automation-session-cell="true"]')];
   const cell = cells[1];
   if (!cell) throw new Error('cancelled automation fixture cell missing');
-  const runButton = cell.querySelector('button[aria-label="셀 실행"]');
+  const runButton = cell.querySelector('button.notebookCellRunButton, button[aria-label$="실행"]');
   if (!runButton) throw new Error('cancelled automation run button missing');
   runButton.click();
   let output = null;
@@ -891,7 +892,7 @@ def jsAssertAutomationVersionSkewOutput() -> str:
   const cells = [...document.querySelectorAll('[data-automation-session-cell="true"]')];
   const cell = cells[2];
   if (!cell) throw new Error('version-skew automation fixture cell missing');
-  const runButton = cell.querySelector('button[aria-label="셀 실행"]');
+  const runButton = cell.querySelector('button.notebookCellRunButton, button[aria-label$="실행"]');
   if (!runButton) throw new Error('version-skew automation run button missing');
   runButton.click();
   let output = null;
