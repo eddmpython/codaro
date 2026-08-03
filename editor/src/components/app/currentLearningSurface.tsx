@@ -9,6 +9,7 @@ import {
   type BrowserLearningWorkspaceAutosaveInput,
 } from "@/lib/browserLearningArchive";
 import { CUSTOM_CURRICULUM_CATEGORY } from "@/lib/customCurricula";
+import { useLessonSectionProgress } from "@/hooks/useLessonSectionProgress";
 import { useLocale } from "@/lib/localeContext";
 import { cn } from "@/lib/utils";
 import { groupCurriculumSections } from "@/components/curriculum/curriculumSectionRenderer";
@@ -48,6 +49,7 @@ export function CurrentLearningSurface(props: CurrentLearningSurfaceProps) {
   const { t } = useLocale();
   const [tocExpanded, setTocExpanded] = useState(false);
   const lessonRef = `${props.selectedCategory}/${props.selectedContentId}`;
+  const { creditedSectionIds } = useLessonSectionProgress(lessonRef);
   const previousLessonRef = useRef(lessonRef);
   const pendingLessonFocusRef = useRef("");
   const storageError = useBrowserLearningWorkspaceAutosave({
@@ -151,6 +153,7 @@ export function CurrentLearningSurface(props: CurrentLearningSurfaceProps) {
       />
       {showToc ? (
         <CurriculumCellToc
+          creditedSectionIds={creditedSectionIds}
           document={curriculumDoc}
           expanded={tocExpanded}
           selectedBlockId={props.selectedCurriculumBlockId}

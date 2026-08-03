@@ -12,6 +12,7 @@ export { CurriculumHeaderProgress } from "./curriculumOverview";
 export { CurriculumCellToc } from "./curriculumToc";
 import { LearningOverviewHeader } from "./curriculumOverview";
 import { CurriculumSectionCard, dueAssessmentBlocks, groupCurriculumSections } from "./curriculumSectionRenderer";
+import { lessonVerifySections } from "./curriculumSurfaceHelpers";
 
 export function CurriculumView({
   apiOnline,
@@ -59,6 +60,12 @@ export function CurriculumView({
   const [assessmentBlocks, setAssessmentBlocks] = useState<BlockConfig[]>([]);
   const visibleBlocks = useMemo(() => [...document.blocks, ...assessmentBlocks], [assessmentBlocks, document.blocks]);
   const curriculumSections = useMemo(() => groupCurriculumSections(visibleBlocks), [visibleBlocks]);
+  // 검증 진행 분모는 기본 문서의 강한 검증 지점으로 고정한다. due 평가 섹션이
+  // 동적으로 붙었다 떨어질 때 분모가 흔들리면 진행률을 믿을 수 없다.
+  const verifySections = useMemo(
+    () => lessonVerifySections(groupCurriculumSections(document.blocks).sections),
+    [document.blocks],
+  );
   const introBlock = curriculumSections.introBlocks[0] ?? document.blocks.find((block) => block.displayKind === "hero" || block.sourceType === "intro");
   const selectedContentIndex = contents.findIndex((content) => content.contentId === selectedContentId);
   const previousLesson = selectedContentIndex > 0 ? contents[selectedContentIndex - 1] : null;
@@ -97,11 +104,11 @@ export function CurriculumView({
         <div className="mx-auto min-w-0 max-w-5xl">
           <LearningOverviewHeader
             apiOnline={apiOnline}
-            contents={contents}
             document={document}
             introBlock={introBlock}
             referenceLoading={referenceLoading}
             sections={curriculumSections.sections}
+            verifySections={verifySections}
             onNavigateBlock={onNavigateBlock}
             selectedCategory={selectedCategory}
             selectedCategoryLabel={selectedCategoryLabel}

@@ -35,7 +35,7 @@ import {
 import type { SidebarCustomCurriculum } from "@/lib/customCurricula";
 import type { LearningArchiveMaterialization } from "@/lib/learningArchive";
 import { useLocale } from "@/lib/localeContext";
-import { resolvePublicAsset } from "@/lib/publicAsset";
+import { resolveLandingHomePath, resolvePublicAsset } from "@/lib/publicAsset";
 import { cn } from "@/lib/utils";
 import { ACCENT_COLORS, type AccentColor, type AutomationSection, type SurfaceMode, type ThemeMode } from "@/lib/surfaceModel";
 import type { CodaroDocument, CurriculumCategory, CurriculumCategoryTreeNode, CurriculumContentSummary } from "@/types";
@@ -173,7 +173,7 @@ export function ProductSidebar({
                     return;
                   }
                   if (surface === "editor") {
-                    window.location.assign("/");
+                    window.location.assign(resolveLandingHomePath());
                     return;
                   }
                   onSurfaceChange("editor");

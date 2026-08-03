@@ -1752,8 +1752,8 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "initialCheckState": "mismatch",
             "requireInlineHint": True,
             "solutionCode": "print('Hello Codaro')",
-            "expectCompletedLessons": 1,
-            "expectFinalCompletedLessons": 1,
+            "expectVerifiedSections": 1,
+            "expectFinalVerifiedSections": 1,
         },
         {
             "name": "web-canonical-completion-mobile",
@@ -1767,7 +1767,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "runLearningCell": True,
             "initialCheckState": "mismatch",
             "solutionCode": "print('Hello Codaro')",
-            "expectCompletedLessons": 1,
+            "expectVerifiedSections": 1,
         },
         {
             "name": "web-canonical-keyboard-desktop",
@@ -1783,7 +1783,10 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "verifyCanonicalSemantics": True,
             "initialCheckState": "mismatch",
             "solutionCode": "print('Hello Codaro')",
-            "expectCompletedLessons": 1,
+            "expectVerifiedSections": 1,
+            # 진행 배지는 레슨 단위라, 키보드 여정이 day02로 이동한 뒤의 최종
+            # audit에서는 아직 검증한 섹션이 없는 0이 정직한 값이다.
+            "expectFinalVerifiedSections": 0,
             "expectNextLesson": "day02_변수와데이터타입",
             "expectedLearningVisualAssetId": "pythonFundamentals",
         },
@@ -2678,7 +2681,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "initialCheckState": "mismatch",
             "solutionCode": "name = 'Codaro'\nprint('Hello', name)",
             "expectedEvidenceCount": 0,
-            "expectCompletedLessons": 0,
+            "expectVerifiedSections": 0,
         },
         {
             "name": "local-learning-evidence-desktop",
@@ -3119,7 +3122,7 @@ async ({ surface, expectedTier }) => {
   let webStrongEvidenceEventCount = 0;
   let webEvidenceSummaryCount = 0;
   let webEvidenceConflictCount = 0;
-  let webCompletedLessonCount = 0;
+  let webVerifiedSectionCount = 0;
   let webEvidenceStoreHeader = null;
   let webLegacyReaderRejected = false;
   try {
@@ -3136,7 +3139,7 @@ async ({ surface, expectedTier }) => {
     );
   } catch {}
   const progressHeader = document.querySelector('[data-curriculum-header-progress="true"]');
-  webCompletedLessonCount = Number(
+  webVerifiedSectionCount = Number(
     progressHeader?.getAttribute('data-curriculum-header-completed') || 0
   );
   const activeProductSurfaceView = document.querySelector(
@@ -3443,7 +3446,7 @@ async ({ surface, expectedTier }) => {
     webEvidenceStoreHeader,
     webLegacyReaderRejected,
     learningEvidenceRuntime,
-    webCompletedLessonCount,
+    webVerifiedSectionCount,
   };
 }
 """
@@ -3722,17 +3725,17 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
                 f"{name}: expected {expected_conflicts} isolated evidence conflict(s), "
                 f"got {audit['webEvidenceConflictCount']}"
             )
-        expectedCompletedLessons = case.get(
-            "expectFinalCompletedLessons",
-            case.get("expectCompletedLessons"),
+        expectedVerifiedSections = case.get(
+            "expectFinalVerifiedSections",
+            case.get("expectVerifiedSections"),
         )
         if (
-            expectedCompletedLessons is not None
-            and audit["webCompletedLessonCount"] != int(expectedCompletedLessons)
+            expectedVerifiedSections is not None
+            and audit["webVerifiedSectionCount"] != int(expectedVerifiedSections)
         ):
             failures.append(
-                f"{name}: expected {expectedCompletedLessons} canonical completed lesson(s), "
-                f"got {audit['webCompletedLessonCount']}"
+                f"{name}: expected {expectedVerifiedSections} verified strong section(s), "
+                f"got {audit['webVerifiedSectionCount']}"
             )
     elif surface == "local-lesson":
         if audit["lessonSectionCount"] < 1:
@@ -3747,14 +3750,14 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
                 f"{name}: expected {expected_evidence} Local evidence event(s), "
                 f"got {audit['webEvidenceSummaryCount']}"
             )
-        expectedCompletedLessons = case.get("expectCompletedLessons")
+        expectedVerifiedSections = case.get("expectVerifiedSections")
         if (
-            expectedCompletedLessons is not None
-            and audit["webCompletedLessonCount"] != int(expectedCompletedLessons)
+            expectedVerifiedSections is not None
+            and audit["webVerifiedSectionCount"] != int(expectedVerifiedSections)
         ):
             failures.append(
-                f"{name}: expected {expectedCompletedLessons} canonical completed lesson(s), "
-                f"got {audit['webCompletedLessonCount']}"
+                f"{name}: expected {expectedVerifiedSections} verified strong section(s), "
+                f"got {audit['webVerifiedSectionCount']}"
             )
         if audit["webEvidenceConflictCount"]:
             failures.append(f"{name}: clean Web-to-Local import created an evidence conflict")
@@ -5561,7 +5564,7 @@ def runBrowserMatrix(
                                 or not canonicalSemanticEvidence.get("directionText")
                                 or not str(
                                     canonicalSemanticEvidence.get("progressLabel") or ""
-                                ).startswith("레슨 ")
+                                ).startswith("검증 ")
                                 or canonicalSemanticEvidence.get("sectionLabelledBy")
                                 != canonicalSemanticEvidence.get("sectionTitleId")
                                 or canonicalSemanticEvidence.get("sectionTitleLevel") != "H2"
@@ -5688,7 +5691,7 @@ def runBrowserMatrix(
                                 checkStateEvidence["screenshots"]["verified"] = str(
                                     verifiedScreenshot.relative_to(ROOT)
                                 ).replace("\\", "/")
-                        if case.get("expectCompletedLessons") is not None:
+                        if case.get("expectVerifiedSections") is not None:
                             page.wait_for_function(
                                 """
                                 (expected) => Number(
@@ -5696,7 +5699,7 @@ def runBrowserMatrix(
                                     ?.getAttribute('data-curriculum-header-completed') || 0
                                 ) === expected
                                 """,
-                                arg=int(case["expectCompletedLessons"]),
+                                arg=int(case["expectVerifiedSections"]),
                                 timeout=20_000,
                             )
                         if case.get("verifyCanonicalKeyboardJourney"):
@@ -6575,7 +6578,7 @@ def runBrowserMatrix(
                         checkCapabilityEvidence["screenshot"] = str(
                             capabilityScreenshot.relative_to(ROOT)
                         ).replace("\\", "/")
-                        if case.get("expectCompletedLessons") is not None:
+                        if case.get("expectVerifiedSections") is not None:
                             page.wait_for_function(
                                 """
                                 (expected) => Number(
@@ -6583,7 +6586,7 @@ def runBrowserMatrix(
                                     ?.getAttribute('data-curriculum-header-completed') || 0
                                 ) === expected
                                 """,
-                                arg=int(case["expectCompletedLessons"]),
+                                arg=int(case["expectVerifiedSections"]),
                                 timeout=20_000,
                             )
                         case["expectedEvidenceCount"] = localEvidenceExpected

@@ -79,7 +79,7 @@ def main() -> int:
         "declared navigation intent": 'data-learning-control-intent="navigation"',
         "mobile navigation closes the sheet": "if (isMobile) setOpenMobile(false);",
         "canonical evidence-derived review": "reviewListFromCanonicalProjection",
-        "canonical completion projection": 'data-curriculum-header-progress="true"',
+        "canonical verify-section projection": 'data-curriculum-header-progress="true"',
         "browser redundant-control audit": "forbiddenLearningControls",
         "browser inline-hint evidence": 'case.get("requireInlineHint")',
     }

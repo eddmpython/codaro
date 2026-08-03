@@ -18,9 +18,16 @@ import type { BlockConfig, CodaroDocument } from "@/types";
 import { CurriculumDependencyPanel } from "./curriculumDependencyPanel";
 import { stripMarkdown } from "@/lib/cellModel";
 import { cn } from "@/lib/utils";
-import { useCurriculumProgress } from "@/hooks/useCurriculumProgress";
+import { useLessonSectionProgress } from "@/hooks/useLessonSectionProgress";
 import { CurriculumProgressBadge } from "./curriculumProgressBadge";
-import { isRecord, payloadTextList, readPayloadText, specificLearningCopy, textAfterHeading } from "./curriculumSurfaceHelpers";
+import {
+  isRecord,
+  payloadTextList,
+  readPayloadText,
+  specificLearningCopy,
+  textAfterHeading,
+  type LessonVerifySection,
+} from "./curriculumSurfaceHelpers";
 import type { CurriculumSectionContract, CurriculumSectionGroup } from "./curriculumSurfaceModels";
 import { cellDomId, selectTocBlock } from "./curriculumNavigation";
 import { LearningDomainVisual } from "./learningDomainVisual";
@@ -336,11 +343,11 @@ export function LearningArchiveMenu({
 // blueprint 격자·rail·배지 행·워크플로 다이어그램·benefits 그리드는 폐지(스펙 §6).
 export function LearningOverviewHeader({
   apiOnline,
-  contents = [],
   document,
   introBlock,
   referenceLoading,
   sections,
+  verifySections,
   onNavigateBlock,
   selectedCategory,
   selectedCategoryLabel,
@@ -348,11 +355,11 @@ export function LearningOverviewHeader({
   selectedContentLabel,
 }: {
   apiOnline: boolean;
-  contents?: Array<{ contentId: string; title: string }>;
   document: CodaroDocument;
   introBlock?: BlockConfig;
   referenceLoading: boolean;
   sections: CurriculumSectionGroup[];
+  verifySections: LessonVerifySection[];
   onNavigateBlock: (blockId: string) => void;
   selectedCategory: string;
   selectedCategoryLabel: string;
@@ -387,9 +394,9 @@ export function LearningOverviewHeader({
           {contentLabel ? <span>{contentLabel}</span> : null}
           <span className="ml-auto flex items-center gap-2">
             <CurriculumHeaderProgress
-              category={selectedCategory}
-              contents={contents}
+              lessonRef={`${selectedCategory}/${selectedContentId}`}
               loading={referenceLoading}
+              verifySections={verifySections}
             />
             {referenceLoading ? <LoadingInline label="레슨 불러오는 중" /> : null}
           </span>
@@ -524,28 +531,31 @@ export function SectionNarrative({ contract }: { contract?: CurriculumSectionCon
   );
 }
 
+// 레슨을 공부하는 동안 실제로 움직이는 숫자만 보여준다. 카테고리 단위 완료 수는
+// 학습 홈이 담당하고, 여기서는 이 레슨의 강한 검증 지점 진행(n/m)을 센다.
 export function CurriculumHeaderProgress({
-  category,
-  contents,
+  lessonRef,
   loading,
+  verifySections,
 }: {
-  category: string;
-  contents: Array<{ contentId: string; title: string }>;
+  lessonRef: string;
   loading?: boolean;
+  verifySections: LessonVerifySection[];
 }) {
-  const { summary } = useCurriculumProgress();
-  if (loading) return null;
-  const completed = summary?.categoryProgress?.[category]?.completed ?? 0;
+  const { creditedSectionIds } = useLessonSectionProgress(lessonRef);
+  if (loading || !verifySections.length) return null;
+  const creditedSet = new Set(creditedSectionIds);
+  const completed = verifySections.filter((section) => creditedSet.has(section.sectionId)).length;
   return (
     <span
       data-curriculum-header-completed={completed}
       data-curriculum-header-progress="true"
-      data-curriculum-header-total={contents.length}
+      data-curriculum-header-total={verifySections.length}
     >
       <CurriculumProgressBadge
         completed={completed}
-        total={contents.length}
-        label="레슨"
+        total={verifySections.length}
+        label="검증"
       />
     </span>
   );

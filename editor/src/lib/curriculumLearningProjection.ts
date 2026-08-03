@@ -28,6 +28,7 @@ export type LessonProgressContract = {
 export type CanonicalLessonProgress = LessonProgressContract & {
   completedAt: string | null;
   creditedOutcomeIds: string[];
+  creditedSectionIds: string[];
   lastEvidenceAt: string | null;
   reviewDueAt: string | null;
   reviewIntervalDays: number;
@@ -165,6 +166,7 @@ function projectLesson(
     ...contract,
     completedAt,
     creditedOutcomeIds,
+    creditedSectionIds: unique(orderedCredits.map((credit) => credit.sectionId)),
     lastEvidenceAt: latestTimestamp([
       ...evidenceEvents.map((event) => event.occurredAt),
       ...orderedCredits.map((credit) => credit.evidenceAt),

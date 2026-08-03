@@ -1,5 +1,6 @@
 import { stripBullet, stripMarkdown } from "@/lib/cellModel";
-import type { CurriculumSectionContract } from "./curriculumSurfaceModels";
+import { parseStrongLearningCheckSpec } from "@/lib/learningCheckSpec";
+import type { CurriculumSectionContract, CurriculumSectionGroup } from "./curriculumSurfaceModels";
 
 export function specificLearningCopy(value: string) {
   const text = stripMarkdown(value);
@@ -64,4 +65,26 @@ export function readPayloadText(value: unknown) {
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+export type LessonVerifySection = {
+  anchorBlockId: string;
+  sectionId: string;
+  title: string;
+};
+
+// 강한 검증(check spec)이 걸린 섹션만 추린다. 레슨 진행은 이 검증 지점 수로 센다.
+// sectionId는 evidence 저장이 쓰는 값(contract.id 우선)과 같은 규칙으로 만들어야
+// projection의 creditedSectionIds와 매칭된다.
+export function lessonVerifySections(sections: CurriculumSectionGroup[]): LessonVerifySection[] {
+  return sections.flatMap((section) => {
+    const exercise = section.blocks.find((block) => block.sourceType === "sectionContract:exercise");
+    const checkConfig = isRecord(exercise?.guide?.checkConfig) ? exercise.guide.checkConfig : undefined;
+    if (!checkConfig || !parseStrongLearningCheckSpec(checkConfig)) return [];
+    return [{
+      anchorBlockId: section.anchorBlockId,
+      sectionId: readPayloadText(section.contract?.id) || section.id,
+      title: section.title,
+    }];
+  });
 }
