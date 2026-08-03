@@ -142,7 +142,7 @@ unknown domain/outcome ID는 400 + `curriculum_unknown_domain` / `curriculum_unk
 
 ## 무결성 게이트
 
-`tests/curriculum/testCurriculumOs.py`에 24개 케이스:
+`tests/curriculum/testCurriculumOs.py`가 그래프 무결성을 검사한다. 아래는 절대 수치가 아니라 불변식이며, 케이스는 카탈로그가 커져도 그대로 유지된다:
 - 모든 domain.targetOutcomes가 outcome 카탈로그에 존재
 - 모든 lessonOutcomes의 outcomes/prerequisites가 카탈로그에 존재
 - 레슨 메타의 outcomes가 taxonomy backfill보다 우선
@@ -150,14 +150,14 @@ unknown domain/outcome ID는 400 + `curriculum_unknown_domain` / `curriculum_unk
 - 완료된 레슨이 plan에서 제외됨
 - gap이 정확히 리포트됨
 - 모든 레슨이 plan 그래프에서 보임 (orphan 0개)
-- 모든 outcome이 어떤 레슨에서 제공됨 (115/115)
-- 모든 도메인이 비어있지 않은 plan을 만듦 (27/27 도메인, gap 0)
+- 모든 outcome이 어떤 레슨에서 제공됨 (uncovered 0개)
+- 모든 도메인이 비어있지 않은 plan을 만듦 (gap 0개)
 - 같은 입력은 같은 plan을 낸다 (결정성 스냅샷)
 - API 엔드포인트 통합 테스트 (FastAPI TestClient)
 
 `tests/curriculum/auditCurriculumWeakness.py`가 영구 게이트로 등록되어 있다 (`tests/run.py gate curriculum-weakness-audit`):
 - 정적 신호: `orphanInPlan`, `noExercise` (intro `00_*` 제외), `exerciseWithoutCheck`, `noHint`, `shortGoal`, `sectionIdMissing` (Phase 2b)
-- 카테고리 신호: `categoryWithoutProject` (Phase 2d, builtins/excel/practical 면제)
+- 카테고리 신호: `categoryWithoutProject` (Phase 2d). 면제 카테고리는 `PROJECT_EXEMPT_CATEGORIES`가 소유하며 현재 `builtins`, `excel`, `practical`, `devTools`, `resilience`다. 나머지 카테고리는 `lessonRole: project` 레슨을 최소 1개 가져야 한다.
 - 각 신호별 임계치(현재 모두 0)를 넘으면 게이트 실패
 - 리포트: `output/test-runner/curriculum-weakness-audit/curriculum-weakness-report.json`
 
