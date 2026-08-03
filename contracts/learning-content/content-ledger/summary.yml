@@ -1,5 +1,5 @@
 schemaVersion: 1
-snapshotDate: '2026-08-02'
+snapshotDate: '2026-08-03'
 canonicalRows: 472
 uniqueLessonRefs: 472
 unownedRows: 0
@@ -20,7 +20,7 @@ plannedTaxonomyOutcomeIds:
 - viz.edaReport
 - automation.browser.audit
 taxonomyTransitionReport: evidence/taxonomy-transition.yml
-targetTaxonomyHash: 67927af4d2aa372fe77d6e9c90dfc8ffd7355dc0bb40e6babd2b80e8f507fb84
+targetTaxonomyHash: 1a8f5ed385803f0bbe3594393b3bd1983e2506ab1e77d65b0b53da24645446ac
 targetTaxonomyHashStatus: approved-and-applied
 ownerPacketCounts:
   01-python-foundation: 66

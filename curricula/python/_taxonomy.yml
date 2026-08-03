@@ -3151,6 +3151,7 @@ lessonOutcomes:
     outcomes: [automation.webApi.exchangeRate]
     prerequisites: [automation.webApi.get, builtins.numericMath]
     estimatedMinutes: 65
+    lessonRole: project
 
   # openpyxl 트랙 - 파일 기반 엑셀 자동화
   "openpyxl/00_openpyxl소개":
