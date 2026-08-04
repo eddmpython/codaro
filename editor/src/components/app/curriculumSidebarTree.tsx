@@ -247,7 +247,7 @@ function CurriculumTreeNodeItem({
       <SidebarMenuItem className="group-data-[collapsible=icon]:hidden">
         <SidebarMenuButton
           aria-expanded={isExpanded}
-          className="h-7 px-2 pr-10 text-[13px] [&>svg]:size-3.5"
+          className="px-2 py-1 pr-10 text-[13px] [&>svg]:size-3.5"
           isActive={hasSelectedCategory}
           tooltip={node.name}
           onClick={() => onToggleTreeNode((current) => ({ ...current, [node.id]: !isExpanded }))}
@@ -359,8 +359,10 @@ function CurriculumCategoryItem({
                 isActive={content.contentId === selectedContentId}
                 size="sm"
               >
+                {/* 상위 카테고리 라벨은 화살표(14px)와 gap(8px) 뒤에서 시작한다.
+                    레슨에는 아이콘이 없으므로 같은 만큼 밀어야 들여쓰기가 뒤집히지 않는다. */}
                 <button
-                  className="text-[12px]"
+                  className="pl-[30px] text-[12px]"
                   data-curriculum-content-id={content.contentId}
                   type="button"
                   onClick={() => onSelectContent(content.contentId)}

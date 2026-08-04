@@ -157,7 +157,7 @@ export function ProductSidebar({
       data-learning-focus-mode={learningMode ? "true" : "false"}
       variant="sidebar"
     >
-      <SidebarHeader>
+      <SidebarHeader className="pr-5 group-data-[collapsible=icon]:pr-2">
         <div className="flex flex-wrap items-center gap-0.5 sm:gap-1">
           <SidebarMenu className="min-w-0 flex-1">
             <SidebarMenuItem>
@@ -165,7 +165,7 @@ export function ProductSidebar({
                   학습 모드에서는 기존 계약대로 도구(노트북)로 탈출한다. */}
               <button
                 aria-label={brandLabel}
-                className="flex min-h-10 w-full min-w-0 items-center gap-2 rounded-md px-2 py-1 text-left text-[13px] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:p-1!"
+                className="flex min-h-10 w-full min-w-0 items-center gap-2 rounded-md px-2 py-1 text-left text-[13px] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:min-h-8! group-data-[collapsible=icon]:p-1!"
                 data-product-brand="escape"
                 title={brandLabel}
                 type="button"

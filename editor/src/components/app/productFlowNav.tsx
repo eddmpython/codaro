@@ -33,8 +33,8 @@ export function ProductFlowNav({ runtimeTier, surface, onSurfaceChange }: Produc
             <SidebarMenuItem
               className={cn(
                 "relative group-data-[collapsible=icon]:before:hidden",
-                flowStep > 1 && "before:absolute before:-top-1 before:left-[18px] before:h-2 before:border-l before:border-sidebar-border/70",
-                flowRole === "secondLoop" && "mt-1 pt-1 before:-top-2 before:h-3",
+                flowStep > 1 && "before:absolute before:-top-1 before:left-[15px] before:h-1 before:border-l before:border-sidebar-border/70",
+                flowRole === "secondLoop" && "mt-1 pt-1 before:-top-3 before:h-3",
               )}
               data-product-flow-role={flowRole}
               data-product-flow-second-loop={flowRole === "secondLoop" ? "true" : undefined}
@@ -52,17 +52,6 @@ export function ProductFlowNav({ runtimeTier, surface, onSurfaceChange }: Produc
                 tooltip={label}
                 onClick={() => onSurfaceChange(value)}
               >
-                <span
-                  aria-hidden="true"
-                  className={cn(
-                    "flex size-4 shrink-0 items-center justify-center rounded-full border border-sidebar-border bg-sidebar text-[10px] font-medium text-sidebar-foreground/55 group-data-[collapsible=icon]:hidden",
-                    flowStep === 1 && "border-sidebar-foreground/35 text-sidebar-foreground",
-                    flowRole === "secondLoop" && "border-sidebar-border/90 bg-sidebar-accent text-sidebar-foreground/70",
-                  )}
-                  data-product-flow-marker="true"
-                >
-                  {flowStep}
-                </span>
                 <Icon />
                 <span>{label}</span>
                 {beta ? (
@@ -70,6 +59,18 @@ export function ProductFlowNav({ runtimeTier, surface, onSurfaceChange }: Produc
                     {t("nav.beta")}
                   </span>
                 ) : null}
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "flex size-4 shrink-0 items-center justify-center rounded-full border border-sidebar-border bg-sidebar text-[10px] font-medium text-sidebar-foreground/55 group-data-[collapsible=icon]:hidden",
+                    beta ? "ml-1" : "ml-auto",
+                    flowStep === 1 && "border-sidebar-foreground/35 text-sidebar-foreground",
+                    flowRole === "secondLoop" && "border-sidebar-border/90 bg-sidebar-accent text-sidebar-foreground/70",
+                  )}
+                  data-product-flow-marker="true"
+                >
+                  {flowStep}
+                </span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
