@@ -181,26 +181,6 @@
   color: var(--color-text-accent);
 }
 
-.homeHeroProductVisual {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  overflow: hidden;
-  background: var(--color-background-muted);
-}
-
-.homeHeroProductVisualMobile {
-  display: none;
-}
-
-.homeHeroProductVisual img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top center;
-}
-
 .homeHeroProofRail {
   display: grid;
   margin: 0;
@@ -709,20 +689,6 @@
     margin-inline: -8px;
   }
 
-  .homeHeroProductVisualDesktop {
-    display: none;
-  }
-
-  .homeHeroProductVisualMobile {
-    display: block;
-    max-height: 480px;
-    aspect-ratio: 390 / 480;
-  }
-
-  .homeHeroProductVisualMobile img {
-    object-position: top center;
-  }
-
   .homeProofLoop,
   .homeOutcomeBand,
   .homeRuntimeBand {
@@ -825,6 +791,126 @@
     scroll-behavior: auto;
     transition-duration: 0.01ms !important;
   }
+}
+
+.liveCodeCell {
+  display: grid;
+  min-width: 0;
+  background: var(--color-background-surface);
+}
+
+.liveCodeCellHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-background-card);
+}
+
+.liveCodeCellDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-icon-accent);
+}
+
+.liveCodeCellTitle {
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-code);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.liveCodeCellStatus {
+  margin-left: auto;
+  color: var(--color-text-tertiary);
+  font-family: var(--font-family-code);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.liveCodeCellStatus[data-live-status="running"] { color: var(--color-text-accent); }
+.liveCodeCellStatus[data-live-status="done"] { color: var(--color-success); }
+.liveCodeCellStatus[data-live-status="error"] { color: var(--color-warning); }
+
+.liveCodeCellEditor {
+  width: 100%;
+  min-height: 150px;
+  padding: 16px 14px;
+  border: 0;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-background-card);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-code);
+  font-size: 13px;
+  line-height: 22px;
+  resize: vertical;
+  outline: none;
+}
+
+.liveCodeCellActions {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-background-surface);
+}
+
+.liveCodeCellRun,
+.liveCodeCellReset {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-background-card);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.liveCodeCellRun {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  border-color: transparent;
+}
+
+.liveCodeCellRun:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.liveCodeCellReset:hover {
+  color: var(--color-text-accent);
+}
+
+.liveCodeCellSpin {
+  animation: liveCodeCellSpin 0.8s linear infinite;
+}
+
+@keyframes liveCodeCellSpin {
+  to { transform: rotate(360deg); }
+}
+
+.liveCodeCellOutput {
+  margin: 0;
+  max-height: 200px;
+  padding: 14px;
+  overflow: auto;
+  background: var(--color-background-muted);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-code);
+  font-size: 13px;
+  line-height: 21px;
+  white-space: pre-wrap;
+}
+
+.liveCodeCellOutputError {
+  color: var(--color-warning);
 }
 
 @media (forced-colors: active) {

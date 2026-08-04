@@ -157,7 +157,7 @@ def testLandingProductProofsFollowTheResolvedThemePair() -> None:
     editorResolver = _read("editor/src/lib/visualAssets.ts")
     browserGate = _read("tests/surface/verifyProductExperiencePlaywright.py")
 
-    assert 'assetId="runLearningHero"' in home
+    assert "LiveCodeCell" in home
     assert "webRunDesktop" not in home
     assert "useCodaroTheme()" in productVisual
     assert "theme: resolvedTheme" in productVisual
