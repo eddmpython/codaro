@@ -689,6 +689,12 @@ GATES: dict[str, Gate] = {
             command(("uv", "run", "python", "-X", "utf8", "tests/assets/verifyVisualAssetBudget.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/assets/verifyInstructionalVisualPurpose.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/assets/verifyRunCaptureMatrix.py")),
+            # instructional 매트릭스는 landing/build 와 src/codaro/webBuild 를 정적 서빙한다.
+            # 두 산출물은 git 미추적이라 이 게이트가 잡의 첫 브라우저 게이트로 돌면(CI experience)
+            # 빌드가 없어 모든 케이스가 404 → #root 타임아웃으로 죽는다. 여기서 명시적으로
+            # 빌드한다. CODARO_FRONTEND_BUILD_REUSE receipt 가 있으면 자동으로 스킵된다.
+            command(("npm", "run", "build"), cwd="landing"),
+            command(("npm", "run", "build"), cwd="editor"),
             # CI 2코어 러너의 브라우저 매트릭스는 페이지 로드가 느려 15분을 넘길 수 있다(속도 문제, 실패 아님).
             command(("uv", "run", "python", "-X", "utf8", "tests/learning/verifyInstructionalVisualPlaywright.py"), timeoutSeconds=1800),
             command(("npm", "run", "build"), cwd="landing"),
