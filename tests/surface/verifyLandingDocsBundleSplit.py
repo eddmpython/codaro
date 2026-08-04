@@ -150,12 +150,19 @@ def verifyLandingHomeProductSeo() -> dict[str, Any]:
         (
             "landing/src/pages/home.jsx",
             (
-                "웹에서 첫 레슨 실행",
+                "첫 레슨으로 시작하기",
+                "학습창 열기",
+                "homeHeroProductFrame",
+                "LearningStudio",
+            ),
+        ),
+        (
+            "landing/src/components/learningStudio.jsx",
+            (
                 "Windows Local 받기",
                 "brand.launcherDownloadUrl",
-                "homeHeroProductFrame",
-                "homeRuntimeBand",
-                "brand.releaseUrl",
+                "homeStudioPaths",
+                "homeStudioLocal",
             ),
         ),
         (
@@ -196,8 +203,9 @@ def verifyLandingHomeProductSeo() -> dict[str, Any]:
                 ".homeProductHero",
                 ".homeHeroActions",
                 ".homeHeroProductFrame",
-                ".homeProofLoop",
-                ".homeTrustBand",
+                ".homeStudio",
+                ".homeStudioPaths",
+                ".homeStudioLocal",
             ),
         ),
         (

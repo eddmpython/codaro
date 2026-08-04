@@ -1587,11 +1587,13 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "viewport": {"width": 390, "height": 844},
             "surface": "landing-home",
             "expectedVisualAssetIds": [
-                "runLearningHero",
-                "runLearningMobile",
-                "runLearningDetail",
+                "pythonFoundationOutcome",
                 "dataReportOutcome",
+                "dataVisualizationOutcome",
                 "fileAutomationOutcome",
+                "officeAutomationOutcome",
+                "webMonitoringOutcome",
+                "runLearningDetail",
                 "localNotebookDesktop",
                 "localAutomationDesktop",
             ],
@@ -1603,11 +1605,13 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "viewport": {"width": 1440, "height": 900},
             "surface": "landing-home",
             "expectedVisualAssetIds": [
-                "runLearningHero",
-                "runLearningMobile",
-                "runLearningDetail",
+                "pythonFoundationOutcome",
                 "dataReportOutcome",
+                "dataVisualizationOutcome",
                 "fileAutomationOutcome",
+                "officeAutomationOutcome",
+                "webMonitoringOutcome",
+                "runLearningDetail",
                 "localNotebookDesktop",
                 "localAutomationDesktop",
             ],
@@ -3551,9 +3555,9 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
     if surface == "landing-home":
         if audit["visibleImageCount"] < 1 or audit["webLearningLinkCount"] < 1:
             failures.append(f"{name}: home needs product media and direct web-learning CTA")
-        if audit["pairedVisualCount"] != 5:
+        if audit["pairedVisualCount"] != 3:
             failures.append(
-                f"{name}: home needs five theme-paired product proofs, "
+                f"{name}: home needs three theme-paired product proofs, "
                 f"got {audit['pairedVisualCount']}"
             )
     elif surface == "landing-learn":
@@ -6964,7 +6968,7 @@ def runBrowserMatrix(
                               );
                               return (
                                 document.documentElement.dataset.theme === expectedTheme &&
-                                paired.length === 5 &&
+                                paired.length === 3 &&
                                 paired.every((element) => (
                                   element.getAttribute("data-visual-theme") === expectedTheme &&
                                   element.getAttribute("data-visual-capture-theme") === expectedTheme

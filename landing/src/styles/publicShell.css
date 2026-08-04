@@ -3,20 +3,23 @@
   top: 0;
   z-index: 50;
   width: 100%;
-  border-bottom: 1px solid var(--color-border);
-  background: color-mix(in srgb, var(--color-background-surface) 96%, transparent);
+  background: transparent;
   color: var(--color-text-primary);
+}
+
+.publicHeader[data-scrolled="true"] {
+  background: color-mix(in srgb, var(--color-background-body) 88%, transparent);
   backdrop-filter: blur(14px);
 }
 
 .publicHeaderInner {
   display: grid;
   width: min(1200px, calc(100% - 40px));
-  min-height: 64px;
+  min-height: 52px;
   margin-inline: auto;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 30px;
+  gap: 24px;
 }
 
 .publicSkipLink {
@@ -116,9 +119,8 @@
 }
 
 .publicRunCommand {
-  border-left: 1px solid var(--color-border);
-  margin-left: 4px;
-  padding-left: 16px;
+  margin-left: 8px;
+  padding-left: 12px;
   color: var(--color-text-primary);
 }
 

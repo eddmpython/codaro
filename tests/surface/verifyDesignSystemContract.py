@@ -293,6 +293,9 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
 
     home = (ROOT / "landing/src/pages/home.jsx").read_text(encoding="utf-8")
     learn = (ROOT / "landing/src/pages/learn.jsx").read_text(encoding="utf-8")
+    learningStudio = (ROOT / "landing/src/components/learningStudio.jsx").read_text(encoding="utf-8")
+    learningCatalog = (ROOT / "landing/src/lib/learningCatalog.js").read_text(encoding="utf-8")
+    lessonRow = (ROOT / "landing/src/components/lessonRow.jsx").read_text(encoding="utf-8")
     lessonPage = (ROOT / "landing/src/pages/lesson.jsx").read_text(encoding="utf-8")
     publicRouting = (ROOT / "landing/src/lib/publicRouting.js").read_text(encoding="utf-8")
     curriculum = (ROOT / "editor/src/components/curriculum/curriculumSurface.tsx").read_text(encoding="utf-8")
@@ -318,28 +321,39 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
     productSidebar = (ROOT / "editor/src/components/app/productSidebar.tsx").read_text(encoding="utf-8")
     app = (ROOT / "editor/src/App.tsx").read_text(encoding="utf-8")
     editorCss = (ROOT / "editor/src/index.css").read_text(encoding="utf-8")
+    homeSurface = "\n".join((home, learningStudio, learningCatalog))
     require(
         all(
-            sourceHasAssetId(home, assetId)
+            sourceHasAssetId(homeSurface, assetId)
             for assetId in (
-                "runLearningHero",
                 "runLearningDetail",
                 "localNotebookDesktop",
                 "localAutomationDesktop",
             )
         ),
-        "home must show manifest-backed Web, learning, and Local product captures",
+        "home must show manifest-backed Web learning and Local product captures",
         failures,
     )
     require(
-        'href={curriculumUrl}' in home and 'label="웹에서 첫 레슨 실행"' in home,
+        'href={curriculumUrl}' in home and 'label="첫 레슨으로 시작하기"' in home,
         "home must prioritize direct web learning",
         failures,
     )
     require(
-        "learnLessonRow" in learn
-        and 'data-public-lesson-link="true"' in learn
-        and "href={lessonHref(" in learn
+        "<LearningStudio />" in home and 'id="studio"' in learningStudio,
+        "home must continue into the learning studio instead of marketing sections",
+        failures,
+    )
+    require(
+        "readLearningResume()" in learningStudio and 'data-client-personalized="true"' in learningStudio,
+        "home learning studio must resume from the run app record",
+        failures,
+    )
+    require(
+        "learnLessonRow" in lessonRow
+        and 'data-public-lesson-link="true"' in lessonRow
+        and "href={lessonHref(" in lessonRow
+        and "<LessonRow" in learn
         and "runLessonHref" in lessonPage
         and 'label="이 레슨 실행"' in lessonPage
         and 'surface: "curriculum"' in publicRouting,

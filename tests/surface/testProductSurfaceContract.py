@@ -132,8 +132,9 @@ def testLearningVisualsUseOneManifestBackedDomainMapping() -> None:
 
 
 def testLandingOutcomePathsUseActualOutcomeProofAssets() -> None:
-    home = _read("landing/src/pages/home.jsx")
+    catalog = _read("landing/src/lib/learningCatalog.js")
     learn = _read("landing/src/pages/learn.jsx")
+    studio = _read("landing/src/components/learningStudio.jsx")
     productVisual = _read("landing/src/components/productVisual.jsx")
 
     for assetId in (
@@ -144,9 +145,10 @@ def testLandingOutcomePathsUseActualOutcomeProofAssets() -> None:
         "officeAutomationOutcome",
         "webMonitoringOutcome",
     ):
-        assert f'assetId: "{assetId}"' in learn
-    assert 'assetId: "dataReportOutcome"' in home
-    assert 'assetId: "fileAutomationOutcome"' in home
+        assert f'assetId: "{assetId}"' in catalog
+    # 홈 학습창과 /learn 탐색기가 같은 경로 정의를 쓴다.
+    assert "guidedPaths" in studio and "guidedPaths" in learn
+    assert "assetId={item.assetId}" in studio
     assert "data-visual-kind={asset.kind}" in productVisual
 
 
@@ -158,6 +160,7 @@ def testLandingProductProofsFollowTheResolvedThemePair() -> None:
     browserGate = _read("tests/surface/verifyProductExperiencePlaywright.py")
 
     assert "LiveCodeCell" in home
+    assert "<LearningStudio />" in home
     assert "webRunDesktop" not in home
     assert "useCodaroTheme()" in productVisual
     assert "theme: resolvedTheme" in productVisual
@@ -211,7 +214,9 @@ def testPublicLearningExplorerPersistsFiltersAndLessonVisualFillsItsFrame() -> N
     lessonStyles = _read("landing/src/styles/lessonAstryx.css")
     browserGate = _read("tests/surface/verifyProductExperiencePlaywright.py")
 
-    learnInputContract = f"{learn}\n{committedSearch}"
+    catalog = _read("landing/src/lib/learningCatalog.js")
+    lessonRow = _read("landing/src/components/lessonRow.jsx")
+    learnInputContract = f"{learn}\n{committedSearch}\n{catalog}\n{lessonRow}"
     for marker in (
         "explorerStateFromSearch(search)",
         "replaceExplorerSearch(resolvedState)",

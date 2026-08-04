@@ -12,12 +12,21 @@ const primaryNavigation = [
 
 export function Header({ currentPath, onNavigate, themeMode, resolvedTheme, onToggleTheme }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const menuToggleRef = useRef(null);
   const themeLabel = resolvedTheme === "dark" ? "라이트 모드로" : "다크 모드로";
   const navigate = (event, path) => {
     setMenuOpen(false);
     onNavigate(event, appPath(path));
   };
+  // 헤더는 투명하게 히어로 위에 떠 있다. 스크롤이 시작되면 본문이 헤더를 뚫고
+  // 보이므로 그때부터 배경을 깔아 준다.
+  useEffect(() => {
+    const syncScrolled = () => setScrolled(window.scrollY > 8);
+    syncScrolled();
+    window.addEventListener("scroll", syncScrolled, { passive: true });
+    return () => window.removeEventListener("scroll", syncScrolled);
+  }, []);
   useEffect(() => {
     if (!menuOpen) return undefined;
     const closeWithEscape = (event) => {
@@ -30,7 +39,7 @@ export function Header({ currentPath, onNavigate, themeMode, resolvedTheme, onTo
     return () => window.removeEventListener("keydown", closeWithEscape);
   }, [menuOpen]);
   return (
-    <header className="publicHeader" data-public-shell="astryx">
+    <header className="publicHeader" data-public-shell="astryx" data-scrolled={scrolled ? "true" : undefined}>
       <a className="publicSkipLink" href="#public-main">본문으로 건너뛰기</a>
       <div className="publicHeaderInner">
       <a

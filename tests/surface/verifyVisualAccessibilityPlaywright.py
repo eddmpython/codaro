@@ -658,11 +658,14 @@ def publicExperienceSnapshot(page: Any) -> dict[str, Any]:
           ).filter(visible);
           const brandLabel = document.querySelector(".publicBrand span");
           const homeOrderSelectors = [
+            ".homeHeroHeadline",
             ".homeProductStatement",
-            ".homeProductDetail",
-            ".homeHeroActions",
-            ".homeLocalLink",
             ".homeHeroProductFrame",
+            ".homeHeroActions",
+            ".homeStudio",
+            ".homeStudioResume",
+            ".homeStudioPaths",
+            ".homeStudioLocal",
           ];
           const learnOrderSelectors = [
             ".learnUtilityHead",
@@ -689,8 +692,8 @@ def publicExperienceSnapshot(page: Any) -> dict[str, Any]:
           ];
           const bodyText = normalize(document.body.innerText);
           const forcedColorProof = Array.from(document.querySelectorAll(
-            ".homeHeroProductFrame, .homeProofProductVisual, "
-              + ".homeOutcomeStory, .homeRuntimeImage, .homeRuntimeFigure figcaption",
+            ".homeHeroProductFrame, .homeStudioResume, "
+              + ".homeStudioPathCard, .homeStudioFigureImage, .homeStudioFigure figcaption",
           )).filter(visible).map((element) => ({
             selector: element.className,
             borderStyle: getComputedStyle(element).borderStyle,
@@ -727,11 +730,11 @@ def publicExperienceSnapshot(page: Any) -> dict[str, Any]:
               index: elementIndex(selector),
             })),
             requiredKoreanLabels: routeKind === "home"
-              ? ["실행으로 증명하는 PYTHON", "실행과 검증으로 학습", "만들 결과 선택", "하나의 제품, 두 실행 환경"]
+              ? ["바로 공부한다.", "어디서나 공부한다.", "자동화를 배운다.", "학습창"]
               : ["CODARO 학습", "결과 경로", "레슨 찾기"],
             missingKoreanLabels: (
               routeKind === "home"
-                ? ["실행으로 증명하는 PYTHON", "실행과 검증으로 학습", "만들 결과 선택", "하나의 제품, 두 실행 환경"]
+                ? ["바로 공부한다.", "어디서나 공부한다.", "자동화를 배운다.", "학습창"]
                 : ["CODARO 학습", "결과 경로", "레슨 찾기"]
             ).filter((label) => !bodyText.includes(label)),
             forbiddenEditorialLabels: forbiddenEditorialLabels.filter(
@@ -1141,8 +1144,8 @@ def validatePublicExperience(
 
     if expectedRouteKind == "home":
         expectedActions = [
-            "웹에서 첫 레슨 실행",
-            "학습 경로 보기",
+            "첫 레슨으로 시작하기",
+            "학습창 열기",
             "Windows Local 받기",
         ]
         if experience.get("homeActionLabels") != expectedActions:
@@ -1184,8 +1187,8 @@ def validatePublicKeyboardJourney(
     if [activation.get("marker") for activation in activations] != expectedMarkers:
         failures.append(f"{prefix}: public action activation order drifted: {activations}")
     expectedLabels = {
-        "primaryLesson": "웹에서 첫 레슨 실행",
-        "resultPaths": "학습 경로 보기",
+        "primaryLesson": "첫 레슨으로 시작하기",
+        "resultPaths": "학습창 열기",
         "localExtension": "Windows Local 받기",
     }
     for activation in activations:
@@ -1200,7 +1203,7 @@ def validatePublicKeyboardJourney(
     }
     if "/learn/lesson/" not in str(activationByMarker.get("primaryLesson", {}).get("href") or ""):
         failures.append(f"{prefix}: primary lesson keyboard target drifted")
-    if "/learn" not in str(activationByMarker.get("resultPaths", {}).get("href") or ""):
+    if not str(activationByMarker.get("resultPaths", {}).get("href") or "").endswith("#studio"):
         failures.append(f"{prefix}: result path keyboard target drifted")
     if not str(activationByMarker.get("localExtension", {}).get("href") or "").startswith(
         ("https://", "http://")

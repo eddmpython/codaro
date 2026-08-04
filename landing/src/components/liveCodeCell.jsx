@@ -1,52 +1,32 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Loader2, Play, RotateCcw } from "lucide-react";
 import { runLandingCode } from "../lib/landingPyproc.js";
 
-const DEFAULT_CODE = `# 어디서든, 설치 없이 바로 실행.
-names = ["재영", "서아", "Codaro"]
-for name in names:
-    print(f"안녕, {name}!")
-
-# 합계도 한 번에
-total = sum([10, 20, 30])
-print(f"합계: {total}")
+// 히어로 셀은 헬로월드 한 줄이면 된다. 여기서 가르치는 것은 문법이 아니라
+// "고치면 그 자리에서 결과가 바뀐다"는 사실이다.
+const DEFAULT_CODE = `# 이름을 바꾸고 실행해 보세요.
+name = "Codaro"
+print(f"안녕하세요, {name}!")
 `;
 
 const STATUS_LABEL = {
-  idle: "대기",
+  idle: "실행 준비됨",
   running: "실행 중",
   done: "실행 완료",
   error: "오류",
 };
+
+const IDLE_OUTPUT = "실행을 누르면 여기에 결과가 나옵니다.";
 
 export function LiveCodeCell({ initialCode = DEFAULT_CODE, className }) {
   const [code, setCode] = useState(initialCode);
   const [output, setOutput] = useState(null);
   const [status, setStatus] = useState("idle");
 
-  // 마운트 시 1회 자동 실행 - 런타임 부팅 + 첫 예제 결과를 보여줘 "움직이는" 첫 인상.
-  // SSR(prerender) 시 useEffect는 돌지 않으니 정적 코드 블록만 보이고, hydrate 후 부팅한다.
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      setStatus("running");
-      try {
-        const result = await runLandingCode(code);
-        if (!active) return;
-        setOutput(result);
-        setStatus(result.stderr ? "error" : "done");
-      } catch (error) {
-        if (!active) return;
-        setOutput({ stdout: "", stderr: String(error?.message || error) });
-        setStatus("error");
-      }
-    })();
-    return () => {
-      active = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+  // 자동 실행하지 않는다. 이유 두 가지.
+  // 1) 홈은 SSR 마크업과 hydrate 직후 마크업이 같아야 한다(landing-public 하이드레이션 계약).
+  //    마운트 시 상태가 바뀌면 그 계약이 깨지고, 출력 블록이 뒤늦게 끼어들어 레이아웃도 흔들린다.
+  // 2) 런타임 부팅은 무거운 작업이다. 첫 방문자 전원에게 강제할 일이 아니라 누른 사람에게만 준다.
   async function handleRun() {
     if (status === "running") return;
     setStatus("running");
@@ -66,13 +46,14 @@ export function LiveCodeCell({ initialCode = DEFAULT_CODE, className }) {
     setStatus("idle");
   }
 
-  const rows = Math.max(code.split("\n").length + 1, 8);
+  const rows = Math.max(code.split("\n").length, 4);
+  const outputText = output ? output.stdout || output.stderr || "(출력 없음)" : IDLE_OUTPUT;
 
   return (
     <div className={`liveCodeCell ${className || ""}`} data-home-live-cell="true">
       <div className="liveCodeCellHead">
         <span className="liveCodeCellDot" aria-hidden="true" />
-        <span className="liveCodeCellTitle">CODARO WEB · 실시간 Python</span>
+        <span className="liveCodeCellTitle">브라우저에서 실행되는 Python</span>
         <span className="liveCodeCellStatus" data-live-status={status}>
           {STATUS_LABEL[status]}
         </span>
@@ -95,17 +76,17 @@ export function LiveCodeCell({ initialCode = DEFAULT_CODE, className }) {
           {status === "running" ? "실행 중" : "실행"}
         </button>
         <button type="button" className="liveCodeCellReset" onClick={handleReset}>
-          <RotateCcw size={14} aria-hidden="true" /> 초기화
+          <RotateCcw size={14} aria-hidden="true" /> 되돌리기
         </button>
       </div>
-      {output ? (
-        <pre
-          className={`liveCodeCellOutput ${output.stderr ? "liveCodeCellOutputError" : ""}`}
-          aria-live="polite"
-        >
-          {output.stdout || output.stderr || "(출력 없음)"}
-        </pre>
-      ) : null}
+      {/* 출력 자리는 처음부터 고정으로 잡아 둔다. 결과가 들어올 때 화면이 밀리지 않는다. */}
+      <pre
+        className={`liveCodeCellOutput ${output?.stderr ? "liveCodeCellOutputError" : ""}`}
+        data-live-output-state={output ? "filled" : "idle"}
+        aria-live="polite"
+      >
+        {outputText}
+      </pre>
     </div>
   );
 }

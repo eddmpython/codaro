@@ -16,6 +16,9 @@
 .homeAstryx p {
   margin: 0;
   letter-spacing: 0;
+  /* 한국어 카피가 음절 중간("바로 바/뀝니다")에서 꺾이면 못 읽는다. 어절 단위로만 줄바꿈. */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 .homeAstryx a {
@@ -40,334 +43,305 @@
   letter-spacing: 0;
 }
 
-.homeV3 {
-  overflow: clip;
+/* ── 홈의 두 칸 ──────────────────────────────────────────────────────────────
+   히어로는 뷰포트 한 장을 차지한 채 제자리에 서 있고(sticky), 학습창이 그 위를
+   덮으며 올라온다. 스크롤 한 번에 "보는 화면"에서 "하는 화면"으로 넘어간다.
+   sticky는 스크롤 조상이 없어야 동작하므로 여기에 overflow를 걸지 않는다. */
+.homeContinuous {
+  position: relative;
 }
 
-.homeV3 .homeProductHero {
-  position: relative;
-  min-height: min(720px, calc(100svh - 64px));
-  padding-block: 72px 64px;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-background-body);
+.homeProductHero {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  display: grid;
+  min-height: 100svh;
+  align-content: center;
+  /* 투명 헤더(52px)가 히어로 위에 떠 있다. 그만큼을 위쪽에 비워 겹치지 않게 한다. */
+  padding-block: calc(52px + 28px) 32px;
+  background:
+    radial-gradient(ellipse 90% 55% at 50% -8%,
+      color-mix(in srgb, var(--color-accent) 12%, transparent),
+      transparent 62%),
+    var(--color-background-body);
+}
+
+.homeProductHero::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--color-border) 60%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--color-border) 60%, transparent) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask: radial-gradient(ellipse 70% 60% at 50% 0%, #000 35%, transparent 72%);
+          mask: radial-gradient(ellipse 70% 60% at 50% 0%, #000 35%, transparent 72%);
+  opacity: 0.5;
+  pointer-events: none;
+  content: "";
 }
 
 .homeHeroLayout {
+  position: relative;
+  z-index: 1;
   display: grid;
-  min-height: 584px;
-  grid-template-columns: minmax(380px, 0.82fr) minmax(0, 1.18fr);
-  align-items: center;
-  gap: 72px;
+  max-width: 720px;
+  justify-items: center;
+  gap: 18px;
+  text-align: center;
 }
 
-.homeV3 .homeProductHeroContent {
+/* 세 박자를 한 문장씩 끊어 읽힌다. 마지막 줄이 제품이 데려가는 곳이다. */
+.homeHeroHeadline {
   display: grid;
-  align-content: center;
-  justify-items: start;
-  gap: 16px;
-  padding-bottom: 44px;
-}
-
-.homeV3 .homeProductHeroContent > * {
-  max-width: 560px;
-}
-
-.homeV3 .homeProductHeroContent h1 {
+  gap: 2px;
   color: var(--color-text-primary);
   font-family: var(--font-family-heading);
-  font-size: clamp(64px, 6vw, 88px);
+  font-size: clamp(30px, 3.7vw, 46px);
   font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: -0.055em;
+  line-height: 1.18;
+  letter-spacing: -0.03em;
 }
 
-.homeV3 .homeProductStatement {
-  color: var(--color-text-primary);
-  font-size: clamp(24px, 2.1vw, 32px);
-  font-weight: 600;
-  line-height: 1.35;
-  letter-spacing: -0.035em;
-  text-wrap: balance;
+.homeHeroHeadline span {
+  display: block;
 }
 
-.homeV3 .homeProductDetail {
-  max-width: 52ch;
-  color: var(--color-text-secondary);
-  font-size: 15px;
-  line-height: 25px;
-}
-
-.homeV3 .homeHeroActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.homeV3 .homeHeroPrimaryAction {
-  color: var(--color-on-accent) !important;
-}
-
-.homeV3 .homeHeroSecondaryAction {
-  color: var(--color-text-primary) !important;
-}
-
-.homeV3 .homeLocalLink,
-.homeV3 .homeInlineAction {
-  display: inline-flex;
-  min-height: 40px;
-  align-items: center;
-  gap: 8px;
-  color: var(--color-text-secondary);
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 20px;
-  text-decoration: none;
-  transition: color var(--duration-fast);
-}
-
-.homeV3 .homeLocalLink:hover,
-.homeV3 .homeInlineAction:hover {
+.homeHeroHeadlineAccent {
   color: var(--color-text-accent);
+}
+
+.homeProductStatement {
+  max-width: 46ch;
+  color: var(--color-text-secondary);
+  font-size: clamp(15px, 1.35vw, 17px);
+  line-height: 1.55;
+  text-wrap: balance;
 }
 
 .homeHeroProductFrame {
   position: relative;
   display: grid;
+  width: 100%;
   min-width: 0;
+  max-width: 560px;
   overflow: hidden;
   border: 1px solid var(--color-border-emphasized);
   border-radius: var(--radius-container);
   background: var(--color-background-card);
-  box-shadow: 0 24px 72px color-mix(in srgb, var(--color-shadow) 65%, transparent);
+  box-shadow: 0 24px 72px color-mix(in srgb, var(--color-shadow) 55%, transparent);
+  text-align: start;
 }
 
-.homeHeroProductFrame::after {
-  position: absolute;
-  z-index: -1;
-  right: -15%;
-  bottom: -22%;
-  width: 70%;
-  height: 55%;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
-  content: "";
-  filter: blur(64px);
-}
-
-.homeHeroProductBar {
+.homeHeroActions {
   display: flex;
-  min-height: 42px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding-inline: 14px;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-background-surface);
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
 }
 
-.homeHeroProductBar span {
+.homeHeroPrimaryAction {
+  color: var(--color-on-accent) !important;
+}
+
+.homeHeroSecondaryAction {
+  color: var(--color-text-primary) !important;
+}
+
+.homeHeroScrollCue {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--color-text-secondary);
-  font-family: var(--font-family-code);
-  font-size: 10px;
-  font-weight: 600;
-  line-height: 16px;
+  color: var(--color-text-tertiary);
+  font-size: 12px;
+  line-height: 18px;
 }
 
-.homeHeroProductBar span:first-child {
+.homeLocalLink,
+.homeInlineAction {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-tertiary);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  text-decoration: none;
+  transition: color var(--duration-fast);
+}
+
+.homeLocalLink:hover,
+.homeInlineAction:hover {
   color: var(--color-text-accent);
 }
 
-.homeHeroProofRail {
+/* 학습창이 올라오는 동안 히어로는 물러난다. 스크롤 타임라인을 지원하지 않는
+   브라우저에서는 그냥 덮이기만 하고, 그래도 동작에는 문제가 없다. */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .homeHeroLayout {
+      animation: homeHeroRecede linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 92svh;
+    }
+  }
+}
+
+@keyframes homeHeroRecede {
+  55% {
+    opacity: 1;
+    transform: none;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-24px) scale(0.98);
+  }
+}
+
+/* ── 학습창 ────────────────────────────────────────────────────────────────
+   히어로 위로 올라오는 판이다. 배경이 불투명해야 히어로를 덮는다. */
+.homeStudio {
+  position: relative;
+  z-index: 1;
+  /* 선을 긋지 않는다. 올라오는 판이라는 것은 모서리와 그림자로만 알린다. */
+  border-radius: 20px 20px 0 0;
+  background: var(--color-background-body);
+  box-shadow: 0 -18px 44px color-mix(in srgb, var(--color-shadow) 26%, transparent);
+}
+
+.homeStudioInner {
   display: grid;
+  gap: 40px;
+  padding-block: 64px 88px;
+}
+
+.homeStudioHead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 24px;
+}
+
+.homeStudioHead > div {
+  display: grid;
+  gap: 10px;
+  max-width: 60ch;
+}
+
+.homeStudioHead h2 {
+  color: var(--color-text-primary);
+  font-size: clamp(24px, 2.4vw, 32px);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.homeStudioSummary {
+  display: flex;
   margin: 0;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  background: var(--color-background-surface);
+  gap: 0;
 }
 
-.homeHeroProofRail div {
+.homeStudioSummary > div {
   display: grid;
-  gap: 4px;
-  padding: 14px;
-}
-
-.homeHeroProofRail div + div {
+  min-width: 88px;
+  gap: 2px;
+  padding: 8px 16px;
   border-left: 1px solid var(--color-border);
+  text-align: center;
 }
 
-.homeHeroProofRail dt {
+.homeStudioSummary > div:first-child {
+  border-left: 0;
+}
+
+.homeStudioSummary dt {
   color: var(--color-text-tertiary);
   font-family: var(--font-family-code);
-  font-size: 10px;
-  line-height: 15px;
-  text-transform: uppercase;
-}
-
-.homeHeroProofRail dd {
-  margin: 0;
-  color: var(--color-text-primary);
-  font-family: var(--font-family-code);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 20px;
-}
-
-.homeProofLoop,
-.homeOutcomeBand,
-.homeRuntimeBand {
-  padding-block: 96px;
-}
-
-.homeSectionHeading {
-  display: grid;
-  max-width: 720px;
-  gap: 12px;
-  margin-bottom: 40px;
-}
-
-.homeSectionHeadingCompact {
-  max-width: 680px;
-}
-
-.homeSectionHeading h2,
-.homeRuntimeCopy h2 {
-  color: var(--color-text-primary);
-  font-size: 36px;
+  font-size: 11px;
   font-weight: 700;
-  line-height: 44px;
-  text-wrap: balance;
 }
 
-.homeSectionHeading p,
-.homeRuntimeCopy p {
-  max-width: 64ch;
-  color: var(--color-text-secondary);
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 26px;
-}
-
-.homeProofLoop {
-  background: var(--color-background-surface);
-}
-
-.homeProofLayout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
-  align-items: center;
-  gap: 72px;
-}
-
-.homeProofProduct {
-  min-width: 0;
-}
-
-.homeProofProductVisual {
-  display: block;
-  overflow: hidden;
-  border: 1px solid var(--color-border-emphasized);
-  border-radius: var(--radius-container);
-  background: var(--color-background-muted);
-  box-shadow: var(--shadow-med);
-}
-
-.homeProofProductVisual img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.homeProofProduct p {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 14px;
-  color: var(--color-text-secondary);
-  font-size: 12px;
-  line-height: 18px;
-}
-
-.homeProofProduct p svg {
-  color: var(--color-icon-teal);
-}
-
-.homeProofSteps {
-  display: grid;
+.homeStudioSummary dd {
   margin: 0;
-  padding: 0;
-  border-top: 1px solid var(--color-border-emphasized);
-  list-style: none;
-}
-
-.homeProofSteps li {
-  position: relative;
-  display: grid;
-  min-height: 108px;
-  grid-template-columns: 28px minmax(0, 1fr);
-  align-items: start;
-  gap: 14px;
-  padding: 18px 42px 18px 0;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.homeProofSteps svg {
-  margin-top: 3px;
-  color: var(--color-icon-accent);
-}
-
-.homeProofIndex {
-  position: absolute;
-  top: 20px;
-  right: 0;
-  color: var(--color-text-disabled);
+  color: var(--color-text-primary);
   font-family: var(--font-family-code);
-  font-size: 12px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 28px;
 }
 
-.homeProofSteps li > span:last-child {
+.homeStudioResume {
   display: grid;
-  gap: 3px;
+  grid-template-columns: 44px minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border: 1px solid var(--color-border-accent);
+  border-radius: var(--radius-container);
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-background-card));
+  text-decoration: none;
+  transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
 }
 
-.homeProofSteps small {
+.homeStudioResume:hover {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-low);
+}
+
+.homeStudioResumeIcon {
+  display: inline-grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: var(--radius-element);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.homeStudioResumeCopy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.homeStudioResumeCopy small {
   color: var(--color-text-accent);
   font-size: 12px;
   font-weight: 700;
   line-height: 18px;
 }
 
-.homeProofSteps strong {
+.homeStudioResumeCopy strong {
   color: var(--color-text-primary);
   font-size: 18px;
   font-weight: 700;
   line-height: 26px;
 }
 
-.homeProofSteps p {
+.homeStudioResumeCopy > span {
   color: var(--color-text-secondary);
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 22px;
+  font-size: 13px;
+  line-height: 20px;
 }
 
-.homeOutcomeBand {
-  background: var(--color-background-body);
+.homeStudioResume > svg {
+  color: var(--color-icon-secondary);
 }
 
-.homeOutcomeStories {
+.homeStudioPaths {
   display: grid;
-  gap: 20px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.homeOutcomeStory {
+.homeStudioPathCard {
   display: grid;
   min-width: 0;
-  grid-template-columns: minmax(0, 1fr) 24px;
-  gap: 0 18px;
+  align-content: start;
+  overflow: hidden;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-container);
   background: var(--color-background-card);
@@ -378,155 +352,190 @@
     box-shadow var(--duration-fast);
 }
 
-.homeOutcomeStory:hover {
+.homeStudioPathCard:hover {
   border-color: var(--color-border-accent);
   box-shadow: var(--shadow-low);
   transform: translateY(-2px);
 }
 
-.homeOutcomeImage {
+.homeStudioPathVisual {
   display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  grid-column: 1 / -1;
   border-bottom: 1px solid var(--color-border);
-  border-radius: var(--radius-container) var(--radius-container) 0 0;
   background: var(--color-background-surface);
 }
 
-.homeOutcomeImage img {
+.homeStudioPathVisual img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.homeOutcomeImage[data-visual-kind="outcomeProof"] img {
+.homeStudioPathVisual[data-visual-kind="outcomeProof"] img {
   object-fit: contain;
 }
 
-.homeOutcomeCopy {
+.homeStudioPathCopy {
   display: grid;
   min-width: 0;
-  gap: 8px;
-  padding: 22px 0 24px 24px;
+  gap: 6px;
+  padding: 16px 18px 18px;
 }
 
-.homeOutcomeCopy > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
+.homeStudioPathCopy small {
   color: var(--color-text-accent);
   font-family: var(--font-family-code);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  line-height: 18px;
+  line-height: 16px;
 }
 
-.homeOutcomeCopy strong {
+.homeStudioPathCopy strong {
   color: var(--color-text-primary);
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 700;
-  line-height: 28px;
+  line-height: 24px;
 }
 
-.homeOutcomeCopy small {
+.homeStudioPathCopy > span {
   color: var(--color-text-secondary);
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 22px;
+  font-size: 13px;
+  line-height: 20px;
 }
 
-.homeOutcomeStory > svg {
-  align-self: center;
-  margin-right: 20px;
-  color: var(--color-icon-secondary);
-}
-
-.homeOutcomeBand .homeInlineAction {
-  margin-top: 24px;
-  color: var(--color-text-accent);
-  font-weight: 700;
-}
-
-.homeRuntimeBand {
-  border-block: 1px solid var(--color-border);
-  background: var(--color-background-muted);
-}
-
-.homeRuntimeLayout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
-  align-items: center;
-  gap: 80px;
-}
-
-.homeRuntimeCopy {
-  display: grid;
-  gap: 14px;
-}
-
-.homeRuntimeActions {
+.homeStudioPathMeta {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 18px;
-  margin-top: 12px;
+  gap: 12px;
+  color: var(--color-text-tertiary);
+  font-family: var(--font-family-code);
+  font-size: 11px;
 }
 
-.homeRuntimeActions > a {
+.homeStudioPathMeta > span {
   display: inline-flex;
-  min-height: 40px;
   align-items: center;
-  gap: 8px;
-  color: var(--color-text-secondary);
-  font-size: 14px;
-  text-decoration: none;
+  gap: 4px;
 }
 
-.homeRuntimeProof {
-  border-top: 1px solid var(--color-border-emphasized);
-}
-
-.homeRuntimeVisuals {
+.homeStudioCatalog {
   display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.homeStudioDomain {
+  min-width: 0;
+  padding-block: 4px 12px;
+}
+
+.homeStudioDomainHead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 4px 12px;
+  padding-block: 10px;
+  border-bottom: 1px solid var(--color-border-emphasized);
+}
+
+.homeStudioDomainHead h3 {
+  color: var(--color-text-primary);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+}
+
+.homeStudioDomainHead > *:nth-child(2) {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.homeStudioDomainCount {
+  grid-column: 2;
+  grid-row: 1;
+  color: var(--color-text-tertiary);
+  font-family: var(--font-family-code);
+  font-size: 12px;
+}
+
+/* 학습창 안의 레슨 행은 두 칸으로 나뉘어 폭이 좁다. 결과 태그를 접고 행을 낮춘다. */
+.homeStudioCatalog .learnLessonRow {
+  min-height: 76px;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
   gap: 12px;
   padding-block: 12px;
 }
 
-.homeRuntimeFigure {
-  position: relative;
-  margin: 0;
+.homeStudioCatalog .learnLessonOutcomes,
+.homeStudioCatalog .learnLessonOpenIcon {
+  display: none;
 }
 
-.homeRuntimeFigure figcaption {
+.homeStudioCatalog .learnLessonBody > strong {
+  font-size: 15px;
+  line-height: 22px;
+}
+
+.homeStudioCatalog .learnLessonDirection {
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.homeStudioLocal {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr);
+  align-items: center;
+  gap: 32px;
+  padding-top: 32px;
+  border-top: 1px solid var(--color-border);
+}
+
+.homeStudioLocalVisuals {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  grid-template-rows: auto auto;
+}
+
+.homeStudioFigure {
+  position: relative;
+  margin: 0;
+  min-width: 0;
+}
+
+.homeStudioFigure:first-child {
+  grid-row: 1 / span 2;
+}
+
+.homeStudioFigure figcaption {
   position: absolute;
   z-index: 1;
-  top: 10px;
-  left: 10px;
-  padding: 5px 8px;
+  top: 8px;
+  left: 8px;
+  padding: 4px 7px;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-control);
+  border-radius: var(--radius-element);
   background: var(--color-background-surface);
   color: var(--color-text-secondary);
   font-family: var(--font-family-code);
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.04em;
   line-height: 14px;
 }
 
-.homeRuntimeImage {
+.homeStudioFigureImage {
   display: block;
   width: 100%;
-  aspect-ratio: 8 / 5;
+  height: 100%;
   overflow: hidden;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-container);
   background: var(--color-background-surface);
 }
 
-.homeRuntimeImage img {
+.homeStudioFigureImage img {
   display: block;
   width: 100%;
   height: 100%;
@@ -534,81 +543,16 @@
   object-position: top center;
 }
 
-.homeRuntimeProof > div {
+.homeStudioLocalCopy {
   display: grid;
-  min-height: 116px;
-  grid-template-columns: 28px 66px minmax(0, 1fr);
-  align-items: center;
-  gap: 5px 12px;
-  padding: 20px 0;
-  border-bottom: 1px solid var(--color-border);
+  gap: 10px;
 }
 
-.homeRuntimeProof svg {
-  grid-row: 1 / span 2;
-  color: var(--color-icon-accent);
-}
-
-.homeRuntimeProof span {
-  grid-row: 1 / span 2;
-  color: var(--color-text-accent);
-  font-family: var(--font-family-code);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.homeRuntimeProof strong {
-  color: var(--color-text-primary);
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 24px;
-}
-
-.homeRuntimeProof small {
-  color: var(--color-text-secondary);
-  font-size: 13px;
-  line-height: 20px;
-}
-
-.homeTrustBand {
-  padding-block: 48px;
-  background: var(--color-background-surface);
-}
-
-.homeTrustLayout {
-  display: grid;
-  grid-template-columns: 32px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 18px;
-}
-
-.homeTrustLayout > svg {
-  color: var(--color-icon-teal);
-}
-
-.homeTrustLayout h2 {
+.homeStudioLocalCopy h3 {
   color: var(--color-text-primary);
   font-size: 20px;
   font-weight: 700;
   line-height: 28px;
-}
-
-.homeTrustLayout p {
-  margin-top: 4px;
-  color: var(--color-text-secondary);
-  font-size: 14px;
-  line-height: 22px;
-}
-
-.homeTrustLayout > a {
-  display: inline-flex;
-  min-height: 40px;
-  align-items: center;
-  gap: 8px;
-  color: var(--color-text-accent);
-  font-size: 14px;
-  font-weight: 700;
-  text-decoration: none;
 }
 
 @media (max-width: 1050px) {
@@ -616,17 +560,18 @@
     width: min(100% - 48px, 1200px);
   }
 
-  .homeHeroLayout {
-    gap: 40px;
-    grid-template-columns: minmax(330px, 0.8fr) minmax(0, 1.2fr);
+  .homeStudioPaths {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 860px) {
+  .homeStudioCatalog {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .homeProofLayout {
-    gap: 48px;
-  }
-
-  .homeRuntimeLayout {
-    gap: 48px;
+  .homeStudioLocal {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -635,159 +580,85 @@
     width: calc(100% - 40px);
   }
 
-  .homeV3 .homeProductHero {
+  /* 좁은 화면에서는 sticky 겹침을 쓰지 않는다. 두 칸을 그냥 세로로 잇는다. */
+  .homeProductHero {
+    position: static;
     min-height: 0;
-    padding-block: 48px 40px;
+    padding-block: calc(56px + 24px) 40px;
   }
 
   .homeHeroLayout {
-    min-height: 0;
+    gap: 14px;
+  }
+
+  .homeStudio {
+    box-shadow: none;
+  }
+
+  .homeStudioInner {
+    gap: 32px;
+    padding-block: 40px 64px;
+  }
+
+  .homeStudioHead {
     grid-template-columns: minmax(0, 1fr);
-    gap: 36px;
+    align-items: start;
   }
 
-  .homeV3 .homeProductHeroContent {
-    gap: 12px;
-    padding: 0;
+  .homeStudioSummary {
+    justify-self: start;
   }
 
-  .homeV3 .homeProductHeroContent > * {
-    max-width: 100%;
-  }
-
-  .homeV3 .homeProductHeroContent h1 {
-    font-size: 54px;
-    line-height: 0.98;
-  }
-
-  .homeV3 .homeProductStatement {
-    font-size: 23px;
-    line-height: 1.38;
-  }
-
-  .homeV3 .homeProductDetail {
-    font-size: 14px;
-    line-height: 23px;
-  }
-
-  .homeV3 .homeHeroActions {
-    width: 100%;
-    flex-wrap: wrap;
-  }
-
-  .homeV3 .homeHeroActions > * {
-    flex: 1 1 180px;
+  .homeStudioSummary > div {
     min-width: 0;
+    padding-inline: 14px;
   }
 
-  .homeV3 .homeLocalLink {
-    min-height: 32px;
-    font-size: 13px;
+  .homeStudioSummary > div:first-child {
+    padding-left: 0;
   }
 
-  .homeHeroProductFrame {
-    margin-inline: -8px;
-  }
-
-  .homeProofLoop,
-  .homeOutcomeBand,
-  .homeRuntimeBand {
-    padding-block: 64px;
-  }
-
-  .homeSectionHeading {
-    gap: 10px;
-    margin-bottom: 28px;
-  }
-
-  .homeSectionHeading h2,
-  .homeRuntimeCopy h2 {
-    font-size: 30px;
-    line-height: 38px;
-  }
-
-  .homeSectionHeading p,
-  .homeRuntimeCopy p {
-    font-size: 15px;
-    line-height: 24px;
-  }
-
-  .homeProofLayout {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 44px;
-  }
-
-  .homeProofSteps li {
-    min-height: 104px;
-  }
-
-  .homeOutcomeStories {
+  .homeStudioPaths {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .homeOutcomeStory,
-  .homeOutcomeStory + .homeOutcomeStory {
-    grid-template-columns: minmax(0, 1fr) 20px;
+  .homeStudioResume {
+    grid-template-columns: 40px minmax(0, 1fr) 18px;
+    gap: 12px;
+    padding: 14px 16px;
   }
 
-  .homeOutcomeImage {
-    width: 100%;
+  .homeStudioResumeIcon {
+    width: 40px;
+    height: 40px;
   }
 
-  .homeOutcomeCopy strong {
-    font-size: 17px;
-    line-height: 24px;
-  }
-
-  .homeOutcomeCopy {
-    padding: 18px 0 20px 18px;
-  }
-
-  .homeOutcomeStory > svg {
-    margin-right: 14px;
-  }
-
-  .homeRuntimeLayout {
+  .homeStudioLocalVisuals {
     grid-template-columns: minmax(0, 1fr);
-    gap: 40px;
   }
 
-  .homeTrustLayout {
-    grid-template-columns: 28px minmax(0, 1fr);
-  }
-
-  .homeTrustLayout > a {
-    grid-column: 2;
+  .homeStudioFigure:first-child {
+    grid-row: auto;
   }
 }
 
 @media (max-width: 430px) {
-  .homeV3 .homeHeroActions {
+  .homeHeroActions {
     align-items: stretch;
     flex-direction: column;
+    width: 100%;
   }
 
-  .homeV3 .homeHeroActions > * {
+  .homeHeroActions > * {
     width: 100%;
     min-height: 48px;
-    flex: 0 0 auto;
-  }
-
-  .homeHeroProofRail {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .homeHeroProofRail div:last-child {
-    grid-column: 1 / -1;
-    border-top: 1px solid var(--color-border);
-    border-left: 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .homeV3 *,
-  .homeV3 *::before,
-  .homeV3 *::after {
+  .homeContinuous *,
+  .homeContinuous *::before,
+  .homeContinuous *::after {
     scroll-behavior: auto;
     transition-duration: 0.01ms !important;
   }
@@ -803,7 +674,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
+  padding: 9px 14px;
   border-bottom: 1px solid var(--color-border);
   background: var(--color-background-card);
 }
@@ -837,8 +708,8 @@
 
 .liveCodeCellEditor {
   width: 100%;
-  min-height: 150px;
-  padding: 16px 14px;
+  min-height: 96px;
+  padding: 14px;
   border: 0;
   border-bottom: 1px solid var(--color-border);
   background: var(--color-background-card);
@@ -865,7 +736,7 @@
   gap: 6px;
   padding: 7px 14px;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-control);
+  border-radius: var(--radius-element);
   background: var(--color-background-card);
   color: var(--color-text-primary);
   font-size: 13px;
@@ -896,10 +767,12 @@
   to { transform: rotate(360deg); }
 }
 
+/* 출력 칸은 결과가 없어도 자리를 지킨다. 실행 결과가 들어올 때 화면이 밀리지 않는다. */
 .liveCodeCellOutput {
   margin: 0;
-  max-height: 200px;
-  padding: 14px;
+  min-height: 64px;
+  max-height: 180px;
+  padding: 12px 14px;
   overflow: auto;
   background: var(--color-background-muted);
   color: var(--color-text-primary);
@@ -909,24 +782,28 @@
   white-space: pre-wrap;
 }
 
+.liveCodeCellOutput[data-live-output-state="idle"] {
+  color: var(--color-text-tertiary);
+}
+
 .liveCodeCellOutputError {
   color: var(--color-warning);
 }
 
 @media (forced-colors: active) {
   .homeHeroProductFrame,
-  .homeProofProductVisual,
-  .homeOutcomeStory,
-  .homeRuntimeImage,
-  .homeRuntimeFigure figcaption {
+  .homeStudioPathCard,
+  .homeStudioResume,
+  .homeStudioFigureImage,
+  .homeStudioFigure figcaption {
     border-color: CanvasText;
   }
 
-  .homeV3 [data-visual-asset] img {
+  .homeContinuous [data-visual-asset] img {
     forced-color-adjust: none;
   }
 
-  .homeV3 a:focus-visible {
+  .homeContinuous a:focus-visible {
     outline: 2px solid Highlight;
     outline-offset: 3px;
   }
