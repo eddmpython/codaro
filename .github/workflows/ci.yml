@@ -204,7 +204,9 @@ jobs:
         run: uv run python -m playwright install --with-deps chromium firefox webkit
 
       - name: Verify visual assets
-        timeout-minutes: 15
+        # 2코어 러너의 firefox/webkit 페이지 로드가 느려 instructional 매트릭스가
+        # 15분을 넘길 수 있다. 실패가 아니라 속도 문제라 예산만 넉넉히 둔다.
+        timeout-minutes: 30
         run: uv run python -X utf8 tests/run.py gate visual-assets
 
       - name: Verify Astryx design system
