@@ -44,7 +44,7 @@ def main() -> int:
             env=environment,
             capture_output=True,
             text=True,
-            timeout=900,
+            timeout=1700,
             check=False,
         )
         if result.returncode != 0 or not sourceReport.is_file():

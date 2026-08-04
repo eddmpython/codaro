@@ -689,7 +689,8 @@ GATES: dict[str, Gate] = {
             command(("uv", "run", "python", "-X", "utf8", "tests/assets/verifyVisualAssetBudget.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/assets/verifyInstructionalVisualPurpose.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/assets/verifyRunCaptureMatrix.py")),
-            command(("uv", "run", "python", "-X", "utf8", "tests/learning/verifyInstructionalVisualPlaywright.py"), timeoutSeconds=900),
+            # CI 2코어 러너의 브라우저 매트릭스는 페이지 로드가 느려 15분을 넘길 수 있다(속도 문제, 실패 아님).
+            command(("uv", "run", "python", "-X", "utf8", "tests/learning/verifyInstructionalVisualPlaywright.py"), timeoutSeconds=1800),
             command(("npm", "run", "build"), cwd="landing"),
             command(("npm", "run", "build"), cwd="editor"),
             command((
