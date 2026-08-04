@@ -1160,14 +1160,14 @@ mod tests {
         assert_eq!(install_record.release_id, "2026.03.18-1");
         assert_eq!(install_record.backend.name, "codaro");
         assert_eq!(install_record.bundles[0].name, "codaro-excel");
+        // 마커는 런타임 루트에 있다. 실행파일 부모로 유도하면 POSIX(bin/python3)에서
+        // bin/을 가리켜 NotFound가 난다.
         assert_eq!(
             install_record.python_runtime.tree_sha256.as_deref(),
             Some(
                 fs::read_to_string(
-                    summary
-                        .python_executable_path
-                        .parent()
-                        .unwrap()
+                    paths
+                        .runtime_store_dir("3.12.12")
                         .join(".runtime-tree-sha256")
                 )
                 .unwrap()

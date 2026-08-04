@@ -193,6 +193,12 @@ jobs:
         working-directory: landing
         run: npm ci
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('uv.lock') }}
+
       - name: Install locked browser matrix
         timeout-minutes: 15
         run: uv run python -m playwright install --with-deps chromium firefox webkit

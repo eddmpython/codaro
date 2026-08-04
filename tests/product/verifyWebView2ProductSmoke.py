@@ -301,7 +301,9 @@ def main() -> int:
                 "12-cell input, execution output, and action names include the current cell position",
                 "WebView2 Chromium accessibility-tree input, execution output, cell-action, and document-control reading order",
                 "Code and Markdown composition-event shortcut guards",
-                "Code and Markdown native Korean IME input and composition-boundary arrow guards",
+                *([
+                    "Code and Markdown native Korean IME input and composition-boundary arrow guards",
+                ] if korean_keyboard_layout_available() else []),
                 "WebView2 forced-colors control boundaries and keyboard focus order",
                 "native 200% browser zoom at the 900x640 Local minimum",
                 "400% text-only fixture at the 900x640 Local minimum",
@@ -315,6 +317,9 @@ def main() -> int:
             "notCovered": [
                 *([] if runtime_lock is not None else ["WebView2 Fixed Version lock"]),
                 "manual NVDA or Narrator speech-output review",
+                *([] if korean_keyboard_layout_available() else [
+                    "native Korean IME input (Korean keyboard layout unavailable in this session)",
+                ]),
                 *([] if deployed_archive is not None else ["public deployed Web archive export"]),
             ],
         },
@@ -1896,7 +1901,11 @@ def verify_long_notebook_keyboard_navigation(
         timeout=120_000,
     )
     composition_evidence = verify_notebook_composition_guards(page, cells)
-    native_ime_evidence = verify_native_korean_ime(page, hwnd=hwnd, cells=cells)
+    native_ime_evidence = (
+        verify_native_korean_ime(page, hwnd=hwnd, cells=cells)
+        if korean_keyboard_layout_available()
+        else {"valid": None, "skipped": "korean-keyboard-layout-unavailable"}
+    )
     accessible_name_evidence = notebook_accessible_name_state(page)
     accessibility_tree_evidence = notebook_accessibility_tree_state(
         page,
@@ -1921,8 +1930,9 @@ def verify_long_notebook_keyboard_navigation(
         "markdownFocusedDown": markdown_down,
         "positionedAccessibleNames": accessible_name_evidence["valid"],
         "accessibilityTreeReadingOrder": accessibility_tree_evidence["valid"],
-        "nativeKoreanIme": native_ime_evidence["valid"],
     }
+    if native_ime_evidence.get("skipped") is None:
+        checks["nativeKoreanIme"] = native_ime_evidence["valid"]
     case_failures = [
         f"{check} check failed"
         for check, passed in checks.items()
@@ -3617,6 +3627,23 @@ def native_key_tap(virtual_key: int) -> None:
     time.sleep(0.035)
     user32.keybd_event(virtual_key, 0, KEYEVENTF_KEYUP, 0)
     time.sleep(0.06)
+
+
+def korean_keyboard_layout_available() -> bool:
+    """이 세션에 한국어 키보드 레이아웃(LANG_KOREAN)이 설치돼 있는지 확인한다.
+
+    CI Windows 러너에는 en-US 레이아웃만 있어 네이티브 한글 IME 조합을 만들 수 없다.
+    이때 native IME 검증은 실패가 아니라 claimScope.notCovered로 정직하게 보고한다.
+    합성 composition 이벤트 경로는 verify_notebook_composition_guards가 항상 검증한다.
+    """
+    user32 = ctypes.windll.user32
+    count = user32.GetKeyboardLayoutList(0, None)
+    if count <= 0:
+        return False
+    layouts = (wintypes.HKL * count)()
+    user32.GetKeyboardLayoutList(count, layouts)
+    LANG_KOREAN = 0x12
+    return any((int(layout) & 0x3FF) == LANG_KOREAN for layout in layouts)
 
 
 def windows_session_evidence() -> dict[str, Any]:
