@@ -1339,6 +1339,26 @@ def verifyLongNotebookKeyboardNavigation(
     if not markdownVisited:
         raise AssertionError("keyboard navigation did not focus the Markdown textarea")
 
+    # 활성줄 채움은 cm-focused 에서만 칠해진다. CI 헤드리스는 페이지가 전면이 아니면
+    # document.hasFocus() 가 false 라 activeElement 가 셀 안에 있어도 CodeMirror 가
+    # cm-focused 를 붙이지 않는다. 판정 전에 페이지를 전면으로 올려 포커스 상태를
+    # 결정적으로 만든다.
+    page.bring_to_front()
+    page.evaluate(
+        """() => {
+          const content = document.querySelector(
+            '[data-notebook-cell="code"][data-notebook-cell-selected="true"] .cm-content'
+          );
+          if (content instanceof HTMLElement) content.focus();
+        }"""
+    )
+    page.wait_for_function(
+        """() => document.querySelector(
+          '[data-notebook-cell="code"][data-notebook-cell-selected="true"] .cm-editor'
+        )?.classList.contains('cm-focused')""",
+        timeout=10_000,
+    )
+
     lineVisualSnapshot = page.evaluate(
         """() => {
           const selectedCell = document.querySelector(
