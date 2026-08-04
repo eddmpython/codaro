@@ -368,6 +368,42 @@ def captureAssets(assets: list[dict[str, Any]], expectedGitHead: str) -> tuple[l
     return captures, failures
 
 
+def partitionAssetsByPlatform(
+    assets: list[dict[str, Any]],
+    runnerPlatform: str,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[str]]:
+    """캡처 플랫폼이 러너와 같은 자산만 픽셀 비교 대상으로 남긴다.
+
+    canonical 캡처는 그것을 찍은 OS 의 텍스트 래스터라이저를 전제한다. 다른 OS 에서
+    재캡처해 비교하면 글리프 렌더링 차이만으로 수만 픽셀이 어긋나므로, 그 비교는
+    검증이 아니라 소음이다. 플랫폼이 다른 자산은 실패가 아니라 명시적 skip 으로
+    보고한다. platform 기록이 없는 자산은 provenance 미비이므로 실패다.
+    """
+    matching: list[dict[str, Any]] = []
+    skipped: list[dict[str, Any]] = []
+    failures: list[str] = []
+    for asset in assets:
+        assetId = str(asset.get("id"))
+        capturePlatform = str(asset.get("capture", {}).get("platform", ""))
+        if not capturePlatform:
+            failures.append(
+                f"{assetId}: capture platform is missing; "
+                "run captureProductVisuals.py --update on the capture machine"
+            )
+        elif capturePlatform != runnerPlatform:
+            skipped.append(
+                {
+                    "id": assetId,
+                    "skipped": "capture-platform-mismatch",
+                    "capturePlatform": capturePlatform,
+                    "runnerPlatform": runnerPlatform,
+                }
+            )
+        else:
+            matching.append(asset)
+    return matching, skipped, failures
+
+
 def checkCaptures(
     assets: list[dict[str, Any]],
     captures: list[dict[str, Any]],
@@ -453,6 +489,9 @@ def updateCaptures(
         asset["sourceHash"] = f"sha256-{promotedHash}"
         asset["sourceGitHead"] = implementationGitHead
         asset["capture"]["browserVersion"] = capture["browserVersion"]
+        # 픽셀 비교는 같은 OS 텍스트 래스터라이저에서만 의미가 있다. --check 가
+        # 플랫폼 불일치를 판정할 수 있도록 캡처 OS 를 provenance 에 남긴다.
+        asset["capture"]["platform"] = sys.platform
         asset["capture"]["sourcePaths"] = normalizedCaptureSourcePaths(asset)
         asset["capture"]["sourceSetHash"] = builder.captureSourceSetHash(
             asset["capture"]["sourcePaths"]
@@ -471,17 +510,20 @@ def writeReport(
     started: float,
     captures: list[dict[str, Any]],
     failures: list[str],
+    skippedAssets: list[dict[str, Any]] | None = None,
 ) -> None:
     payload = {
         "gate": "product-visual-capture",
         "status": "passed" if not failures else "failed",
         "passed": not failures,
         "mode": mode,
+        "runnerPlatform": sys.platform,
         "gitHead": gitHeadValue,
         "startedAt": startedAt,
         "completedAt": datetime.now(UTC).isoformat(),
         "durationMs": round((time.monotonic() - started) * 1000),
         "assetCount": len(captures),
+        "skippedAssets": skippedAssets or [],
         "assets": [
             {
                 "id": capture["id"],
@@ -529,6 +571,7 @@ def main(argv: list[str] | None = None) -> int:
     head = gitHead()
     captures: list[dict[str, Any]] = []
     failures: list[str] = []
+    skippedAssets: list[dict[str, Any]] = []
     mode = "update" if args.update else "check"
     try:
         manifest = loadManifest()
@@ -541,7 +584,13 @@ def main(argv: list[str] | None = None) -> int:
         )
         if args.update:
             requireCleanWorktree()
-        if not failures:
+        if args.check:
+            assets, skippedAssets, platformFailures = partitionAssetsByPlatform(
+                assets,
+                sys.platform,
+            )
+            failures.extend(platformFailures)
+        if not failures and assets:
             captures, captureFailures = captureAssets(assets, head)
             failures.extend(captureFailures)
         if not failures and args.check:
@@ -557,12 +606,18 @@ def main(argv: list[str] | None = None) -> int:
         started=started,
         captures=captures,
         failures=failures,
+        skippedAssets=skippedAssets,
     )
     if failures:
         for failure in failures:
             print(f"FAIL: {failure}", file=sys.stderr)
         return 1
-    print(f"ok: product visual capture {mode} ({len(captures)} assets)")
+    skipNote = (
+        f", {len(skippedAssets)} skipped: capture-platform-mismatch"
+        if skippedAssets
+        else ""
+    )
+    print(f"ok: product visual capture {mode} ({len(captures)} assets{skipNote})")
     return 0
 
 

@@ -94,6 +94,40 @@ class CaptureProductVisualsTest(unittest.TestCase):
             all(themes == {"light", "dark"} for themes in themesByFixture.values())
         )
 
+    def testEveryProductCaptureRecordsItsCapturePlatform(self) -> None:
+        # 픽셀 비교는 같은 OS 래스터라이저에서만 유효하다. --check 가 플랫폼
+        # 일치 여부를 판정하려면 모든 캡처가 자기 OS 를 기록해야 한다.
+        for asset in self.assets:
+            with self.subTest(asset=asset["id"]):
+                self.assertIn(
+                    asset["capture"].get("platform"),
+                    {"win32", "linux", "darwin"},
+                )
+
+    def testCheckSkipsPixelComparisonOnlyForForeignCapturePlatform(self) -> None:
+        assets = [
+            {"id": "sameOs", "capture": {"platform": "win32"}},
+            {"id": "foreignOs", "capture": {"platform": "linux"}},
+            {"id": "unstamped", "capture": {}},
+        ]
+        matching, skipped, failures = CAPTURE_TOOL.partitionAssetsByPlatform(assets, "win32")
+        self.assertEqual([asset["id"] for asset in matching], ["sameOs"])
+        self.assertEqual(
+            skipped,
+            [
+                {
+                    "id": "foreignOs",
+                    "skipped": "capture-platform-mismatch",
+                    "capturePlatform": "linux",
+                    "runnerPlatform": "win32",
+                }
+            ],
+        )
+        # 기록이 없는 자산은 skip 이 아니라 provenance 실패다.
+        self.assertEqual(len(failures), 1)
+        self.assertIn("unstamped", failures[0])
+        self.assertIn("--update", failures[0])
+
     def testCanonicalProductPngDimensionsMatchManifest(self) -> None:
         for asset in self.assets:
             with self.subTest(asset=asset["id"]):

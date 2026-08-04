@@ -159,6 +159,7 @@
       "properties": {
         "browser": { "const": "chromium" },
         "browserVersion": { "type": "string", "minLength": 1 },
+        "platform": { "enum": ["win32", "linux", "darwin"] },
         "viewport": { "$ref": "#/$defs/viewport" },
         "theme": { "enum": ["light", "dark"] },
         "locale": { "type": "string", "minLength": 2 },
