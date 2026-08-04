@@ -4231,10 +4231,11 @@ def runBrowserMatrix(
                 try:
                     page.goto(case["url"], wait_until="domcontentloaded", timeout=30_000)
                     # 부트 대기는 성능 판정이 아니다(성능은 frontend-performance-budget가
-                    # 측정). CI 2코어 러너의 firefox/webkit 콜드스타트가 20초를 넘겨
-                    # 매트릭스가 플레이크하므로 여유를 둔다.
-                    page.wait_for_selector("#root", state="visible", timeout=60_000)
-                    page.wait_for_selector("[data-astryx-theme='codaro']", timeout=60_000)
+                    # 측정). CI 2코어 러너에서 instructional 매트릭스가 다른 케이스와
+                    # 겹치면 콜드스타트가 60초를 넘긴다. 이 파일의 다른 부트 대기와
+                    # 같은 120초로 맞춘다.
+                    page.wait_for_selector("#root", state="visible", timeout=120_000)
+                    page.wait_for_selector("[data-astryx-theme='codaro']", timeout=120_000)
                     if case.get("waitFor"):
                         page.wait_for_selector(case["waitFor"], timeout=30_000)
                     if case.get("verifyFirstLearningSectionInViewport"):
