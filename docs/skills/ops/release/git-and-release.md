@@ -110,9 +110,10 @@ uv run python -X utf8 tests/run.py preflight 통과. 학습 화면에서 셀 클
 
 ### 깨끗함/더러움 기준
 
-아래 9개를 **모두** 충족해야 "깨끗함"이다. 하나라도 위반하면 "더러움"이고, 그 자체로 릴리즈 중단 사유다.
+아래 10개를 **모두** 충족해야 "깨끗함"이다. 하나라도 위반하면 "더러움"이고, 그 자체로 릴리즈 중단 사유다.
 
 1. **게이트 green** - `uv run python -X utf8 tests/run.py preflight`의 전 게이트 통과 + 릴리즈 표면 게이트(`launcher-test`, `install-launcher-smoke` 등). 빨간 게이트·스킵된 게이트는 곧 더러움이다.
+1-1. **원격 CI 전부 green** - 릴리즈 커밋 기준으로 GitHub Actions의 push 트리거 워크플로(`CI`, `Deploy Pages`, `Security`) 전 job이 green이어야 한다. 릴리즈 워크플로만 green이고 main CI가 red인 상태의 릴리즈는 더러움이다(v0.0.13에서 실제 위반 발생). CI 실패가 릴리즈 범위와 무관한 기존 red라도, 먼저 그 red를 정공법으로 청소한 뒤 릴리즈한다.
 2. **빌드 산출물 동기화** - 소스를 바꿨으면 에디터 `src/codaro/webBuild/**`와 landing `generated/**`가 *현재 소스로 재빌드된* 상태여야 한다. 소스는 바뀌었는데 산출물은 옛것인 stale 빌드는 더러움이다.
 3. **작업 트리·이력 정합** - `git status` 클린(미커밋 변경 0), `origin/main`과 동기화, `root-clean` 게이트 통과. 루트/작업 트리에 임시·스크래치·로그·preview 산출물 없음. 켜져 있지만 미완성인(half-done) 코드 경로가 릴리즈 범위에 없음.
 4. **임시·디버그 잔재 0** - 이번 릴리즈에 들어가는 변경에 `TODO`/`FIXME`/`XXX`, 디버그 `print`/`console.log`, 주석 처리된 죽은 코드, 임시 hack·우회·fallback 잔재가 없다.
