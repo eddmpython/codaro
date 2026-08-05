@@ -45,7 +45,7 @@
   gap: 8px;
   margin-bottom: 24px;
   color: var(--color-text-tertiary);
-  font-size: 13px;
+  font-size: var(--type-sm);
 }
 
 .lessonBreadcrumb a {
@@ -65,7 +65,7 @@
   gap: 10px 20px;
   margin-top: 24px;
   color: var(--color-text-secondary);
-  font-size: 13px;
+  font-size: var(--type-sm);
 }
 
 .lessonMetaLine span,
@@ -87,7 +87,7 @@
 .lessonLocalLink {
   min-height: 44px;
   color: var(--color-text-secondary);
-  font-size: 14px;
+  font-size: var(--type-base);
   font-weight: 600;
   text-decoration: none;
 }
@@ -126,7 +126,7 @@
 .lessonProductFigure figcaption {
   margin-top: 10px;
   color: var(--color-text-tertiary);
-  font-size: 12px;
+  font-size: var(--type-xs);
   line-height: 1.5;
 }
 
@@ -148,13 +148,13 @@
   align-items: flex-start;
   gap: 10px;
   color: var(--color-text-secondary);
-  font-size: 12px;
+  font-size: var(--type-xs);
   line-height: 1.55;
 }
 
 .lessonRouteRail strong {
   color: var(--color-text-primary);
-  font-size: 14px;
+  font-size: var(--type-base);
 }
 
 .lessonRouteRail a {
@@ -166,7 +166,7 @@
 
 .lessonRailLabel {
   color: var(--color-text-tertiary);
-  font-size: 11px;
+  font-size: var(--type-2xs);
   font-weight: 700;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -253,7 +253,7 @@
   padding-top: 5px;
   color: var(--color-text-accent);
   font-family: var(--font-family-mono);
-  font-size: 12px;
+  font-size: var(--type-xs);
   font-weight: 700;
 }
 
@@ -275,7 +275,7 @@
 
 .lessonGoal strong {
   color: var(--color-text-accent);
-  font-size: 12px;
+  font-size: var(--type-xs);
 }
 
 .lessonWhy,
@@ -302,7 +302,7 @@
   border-bottom: 1px solid color-mix(in srgb, var(--color-text-inverse) 16%, transparent);
   padding: 9px 14px;
   color: color-mix(in srgb, var(--color-text-inverse) 72%, transparent);
-  font-size: 11px;
+  font-size: var(--type-2xs);
   font-weight: 600;
 }
 
@@ -312,7 +312,7 @@
   margin: 0;
   padding: 18px;
   font-family: var(--font-family-mono);
-  font-size: 13px;
+  font-size: var(--type-sm);
   line-height: 1.7;
   white-space: pre;
 }
@@ -322,13 +322,13 @@
   border-left: 2px solid var(--color-border-default);
   padding: 2px 0 2px 18px;
   color: var(--color-text-secondary);
-  font-size: 14px;
+  font-size: var(--type-base);
 }
 
 .lessonTips strong,
 .lessonExercise > span {
   color: var(--color-text-primary);
-  font-size: 12px;
+  font-size: var(--type-xs);
   font-weight: 700;
 }
 

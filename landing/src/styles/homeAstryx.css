@@ -37,9 +37,9 @@
   gap: 8px;
   color: var(--color-text-accent);
   font-family: var(--font-family-code);
-  font-size: 12px;
+  font-size: var(--type-xs);
   font-weight: 700;
-  line-height: 18px;
+  line-height: var(--leading-xs);
   letter-spacing: 0;
 }
 
@@ -95,13 +95,20 @@
   text-align: center;
 }
 
+.homeHeroAvatar {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 28px color-mix(in srgb, var(--color-shadow) 45%, transparent));
+}
+
 /* 세 박자를 한 문장씩 끊어 읽힌다. 마지막 줄이 제품이 데려가는 곳이다. */
 .homeHeroHeadline {
   display: grid;
   gap: 2px;
   color: var(--color-text-primary);
   font-family: var(--font-family-heading);
-  font-size: clamp(30px, 3.7vw, 46px);
+  font-size: var(--type-display);
   font-weight: 700;
   line-height: 1.18;
   letter-spacing: -0.03em;
@@ -118,7 +125,7 @@
 .homeProductStatement {
   max-width: 46ch;
   color: var(--color-text-secondary);
-  font-size: clamp(15px, 1.35vw, 17px);
+  font-size: var(--type-lg);
   line-height: 1.55;
   text-wrap: balance;
 }
@@ -157,8 +164,8 @@
   align-items: center;
   gap: 6px;
   color: var(--color-text-tertiary);
-  font-size: 12px;
-  line-height: 18px;
+  font-size: var(--type-xs);
+  line-height: var(--leading-xs);
 }
 
 .homeLocalLink,
@@ -168,9 +175,9 @@
   align-items: center;
   gap: 6px;
   color: var(--color-text-tertiary);
-  font-size: 13px;
+  font-size: var(--type-sm);
   font-weight: 400;
-  line-height: 18px;
+  line-height: var(--leading-sm);
   text-decoration: none;
   transition: color var(--duration-fast);
 }
@@ -236,7 +243,7 @@
 
 .homeStudioHead h2 {
   color: var(--color-text-primary);
-  font-size: clamp(24px, 2.4vw, 32px);
+  font-size: var(--type-title);
   font-weight: 700;
   line-height: 1.25;
 }
@@ -263,7 +270,7 @@
 .homeStudioSummary dt {
   color: var(--color-text-tertiary);
   font-family: var(--font-family-code);
-  font-size: 11px;
+  font-size: var(--type-2xs);
   font-weight: 700;
 }
 
@@ -271,9 +278,9 @@
   margin: 0;
   color: var(--color-text-primary);
   font-family: var(--font-family-code);
-  font-size: 22px;
+  font-size: var(--type-2xl);
   font-weight: 700;
-  line-height: 28px;
+  line-height: var(--leading-2xl);
 }
 
 .homeStudioResume {
@@ -316,22 +323,22 @@
 
 .homeStudioResumeCopy small {
   color: var(--color-text-accent);
-  font-size: 12px;
+  font-size: var(--type-xs);
   font-weight: 700;
-  line-height: 18px;
+  line-height: var(--leading-xs);
 }
 
 .homeStudioResumeCopy strong {
   color: var(--color-text-primary);
-  font-size: 18px;
+  font-size: var(--type-lg);
   font-weight: 700;
-  line-height: 26px;
+  line-height: var(--leading-lg);
 }
 
 .homeStudioResumeCopy > span {
   color: var(--color-text-secondary);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: var(--type-sm);
+  line-height: var(--leading-sm);
 }
 
 .homeStudioResume > svg {
@@ -394,22 +401,22 @@
 .homeStudioPathCopy small {
   color: var(--color-text-accent);
   font-family: var(--font-family-code);
-  font-size: 11px;
+  font-size: var(--type-2xs);
   font-weight: 700;
-  line-height: 16px;
+  line-height: var(--leading-2xs);
 }
 
 .homeStudioPathCopy strong {
   color: var(--color-text-primary);
-  font-size: 17px;
+  font-size: var(--type-lg);
   font-weight: 700;
-  line-height: 24px;
+  line-height: var(--leading-lg);
 }
 
 .homeStudioPathCopy > span {
   color: var(--color-text-secondary);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: var(--type-sm);
+  line-height: var(--leading-sm);
 }
 
 .homeStudioPathMeta {
@@ -418,7 +425,7 @@
   gap: 12px;
   color: var(--color-text-tertiary);
   font-family: var(--font-family-code);
-  font-size: 11px;
+  font-size: var(--type-2xs);
 }
 
 .homeStudioPathMeta > span {
@@ -449,9 +456,9 @@
 
 .homeStudioDomainHead h3 {
   color: var(--color-text-primary);
-  font-size: 16px;
+  font-size: var(--type-md);
   font-weight: 700;
-  line-height: 24px;
+  line-height: var(--leading-md);
 }
 
 .homeStudioDomainHead > *:nth-child(2) {
@@ -464,7 +471,7 @@
   grid-row: 1;
   color: var(--color-text-tertiary);
   font-family: var(--font-family-code);
-  font-size: 12px;
+  font-size: var(--type-xs);
 }
 
 /* 학습창 안의 레슨 행은 두 칸으로 나뉘어 폭이 좁다. 결과 태그를 접고 행을 낮춘다. */
@@ -481,13 +488,13 @@
 }
 
 .homeStudioCatalog .learnLessonBody > strong {
-  font-size: 15px;
-  line-height: 22px;
+  font-size: var(--type-md);
+  line-height: var(--leading-md);
 }
 
 .homeStudioCatalog .learnLessonDirection {
-  font-size: 13px;
-  line-height: 20px;
+  font-size: var(--type-sm);
+  line-height: var(--leading-sm);
 }
 
 .homeStudioLocal {
@@ -527,9 +534,9 @@
   background: var(--color-background-surface);
   color: var(--color-text-secondary);
   font-family: var(--font-family-code);
-  font-size: 10px;
+  font-size: var(--type-2xs);
   font-weight: 700;
-  line-height: 14px;
+  line-height: var(--leading-2xs);
 }
 
 .homeStudioFigureImage {
@@ -557,9 +564,9 @@
 
 .homeStudioLocalCopy h3 {
   color: var(--color-text-primary);
-  font-size: 20px;
+  font-size: var(--type-xl);
   font-weight: 700;
-  line-height: 28px;
+  line-height: var(--leading-xl);
 }
 
 @media (max-width: 1050px) {
@@ -696,7 +703,7 @@
 .liveCodeCellTitle {
   color: var(--color-text-secondary);
   font-family: var(--font-family-code);
-  font-size: 11px;
+  font-size: var(--type-2xs);
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -705,7 +712,7 @@
   margin-left: auto;
   color: var(--color-text-tertiary);
   font-family: var(--font-family-code);
-  font-size: 10px;
+  font-size: var(--type-2xs);
   font-weight: 600;
 }
 
@@ -722,8 +729,8 @@
   background: var(--color-background-card);
   color: var(--color-text-primary);
   font-family: var(--font-family-code);
-  font-size: 13px;
-  line-height: 22px;
+  font-size: var(--type-sm);
+  line-height: var(--leading-sm);
   resize: vertical;
   outline: none;
 }
@@ -746,7 +753,7 @@
   border-radius: var(--radius-element);
   background: var(--color-background-card);
   color: var(--color-text-primary);
-  font-size: 13px;
+  font-size: var(--type-sm);
   font-weight: 600;
   cursor: pointer;
 }
@@ -784,8 +791,8 @@
   background: var(--color-background-muted);
   color: var(--color-text-primary);
   font-family: var(--font-family-code);
-  font-size: 13px;
-  line-height: 21px;
+  font-size: var(--type-sm);
+  line-height: var(--leading-sm);
   white-space: pre-wrap;
 }
 

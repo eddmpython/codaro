@@ -23,18 +23,18 @@
 
 .learnUtilityHead h1 {
   color: var(--color-text-primary);
-  font-size: 32px;
+  font-size: var(--type-title);
   font-weight: 700;
-  line-height: 40px;
+  line-height: var(--leading-title);
   text-wrap: balance;
 }
 
 .learnUtilityHead p {
   max-width: 64ch;
   color: var(--color-text-secondary);
-  font-size: 16px;
+  font-size: var(--type-md);
   font-weight: 400;
-  line-height: 26px;
+  line-height: var(--leading-md);
 }
 
 .learnCoverage {
@@ -57,18 +57,18 @@
 
 .learnCoverage dt {
   color: var(--color-text-secondary);
-  font-size: 12px;
+  font-size: var(--type-xs);
   font-weight: 400;
-  line-height: 18px;
+  line-height: var(--leading-xs);
 }
 
 .learnCoverage dd {
   margin: 0;
   color: var(--color-text-primary);
   font-family: var(--font-family-code);
-  font-size: 16px;
+  font-size: var(--type-md);
   font-weight: 700;
-  line-height: 22px;
+  line-height: var(--leading-md);
 }
 
 .learnResumeBand {
@@ -111,26 +111,26 @@
 
 .learnResumeCopy small {
   color: var(--color-text-accent);
-  font-size: 12px;
+  font-size: var(--type-xs);
   font-weight: 700;
-  line-height: 18px;
+  line-height: var(--leading-xs);
 }
 
 .learnResumeCopy strong {
   overflow: hidden;
   color: var(--color-text-primary);
-  font-size: 16px;
+  font-size: var(--type-md);
   font-weight: 700;
-  line-height: 24px;
+  line-height: var(--leading-md);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .learnResumeCopy span {
   color: var(--color-text-secondary);
-  font-size: 13px;
+  font-size: var(--type-sm);
   font-weight: 400;
-  line-height: 20px;
+  line-height: var(--leading-sm);
 }
 
 .learnResumeBand > svg {
@@ -162,8 +162,8 @@
 
 .learnSearchBar label > span {
   color: var(--color-text-secondary);
-  font-size: 11px;
-  line-height: 16px;
+  font-size: var(--type-2xs);
+  line-height: var(--leading-2xs);
 }
 
 .learnSearchBar input {
@@ -175,9 +175,9 @@
   outline: 0;
   background: transparent;
   color: var(--color-text-primary);
-  font-size: 15px;
+  font-size: var(--type-md);
   font-weight: 400;
-  line-height: 22px;
+  line-height: var(--leading-md);
 }
 
 .learnSearchBar input::placeholder {
@@ -191,8 +191,8 @@
 
 .learnSearchHint {
   color: var(--color-text-secondary);
-  font-size: 12px;
-  line-height: 18px;
+  font-size: var(--type-xs);
+  line-height: var(--leading-xs);
 }
 
 .learnGuideBand {
@@ -212,9 +212,9 @@
 .learnDomainHead h2,
 .learnLocalBand h2 {
   color: var(--color-text-primary);
-  font-size: 28px;
+  font-size: var(--type-title);
   font-weight: 700;
-  line-height: 36px;
+  line-height: var(--leading-title);
 }
 
 .learnSectionLead p,
@@ -222,9 +222,9 @@
 .learnDomainHead p,
 .learnLocalBand p {
   color: var(--color-text-secondary);
-  font-size: 15px;
+  font-size: var(--type-md);
   font-weight: 400;
-  line-height: 24px;
+  line-height: var(--leading-md);
 }
 
 .learnPathRail {
@@ -282,9 +282,9 @@
 .learnLessonIndex {
   color: var(--color-text-accent);
   font-family: var(--font-family-code);
-  font-size: 12px;
+  font-size: var(--type-xs);
   font-weight: 700;
-  line-height: 18px;
+  line-height: var(--leading-xs);
 }
 
 .learnPathCopy {
@@ -295,23 +295,23 @@
 
 .learnPathCopy > small {
   color: var(--color-text-accent);
-  font-size: 12px;
+  font-size: var(--type-xs);
   font-weight: 700;
-  line-height: 18px;
+  line-height: var(--leading-xs);
 }
 
 .learnPathCopy > strong {
   color: var(--color-text-primary);
-  font-size: 19px;
+  font-size: var(--type-xl);
   font-weight: 700;
-  line-height: 27px;
+  line-height: var(--leading-xl);
 }
 
 .learnPathCopy > span:not(.learnPathMeta) {
   color: var(--color-text-secondary);
-  font-size: 14px;
+  font-size: var(--type-base);
   font-weight: 400;
-  line-height: 22px;
+  line-height: var(--leading-base);
 }
 
 .learnPathMeta {
@@ -320,8 +320,8 @@
   gap: 8px 16px;
   margin-top: 4px;
   color: var(--color-text-secondary);
-  font-size: 12px;
-  line-height: 18px;
+  font-size: var(--type-xs);
+  line-height: var(--leading-xs);
 }
 
 .learnPathMeta > span {
@@ -379,8 +379,8 @@
 .learnPathSelect > span {
   margin-bottom: 6px;
   color: var(--color-text-secondary);
-  font-size: 12px;
-  line-height: 18px;
+  font-size: var(--type-xs);
+  line-height: var(--leading-xs);
 }
 
 .learnRuntimeSegments button,
@@ -389,7 +389,7 @@
   border: 1px solid var(--color-border);
   background: var(--color-background-surface);
   color: var(--color-text-secondary);
-  font-size: 13px;
+  font-size: var(--type-sm);
 }
 
 .learnRuntimeSegments button {
@@ -428,17 +428,24 @@
   margin: 0;
   color: var(--color-text-secondary);
   font-family: var(--font-family-code);
-  font-size: 12px;
-  line-height: 18px;
+  font-size: var(--type-xs);
+  line-height: var(--leading-xs);
 }
 
 .learnDomainNav {
   position: sticky;
   z-index: 10;
-  top: 64px;
+  top: 52px; /* publicHeader 높이와 같은 값 */
   overflow-x: auto;
   border-bottom: 1px solid var(--color-border);
   background: color-mix(in srgb, var(--color-background-surface) 96%, transparent);
+}
+
+/* 모바일 헤더는 56px 이다(publicShell 820px 분기). 같은 분기로 따라간다. */
+@media (max-width: 820px) {
+  .learnDomainNav {
+    top: 56px;
+  }
 }
 
 .learnDomainNavInner {
@@ -453,7 +460,7 @@
   align-items: center;
   border-bottom: 2px solid transparent;
   color: var(--color-text-secondary);
-  font-size: 13px;
+  font-size: var(--type-sm);
   font-weight: 400;
   text-decoration: none;
 }
@@ -486,16 +493,16 @@
 
 .learnSearchResultsHead h2 {
   color: var(--color-text-primary);
-  font-size: 24px;
+  font-size: var(--type-2xl);
   font-weight: 700;
-  line-height: 32px;
+  line-height: var(--leading-2xl);
 }
 
 .learnSearchResultsHead > span {
   color: var(--color-text-secondary);
   font-family: var(--font-family-code);
-  font-size: 12px;
-  line-height: 18px;
+  font-size: var(--type-xs);
+  line-height: var(--leading-xs);
 }
 
 .learnDomainSection {
@@ -525,8 +532,8 @@
 .learnDomainCount {
   color: var(--color-text-secondary);
   font-family: var(--font-family-code);
-  font-size: 12px;
-  line-height: 18px;
+  font-size: var(--type-xs);
+  line-height: var(--leading-xs);
 }
 
 .learnLessonList {
@@ -558,24 +565,24 @@
 
 .learnLessonTrack {
   color: var(--color-text-secondary);
-  font-size: 12px;
+  font-size: var(--type-xs);
   font-weight: 400;
-  line-height: 18px;
+  line-height: var(--leading-xs);
 }
 
 .learnLessonBody > strong {
   color: var(--color-text-primary);
-  font-size: 17px;
+  font-size: var(--type-lg);
   font-weight: 700;
-  line-height: 24px;
+  line-height: var(--leading-lg);
 }
 
 .learnLessonDirection {
   overflow: hidden;
   color: var(--color-text-secondary);
-  font-size: 14px;
+  font-size: var(--type-base);
   font-weight: 400;
-  line-height: 22px;
+  line-height: var(--leading-base);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -594,8 +601,8 @@
   border-radius: var(--radius-element);
   background: var(--color-background-muted);
   color: var(--color-text-secondary);
-  font-size: 11px;
-  line-height: 16px;
+  font-size: var(--type-2xs);
+  line-height: var(--leading-2xs);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -605,9 +612,9 @@
   align-items: center;
   gap: 6px;
   color: var(--color-text-teal);
-  font-size: 12px;
+  font-size: var(--type-xs);
   font-weight: 700;
-  line-height: 18px;
+  line-height: var(--leading-xs);
 }
 
 .learnLessonRow[data-runtime-tier="local"] .learnLessonRuntime {
@@ -627,9 +634,9 @@
 }
 
 .learnEmptyState h2 {
-  font-size: 24px;
+  font-size: var(--type-2xl);
   font-weight: 700;
-  line-height: 32px;
+  line-height: var(--leading-2xl);
 }
 
 .learnLocalBand {
@@ -654,7 +661,7 @@
   align-items: center;
   gap: 8px;
   color: var(--color-text-accent);
-  font-size: 14px;
+  font-size: var(--type-base);
   font-weight: 700;
   text-decoration: none;
 }
@@ -694,13 +701,13 @@
   }
 
   .learnUtilityHead h1 {
-    font-size: 30px;
-    line-height: 38px;
+    font-size: var(--type-title);
+    line-height: var(--leading-title);
   }
 
   .learnUtilityHead p {
-    font-size: 15px;
-    line-height: 24px;
+    font-size: var(--type-md);
+    line-height: var(--leading-md);
   }
 
   .learnCoverage {
@@ -732,8 +739,8 @@
   .learnExplorerLead h2,
   .learnDomainHead h2,
   .learnLocalBand h2 {
-    font-size: 24px;
-    line-height: 32px;
+    font-size: var(--type-2xl);
+    line-height: var(--leading-2xl);
   }
 
   .learnPathStep {
@@ -752,15 +759,15 @@
   }
 
   .learnPathCopy > strong {
-    font-size: 17px;
-    line-height: 24px;
+    font-size: var(--type-lg);
+    line-height: var(--leading-lg);
   }
 
   .learnPathCopy > span:not(.learnPathMeta) {
     display: -webkit-box;
     overflow: hidden;
-    font-size: 13px;
-    line-height: 20px;
+    font-size: var(--type-sm);
+    line-height: var(--leading-sm);
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
@@ -826,8 +833,8 @@
   }
 
   .learnSearchResultsHead h2 {
-    font-size: 22px;
-    line-height: 28px;
+    font-size: var(--type-2xl);
+    line-height: var(--leading-2xl);
   }
 
   .learnDomainHead {

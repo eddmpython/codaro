@@ -119,11 +119,25 @@ export function guidedPathAriaLabel(item) {
   return `${item.label}. 결과물: ${item.result}. ${item.detail} Web ${item.webCount}개, ${localScope}. 추천 레슨: ${recommendedLesson}.`;
 }
 
+// 추천 시작점 = 경로별 첫 레슨 + 도메인별 첫 두 레슨.
+// 경로 픽만 쓰면 여러 경로가 같은 레슨을 골라 중복 제거 후 3개로 줄어들고,
+// /learn 기본 화면이 사실상 빈 화면이 된다. 도메인 픽을 합쳐 여덟 도메인이
+// 모두 최소 한 줄씩 보이게 한다.
+const domainStarterLessons = [...new Map(
+  curriculumLessons
+    .filter((lesson) => lesson.runtimeTier === "browser")
+    .map((lesson) => [lesson.domain, []]),
+).keys()].flatMap((domain) =>
+  curriculumLessons
+    .filter((lesson) => lesson.domain === domain && lesson.runtimeTier === "browser")
+    .slice(0, 2),
+);
+
 export const featuredLessons = [...new Map(
-  guidedPaths
-    .map((path) => path.lesson)
-    .filter(Boolean)
-    .map((lesson) => [lessonRef(lesson), lesson]),
+  [
+    ...guidedPaths.map((path) => path.lesson).filter(Boolean),
+    ...domainStarterLessons,
+  ].map((lesson) => [lessonRef(lesson), lesson]),
 ).values()];
 
 export const firstBrowserLesson = curriculumLessons.find((lesson) => lesson.runtimeTier === "browser")

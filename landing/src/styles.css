@@ -138,19 +138,20 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 }
 
 .brandMark {
-  gap: 9px;
-  min-height: 38px;
+  gap: var(--brand-mark-gap-px, 5px);
+  min-height: 40px;
   padding-right: 8px;
   font-family: var(--font-display);
   font-weight: 700;
   letter-spacing: -0.01em;
-  font-size: 17px;
+  font-size: var(--type-lg);
 }
 
 .brandMark img {
-  width: 34px;
-  height: 34px;
+  width: var(--brand-mark-avatar-px, 40px);
+  height: var(--brand-mark-avatar-px, 40px);
   object-fit: contain;
+  flex: 0 0 var(--brand-mark-avatar-px, 40px);
 }
 
 .siteHeader nav {
@@ -169,7 +170,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   padding: 0 12px;
   color: var(--muted-foreground);
   font-family: var(--font-mono);
-  font-size: 12.5px;
+  font-size: var(--type-sm);
   font-weight: 400;
   letter-spacing: 0.01em;
 }
@@ -261,7 +262,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   border-radius: 0;
   background: var(--code);
   color: var(--code-fg);
-  font-size: 13px;
+  font-size: var(--type-sm);
   line-height: 1.6;
 }
 
@@ -270,7 +271,8 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 .pageShell,
 .articleLayout,
 .siteFooter {
-  width: min(1220px, calc(100% - 48px));
+  /* 셸 폭은 homeShell 과 한 벌이다: 1200px, 여백 80(데스크톱)/40(모바일). */
+  width: min(1200px, calc(100% - 80px));
   margin: 0 auto;
 }
 
@@ -341,7 +343,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   background: var(--brand-emphasis);
   color: var(--brand-emphasis-foreground);
   font-weight: 700;
-  font-size: 13px;
+  font-size: var(--type-sm);
 }
 
 .downloadChip:hover {
@@ -378,7 +380,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   margin: 0 0 14px;
   color: var(--foreground);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--type-xs);
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -394,7 +396,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 
 .footerCol a {
   color: var(--muted-foreground);
-  font-size: 14px;
+  font-size: var(--type-base);
 }
 
 .footerCol a:hover {
@@ -411,7 +413,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   border-top: 1px solid var(--border);
   color: var(--muted-foreground);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--type-xs);
 }
 
 .heroKicker,
@@ -439,7 +441,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   border-radius: var(--radius);
   background: var(--card);
   color: var(--muted-foreground);
-  font-size: 12px;
+  font-size: var(--type-xs);
   font-weight: 700;
 }
 
@@ -473,13 +475,13 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 
 .proofTile strong {
   color: var(--card-foreground);
-  font-size: 13px;
+  font-size: var(--type-sm);
 }
 
 .proofTile span {
   margin-top: 8px;
   color: var(--muted-foreground);
-  font-size: 13px;
+  font-size: var(--type-sm);
   line-height: 1.55;
 }
 
@@ -487,7 +489,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   margin: 0 0 14px;
   color: var(--brand-emphasis);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--type-xs);
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -501,7 +503,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   justify-content: center;
   gap: 8px;
   min-height: 46px;
-  font-size: 14.5px;
+  font-size: var(--type-md);
   font-weight: 700;
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
@@ -567,7 +569,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 
 .sectionIntro h2,
 .splitSection h2 {
-  font-size: 36px;
+  font-size: var(--type-display);
   line-height: 1.12;
   letter-spacing: -0.01em;
   font-weight: 700;
@@ -578,7 +580,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 .pageHeader p,
 .articleDescription {
   color: var(--muted-foreground);
-  font-size: 17px;
+  font-size: var(--type-lg);
   line-height: 1.75;
 }
 
@@ -620,7 +622,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 .toolCard strong {
   margin: 0;
   color: var(--card-foreground);
-  font-size: 18px;
+  font-size: var(--type-lg);
 }
 
 .postCard span,
@@ -656,7 +658,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 .shareHowTo h2 {
   margin: 0 0 8px;
   color: var(--card-foreground);
-  font-size: 20px;
+  font-size: var(--type-xl);
 }
 
 .shareHowTo p {
@@ -698,14 +700,14 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   border-radius: var(--radius);
   background: var(--muted);
   color: var(--muted-foreground);
-  font-size: 12px;
+  font-size: var(--type-xs);
   font-weight: 700;
 }
 
 .packCard h2 {
   margin: 0;
   color: var(--card-foreground);
-  font-size: 24px;
+  font-size: var(--type-2xl);
 }
 
 .packCard p {
@@ -719,7 +721,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   border-radius: var(--radius);
   background: var(--muted);
   color: var(--card-foreground);
-  font-size: 13px;
+  font-size: var(--type-sm);
 }
 
 .siteFooter {
@@ -737,7 +739,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 
 .pageHeader h1,
 .proseArticle h1 {
-  font-size: 50px;
+  font-size: var(--type-display);
   line-height: 1.08;
 }
 
@@ -755,7 +757,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 .toolGroups h2 {
   margin: 0 0 14px;
   color: var(--card-foreground);
-  font-size: 20px;
+  font-size: var(--type-xl);
 }
 
 .linkList,
@@ -803,7 +805,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 
 .articleRail {
   position: sticky;
-  top: 86px;
+  top: 68px; /* 헤더 52px + 16px */
   display: grid;
   gap: 6px;
   max-height: calc(100vh - 116px);
@@ -814,7 +816,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   padding: 9px 10px;
   border-radius: var(--radius);
   color: var(--muted-foreground);
-  font-size: 13px;
+  font-size: var(--type-sm);
   font-weight: 700;
 }
 
@@ -849,7 +851,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 
 .htmlContent {
   color: var(--foreground);
-  font-size: 17px;
+  font-size: var(--type-lg);
   line-height: 1.8;
 }
 
@@ -862,15 +864,15 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 }
 
 .htmlContent h1 {
-  font-size: 34px;
+  font-size: var(--type-display);
 }
 
 .htmlContent h2 {
-  font-size: 26px;
+  font-size: var(--type-2xl);
 }
 
 .htmlContent h3 {
-  font-size: 21px;
+  font-size: var(--type-xl);
 }
 
 .htmlContent p,
@@ -952,7 +954,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 .featuredPostBody h2 {
   margin: 0;
   color: var(--card-foreground);
-  font-size: 34px;
+  font-size: var(--type-display);
   line-height: 1.12;
   word-break: keep-all;
   overflow-wrap: break-word;
@@ -961,7 +963,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 .featuredPostBody > span {
   margin-top: 14px;
   color: var(--muted-foreground);
-  font-size: 17px;
+  font-size: var(--type-lg);
   line-height: 1.7;
 }
 
@@ -978,7 +980,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   border-radius: var(--radius);
   background: var(--muted);
   color: var(--muted-foreground);
-  font-size: 12px;
+  font-size: var(--type-xs);
   font-weight: 700;
 }
 
@@ -1063,12 +1065,12 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 
 .searchResultsHeader h2 {
   color: var(--card-foreground);
-  font-size: 18px;
+  font-size: var(--type-lg);
 }
 
 .searchResultsHeader p {
   color: var(--muted-foreground);
-  font-size: 13px;
+  font-size: var(--type-sm);
 }
 
 .searchResultList {
@@ -1143,7 +1145,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 }
 
 .toolCard span {
-  font-size: 24px;
+  font-size: var(--type-2xl);
   font-weight: 700;
 }
 
@@ -1226,7 +1228,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   .siteFooter,
   .footerGrid,
   .footerBottom {
-    width: min(100% - 28px, 1220px);
+    width: min(100% - 40px, 1200px);
   }
 
   .contentBand,
@@ -1237,7 +1239,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 
   .pageHeader h1,
   .proseArticle h1 {
-    font-size: 34px;
+    font-size: var(--type-display);
   }
 
   .heroLead,
@@ -1246,7 +1248,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   .pageHeader p,
   .articleDescription,
   .htmlContent {
-    font-size: 16px;
+    font-size: var(--type-md);
   }
 
   .footerGrid {
@@ -1259,7 +1261,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   }
 
   .featuredPostBody h2 {
-    font-size: 28px;
+    font-size: var(--type-title);
   }
 
 }

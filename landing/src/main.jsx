@@ -8,6 +8,7 @@ import "@astryxdesign/core/astryx.css";
 import "@astryxdesign/theme-neutral/theme.css";
 import "./styles/generated/fonts.css";
 import "./styles/generated/codaroTheme.css";
+import "./styles/typeScale.css";
 import "./styles.css";
 import "./styles/homeAstryx.css";
 import "./styles/learnExplorer.css";

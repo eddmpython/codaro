@@ -494,6 +494,40 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
     require(oversizedRadius is None, "representative landing CSS exceeds the 8px radius ceiling", failures)
 
 
+# 랜딩 표면 타이포 계약. 스케일 SSOT 는 landing/src/styles/typeScale.css 하나이고,
+# 표면 CSS 는 font-size px 리터럴을 쓰지 않는다. px 리터럴 총량은 ratchet 예산이다:
+# 줄이는 커밋에서 예산도 같이 내리고, 올리는 변경은 여기서 막힌다.
+LANDING_TYPE_SCALE_PATH = "landing/src/styles/typeScale.css"
+LANDING_SURFACE_CSS_PX_BUDGET = {
+    "landing/src/styles/homeAstryx.css": 131,
+    "landing/src/styles/learnExplorer.css": 173,
+    "landing/src/styles/publicShell.css": 58,
+    "landing/src/styles/lessonAstryx.css": 126,
+    "landing/src/styles.css": 240,
+}
+
+
+def verifyLandingTypeContract(failures: list[str]) -> None:
+    scale = (ROOT / LANDING_TYPE_SCALE_PATH).read_text(encoding="utf-8")
+    mainEntry = (ROOT / "landing/src/main.jsx").read_text(encoding="utf-8")
+    require("--type-display" in scale and "--leading-sm" in scale, "landing type scale tokens are missing", failures)
+    require("./styles/typeScale.css" in mainEntry, "landing entry must import the type scale contract", failures)
+    for relativePath, budget in LANDING_SURFACE_CSS_PX_BUDGET.items():
+        source = (ROOT / relativePath).read_text(encoding="utf-8")
+        fontSizeLiterals = re.findall(r"font-size:\s*[\d.]+px", source)
+        require(
+            not fontSizeLiterals,
+            f"{relativePath}: font-size must use the type scale, found {fontSizeLiterals[:3]}",
+            failures,
+        )
+        pxLiteralCount = len(re.findall(r"\b\d+(?:\.\d+)?px\b", source))
+        require(
+            pxLiteralCount <= budget,
+            f"{relativePath}: px literal count {pxLiteralCount} exceeds ratchet budget {budget}",
+            failures,
+        )
+
+
 def buildReportPayload(
     *,
     tokens: dict[str, object],
@@ -533,6 +567,7 @@ def main() -> int:
     verifySemanticCssReferences(tokens, failures)
     verifyEntryPoints(failures)
     verifyRepresentativeSurfaces(failures)
+    verifyLandingTypeContract(failures)
 
     payload = buildReportPayload(
         tokens=tokens,

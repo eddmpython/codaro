@@ -1,0 +1,39 @@
+/* 랜딩 표면 타이포 계약 (SSOT)
+ *
+ * 규칙:
+ * - 표면 CSS 는 font-size 에 px 리터럴을 쓰지 않는다. 아래 스텝만 쓴다.
+ *   (verifyDesignSystemContract 가 강제한다. 새 스텝이 필요하면 여기에 추가하고
+ *    게이트 예산을 같은 커밋에서 갱신한다.)
+ * - line-height 는 같은 스텝의 --leading-* 짝을 쓴다. 수직 중앙정렬 목적의
+ *   line-height(버튼 높이 등)는 예외다.
+ * - 간격은 4/8px 그리드로 스냅한다(astryx spacing 철학). 임의 값 금지.
+ */
+:root {
+  --type-2xs: 11px;
+  --leading-2xs: 16px;
+  --type-xs: 12px;
+  --leading-xs: 18px;
+  --type-sm: 13px;
+  --leading-sm: 20px;
+  --type-base: 14px;
+  --leading-base: 22px;
+  --type-md: 15px;
+  --leading-md: 24px;
+  --type-lg: 17px;
+  --leading-lg: 26px;
+  --type-xl: 20px;
+  --leading-xl: 28px;
+  --type-2xl: 24px;
+  --leading-2xl: 32px;
+  --type-title: clamp(24px, 2.4vw, 32px);
+  --leading-title: 1.25;
+  --type-display: clamp(30px, 3.7vw, 46px);
+  --leading-display: 1.16;
+}
+
+/* 포커스 표식 한 벌. :where 로 특이도를 0 으로 눌러 컴포넌트 자체 링(astryx
+   Button 등)이 있으면 그쪽이 이긴다. 아무것도 없는 원시 앵커/버튼의 기본값. */
+:where(a, button, summary, [role="button"]):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
