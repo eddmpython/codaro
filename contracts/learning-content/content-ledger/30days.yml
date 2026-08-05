@@ -4,7 +4,7 @@ canonicalRows: 30
 lessons:
   - lessonRef: "30days/day01_헬로월드"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "09498a19dae41199936848bc8229b40b8ae67c5705c95d85d6def20a3464f341"
+    lessonContentHash: "ebbcfb639e9af6cd4cff0b11baa7441f0b87a4f8a60e225c117cc74cdfeba184"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -26,7 +26,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day02_변수와데이터타입"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "3694e3b0194a597946a358b5d3ca587176c8013ab61415380a93a4f07293649e"
+    lessonContentHash: "af9573228145177bb1196b9546c9944552e7684d632c196ad32c24190dd2cd31"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["computerVision","dataReporting","dataVisualization","geoVisualization","imageProcessing","officeAutomation","pythonFoundation","scriptingAutomation","sqlAnalysis","webMonitoring"]
@@ -268,7 +268,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day13_조건문"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "69b50de374b7885aa53d65b4d641ee56b08154bc046ba037fd6e1881418abeb0"
+    lessonContentHash: "4efe2a900158a4874a123467f8c8296ee3c33bc69dc939bde1f6c96c3ef49095"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["dataReporting","dataVisualization","officeAutomation","pythonFoundation","scriptingAutomation","webMonitoring"]
@@ -290,7 +290,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day14_반복문"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "c4b64bf53cf1401bdec5f4ddc98b07aff6e2641dd6e60cc90a6c4a5ee01025e2"
+    lessonContentHash: "d13a78875e2936da53631dc1b7b5c18c9a271f455d0769fce5bb393c4c7f582a"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["dataReporting","dataVisualization","officeAutomation","pythonFoundation","scriptingAutomation","webMonitoring"]
@@ -312,7 +312,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day15_함수기초"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "92dd7d74370e9dc46632b961623291cf5762ecef9bb79ce3596ba4beda2dcc00"
+    lessonContentHash: "0a41cf2564da4345b422b174d2184da953f35cdca88cdb55333235c5c8f99a05"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["aiIntegration","dataReporting","desktopAutomation","documentAutomation","emailAutomation","graphAnalysis","machineLearning","officeAutomation","pdfAutomation","pythonFoundation","scriptingAutomation","standardLibraryMastery","webMonitoring"]

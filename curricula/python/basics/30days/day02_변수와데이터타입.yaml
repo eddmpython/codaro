@@ -80,6 +80,9 @@ sections:
     starterCode: |-
       msg = 'Python'
       msg
+    solution: |-
+      msg = 'Codaro'
+      msg
     hints:
     - "msg = 'Python'을 msg = 'Codaro'로 바꿉니다."
     - 마지막 줄 msg는 그대로 둡니다.
@@ -110,6 +113,10 @@ sections:
     starterCode: |-
       userName = 'John Doe'
       user_name = 'Jane Smith'
+      print('카멜케이스 : ', userName, '\n스네이크케이스 : ', user_name)
+    solution: |-
+      userName = 'Codaro User'
+      user_name = 'Codaro Learner'
       print('카멜케이스 : ', userName, '\n스네이크케이스 : ', user_name)
     hints:
     - 따옴표 안 글자만 바꿉니다. 변수 이름은 그대로 둡니다.
@@ -144,6 +151,10 @@ sections:
       score = 80
       score = 95
       score
+    solution: |-
+      score = 80
+      score = 100
+      score
     hints:
     - score = 95를 score = 100으로 바꿉니다.
     - 첫 줄 score = 80은 그대로 둬도 됩니다.
@@ -173,6 +184,9 @@ sections:
     starterCode: |-
       years = 25
       years
+    solution: |-
+      years = 30
+      years
     hints:
     - years = 25를 years = 30으로 바꿉니다.
   check:
@@ -200,6 +214,9 @@ sections:
       실행하면 3.14가 보여야 합니다.
     starterCode: |-
       pi = 3.14159
+      pi
+    solution: |-
+      pi = 3.14
       pi
     hints:
     - pi = 3.14159를 pi = 3.14로 바꿉니다.
@@ -229,6 +246,9 @@ sections:
     starterCode: |-
       town = 'Seoul'
       town
+    solution: |-
+      town = 'Busan'
+      town
     hints:
     - "town = 'Seoul'을 town = 'Busan'으로 바꿉니다."
   check:
@@ -256,6 +276,9 @@ sections:
       실행하면 False가 보여야 합니다.
     starterCode: |-
       active = True
+      active
+    solution: |-
+      active = False
       active
     hints:
     - active = True를 active = False로 바꿉니다.
@@ -286,6 +309,9 @@ sections:
     starterCode: |-
       point = 100
       type(point)
+    solution: |-
+      point = 3.5
+      type(point)
     hints:
     - point = 100을 point = 3.5로 바꿉니다.
     - "화면에 <class 'float'>가 보이면 맞습니다."
@@ -314,6 +340,9 @@ sections:
       실행하면 길이 13이 나와야 합니다.
     starterCode: |-
       email = 'python@example.com'
+      len(email)
+    solution: |-
+      email = 'a@example.com'
       len(email)
     hints:
     - "email = 'python@example.com'을 email = 'a@example.com'으로 바꿉니다."
@@ -344,6 +373,9 @@ sections:
     starterCode: |-
       text = '100'
       int(text)
+    solution: |-
+      text = '42'
+      int(text)
     hints:
     - "text = '100'을 text = '42'로 바꿉니다."
     - "int('42') 결과는 42입니다."
@@ -371,6 +403,9 @@ sections:
       실행하면 7.0이 나와야 합니다.
     starterCode: |-
       val = 42
+      float(val)
+    solution: |-
+      val = 7
       float(val)
     hints:
     - val = 42를 val = 7로 바꿉니다.
@@ -400,6 +435,9 @@ sections:
     starterCode: |-
       code = 123
       str(code)
+    solution: |-
+      code = 7
+      str(code)
     hints:
     - code = 123을 code = 7로 바꿉니다.
     - 화면에 따옴표 없이 7처럼 보여도 문자열입니다.
@@ -428,6 +466,9 @@ sections:
     starterCode: |-
       name, age, city = 'Alice', 25, 'Seoul'
       name, age, city
+    solution: |-
+      name, age, city = 'Codaro', 25, 'Seoul'
+      name, age, city
     hints:
     - "'Alice'만 'Codaro'로 바꿉니다."
     - age와 city는 그대로 둬도 됩니다.
@@ -455,6 +496,9 @@ sections:
       실행하면 5가 보여야 합니다.
     starterCode: |-
       a = b = c = 0
+      a
+    solution: |-
+      a = b = c = 5
       a
     hints:
     - 오른쪽 숫자만 5로 바꿉니다.
@@ -515,6 +559,24 @@ sections:
 
       orderSubtotal = unitPrice * quantity
       orderSubtotal
+    solution: |-
+      rawProduct = "notebook"
+      rawPrice = "1200000"
+      rawQuantity = "2"
+      rawMember = "yes"
+
+      productName = rawProduct
+      unitPrice = int(rawPrice)
+      quantity = int(rawQuantity)
+      isMember = rawMember == "yes"
+
+      assert type(productName).__name__ == "str"
+      assert type(unitPrice).__name__ == "int"
+      assert type(quantity).__name__ == "int"
+      assert type(isMember).__name__ == "bool"
+
+      orderSubtotal = unitPrice * quantity
+      orderSubtotal
     hints:
     - rawPrice와 rawQuantity를 정수로 바꾼 뒤 곱합니다.
     - 마지막 값 orderSubtotal이 2400000이면 통과입니다.
@@ -542,6 +604,9 @@ sections:
       실행하면 Codaro가 보여야 합니다.
     starterCode: |-
       lang = 'Python'
+      lang
+    solution: |-
+      lang = 'Codaro'
       lang
     hints:
     - "lang = 'Python'을 lang = 'Codaro'로 바꿉니다."

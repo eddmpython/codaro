@@ -110,6 +110,8 @@ sections:
       
       실행하면 안녕하세요, Codaro!가 한 줄로 나와야 합니다.
     starterCode: print('안녕하세요, ____!')
+    solution: |-
+      print('안녕하세요, Codaro!')
     hints:
     - ____만 Codaro로 바꿉니다. 쉼표와 느낌표는 그대로 둡니다.
     - "정답 형태: print('안녕하세요, Codaro!')"
@@ -142,6 +144,10 @@ sections:
       print('첫 번째 줄')
       print('____')
       print('세 번째 줄')
+    solution: |-
+      print('첫 번째 줄')
+      print('바꾼 두 번째 줄')
+      print('세 번째 줄')
     hints:
     - ____가 있는 줄만 고치면 됩니다.
     - "따옴표는 그대로 두고 안만 바꿉니다. 예: print('바꾼 두 번째 줄')"
@@ -171,6 +177,8 @@ sections:
       
       줄바꿈 문자(백슬래시와 n)는 그대로 둡니다. 실행하면 세 줄이 나와야 합니다.
     starterCode: print('첫 번째 줄\n____\n세 번째 줄')
+    solution: |-
+      print('첫 번째 줄\n두 번째 줄\n세 번째 줄')
     hints:
     - ____만 두 번째 줄로 바꿉니다. 줄바꿈 문자는 건드리지 마세요.
     - "정답 형태: print('첫 번째 줄' 다음에 줄바꿈 문자, '두 번째 줄', 줄바꿈 문자, '세 번째 줄')"
@@ -203,6 +211,9 @@ sections:
     starterCode: |-
       # 이 줄은 실행 결과에 나오지 않습니다.
       print('____')
+    solution: |-
+      # 이 줄은 실행 결과에 나오지 않습니다.
+      print('실행됩니다')
     hints:
     - "샵(#) 줄은 메모라서 화면에 안 나옵니다. 건드리지 마세요."
     - ____만 실행됩니다로 바꿉니다.
@@ -242,6 +253,13 @@ sections:
       지금은 실행 결과에 보이지 않습니다.
       '''
       print('____')
+    solution: |-
+      print('주석 전')
+      '''
+      이 부분은 여러 줄 설명 메모처럼 볼 수 있습니다.
+      지금은 실행 결과에 보이지 않습니다.
+      '''
+      print('주석 후')
     hints:
     - 삼중 따옴표로 감싼 부분은 건드리지 마세요.
     - ____만 주석 후로 바꿉니다.
@@ -270,6 +288,8 @@ sections:
       
       따옴표는 쓰지 마세요. 예: print(400 + 56) 또는 print(456)
     starterCode: print(100 + 23)
+    solution: |-
+      print(400 + 56)
     hints:
     - 지금 코드는 100 + 23이라 123이 나옵니다.
     - 괄호 안을 바꿔 결과가 456이 되게 하면 됩니다.
@@ -296,6 +316,8 @@ sections:
       
       지금 식은 (6 * 7) - 1이라 41이 나옵니다.
     starterCode: print((6 * 7) - 1)
+    solution: |-
+      print(6 * 7)
     hints:
     - "숫자나 연산자 중 하나만 고쳐도 됩니다. 예: 빼기 1을 지우거나 더하기 0으로 바꾸기."
     - 실행 결과가 정확히 42면 통과입니다.
@@ -321,6 +343,8 @@ sections:
       
       print()는 쓰지 마세요. 실행하면 Hello Notebook이 보여야 합니다.
     starterCode: '''Hello ____'''
+    solution: |-
+      'Hello Notebook'
     hints:
     - ____만 Notebook으로 바꿉니다.
     - "정답 형태: 'Hello Notebook'"
@@ -350,6 +374,10 @@ sections:
     starterCode: |-
       # name 변수는 출력할 대상을 기억합니다.
       name = '____'
+      print('Hello', name)
+    solution: |-
+      # name 변수는 출력할 대상을 기억합니다.
+      name = 'Codaro'
       print('Hello', name)
     hints:
     - ____만 Codaro로 바꿉니다.
