@@ -57,8 +57,8 @@ sections:
   title: import 기본
   structuredPrimary: true
   subtitle: 모듈 가져오기
-  goal: import 기본에서 문자열, 숫자, 변수 같은 예제 값을 바꿨을 때 출력 또는 마지막 표현식 결과가 어떻게 달라지는지 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: import로 가져온 모듈을 모듈명.함수명() 형태로 호출해 값을 얻는다.
+  why: 제곱근 같은 계산은 직접 만들 필요 없이 파이썬이 표준 모듈로 이미 갖고 있어서, import 한 줄이면 검증된 함수를 그대로 씁니다.
   explanation: |-
     모듈은 함수와 변수를 담은 파이썬 파일입니다. import 모듈명으로 모듈을 가져오고, 모듈명.함수명()으로 사용합니다. 파이썬은 많은 표준 모듈을 제공합니다.
 
@@ -68,24 +68,32 @@ sections:
 
     math.sqrt(16)
   exercise:
-    prompt: import 기본 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    prompt: |-
+      마지막 줄 math.sqrt(16)을 math.sqrt(49)로 바꾸세요. 첫 줄 import math는 그대로 둡니다.
+
+      sqrt는 정수를 넣어도 실수를 돌려주므로 7.0이 나와야 합니다.
     starterCode: |-
       import math
 
       math.sqrt(16)
+    solution: |-
+      import math
+
+      math.sqrt(49)
     hints:
-    - 바꿀 지점은 문자열, 숫자, 변수 같은 예제 값을 만드는 첫 줄과 기초 문법 줄에서 찾으세요.
-    - 실행 뒤 출력 또는 마지막 표현식 결과 중 하나가 바꾼 값을 반영하는지 보세요.
+    - math.sqrt(16) 을 math.sqrt(49) 로 바꿉니다. 첫 줄 import math 는 그대로 둡니다.
+    - "정답 형태: math.sqrt(49)"
   check:
-    type: noError
-    noError: import 기본의 수정 코드가 기초 문법 단계의 마지막 확인 값까지 도달해야 합니다.
-    resultCheck: import 기본 실행 결과가 출력 또는 마지막 표현식 결과 기준으로 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '7.0'
+    resultCheck: "출력이 정확히 일치해야 합니다: '7.0'"
 - id: from_import
   title: from import
   structuredPrimary: true
   subtitle: 특정 함수만 가져오기
-  goal: from import에서 문자열, 숫자, 변수 같은 예제 값을 바꿨을 때 출력 또는 마지막 표현식 결과가 어떻게 달라지는지 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: 필요한 함수 두 개를 쉼표로 함께 가져와 모듈명 없이 바로 호출한다.
+  why: 한 파일에서 sqrt와 floor처럼 몇 개만 반복해 쓸 때는 필요한 이름만 가져오면 호출 줄이 짧아지고, 이 파일이 무엇을 쓰는지 첫 줄만 봐도 드러납니다.
   explanation: |-
     from 모듈명 import 함수명으로 특정 함수만 가져올 수 있습니다. 모듈명 없이 함수명만으로 사용할 수 있습니다. 여러 함수를 쉼표로 구분하여 가져올 수 있습니다.
 
@@ -95,24 +103,32 @@ sections:
 
     sqrt(25)
   exercise:
-    prompt: from import 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    prompt: |-
+      두 곳을 고치세요. 첫 줄 from math import sqrt를 from math import sqrt, floor로 바꾸고, 마지막 줄 sqrt(25)를 floor(sqrt(200))으로 바꾸세요.
+
+      sqrt(200)은 14.142...이고 floor가 소수점 아래를 버리므로 14가 나와야 합니다.
     starterCode: |-
       from math import sqrt
 
       sqrt(25)
+    solution: |-
+      from math import sqrt, floor
+
+      floor(sqrt(200))
     hints:
-    - 바꿀 지점은 문자열, 숫자, 변수 같은 예제 값을 만드는 첫 줄과 기초 문법 줄에서 찾으세요.
-    - 실행 뒤 출력 또는 마지막 표현식 결과 중 하나가 바꾼 값을 반영하는지 보세요.
+    - 첫 줄 끝에 쉼표를 찍고 floor 를 더해 from math import sqrt, floor 로 만든 뒤, 마지막 줄을 floor(sqrt(200)) 으로 바꿉니다.
+    - "정답 형태: floor(sqrt(200))"
   check:
-    type: noError
-    noError: from import의 수정 코드가 기초 문법 단계의 마지막 확인 값까지 도달해야 합니다.
-    resultCheck: from import 실행 결과가 출력 또는 마지막 표현식 결과 기준으로 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '14'
+    resultCheck: "출력이 정확히 일치해야 합니다: '14'"
 - id: import_as
   title: as 별칭
   structuredPrimary: true
   subtitle: 모듈/함수 이름 바꾸기
-  goal: as 별칭에서 문자열, 숫자, 변수 같은 예제 값을 바꿨을 때 출력 또는 마지막 표현식 결과가 어떻게 달라지는지 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: 별칭을 바꾸면 그 별칭을 쓰는 호출 줄도 함께 바꿔야 한다는 것을 확인한다.
+  why: 별칭은 import 줄에서만 정해지고 나머지 코드는 그 이름에 매여 있어서, 별칭 하나만 고치고 호출 줄을 놓치면 바로 NameError가 납니다.
   explanation: |-
     as 키워드로 모듈이나 함수에 별칭을 붙일 수 있습니다. import 모듈명 as 별칭 또는 from 모듈명 import 함수명 as 별칭 형식입니다. 긴 이름을 짧게 만들거나 충돌을 피할 때 사용합니다.
 
@@ -122,24 +138,32 @@ sections:
 
     m.sqrt(36)
   exercise:
-    prompt: as 별칭 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    prompt: |-
+      별칭을 m에서 mt로 바꾸세요. 첫 줄을 import math as mt로 바꾸고, 마지막 줄도 mt.sqrt(64)로 바꿉니다.
+
+      실행하면 8.0이 나와야 합니다.
     starterCode: |-
       import math as m
 
       m.sqrt(36)
+    solution: |-
+      import math as mt
+
+      mt.sqrt(64)
     hints:
-    - 바꿀 지점은 문자열, 숫자, 변수 같은 예제 값을 만드는 첫 줄과 기초 문법 줄에서 찾으세요.
-    - 실행 뒤 출력 또는 마지막 표현식 결과 중 하나가 바꾼 값을 반영하는지 보세요.
+    - 첫 줄의 as m 을 as mt 로 바꾸고, 마지막 줄도 m.sqrt(36) 에서 mt.sqrt(64) 로 바꿉니다.
+    - "정답 형태: mt.sqrt(64)"
   check:
-    type: noError
-    noError: as 별칭의 수정 코드가 기초 문법 단계의 마지막 확인 값까지 도달해야 합니다.
-    resultCheck: as 별칭 실행 결과가 출력 또는 마지막 표현식 결과 기준으로 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '8.0'
+    resultCheck: "출력이 정확히 일치해야 합니다: '8.0'"
 - id: math_module
   title: math 모듈
   structuredPrimary: true
   subtitle: 수학 함수
-  goal: math 모듈에서 문자열, 숫자, 변수 같은 예제 값을 바꿨을 때 출력 또는 마지막 표현식 결과가 어떻게 달라지는지 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: math 모듈에서 sqrt 대신 ceil을 가져와 올림 결과를 확인한다.
+  why: 인원수나 상자 개수처럼 나누어떨어지지 않아도 정수로 올려야 하는 계산이 많고, 그때 직접 조건문을 쓰는 대신 ceil 한 번으로 끝냅니다.
   explanation: |-
     math 모듈은 수학 함수를 제공합니다. sqrt(제곱근), ceil(올림), floor(내림), pow(거듭제곱), pi(파이), e(자연상수) 등을 사용할 수 있습니다.
 
@@ -149,24 +173,32 @@ sections:
 
     sqrt(144)
   exercise:
-    prompt: math 모듈 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    prompt: |-
+      두 곳을 고치세요. 첫 줄 from math import sqrt를 from math import ceil로 바꾸고, 마지막 줄 sqrt(144)를 ceil(12.01)로 바꾸세요.
+
+      ceil은 올림이라 소수점 아래가 조금이라도 있으면 위 정수로 올라가므로 13이 나와야 합니다.
     starterCode: |-
       from math import sqrt
 
       sqrt(144)
+    solution: |-
+      from math import ceil
+
+      ceil(12.01)
     hints:
-    - 바꿀 지점은 문자열, 숫자, 변수 같은 예제 값을 만드는 첫 줄과 기초 문법 줄에서 찾으세요.
-    - 실행 뒤 출력 또는 마지막 표현식 결과 중 하나가 바꾼 값을 반영하는지 보세요.
+    - 첫 줄의 sqrt 를 ceil 로 바꾸고, 마지막 줄도 sqrt(144) 에서 ceil(12.01) 로 바꿉니다.
+    - "정답 형태: ceil(12.01)"
   check:
-    type: noError
-    noError: math 모듈의 수정 코드가 기초 문법 단계의 마지막 확인 값까지 도달해야 합니다.
-    resultCheck: math 모듈 실행 결과가 출력 또는 마지막 표현식 결과 기준으로 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '13'
+    resultCheck: "출력이 정확히 일치해야 합니다: '13'"
 - id: random_module
   title: random 모듈
   structuredPrimary: true
   subtitle: 난수 생성
-  goal: random 모듈에서 문자열, 숫자, 변수 같은 예제 값을 바꿨을 때 출력 또는 마지막 표현식 결과가 어떻게 달라지는지 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: 뽑은 난수가 매번 달라져도 randint가 정한 범위 안에 있다는 것을 참거짓으로 확인한다.
+  why: 난수는 실행할 때마다 값이 달라져서 결과를 그대로 비교할 수 없기 때문에, 뽑힌 값이 허용 범위 안인지를 확인하는 방식으로 검증합니다.
   explanation: |-
     random 모듈은 난수를 생성합니다. randint(정수 난수), choice(리스트에서 선택), shuffle(리스트 섞기), random(0~1 실수) 등을 제공합니다.
 
@@ -176,24 +208,33 @@ sections:
 
     randint(1, 100)
   exercise:
-    prompt: random 모듈 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    prompt: |-
+      마지막 줄 randint(1, 100)을 두 줄로 바꾸세요. 먼저 dice = randint(1, 6)으로 주사위 눈을 하나 뽑고, 그 아래 줄에 1 <= dice <= 6을 씁니다.
+
+      뽑히는 숫자는 실행할 때마다 달라지지만 1 이상 6 이하라는 범위는 늘 지켜지므로, 몇이 나오든 True가 나와야 합니다.
     starterCode: |-
       from random import randint
 
       randint(1, 100)
+    solution: |-
+      from random import randint
+
+      dice = randint(1, 6)
+      1 <= dice <= 6
     hints:
-    - 바꿀 지점은 문자열, 숫자, 변수 같은 예제 값을 만드는 첫 줄과 기초 문법 줄에서 찾으세요.
-    - 실행 뒤 출력 또는 마지막 표현식 결과 중 하나가 바꾼 값을 반영하는지 보세요.
+    - randint(1, 100) 줄을 dice = randint(1, 6) 으로 바꾸고, 그 아래에 1 <= dice <= 6 줄을 새로 씁니다. 첫 줄 import 는 그대로 둡니다.
+    - "정답 형태: 1 <= dice <= 6"
   check:
-    type: noError
-    noError: random 모듈의 수정 코드가 기초 문법 단계의 마지막 확인 값까지 도달해야 합니다.
-    resultCheck: random 모듈 실행 결과가 출력 또는 마지막 표현식 결과 기준으로 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'True'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'True'"
 - id: datetime_module
   title: datetime 모듈
   structuredPrimary: true
   subtitle: 날짜와 시간
-  goal: datetime 모듈에서 `now` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: 현재 시각 대신 날짜를 직접 지정해 datetime 객체의 year, month, day를 확인한다.
+  why: 오늘 날짜에 기대어 만든 코드는 내일 실행하면 결과가 달라져 맞는지 확인할 수 없으므로, 확인이 필요할 때는 날짜를 직접 지정해 결과를 고정합니다.
   explanation: |-
     datetime 모듈은 날짜와 시간을 다룹니다. datetime.now(현재 시각), date(날짜), time(시간), timedelta(시간 차이) 등을 제공합니다.
 
@@ -204,25 +245,34 @@ sections:
     now = datetime.now()
     now.year, now.month, now.day
   exercise:
-    prompt: datetime 모듈 예제에서 `now` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      now = datetime.now()를 now = datetime(2026, 1, 1)로 바꾸세요. 마지막 줄 now.year, now.month, now.day는 그대로 둡니다.
+
+      datetime.now()는 실행하는 순간의 시각이라 매번 달라지지만 날짜를 직접 지정하면 결과가 고정되므로, (2026, 1, 1)이 나와야 합니다.
     starterCode: |-
       from datetime import datetime
 
       now = datetime.now()
       now.year, now.month, now.day
+    solution: |-
+      from datetime import datetime
+
+      now = datetime(2026, 1, 1)
+      now.year, now.month, now.day
     hints:
-    - 바꿀 지점은 `now = ...` 오른쪽 값입니다.
-    - 실행 뒤 `now` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - now = datetime.now() 를 now = datetime(2026, 1, 1) 로 바꿉니다. 괄호 안은 연, 월, 일 순서입니다.
+    - "정답 형태: now = datetime(2026, 1, 1)"
   check:
-    type: noError
-    noError: datetime 모듈에서 `now` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: datetime 모듈 실행 뒤 `now` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '(2026, 1, 1)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(2026, 1, 1)'"
 - id: workflow_validation
   title: 실무 import 조합 루프
   structuredPrimary: true
   subtitle: 필요한 도구를 고르고 오류를 읽기
-  goal: 실무 import 조합 루프에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
-  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  goal: 로그 한 줄을 고쳐 datetime, statistics, pathlib이 함께 만드는 요약 값이 어떻게 달라지는지 확인한다.
+  why: 실무 리포트는 모듈 하나로 끝나지 않고 날짜 해석, 평균 계산, 파일 이름 만들기가 한 흐름으로 이어지므로, 입력 한 줄이 바뀔 때 어느 값까지 따라 바뀌는지 볼 수 있어야 합니다.
   explanation: |-
     실무에서는 모듈 하나만 외워서 쓰기보다, 표준 라이브러리 여러 개를 필요한 만큼 가져와 작은 리포트 흐름을 만듭니다. 실행 전에 어떤 모듈이 어떤 역할을 하는지 예측하고, 이름 오류가 나면 import 방식과 별칭을 확인해 고칩니다.
 
@@ -256,7 +306,12 @@ sections:
     workSummary = summarizeWorkLogs(workLogs)
     workSummary
   exercise:
-    prompt: 실무 import 조합 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    prompt: |-
+      workLogs의 마지막 로그 한 줄을 아래 줄로 바꾸세요. 날짜는 2026-05-06 09:00으로, status는 done으로 바뀝니다.
+      {"startedAt": "2026-05-06 09:00", "minutes": 12, "status": "done"},
+
+      done인 로그가 3개에서 4개로 늘고 가장 늦은 날짜도 바뀌므로, 실행하면 아래 한 줄이 나와야 합니다.
+      {'doneCount': 4, 'averageMinutes': 20.8, 'latestDate': '2026-05-06', 'reportFile': 'daily-2026-05-06.txt'}
     starterCode: |-
       from datetime import datetime
       from pathlib import Path
@@ -285,19 +340,48 @@ sections:
 
       workSummary = summarizeWorkLogs(workLogs)
       workSummary
+    solution: |-
+      from datetime import datetime
+      from pathlib import Path
+      from statistics import mean
+
+      workLogs = [
+          {"startedAt": "2026-05-01 09:15", "minutes": 18, "status": "done"},
+          {"startedAt": "2026-05-02 10:30", "minutes": 32, "status": "done"},
+          {"startedAt": "2026-05-03 13:10", "minutes": 21, "status": "done"},
+          {"startedAt": "2026-05-06 09:00", "minutes": 12, "status": "done"},
+      ]
+
+      def summarizeWorkLogs(logs):
+          finishedLogs = [log for log in logs if log["status"] == "done"]
+          latestStartedAt = max(
+              datetime.strptime(log["startedAt"], "%Y-%m-%d %H:%M")
+              for log in finishedLogs
+          )
+          reportPath = Path("reports") / f"daily-{latestStartedAt:%Y-%m-%d}.txt"
+          return {
+              "doneCount": len(finishedLogs),
+              "averageMinutes": round(mean(log["minutes"] for log in finishedLogs), 1),
+              "latestDate": latestStartedAt.strftime("%Y-%m-%d"),
+              "reportFile": reportPath.name,
+          }
+
+      workSummary = summarizeWorkLogs(workLogs)
+      workSummary
     hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    - 'workLogs의 네 번째 줄 하나만 바꿉니다. "2026-05-03 16:00" 을 "2026-05-06 09:00" 으로, "todo" 를 "done" 으로 바꾸고 minutes 12는 그대로 둡니다.'
+    - '정답 형태: {"startedAt": "2026-05-06 09:00", "minutes": 12, "status": "done"},'
   check:
-    type: noError
-    noError: 실무 import 조합 루프의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
-    resultCheck: 실무 import 조합 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: "{'doneCount': 4, 'averageMinutes': 20.8, 'latestDate': '2026-05-06', 'reportFile': 'daily-2026-05-06.txt'}"
+    resultCheck: "출력이 정확히 일치해야 합니다: \"{'doneCount': 4, 'averageMinutes': 20.8, 'latestDate': '2026-05-06', 'reportFile': 'daily-2026-05-06.txt'}\""
 - id: practice
   title: Day 18 종합 복습
   structuredPrimary: true
   subtitle: 모듈과 import 마스터하기
-  goal: Day 18 종합 복습에서 문자열, 숫자, 변수 같은 예제 값을 바꿨을 때 출력 또는 마지막 표현식 결과가 어떻게 달라지는지 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: 별칭 import와 두 함수 조합을 한 셀에서 이어 써 본다.
+  why: 별칭을 붙이고 그 별칭으로 여러 함수를 이어 부르는 것이 표준 라이브러리를 쓰는 가장 흔한 형태라, 여기까지 직접 해 봐야 다음 강의의 파일 입출력을 바로 따라갈 수 있습니다.
   explanation: Day 18에서 배운 모듈과 import를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로
     어떤 순서로 해도 괜찮습니다.
   tips:
@@ -307,18 +391,26 @@ sections:
 
     math.sqrt(81)
   exercise:
-    prompt: Day 18 종합 복습 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    prompt: |-
+      두 곳을 고치세요. 첫 줄 import math를 import math as m으로 바꾸고, 마지막 줄 math.sqrt(81)을 m.floor(m.sqrt(300))으로 바꾸세요. 첫 줄 뒤에 붙은 설명 문구는 그대로 둡니다.
+
+      sqrt(300)은 17.32...이고 floor가 소수점 아래를 버리므로 17이 나와야 합니다.
     starterCode: |-
       import math  # 첫 번째 셀에서 import
 
       math.sqrt(81)
+    solution: |-
+      import math as m  # 첫 번째 셀에서 import
+
+      m.floor(m.sqrt(300))
     hints:
-    - 바꿀 지점은 문자열, 숫자, 변수 같은 예제 값을 만드는 첫 줄과 기초 문법 줄에서 찾으세요.
-    - 실행 뒤 출력 또는 마지막 표현식 결과 중 하나가 바꾼 값을 반영하는지 보세요.
+    - 첫 줄 import math 뒤에 as m 을 붙이고, 마지막 줄은 별칭 m 으로 두 함수를 이어 m.floor(m.sqrt(300)) 으로 씁니다.
+    - "정답 형태: m.floor(m.sqrt(300))"
   check:
-    type: noError
-    noError: Day 18 종합 복습의 수정 코드가 기초 문법 단계의 마지막 확인 값까지 도달해야 합니다.
-    resultCheck: Day 18 종합 복습 실행 결과가 출력 또는 마지막 표현식 결과 기준으로 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '17'
+    resultCheck: "출력이 정확히 일치해야 합니다: '17'"
 assessment:
   schemaVersion: 1
   performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.

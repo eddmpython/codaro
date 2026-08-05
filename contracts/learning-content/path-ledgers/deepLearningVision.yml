@@ -4,7 +4,7 @@ composerSnapshotDate: '2026-08-03'
 composerGraphCount: 472
 composerVersionHash: e4d4d563381b658826a477e2541ce7cbb70db111eafdf9217f15e8f7eadc6ef3
 taxonomySnapshotHash: 1a8f5ed385803f0bbe3594393b3bd1983e2506ab1e77d65b0b53da24645446ac
-sourceSetHash: 2b72334e6aefb8a0ca348ca35de8f2c89211f93c7aa5558e8c717fde36492ef5
+sourceSetHash: f208d4c76ce39684a94cf11e2d76ec23c484322371ec3a0bc9091747f5f99cdd
 ledgerTool: uv run python -X utf8 docs/skills/ops/tools/buildLearningLedgers.py --check
 targetOutcomes:
 - numpy.arrayOps
