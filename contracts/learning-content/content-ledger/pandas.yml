@@ -70,7 +70,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pandas/03_펭귄종비교분석"
     identityLedgerRef: "identity-ledger/pandas.yml"
-    lessonContentHash: "f087f69bbd1f6e796816b3c09a143999b8a4a4dcf5a0e34fccda453593bf0a22"
+    lessonContentHash: "bee05805a90872552b31b5273182a1491103adfc4696fb0695a8763a5ee12eec"
     disposition: migrate
     ownerPacket: "02-data-reporting"
     eligiblePathIds: ["dataReporting","interactiveDashboards","officeAutomation","timeSeriesAnalysis"]
@@ -92,7 +92,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pandas/04_붓꽃품종분류"
     identityLedgerRef: "identity-ledger/pandas.yml"
-    lessonContentHash: "6b68d91cf80fa825bb23fa3370ab345d862d0cf28203f287deab4ec28c35f2b8"
+    lessonContentHash: "d10cfbc62107637e98939e2db8e67ecb7330d3b132fd63cc50258567c655b035"
     disposition: migrate
     ownerPacket: "02-data-reporting"
     eligiblePathIds: ["dataReporting","interactiveDashboards","officeAutomation","timeSeriesAnalysis"]

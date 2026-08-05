@@ -92,7 +92,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionApps/05_얼굴검출모자이크"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "71e0259358b6a6a9bb22eb3b78e50ecbb4b87f1c43f120bd6f142eecf2aa099e"
+    lessonContentHash: "8311a5d5d8975fc646bf4cb5ef3d420bae439104f69bc0a95ed4c961aa4e9cd8"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]
@@ -158,7 +158,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "visionApps/08_영상자동썸네일"
     identityLedgerRef: "identity-ledger/visionApps.yml"
-    lessonContentHash: "3508e9473ec9ebfcf7fdc1c3b801226b7f1b57569ec5349c4091f4dfeafc04c9"
+    lessonContentHash: "c8f5e8b0d81d7d6a399900e80adceacc1b35e713e5b8bcf53f035ea03406dc2e"
     disposition: migrate
     ownerPacket: "07-remaining-domains/15-vision-automation"
     eligiblePathIds: ["visionAutomation"]

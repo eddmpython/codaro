@@ -158,7 +158,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "deepVision/08_전이학습"
     identityLedgerRef: "identity-ledger/deepVision.yml"
-    lessonContentHash: "bdb01256d3c730921fb3227671d23c4b9788460209a5456e32f8c0d904a7cac7"
+    lessonContentHash: "145ef15d299507533f273115b70fb4e4abe25b24c4bc63c7bf81410dfbd2c64d"
     disposition: migrate
     ownerPacket: "07-remaining-domains/14-deep-learning-vision"
     eligiblePathIds: ["deepLearningVision"]

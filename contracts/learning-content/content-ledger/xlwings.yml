@@ -180,7 +180,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "xlwings/08_월별파일분기합치기"
     identityLedgerRef: "identity-ledger/xlwings.yml"
-    lessonContentHash: "59760a837287f7206928adbd24d3ff33e657f47d9ae0a3eb0cacaaa1a35513cc"
+    lessonContentHash: "8e49e37a62c8ddb6b7d1b09ce8227ce0b760743f97f9d3f4120f30047e60242a"
     disposition: migrate
     ownerPacket: "05-office-automation"
     eligiblePathIds: ["officeAutomation"]

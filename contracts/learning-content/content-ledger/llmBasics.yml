@@ -92,7 +92,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "llmBasics/04_토큰과비용추적"
     identityLedgerRef: "identity-ledger/llmBasics.yml"
-    lessonContentHash: "1174959b14b39c664c44f4b3699a67f37888a7c6fba419eb9444da040b06773d"
+    lessonContentHash: "542e42b2305cd6ae62bc7c895af2a2dd5f14d5016de3639af1c84506c3526fca"
     disposition: migrate
     ownerPacket: "07-remaining-domains/24-ai-integration"
     eligiblePathIds: ["aiIntegration"]
@@ -136,7 +136,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "llmBasics/06_JSON구조화출력"
     identityLedgerRef: "identity-ledger/llmBasics.yml"
-    lessonContentHash: "6ced9670d296b7b6364c46e4a7af227287bb27c1bdadb8667122bc7bfc67da40"
+    lessonContentHash: "fbed0e1007e43d7546cc00f893eced85502e06566801beb3ffb9de8f7ebe29d7"
     disposition: migrate
     ownerPacket: "07-remaining-domains/24-ai-integration"
     eligiblePathIds: ["aiIntegration"]
@@ -202,7 +202,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "llmBasics/09_멀티도구라우팅"
     identityLedgerRef: "identity-ledger/llmBasics.yml"
-    lessonContentHash: "61414d2e9d71331a353c47e7e8d0068c995168745fe34a21836292853d2e6733"
+    lessonContentHash: "de9f654ca71700f7c271300f6c50c764355c4988c9d920477d08f6deedd01f31"
     disposition: migrate
     ownerPacket: "07-remaining-domains/24-ai-integration"
     eligiblePathIds: ["aiIntegration"]
