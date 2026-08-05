@@ -231,7 +231,7 @@ sections:
       prefillParsed = json.loads(prefillJsonText)
       prefillParsed
     hints:
-    - assistant content를 "{\"orderId\": \""로 두면 모델이 그 자리부터 이어 씁니다.
+    - 'assistant content를 "{\"orderId\": \""로 두면 모델이 그 자리부터 이어 씁니다.'
     - 응답에 prefill 텍스트를 다시 붙여 완전한 JSON 문자열을 만듭니다.
   check:
     noError: prefill 호출과 json.loads가 정상 실행되어야 합니다.

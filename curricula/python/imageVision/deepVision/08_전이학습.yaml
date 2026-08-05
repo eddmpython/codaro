@@ -268,7 +268,7 @@ sections:
       axis2.axis('off')
       fig2
     hints:
-    - 빈칸은 새 seed(예: 1000) 입니다.
+    - '빈칸은 새 seed(예: 1000) 입니다.'
     - 결과가 1이면 flower를 정확히 분류한 것입니다.
   check:
     noError: 검증 시각화가 오류 없이 끝나야 합니다.

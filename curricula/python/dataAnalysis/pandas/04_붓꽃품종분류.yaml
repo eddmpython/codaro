@@ -210,7 +210,7 @@ sections:
 
     assign()은 여러 컬럼을 동시에 추가할 수 있습니다. iris.assign(petalArea=..., sepalArea=...) 형태로 작성하면 됩니다. df['새컬럼'] = 값 방식도 가능하지만, Codaro에서는 변수 재할당 문제가 발생할 수 있어 assign()을 권장합니다.
   tips:
-  - assign 인자에 lambda를 넘기면 메서드 체이닝 중간에서도 새 컬럼을 만들 수 있습니다 - df.query(...).assign(area=lambda d: d.x * d.y).
+  - 'assign 인자에 lambda를 넘기면 메서드 체이닝 중간에서도 새 컬럼을 만들 수 있습니다 - df.query(...).assign(area=lambda d: d.x * d.y).'
   snippet: |-
     withArea = iris.assign(petalArea=iris['petal_length'] * iris['petal_width'])
     withArea.head()

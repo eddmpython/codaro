@@ -293,7 +293,7 @@ sections:
 
     agg()에는 'mean', 'sum', 'min', 'max', 'std'(표준편차), 'count', 'median'(중앙값), 'var'(분산) 등 다양한 집계 함수를 사용할 수 있습니다. 사용자 정의 함수도 lambda나 def로 만들어 전달할 수 있습니다.
   tips:
-  - agg에 lambda도 넘길 수 있습니다 - agg(['mean', lambda s: s.max() - s.min()])처럼 범위(range)를 즉석에서 정의 가능합니다.
+  - 'agg에 lambda도 넘길 수 있습니다 - agg([''mean'', lambda s: s.max() - s.min()])처럼 범위(range)를 즉석에서 정의 가능합니다.'
   snippet: penguins.groupby('species')['body_mass_g'].agg(['mean', 'min', 'max'])
   exercise:
     prompt: 리스트에 'std', 'median'을 추가해 표준편차와 중앙값까지 한 번에 보세요.

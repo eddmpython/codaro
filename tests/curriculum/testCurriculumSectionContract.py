@@ -218,11 +218,53 @@ def testLearnerFacingPlainScalarsDoNotLoseInlineHashText() -> None:
 
     content = yaml.safe_load(DAY_ONE.read_text(encoding="utf-8"))
     commentSection = next(section for section in content["sections"] if section["id"] == "comment_single")
+
     assert commentSection["exercise"]["prompt"] == (
         "샵(#)으로 시작하는 첫 줄은 그대로 두세요.\n"
         "print() 안의 ____를 실행됩니다로 바꾸세요.\n"
         "\n"
         "화면에는 실행됩니다 라는 글자만 나와야 합니다."
+    )
+
+
+def testLearnerFacingTextFieldsParseAsStrings() -> None:
+    """콜론 뒤 공백이 든 문장을 따옴표 없이 쓰면 YAML 이 문자열이 아니라 매핑으로 읽는다.
+
+    잘린 문장(#)과 같은 부류의 함정이고, 실행 감사도 카드 계약도 잡지 못한다.
+    파싱 결과가 문자열이 아니면 학습자 화면에 문장 대신 깨진 값이 뜬다.
+    """
+    failures: list[str] = []
+    for path in sorted(CURRICULA_DIR.rglob("*.yaml")):
+        if path.name.startswith("_") or path.name == "schema.yaml":
+            continue
+        content = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if not isinstance(content, dict):
+            continue
+        for section in content.get("sections") or []:
+            if not isinstance(section, dict):
+                continue
+            label = f"{path.relative_to(ROOT).as_posix()}::{section.get('id')}"
+            for field in ("goal", "why", "explanation", "subtitle", "title"):
+                value = section.get(field)
+                if value is not None and not isinstance(value, str):
+                    failures.append(f"{label}.{field} -> {type(value).__name__}")
+            for index, value in enumerate(section.get("tips") or []):
+                if not isinstance(value, str):
+                    failures.append(f"{label}.tips[{index}] -> {type(value).__name__}")
+            exercise = section.get("exercise")
+            if not isinstance(exercise, dict):
+                continue
+            for field in ("prompt", "starterCode", "solution"):
+                value = exercise.get(field)
+                if value is not None and not isinstance(value, str):
+                    failures.append(f"{label}.exercise.{field} -> {type(value).__name__}")
+            for index, value in enumerate(exercise.get("hints") or []):
+                if not isinstance(value, str):
+                    failures.append(f"{label}.hints[{index}] -> {type(value).__name__}")
+
+    assert failures == [], (
+        "학습자에게 보이는 문구가 문자열로 파싱되지 않습니다. 콜론 뒤에 공백이 있는 문장은 "
+        f"따옴표로 감싸세요: {failures}"
     )
 
 

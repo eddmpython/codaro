@@ -164,7 +164,7 @@ sections:
       dispatchTool("get_weather", {"city": "서울"})
     hints:
     - handleExchange(payload) 함수를 정의하고 source/target 인자를 사용합니다.
-    - handlers 사전에 "get_exchange_rate": handleExchange를 추가합니다.
+    - 'handlers 사전에 "get_exchange_rate": handleExchange를 추가합니다.'
   check:
     noError: 핸들러 정의와 dispatchTool 호출이 정상 실행되어야 합니다.
     resultCheck: 호출 결과가 "맑음 12도" 같은 문자열이어야 합니다.
@@ -325,7 +325,7 @@ sections:
       )
       (len(kit.schemas), kit.dispatch("get_weather", {"city": "서울"}))
     hints:
-    - describeAll은 schemas의 name과 description을 모아 "name: description" 문자열 리스트를 join한 문자열을 돌려줍니다.
+    - 'describeAll은 schemas의 name과 description을 모아 "name: description" 문자열 리스트를 join한 문자열을 돌려줍니다.'
     - 자동화에서 이 함수 결과를 시스템 프롬프트에 넣어 도구 목록을 모델에 알려줄 수 있습니다.
   check:
     noError: ToolKit 정의와 두 도구 등록이 정상 실행되어야 합니다.

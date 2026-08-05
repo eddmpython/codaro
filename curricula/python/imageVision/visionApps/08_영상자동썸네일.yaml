@@ -214,7 +214,7 @@ sections:
   explanation: |-
     N장의 썸네일이라면 1xN 또는 2x(N/2) 격자가 자연스럽습니다. 각 칸에 프레임 인덱스를 타이틀로 표시합니다.
   tips:
-  - 영상 길이가 길어지면 N을 동적으로 조절(예: 길이의 5%) 하는 것이 좋습니다.
+  - '영상 길이가 길어지면 N을 동적으로 조절(예: 길이의 5%) 하는 것이 좋습니다.'
   snippet: |-
     fig, axes = plt.subplots(1, len(thumbnails), figsize=(4 * len(thumbnails), 4))
     for axis, key in zip(axes, sorted(thumbnails)):

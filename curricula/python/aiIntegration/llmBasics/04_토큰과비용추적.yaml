@@ -203,7 +203,7 @@ sections:
   explanation: CostLogger는 record(model, usage) 호출마다 사전 한 줄을 entries 리스트에 추가하고 총합을 함께 추적합니다. summary
     메서드는 총 호출 수, 총 토큰, 총 비용을 사전으로 돌려줍니다. JSON으로 직렬화해 파일로 남길 수 있도록 dataclass 대신 사전 기반으로 만듭니다.
   tips:
-  - 로거가 비용 사전을 인자로 받게 두면 다른 가격표(예: 캐싱 가격)도 같은 로거를 재사용할 수 있습니다.
+  - '로거가 비용 사전을 인자로 받게 두면 다른 가격표(예: 캐싱 가격)도 같은 로거를 재사용할 수 있습니다.'
   snippet: |-
     import anthropic
 
