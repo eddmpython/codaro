@@ -51,6 +51,14 @@ def test_runtime_policy_requires_native_isolation_before_local_strong_evidence()
   const decision = JSON.parse(fs.readFileSync({json.dumps(str(CONTRACT))}, "utf8"));
   const policy = load({json.dumps(str(POLICY))}, (specifier) => {{
     if (specifier === "@/lib/generatedContracts/checkSandboxFeasibilityDecision.json") return decision;
+    if (specifier === "@/lib/learningOutputMatch") return {{
+      matchLearningOutput: (expected, actual) => ({{
+        feedback: expected === actual ? "목표한 출력과 일치합니다." : "출력이 다릅니다.",
+        passed: expected === actual,
+        tier: "exact",
+      }}),
+      normalizeLearningOutput: (value) => value,
+    }};
     if (specifier === "@/lib/learningCheckSpec") return {{}};
     return require(specifier);
   }});
@@ -86,6 +94,14 @@ def test_runtime_policy_requires_native_isolation_before_local_strong_evidence()
       }},
     }};
     if (specifier === "@/lib/checkSandboxPolicy") return policy;
+    if (specifier === "@/lib/learningOutputMatch") return {{
+      matchLearningOutput: (expected, actual) => ({{
+        feedback: expected === actual ? "목표한 출력과 일치합니다." : "출력이 다릅니다.",
+        passed: expected === actual,
+        tier: "exact",
+      }}),
+      normalizeLearningOutput: (value) => value,
+    }};
     if (specifier === "@/lib/learningCheckSpec") return {{
       normalizeLearningOutput: (value) => value,
       verifyLearningFixtureHash: async () => true,
@@ -122,6 +138,14 @@ def test_runtime_policy_requires_native_isolation_before_local_strong_evidence()
       }},
     }};
     if (specifier === "@/lib/checkSandboxPolicy") return policy;
+    if (specifier === "@/lib/learningOutputMatch") return {{
+      matchLearningOutput: (expected, actual) => ({{
+        feedback: expected === actual ? "목표한 출력과 일치합니다." : "출력이 다릅니다.",
+        passed: expected === actual,
+        tier: "exact",
+      }}),
+      normalizeLearningOutput: (value) => value,
+    }};
     if (specifier === "@/lib/learningCheckSpec") return {{}};
     return require(specifier);
   }});
@@ -156,6 +180,14 @@ def test_runtime_policy_requires_native_isolation_before_local_strong_evidence()
       executeBrowserStrongCheck: async () => {{ throw new Error("unexpected browser executor"); }},
     }};
     if (specifier === "@/lib/displayFormat") return {{ stringifyData: String }};
+    if (specifier === "@/lib/learningOutputMatch") return {{
+      matchLearningOutput: (expected, actual) => ({{
+        feedback: expected === actual ? "목표한 출력과 일치합니다." : "출력이 다릅니다.",
+        passed: expected === actual,
+        tier: "exact",
+      }}),
+      normalizeLearningOutput: (value) => value,
+    }};
     if (specifier === "@/lib/learningCheckSpec") return {{ parseStrongLearningCheckSpec: () => behaviorSpec }};
     if (specifier === "@/lib/localLearningCheckExecutor") return {{
       executeLocalStrongCheck: async () => localAttemptResult,

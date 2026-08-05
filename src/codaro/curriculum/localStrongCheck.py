@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from .checkSandboxBrokerClient import checkSandboxBrokerAvailable, runCheckSandboxBroker
+from .outputMatch import matchLearningOutput, normalizeLearningOutput
 
 
 WORKER_PATH = Path(__file__).with_name("_localStrongCheckWorker.py")
@@ -143,7 +144,11 @@ def runLocalStrongCheckAttempt(
         actual = normalizeOutput(str(response.get("actual") or "")) if normalized["kind"] == "output" else str(
             response.get("actual") or ""
         )
-        if actual != expected:
+        if normalized["kind"] == "output":
+            verdict = matchLearningOutput(expected, actual)
+            if not verdict.passed:
+                return failedResult("mismatch", expected, actual, verdict.feedback), False
+        elif actual != expected:
             return (
                 failedResult(
                     "mismatch",
@@ -206,14 +211,20 @@ def validateLocalStrongCheck(spec: dict[str, Any], source: str) -> dict[str, Any
     if not isinstance(payload, dict):
         raise LocalStrongCheckInvalid("check payload가 비어 있습니다.")
     if kind == "output":
-        if payload.get("comparator") != "exact" or payload.get("normalization") != "trim-final-newline":
+        # canonical 라벨은 line-trim 이다. trim-final-newline 은 기존 YAML 콘텐츠의
+        # 이전 라벨로, 콘텐츠 마이그레이션 사이클(outputExact 전수 패스)에서 YAML 을
+        # 개명하면 함께 제거한다. 두 라벨 모두 실제 의미는 outputMatch(line-trim)다.
+        if payload.get("comparator") != "exact" or payload.get("normalization") not in {
+            "line-trim",
+            "trim-final-newline",
+        }:
             raise LocalStrongCheckInvalid("지원하지 않는 output comparator입니다.")
         if not isinstance(payload.get("expected"), str) or not payload["expected"]:
             raise LocalStrongCheckInvalid("output expected가 비어 있습니다.")
         normalizedPayload = {
             "comparator": "exact",
             "expected": payload["expected"],
-            "normalization": "trim-final-newline",
+            "normalization": "line-trim",
         }
     elif kind == "variable":
         name = payload.get("name")
@@ -580,7 +591,8 @@ def ensureJsonValue(value: Any, label: str) -> None:
 
 
 def normalizeOutput(value: str) -> str:
-    return value.replace("\r\n", "\n").replace("\r", "\n").rstrip("\n")
+    # 비교 의미의 SSOT 는 outputMatch.normalizeLearningOutput 이다(line-trim).
+    return normalizeLearningOutput(value)
 
 
 def displayOutput(value: str) -> str:

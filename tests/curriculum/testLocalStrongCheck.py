@@ -37,7 +37,7 @@ def outputSpec(expected: str, *, timeoutMs: int = 2_000) -> dict[str, object]:
         "payload": {
             "comparator": "exact",
             "expected": expected,
-            "normalization": "trim-final-newline",
+            "normalization": "line-trim",
         },
     }
 

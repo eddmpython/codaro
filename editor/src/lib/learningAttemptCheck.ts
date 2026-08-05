@@ -2,6 +2,7 @@ import type { ExecutionResult } from "@/types";
 import { executeBrowserStrongCheck } from "@/lib/browserLearningCheckExecutor";
 import { stringifyData } from "@/lib/displayFormat";
 import { parseStrongLearningCheckSpec } from "@/lib/learningCheckSpec";
+import { matchLearningOutput, normalizeLearningOutput } from "@/lib/learningOutputMatch";
 import { executeLocalStrongCheck } from "@/lib/localLearningCheckExecutor";
 import type { LearningEvidenceArtifact, LearningEvidencePackageAsset } from "@/lib/webLearningEvidence";
 
@@ -88,14 +89,20 @@ export async function evaluateLearningAttempt(
       state: "unsupported",
     };
   }
-  if (actual !== expected) {
+  // 비교 의미의 SSOT 는 learningOutputMatch 다. 대소문자가 학습 목표와 무관한
+  // 검사는 콘텐츠가 caseInsensitive 로 옵트인한다. 실패 피드백은 무엇이 다른지
+  // (대소문자만/공백만/N번째 줄)를 정확히 짚는다.
+  const verdict = matchLearningOutput(expected, actual, {
+    caseInsensitive: checkConfig?.caseInsensitive === true,
+  });
+  if (!verdict.passed) {
     return {
       actual,
       checkId: "",
       evidence: "none",
       executor: "practice",
       expected,
-      feedback: `기대 출력은 ${displayOutput(expected)}이고, 현재 출력은 ${displayOutput(actual)}입니다.`,
+      feedback: verdict.feedback,
       fixtureHash: "",
       passed: false,
       source,
@@ -108,7 +115,7 @@ export async function evaluateLearningAttempt(
     evidence: "practice",
     executor: "practice",
     expected,
-    feedback: "목표한 출력과 일치합니다.",
+    feedback: verdict.feedback,
     fixtureHash: "",
     passed: true,
     source,
@@ -132,7 +139,8 @@ export function practiceActualOutput(result: ExecutionResult): string {
 }
 
 function normalizeOutput(value: string): string {
-  return value.replace(/\r\n?/g, "\n").trim();
+  // 비교 의미의 SSOT 는 learningOutputMatch(line-trim)다.
+  return normalizeLearningOutput(value);
 }
 
 function decodePythonStringRepr(value: string): string {
@@ -183,10 +191,6 @@ function decodePythonStringRepr(value: string): string {
     index += 1;
   }
   return decoded;
-}
-
-function displayOutput(value: string): string {
-  return value ? `“${value.replace(/\n/g, " ↵ ")}”` : "빈 출력";
 }
 
 function learnerFeedback(

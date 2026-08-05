@@ -95,7 +95,7 @@ check:
   payload:
     comparator: exact
     expected: Hello Codaro
-    normalization: trim-final-newline
+    normalization: line-trim
 ```
 
 fixture hash는 key를 정렬한 compact JSON UTF-8 bytes의 SHA-256 SRI다. author gate가 hash를 다시 계산하므로 임의 문자열을 넣어 통과시킬 수 없다. `contracts/checkSandboxFeasibilityDecision.json`이 Web과 Local의 실행 가능 evidence를 함께 결정한다. Web `output`·직렬화 `variable`만 fresh pyproc Worker와 processWorker graph SRI, fixture hash, timeout, teardown을 통과하면 strong 후보가 되며 `behavior`는 Worker boot 전에 `localRequired`로 끝난다. Local `local-sandbox`는 같은 behavior spec을 별도 native Python 자식 프로세스에서 실행한다. Windows launcher 경로는 managed runtime·worker를 tree hash와 active release로 고정하고 AppContainer capability 0, Job Object, handle allowlist, HMAC named pipe, 실행별 ACL receipt v2로 fixture 밖 읽기, network와 child process를 OS 경계에서도 거부한다. 공유 DACL mutex는 동시 grant·revoke를 직렬화하며 회수 실패 receipt/profile은 다음 launcher 시작이 stale run으로 GC한다. Local package asset은 설치본 `CODARO_WEB_BUILD_ROOT`의 pinned wheel만 사용하고 cold 병렬 검사도 캐시를 만들지 않는다. Local 결과는 계약이 지원하는 Windows NT 10.0 build 19045 이상에서 응답의 `isolation=windows-appcontainer`와 실제 build 번호가 함께 확인된 경우에만 strong evidence로 append한다. 일반 개발 서버의 `python-audit-hook` 결과와 더 오래된 Windows 결과는 같은 판정을 통과해도 practice 피드백에만 사용한다. 임의 원격 URL이나 최신 버전 즉석 설치는 strong evidence에 사용할 수 없다.

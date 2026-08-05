@@ -38,7 +38,7 @@ export type StrongOutputCheckSpecV1 = {
   payload: {
     comparator: "exact";
     expected: string;
-    normalization: "trim-final-newline";
+    normalization: "line-trim";
   };
   strength: "strong";
   timeoutMs: number;
@@ -88,7 +88,7 @@ export function parseStrongLearningCheckSpec(
       payload: {
         comparator: "exact",
         expected,
-        normalization: "trim-final-newline",
+        normalization: "line-trim",
       },
     };
   }
@@ -228,9 +228,9 @@ export async function verifyLearningFixtureHash(spec: StrongLearningCheckSpecV1)
   return spec.fixtureHash === `sha256-${bytesToBase64(new Uint8Array(digest))}`;
 }
 
-export function normalizeLearningOutput(value: string): string {
-  return value.replace(/\r\n?/g, "\n").replace(/\n+$/g, "");
-}
+// 비교 의미의 SSOT 는 learningOutputMatch(line-trim)다. 여기서 재수출해
+// 기존 소비자의 import 경로를 유지한다.
+export { normalizeLearningOutput } from "./learningOutputMatch";
 
 function stableJson(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(stableJson).join(",")}]`;

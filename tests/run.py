@@ -504,6 +504,8 @@ GATES: dict[str, Gate] = {
             command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyStrongAssessmentSolutions.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyAssessmentAuthoringQuality.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyLearningContentCompletion.py")),
+            # 채점 비교 의미(outputMatch)의 Python/TS 미러가 같은 계약 벡터를 통과하는지 확인한다.
+            command(("node", "--experimental-strip-types", "tests/learning/verifyOutputMatchParity.mjs")),
         ),
         ci_required=False,
     ),

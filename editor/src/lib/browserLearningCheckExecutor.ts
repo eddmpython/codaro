@@ -8,6 +8,7 @@ import {
   type StrongLearningCheckSpecV1,
   verifyLearningFixtureHash,
 } from "@/lib/learningCheckSpec";
+import { matchLearningOutput } from "@/lib/learningOutputMatch";
 import type { LearningEvidenceArtifact } from "@/lib/webLearningEvidence";
 
 type PyProcManifestFile = {
@@ -396,7 +397,14 @@ export async function executeBrowserStrongCheck(
     if (payload.exception) {
       return failed("error", expected, actual, concisePythonError(payload.exception));
     }
-    if (actual !== expected) {
+    // output 검사는 공유 매처(line-trim + 정밀 피드백)로 판정한다.
+    // variable/behavior 는 구조화 값이라 stableJson 동등 비교를 유지한다.
+    if (spec.kind === "output") {
+      const verdict = matchLearningOutput(expected, actual);
+      if (!verdict.passed) {
+        return failed("mismatch", expected, actual, verdict.feedback);
+      }
+    } else if (actual !== expected) {
       return failed("mismatch", expected, actual, `기대 출력은 ${displayOutput(expected)}이고, 현재 출력은 ${displayOutput(actual)}입니다.`);
     }
     return {

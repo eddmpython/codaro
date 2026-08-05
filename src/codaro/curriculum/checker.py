@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass, field
 
 from ..kernel.session import KernelSession
+from .outputMatch import matchLearningOutput, normalizeLearningOutput
 
 
 @dataclass(slots=True)
@@ -88,10 +88,11 @@ async def checkByOutput(
             detail="execution_error",
         )
 
-    studentOut = _normalize(studentResult.stdout + studentResult.data)
-    expectedOut = _normalize(expectedResult.stdout + expectedResult.data)
+    studentOut = normalizeLearningOutput(studentResult.stdout + studentResult.data)
+    expectedOut = normalizeLearningOutput(expectedResult.stdout + expectedResult.data)
 
-    if studentOut == expectedOut:
+    verdict = matchLearningOutput(expectedOut, studentOut)
+    if verdict.passed:
         return CheckResult(
             passed=True,
             feedback="정답입니다!",
@@ -104,7 +105,7 @@ async def checkByOutput(
     if hints and nextHintLevel > 0 and nextHintLevel <= len(hints):
         hintText = hints[nextHintLevel - 1]
 
-    feedback = "출력이 다릅니다."
+    feedback = verdict.feedback
     if hintText:
         feedback += f" 힌트: {hintText}"
 
@@ -150,7 +151,7 @@ async def checkByVariable(
         )
 
     actual = variables[variableName].repr
-    if _normalize(actual) == _normalize(expectedValue):
+    if normalizeLearningOutput(actual) == normalizeLearningOutput(expectedValue):
         return CheckResult(
             passed=True,
             feedback="정답입니다!",
@@ -193,7 +194,8 @@ async def checkExpectedOutput(
 
     actual = _composeOutput(result)
     expected = expectedOutput.strip()
-    if _normalize(actual) == _normalize(expected):
+    verdict = matchLearningOutput(expected, actual)
+    if verdict.passed:
         return CheckResult(
             passed=True,
             feedback="정답입니다!",
@@ -202,7 +204,7 @@ async def checkExpectedOutput(
         )
     return CheckResult(
         passed=False,
-        feedback="출력이 다릅니다.",
+        feedback=verdict.feedback,
         studentOutput=actual,
         expectedOutput=expected,
         detail="output_mismatch",
@@ -312,10 +314,6 @@ async def checkNoError(
         feedback="에러 없이 실행되었습니다!",
         studentOutput=_composeOutput(result),
     )
-
-
-def _normalize(text: str) -> str:
-    return re.sub(r"\s+", " ", text.strip()).strip()
 
 
 def _composeOutput(result) -> str:

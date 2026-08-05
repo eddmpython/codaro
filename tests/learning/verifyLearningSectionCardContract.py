@@ -185,7 +185,10 @@ def main() -> int:
     attempt_tokens = {
         "deterministic practice classifier": "isDeterministicPracticeCheckConfig",
         "Local done status is successful": '["success", "ok", "done"]',
-        "exact output comparator": "if (actual !== expected)",
+        # 비교 의미의 SSOT 는 learningOutputMatch 다. 정확 비교 리터럴 대신
+        # 공유 매처 호출과 콘텐츠 옵트인 플래그를 pin 한다.
+        "shared output matcher": "matchLearningOutput(expected, actual",
+        "case-insensitive content opt-in": 'checkConfig?.caseInsensitive === true',
         "verified practice state": 'state: "verified"',
         "unsupported completion state": 'state: "unsupported"',
         "practice evidence only": 'evidence: "practice"',
