@@ -532,7 +532,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day25_프로퍼티와데코레이터"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "4c00f0185c34544a63e54964441cf2aacca52b33aa77eab3ae25f9b2d25e49e5"
+    lessonContentHash: "a3c104fca2f6185523ae24b84952d921132d6f58466fc82f6108804638d66ebf"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -554,7 +554,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day26_컴프리헨션"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "5715b17098209dc88df74d8b06d67b3245a5afe6b9f12246a4c8d388f56b79f7"
+    lessonContentHash: "a5720a5e648f952bd5bc434b352d0b9c88866e08f2459a45e9f3baebe5f64019"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -576,7 +576,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day27_제너레이터와이터레이터"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "855a7e5153e72180d4d0d286823f30c2751878f63253a2a2a21de7aacf183046"
+    lessonContentHash: "16eea61c2a48e0034cdb17aa76769a79c47781eb91e9f1049e7ba73de4b07260"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
