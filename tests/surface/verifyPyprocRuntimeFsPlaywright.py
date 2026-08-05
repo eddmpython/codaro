@@ -236,6 +236,21 @@ def jsVerifyPyprocRuntimeFs() -> str:
     throw new Error('latest run record was not updated by second cell: ' + JSON.stringify(latest));
   }
   checks.push({ caseId: 'runtime-fs-latest-record', passed: true, status: 'passed' });
+  const figureCode = [
+    "import matplotlib.pyplot as plt",
+    "fig, ax = plt.subplots()",
+    "ax.plot([1, 2, 3], [4, 5, 6])",
+    "fig",
+  ].join("\\n");
+  const figureRun = await diagnostics.executeBlock('cell-figure', figureCode, 3, ['matplotlib']);
+  if (figureRun.status !== 'success') throw new Error('figure cell failed: ' + figureRun.stderr);
+  if (figureRun.type !== 'image') throw new Error('figure cell produced type ' + figureRun.type + ', expected image');
+  if (typeof figureRun.data !== 'string' || figureRun.data.indexOf('data:image/png;base64,') !== 0) {
+    throw new Error('figure payload is not a png data uri');
+  }
+  const figureRerun = await diagnostics.executeBlock('cell-figure-after', "value = 1 + 1\\nvalue", 4, []);
+  if (figureRerun.type === 'image') throw new Error('captured figure leaked into the next cell');
+  checks.push({ caseId: 'matplotlib-figure-capture', passed: true, status: 'passed', bytes: figureRun.data.length });
   const signals = {
     booted: diagnostics.isBooted(),
     sourcePath: sourceArtifact.path,
@@ -245,6 +260,9 @@ def jsVerifyPyprocRuntimeFs() -> str:
     secondStatus: second.status,
     pythonOpenShared: true,
     runtimeFileSystem: record.runtime.fileSystem,
+    figureStatus: figureRun.status,
+    figureType: figureRun.type,
+    figureBytes: figureRun.data.length,
   };
   return JSON.stringify({ checks, signals });
 })()

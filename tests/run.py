@@ -459,7 +459,7 @@ GATES: dict[str, Gate] = {
     ),
     "pyproc-runtime-fs-browser": Gate(
         tier="surface",
-        description="editor build의 브라우저 pyproc Runtime.fs와 Python open() 공유 파일 세계를 실제 브라우저에서 확인한다.",
+        description="editor build의 브라우저 pyproc Runtime.fs와 Python open() 공유 파일 세계, matplotlib 그림 수집을 실제 브라우저에서 확인한다.",
         commands=(
             command(("npm", "run", "build"), cwd="editor"),
             command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyPyprocRuntimeFsPlaywright.py")),

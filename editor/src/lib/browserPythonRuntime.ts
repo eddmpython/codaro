@@ -7,6 +7,7 @@
 // scheduleBrowserPythonRuntimeWarm()으로 같은 싱글턴을 미리 올려 첫 셀 실행 지연을 줄인다.
 // 단일 boot 경로는 SharedArrayBuffer/COOP-COEP가 필요 없어 정적 호스팅에서도 돈다.
 import analysisSource from "../../../src/codaro/document/analysis.py?raw";
+import figureCaptureSource from "../../../src/codaro/runtime/figureCapture.py?raw";
 import reactivePlanSource from "../../../src/codaro/kernel/reactivePlan.py?raw";
 import { shouldUseApi } from "@/lib/api";
 import type { ExecutionResult, ReactiveDiagnostics, VariableInfo } from "@/types";
@@ -99,11 +100,15 @@ async function ensureRuntime(): Promise<PyRuntime> {
       .then(async (module) => {
         const { bootRuntime } = module as unknown as PyProcModule;
         const assetIntegrity = await loadAssetIntegrity();
-        return bootRuntime({
+        const runtime = await bootRuntime({
           stdout: (line: string) => stdoutLines.push(line),
           stderr: (line: string) => stderrLines.push(line),
           ...(assetIntegrity ? { assetIntegrity } : {}),
         });
+        // matplotlib을 headless로 고정한다. import보다 먼저 정해져야 하므로 부팅 직후에 둔다.
+        // 로컬 워커도 같은 값을 쓴다(localWorker.py 상단).
+        runtime.run("import os as _codaroOs\n_codaroOs.environ.setdefault('MPLBACKEND', 'Agg')");
+        return runtime;
       })
       .catch((error: unknown) => {
         runtimePromise = null;
@@ -191,6 +196,30 @@ export async function planBrowserReactiveNotebook(
     "_codaroJson.dumps(_codaroPayload)",
   ].join("\n");
   return JSON.parse(String(runtime.run(code))) as BrowserReactivePlan;
+}
+
+// 셀이 남긴 matplotlib figure를 거둔다. 규칙은 로컬 워커와 같은 파일(figureCapture.py)이 소유해
+// Web Run과 Local이 "어느 쪽에서는 그림이 나오고 어느 쪽에서는 안 나오는" 갈라짐을 만들지 않는다.
+const FIGURE_CAPTURE_SNIPPET = [
+  "import json as _codaroJson",
+  "import sys as _codaroSys",
+  "import types as _codaroTypes",
+  "_codaroFigureCapture = _codaroSys.modules.get('_codaro_figure_capture_ssot')",
+  "if _codaroFigureCapture is None:",
+  "    _codaroFigureCapture = _codaroTypes.ModuleType('_codaro_figure_capture_ssot')",
+  "    _codaroSys.modules[_codaroFigureCapture.__name__] = _codaroFigureCapture",
+  `    exec(${JSON.stringify(figureCaptureSource)}, _codaroFigureCapture.__dict__)`,
+  "_codaroJson.dumps(_codaroFigureCapture.captureMatplotlibFigures())",
+].join("\n");
+
+function captureFigures(runtime: PyRuntime): string[] {
+  try {
+    const parsed = JSON.parse(String(runtime.run(FIGURE_CAPTURE_SNIPPET)));
+    return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === "string") : [];
+  } catch {
+    // 그림 수집 실패가 셀 실행 결과를 덮어써서는 안 된다. 코드는 이미 돌았다.
+    return [];
+  }
 }
 
 // 사용자 전역을 VariableInfo 목록(JSON)으로 뽑는다. 밑줄 프리픽스는 내부용이라 제외.
@@ -481,6 +510,8 @@ export async function executeBrowserBlock(
     errorText = error instanceof Error ? error.message : String(error);
   }
 
+  // 에러로 끝난 셀에서도 거둔다. 남겨 두면 다음 셀이 같은 그림을 다시 낸다.
+  const figures = captureFigures(runtime);
   const { stdout, stderr } = drainBuffers();
   const status = errorText ? "error" : "success";
   try {
@@ -504,10 +535,11 @@ export async function executeBrowserBlock(
   const stateDelta = errorText ? { added: [], updated: [], removed: [] } : computeDelta(variables);
   const combinedStdout = resultRepr ? (stdout ? `${stdout}\n${resultRepr}` : resultRepr) : stdout;
 
+  const showFigures = !errorText && figures.length > 0;
   return {
-    type: "text",
+    type: showFigures ? "image" : "text",
     blockId,
-    data: null,
+    data: showFigures ? (figures.length > 1 ? figures : figures[0]) : null,
     stdout: combinedStdout,
     stderr: errorText ? (stderr ? `${stderr}\n${errorText}` : errorText) : stderr,
     variables,
