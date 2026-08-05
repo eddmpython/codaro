@@ -219,10 +219,7 @@ def testLearnerFacingPlainScalarsDoNotLoseInlineHashText() -> None:
     content = yaml.safe_load(DAY_ONE.read_text(encoding="utf-8"))
     commentSection = next(section for section in content["sections"] if section["id"] == "comment_single")
     assert commentSection["exercise"]["prompt"] == (
-        "샵(#)으로 시작하는 첫 줄은 그대로 두세요.\n"
-        "print() 안의 ____를 실행됩니다로 바꾸세요.\n"
-        "\n"
-        "화면에는 실행됩니다 라는 글자만 나와야 합니다."
+        "첫 줄은 # 주석으로 남기고 빈칸을 바꿔 실행됩니다만 출력하세요."
     )
 
 
