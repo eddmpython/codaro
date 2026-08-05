@@ -56,8 +56,8 @@ sections:
   title: 문자열 연결
   structuredPrimary: true
   subtitle: + 기호로 문자열 합치기
-  goal: 문자열 연결에서 `first` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: 더하기 기호로 두 문자열을 이어 붙인 결과를 만든다.
+  why: 이름과 직함, 폴더 이름과 파일 이름처럼 조각으로 나뉜 글자를 하나로 합칠 때 씁니다.
   explanation: |-
     문자열은 + 연산자로 연결할 수 있습니다. 두 개 이상의 문자열을 하나로 합칠 때 사용합니다. 숫자의 덧셈과 같은 기호지만 문자열에서는 연결의 의미입니다.
 
@@ -67,24 +67,32 @@ sections:
     second = 'World'
     first + ' ' + second
   exercise:
-    prompt: 문자열 연결 예제에서 `first`, `second` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    prompt: |-
+      second를 'Codaro'로 바꾸세요.
+
+      실행하면 Hello Codaro가 나와야 합니다.
     starterCode: |-
       first = 'Hello'
       second = 'World'
       first + ' ' + second
+    solution: |-
+      first = 'Hello'
+      second = 'Codaro'
+      first + ' ' + second
     hints:
-    - 바꿀 지점은 `first = ...` 오른쪽 값입니다.
-    - 실행 뒤 `first` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "second = 'World' 를 second = 'Codaro' 로 바꿉니다. 마지막 줄은 그대로 둡니다."
+    - "정답 형태: second = 'Codaro'"
   check:
-    type: noError
-    noError: 문자열 연결에서 `first` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 문자열 연결 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'Hello Codaro'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Hello Codaro'"
 - id: string_repeat
   title: 문자열 반복
   structuredPrimary: true
   subtitle: '* 기호로 문자열 반복하기'
-  goal: 문자열 반복에서 `word` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: 곱하기 기호로 같은 문자열을 정해진 횟수만큼 반복한다.
+  why: 구분선이나 들여쓰기 공백처럼 같은 글자를 여러 번 찍어야 할 때 반복문 없이 한 줄로 끝냅니다.
   explanation: |-
     문자열에 * 연산자를 사용하면 문자열을 반복할 수 있습니다. 숫자를 곱하면 그 횟수만큼 문자열이 반복됩니다. 같은 문자를 여러 번 출력할 때 유용합니다.
 
@@ -93,23 +101,30 @@ sections:
     word = 'Python'
     word * 3
   exercise:
-    prompt: 문자열 반복 예제에서 `word` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      word를 'Go'로 바꾸세요. 곱하는 숫자 3은 그대로 둡니다.
+
+      실행하면 GoGoGo가 나와야 합니다.
     starterCode: |-
       word = 'Python'
       word * 3
+    solution: |-
+      word = 'Go'
+      word * 3
     hints:
-    - 바꿀 지점은 `word = ...` 오른쪽 값입니다.
-    - 실행 뒤 `word` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "word = 'Python' 을 word = 'Go' 로 바꿉니다. word * 3 줄은 그대로 둡니다."
+    - "정답 형태: word = 'Go'"
   check:
-    type: noError
-    noError: 문자열 반복에서 `word` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 문자열 반복 실행 뒤 `word` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'GoGoGo'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'GoGoGo'"
 - id: string_length
   title: 문자열 길이
   structuredPrimary: true
   subtitle: len() 함수로 길이 구하기
-  goal: 문자열 길이에서 `text` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: len()으로 문자열에 든 글자 개수를 센다.
+  why: 비밀번호가 최소 길이를 넘는지, 제목이 정해진 칸에 들어가는지 판단할 때 씁니다.
   explanation: len() 함수는 문자열의 길이를 반환합니다. 문자열에 포함된 문자의 개수를 세어줍니다. 공백과 특수문자도 모두 포함됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -117,23 +132,30 @@ sections:
     text = 'Hello Python'
     len(text)
   exercise:
-    prompt: 문자열 길이 예제에서 `text` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      text를 'Codaro'로 바꾸세요.
+
+      실행하면 6이 나와야 합니다.
     starterCode: |-
       text = 'Hello Python'
       len(text)
+    solution: |-
+      text = 'Codaro'
+      len(text)
     hints:
-    - 바꿀 지점은 `text = ...` 오른쪽 값입니다.
-    - 실행 뒤 `text` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "text = 'Hello Python' 을 text = 'Codaro' 로 바꿉니다. len(text) 줄은 그대로 둡니다."
+    - "정답 형태: text = 'Codaro'"
   check:
-    type: noError
-    noError: 문자열 길이에서 `text` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 문자열 길이 실행 뒤 `text` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '6'
+    resultCheck: "출력이 정확히 일치해야 합니다: '6'"
 - id: fstring
   title: f-string 포맷팅
   structuredPrimary: true
   subtitle: f-string으로 간편하게 문자열 만들기
-  goal: fstring 포맷팅에서 `name` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: f-string으로 변수 값을 문장 안에 끼워 넣는다.
+  why: 알림 문구나 보고 문장처럼 사람이 읽을 글에 값을 넣을 때 더하기 연결보다 짧고 형 변환 실수가 없습니다.
   explanation: |-
     f-string은 문자열 앞에 f를 붙여 변수를 직접 넣을 수 있는 방법입니다. + 연결이나 str() 변환 없이도 변수와 문자를 자연스럽게 조합할 수 있습니다. 중괄호 {} 안에 변수명이나 표현식을 넣으면 자동으로 문자열로 변환됩니다.
 
@@ -143,24 +165,33 @@ sections:
     age = 25
     f'{name}님의 나이는 {age}세입니다'
   exercise:
-    prompt: fstring 포맷팅 예제에서 `name`, `age` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    prompt: |-
+      age를 30으로 바꾸세요. f-string 줄은 그대로 둡니다.
+
+      실행하면 아래 한 줄이 나와야 합니다.
+      김철수님의 나이는 30세입니다
     starterCode: |-
       name = '김철수'
       age = 25
       f'{name}님의 나이는 {age}세입니다'
+    solution: |-
+      name = '김철수'
+      age = 30
+      f'{name}님의 나이는 {age}세입니다'
     hints:
-    - 바꿀 지점은 `name = ...` 오른쪽 값입니다.
-    - 실행 뒤 `name` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - age = 25 를 age = 30 으로 바꿉니다. 중괄호 안의 age는 건드리지 않습니다.
+    - "정답 형태: age = 30"
   check:
-    type: noError
-    noError: fstring 포맷팅에서 `name` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: fstring 포맷팅 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '김철수님의 나이는 30세입니다'
+    resultCheck: "출력이 정확히 일치해야 합니다: '김철수님의 나이는 30세입니다'"
 - id: escape_newline
   title: 줄바꿈 문자
   structuredPrimary: true
   subtitle: \n으로 줄 바꾸기
-  goal: 줄바꿈 문자에서 print() 입력값이 출력 영역에 어떻게 표시되는지 확인한다.
-  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  goal: '\n을 넣어 문자열 하나를 여러 줄로 출력한다.'
+  why: 여러 줄짜리 안내문이나 로그를 문자열 하나로 다루면서 화면에서는 줄을 나눠 보여줄 때 씁니다.
   explanation: 이스케이프 문자는 백슬래시(\)로 시작하는 특수 문자입니다. \n은 줄바꿈을 의미하며, 문자열 중간에 사용하면 그 지점에서 줄이 바뀝니다. 여러 줄 출력에
     유용합니다.
   tips:
@@ -169,23 +200,38 @@ sections:
     lines = '첫 번째 줄\n두 번째 줄\n세 번째 줄'
     print(lines)
   exercise:
-    prompt: 줄바꿈 문자 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
+    prompt: |-
+      lines 문자열 끝, 닫는 따옴표 바로 앞에 \n네 번째 줄 을 이어 붙이세요.
+
+      실행하면 아래 네 줄이 나와야 합니다.
+      첫 번째 줄
+      두 번째 줄
+      세 번째 줄
+      네 번째 줄
     starterCode: |-
       lines = '첫 번째 줄\n두 번째 줄\n세 번째 줄'
       print(lines)
+    solution: |-
+      lines = '첫 번째 줄\n두 번째 줄\n세 번째 줄\n네 번째 줄'
+      print(lines)
     hints:
-    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
-    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+    - '세 번째 줄 과 닫는 따옴표 사이에 \n네 번째 줄 을 넣습니다. 따옴표는 새로 열지 않습니다.'
+    - '정답 형태: lines = ''첫 번째 줄\n두 번째 줄\n세 번째 줄\n네 번째 줄'''
   check:
-    type: noError
-    noError: 줄바꿈 문자의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
-    resultCheck: 줄바꿈 문자 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: |-
+      첫 번째 줄
+      두 번째 줄
+      세 번째 줄
+      네 번째 줄
+    resultCheck: "출력이 정확히 일치해야 합니다: '첫 번째 줄\n두 번째 줄\n세 번째 줄\n네 번째 줄'"
 - id: escape_tab
   title: 탭 문자
   structuredPrimary: true
   subtitle: \t로 간격 넣기
-  goal: 탭 문자에서 print() 입력값이 출력 영역에 어떻게 표시되는지 확인한다.
-  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  goal: '\t로 항목 사이에 탭 간격을 넣어 한 줄을 열처럼 정렬한다.'
+  why: 값을 표처럼 늘어놓을 때 공백을 몇 칸 넣을지 세지 않고도 열이 맞아 보이게 만듭니다.
   explanation: \t는 탭 문자로, 일정한 간격을 만듭니다. 텍스트를 정렬할 때 유용하며, 보통 4칸 또는 8칸의 공백과 같은 효과를 냅니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -193,23 +239,31 @@ sections:
     row = '이름\t나이\t도시'
     print(row)
   exercise:
-    prompt: 탭 문자 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
+    prompt: |-
+      row 문자열 끝, 닫는 따옴표 바로 앞에 \t직업 을 이어 붙이세요.
+
+      실행하면 아래 한 줄이 나와야 합니다. 항목 사이는 탭 간격입니다.
+      이름	나이	도시	직업
     starterCode: |-
       row = '이름\t나이\t도시'
       print(row)
+    solution: |-
+      row = '이름\t나이\t도시\t직업'
+      print(row)
     hints:
-    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
-    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+    - '도시 와 닫는 따옴표 사이에 \t직업 을 넣습니다. 탭은 백슬래시와 t 두 글자로 씁니다.'
+    - '정답 형태: row = ''이름\t나이\t도시\t직업'''
   check:
-    type: noError
-    noError: 탭 문자의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
-    resultCheck: 탭 문자 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: "이름\t나이\t도시\t직업"
+    resultCheck: "출력이 정확히 일치해야 합니다: '이름\t나이\t도시\t직업'"
 - id: escape_quote
   title: 따옴표 문자
   structuredPrimary: true
   subtitle: \'와 \"로 따옴표 넣기
-  goal: 따옴표 문자에서 `quote` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: 따옴표가 들어간 문장을 오류 없이 문자열로 담는다.
+  why: 영어 축약형 It's나 인용 부호가 든 문장은 따옴표를 잘못 고르면 문자열이 중간에 끊겨 오류가 납니다.
   explanation: 문자열 안에 따옴표를 넣으려면 백슬래시를 앞에 붙입니다. \'는 작은따옴표, \"는 큰따옴표를 문자로 표현합니다. 또는 작은따옴표 문자열 안에 큰따옴표를 사용할
     수도 있습니다.
   tips:
@@ -218,23 +272,30 @@ sections:
     quote = "It's a beautiful day"
     quote
   exercise:
-    prompt: 따옴표 문자 예제에서 `quote` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      quote 안의 beautiful을 rainy로 바꾸세요.
+
+      실행하면 It's a rainy day가 나와야 합니다. 감싼 따옴표는 화면에 나오지 않습니다.
     starterCode: |-
       quote = "It's a beautiful day"
       quote
+    solution: |-
+      quote = "It's a rainy day"
+      quote
     hints:
-    - 바꿀 지점은 `quote = ...` 오른쪽 값입니다.
-    - 실행 뒤 `quote` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - beautiful 을 rainy 로 바꿉니다. 바깥 큰따옴표와 It's 의 작은따옴표는 그대로 둡니다.
+    - "정답 형태: quote = \"It's a rainy day\""
   check:
-    type: noError
-    noError: 따옴표 문자에서 `quote` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 따옴표 문자 실행 뒤 `quote` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: "It's a rainy day"
+    resultCheck: "출력이 정확히 일치해야 합니다: 'It's a rainy day'"
 - id: escape_backslash
   title: 백슬래시 문자
   structuredPrimary: true
   subtitle: \\로 백슬래시 표현하기
-  goal: 백슬래시 문자에서 print() 입력값이 출력 영역에 어떻게 표시되는지 확인한다.
-  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  goal: 백슬래시를 두 번 써서 Windows 경로를 문자열에 담는다.
+  why: Windows 경로에는 백슬래시가 들어가는데 한 번만 쓰면 뒤 글자와 묶여 다른 문자로 해석됩니다.
   explanation: 백슬래시 자체를 문자로 표현하려면 코드 안에서 \\처럼 두 번 사용합니다. 예를 들어 Windows 경로는 코드에서 'C:\\Users'처럼 쓰고, 출력에는 C:\Users처럼 보입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -242,23 +303,30 @@ sections:
     path = 'C:\\Users\\Documents'
     print(path)
   exercise:
-    prompt: 백슬래시 문자 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
+    prompt: |-
+      path 안의 Documents를 Reports로 바꾸세요.
+
+      실행하면 C:\Users\Reports가 나와야 합니다. 코드에는 백슬래시를 두 번 쓰지만 출력에는 한 번만 보입니다.
     starterCode: |-
       path = 'C:\\Users\\Documents'
       print(path)
+    solution: |-
+      path = 'C:\\Users\\Reports'
+      print(path)
     hints:
-    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
-    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+    - path 값의 Documents 를 Reports 로 바꿉니다. 백슬래시 두 개는 그대로 둡니다.
+    - '정답 형태: path = ''C:\\Users\\Reports'''
   check:
-    type: noError
-    noError: 백슬래시 문자의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
-    resultCheck: 백슬래시 문자 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'C:\Users\Reports'
+    resultCheck: '출력이 정확히 일치해야 합니다: ''C:\Users\Reports'''
 - id: multiline_string
   title: 여러 줄 문자열
   structuredPrimary: true
   subtitle: 삼중 따옴표로 여러 줄 작성
-  goal: 여러 줄 문자열에서 print() 입력값이 출력 영역에 어떻게 표시되는지 확인한다.
-  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  goal: 삼중 따옴표로 줄바꿈이 포함된 문자열을 보이는 모양 그대로 작성한다.
+  why: '여러 줄 안내문이나 긴 SQL 문을 \n 없이 붙여 넣을 수 있어 원문과 나란히 두고 대조하기 쉽습니다.'
   explanation: 삼중 따옴표(''' 또는 \"\"\")를 사용하면 여러 줄에 걸친 문자열을 쉽게 작성할 수 있습니다. 줄바꿈이 자동으로 포함되며, \n을 사용하지 않아도 됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -268,25 +336,40 @@ sections:
     세 번째 줄'''
     print(block)
   exercise:
-    prompt: 여러 줄 문자열 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
+    prompt: |-
+      세 번째 줄 이라고 적힌 부분을 마지막 줄 로 바꾸세요. 삼중 따옴표는 그대로 둡니다.
+
+      실행하면 아래 세 줄이 나와야 합니다.
+      첫 번째 줄
+      두 번째 줄
+      마지막 줄
     starterCode: |-
       block = '''첫 번째 줄
       두 번째 줄
       세 번째 줄'''
       print(block)
+    solution: |-
+      block = '''첫 번째 줄
+      두 번째 줄
+      마지막 줄'''
+      print(block)
     hints:
-    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
-    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+    - 세 번째 줄 이라고 쓴 글자만 마지막 줄 로 바꿉니다. 뒤에 붙은 삼중 따옴표는 그대로 둡니다.
+    - "정답 형태: 마지막 줄'''"
   check:
-    type: noError
-    noError: 여러 줄 문자열의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
-    resultCheck: 여러 줄 문자열 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: |-
+      첫 번째 줄
+      두 번째 줄
+      마지막 줄
+    resultCheck: "출력이 정확히 일치해야 합니다: '첫 번째 줄\n두 번째 줄\n마지막 줄'"
 - id: raw_string
   title: 원시 문자열
   structuredPrimary: true
   subtitle: r 접두사로 이스케이프 무시하기
-  goal: 원시 문자열에서 print() 입력값이 출력 영역에 어떻게 표시되는지 확인한다.
-  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  goal: r 접두사로 백슬래시를 이스케이프로 해석하지 않게 만든다.
+  why: '경로나 정규표현식처럼 백슬래시가 많은 문자열에서 \\ 로 두 번씩 쓰는 번거로움과 빠뜨림을 없앱니다.'
   explanation: 문자열 앞에 r을 붙이면 이스케이프 문자를 무시합니다. \n이 줄바꿈이 아닌 문자 그대로 표시됩니다. 정규표현식이나 파일 경로 작성에 유용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -294,23 +377,30 @@ sections:
     raw = r'C:\Users\Documents'
     print(raw)
   exercise:
-    prompt: 원시 문자열 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
+    prompt: |-
+      raw를 r'C:\temp\new.txt'로 바꾸세요. 앞에 붙은 r은 그대로 둡니다.
+
+      실행하면 C:\temp\new.txt가 나와야 합니다. r 덕분에 \t와 \n이 탭과 줄바꿈으로 바뀌지 않고 글자 그대로 남습니다.
     starterCode: |-
       raw = r'C:\Users\Documents'
       print(raw)
+    solution: |-
+      raw = r'C:\temp\new.txt'
+      print(raw)
     hints:
-    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
-    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+    - 'Users\Documents 를 temp\new.txt 로 바꿉니다. 앞의 r 은 지우지 않습니다.'
+    - '정답 형태: raw = r''C:\temp\new.txt'''
   check:
-    type: noError
-    noError: 원시 문자열의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
-    resultCheck: 원시 문자열 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'C:\temp\new.txt'
+    resultCheck: '출력이 정확히 일치해야 합니다: ''C:\temp\new.txt'''
 - id: string_in
   title: 문자열 포함 확인
   structuredPrimary: true
   subtitle: in 연산자로 부분 문자열 찾기
-  goal: 문자열 포함 확인에서 `phrase` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: in으로 문자열에 특정 단어가 있는지 판정하고 결과를 False로 뒤집어 본다.
+  why: 로그 한 줄에 오류 단어가 있는지, 파일 이름에 키워드가 들어 있는지 걸러낼 때 씁니다.
   explanation: |-
     in 연산자는 문자열 안에 특정 문자나 단어가 포함되어 있는지 확인합니다. 포함되어 있으면 True, 없으면 False를 반환합니다.
 
@@ -319,23 +409,30 @@ sections:
     phrase = 'Python Programming'
     'Python' in phrase
   exercise:
-    prompt: 문자열 포함 확인 예제에서 `phrase` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      phrase를 'Codaro Programming'으로 바꾸세요.
+
+      Codaro Programming에는 Python이 없으므로 False가 나와야 합니다.
     starterCode: |-
       phrase = 'Python Programming'
       'Python' in phrase
+    solution: |-
+      phrase = 'Codaro Programming'
+      'Python' in phrase
     hints:
-    - 바꿀 지점은 `phrase = ...` 오른쪽 값입니다.
-    - 실행 뒤 `phrase` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "phrase = 'Python Programming' 을 phrase = 'Codaro Programming' 으로 바꿉니다. 마지막 줄은 그대로 둡니다."
+    - "정답 형태: phrase = 'Codaro Programming'"
   check:
-    type: noError
-    noError: 문자열 포함 확인에서 `phrase` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 문자열 포함 확인 실행 뒤 `phrase` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'False'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'False'"
 - id: string_not_in
   title: 문자열 미포함 확인
   structuredPrimary: true
   subtitle: not in 연산자로 확인하기
-  goal: 문자열 미포함 확인에서 `sentence` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: not in으로 특정 단어가 없는지 판정하고 결과를 False로 뒤집어 본다.
+  why: 금지어가 섞이지 않았는지, 로그에 ERROR가 없는지처럼 없어야 정상인 조건을 뒤집지 않고 그대로 적을 수 있습니다.
   explanation: not in 연산자는 문자열에 특정 문자나 단어가 포함되지 않았는지 확인합니다. 포함되지 않으면 True, 포함되어 있으면 False를 반환합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -343,23 +440,30 @@ sections:
     sentence = 'Hello World'
     'Python' not in sentence
   exercise:
-    prompt: 문자열 미포함 확인 예제에서 `sentence` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      sentence를 'Hello Python'으로 바꾸세요.
+
+      Python이 들어가므로 not in 결과는 False가 나와야 합니다.
     starterCode: |-
       sentence = 'Hello World'
       'Python' not in sentence
+    solution: |-
+      sentence = 'Hello Python'
+      'Python' not in sentence
     hints:
-    - 바꿀 지점은 `sentence = ...` 오른쪽 값입니다.
-    - 실행 뒤 `sentence` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "sentence = 'Hello World' 를 sentence = 'Hello Python' 으로 바꿉니다. 마지막 줄은 그대로 둡니다."
+    - "정답 형태: sentence = 'Hello Python'"
   check:
-    type: noError
-    noError: 문자열 미포함 확인에서 `sentence` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 문자열 미포함 확인 실행 뒤 `sentence` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'False'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'False'"
 - id: workflow_validation
   title: '검증 루프: 영수증 문자열을 안전하게 만들기'
   structuredPrimary: true
   subtitle: 문자열을 업무 출력물로 조립하고 검증하기
-  goal: '검증 루프: 영수증 문자열을 안전하게 만들기에서 예상값과 실제 실행 결과를 비교하는 검증 흐름을 확인한다.'
-  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  goal: 영수증과 로그 문자열을 조립한 뒤 빠진 조각이 없는지 assert로 검증하는 흐름을 확인한다.
+  why: 사람이 읽을 출력물은 한 조각만 어긋나도 눈으로는 잘 안 보이므로 기준을 assert로 코드에 박아 둡니다.
   explanation: 문자열 기초는 단어를 붙이는 데서 끝나지 않습니다. 실제 업무에서는 영수증, 알림 문구, 로그 메시지처럼 사람이 읽을 출력물을 만들고, 빠진 줄이나 잘못된
     변환이 없는지 검증해야 합니다.
   tips:
@@ -386,7 +490,10 @@ sections:
     assert receipt.count('\n') == 5
     print(receipt)
   exercise:
-    prompt: '검증 루프: 영수증 문자열을 안전하게 만들기 예제에서 문자열 값과 포맷 조각을 바꾸고 출력 문장이 달라지는지 확인하세요.'
+    prompt: |-
+      값은 바꾸지 말고 코드를 그대로 실행하세요.
+
+      assert 세 줄이 모두 통과하고 마지막에 [INFO] order_created: ORD-2026-0007 이 나와야 합니다.
     starterCode: |-
       level = 'INFO'
       action = 'order_created'
@@ -397,19 +504,30 @@ sections:
       assert 'order_created' in logLine
       assert 'ERROR' not in logLine
       logLine
+    solution: |-
+      level = 'INFO'
+      action = 'order_created'
+      orderId = 'ORD-2026-0007'
+      logLine = f'[{level}] {action}: {orderId}'
+
+      assert logLine.startswith('[INFO]')
+      assert 'order_created' in logLine
+      assert 'ERROR' not in logLine
+      logLine
     hints:
-    - 바꿀 지점은 `level`, `orderId`, `amount`, f-string 포맷 조각입니다.
-    - 실행 뒤 `receipt` 문자열의 접두사, 주문번호, 금액 표기가 바꾼 입력을 반영하는지 보세요.
+    - 값을 바꾸면 assert가 AssertionError로 멈춥니다. 그때는 원래 값으로 되돌리세요.
+    - "정답 형태: 코드를 그대로 실행, 마지막 값 [INFO] order_created: ORD-2026-0007"
   check:
-    type: noError
-    noError: '검증 루프: 영수증 문자열을 안전하게 만들기에서 `level` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
-    resultCheck: '검증 루프: 영수증 문자열을 안전하게 만들기에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.'
+    type: outputExact
+    evidence: practice
+    outputExact: '[INFO] order_created: ORD-2026-0007'
+    resultCheck: "출력이 정확히 일치해야 합니다: '[INFO] order_created: ORD-2026-0007'"
 - id: practice
   title: Day 4 종합 복습
   structuredPrimary: true
   subtitle: 문자열 기초 마스터하기
-  goal: Day 4 종합 복습에서 `first` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: 오늘 배운 문자열 연결로 두 단어를 한 문장으로 합친다.
+  why: 오늘 배운 문자열 조작을 직접 다시 써 봐야 다음 강의의 문자열 메서드로 넘어갈 수 있습니다.
   explanation: Day 4에서 배운 문자열 기초를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤
     순서로 해도 괜찮습니다.
   tips:
@@ -418,18 +536,26 @@ sections:
     path = 'C:\\Users\\Documents\\file.txt'
     path
   exercise:
-    prompt: Day 4 종합 복습 예제에서 `first`, `second` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    prompt: |-
+      first를 'Codaro'로 바꾸세요.
+
+      실행하면 Codaro Python이 나와야 합니다.
     starterCode: |-
       first = 'Hello'
       second = 'Python'
       first + ' ' + second
+    solution: |-
+      first = 'Codaro'
+      second = 'Python'
+      first + ' ' + second
     hints:
-    - 바꿀 지점은 `first = ...` 오른쪽 값입니다.
-    - 실행 뒤 `first` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "first = 'Hello' 를 first = 'Codaro' 로 바꿉니다. second 줄과 마지막 줄은 그대로 둡니다."
+    - "정답 형태: first = 'Codaro'"
   check:
-    type: noError
-    noError: Day 4 종합 복습에서 `first` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: Day 4 종합 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'Codaro Python'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Codaro Python'"
 assessment:
   schemaVersion: 1
   performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
