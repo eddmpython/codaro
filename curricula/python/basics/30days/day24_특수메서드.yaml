@@ -53,8 +53,8 @@ sections:
   title: __str__ 메서드
   structuredPrimary: true
   subtitle: 사람이 읽기 쉬운 문자열 표현
-  goal: str 메서드에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
-  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  goal: 책 정보를 바꾸고 print에 객체를 그대로 넣어 __str__이 자동으로 불리는 것을 확인한다.
+  why: 객체를 그냥 출력하면 기본값은 사람이 읽을 수 없는 주소인데, __str__을 한 번 정의해 두면 그 객체를 화면에 찍는 모든 자리가 한꺼번에 읽을 수 있는 문장으로 바뀝니다.
   explanation: |-
     __str__ 메서드는 객체를 문자열로 변환할 때 호출됩니다. str(객체)나 print(객체)를 사용하면 자동으로 __str__이 호출되어 사람이 읽기 쉬운 형태로 출력됩니다. 이 메서드를 정의하지 않으면 기본적으로 객체의 메모리 주소가 출력됩니다.
 
@@ -71,7 +71,10 @@ sections:
     book = Book('Python Guide', 'Kim')
     str(book)
   exercise:
-    prompt: str 메서드 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    prompt: |-
+      두 곳을 고치세요. book = Book('Python Guide', 'Kim')을 book = Book('Clean Code', 'Martin')으로 바꾸고, 마지막 줄 str(book)을 print(book)으로 바꾸세요. 클래스 본문은 그대로 둡니다.
+
+      print에 객체를 그대로 넣어도 __str__이 불리므로 Clean Code by Martin이 나와야 합니다.
     starterCode: |-
       class Book:
           def __init__(self, title, author):
@@ -83,19 +86,31 @@ sections:
 
       book = Book('Python Guide', 'Kim')
       str(book)
+    solution: |-
+      class Book:
+          def __init__(self, title, author):
+              self.title = title
+              self.author = author
+
+          def __str__(self):
+              return self.title + ' by ' + self.author
+
+      book = Book('Clean Code', 'Martin')
+      print(book)
     hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    - "book = Book('Python Guide', 'Kim') 을 book = Book('Clean Code', 'Martin') 으로 바꾸고, 마지막 줄 str(book) 을 print(book) 으로 바꿉니다. 클래스 안쪽은 건드리지 않습니다."
+    - "정답 형태: 마지막 줄 print(book)"
   check:
-    type: noError
-    noError: str 메서드의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
-    resultCheck: str 메서드 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'Clean Code by Martin'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Clean Code by Martin'"
 - id: repr_method
   title: __repr__ 메서드
   structuredPrimary: true
   subtitle: 개발자를 위한 명확한 표현
-  goal: repr 메서드에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
-  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  goal: repr()로 감싸지 않고 객체 이름만 적어도 __repr__이 쓰이는 것을 다른 좌표로 확인한다.
+  why: 디버깅할 때 객체를 그냥 찍어 봤는데 주소만 나오면 아무 단서가 없지만, __repr__을 정의해 두면 안에 어떤 값이 들어 있는지 그 자리에서 바로 보입니다.
   explanation: |-
     __repr__ 메서드는 객체의 공식적인 문자열 표현을 정의합니다. repr(객체)를 호출하거나 인터프리터에서 객체를 직접 입력하면 호출됩니다. 주로 디버깅이나 로깅에 사용되며, 가능하면 객체를 재생성할 수 있는 형태의 문자열을 반환해야 합니다.
 
@@ -112,7 +127,10 @@ sections:
     pt = Point(3, 4)
     repr(pt)
   exercise:
-    prompt: repr 메서드 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    prompt: |-
+      두 곳을 고치세요. pt = Point(3, 4)를 pt = Point(10, 20)으로 바꾸고, 마지막 줄 repr(pt)를 pt로 바꾸세요. 클래스 본문은 그대로 둡니다.
+
+      repr()로 감싸지 않고 객체 이름만 적어도 __repr__이 불리므로 Point(10, 20)이 나와야 합니다.
     starterCode: |-
       class Point:
           def __init__(self, x, y):
@@ -124,19 +142,31 @@ sections:
 
       pt = Point(3, 4)
       repr(pt)
+    solution: |-
+      class Point:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+          def __repr__(self):
+              return 'Point(' + str(self.x) + ', ' + str(self.y) + ')'
+
+      pt = Point(10, 20)
+      pt
     hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    - pt = Point(3, 4) 를 pt = Point(10, 20) 으로 바꾸고, 마지막 줄 repr(pt) 를 pt 한 글자짜리 줄로 바꿉니다.
+    - "정답 형태: 마지막 줄에 pt"
   check:
-    type: noError
-    noError: repr 메서드의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
-    resultCheck: repr 메서드 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'Point(10, 20)'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Point(10, 20)'"
 - id: len_method
   title: __len__ 메서드
   structuredPrimary: true
   subtitle: 객체의 길이 정의
-  goal: len 메서드에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
-  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  goal: 곡이 든 재생목록과 빈 재생목록을 나란히 놓아 __len__이 len()과 참거짓 판정에 함께 쓰이는 것을 확인한다.
+  why: 비어 있는지 확인할 때마다 len(x) == 0 이라고 적지 않고 if playlist 한 줄로 쓸 수 있는 이유가 __len__이며, 이 하나만 있으면 내가 만든 클래스도 리스트처럼 조건문에 바로 넣을 수 있습니다.
   explanation: |-
     __len__ 메서드는 객체의 길이를 정의합니다. len(객체)를 호출하면 자동으로 __len__이 호출되어 정수값을 반환합니다. 컬렉션 타입 클래스를 만들 때 매우 유용하며, 반드시 음이 아닌 정수를 반환해야 합니다.
 
@@ -157,7 +187,10 @@ sections:
     pl.add('Song B')
     len(pl)
   exercise:
-    prompt: len 메서드 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    prompt: |-
+      두 곳을 고치세요. pl.add('Song B') 아래에 empty = Playlist() 한 줄을 들여쓰기 없이 추가하고, 마지막 줄 len(pl)을 len(pl), bool(pl), len(empty), bool(empty)로 바꾸세요.
+
+      __len__이 돌려준 수가 0이면 False, 0이 아니면 True로 판정되므로 (2, True, 0, False)가 나와야 합니다.
     starterCode: |-
       class Playlist:
           def __init__(self):
@@ -173,19 +206,36 @@ sections:
       pl.add('Song A')
       pl.add('Song B')
       len(pl)
+    solution: |-
+      class Playlist:
+          def __init__(self):
+              self.songs = []
+
+          def add(self, song):
+              self.songs.append(song)
+
+          def __len__(self):
+              return len(self.songs)
+
+      pl = Playlist()
+      pl.add('Song A')
+      pl.add('Song B')
+      empty = Playlist()
+      len(pl), bool(pl), len(empty), bool(empty)
     hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    - "pl.add('Song B') 다음 줄에 empty = Playlist() 를 넣고, 마지막 줄을 len(pl), bool(pl), len(empty), bool(empty) 로 바꿉니다. empty에는 곡을 넣지 않습니다."
+    - "정답 형태: len(pl), bool(pl), len(empty), bool(empty)"
   check:
-    type: noError
-    noError: len 메서드의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
-    resultCheck: len 메서드 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '(2, True, 0, False)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(2, True, 0, False)'"
 - id: add_method
   title: __add__ 메서드
   structuredPrimary: true
   subtitle: + 연산자 구현
-  goal: add 메서드에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
-  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  goal: 더하기가 새 Vector를 만들어 돌려주고 원래 v1은 그대로 남는다는 것을 한 줄로 나란히 확인한다.
+  why: 좌표나 금액을 더할 때 v1 + v2 라고 쓸 수 있으면 계산식이 수식 그대로 읽히고, 새 객체를 돌려주므로 더하기 한 번에 원본이 바뀌는 사고도 나지 않습니다.
   explanation: |-
     __add__ 메서드는 + 연산자의 동작을 정의합니다. a + b를 실행하면 a.__add__(b)가 호출됩니다. 이를 통해 사용자 정의 클래스에서도 덧셈 연산을 의미있게 구현할 수 있습니다. 새로운 객체를 반환하는 것이 일반적입니다.
 
@@ -207,7 +257,10 @@ sections:
     v3 = v1 + v2
     repr(v3)
   exercise:
-    prompt: add 메서드 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    prompt: |-
+      두 곳을 고치세요. v2 = Vector(3, 4)를 v2 = Vector(9, 18)로 바꾸고, 마지막 줄 repr(v3)를 v3, v1로 바꾸세요. 클래스 본문은 그대로 둡니다.
+
+      __add__가 새 Vector를 만들어 v3에 넣고 v1은 손대지 않으므로 (Vector(10, 20), Vector(1, 2))가 나와야 합니다.
     starterCode: |-
       class Vector:
           def __init__(self, x, y):
@@ -224,19 +277,36 @@ sections:
       v2 = Vector(3, 4)
       v3 = v1 + v2
       repr(v3)
+    solution: |-
+      class Vector:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+          def __add__(self, other):
+              return Vector(self.x + other.x, self.y + other.y)
+
+          def __repr__(self):
+              return 'Vector(' + str(self.x) + ', ' + str(self.y) + ')'
+
+      v1 = Vector(1, 2)
+      v2 = Vector(9, 18)
+      v3 = v1 + v2
+      v3, v1
     hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    - v2 = Vector(3, 4) 를 v2 = Vector(9, 18) 로 바꾸고, 마지막 줄 repr(v3) 를 v3, v1 로 바꿉니다. v3 = v1 + v2 줄은 그대로 둡니다.
+    - "정답 형태: 마지막 줄에 v3, v1"
   check:
-    type: noError
-    noError: add 메서드의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
-    resultCheck: add 메서드 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '(Vector(10, 20), Vector(1, 2))'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(Vector(10, 20), Vector(1, 2))'"
 - id: eq_method
   title: __eq__ 메서드
   structuredPrimary: true
   subtitle: == 연산자 구현
-  goal: eq 메서드에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
-  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  goal: 값이 같으면 ==는 True이지만 is는 여전히 False라는 것을 한 줄에 나란히 놓고 확인한다.
+  why: 좌표나 금액처럼 값이 같으면 같은 것으로 봐야 하는 자료는 __eq__가 없으면 내용이 똑같아도 다르다고 판정되어, 비교하는 코드가 전부 속성을 하나씩 꺼내 보는 모양이 됩니다.
   explanation: |-
     __eq__ 메서드는 == 연산자의 동작을 정의합니다. a == b를 실행하면 a.__eq__(b)가 호출됩니다. 기본적으로 객체는 같은 메모리 주소일 때만 같다고 판단하지만, __eq__를 정의하면 값 기반 비교가 가능합니다. True나 False를 반환해야 합니다.
 
@@ -254,7 +324,10 @@ sections:
     loc2 = Location(1, 2)
     loc1 == loc2
   exercise:
-    prompt: eq 메서드 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    prompt: |-
+      마지막 줄 loc1 == loc2를 loc1 == loc2, loc1 is loc2로 바꾸세요. 클래스와 두 객체를 만드는 줄은 그대로 둡니다.
+
+      __eq__ 덕분에 값이 같으면 ==는 True이지만, 따로 만들어진 두 객체라서 같은 자리인지 묻는 is는 False입니다. 그래서 (True, False)가 나와야 합니다.
     starterCode: |-
       class Location:
           def __init__(self, x, y):
@@ -267,19 +340,32 @@ sections:
       loc1 = Location(1, 2)
       loc2 = Location(1, 2)
       loc1 == loc2
+    solution: |-
+      class Location:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+          def __eq__(self, other):
+              return self.x == other.x and self.y == other.y
+
+      loc1 = Location(1, 2)
+      loc2 = Location(1, 2)
+      loc1 == loc2, loc1 is loc2
     hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    - 마지막 줄 뒤에 쉼표를 찍고 loc1 is loc2 를 이어 붙여 loc1 == loc2, loc1 is loc2 로 만듭니다. 좌표 값은 두 객체 모두 그대로 둡니다.
+    - "정답 형태: loc1 == loc2, loc1 is loc2"
   check:
-    type: noError
-    noError: eq 메서드의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
-    resultCheck: eq 메서드 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '(True, False)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(True, False)'"
 - id: getitem_method
   title: __getitem__ 메서드
   structuredPrimary: true
   subtitle: 인덱싱과 슬라이싱 지원
-  goal: getitem 메서드에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
-  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  goal: __getitem__ 하나만 정의해도 음수 인덱스와 목록 변환이 함께 되는 것을 확인한다.
+  why: 내가 만든 클래스에 __getitem__ 하나만 붙여도 대괄호 인덱싱과 반복이 같이 열리기 때문에, 그 객체를 받는 쪽 코드가 리스트를 다루던 방식 그대로 돌아갑니다.
   explanation: |-
     __getitem__ 메서드는 객체[키] 형태의 인덱싱을 가능하게 합니다. obj[key]를 실행하면 obj.__getitem__(key)가 호출됩니다. 리스트처럼 동작하는 커스텀 컨테이너를 만들 때 필수적이며, 슬라이싱도 지원할 수 있습니다.
 
@@ -300,7 +386,10 @@ sections:
     items.add('second')
     items[0]
   exercise:
-    prompt: getitem 메서드 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    prompt: |-
+      마지막 줄 items[0]을 items[-1], list(items)로 바꾸세요. 클래스와 add 호출 두 줄은 그대로 둡니다.
+
+      안쪽 리스트가 음수 인덱스를 그대로 처리하고, list()는 __getitem__을 0번부터 차례로 불러 값을 모읍니다. 그래서 ('second', ['first', 'second'])가 나와야 합니다.
     starterCode: |-
       class Items:
           def __init__(self):
@@ -316,19 +405,35 @@ sections:
       items.add('first')
       items.add('second')
       items[0]
+    solution: |-
+      class Items:
+          def __init__(self):
+              self.data = []
+
+          def add(self, item):
+              self.data.append(item)
+
+          def __getitem__(self, idx):
+              return self.data[idx]
+
+      items = Items()
+      items.add('first')
+      items.add('second')
+      items[-1], list(items)
     hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    - "items[0] 을 items[-1], list(items) 로 바꿉니다. 대괄호 안에 -1 을 넣으면 마지막 항목이고, list() 는 객체 전체를 목록으로 만듭니다."
+    - "정답 형태: items[-1], list(items)"
   check:
-    type: noError
-    noError: getitem 메서드의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
-    resultCheck: getitem 메서드 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: "('second', ['first', 'second'])"
+    resultCheck: "출력이 정확히 일치해야 합니다: \"('second', ['first', 'second'])\""
 - id: special_methods_practice
   title: 특수 메서드 실전
   structuredPrimary: true
   subtitle: 여러 특수 메서드 조합
-  goal: 특수 메서드 실전에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
-  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  goal: 할 일을 하나 더 넣어 __len__, __str__, __getitem__ 세 가지가 같은 변화에 함께 반응하는 것을 확인한다.
+  why: 특수 메서드를 여러 개 갖춘 객체는 길이 재기, 문자열 만들기, 인덱싱을 모두 파이썬 기본 문법으로 받아 주기 때문에, 그 객체를 쓰는 코드가 리스트를 다루던 코드와 똑같이 읽힙니다.
   explanation: |-
     실제 클래스는 여러 특수 메서드를 함께 구현하여 파이썬 내장 타입처럼 동작하게 만듭니다. __str__, __len__, __getitem__ 등을 조합하면 강력하고 직관적인 인터페이스를 제공할 수 있습니다.
 
@@ -355,7 +460,10 @@ sections:
     todo.add('Code')
     len(todo), str(todo), todo[0]
   exercise:
-    prompt: 특수 메서드 실전 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    prompt: |-
+      두 곳을 고치세요. todo.add('Code') 아래에 todo.add('Rest') 한 줄을 추가하고, 마지막 줄의 todo[0]을 todo[-1]로 바꾸세요. 클래스 본문은 그대로 둡니다.
+
+      할 일이 셋이 되면 __len__은 3을, __str__은 그 수를 그대로 쓴 3 tasks를, __getitem__은 마지막 항목을 돌려줍니다. 그래서 (3, '3 tasks', 'Rest')가 나와야 합니다.
     starterCode: |-
       class TodoList:
           def __init__(self):
@@ -377,19 +485,42 @@ sections:
       todo.add('Study')
       todo.add('Code')
       len(todo), str(todo), todo[0]
+    solution: |-
+      class TodoList:
+          def __init__(self):
+              self.tasks = []
+
+          def add(self, task):
+              self.tasks.append(task)
+
+          def __len__(self):
+              return len(self.tasks)
+
+          def __getitem__(self, idx):
+              return self.tasks[idx]
+
+          def __str__(self):
+              return str(len(self.tasks)) + ' tasks'
+
+      todo = TodoList()
+      todo.add('Study')
+      todo.add('Code')
+      todo.add('Rest')
+      len(todo), str(todo), todo[-1]
     hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    - "todo.add('Code') 다음 줄에 todo.add('Rest') 를 들여쓰기 없이 넣고, 마지막 줄의 todo[0] 만 todo[-1] 로 바꿉니다. len(todo) 와 str(todo) 는 그대로 둡니다."
+    - "정답 형태: len(todo), str(todo), todo[-1]"
   check:
-    type: noError
-    noError: 특수 메서드 실전의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
-    resultCheck: 특수 메서드 실전 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: "(3, '3 tasks', 'Rest')"
+    resultCheck: "출력이 정확히 일치해야 합니다: \"(3, '3 tasks', 'Rest')\""
 - id: workflow_validation
   title: '현업 흐름 검증: 장바구니를 파이썬답게 다루기'
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
-  goal: '현업 흐름 검증: 장바구니를 파이썬답게 다루기에서 예상값과 실제 실행 결과를 비교하는 검증 흐름을 확인한다.'
-  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  goal: assert 네 줄을 그대로 통과시킨 뒤 장바구니 합계를 출력해 __str__이 없으면 __repr__이 대신 쓰이는 것을 확인한다.
+  why: 특수 메서드가 여럿 얽힌 코드는 눈으로 훑어서는 맞는지 알 수 없으므로, 기대값을 assert로 박아 두고 조용히 끝나는지 본 다음 마지막 값 하나만 눈으로 확인합니다.
   explanation: 특수 메서드는 객체를 len(), 인덱싱, 비교, 더하기 같은 파이썬 기본 문법과 자연스럽게 연결합니다. 장바구니 예제로 동작을 검증해봅니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -449,7 +580,12 @@ sections:
 
     print("장바구니 특수 메서드 흐름 통과")
   exercise:
-    prompt: '현업 흐름 검증: 장바구니를 파이썬답게 다루기 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
+    prompt: |-
+      기존 줄은 하나도 바꾸지 말고 그대로 두세요. 맨 아래 print 줄 다음에 print(cart.total()) 한 줄만 추가하면 됩니다.
+
+      assert 네 줄이 조용히 통과한 뒤, Money에는 __str__이 없어 print가 __repr__을 대신 쓰므로 아래 두 줄이 나와야 합니다.
+      장바구니 특수 메서드 흐름 통과
+      Money(70000)
     starterCode: |-
       class Money:
           def __init__(self, amount):
@@ -505,19 +641,78 @@ sections:
           assert "Money" in str(exc)
 
       print("장바구니 특수 메서드 흐름 통과")
+    solution: |-
+      class Money:
+          def __init__(self, amount):
+              if amount < 0:
+                  raise ValueError("amount must not be negative")
+              self.amount = amount
+
+          def __add__(self, other):
+              if not isinstance(other, Money):
+                  raise TypeError("Money can only be added to Money")
+              return Money(self.amount + other.amount)
+
+          def __eq__(self, other):
+              return isinstance(other, Money) and self.amount == other.amount
+
+          def __repr__(self):
+              return f"Money({self.amount})"
+
+      class Cart:
+          def __init__(self):
+              self.lines = []
+
+          def add(self, name, price):
+              self.lines.append({"name": name, "price": Money(price)})
+
+          def __len__(self):
+              return len(self.lines)
+
+          def __getitem__(self, index):
+              return self.lines[index]
+
+          def total(self):
+              totalMoney = Money(0)
+              for line in self.lines:
+                  totalMoney = totalMoney + line["price"]
+              return totalMoney
+
+          def __repr__(self):
+              return f"Cart(lines={self.lines!r})"
+
+      cart = Cart()
+      cart.add("keyboard", 50000)
+      cart.add("mouse", 20000)
+
+      assert len(cart) == 2
+      assert cart[0]["name"] == "keyboard"
+      assert cart.total() == Money(70000)
+      assert repr(cart).startswith("Cart(")
+
+      try:
+          Money(1000) + 500
+      except TypeError as exc:
+          assert "Money" in str(exc)
+
+      print("장바구니 특수 메서드 흐름 통과")
+      print(cart.total())
     hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    - 코드는 하나도 고치지 말고, 맨 아래 print 줄 다음에 print(cart.total()) 한 줄만 들여쓰기 없이 추가합니다.
+    - "정답 형태: 마지막 줄에 print(cart.total())"
   check:
-    type: noError
-    noError: '현업 흐름 검증: 장바구니를 파이썬답게 다루기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
-    resultCheck: '현업 흐름 검증: 장바구니를 파이썬답게 다루기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+    type: outputExact
+    evidence: practice
+    outputExact: |-
+      장바구니 특수 메서드 흐름 통과
+      Money(70000)
+    resultCheck: "출력이 정확히 일치해야 합니다: '장바구니 특수 메서드 흐름 통과\nMoney(70000)'"
 - id: practice
   title: Day 24 종합 복습
   structuredPrimary: true
   subtitle: 특수 메서드 마스터하기
-  goal: Day 24 종합 복습에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
-  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  goal: Person에 __repr__을 직접 붙여 같은 객체가 자리에 따라 다른 문자열로 보이게 만든다.
+  why: __str__은 사용자에게 보여 줄 문장이고 __repr__은 값을 그대로 드러내는 개발자용 표현이라, 둘을 함께 정의해 두면 화면과 로그가 각자 필요한 형태를 갖게 됩니다.
   explanation: Day 24에서 배운 특수 메서드를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -533,7 +728,10 @@ sections:
     p = Person('Alice', 25)
     str(p)
   exercise:
-    prompt: Day 24 종합 복습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    prompt: |-
+      두 곳을 고치세요. __str__ 메서드 아래에 빈 줄 하나를 두고 __repr__ 메서드를 클래스 안에 추가하세요. 본문은 return 'Person(' + self.name + ', ' + str(self.age) + ')' 한 줄입니다. 그리고 마지막 줄 str(p)를 str(p), p로 바꾸세요.
+
+      같은 p 객체인데 str()은 __str__을 쓰고 이름만 적은 자리는 __repr__을 쓰므로 ('Alice (25)', Person(Alice, 25))가 나와야 합니다.
     starterCode: |-
       class Person:
           def __init__(self, name, age):
@@ -545,13 +743,28 @@ sections:
 
       p = Person('Alice', 25)
       str(p)
+    solution: |-
+      class Person:
+          def __init__(self, name, age):
+              self.name = name
+              self.age = age
+
+          def __str__(self):
+              return self.name + ' (' + str(self.age) + ')'
+
+          def __repr__(self):
+              return 'Person(' + self.name + ', ' + str(self.age) + ')'
+
+      p = Person('Alice', 25)
+      str(p), p
     hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    - "def __repr__(self): 를 __str__ 과 같은 들여쓰기(공백 4칸)로 적고, 그 안에 return 'Person(' + self.name + ', ' + str(self.age) + ')' 한 줄을 넣습니다. 그리고 마지막 줄을 str(p), p 로 바꿉니다."
+    - "정답 형태: __repr__ 추가 뒤 마지막 줄 str(p), p"
   check:
-    type: noError
-    noError: Day 24 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
-    resultCheck: Day 24 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: "('Alice (25)', Person(Alice, 25))"
+    resultCheck: "출력이 정확히 일치해야 합니다: \"('Alice (25)', Person(Alice, 25))\""
 assessment:
   schemaVersion: 1
   performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
