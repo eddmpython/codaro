@@ -31,7 +31,7 @@ REPORT_PATH = REPORT_ROOT / "visual-accessibility-report.json"
 SCREENSHOT_ROOT = REPORT_ROOT / "screenshots"
 SCHEMA_VERSION = 2
 PLAYWRIGHT_VERSION = "1.61.0"
-SOCIAL_ORDER = ["github", "support", "youtube", "threads"]
+SOCIAL_ORDER = ["github", "support", "youtube", "threads", "email"]
 ACCOUNT_NUMBER = "1002-0421-4626"
 MINIMUM_CONTRAST = 4.5
 

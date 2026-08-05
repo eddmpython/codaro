@@ -3508,7 +3508,7 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
         failures.append(
             f"{name}: canonical cascade layer order was not injected before split CSS"
         )
-    if audit["visibleSocialLinkIds"] != ["github", "support", "youtube", "threads"]:
+    if audit["visibleSocialLinkIds"] != ["github", "support", "youtube", "threads", "email"]:
         failures.append(
             f"{name}: shared SNS rail is missing or reordered: {audit['visibleSocialLinkIds']}"
         )

@@ -52,7 +52,7 @@ whenToUse: 새 UI 컴포넌트 추가, 색/반지름/그림자 변경, 랜딩/�
 - 랜딩과 editor의 테마 버튼은 현재 해석된 테마를 기준으로 light와 dark를 직접 전환한다. 저장값이 `system`이어도 첫 클릭이 같은 화면을 유지하거나 세 번째 상태를 거치면 안 된다.
 - SNS와 외부 링크의 SSOT는 `assets/brand/designSystem/socialLinks.json`이다.
   - 우상단 control lane은 테마 전환을 먼저 두고 그 뒤에 공용 SNS를 배치한다. 테마 전환은 SNS registry 항목이 아니지만 Landing, Learn, Web Run, Local에서 항상 같은 행에 보인다.
-  - 표시 순서는 `GitHub → 하트 → YouTube → Threads`다. 사용자-facing label, URL, SVG path는 이 registry만 수정한다.
+  - 표시 순서는 `GitHub → 하트 → YouTube → Threads → 이메일`이다. 사용자-facing label, URL, SVG path는 이 registry만 수정한다. 이메일은 `mailto:` 주소만 허용한다.
   - 하트는 외부 링크가 아니라 `supportDialog` action이다. 팝업 제목, 안내, 참여 링크, Buy Me a Coffee, GitHub Sponsors, 토스뱅크 계좌번호와 예금주도 같은 registry의 `supportCenter`가 소유한다.
   - `assets/brand/tools/buildDesignSystem.py`가 landing과 editor의 `styles/generated/socialLinks.tsx`를 동일 byte로 생성한다.
   - 생성 컴포넌트는 Astryx `IconButton`, body portal 팝업, Escape 닫기, 기존 focus 복원, 계좌번호 복사를 함께 제공한다. landing과 editor는 각 app bundle 안에서 이 생성 컴포넌트를 사용하며 한 제품 표면의 내부 component를 다른 표면에서 직접 import하지 않는다.

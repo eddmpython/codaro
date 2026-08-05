@@ -203,7 +203,7 @@ def validateSocialLinks(document: dict[str, Any]) -> None:
     supportCenter = document.get("supportCenter")
     if document.get("version") != 2 or not isinstance(links, list):
         raise DesignSystemError("social link registry must use version 2 and define links")
-    expectedIds = ["github", "support", "youtube", "threads"]
+    expectedIds = ["github", "support", "youtube", "threads", "email"]
     actualIds = [link.get("id") for link in links if isinstance(link, dict)]
     if actualIds != expectedIds:
         raise DesignSystemError("social links must keep the approved shared order")
@@ -217,8 +217,13 @@ def validateSocialLinks(document: dict[str, Any]) -> None:
             raise DesignSystemError(f"social link fields are invalid: {link}")
         if not all(isinstance(link[key], str) and link[key].strip() for key in requiredKeys):
             raise DesignSystemError(f"social link fields must be non-empty strings: {link.get('id')}")
-        if "href" in link and not link["href"].startswith("https://"):
-            raise DesignSystemError(f"social link must use HTTPS: {link['id']}")
+        href = link.get("href")
+        if isinstance(href, str):
+            if link.get("id") == "email":
+                if not href.startswith("mailto:") or "@" not in href.removeprefix("mailto:"):
+                    raise DesignSystemError(f"email social link must use mailto address: {link['id']}")
+            elif not href.startswith("https://"):
+                raise DesignSystemError(f"social link must use HTTPS: {link['id']}")
         if link.get("id") == "support" and link.get("action") != "supportDialog":
             raise DesignSystemError("support social link must open the shared support dialog")
         if link["viewBox"] != "0 0 24 24":
@@ -551,10 +556,11 @@ export function SocialLinks({
               icon={<SocialIcon link={link} />}
               key={link.id}
               label={link.label}
-              rel="noopener noreferrer"
               size="sm"
-              target="_blank"
               variant="ghost"
+              {...(link.href.startsWith("mailto:")
+                ? {}
+                : {rel: "noopener noreferrer", target: "_blank"})}
             />
           ),
         )}

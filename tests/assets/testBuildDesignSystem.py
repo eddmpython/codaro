@@ -41,12 +41,14 @@ class BuildDesignSystemTest(unittest.TestCase):
         source = GENERATOR.renderSocialLinks(self.socialLinks)
         self.assertEqual(
             [link["id"] for link in self.socialLinks["links"]],
-            ["github", "support", "youtube", "threads"],
+            ["github", "support", "youtube", "threads", "email"],
         )
         self.assertIn("socialLinksSourceHash", source)
         self.assertIn("https://github.com/eddmpython/codaro", source)
         self.assertIn("https://www.youtube.com/@eddmpython", source)
         self.assertIn("https://www.threads.net/@eddmpython", source)
+        self.assertIn("mailto:eddmpython@gmail.com", source)
+        self.assertIn('link.href.startsWith("mailto:")', source)
         self.assertIn("https://buymeacoffee.com/eddmpython", source)
         self.assertIn('data-support-dialog="codaro"', source)
         self.assertIn('fillOpacity={link.id === "support" ? 0.24 : 1}', source)
