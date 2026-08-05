@@ -3,6 +3,8 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 
+import pytest
+
 from codaro.kernel import SessionManager, KernelSession, executeKernelBlock, executeKernelReactive
 
 
@@ -306,6 +308,77 @@ FakeImage()
     assert result.status == "done"
     assert result.type == "image"
     assert result.data.startswith("data:image/png;base64,")
+    session.dispose()
+
+
+def testMatplotlibShowProducesFigure() -> None:
+    """`plt.show()`로 끝나는 셀이 그림을 낸다.
+
+    커널은 `_repr_png_`만 보고 있었는데 matplotlib Figure는 IPython 없이는 그 메서드를 갖지
+    않는다. 그래서 시각화 레슨 전체가 그림 없이 텍스트만 내보내던 회귀를 막는다.
+    stderr까지 함께 본다 — headless 경고가 새면 정상 실행이 오류 박스로 표시된다.
+    """
+    pytest.importorskip("matplotlib")
+    session = KernelSession()
+    code = """
+import matplotlib.pyplot as plt
+plt.plot([1, 2, 3], [4, 5, 6])
+plt.show()
+"""
+    result = _run(session.execute(code, blockId="figure"))
+
+    assert result.status == "done"
+    assert result.type == "image"
+    assert result.data.startswith("data:image/png;base64,")
+    assert result.stderr == ""
+    session.dispose()
+
+
+def testMatplotlibFiguresDoNotLeakToNextCell() -> None:
+    """거둔 figure는 닫힌다 — 닫지 않으면 다음 셀이 같은 그림을 다시 낸다."""
+    pytest.importorskip("matplotlib")
+    session = KernelSession()
+    _run(session.execute("import matplotlib.pyplot as plt\nplt.plot([1, 2])", blockId="first"))
+    second = _run(session.execute("value = 1 + 1\nvalue", blockId="second"))
+
+    assert second.type == "text"
+    assert "2" in second.data
+    session.dispose()
+
+
+def testMultipleFiguresArriveAsList() -> None:
+    pytest.importorskip("matplotlib")
+    session = KernelSession()
+    code = """
+import matplotlib.pyplot as plt
+plt.figure()
+plt.plot([1])
+plt.figure()
+plt.plot([2])
+"""
+    result = _run(session.execute(code, blockId="figures"))
+
+    assert result.type == "image"
+    assert isinstance(result.data, list)
+    assert len(result.data) == 2
+    assert all(item.startswith("data:image/png;base64,") for item in result.data)
+    session.dispose()
+
+
+def testReprHtmlReturningNoneFallsBackToText() -> None:
+    """`_repr_html_`가 None을 주는 객체를 html 출력으로 흘리지 않는다(빈 출력 회귀)."""
+    session = KernelSession()
+    code = """
+class QuietHtml:
+    def _repr_html_(self):
+        return None
+
+QuietHtml()
+"""
+    result = _run(session.execute(code, blockId="quiet"))
+
+    assert result.type == "text"
+    assert "QuietHtml" in result.data
     session.dispose()
 
 

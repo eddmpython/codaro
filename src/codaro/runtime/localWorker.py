@@ -11,6 +11,7 @@ from pathlib import Path
 import sys
 import traceback
 from typing import Any
+import warnings
 
 # numpy/scipy/scikit-learn이 쓰는 OpenBLAS는 기본적으로 CPU 코어 수만큼 스레드 버퍼를 미리
 # 잡는다. spawn으로 만든 worker(특히 여러 세션이 동시에 떠 있을 때)에서는 이 할당이 실패해
@@ -22,11 +23,17 @@ from typing import Any
 for _threadVar in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS"):
     os.environ.setdefault(_threadVar, "1")
 os.environ.setdefault("MPLBACKEND", "Agg")
+# headless(Agg)에서 `plt.show()`는 "FigureCanvasAgg is non-interactive" 경고를 stderr로 낸다.
+# Codaro는 셀이 끝날 때 열린 figure를 거둬 그림으로 보여주므로(_captureMatplotlibFigures)
+# show()는 실제로 동작하고, 이 경고는 사실과 다르다. 그대로 두면 stderr가 채워져 학습자에게
+# 정상 실행이 오류로 표시된다. 이 한 문구만 막고 다른 경고는 그대로 전달한다.
+warnings.filterwarnings("ignore", message=".*FigureCanvasAgg is non-interactive.*")
 
 from ..document.analysis import analyzeCode, interpolateMarkdown
 from ..errorGuard import safeRepr
 from ..outputDescriptor import StopExecution, isDescriptorPayload, markdown
 from ..uiValue import beginBlock, resetStore, setStoredValue
+from .figureCapture import captureMatplotlibFigures
 
 
 def runLocalWorker(
@@ -293,6 +300,15 @@ def _executeCommand(
             resultType = "error"
             resultData = traceback.format_exc()
             hasDisplay = True
+
+    # 셀이 남긴 그림 거두기. 마지막 표현식이 값을 내지 않는 경우(`plt.show()`, `ax.plot(...)`,
+    # `fig, ax = plt.subplots()`)가 학습 코드의 대다수라, 이 수집이 없으면 그림이 사라진다.
+    # 에러로 끝난 셀에서도 호출해 열린 figure가 다음 셀로 새지 않게 한다(수집 함수가 닫는다).
+    figures = captureMatplotlibFigures()
+    if figures and resultStatus not in ("error", "stopped") and resultType == "text":
+        resultType = "image"
+        resultData = figures if len(figures) > 1 else figures[0]
+        hasDisplay = True
 
     effectiveBlockId = blockId or f"_anon_{executionCount}"
     if resultStatus not in ("error", "stopped"):
@@ -613,9 +629,14 @@ def _normalizeResult(value: object) -> tuple[str, object]:
 
     if hasattr(value, "_repr_html_"):
         try:
-            return "html", value._repr_html_()
+            html = value._repr_html_()
         except Exception:  # noqa: BLE001 — user object method
             return "text", repr(value)
+        # matplotlib Figure처럼 _repr_html_를 갖고도 None을 돌려주는 객체가 있다.
+        # 그대로 통과시키면 화면에 빈 html 출력이 남으므로 텍스트로 되돌린다.
+        if isinstance(html, str) and html:
+            return "html", html
+        return "text", repr(value)
 
     return "text", repr(value)
 

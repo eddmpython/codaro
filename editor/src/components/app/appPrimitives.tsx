@@ -24,7 +24,7 @@ import { useLocale } from "@/lib/localeContext";
 import { learnerFacingErrorText } from "@/lib/tracebackParser";
 import { cn } from "@/lib/utils";
 import { useWidgetSession } from "@/lib/widgetSession";
-import type { BlockConfig, ExecutionResult } from "@/types";
+import type { BlockConfig, ExecutionResult, VariableInfo } from "@/types";
 
 export function IconButton({
   children,
@@ -98,6 +98,141 @@ export function CodePayload({ label = "예제 스니펫", value }: { label?: str
   );
 }
 
+// 커널이 만든 그림만 그린다. data URI 외의 출처(원격 URL 등)는 통과시키지 않는다.
+const FIGURE_DATA_URI = /^data:image\/(png|jpeg|gif|webp);base64,[A-Za-z0-9+/=]+$/;
+
+function asFigureSources(data: unknown): string[] | null {
+  const candidates = Array.isArray(data) ? data : [data];
+  const sources = candidates.filter(
+    (item): item is string => typeof item === "string" && FIGURE_DATA_URI.test(item),
+  );
+  return sources.length > 0 ? sources : null;
+}
+
+/**
+ * 커널이 거둔 그림을 학습 흐름 안에 놓는다.
+ *
+ * 높이를 26rem으로 묶는 이유는 미관이 아니다. 원본 크기대로 두면 차트 한 장이 화면을 덮어
+ * 바로 위의 코드와 아래의 다음 단계가 밀려나고, 학습자가 "무슨 코드가 이 그림을 만들었는지"를
+ * 한 화면에서 못 본다.
+ */
+function FigureOutput({ sources }: { sources: string[] }) {
+  const { t } = useLocale();
+  return (
+    <div className="flex flex-col gap-3" data-execution-output-mode="figure">
+      {sources.map((source, index) => (
+        <img
+          alt={sources.length > 1 ? t("system.figureNth", { index: index + 1 }) : t("system.figure")}
+          className="h-auto max-h-[26rem] w-auto max-w-full self-start rounded-md border bg-background"
+          key={`${index}-${source.slice(22, 54)}`}
+          src={source}
+        />
+      ))}
+    </div>
+  );
+}
+
+// 변수 하나를 가장 짧게 설명하는 문구 — 형태가 있으면 형태가 값보다 많은 것을 말한다.
+function variableSummary(variable: VariableInfo): string {
+  if (variable.shape) {
+    return variable.dtype ? `${variable.shape} ${variable.dtype}` : variable.shape;
+  }
+  const repr = variable.repr ?? "";
+  return repr.length > 28 ? `${repr.slice(0, 28)}…` : repr;
+}
+
+// import한 함수나 클래스가 바뀌었다는 사실은 학습자가 볼 이유가 없다. 리본은 데이터만 말한다.
+const DELTA_NOISE_TYPES = new Set([
+  "ABCMeta",
+  "builtin_function_or_method",
+  "function",
+  "method",
+  "module",
+  "type",
+]);
+
+function isLearnerVisible(variable: VariableInfo): boolean {
+  return !DELTA_NOISE_TYPES.has(variable.typeName);
+}
+
+// 형태를 가진 값(표·배열)이 학습에서 가장 중요하다. 뒤로 밀리지 않게 앞으로 올린다.
+function byDataFirst(left: VariableInfo, right: VariableInfo): number {
+  return Number(Boolean(right.shape)) - Number(Boolean(left.shape));
+}
+
+const DELTA_BADGE_LIMIT = 5;
+
+/**
+ * 이번 실행이 남긴 변화를 한 줄로 보여준다.
+ *
+ * 커널은 실행마다 added/updated/removed를 계산해 프론트까지 보내고 있었지만 그리는 곳이 없었다.
+ * 학습자가 "실행됐다"가 아니라 "무엇이 달라졌다"를 보게 하는 것이 이 줄의 목적이라, 색이 아니라
+ * 기호로 구분해 학습 표면의 색 계열(무채 + accent + success/warning/destructive)을 늘리지 않는다.
+ */
+function StateDeltaRibbon({ delta }: { delta?: ExecutionResult["stateDelta"] }) {
+  const { t } = useLocale();
+  if (!delta) return null;
+  const added = (delta.added ?? []).filter(isLearnerVisible).sort(byDataFirst);
+  const addedNames = new Set(added.map((variable) => variable.name));
+  // 같은 이름이 added와 updated 양쪽에 오면 새로 생겼다는 사실 하나만 말한다.
+  const updated = (delta.updated ?? [])
+    .filter((variable) => isLearnerVisible(variable) && !addedNames.has(variable.name))
+    .sort(byDataFirst);
+  const entries = [
+    ...added.map((variable) => ({
+      key: `added:${variable.name}`,
+      mark: "+",
+      name: variable.name,
+      role: t("system.stateDelta.added"),
+      strike: false,
+      summary: variableSummary(variable),
+    })),
+    ...updated.map((variable) => ({
+      key: `updated:${variable.name}`,
+      mark: "~",
+      name: variable.name,
+      role: t("system.stateDelta.updated"),
+      strike: false,
+      summary: variableSummary(variable),
+    })),
+    ...(delta.removed ?? []).map((name) => ({
+      key: `removed:${name}`,
+      mark: "−",
+      name,
+      role: t("system.stateDelta.removed"),
+      strike: true,
+      summary: "",
+    })),
+  ];
+
+  if (entries.length === 0) return null;
+
+  const shown = entries.slice(0, DELTA_BADGE_LIMIT);
+  const hiddenCount = entries.length - shown.length;
+
+  return (
+    <div
+      className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1 border-t pt-2 text-xs"
+      data-execution-state-delta="true"
+    >
+      <span className="text-muted-foreground">{t("system.stateDelta")}</span>
+      {shown.map((entry) => (
+        <span className="inline-flex items-baseline gap-1" key={entry.key}>
+          <span aria-hidden="true" className="text-muted-foreground">{entry.mark}</span>
+          <span className="sr-only">{entry.role}</span>
+          <span className={cn("font-mono text-foreground", entry.strike && "line-through")}>{entry.name}</span>
+          {entry.summary ? (
+            <span className="font-mono text-muted-foreground">{entry.summary}</span>
+          ) : null}
+        </span>
+      ))}
+      {hiddenCount > 0 ? (
+        <span className="text-muted-foreground">{t("system.stateDelta.more", { count: hiddenCount })}</span>
+      ) : null}
+    </div>
+  );
+}
+
 export function ExecutionOutput({
   ariaLabel,
   result,
@@ -119,6 +254,9 @@ export function ExecutionOutput({
     : packageError || result.status === "error" || Boolean(result.stderr);
   const widgetDescriptor = !hasError && isWidgetDescriptor(result.data) ? result.data : null;
   const dataframeData = !widgetDescriptor && !hasError && result.type === "dataframe" ? asDataFramePayload(result.data) : null;
+  const figureSources = !widgetDescriptor && !dataframeData && !hasError && result.type === "image"
+    ? asFigureSources(result.data)
+    : null;
   const automationError = hasError && result.type === "automation";
   const rawOutput = result.stderr || result.stdout || stringifyData(result.data) || t("runtime.noOutput");
   const output = automationOutput
@@ -155,6 +293,8 @@ export function ExecutionOutput({
         </div>
       ) : dataframeData ? (
         <DataFrameOutput data={dataframeData} />
+      ) : figureSources ? (
+        <FigureOutput sources={figureSources} />
       ) : automationOutput?.valid ? (
         <AutomationSessionOutput presentation={automationOutput.presentation} />
       ) : (
@@ -162,6 +302,7 @@ export function ExecutionOutput({
         <pre className="max-w-full whitespace-pre-wrap break-words font-mono text-sm leading-6">{output}</pre>
       </ScrollArea>
       )}
+      {hasError ? null : <StateDeltaRibbon delta={result.stateDelta} />}
       {hasError && !automationError ? (
         <div
           className="mt-3 flex gap-2 rounded-md border border-destructive/25 bg-background/70 px-3 py-2 text-xs leading-5"
