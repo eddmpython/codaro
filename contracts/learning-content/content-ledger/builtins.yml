@@ -4,7 +4,7 @@ canonicalRows: 35
 lessons:
   - lessonRef: "builtins/01_math"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "206d3fe9b407bfa30b9f901596864a01b92e449dfb782fc303b18497bf9bfa71"
+    lessonContentHash: "446e3ab14eda82af61a35b542880a4a62af07de877f5b2665f1854d6d4b002dc"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]

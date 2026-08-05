@@ -57,7 +57,7 @@ sections:
   assessmentMode: mastery
   unseen: true
   subtitle: 첫 파이썬 프로그램
-  goal: Hello World에서 print() 입력값이 출력 영역에 어떻게 표시되는지 확인한다.
+  goal: print()로 글자를 화면에 출력하는 방법을 확인한다.
   why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: |-
     프로그래밍을 처음 배울 때는 보통 'Hello World'를 화면에 출력합니다. 코드가 제대로 실행되는지 가장 작게 확인할 수 있기 때문입니다. 파이썬에서는 print()를 사용해 화면에 텍스트를 보여줍니다.
@@ -65,18 +65,14 @@ sections:
     작은따옴표('')와 큰따옴표("")는 기능상 차이가 없습니다. 편한 것을 사용하세요.
   snippet: print('Hello World')
   exercise:
-    prompt: 빈칸 문자열을 Codaro로 바꿔 정확히 Hello Codaro를 출력하세요.
+    prompt: |-
+      print() 안의 ____를 Codaro로 바꾸세요.
+      
+      실행하면 Hello Codaro가 한 줄로 나와야 합니다.
     starterCode: print('Hello ____')
     hints:
-    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
-    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
-    variations:
-    - prompt: 작은따옴표 대신 큰따옴표로 바꿔도 같은 결과가 나오는지 확인하세요.
-      starterCode: print("Hello Codaro")
-      parameterization: 따옴표 종류 변경 - 동일 출력 검증
-    - prompt: print() 안에 쉼표로 두 값을 넣으면 어떻게 표시되는지 확인하세요.
-      starterCode: print('Hello', 'World')
-      parameterization: 인자 개수 변경 - 공백 구분자 검증
+    - ____만 Codaro로 바꿉니다. 따옴표는 그대로 둡니다.
+    - "정답 형태: print('Hello Codaro')"
   check:
     id: python.print.hello-codaro.output.v1
     version: 1
@@ -101,7 +97,7 @@ sections:
   title: 한글 출력하기
   structuredPrimary: true
   subtitle: 파이썬은 모든 언어 지원
-  goal: 한글 출력하기에서 print() 입력값이 출력 영역에 어떻게 표시되는지 확인한다.
+  goal: print()로 한글도 그대로 출력되는지 확인한다.
   why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: |-
     파이썬은 영어뿐만 아니라 한글, 일본어, 중국어처럼 여러 언어의 글자를 출력할 수 있습니다. 지금은 어려운 원리를 외울 필요 없이, 따옴표 안에 넣은 글자가 화면에 보인다고 이해하면 됩니다.
@@ -109,21 +105,24 @@ sections:
     이모지도 출력할 수 있습니다: print('🐍 Python')
   snippet: print('안녕하세요, 파이썬!')
   exercise:
-    prompt: 빈칸을 Codaro로 바꿔 정확히 안녕하세요, Codaro!를 출력하세요.
+    prompt: |-
+      print() 안의 ____를 Codaro로 바꾸세요.
+      
+      실행하면 안녕하세요, Codaro!가 한 줄로 나와야 합니다.
     starterCode: print('안녕하세요, ____!')
     hints:
-    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
-    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+    - ____만 Codaro로 바꿉니다. 쉼표와 느낌표는 그대로 둡니다.
+    - "정답 형태: print('안녕하세요, Codaro!')"
   check:
     type: outputExact
     evidence: practice
-    outputExact: 안녕하세요, Codaro!
-    resultCheck: 출력이 안녕하세요, Codaro!와 정확히 일치해야 합니다.
+    outputExact: "안녕하세요, Codaro!"
+    resultCheck: "출력이 정확히 일치해야 합니다: '안녕하세요, Codaro!'"
 - id: print_multiple
   title: 여러 줄 출력하기
   structuredPrimary: true
   subtitle: print() 여러 번 사용
-  goal: 여러 줄 출력하기에서 여러 print() 호출의 출력 순서와 줄 수를 확인한다.
+  goal: print()를 여러 번 쓰면 화면에 여러 줄이 나온다는 걸 확인한다.
   why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: 여러 줄의 텍스트를 출력하려면 print()를 여러 번 사용하면 됩니다. 각 print()는 자동으로 줄을 바꾸므로 다음 출력은 새 줄에서 시작됩니다.
   tips:
@@ -133,14 +132,20 @@ sections:
     print('두 번째 줄')
     print('세 번째 줄')
   exercise:
-    prompt: 두 번째 줄의 빈칸을 "바꾼 두 번째 줄"로 바꿔 세 줄을 정확한 순서로 출력하세요.
+    prompt: |-
+      두 번째 print() 안의 ____만 아래 글자로 바꾸세요.
+      
+      바꾼 두 번째 줄
+      
+      다른 줄은 그대로 두고 실행하세요. 결과는 세 줄이어야 합니다.
     starterCode: |-
       print('첫 번째 줄')
       print('____')
       print('세 번째 줄')
     hints:
-    - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
-    - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
+    - ____가 있는 줄만 고치면 됩니다.
+    - "따옴표는 그대로 두고 안만 바꿉니다. 예: print('바꾼 두 번째 줄')"
+    - "실행 후 화면에 세 줄이 이 순서로 보이면 맞습니다: 첫 번째 줄 / 바꾼 두 번째 줄 / 세 번째 줄"
   check:
     type: outputExact
     evidence: practice
@@ -148,12 +153,12 @@ sections:
       첫 번째 줄
       바꾼 두 번째 줄
       세 번째 줄
-    resultCheck: 세 줄의 문구와 순서가 정확히 일치해야 합니다.
+    resultCheck: "출력이 정확히 일치해야 합니다: '첫 번째 줄\n바꾼 두 번째 줄\n세 번째 줄'"
 - id: print_newline
   title: 줄바꿈 문자
   structuredPrimary: true
   subtitle: \n으로 한 번에 여러 줄 출력
-  goal: 줄바꿈 문자에서 print() 입력값이 출력 영역에 어떻게 표시되는지 확인한다.
+  goal: 하나의 print()에 줄바꿈 문자를 넣어 여러 줄을 출력하는 방법을 확인한다.
   why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: |-
     \n은 줄바꿈 문자로, 하나의 print() 안에서 여러 줄을 출력할 수 있게 해줍니다. \n을 만나면 그 지점에서 줄이 바뀝니다. 백슬래시(\)와 문자 n을 함께 써서 만듭니다.
@@ -161,11 +166,15 @@ sections:
     \n을 사용하면 print() 한 번으로 여러 줄을 출력할 수 있어 편리합니다.
   snippet: print('첫 번째 줄\n두 번째 줄\n세 번째 줄')
   exercise:
-    prompt: 가운데 빈칸을 "두 번째 줄"로 채워 줄바꿈 문자 하나의 print()로 세 줄을 정확히 출력하세요.
+    prompt: |-
+      print() 안의 ____를 두 번째 줄로 바꾸세요.
+      
+      줄바꿈 문자(백슬래시와 n)는 그대로 둡니다. 실행하면 세 줄이 나와야 합니다.
     starterCode: print('첫 번째 줄\n____\n세 번째 줄')
     hints:
-    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
-    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+    - ____만 두 번째 줄로 바꿉니다. 줄바꿈 문자는 건드리지 마세요.
+    - "정답 형태: print('첫 번째 줄' 다음에 줄바꿈 문자, '두 번째 줄', 줄바꿈 문자, '세 번째 줄')"
+    - 화면에 첫 번째 줄 / 두 번째 줄 / 세 번째 줄이 보이면 맞습니다.
   check:
     type: outputExact
     evidence: practice
@@ -173,12 +182,12 @@ sections:
       첫 번째 줄
       두 번째 줄
       세 번째 줄
-    resultCheck: 줄바꿈 뒤 세 줄이 정확히 일치해야 합니다.
+    resultCheck: "출력이 정확히 일치해야 합니다: '첫 번째 줄\n두 번째 줄\n세 번째 줄'"
 - id: comment_single
   title: 한 줄 주석
   structuredPrimary: true
   subtitle: 코드에 설명 추가하기
-  goal: 한 줄 주석에서 print() 입력값이 출력 영역에 어떻게 표시되는지 확인한다.
+  goal: "샵(#)으로 시작하는 줄은 실행되지 않고, print()만 출력되는지 확인한다."
   why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: |-
     주석(Comment)은 프로그램 실행에 영향을 주지 않는 메모입니다. 코드에 설명을 추가하여 나중에 다시 볼 때나 다른 사람이 볼 때 이해하기 쉽게 만듭니다. 파이썬에서 한 줄 주석은 # 기호로 시작합니다.
@@ -186,23 +195,28 @@ sections:
     주석은 코드를 이해하기 쉽게 만들지만, 과도한 주석은 오히려 가독성을 해칩니다.
   snippet: print('실행됩니다')
   exercise:
-    prompt: "첫 줄은 # 주석으로 남기고 빈칸을 바꿔 실행됩니다만 출력하세요."
+    prompt: |-
+      샵(#)으로 시작하는 첫 줄은 그대로 두세요.
+      print() 안의 ____를 실행됩니다로 바꾸세요.
+      
+      화면에는 실행됩니다 라는 글자만 나와야 합니다.
     starterCode: |-
       # 이 줄은 실행 결과에 나오지 않습니다.
       print('____')
     hints:
-    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
-    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+    - "샵(#) 줄은 메모라서 화면에 안 나옵니다. 건드리지 마세요."
+    - ____만 실행됩니다로 바꿉니다.
+    - "정답 형태: print('실행됩니다')"
   check:
     type: outputExact
     evidence: practice
     outputExact: 실행됩니다
-    resultCheck: 주석 문장은 제외되고 실행됩니다만 출력되어야 합니다.
+    resultCheck: "출력이 정확히 일치해야 합니다: '실행됩니다'"
 - id: comment_multi
   title: 여러 줄 설명 메모
   structuredPrimary: true
   subtitle: 삼중 따옴표를 조심해서 보기
-  goal: 여러 줄 설명 메모에서 여러 print() 호출의 출력 순서와 줄 수를 확인한다.
+  goal: 삼중 따옴표 설명 메모는 출력되지 않고, print()만 화면에 나오는지 확인한다.
   why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: |-
     파이썬의 정식 주석은 #으로 시작하는 한 줄 주석입니다. 다만 삼중 따옴표(''' 또는 """)로 여러 줄 문자열을 만들어 설명 메모처럼 두는 코드도 자주 보입니다. 처음에는 '긴 설명을 여러 줄로 적는 방법' 정도로만 이해하면 됩니다.
@@ -216,7 +230,11 @@ sections:
     '''
     print('주석 후')
   exercise:
-    prompt: 삼중 따옴표 설명은 그대로 두고 마지막 빈칸을 "주석 후"로 채워 두 줄만 출력하세요.
+    prompt: |-
+      가운데 삼중 따옴표 설명은 그대로 두세요.
+      마지막 print() 안의 ____를 주석 후로 바꾸세요.
+      
+      화면에는 주석 전과 주석 후, 두 줄만 나와야 합니다.
     starterCode: |-
       print('주석 전')
       '''
@@ -225,20 +243,21 @@ sections:
       '''
       print('____')
     hints:
-    - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
-    - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
+    - 삼중 따옴표로 감싼 부분은 건드리지 마세요.
+    - ____만 주석 후로 바꿉니다.
+    - "정답 형태: print('주석 후')"
   check:
     type: outputExact
     evidence: practice
     outputExact: |-
       주석 전
       주석 후
-    resultCheck: 설명 메모는 출력되지 않고 주석 전과 주석 후만 순서대로 나와야 합니다.
+    resultCheck: "출력이 정확히 일치해야 합니다: '주석 전\n주석 후'"
 - id: print_numbers
   title: 숫자 출력하기
   structuredPrimary: true
   subtitle: 따옴표 없이 숫자 출력
-  goal: 숫자 출력하기에서 print() 입력값이 출력 영역에 어떻게 표시되는지 확인한다.
+  goal: 숫자에는 따옴표를 쓰지 않고 print()로 출력하는 방법을 확인한다.
   why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: |-
     숫자를 출력할 때는 따옴표가 필요 없습니다. 따옴표로 감싸면 문자로 인식되고, 따옴표 없이 쓰면 숫자로 인식됩니다. 숫자는 계산에 사용할 수 있지만, 문자는 계산할 수 없습니다.
@@ -246,21 +265,25 @@ sections:
     print(123)은 숫자 123을, print('123')은 문자 '123'을 출력합니다.
   snippet: print(123)
   exercise:
-    prompt: 계산식의 숫자를 바꿔 숫자 456을 출력하세요. 따옴표로 감싸지 마세요.
+    prompt: |-
+      print() 안의 계산을 고쳐 화면에 456이 나오게 하세요.
+      
+      따옴표는 쓰지 마세요. 예: print(400 + 56) 또는 print(456)
     starterCode: print(100 + 23)
     hints:
-    - 바꿀 지점은 print() 괄호 안의 숫자 리터럴입니다.
-    - 실행 뒤 출력된 숫자가 입력한 숫자와 정확히 같은지 보세요.
+    - 지금 코드는 100 + 23이라 123이 나옵니다.
+    - 괄호 안을 바꿔 결과가 456이 되게 하면 됩니다.
+    - "print('456')처럼 따옴표를 쓰면 이번 연습에서는 틀립니다."
   check:
     type: outputExact
     evidence: practice
     outputExact: '456'
-    resultCheck: 계산 결과가 숫자 456으로 정확히 출력되어야 합니다.
+    resultCheck: "출력이 정확히 일치해야 합니다: '456'"
 - id: print_calculation
   title: 계산 결과 출력하기
   structuredPrimary: true
   subtitle: 파이썬을 계산기처럼 사용
-  goal: 계산 결과 출력하기에서 print() 입력값이 출력 영역에 어떻게 표시되는지 확인한다.
+  goal: print() 안에서 계산한 결과가 화면에 나오는지 확인한다.
   why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: print() 안에서 직접 계산을 할 수 있습니다. 파이썬은 계산 결과를 자동으로 구한 후 출력합니다. 더하기(+), 빼기(-), 곱하기(*), 나누기(/)
     등 다양한 연산이 가능합니다.
@@ -268,21 +291,24 @@ sections:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: print(10 + 20)
   exercise:
-    prompt: 계산식의 숫자나 연산자를 바꿔 정확히 42를 출력하세요.
+    prompt: |-
+      print() 안의 계산을 고쳐 화면에 42가 나오게 하세요.
+      
+      지금 식은 (6 * 7) - 1이라 41이 나옵니다.
     starterCode: print((6 * 7) - 1)
     hints:
-    - 바꿀 지점은 print() 안의 숫자, 연산자, 괄호 위치에서 찾으세요.
-    - 실행 뒤 출력 숫자를 직접 계산한 값과 비교하세요.
+    - "숫자나 연산자 중 하나만 고쳐도 됩니다. 예: 빼기 1을 지우거나 더하기 0으로 바꾸기."
+    - 실행 결과가 정확히 42면 통과입니다.
   check:
     type: outputExact
     evidence: practice
     outputExact: '42'
-    resultCheck: 계산식의 실행 결과가 42와 정확히 일치해야 합니다.
+    resultCheck: "출력이 정확히 일치해야 합니다: '42'"
 - id: notebook_expression
   title: 마지막 줄 값 확인하기
   structuredPrimary: true
   subtitle: print 없이 표현식만 쓰기
-  goal: 마지막 줄 값 확인하기에서 셀 마지막 표현식이 결과로 표시되는 흐름을 확인한다.
+  goal: print() 없이도 셀 마지막 값이 화면에 보이는지 확인한다.
   why: 마지막 표현식 결과를 이해하면 노트북에서 작은 값을 빠르게 확인할 수 있습니다.
   explanation: Colab과 Codaro 같은 노트북 환경에서는 셀의 마지막 줄에 값이 있으면 화면에 자동으로 보입니다. 처음에는 print()를 주로 쓰되, 마지막 줄에
     값만 놓았을 때도 화면에 보일 수 있다는 점을 확인해보세요.
@@ -290,21 +316,25 @@ sections:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: '''Hello Notebook'''
   exercise:
-    prompt: 마지막 표현식의 빈칸을 바꿔 print() 없이 Hello Notebook을 표시하세요.
+    prompt: |-
+      ____를 Notebook으로 바꾸세요.
+      
+      print()는 쓰지 마세요. 실행하면 Hello Notebook이 보여야 합니다.
     starterCode: '''Hello ____'''
     hints:
-    - 바꿀 지점은 셀 마지막 줄의 문자열, 숫자, 계산식입니다.
-    - 실행 뒤 출력 영역의 마지막 값이 직접 입력한 표현식 결과와 맞는지 보세요.
+    - ____만 Notebook으로 바꿉니다.
+    - "정답 형태: 'Hello Notebook'"
+    - print()를 새로 추가하지 마세요.
   check:
     type: outputExact
     evidence: practice
     outputExact: Hello Notebook
-    resultCheck: 마지막 표현식 결과가 Hello Notebook과 정확히 일치해야 합니다.
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Hello Notebook'"
 - id: practice
   title: Day 1 종합 복습
   structuredPrimary: true
   subtitle: Hello World와 주석 마스터하기
-  goal: Day 1 종합 복습에서 print() 입력값이 출력 영역에 어떻게 표시되는지 확인한다.
+  goal: 변수와 print()를 함께 써서 Hello Codaro를 출력한다.
   why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: Day 1에서 배운 print() 출력과 주석을 난이도별로 복습합니다. 기본 미션부터 시작하여 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로
     어떤 순서로 해도 괜찮습니다.
@@ -312,19 +342,24 @@ sections:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: print('Hello World')
   exercise:
-    prompt: 변수의 빈칸을 채우고 주석은 실행하지 않은 채 Hello Codaro를 출력하세요.
+    prompt: |-
+      name = '____'의 ____를 Codaro로 바꾸세요.
+      
+      샵(#) 주석 줄과 print() 줄은 그대로 둡니다.
+      실행하면 Hello Codaro가 나와야 합니다.
     starterCode: |-
       # name 변수는 출력할 대상을 기억합니다.
       name = '____'
       print('Hello', name)
     hints:
-    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
-    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+    - ____만 Codaro로 바꿉니다.
+    - "샵(#) 줄은 메모라서 화면에 안 나옵니다."
+    - "print('Hello', name)은 이미 맞게 되어 있으니 건드리지 마세요."
   check:
     type: outputExact
     evidence: practice
     outputExact: Hello Codaro
-    resultCheck: 변수와 print()를 연결한 출력이 Hello Codaro와 정확히 일치해야 합니다.
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Hello Codaro'"
 - id: reflection
   title: Day 1 회고 - 오늘 무엇을 배웠나요?
   structuredPrimary: true

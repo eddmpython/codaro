@@ -4,7 +4,7 @@ canonicalRows: 35
 lessons:
   - lessonRef: "advancedPython/01_람다와고차함수"
     identityLedgerRef: "identity-ledger/advancedPython.yml"
-    lessonContentHash: "95b60caeeb6521a89680a455ef353224bff00d1222a8247995f2b3cb3615d349"
+    lessonContentHash: "0639b273b453a5c3520cf88588e94164215c9d39dceb727a4fa878945baf490d"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]

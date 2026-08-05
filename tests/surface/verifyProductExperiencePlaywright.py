@@ -3130,7 +3130,9 @@ async ({ surface, expectedTier }) => {
   ].filter(visible).map((element) => element.getAttribute("data-provider-reconnect-bar"));
   const notebookToolsToggle = document.querySelector('[data-notebook-tools-toggle="true"]');
   const exactDayOneCommentPrompt = (
-    "첫 줄은 # 주석으로 남기고 빈칸을 바꿔 실행됩니다만 출력하세요."
+    "샵(#)으로 시작하는 첫 줄은 그대로 두세요. "
+    + "print() 안의 ____를 실행됩니다로 바꾸세요. "
+    + "화면에는 실행됩니다 라는 글자만 나와야 합니다."
   );
   const dayOneCommentPromptCount = [...document.querySelectorAll("p")]
     .filter((paragraph) => (paragraph.textContent || "").trim() === exactDayOneCommentPrompt)

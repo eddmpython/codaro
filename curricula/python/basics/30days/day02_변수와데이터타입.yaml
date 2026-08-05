@@ -63,7 +63,7 @@ sections:
   blocks:
   - type: image
     assetId: pythonFundamentals
-  goal: 변수란?에서 `msg` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  goal: 변수에 문자열을 넣고 그 값이 화면에 나오는지 확인한다.
   why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     변수(Variable)는 데이터를 저장하는 메모리 공간에 붙인 이름표입니다. 마치 상자에 물건을 넣고 라벨을 붙이는 것과 같습니다. 변수를 사용하면 데이터를 저장했다가 나중에 다시 사용할 수 있습니다. = 기호는 수학의 "같다"가 아니라 "오른쪽 값을 왼쪽 변수에 저장한다"는 의미입니다.
@@ -73,22 +73,26 @@ sections:
     msg = 'Python'
     msg
   exercise:
-    prompt: 변수란? 예제에서 `msg` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      msg의 값을 'Codaro'로 바꾸세요.
+      
+      실행하면 Codaro가 보여야 합니다.
     starterCode: |-
       msg = 'Python'
       msg
     hints:
-    - 바꿀 지점은 `msg = ...` 오른쪽 값입니다.
-    - 실행 뒤 `msg` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "msg = 'Python'을 msg = 'Codaro'로 바꿉니다."
+    - 마지막 줄 msg는 그대로 둡니다.
   check:
-    type: noError
-    noError: 변수란?에서 `msg` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 변수란? 실행 뒤 `msg` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: Codaro
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Codaro'"
 - id: naming_convention
   title: 변수명 작성 스타일
   structuredPrimary: true
   subtitle: 카멜케이스 vs 스네이크케이스
-  goal: 변수명 작성 스타일에서 print() 입력값이 출력 영역에 어떻게 표시되는지 확인한다.
+  goal: 카멜케이스와 스네이크케이스 변수로 이름을 출력한다.
   why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
   explanation: |-
     변수명을 지을 때 단어를 연결하는 방법에는 크게 두 가지 스타일이 있습니다. 카멜케이스(camelCase)는 첫 단어는 소문자로 시작하고 이후 단어의 첫 글자를 대문자로 쓰는 방식입니다. 스네이크케이스(snake_case)는 모든 단어를 소문자로 쓰고 밑줄(_)로 연결하는 방식입니다. 파이썬 공식 스타일 가이드(PEP 8)는 스네이크케이스를 권장하지만, 이 학습 컨텐츠는 작성자의 코딩 스타일에 따라 카멜케이스를 사용합니다.
@@ -99,23 +103,29 @@ sections:
     user_name = 'Jane Smith'
     print('카멜케이스 : ', userName, '\n스네이크케이스 : ', user_name)
   exercise:
-    prompt: 변수명 작성 스타일 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
+    prompt: |-
+      userName 값을 'Codaro User'로, user_name 값을 'Codaro Learner'로 바꾸세요.
+      
+      실행하면 두 이름이 모두 출력되어야 합니다.
     starterCode: |-
       userName = 'John Doe'
       user_name = 'Jane Smith'
       print('카멜케이스 : ', userName, '\n스네이크케이스 : ', user_name)
     hints:
-    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
-    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+    - 따옴표 안 글자만 바꿉니다. 변수 이름은 그대로 둡니다.
+    - 출력에 Codaro User와 Codaro Learner가 보이면 맞습니다.
   check:
-    type: noError
-    noError: 변수명 작성 스타일의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
-    resultCheck: 변수명 작성 스타일 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: |-
+      카멜케이스 :  Codaro User 
+      스네이크케이스 :  Codaro Learner
+    resultCheck: "출력이 정확히 일치해야 합니다: '카멜케이스 :  Codaro User \n스네이크케이스 :  Codaro Learner'"
 - id: variable_reassign
   title: 변수 값 변경하기
   structuredPrimary: true
   subtitle: 저장된 값을 새 값으로 교체
-  goal: 변수 값 변경하기에서 `score` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  goal: 같은 변수에 새 값을 넣으면 마지막 값만 남는다는 걸 확인한다.
   why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     변수는 언제든지 새로운 값으로 변경할 수 있습니다. 같은 변수에 새 값을 할당하면 이전 값은 사라지고 새 값으로 대체됩니다. 이것이 "변수(Variable)"라는 이름의 의미입니다.
@@ -126,23 +136,27 @@ sections:
     score = 95
     score
   exercise:
-    prompt: 변수 값 변경하기 예제에서 `score` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      두 번째 줄 score를 100으로 바꾸세요.
+      
+      실행하면 최종 값 100이 보여야 합니다.
     starterCode: |-
       score = 80
       score = 95
       score
     hints:
-    - 바꿀 지점은 `score = ...` 오른쪽 값입니다.
-    - 실행 뒤 `score` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - score = 95를 score = 100으로 바꿉니다.
+    - 첫 줄 score = 80은 그대로 둬도 됩니다.
   check:
-    type: noError
-    noError: 변수 값 변경하기에서 `score` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 변수 값 변경하기 실행 뒤 `score` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '100'
+    resultCheck: "출력이 정확히 일치해야 합니다: '100'"
 - id: type_integer
   title: 정수 타입
   structuredPrimary: true
   subtitle: 소수점 없는 숫자
-  goal: 정수 타입에서 `years` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  goal: 정수(int) 값을 변수에 넣고 확인한다.
   why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 정수(Integer)는 소수점이 없는 숫자입니다. 1, 100, -5처럼 양수, 0, 음수 모두 정수입니다. 파이썬에서 정수 타입은 int로 표시됩니다. int는
     integer(정수)의 줄임말입니다.
@@ -152,22 +166,25 @@ sections:
     years = 25
     years
   exercise:
-    prompt: 정수 타입 예제에서 `years` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      years를 30으로 바꾸세요.
+      
+      실행하면 30이 보여야 합니다.
     starterCode: |-
       years = 25
       years
     hints:
-    - 바꿀 지점은 `years = ...` 오른쪽 값입니다.
-    - 실행 뒤 `years` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - years = 25를 years = 30으로 바꿉니다.
   check:
-    type: noError
-    noError: 정수 타입에서 `years` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 정수 타입 실행 뒤 `years` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '30'
+    resultCheck: "출력이 정확히 일치해야 합니다: '30'"
 - id: type_float
   title: 실수 타입
   structuredPrimary: true
   subtitle: 소수점 있는 숫자
-  goal: 실수 타입에서 `pi` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  goal: 실수(float) 값을 변수에 넣고 확인한다.
   why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 실수(Float)는 소수점이 있는 숫자입니다. 3.14, 2.5, -1.5처럼 소수점을 포함한 숫자입니다. 파이썬에서 실수 타입은 float로 표시됩니다.
     float는 floating point(부동소수점)의 줄임말입니다.
@@ -177,22 +194,25 @@ sections:
     pi = 3.14159
     pi
   exercise:
-    prompt: 실수 타입 예제에서 `pi` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      pi를 3.14로 바꾸세요.
+      
+      실행하면 3.14가 보여야 합니다.
     starterCode: |-
       pi = 3.14159
       pi
     hints:
-    - 바꿀 지점은 `pi = ...` 오른쪽 값입니다.
-    - 실행 뒤 `pi` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - pi = 3.14159를 pi = 3.14로 바꿉니다.
   check:
-    type: noError
-    noError: 실수 타입에서 `pi` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 실수 타입 실행 뒤 `pi` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '3.14'
+    resultCheck: "출력이 정확히 일치해야 합니다: '3.14'"
 - id: type_string
   title: 문자열 타입
   structuredPrimary: true
   subtitle: 따옴표로 감싼 텍스트
-  goal: 문자열 타입에서 `town` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  goal: 문자열(str) 값을 변수에 넣고 확인한다.
   why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 문자열(String)은 따옴표로 감싼 텍스트입니다. 'Hello', "Python"처럼 작은따옴표나 큰따옴표로 만듭니다. 문자 하나('A')도 문자열이고,
     긴 문장도 문자열입니다. 파이썬에서 문자열 타입은 str로 표시됩니다.
@@ -202,22 +222,25 @@ sections:
     town = 'Seoul'
     town
   exercise:
-    prompt: 문자열 타입 예제에서 `town` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      town을 'Busan'으로 바꾸세요.
+      
+      실행하면 Busan이 보여야 합니다.
     starterCode: |-
       town = 'Seoul'
       town
     hints:
-    - 바꿀 지점은 `town = ...` 오른쪽 값입니다.
-    - 실행 뒤 `town` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "town = 'Seoul'을 town = 'Busan'으로 바꿉니다."
   check:
-    type: noError
-    noError: 문자열 타입에서 `town` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 문자열 타입 실행 뒤 `town` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: Busan
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Busan'"
 - id: type_boolean
   title: 불린 타입
   structuredPrimary: true
   subtitle: 참과 거짓
-  goal: 불린 타입에서 `active` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  goal: 불린(bool) 값을 변수에 넣고 확인한다.
   why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 불린(Boolean)은 참(True) 또는 거짓(False) 두 가지 값만 가지는 타입입니다. 영국 수학자 조지 불(George Boole)의 이름에서 유래했습니다.
     True와 False는 첫 글자가 반드시 대문자여야 합니다. 조건 판단, 비교 연산에서 주로 사용됩니다.
@@ -227,22 +250,26 @@ sections:
     active = True
     active
   exercise:
-    prompt: 불린 타입 예제에서 `active` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      active를 False로 바꾸세요.
+      
+      실행하면 False가 보여야 합니다.
     starterCode: |-
       active = True
       active
     hints:
-    - 바꿀 지점은 `active = ...` 오른쪽 값입니다.
-    - 실행 뒤 `active` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - active = True를 active = False로 바꿉니다.
+    - False는 대문자 F로 씁니다.
   check:
-    type: noError
-    noError: 불린 타입에서 `active` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 불린 타입 실행 뒤 `active` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'False'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'False'"
 - id: type_function
   title: type() 함수
   structuredPrimary: true
   subtitle: 데이터 타입 확인하기
-  goal: type() 함수에서 `point` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  goal: type()으로 값의 타입을 확인한다.
   why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: type() 함수는 값이나 변수의 데이터 타입을 알려줍니다. 괄호 안에 변수나 값을 넣으면 그것의 타입을 반환합니다. 결과는 <class 'int'>, <class
     'str'> 같은 형태로 표시됩니다. 디버깅이나 타입 확인에 매우 유용합니다.
@@ -252,22 +279,26 @@ sections:
     point = 100
     type(point)
   exercise:
-    prompt: type() 함수 예제에서 `point` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      point를 3.5로 바꾼 뒤 type(point)를 실행하세요.
+      
+      결과는 float 타입이어야 합니다.
     starterCode: |-
       point = 100
       type(point)
     hints:
-    - 바꿀 지점은 `point = ...` 오른쪽 값입니다.
-    - 실행 뒤 `point` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - point = 100을 point = 3.5로 바꿉니다.
+    - "화면에 <class 'float'>가 보이면 맞습니다."
   check:
-    type: noError
-    noError: type() 함수에서 `point` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: type() 함수 실행 뒤 `point` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: "<class 'float'>"
+    resultCheck: "출력이 정확히 일치해야 합니다: \"<class 'float'>\""
 - id: len_function
   title: len() 함수
   structuredPrimary: true
   subtitle: 문자열 길이 측정
-  goal: len() 함수에서 `email` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  goal: len()으로 문자열 길이를 확인한다.
   why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: |-
     len() 함수는 문자열의 길이(문자 개수)를 반환합니다. len은 length(길이)의 줄임말입니다. 공백, 특수문자, 한글 모두 각각 1로 계산됩니다. 빈 문자열('')의 길이는 0입니다.
@@ -277,22 +308,26 @@ sections:
     email = 'python@example.com'
     len(email)
   exercise:
-    prompt: len() 함수 예제에서 `email` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      email을 'a@b.com'으로 바꾸세요.
+      
+      실행하면 길이 7이 나와야 합니다.
     starterCode: |-
       email = 'python@example.com'
       len(email)
     hints:
-    - 바꿀 지점은 `email = ...` 오른쪽 값입니다.
-    - 실행 뒤 `email` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "email = 'python@example.com'을 email = 'a@b.com'으로 바꿉니다."
+    - "len('a@b.com')은 7입니다."
   check:
-    type: noError
-    noError: len() 함수에서 `email` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: len() 함수 실행 뒤 `email` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '7'
+    resultCheck: "출력이 정확히 일치해야 합니다: '7'"
 - id: convert_to_int
   title: int() 변환
   structuredPrimary: true
   subtitle: 정수로 변환하기
-  goal: int() 변환에서 `text` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  goal: int()로 문자열을 정수로 바꾼다.
   why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: int() 함수는 다른 타입을 정수로 변환합니다. 문자열 '100'을 숫자 100으로 바꿀 수 있습니다. 단, 문자열은 숫자로만 이루어져 있어야 합니다. 실수를
     정수로 변환하면 소수점 이하는 버려집니다.
@@ -302,22 +337,26 @@ sections:
     text = '100'
     int(text)
   exercise:
-    prompt: int() 변환 예제에서 `text` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      text를 '42'로 바꾸세요.
+      
+      실행하면 정수 42가 나와야 합니다.
     starterCode: |-
       text = '100'
       int(text)
     hints:
-    - 바꿀 지점은 `text = ...` 오른쪽 값입니다.
-    - 실행 뒤 `text` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "text = '100'을 text = '42'로 바꿉니다."
+    - "int('42') 결과는 42입니다."
   check:
-    type: noError
-    noError: int() 변환에서 `text` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: int() 변환 실행 뒤 `text` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '42'
+    resultCheck: "출력이 정확히 일치해야 합니다: '42'"
 - id: convert_to_float
   title: float() 변환
   structuredPrimary: true
   subtitle: 실수로 변환하기
-  goal: float() 변환에서 `val` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  goal: float()로 정수를 실수로 바꾼다.
   why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: float() 함수는 다른 타입을 실수로 변환합니다. 정수 10을 실수 10.0으로 바꿀 수 있습니다. 문자열 '3.14'를 숫자 3.14로 변환할 수 있습니다.
   tips:
@@ -326,22 +365,26 @@ sections:
     val = 42
     float(val)
   exercise:
-    prompt: float() 변환 예제에서 `val` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      val을 7로 바꾸세요.
+      
+      실행하면 7.0이 나와야 합니다.
     starterCode: |-
       val = 42
       float(val)
     hints:
-    - 바꿀 지점은 `val = ...` 오른쪽 값입니다.
-    - 실행 뒤 `val` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - val = 42를 val = 7로 바꿉니다.
+    - float(7) 결과는 7.0입니다.
   check:
-    type: noError
-    noError: float() 변환에서 `val` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: float() 변환 실행 뒤 `val` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '7.0'
+    resultCheck: "출력이 정확히 일치해야 합니다: '7.0'"
 - id: convert_to_str
   title: str() 변환
   structuredPrimary: true
   subtitle: 문자열로 변환하기
-  goal: str() 변환에서 `code` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  goal: str()로 숫자를 문자열로 바꾼다.
   why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: str() 함수는 어떤 값이든 문자열로 변환합니다. 숫자 25를 문자열 '25'로 바꿀 수 있습니다. 문자열 연결이나 출력 메시지를 만들 때 자주 사용됩니다.
   tips:
@@ -350,22 +393,26 @@ sections:
     code = 123
     str(code)
   exercise:
-    prompt: str() 변환 예제에서 `code` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      code를 7로 바꾸세요.
+      
+      실행하면 문자열 '7'이 나와야 합니다.
     starterCode: |-
       code = 123
       str(code)
     hints:
-    - 바꿀 지점은 `code = ...` 오른쪽 값입니다.
-    - 실행 뒤 `code` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - code = 123을 code = 7로 바꿉니다.
+    - 화면에 따옴표 없이 7처럼 보여도 문자열입니다.
   check:
-    type: noError
-    noError: str() 변환에서 `code` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: str() 변환 실행 뒤 `code` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '7'
+    resultCheck: "출력이 정확히 일치해야 합니다: '7'"
 - id: multiple_assign
   title: 다중 변수 할당
   structuredPrimary: true
   subtitle: 한 줄로 여러 변수 선언
-  goal: 다중 변수 할당에서 문자열, 숫자, 변수 같은 예제 값을 바꿨을 때 출력 또는 마지막 표현식 결과가 어떻게 달라지는지 확인한다.
+  goal: 한 줄에서 여러 변수에 값을 넣는다.
   why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: 쉼표로 구분하여 한 줄에 여러 변수를 선언할 수 있습니다. 순서대로 매칭되므로 첫 번째 변수에 첫 번째 값이 저장됩니다. 코드를 더 간결하게 만들 수 있습니다.
   tips:
@@ -374,22 +421,26 @@ sections:
     name, age, city = 'Alice', 25, 'Seoul'
     name, age, city
   exercise:
-    prompt: 다중 변수 할당 예제에서 `name`, `age`, `city` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    prompt: |-
+      name을 'Codaro'로 바꾸세요.
+      
+      실행하면 Codaro가 포함된 결과가 나와야 합니다.
     starterCode: |-
       name, age, city = 'Alice', 25, 'Seoul'
       name, age, city
     hints:
-    - 바꿀 지점은 = 오른쪽 값들의 순서와 개수입니다.
-    - 실행 뒤 각 변수와 마지막 표시값이 같은 순서로 바뀌었는지 보세요.
+    - "'Alice'만 'Codaro'로 바꿉니다."
+    - age와 city는 그대로 둬도 됩니다.
   check:
-    type: noError
-    noError: 다중 변수 할당에서 `name`, `age`, `city` 할당 개수와 값 순서가 맞아야 합니다.
-    resultCheck: 다중 변수 할당 실행 결과가 출력 또는 마지막 표현식 결과 기준으로 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: "('Codaro', 25, 'Seoul')"
+    resultCheck: "출력이 정확히 일치해야 합니다: \"('Codaro', 25, 'Seoul')\""
 - id: same_value_assign
   title: 같은 값 할당
   structuredPrimary: true
   subtitle: 여러 변수에 동일한 값
-  goal: 같은 값 할당에서 `a` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  goal: 여러 변수에 같은 값을 한 번에 넣는다.
   why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: = 연산자를 연결하면 여러 변수에 같은 값을 동시에 할당할 수 있습니다. 모든 변수가 동일한 값을 가지게 됩니다. 초기화할 때 자주 사용하는 패턴입니다.
   tips:
@@ -398,22 +449,25 @@ sections:
     a = b = c = 0
     a
   exercise:
-    prompt: 같은 값 할당 예제에서 `a` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      a = b = c = 0의 0을 5로 바꾸세요.
+      
+      실행하면 5가 보여야 합니다.
     starterCode: |-
       a = b = c = 0
       a
     hints:
-    - 바꿀 지점은 `a = ...` 오른쪽 값입니다.
-    - 실행 뒤 `a` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - 오른쪽 숫자만 5로 바꿉니다.
   check:
-    type: noError
-    noError: 같은 값 할당에서 `a` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 같은 값 할당 실행 뒤 `a` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '5'
+    resultCheck: "출력이 정확히 일치해야 합니다: '5'"
 - id: workflow_validation
   title: '검증 루프: 입력값을 업무 데이터로 바꾸기'
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증
-  goal: '검증 루프: 입력값을 업무 데이터로 바꾸기에서 예상값과 실제 실행 결과를 비교하는 검증 흐름을 확인한다.'
+  goal: 문자열 입력을 숫자로 바꾼 뒤 assert로 검증하는 흐름을 확인한다.
   why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
   explanation: 변수와 타입은 값을 담는 문법이 아니라, 외부에서 들어온 문자열을 계산 가능한 데이터로 바꾸고 검증하는 출발점입니다. 실행 전에 어떤 값이 str/int/float/bool이
     될지 예측하고, 변환 실패를 직접 확인한 뒤, 업무 리포트에 쓸 수 있는 구조로 정리합니다.
@@ -438,7 +492,11 @@ sections:
     orderSubtotal = unitPrice * quantity
     orderSubtotal
   exercise:
-    prompt: '검증 루프: 입력값을 업무 데이터로 바꾸기 예제에서 기대 문자열이나 실제 출력 문구를 바꾸고 assert 비교가 맞는지 확인하세요.'
+    prompt: |-
+      코드를 그대로 실행하세요.
+      
+      값을 마음대로 바꾸면 assert가 깨질 수 있습니다.
+      assert가 모두 통과하고 마지막에 2400000이 나오면 맞습니다.
     starterCode: |-
       rawProduct = "notebook"
       rawPrice = "1200000"
@@ -458,17 +516,18 @@ sections:
       orderSubtotal = unitPrice * quantity
       orderSubtotal
     hints:
-    - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
-    - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
+    - rawPrice와 rawQuantity를 정수로 바꾼 뒤 곱합니다.
+    - 마지막 값 orderSubtotal이 2400000이면 통과입니다.
   check:
-    type: noError
-    noError: '검증 루프: 입력값을 업무 데이터로 바꾸기에서 `rawProduct` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
-    resultCheck: '검증 루프: 입력값을 업무 데이터로 바꾸기에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.'
+    type: outputExact
+    evidence: practice
+    outputExact: '2400000'
+    resultCheck: "출력이 정확히 일치해야 합니다: '2400000'"
 - id: practice
   title: Day 2 종합 복습
   structuredPrimary: true
   subtitle: 변수와 타입 마스터하기
-  goal: Day 2 종합 복습에서 `lang` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  goal: 변수를 만들고 값을 확인하는 Day 2 복습을 한다.
   why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
   explanation: Day 2에서 배운 변수, 데이터 타입, 타입 변환을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
   tips:
@@ -477,17 +536,20 @@ sections:
     name = '홍길동'
     print('name:', name)
   exercise:
-    prompt: Day 2 종합 복습 예제에서 `lang` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      lang을 'Codaro'로 바꾸세요.
+      
+      실행하면 Codaro가 보여야 합니다.
     starterCode: |-
       lang = 'Python'
       lang
     hints:
-    - 바꿀 지점은 `lang = ...` 오른쪽 값입니다.
-    - 실행 뒤 `lang` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "lang = 'Python'을 lang = 'Codaro'로 바꿉니다."
   check:
-    type: noError
-    noError: Day 2 종합 복습에서 `lang` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: Day 2 종합 복습 실행 뒤 `lang` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: Codaro
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Codaro'"
 assessment:
   schemaVersion: 1
   performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.

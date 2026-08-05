@@ -4,7 +4,7 @@ canonicalRows: 30
 lessons:
   - lessonRef: "30days/day01_헬로월드"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "ebce98c771741e2a0de67e8a6b976c4c1e44e1b851ebd1f190920f200a7f207c"
+    lessonContentHash: "09498a19dae41199936848bc8229b40b8ae67c5705c95d85d6def20a3464f341"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -26,7 +26,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day02_변수와데이터타입"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "4db1b198d1db612a87b72fa322a28b5cdff2aac207fc053272ba2799fe5b5fa7"
+    lessonContentHash: "4dc0cb6b22171fd40fa1d50374e943a3ab79c3c236af3ba2e8d412085c186863"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["computerVision","dataReporting","dataVisualization","geoVisualization","imageProcessing","officeAutomation","pythonFoundation","scriptingAutomation","sqlAnalysis","webMonitoring"]
