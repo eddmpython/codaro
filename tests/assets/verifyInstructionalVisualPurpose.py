@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -10,6 +9,8 @@ import time
 from typing import Any
 
 import yaml
+
+from codaro.curriculum.contentHash import lessonContentHash
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -78,7 +79,9 @@ def main() -> int:
                 f"{assetId}: manifest/YAML anchor mismatch "
                 f"{anchorsByAsset.get(assetId, [])} != {[lessonRef]}"
             )
-        expectedHash = f"sha256-{hashlib.sha256(lesson['path'].read_bytes()).hexdigest()}"
+        # 원장과 같은 규칙(LF 정규화)으로 계산한다. 원본 바이트를 그대로 해시하면
+        # 같은 커밋인데도 Windows 작업 트리와 Linux CI 가 다른 값을 낸다.
+        expectedHash = f"sha256-{lessonContentHash(lesson['path'])}"
         if asset.get("provenance", {}).get("lessonContentHash") != expectedHash:
             failures.append(f"{assetId}: lessonContentHash drifted for {lessonRef}")
         for field in ("alt", "caption", "learningQuestion", "decisionShown"):

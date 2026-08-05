@@ -11,6 +11,7 @@ from typing import Any
 
 import yaml
 
+from codaro.curriculum.contentHash import lessonContentHash
 from codaro.curriculum.lessonGraph import LessonGraph, buildLessonGraph
 from codaro.curriculum.planComposer import PlanGoal, composeMasterPlan
 from codaro.curriculum.studyLoader import StudyLoader
@@ -128,8 +129,8 @@ def ownerRegistry() -> dict[str, int]:
 
 
 def fileSha256(path: Path) -> str:
-    content = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
-    return hashlib.sha256(content).hexdigest()
+    # 규칙의 SSOT는 codaro.curriculum.contentHash다. 시각 자산 provenance도 같은 값을 쓴다.
+    return lessonContentHash(path)
 
 
 def aggregateHash(entries: list[dict[str, str]]) -> str:
