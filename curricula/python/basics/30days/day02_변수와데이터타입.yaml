@@ -309,20 +309,20 @@ sections:
     len(email)
   exercise:
     prompt: |-
-      email을 'a@b.com'으로 바꾸세요.
-      
-      실행하면 길이 7이 나와야 합니다.
+      email을 'a@example.com'으로 바꾸세요.
+
+      실행하면 길이 13이 나와야 합니다.
     starterCode: |-
       email = 'python@example.com'
       len(email)
     hints:
-    - "email = 'python@example.com'을 email = 'a@b.com'으로 바꿉니다."
-    - "len('a@b.com')은 7입니다."
+    - "email = 'python@example.com'을 email = 'a@example.com'으로 바꿉니다."
+    - "len('a@example.com')은 13입니다."
   check:
     type: outputExact
     evidence: practice
-    outputExact: '7'
-    resultCheck: "출력이 정확히 일치해야 합니다: '7'"
+    outputExact: '13'
+    resultCheck: "출력이 정확히 일치해야 합니다: '13'"
 - id: convert_to_int
   title: int() 변환
   structuredPrimary: true
