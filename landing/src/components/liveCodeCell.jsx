@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Loader2, Play, RotateCcw } from "lucide-react";
-import { runLandingCode } from "../lib/landingPyproc.js";
+import { runLandingCode, warmLandingRuntime } from "../lib/landingPyproc.js";
 
 // 히어로 셀은 헬로월드 한 줄이면 된다. 여기서 가르치는 것은 문법이 아니라
 // "고치면 그 자리에서 결과가 바뀐다"는 사실이다.
@@ -23,10 +23,11 @@ export function LiveCodeCell({ initialCode = DEFAULT_CODE, className }) {
   const [output, setOutput] = useState(null);
   const [status, setStatus] = useState("idle");
 
-  // 자동 실행하지 않는다. 이유 두 가지.
-  // 1) 홈은 SSR 마크업과 hydrate 직후 마크업이 같아야 한다(landing-public 하이드레이션 계약).
-  //    마운트 시 상태가 바뀌면 그 계약이 깨지고, 출력 블록이 뒤늦게 끼어들어 레이아웃도 흔들린다.
-  // 2) 런타임 부팅은 무거운 작업이다. 첫 방문자 전원에게 강제할 일이 아니라 누른 사람에게만 준다.
+  // 자동 실행하지 않는다. SSR 마크업과 hydrate 직후 마크업이 같아야 한다
+  // (landing-public 하이드레이션 계약). 마운트 시 출력/status를 바꾸면 계약이 깨진다.
+  // 런타임만 idle에 미리 올려 첫 실행 지연을 줄인다. React state는 건드리지 않는다.
+  useEffect(() => warmLandingRuntime(), []);
+
   async function handleRun() {
     if (status === "running") return;
     setStatus("running");

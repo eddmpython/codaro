@@ -42,7 +42,10 @@ import {
   type ReconnectVariant,
 } from "@/lib/providerReconnectPolicy";
 import { WidgetSessionProvider } from "@/lib/widgetSession";
-import { installBrowserPythonRuntimeDiagnostics } from "@/lib/browserPythonRuntime";
+import {
+  installBrowserPythonRuntimeDiagnostics,
+  scheduleBrowserPythonRuntimeWarm,
+} from "@/lib/browserPythonRuntime";
 import {
   SidebarInset,
   SidebarProvider,
@@ -91,6 +94,12 @@ function App() {
   // apiOnline 은 부트스트랩 1회가 아니라 라이브 연결 스토어가 소유한다(세션 중간 끊김 감지).
   const connection = useConnectionStatus();
   const apiOnline = connection.apiOnline;
+  // Web Run(로컬 API 없음)에서는 첫 페인트 뒤 idle에 pyproc를 미리 올린다.
+  // Local Studio(apiOnline)는 네이티브 커널을 쓰므로 예열하지 않는다.
+  useEffect(() => {
+    if (apiOnline) return undefined;
+    return scheduleBrowserPythonRuntimeWarm();
+  }, [apiOnline]);
   const [notice, setNotice] = useState<AppNotice>(initialAppNotice);
   const applyNotice = useCallback((nextNotice: AppNotice) => {
     setNotice((currentNotice) =>
