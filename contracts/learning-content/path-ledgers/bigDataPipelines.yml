@@ -4,7 +4,7 @@ composerSnapshotDate: '2026-08-03'
 composerGraphCount: 472
 composerVersionHash: e4d4d563381b658826a477e2541ce7cbb70db111eafdf9217f15e8f7eadc6ef3
 taxonomySnapshotHash: 1a8f5ed385803f0bbe3594393b3bd1983e2506ab1e77d65b0b53da24645446ac
-sourceSetHash: 888d2c53cda7a032f6528cf710d2070c82af8ef3d0d7ac793a39e884e6b0857f
+sourceSetHash: 51de34303e35d6a457cc4987e00ad0f4b1a51d5d2a82e45cd648f2e32783200f
 ledgerTool: uv run python -X utf8 docs/skills/ops/tools/buildLearningLedgers.py --check
 targetOutcomes:
 - pandas.intro

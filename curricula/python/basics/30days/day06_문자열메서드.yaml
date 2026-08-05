@@ -54,8 +54,8 @@ sections:
   title: 대문자 변환
   structuredPrimary: true
   subtitle: upper()로 모두 대문자로
-  goal: 대문자 변환에서 `text` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: upper()로 문자열의 영문자를 모두 대문자로 바꾼다.
+  why: 사람이 대소문자를 섞어 입력한 코드나 약어를 한 형태로 모아 두면 값을 비교하기 쉬워집니다.
   explanation: upper() 메서드는 문자열의 모든 문자를 대문자로 변환합니다. 영문자만 영향을 받으며, 숫자나 특수문자는 그대로 유지됩니다. 원본 문자열은 변경되지 않고
     새로운 문자열을 반환합니다.
   tips:
@@ -64,23 +64,30 @@ sections:
     text = 'hello python'
     text.upper()
   exercise:
-    prompt: 대문자 변환 예제에서 `text` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      text를 'codaro lab'으로 바꾸세요.
+
+      실행하면 CODARO LAB이 나와야 합니다.
     starterCode: |-
       text = 'hello python'
       text.upper()
+    solution: |-
+      text = 'codaro lab'
+      text.upper()
     hints:
-    - 바꿀 지점은 `text = ...` 오른쪽 값입니다.
-    - 실행 뒤 `text` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "text = 'hello python' 을 text = 'codaro lab' 으로 바꿉니다. text.upper() 줄은 그대로 둡니다."
+    - "정답 형태: text = 'codaro lab'"
   check:
-    type: noError
-    noError: 대문자 변환에서 `text` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 대문자 변환 실행 뒤 `text` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'CODARO LAB'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'CODARO LAB'"
 - id: method_lower
   title: 소문자 변환
   structuredPrimary: true
   subtitle: lower()로 모두 소문자로
-  goal: 소문자 변환에서 `msg` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: lower()로 문자열의 영문자를 모두 소문자로 바꾼다.
+  why: 아이디나 확장자를 소문자로 모아 두면 대소문자 차이 때문에 같은 값이 다른 값으로 취급되지 않습니다.
   explanation: lower() 메서드는 문자열의 모든 문자를 소문자로 변환합니다. 대소문자 구분 없이 비교할 때 자주 사용됩니다. 원본 문자열은 그대로 유지됩니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -88,23 +95,30 @@ sections:
     msg = 'HELLO PYTHON'
     msg.lower()
   exercise:
-    prompt: 소문자 변환 예제에서 `msg` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      msg를 'CODARO LAB'으로 바꾸세요.
+
+      실행하면 codaro lab이 나와야 합니다.
     starterCode: |-
       msg = 'HELLO PYTHON'
       msg.lower()
+    solution: |-
+      msg = 'CODARO LAB'
+      msg.lower()
     hints:
-    - 바꿀 지점은 `msg = ...` 오른쪽 값입니다.
-    - 실행 뒤 `msg` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "msg = 'HELLO PYTHON' 을 msg = 'CODARO LAB' 으로 바꿉니다. msg.lower() 줄은 그대로 둡니다."
+    - "정답 형태: msg = 'CODARO LAB'"
   check:
-    type: noError
-    noError: 소문자 변환에서 `msg` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 소문자 변환 실행 뒤 `msg` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'codaro lab'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'codaro lab'"
 - id: method_capitalize
   title: 첫 글자 대문자
   structuredPrimary: true
   subtitle: capitalize()로 첫 문자만 대문자
-  goal: 첫 글자 대문자에서 `phrase` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: capitalize()로 첫 글자만 대문자로 만들고 나머지는 소문자로 내린다.
+  why: 아무렇게나 입력된 문장을 문장 첫 글자만 대문자인 한 가지 표기로 정리할 때 씁니다.
   explanation: capitalize() 메서드는 문자열의 첫 번째 문자만 대문자로 만들고 나머지는 모두 소문자로 변환합니다. 문장의 시작을 정리할 때 유용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -112,23 +126,30 @@ sections:
     phrase = 'hello PYTHON'
     phrase.capitalize()
   exercise:
-    prompt: 첫 글자 대문자 예제에서 `phrase` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      phrase를 'CODARO lab'으로 바꾸세요.
+
+      실행하면 Codaro lab이 나와야 합니다. 첫 글자만 대문자로 남고 나머지는 전부 소문자로 내려갑니다.
     starterCode: |-
       phrase = 'hello PYTHON'
       phrase.capitalize()
+    solution: |-
+      phrase = 'CODARO lab'
+      phrase.capitalize()
     hints:
-    - 바꿀 지점은 `phrase = ...` 오른쪽 값입니다.
-    - 실행 뒤 `phrase` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "phrase = 'hello PYTHON' 을 phrase = 'CODARO lab' 으로 바꿉니다. phrase.capitalize() 줄은 그대로 둡니다."
+    - "정답 형태: phrase = 'CODARO lab'"
   check:
-    type: noError
-    noError: 첫 글자 대문자에서 `phrase` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 첫 글자 대문자 실행 뒤 `phrase` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'Codaro lab'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Codaro lab'"
 - id: method_title
   title: 제목 형식
   structuredPrimary: true
   subtitle: title()로 각 단어 첫 글자 대문자
-  goal: 제목 형식에서 `sentence` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: title()로 각 단어의 첫 글자를 대문자로 만든다.
+  why: 이름이나 제목 목록을 한 가지 표기로 맞춰 화면과 보고서에 그대로 실을 수 있게 만듭니다.
   explanation: title() 메서드는 각 단어의 첫 글자를 대문자로 만듭니다. 공백이나 특수문자로 구분된 각 단어마다 적용됩니다. 제목이나 이름을 정리할 때 사용합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -136,23 +157,30 @@ sections:
     sentence = 'hello python programming'
     sentence.title()
   exercise:
-    prompt: 제목 형식 예제에서 `sentence` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      sentence를 'codaro lab guide'로 바꾸세요.
+
+      실행하면 Codaro Lab Guide가 나와야 합니다. 단어 세 개의 첫 글자가 모두 대문자가 됩니다.
     starterCode: |-
       sentence = 'hello python programming'
       sentence.title()
+    solution: |-
+      sentence = 'codaro lab guide'
+      sentence.title()
     hints:
-    - 바꿀 지점은 `sentence = ...` 오른쪽 값입니다.
-    - 실행 뒤 `sentence` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "sentence = 'hello python programming' 을 sentence = 'codaro lab guide' 로 바꿉니다. sentence.title() 줄은 그대로 둡니다."
+    - "정답 형태: sentence = 'codaro lab guide'"
   check:
-    type: noError
-    noError: 제목 형식에서 `sentence` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 제목 형식 실행 뒤 `sentence` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'Codaro Lab Guide'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Codaro Lab Guide'"
 - id: method_strip
   title: 양쪽 공백 제거
   structuredPrimary: true
   subtitle: strip()으로 공백 정리
-  goal: 양쪽 공백 제거에서 `raw` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: strip()으로 문자열 양쪽 끝의 공백을 지운다.
+  why: 사람이 복사해 붙인 값에는 앞뒤 공백이 자주 섞여 들어가고, 그대로 두면 비교와 저장이 어긋납니다.
   explanation: strip() 메서드는 문자열 양쪽 끝의 공백을 제거합니다. 사용자 입력을 정리하거나 데이터를 깔끔하게 만들 때 자주 사용됩니다. 문자열 중간의 공백은 제거하지
     않습니다.
   tips:
@@ -161,23 +189,30 @@ sections:
     raw = '   hello python   '
     raw.strip()
   exercise:
-    prompt: 양쪽 공백 제거 예제에서 `raw` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      raw 안의 hello python을 sales data로 바꾸세요. 앞뒤 공백 세 칸은 그대로 둡니다.
+
+      실행하면 sales data가 나와야 합니다. 양쪽 공백은 사라지고 가운데 한 칸만 남습니다.
     starterCode: |-
       raw = '   hello python   '
       raw.strip()
+    solution: |-
+      raw = '   sales data   '
+      raw.strip()
     hints:
-    - 바꿀 지점은 `raw = ...` 오른쪽 값입니다.
-    - 실행 뒤 `raw` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "따옴표 안의 hello python 만 sales data 로 바꿉니다. 앞뒤 공백과 raw.strip() 줄은 그대로 둡니다."
+    - "정답 형태: raw = '   sales data   '"
   check:
-    type: noError
-    noError: 양쪽 공백 제거에서 `raw` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 양쪽 공백 제거 실행 뒤 `raw` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'sales data'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'sales data'"
 - id: method_lstrip_rstrip
   title: 한쪽 공백 제거
   structuredPrimary: true
   subtitle: lstrip(), rstrip()으로 한쪽만 제거
-  goal: 한쪽 공백 제거에서 `left` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: lstrip()으로 왼쪽 공백만 지우고 오른쪽 공백은 남는 것을 확인한다.
+  why: 들여쓰기처럼 앞쪽 공백만 걷어내고 뒤쪽은 손대지 않아야 할 때 지울 방향을 골라 쓸 수 있습니다.
   explanation: lstrip()은 왼쪽 공백만, rstrip()은 오른쪽 공백만 제거합니다. l은 left(왼쪽), r은 right(오른쪽)를 의미합니다. 특정 방향의 공백만
     제거할 때 사용합니다.
   tips:
@@ -186,23 +221,30 @@ sections:
     left = '   hello   '
     left.lstrip()
   exercise:
-    prompt: 한쪽 공백 제거 예제에서 `left` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      두 가지를 바꾸세요. left 안의 hello를 codaro lab으로 바꾸고, 마지막 줄을 print(left.lstrip() + '|')로 바꾸세요. 앞뒤 공백 세 칸은 그대로 둡니다.
+
+      실행하면 codaro lab   | 이 나와야 합니다. 왼쪽 공백은 사라졌는데 오른쪽 공백 세 칸은 남아서 막대 기호 앞에 그대로 보입니다.
     starterCode: |-
       left = '   hello   '
       left.lstrip()
+    solution: |-
+      left = '   codaro lab   '
+      print(left.lstrip() + '|')
     hints:
-    - 바꿀 지점은 `left = ...` 오른쪽 값입니다.
-    - 실행 뒤 `left` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "따옴표 안의 hello 만 codaro lab 으로 바꾸고, 마지막 줄을 print(left.lstrip() + '|') 로 바꿉니다. 막대 기호는 공백이 어디까지 남았는지 보이게 하는 표시입니다."
+    - "정답 형태: print(left.lstrip() + '|')"
   check:
-    type: noError
-    noError: 한쪽 공백 제거에서 `left` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 한쪽 공백 제거 실행 뒤 `left` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: "codaro lab   |"
+    resultCheck: "출력이 정확히 일치해야 합니다: 'codaro lab   |'"
 - id: method_replace
   title: 문자열 치환
   structuredPrimary: true
   subtitle: replace()로 문자 바꾸기
-  goal: 문자열 치환에서 `greeting` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: replace()로 문자열 안의 특정 부분만 다른 문자열로 갈아 끼운다.
+  why: 문구 하나만 바뀐 안내문이나 경로를 처음부터 다시 쓰지 않고 그 부분만 바꿔 쓸 수 있습니다.
   explanation: replace() 메서드는 문자열 안의 특정 부분을 다른 문자열로 바꿉니다. replace(찾을문자, 바꿀문자) 형태로 사용하며, 모든 일치하는 부분을 바꿉니다.
     원본은 변경되지 않습니다.
   tips:
@@ -211,23 +253,30 @@ sections:
     greeting = 'Hello World'
     greeting.replace('World', 'Python')
   exercise:
-    prompt: 문자열 치환 예제에서 `greeting` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      greeting을 'Goodbye World'로 바꾸세요. replace() 줄은 그대로 둡니다.
+
+      실행하면 Goodbye Python이 나와야 합니다. World만 Python으로 바뀌고 앞 단어는 그대로 남습니다.
     starterCode: |-
       greeting = 'Hello World'
       greeting.replace('World', 'Python')
+    solution: |-
+      greeting = 'Goodbye World'
+      greeting.replace('World', 'Python')
     hints:
-    - 바꿀 지점은 `greeting = ...` 오른쪽 값입니다.
-    - 실행 뒤 `greeting` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "greeting = 'Hello World' 를 greeting = 'Goodbye World' 로 바꿉니다. World 는 지우지 않습니다."
+    - "정답 형태: greeting = 'Goodbye World'"
   check:
-    type: noError
-    noError: 문자열 치환에서 `greeting` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 문자열 치환 실행 뒤 `greeting` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'Goodbye Python'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Goodbye Python'"
 - id: method_replace_all
   title: 여러 개 치환
   structuredPrimary: true
   subtitle: 모든 일치 항목 바꾸기
-  goal: 여러 개 치환에서 `allText` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: replace()가 일치하는 부분을 하나만이 아니라 전부 바꾼다는 것을 확인한다.
+  why: 문서 전체에서 같은 단어를 한 번에 바꿀 때 그 단어가 몇 번 나오는지 미리 세지 않아도 됩니다.
   explanation: replace()는 기본적으로 일치하는 모든 부분을 바꿉니다. 같은 문자가 여러 번 나와도 모두 치환됩니다. 공백을 다른 문자로 바꾸거나 특정 패턴을 제거할
     때 유용합니다.
   tips:
@@ -236,23 +285,30 @@ sections:
     allText = 'apple apple orange apple'
     allText.replace('apple', 'banana')
   exercise:
-    prompt: 여러 개 치환 예제에서 `allText` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      allText를 'apple orange apple'로 바꾸세요. replace() 줄은 그대로 둡니다.
+
+      실행하면 banana orange banana가 나와야 합니다. apple은 두 개 모두 바뀌고 orange는 그대로 남습니다.
     starterCode: |-
       allText = 'apple apple orange apple'
       allText.replace('apple', 'banana')
+    solution: |-
+      allText = 'apple orange apple'
+      allText.replace('apple', 'banana')
     hints:
-    - 바꿀 지점은 `allText = ...` 오른쪽 값입니다.
-    - 실행 뒤 `allText` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "allText 값을 'apple orange apple' 로 바꿉니다. apple 두 개와 orange 하나만 남기면 됩니다."
+    - "정답 형태: allText = 'apple orange apple'"
   check:
-    type: noError
-    noError: 여러 개 치환에서 `allText` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 여러 개 치환 실행 뒤 `allText` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'banana orange banana'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'banana orange banana'"
 - id: method_split
   title: 문자열 나누기
   structuredPrimary: true
   subtitle: split()으로 구분자 기준 분리
-  goal: 문자열 나누기에서 `row` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: split()으로 쉼표로 붙어 있는 한 줄을 항목 리스트로 나눈다.
+  why: CSV 한 줄이나 로그 한 줄은 항목별로 쪼개야 계산하거나 검사할 수 있습니다.
   explanation: split() 메서드는 문자열을 특정 구분자 기준으로 나누어 리스트를 만듭니다. 쉼표로 구분된 CSV 한 줄, 공백으로 나뉜 단어, 하이픈이 들어간 코드처럼
     정해진 패턴을 데이터로 바꿀 때 자주 사용합니다.
   tips:
@@ -261,23 +317,31 @@ sections:
     row = 'kim@example.com,paid,15000'
     row.split(',')
   exercise:
-    prompt: 문자열 나누기 예제에서 `row` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      row 끝의 15000을 27000으로 바꾸세요. 앞의 두 항목과 split 줄은 그대로 둡니다.
+
+      실행하면 아래 리스트가 나와야 합니다. 금액도 따옴표가 붙은 문자열로 나뉩니다.
+      ['kim@example.com', 'paid', '27000']
     starterCode: |-
       row = 'kim@example.com,paid,15000'
       row.split(',')
+    solution: |-
+      row = 'kim@example.com,paid,27000'
+      row.split(',')
     hints:
-    - 바꿀 지점은 `row = ...` 오른쪽 값입니다.
-    - 실행 뒤 `row` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "row 값 맨 뒤의 15000 만 27000 으로 바꿉니다. 쉼표 위치와 다른 항목은 건드리지 않습니다."
+    - "정답 형태: row = 'kim@example.com,paid,27000'"
   check:
-    type: noError
-    noError: 문자열 나누기에서 `row` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 문자열 나누기 실행 뒤 `row` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: "['kim@example.com', 'paid', '27000']"
+    resultCheck: "출력이 정확히 일치해야 합니다: ['kim@example.com', 'paid', '27000']"
 - id: method_join
   title: 문자열 합치기
   structuredPrimary: true
   subtitle: join()으로 리스트를 문자열로 조립
-  goal: 문자열 합치기에서 `fields` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: join()으로 리스트 항목을 정한 구분자로 이어 한 문자열로 만든다.
+  why: 나눠서 다루던 항목을 파일이나 로그에 다시 한 줄로 적어 저장할 때 씁니다.
   explanation: join() 메서드는 문자열 리스트를 하나의 문자열로 합칩니다. 어떤 구분자를 사이에 넣을지 먼저 쓰고, 그 뒤에 합칠 리스트를 넘깁니다. split()으로
     나눈 데이터를 다시 저장 형식으로 만들 때 함께 사용합니다.
   tips:
@@ -286,23 +350,30 @@ sections:
     fields = ['kim@example.com', 'paid', '15000']
     '|'.join(fields)
   exercise:
-    prompt: 문자열 합치기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    prompt: |-
+      fields의 마지막 항목 '15000'을 '27000'으로 바꾸세요. 감싼 따옴표와 join 줄은 그대로 둡니다.
+
+      실행하면 kim@example.com|paid|27000이 나와야 합니다.
     starterCode: |-
       fields = ['kim@example.com', 'paid', '15000']
       '|'.join(fields)
+    solution: |-
+      fields = ['kim@example.com', 'paid', '27000']
+      '|'.join(fields)
     hints:
-    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
-    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    - "리스트 세 번째 항목 '15000' 을 '27000' 으로 바꿉니다. 따옴표를 지우면 join 이 실패합니다."
+    - "정답 형태: fields = ['kim@example.com', 'paid', '27000']"
   check:
-    type: noError
-    noError: 문자열 합치기에서 `fields` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 문자열 합치기 실행 뒤 `fields` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'kim@example.com|paid|27000'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'kim@example.com|paid|27000'"
 - id: method_count
   title: 문자열 개수 세기
   structuredPrimary: true
   subtitle: count()로 등장 횟수 확인
-  goal: 문자열 개수 세기에서 `words` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: count()로 특정 문자열이 몇 번 나오는지 센다.
+  why: 로그에 오류 단어가 몇 번 찍혔는지, 구분자가 몇 개인지 세어 형식이 맞는지 확인할 때 씁니다.
   explanation: count() 메서드는 문자열에서 특정 문자나 문자열이 몇 번 등장하는지 셉니다. 결과는 정수로 반환되며, 없으면 0을 반환합니다. 대소문자를 구분합니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -310,23 +381,30 @@ sections:
     words = 'hello hello world hello'
     words.count('hello')
   exercise:
-    prompt: 문자열 개수 세기 예제에서 `words` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      words를 'hello world hello world'로 바꾸세요. count 줄은 그대로 둡니다.
+
+      hello가 두 번만 남으므로 2가 나와야 합니다.
     starterCode: |-
       words = 'hello hello world hello'
       words.count('hello')
+    solution: |-
+      words = 'hello world hello world'
+      words.count('hello')
     hints:
-    - 바꿀 지점은 `words = ...` 오른쪽 값입니다.
-    - 실행 뒤 `words` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "words 값을 'hello world hello world' 로 바꿉니다. hello 와 world 가 두 번씩 번갈아 나오게 씁니다."
+    - "정답 형태: words = 'hello world hello world'"
   check:
-    type: noError
-    noError: 문자열 개수 세기에서 `words` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 문자열 개수 세기 실행 뒤 `words` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '2'
+    resultCheck: "출력이 정확히 일치해야 합니다: '2'"
 - id: method_find
   title: 문자열 위치 찾기
   structuredPrimary: true
   subtitle: find()로 첫 등장 위치 확인
-  goal: 문자열 위치 찾기에서 `code` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: find()로 찾는 단어가 몇 번째 자리에서 시작하는지 확인한다.
+  why: 구분 기호나 확장자가 몇 번째 글자에서 시작하는지 알아야 그 앞뒤를 잘라 쓸 수 있습니다.
   explanation: find() 메서드는 문자열에서 특정 문자나 문자열이 처음 나타나는 위치(인덱스)를 반환합니다. 찾지 못하면 -1을 반환합니다. 문자열의 위치를 확인할 때
     사용합니다.
   tips:
@@ -335,23 +413,30 @@ sections:
     code = 'Hello Python Programming'
     code.find('Python')
   exercise:
-    prompt: 문자열 위치 찾기 예제에서 `code` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      code에서 앞의 Hello와 그 뒤 공백을 지워 'Python Programming'으로 바꾸세요.
+
+      Python이 맨 앞으로 오므로 0이 나와야 합니다. 위치는 1이 아니라 0부터 셉니다.
     starterCode: |-
       code = 'Hello Python Programming'
       code.find('Python')
+    solution: |-
+      code = 'Python Programming'
+      code.find('Python')
     hints:
-    - 바꿀 지점은 `code = ...` 오른쪽 값입니다.
-    - 실행 뒤 `code` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "code = 'Hello Python Programming' 을 code = 'Python Programming' 으로 바꿉니다. find 줄은 그대로 둡니다."
+    - "정답 형태: code = 'Python Programming'"
   check:
-    type: noError
-    noError: 문자열 위치 찾기에서 `code` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 문자열 위치 찾기 실행 뒤 `code` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '0'
+    resultCheck: "출력이 정확히 일치해야 합니다: '0'"
 - id: method_find_notfound
   title: 찾기 실패
   structuredPrimary: true
   subtitle: 없는 문자 찾을 때
-  goal: 찾기 실패에서 print() 입력값이 출력 영역에 어떻게 표시되는지 확인한다.
-  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  goal: find()가 못 찾으면 -1, 찾으면 시작 위치를 돌려준다는 차이를 눈으로 확인한다.
+  why: -1인지 아닌지만 보면 값이 있는지 없는지를 조건 하나로 가를 수 있습니다.
   explanation: find() 메서드로 문자열을 찾지 못하면 -1을 반환합니다. 이를 활용하여 특정 문자열의 존재 여부를 확인할 수 있습니다. in 연산자와 비슷하지만 위치
     정보도 함께 얻을 수 있습니다.
   tips:
@@ -361,24 +446,33 @@ sections:
     result = text.find('Python')
     print('found:', result)
   exercise:
-    prompt: 찾기 실패 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
+    prompt: |-
+      text의 World를 Python으로 바꾸세요. find 줄과 print 줄은 그대로 둡니다.
+
+      이제 찾는 데 성공하므로 실패를 뜻하는 -1 대신 아래 한 줄이 나와야 합니다.
+      found: 6
     starterCode: |-
       text = 'Hello World'
       result = text.find('Python')
       print('found:', result)
+    solution: |-
+      text = 'Hello Python'
+      result = text.find('Python')
+      print('found:', result)
     hints:
-    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
-    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+    - "text = 'Hello World' 를 text = 'Hello Python' 으로 바꿉니다. Hello 와 공백은 그대로 둡니다."
+    - "정답 형태: text = 'Hello Python'"
   check:
-    type: noError
-    noError: 찾기 실패의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
-    resultCheck: 찾기 실패 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'found: 6'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'found: 6'"
 - id: method_startswith
   title: 시작 문자 확인
   structuredPrimary: true
   subtitle: startswith()로 시작 여부 확인
-  goal: 시작 문자 확인에서 `title` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: startswith()로 시작 글자를 판정하고 결과를 False로 뒤집어 본다.
+  why: 주소가 https로 시작하는지, 파일 이름이 정해진 접두사로 시작하는지 걸러낼 때 씁니다.
   explanation: startswith() 메서드는 문자열이 특정 문자로 시작하는지 확인합니다. 결과는 True 또는 False입니다. URL이 http로 시작하는지, 파일명이
     특정 문자로 시작하는지 등을 확인할 때 유용합니다.
   tips:
@@ -387,23 +481,30 @@ sections:
     title = 'Python Programming'
     title.startswith('Python')
   exercise:
-    prompt: 시작 문자 확인 예제에서 `title` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      title을 'Codaro Programming'으로 바꾸세요. startswith 줄은 그대로 둡니다.
+
+      지금은 True가 나오지만, 바꾸면 Python으로 시작하지 않으므로 False가 나와야 합니다.
     starterCode: |-
       title = 'Python Programming'
       title.startswith('Python')
+    solution: |-
+      title = 'Codaro Programming'
+      title.startswith('Python')
     hints:
-    - 바꿀 지점은 `title = ...` 오른쪽 값입니다.
-    - 실행 뒤 `title` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "앞 단어 Python 만 Codaro 로 바꿉니다. startswith('Python') 안의 Python 은 그대로 둡니다."
+    - "정답 형태: title = 'Codaro Programming'"
   check:
-    type: noError
-    noError: 시작 문자 확인에서 `title` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 시작 문자 확인 실행 뒤 `title` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'False'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'False'"
 - id: method_endswith
   title: 끝 문자 확인
   structuredPrimary: true
   subtitle: endswith()로 종료 여부 확인
-  goal: 끝 문자 확인에서 `file` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: endswith()로 끝 글자를 판정하고 결과를 False로 뒤집어 본다.
+  why: 확장자가 .py인지 .csv인지 보고 그 파일을 처리할지 건너뛸지 정할 때 씁니다.
   explanation: endswith() 메서드는 문자열이 특정 문자로 끝나는지 확인합니다. 파일 확장자 확인이나 문장 부호 확인 등에 자주 사용됩니다. 결과는 True 또는 False입니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -411,23 +512,30 @@ sections:
     file = 'script.py'
     file.endswith('.py')
   exercise:
-    prompt: 끝 문자 확인 예제에서 `file` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      file을 'script.txt'로 바꾸세요. endswith 줄은 그대로 둡니다.
+
+      지금은 True가 나오지만, 바꾸면 .py로 끝나지 않으므로 False가 나와야 합니다.
     starterCode: |-
       file = 'script.py'
       file.endswith('.py')
+    solution: |-
+      file = 'script.txt'
+      file.endswith('.py')
     hints:
-    - 바꿀 지점은 `file = ...` 오른쪽 값입니다.
-    - 실행 뒤 `file` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "확장자 .py 만 .txt 로 바꿉니다. endswith('.py') 안의 .py 는 그대로 둡니다."
+    - "정답 형태: file = 'script.txt'"
   check:
-    type: noError
-    noError: 끝 문자 확인에서 `file` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 끝 문자 확인 실행 뒤 `file` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'False'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'False'"
 - id: workflow_validation
   title: '검증 루프: 고객 행 정제하기'
   structuredPrimary: true
   subtitle: 공백, 대소문자, 쉼표 형식을 업무 데이터로 정리
-  goal: '검증 루프: 고객 행 정제하기에서 예상값과 실제 실행 결과를 비교하는 검증 흐름을 확인한다.'
-  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  goal: strip, lower, replace를 이어 붙인 정제 결과가 기준값과 같은지 assert로 검증하는 흐름을 확인한다.
+  why: 정제는 한 단계만 빠져도 결과가 그럴듯해 보여서, 기준 문자열을 assert로 코드에 박아 두어야 어긋난 순간 바로 멈춥니다.
   explanation: 문자열 메서드는 입력값을 보기 좋게 꾸미는 기능이 아니라, 사람이 넣은 거친 텍스트를 프로그램이 믿고 처리할 수 있는 데이터로 바꾸는 도구입니다. 공백 제거,
     대소문자 통일, 구분자 검사, 숫자 변환까지 한 흐름으로 묶어야 실무에서 다시 쓸 수 있습니다.
   tips:
@@ -447,7 +555,10 @@ sections:
     assert amount == 15000
     assert cleanLine == 'kim@example.com|paid|15000'
   exercise:
-    prompt: '검증 루프: 고객 행 정제하기 예제에서 기대 문자열이나 실제 출력 문구를 바꾸고 assert 비교가 맞는지 확인하세요.'
+    prompt: |-
+      값은 바꾸지 말고 코드를 그대로 실행하세요.
+
+      assert 두 줄이 모두 통과하고 마지막에 sales_report_2026_final.csv가 나와야 합니다.
     starterCode: |-
       rawFileName = '  Sales Report 2026 FINAL.CSV  '
       cleanFileName = rawFileName.strip().lower().replace(' ', '_')
@@ -455,19 +566,27 @@ sections:
       assert cleanFileName == 'sales_report_2026_final.csv'
       assert cleanFileName.endswith('.csv')
       cleanFileName
+    solution: |-
+      rawFileName = '  Sales Report 2026 FINAL.CSV  '
+      cleanFileName = rawFileName.strip().lower().replace(' ', '_')
+
+      assert cleanFileName == 'sales_report_2026_final.csv'
+      assert cleanFileName.endswith('.csv')
+      cleanFileName
     hints:
-    - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
-    - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
+    - 값이나 메서드 순서를 바꾸면 assert가 AssertionError로 멈춥니다. 그때는 원래 코드로 되돌리세요.
+    - "정답 형태: 코드를 그대로 실행, 마지막 값 sales_report_2026_final.csv"
   check:
-    type: noError
-    noError: '검증 루프: 고객 행 정제하기에서 `rawFileName` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
-    resultCheck: '검증 루프: 고객 행 정제하기에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.'
+    type: outputExact
+    evidence: practice
+    outputExact: 'sales_report_2026_final.csv'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'sales_report_2026_final.csv'"
 - id: practice
   title: Day 6 종합 복습
   structuredPrimary: true
   subtitle: 문자열 메서드 마스터하기
-  goal: Day 6 종합 복습에서 `greet` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: 오늘 배운 upper()로 문자열을 다시 한 번 대문자로 바꿔 본다.
+  why: 메서드를 손으로 한 번 더 써 봐야 다음 강의에서 리스트에 담긴 문자열을 정제할 때 바로 꺼내 쓸 수 있습니다.
   explanation: Day 6에서 배운 문자열 메서드를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로
     어떤 순서로 해도 괜찮습니다.
   tips:
@@ -477,17 +596,24 @@ sections:
     isPdf = file1.endswith('.pdf')
     print('is_pdf:', isPdf)
   exercise:
-    prompt: Day 6 종합 복습 예제에서 `greet` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      greet를 'good job'으로 바꾸세요.
+
+      실행하면 GOOD JOB이 나와야 합니다.
     starterCode: |-
       greet = 'hello world'
       greet.upper()
+    solution: |-
+      greet = 'good job'
+      greet.upper()
     hints:
-    - 바꿀 지점은 `greet = ...` 오른쪽 값입니다.
-    - 실행 뒤 `greet` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "greet = 'hello world' 를 greet = 'good job' 으로 바꿉니다. greet.upper() 줄은 그대로 둡니다."
+    - "정답 형태: greet = 'good job'"
   check:
-    type: noError
-    noError: Day 6 종합 복습에서 `greet` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: Day 6 종합 복습 실행 뒤 `greet` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'GOOD JOB'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'GOOD JOB'"
 assessment:
   schemaVersion: 1
   performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
