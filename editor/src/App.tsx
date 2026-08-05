@@ -42,6 +42,7 @@ import {
   type ReconnectVariant,
 } from "@/lib/providerReconnectPolicy";
 import { WidgetSessionProvider } from "@/lib/widgetSession";
+import { shouldUseApi } from "@/lib/api";
 import {
   installBrowserPythonRuntimeDiagnostics,
   scheduleBrowserPythonRuntimeWarm,
@@ -94,12 +95,14 @@ function App() {
   // apiOnline 은 부트스트랩 1회가 아니라 라이브 연결 스토어가 소유한다(세션 중간 끊김 감지).
   const connection = useConnectionStatus();
   const apiOnline = connection.apiOnline;
-  // Web Run(로컬 API 없음)에서는 첫 페인트 뒤 idle에 pyproc를 미리 올린다.
-  // Local Studio(apiOnline)는 네이티브 커널을 쓰므로 예열하지 않는다.
+  // Web Run에서만 첫 페인트 뒤 idle에 pyproc를 미리 올린다. Local Studio는 네이티브
+  // 커널을 쓰므로 브라우저 런타임을 내려받지 않는다. 판정은 apiOnline이 아니라
+  // shouldUseApi()로 한다. apiOnline은 첫 health probe 전까지 false라서, 그걸 쓰면
+  // Local 부팅 중 잠깐 Web Run으로 오인해 CDN 요청을 시작했다가 취소해버린다.
   useEffect(() => {
-    if (apiOnline) return undefined;
+    if (shouldUseApi()) return undefined;
     return scheduleBrowserPythonRuntimeWarm();
-  }, [apiOnline]);
+  }, []);
   const [notice, setNotice] = useState<AppNotice>(initialAppNotice);
   const applyNotice = useCallback((nextNotice: AppNotice) => {
     setNotice((currentNotice) =>
