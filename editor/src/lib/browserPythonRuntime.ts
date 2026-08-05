@@ -3,11 +3,12 @@
 // notebookRuntime이 이 커널로 셀을 진짜 실행한다(과거 print 정규식 시뮬레이션 대체).
 // Web Run과 Local은 같은 학습 문서와 evidence 계약을 쓴다. 설계 근거:
 // docs/skills/architecture/learning-experience.md와 contracts/learningEvent.schema.json.
-// pyproc은 코드 스플릿으로 lazy import한다. Web Run(!apiOnline)에서는 App이 idle에
-// warmBrowserPythonRuntime()으로 같은 싱글턴을 미리 올려 첫 셀 실행 지연을 줄인다.
+// pyproc은 코드 스플릿으로 lazy import한다. Web Run에서는 App이 idle에
+// scheduleBrowserPythonRuntimeWarm()으로 같은 싱글턴을 미리 올려 첫 셀 실행 지연을 줄인다.
 // 단일 boot 경로는 SharedArrayBuffer/COOP-COEP가 필요 없어 정적 호스팅에서도 돈다.
 import analysisSource from "../../../src/codaro/document/analysis.py?raw";
 import reactivePlanSource from "../../../src/codaro/kernel/reactivePlan.py?raw";
+import { shouldUseApi } from "@/lib/api";
 import type { ExecutionResult, ReactiveDiagnostics, VariableInfo } from "@/types";
 
 type PyRuntime = {
@@ -124,9 +125,15 @@ export function warmBrowserPythonRuntime(): void {
   });
 }
 
-/** idle(+timeout)에 pyproc 부팅을 예약하고, 취소 함수를 돌려준다. */
+/**
+ * idle(+timeout)에 pyproc 부팅을 예약하고, 취소 함수를 돌려준다.
+ * 예열 대상 판정도 여기서 한다. Local Studio는 네이티브 커널을 쓰므로 브라우저
+ * 런타임을 내려받지 않는다. 판정에 연결 상태(apiOnline)를 쓰면 첫 health probe
+ * 전까지 false라서 Local 부팅 중 잠깐 Web Run으로 오인해 CDN 요청을 시작했다가
+ * 취소해버린다. shouldUseApi()는 runtime-tier meta로 결정되는 동기 값이라 경합이 없다.
+ */
 export function scheduleBrowserPythonRuntimeWarm(): () => void {
-  if (typeof window === "undefined") return () => {};
+  if (typeof window === "undefined" || shouldUseApi()) return () => {};
   let cancelled = false;
   const start = () => {
     if (cancelled) return;
