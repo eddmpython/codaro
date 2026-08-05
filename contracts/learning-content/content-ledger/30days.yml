@@ -400,7 +400,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day19_파일입출력"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "5a5c3e0afe93f45cabd661e356d11406c74b2d16aa8f099341ea5f9f5eda0171"
+    lessonContentHash: "0dacf9dde033c3d6abb971aa4bd326279e2c9786feff98a8cba12aff521036b5"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["aiIntegration","documentAutomation","emailAutomation","fileAutomation","imageProcessing","officeAutomation","pdfAutomation","pythonFoundation","scriptingAutomation","standardLibraryMastery"]
@@ -422,7 +422,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day20_예외처리"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "82a95598fccd6cbbd9a3f613f0804ddfde74dba70eb8e3b7e706dae416cfc2ff"
+    lessonContentHash: "a67c3b8a5d46f8a44595b5a73409a5d9e7988f9003f4c616696eecc4fd6fc9ab"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["aiIntegration","desktopAutomation","emailAutomation","pdfAutomation","pythonFoundation","scriptingAutomation","systemMonitoring"]
@@ -444,7 +444,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day21_중간종합복습"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "492cae1be777a63314552edbd4c41252079c643dbb387c7eae04fc15649585c8"
+    lessonContentHash: "50b486ae4294f682a291c8f6335e6b546df2c85f174ce11f3a58a27830aca36b"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]

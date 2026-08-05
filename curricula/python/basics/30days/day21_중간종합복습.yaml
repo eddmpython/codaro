@@ -54,8 +54,8 @@ sections:
   title: 자료구조 복습
   structuredPrimary: true
   subtitle: 문자열, 리스트, 튜플, 집합, 딕셔너리
-  goal: 자료구조 복습에서 `phrase` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: 문자열 메서드를 이어 붙이고 마지막에 split으로 리스트를 만들어 자료형이 바뀌는 지점을 확인한다.
+  why: 원본 데이터는 대부분 한 덩어리 문자열로 들어오기 때문에, 모양을 다듬은 뒤 리스트로 쪼개 두어야 그다음 반복문과 집계로 넘길 수 있습니다.
   explanation: 파이썬의 5가지 핵심 자료구조를 복습합니다. 문자열(str), 리스트(list), 튜플(tuple), 집합(set), 딕셔너리(dict)의 특징과 메서드를
     다시 확인합니다.
   tips:
@@ -64,23 +64,31 @@ sections:
     phrase = "Python Programming"
     phrase.lower().replace('p', 'J')
   exercise:
-    prompt: 자료구조 복습 예제에서 `phrase` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      두 곳을 고치세요. phrase 값을 "Python Data Tools"로 바꾸고, 마지막 줄 phrase.lower().replace('p', 'J')를 phrase.upper().split()로 바꾸세요.
+
+      전부 대문자로 바꾼 뒤 공백에서 쪼개지므로 아래 리스트가 나와야 합니다.
+      ['PYTHON', 'DATA', 'TOOLS']
     starterCode: |-
       phrase = "Python Programming"
       phrase.lower().replace('p', 'J')
+    solution: |-
+      phrase = "Python Data Tools"
+      phrase.upper().split()
     hints:
-    - 바꿀 지점은 `phrase = ...` 오른쪽 값입니다.
-    - 실행 뒤 `phrase` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - 'phrase 값을 "Python Data Tools" 로 바꾸고, 마지막 줄 전체를 phrase.upper().split() 로 바꿉니다.'
+    - "정답 형태: phrase.upper().split()"
   check:
-    type: noError
-    noError: 자료구조 복습에서 `phrase` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 자료구조 복습 실행 뒤 `phrase` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: "['PYTHON', 'DATA', 'TOOLS']"
+    resultCheck: "출력이 정확히 일치해야 합니다: \"['PYTHON', 'DATA', 'TOOLS']\""
 - id: control_flow_review
   title: 제어문 복습
   structuredPrimary: true
   subtitle: 조건문과 반복문
-  goal: 제어문 복습에서 조건값이 선택되는 분기와 결과를 어떻게 바꾸는지 확인한다.
-  why: 조건 분기는 입력값에 따라 실행 경로가 바뀌므로 결과를 바로 확인해야 합니다.
+  goal: 값 하나를 판정하던 조건식을 for 루프 안으로 옮겨 목록 전체를 한 번에 등급으로 바꾼다.
+  why: 판정 규칙은 값 하나에만 쓰이지 않고 보통 목록 전체에 같은 기준을 반복 적용해야 하므로, 조건식과 반복문을 붙여 쓰는 형태가 실제로 가장 많이 나옵니다.
   explanation: 조건문(if, elif, else)과 반복문(for, while)을 복습합니다. break, continue, else절을 활용하여 프로그램의 흐름을 제어할
     수 있습니다.
   tips:
@@ -89,23 +97,34 @@ sections:
     score = 85
     'A' if score >= 90 else 'B' if score >= 80 else 'C'
   exercise:
-    prompt: 제어문 복습 예제에서 조건값을 바꾸고 선택되는 분기와 결과가 달라지는지 확인하세요.
+    prompt: |-
+      점수 하나를 판정하던 코드를 점수 목록 전체를 판정하는 코드로 바꾸세요. 첫 줄 score = 85를 scores = [95, 72, 88]로 바꾸고, 그 아래에 grades = [] 한 줄을 추가합니다. 이어서 for score in scores: 줄을 넣고, 원래 마지막 줄에 있던 조건식을 그 안에서 grades.append(...)의 괄호 안으로 옮겨 들여씁니다. 맨 마지막 줄에는 grades만 씁니다.
+
+      95는 A, 72는 C, 88은 B로 판정되어 아래 리스트가 나와야 합니다.
+      ['A', 'C', 'B']
     starterCode: |-
       score = 85
       'A' if score >= 90 else 'B' if score >= 80 else 'C'
+    solution: |-
+      scores = [95, 72, 88]
+      grades = []
+      for score in scores:
+          grades.append('A' if score >= 90 else 'B' if score >= 80 else 'C')
+      grades
     hints:
-    - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
-    - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
+    - "score = 85 를 scores = [95, 72, 88] 로 바꾸고 그 아래 grades = [] 를 추가한 뒤, for score in scores: 안에서 grades.append(조건식) 을 호출하고 마지막 줄에 grades 를 씁니다."
+    - "정답 형태: for 루프 안에서 grades.append('A' if score >= 90 else 'B' if score >= 80 else 'C')"
   check:
-    type: noError
-    noError: 제어문 복습의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
-    resultCheck: 제어문 복습 분기 결과가 바꾼 조건값에 맞게 달라져야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: "['A', 'C', 'B']"
+    resultCheck: "출력이 정확히 일치해야 합니다: \"['A', 'C', 'B']\""
 - id: function_review
   title: 함수 복습
   structuredPrimary: true
   subtitle: def, return, 매개변수, 인자
-  goal: 함수 복습에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
-  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  goal: 매개변수에 기본값을 주어 인자를 하나만 넘겨도 같은 함수가 도는 것을 확인한다.
+  why: 자주 쓰는 값을 기본값으로 정해 두면 호출할 때마다 같은 숫자를 다시 적지 않아도 되고, 특별한 경우에만 값을 넘겨 덮어쓸 수 있습니다.
   explanation: 함수의 정의(def), 반환(return), 매개변수와 인자를 복습합니다. 기본 매개변수, 키워드 인자, *args, **kwargs, lambda까지 다양한
     함수 기법을 활용할 수 있습니다.
   tips:
@@ -116,25 +135,34 @@ sections:
 
     multiply(7, 8)
   exercise:
-    prompt: 함수 복습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    prompt: |-
+      두 곳을 고치세요. def multiply(a, b):를 def multiply(a, b=10):으로 바꾸고, 마지막 줄 multiply(7, 8)을 multiply(7)로 바꾸세요. 함수 본문 return a * b는 그대로 둡니다.
+
+      b를 넘기지 않으면 기본값 10이 대신 쓰이므로 70이 나와야 합니다.
     starterCode: |-
       def multiply(a, b):
           return a * b
 
       multiply(7, 8)
+    solution: |-
+      def multiply(a, b=10):
+          return a * b
+
+      multiply(7)
     hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    - "def 줄의 b 뒤에 =10 을 붙여 def multiply(a, b=10): 으로 만들고, 마지막 줄에서 두 번째 인자를 지워 multiply(7) 로 바꿉니다."
+    - "정답 형태: def multiply(a, b=10) 과 multiply(7)"
   check:
-    type: noError
-    noError: 함수 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
-    resultCheck: 함수 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '70'
+    resultCheck: "출력이 정확히 일치해야 합니다: '70'"
 - id: module_file_review
   title: 모듈과 파일 복습
   structuredPrimary: true
   subtitle: import, 파일 입출력
-  goal: 모듈과 파일 복습에서 `radius` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: import한 pi와 sqrt를 둘 다 써서 원의 넓이와 그 넓이를 가진 정사각형의 한 변을 구한다.
+  why: from math import로 이름을 여러 개 가져오면 math.를 앞에 붙이지 않고 바로 쓸 수 있어서 계산식이 종이에 쓴 수식과 비슷해집니다.
   explanation: 모듈 가져오기(import, from, as)와 파일 입출력(open, read, write, with)을 복습합니다. math, random, datetime
     같은 표준 모듈을 활용할 수 있습니다.
   tips:
@@ -146,26 +174,36 @@ sections:
     area = pi * radius ** 2
     area
   exercise:
-    prompt: 모듈과 파일 복습 예제에서 `radius`, `area` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    prompt: |-
+      두 곳을 고치세요. radius를 5로 바꾸고, 마지막 줄 area를 round(sqrt(area), 2)로 바꾸세요. import 줄과 area 계산 줄은 그대로 둡니다.
+
+      반지름 5인 원의 넓이는 78.53981633974483이고 그 제곱근이 같은 넓이인 정사각형의 한 변입니다. 소수점 둘째 자리까지 반올림하면 8.86이 나와야 합니다.
     starterCode: |-
       from math import sqrt, pi
 
       radius = 4
       area = pi * radius ** 2
       area
+    solution: |-
+      from math import sqrt, pi
+
+      radius = 5
+      area = pi * radius ** 2
+      round(sqrt(area), 2)
     hints:
-    - 바꿀 지점은 `radius = ...` 오른쪽 값입니다.
-    - 실행 뒤 `radius` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - radius = 4 를 radius = 5 로 바꾸고, 마지막 줄 area 를 round(sqrt(area), 2) 로 바꿉니다. sqrt는 첫 줄에서 이미 가져왔으므로 바로 쓸 수 있습니다.
+    - "정답 형태: round(sqrt(area), 2)"
   check:
-    type: noError
-    noError: 모듈과 파일 복습에서 `radius` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 모듈과 파일 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '8.86'
+    resultCheck: "출력이 정확히 일치해야 합니다: '8.86'"
 - id: exception_review
   title: 예외 처리 복습
   structuredPrimary: true
   subtitle: try, except, finally, raise
-  goal: 예외 처리 복습에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
-  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  goal: finally 블록이 return보다 먼저 실행되고 그다음에 값이 돌아오는 순서를 출력으로 확인한다.
+  why: 파일을 닫거나 기록을 남기는 마무리 작업은 성공했든 예외가 났든 반드시 실행돼야 하는데, finally에 두면 그 보장을 코드로 얻습니다.
   explanation: 예외 처리를 통해 오류를 안전하게 처리하는 방법을 복습합니다. try, except, finally, raise를 활용하여 안정적인 프로그램을 작성할 수 있습니다.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -178,7 +216,12 @@ sections:
 
     safeDivide(10, 0)
   exercise:
-    prompt: 예외 처리 복습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    prompt: |-
+      두 곳을 고치세요. except 블록 다음에 try와 같은 열로 finally: 줄을 넣고 그 안에 print('done')을 들여쓰세요. 그리고 마지막 줄 safeDivide(10, 0)을 print(safeDivide(9, 4))로 바꾸세요.
+
+      0으로 나누지 않으니 예외가 나지 않고, 값이 돌아가기 전에 finally가 먼저 실행되므로 아래 두 줄이 이 순서로 나와야 합니다.
+      done
+      2.25
     starterCode: |-
       def safeDivide(a, b):
           try:
@@ -187,19 +230,32 @@ sections:
               return 'Cannot divide by zero'
 
       safeDivide(10, 0)
+    solution: |-
+      def safeDivide(a, b):
+          try:
+              return a / b
+          except ZeroDivisionError:
+              return 'Cannot divide by zero'
+          finally:
+              print('done')
+
+      print(safeDivide(9, 4))
     hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    - "except 블록 아래에 finally: 를 try 와 같은 열에 쓰고 그 다음 줄에 print('done') 을 들여씁니다. 마지막 줄은 print(safeDivide(9, 4)) 로 바꿉니다."
+    - "정답 형태: finally 안에 print('done'), 마지막 줄에 print(safeDivide(9, 4))"
   check:
-    type: noError
-    noError: 예외 처리 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
-    resultCheck: 예외 처리 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: |-
+      done
+      2.25
+    resultCheck: "출력이 정확히 일치해야 합니다: 'done\n2.25'"
 - id: integrated_practice
   title: 통합 실전 문제
   structuredPrimary: true
   subtitle: 여러 개념을 종합적으로 활용
-  goal: 통합 실전 문제에서 반복 대상과 반복 결과의 개수나 값 변화를 확인한다.
-  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  goal: 문장을 단어로 쪼개고 딕셔너리로 개수를 센 뒤 정렬된 목록으로 내놓는 흐름을 끝까지 잇는다.
+  why: 로그 한 줄이나 설문 답변처럼 반복되는 문자열을 셀 때 이 흐름을 그대로 쓰고, 마지막에 정렬해 두면 실행할 때마다 같은 순서로 볼 수 있습니다.
   explanation: |-
     여러 개념을 함께 활용하는 실전 문제들입니다. 자료구조, 제어문, 함수, 모듈을 통합적으로 사용하여 문제를 해결합니다.
 
@@ -212,7 +268,11 @@ sections:
         freq[word] = freq.get(word, 0) + 1
     freq
   exercise:
-    prompt: 통합 실전 문제 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    prompt: |-
+      두 곳을 고치세요. sentence를 "data is gold data is oil data wins"로 바꾸고, 마지막 줄 freq를 sorted(freq.items())로 바꾸세요. 가운데 for 루프는 그대로 둡니다.
+
+      data가 3번, is가 2번, 나머지가 1번씩 세어지고 단어 순으로 정렬되어 아래 한 줄이 나와야 합니다.
+      [('data', 3), ('gold', 1), ('is', 2), ('oil', 1), ('wins', 1)]
     starterCode: |-
       sentence = "python is fun python is powerful"
       words = sentence.split()
@@ -220,19 +280,27 @@ sections:
       for word in words:
           freq[word] = freq.get(word, 0) + 1
       freq
+    solution: |-
+      sentence = "data is gold data is oil data wins"
+      words = sentence.split()
+      freq = {}
+      for word in words:
+          freq[word] = freq.get(word, 0) + 1
+      sorted(freq.items())
     hints:
-    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
-    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+    - 'sentence 값을 "data is gold data is oil data wins" 로 바꾸고, 마지막 줄 freq 를 sorted(freq.items()) 로 바꿉니다.'
+    - "정답 형태: sorted(freq.items())"
   check:
-    type: noError
-    noError: 통합 실전 문제의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
-    resultCheck: 통합 실전 문제 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: "[('data', 3), ('gold', 1), ('is', 2), ('oil', 1), ('wins', 1)]"
+    resultCheck: "출력이 정확히 일치해야 합니다: \"[('data', 3), ('gold', 1), ('is', 2), ('oil', 1), ('wins', 1)]\""
 - id: workflow_validation
   title: '현업 흐름 검증: 주문 데이터를 정제하고 리포트 만들기'
   structuredPrimary: true
   subtitle: 작게 실행하고 결과를 확인하는 단계
-  goal: '현업 흐름 검증: 주문 데이터를 정제하고 리포트 만들기에서 예상값과 실제 실행 결과를 비교하는 검증 흐름을 확인한다.'
-  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  goal: 정제, 집계, 예외, 파일 쓰기를 한 흐름으로 잇고 단계마다 기대값을 assert로 못박아 실행한다.
+  why: 단계가 여러 개인 코드는 중간 한 곳만 어긋나도 마지막 숫자만 봐서는 어디서 틀렸는지 알 수 없으므로, 단계마다 기대값을 assert로 박아 두면 틀린 지점에서 바로 멈춥니다.
   explanation: 중간 복습에서는 문법을 따로따로 외우는 것보다, 작은 업무 흐름을 끝까지 통과시키는지가 중요합니다. 아래 코드는 문자열 정제, 딕셔너리 검증, 함수 분리,
     반복문, 예외 처리, 파일 입출력을 한 번에 연결합니다.
   tips:
@@ -279,7 +347,9 @@ sections:
             "paidIds": paidIds,
         }
 
-    normalizedOrders = [normalizeOrder(row) for row in rawOrders]
+    normalizedOrders = []
+    for row in rawOrders:
+        normalizedOrders.append(normalizeOrder(row))
     summary = summarizePaidOrders(normalizedOrders)
 
     assert summary["paidCount"] == 2
@@ -303,7 +373,11 @@ sections:
     assert "paidAmount=27000" in loadedReport
     print("중간 복습 흐름 통과")
   exercise:
-    prompt: '현업 흐름 검증: 주문 데이터를 정제하고 리포트 만들기 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
+    prompt: |-
+      값은 바꾸지 말고 코드를 그대로 실행하세요. 어디를 고치면 어떤 assert가 멈추는지는 실행이 통과한 다음에 확인하세요.
+
+      paid 주문 2건, 합계 27000, 잘못된 금액의 ValueError, 파일에 쓰고 다시 읽은 내용까지 assert가 전부 통과하면 마지막 줄에서 아래 문구가 출력되어야 합니다.
+      중간 복습 흐름 통과
     starterCode: |-
       from pathlib import Path
       import tempfile
@@ -346,7 +420,76 @@ sections:
               "paidIds": paidIds,
           }
 
-      normalizedOrders = [normalizeOrder(row) for row in rawOrders]
+      normalizedOrders = []
+      for row in rawOrders:
+          normalizedOrders.append(normalizeOrder(row))
+      summary = summarizePaidOrders(normalizedOrders)
+
+      assert summary["paidCount"] == 2
+      assert summary["paidAmount"] == 27000
+      assert summary["paidIds"] == ["A-100", "A-102"]
+
+      try:
+          normalizeOrder({"id": "A-999", "status": "paid", "amount": "twelve"})
+      except ValueError as exc:
+          assert "invalid amount" in str(exc)
+
+      with tempfile.TemporaryDirectory() as tempDir:
+          reportPath = Path(tempDir) / "midReviewReport.txt"
+          reportPath.write_text(
+              f"paidCount={summary['paidCount']}\npaidAmount={summary['paidAmount']}",
+              encoding="utf-8",
+          )
+          loadedReport = reportPath.read_text(encoding="utf-8")
+
+      assert "paidCount=2" in loadedReport
+      assert "paidAmount=27000" in loadedReport
+      print("중간 복습 흐름 통과")
+    solution: |-
+      from pathlib import Path
+      import tempfile
+
+      rawOrders = [
+          {"id": " A-100 ", "status": " PAID ", "amount": "12000"},
+          {"id": "A-101", "status": "cancelled", "amount": "8000"},
+          {"id": "A-102", "status": "paid", "amount": "15000"},
+      ]
+
+      def normalizeOrder(row):
+          requiredKeys = {"id", "status", "amount"}
+          missingKeys = sorted(requiredKeys - set(row))
+          if missingKeys:
+              raise KeyError(f"missing keys: {missingKeys}")
+
+          orderId = row["id"].strip()
+          status = row["status"].strip().lower()
+
+          try:
+              amount = int(row["amount"])
+          except ValueError as exc:
+              raise ValueError(f"invalid amount: {row['amount']}") from exc
+
+          return {"id": orderId, "status": status, "amount": amount}
+
+      def summarizePaidOrders(orders):
+          paidIds = []
+          paidAmount = 0
+
+          for order in orders:
+              if order["status"] != "paid":
+                  continue
+              paidIds.append(order["id"])
+              paidAmount += order["amount"]
+
+          return {
+              "paidCount": len(paidIds),
+              "paidAmount": paidAmount,
+              "paidIds": paidIds,
+          }
+
+      normalizedOrders = []
+      for row in rawOrders:
+          normalizedOrders.append(normalizeOrder(row))
       summary = summarizePaidOrders(normalizedOrders)
 
       assert summary["paidCount"] == 2
@@ -370,18 +513,19 @@ sections:
       assert "paidAmount=27000" in loadedReport
       print("중간 복습 흐름 통과")
     hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    - 금액이나 status 값을 바꾸면 대응하는 assert가 AssertionError로 멈춥니다. 그때는 원래 값으로 되돌리세요.
+    - "정답 형태: 코드를 그대로 실행, 출력은 중간 복습 흐름 통과"
   check:
-    type: noError
-    noError: '현업 흐름 검증: 주문 데이터를 정제하고 리포트 만들기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
-    resultCheck: '현업 흐름 검증: 주문 데이터를 정제하고 리포트 만들기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+    type: outputExact
+    evidence: practice
+    outputExact: '중간 복습 흐름 통과'
+    resultCheck: "출력이 정확히 일치해야 합니다: '중간 복습 흐름 통과'"
 - id: practice
   title: Day 21 종합 복습
   structuredPrimary: true
   subtitle: 중간 점검 완전 정복
-  goal: Day 21 종합 복습에서 `text` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: 앞뒤 공백을 걷어내고 단어마다 첫 글자를 대문자로 바꾼 뒤 리스트로 쪼개는 세 단계를 한 줄로 잇는다.
+  why: 사람이 입력한 이름이나 제목은 공백과 대소문자가 제각각이라, 저장하기 전에 같은 모양으로 다듬어 두어야 나중에 비교와 정렬이 어긋나지 않습니다.
   explanation: Day 1~20까지 배운 모든 개념을 종합적으로 복습합니다. 🟢 기본 미션으로 핵심 개념을 확인하고, 🟡 응용 미션으로 활용 능력을 키우고, 🔴 심화 미션으로
     통합 사고력을 키웁니다.
   tips:
@@ -390,23 +534,31 @@ sections:
     text = "  Hello World  "
     text.strip().upper()
   exercise:
-    prompt: Day 21 종합 복습 예제에서 `text` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      두 곳을 고치세요. text를 "  codaro python study  "로 바꾸고(앞뒤 공백 두 칸은 그대로 남겨 둡니다), 마지막 줄 text.strip().upper()를 text.strip().title().split()로 바꾸세요.
+
+      앞뒤 공백이 지워지고 단어마다 첫 글자가 대문자가 된 뒤 공백에서 쪼개지므로 아래 리스트가 나와야 합니다.
+      ['Codaro', 'Python', 'Study']
     starterCode: |-
       text = "  Hello World  "
       text.strip().upper()
+    solution: |-
+      text = "  codaro python study  "
+      text.strip().title().split()
     hints:
-    - 바꿀 지점은 `text = ...` 오른쪽 값입니다.
-    - 실행 뒤 `text` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - 'text 값을 "  codaro python study  " 로 바꾸고, 마지막 줄의 upper() 를 title() 로 바꾼 뒤 그 뒤에 .split() 을 붙입니다.'
+    - "정답 형태: text.strip().title().split()"
   check:
-    type: noError
-    noError: Day 21 종합 복습에서 `text` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: Day 21 종합 복습 실행 뒤 `text` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: "['Codaro', 'Python', 'Study']"
+    resultCheck: "출력이 정확히 일치해야 합니다: \"['Codaro', 'Python', 'Study']\""
 - id: reflection
   title: Day 21 회고 - 중간 종합 점검
   structuredPrimary: true
   subtitle: 기억 굳히기
-  goal: Day 1-20 의 누적 개념 중 자신이 가장 약한 영역을 한 가지 골라 학습 계획을 세운다.
-  why: 누적 학습은 자기 약점을 직접 호출하지 않으면 휘발됩니다. 회고로 약점을 호명하면 다음 사이클이 의도된 복습이 됩니다.
+  goal: Day 1부터 20까지 중 자신이 가장 자주 막혔던 영역 하나를 고르고, 그 영역으로 다음 주에 만들 것을 한 줄로 정한다.
+  why: 막혔던 자리를 적어 두지 않으면 다음에도 같은 자리에서 막히고, 만들 것을 미리 정해 두면 다음 복습이 막연한 다시 읽기가 아니라 실제 코드 작성이 됩니다.
   explanation: Day 1-20에서 다룬 print, 변수, 자료형, 문자열, 리스트/딕셔너리, 조건문, 반복문, 함수, 파일입출력 중에서 가장 자주 막혔던 영역을 한 가지만 적고, 다음 주에 이 영역으로 무엇을 만들지 한 줄로 계획해보세요.
   reflection:
     prompt: 가장 약한 영역 1개 + 그 영역으로 다음 주에 만들 작은 자동화 1개를 적어주세요.

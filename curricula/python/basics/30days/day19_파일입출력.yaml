@@ -54,8 +54,8 @@ sections:
   title: 파일 열기
   structuredPrimary: true
   subtitle: open() 함수
-  goal: 파일 열기에서 `f` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: open()으로 연 파일을 close()로 닫은 뒤, 파일 객체가 정말 닫혔는지 직접 확인한다.
+  why: 파일을 열어 놓고 닫지 않으면 쓴 내용이 디스크까지 다 넘어가지 않거나 다른 프로그램이 그 파일을 열지 못하는 일이 생기므로, 연 파일을 닫았는지 확인하는 습관이 필요합니다.
   explanation: |-
     open() 함수로 파일을 엽니다. open(파일경로, 모드) 형식으로 쓰며, 파일 객체를 반환합니다. 사용 후에는 close()로 닫아야 합니다. 기본 모드는 읽기('r')입니다.
 
@@ -66,24 +66,34 @@ sections:
     f.close()
     'File created'
   exercise:
-    prompt: 파일 열기 예제에서 `f` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      마지막 줄 'File created'를 f.closed로 바꾸세요. 앞의 세 줄은 그대로 둡니다.
+
+      파일 객체는 자기가 닫혔는지를 closed에 담고 있고, 바로 위에서 f.close()를 불렀으므로 True가 나와야 합니다.
     starterCode: |-
       f = open('test.txt', 'w')
       f.write('Hello World')
       f.close()
       'File created'
+    solution: |-
+      f = open('test.txt', 'w')
+      f.write('Hello World')
+      f.close()
+      f.closed
     hints:
-    - 바꿀 지점은 `f = ...` 오른쪽 값입니다.
-    - 실행 뒤 `f` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "마지막 줄 'File created' 를 f.closed 로 바꿉니다. open, write, close 세 줄은 그대로 둡니다."
+    - "정답 형태: f.closed"
   check:
-    noError: 파일 열기에서 `f` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 파일 열기 실행 뒤 `f` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'True'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'True'"
 - id: read_file
   title: 파일 읽기
   structuredPrimary: true
   subtitle: read() 메서드
-  goal: 파일 읽기에서 `writer` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: read() 대신 readlines()로 읽어, 줄 목록의 각 줄 끝에 줄바꿈 문자가 그대로 남는 것을 확인한다.
+  why: 파일을 통째 문자열로 받을지 줄 목록으로 받을지에 따라 다음 처리 코드가 완전히 달라지고, readlines()가 남기는 줄바꿈을 모르면 비교나 이어 붙이기에서 조용히 어긋납니다.
   explanation: |-
     read() 메서드로 파일 내용을 읽습니다. 전체 내용을 문자열로 반환합니다. readline()은 한 줄씩, readlines()는 모든 줄을 리스트로 반환합니다.
 
@@ -98,7 +108,11 @@ sections:
     reader.close()
     text
   exercise:
-    prompt: 파일 읽기 예제에서 `writer`, `reader`, `text` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    prompt: |-
+      text = reader.read()를 text = reader.readlines()로 바꾸세요. 나머지 줄은 그대로 둡니다.
+
+      readlines()는 파일을 줄 단위로 잘라 리스트로 돌려주고 각 줄 끝의 줄바꿈 문자는 지우지 않습니다. 마지막 줄 뒤에는 줄바꿈이 없으므로 아래 한 줄이 나와야 합니다.
+      ['Line 1\n', 'Line 2\n', 'Line 3']
     starterCode: |-
       writer = open('data.txt', 'w')
       writer.write('Line 1\nLine 2\nLine 3')
@@ -108,18 +122,29 @@ sections:
       text = reader.read()
       reader.close()
       text
+    solution: |-
+      writer = open('data.txt', 'w')
+      writer.write('Line 1\nLine 2\nLine 3')
+      writer.close()
+
+      reader = open('data.txt', 'r')
+      text = reader.readlines()
+      reader.close()
+      text
     hints:
-    - 바꿀 지점은 `writer = ...` 오른쪽 값입니다.
-    - 실행 뒤 `writer` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - text = reader.read() 를 text = reader.readlines() 로 바꿉니다. writer 쪽 세 줄과 마지막 text 는 그대로 둡니다.
+    - "정답 형태: text = reader.readlines()"
   check:
-    noError: 파일 읽기에서 `writer` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 파일 읽기 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: "['Line 1\\n', 'Line 2\\n', 'Line 3']"
+    resultCheck: "출력이 정확히 일치해야 합니다: \"['Line 1\\n', 'Line 2\\n', 'Line 3']\""
 - id: write_file
   title: 파일 쓰기
   structuredPrimary: true
   subtitle: write() 메서드
-  goal: 파일 쓰기에서 `fileObj` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: write()에 넘기는 문자열을 바꿔, 돌려받는 글자 수가 함께 달라지는 것을 확인한다.
+  why: write()가 돌려주는 글자 수는 의도한 만큼 실제로 쓰였는지 확인하는 가장 싼 방법이고, 공백까지 세기 때문에 눈으로 센 길이와 다르면 그 자리에서 알아챌 수 있습니다.
   explanation: |-
     write() 메서드로 파일에 문자열을 씁니다. 'w' 모드는 기존 내용을 지우고, 'a' 모드는 끝에 추가합니다. write()는 쓴 문자 수를 반환합니다.
 
@@ -130,24 +155,34 @@ sections:
     fileObj.close()
     count
   exercise:
-    prompt: 파일 쓰기 예제에서 `fileObj`, `count` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    prompt: |-
+      두 번째 줄의 'Hello Python'을 'Codaro file'로 바꾸세요. 나머지 줄은 그대로 둡니다.
+
+      write()는 쓴 글자 수를 돌려줍니다. Codaro file은 가운데 공백까지 한 글자로 세면 11글자이므로 11이 나와야 합니다.
     starterCode: |-
       fileObj = open('message.txt', 'w')
       count = fileObj.write('Hello Python')
       fileObj.close()
       count
+    solution: |-
+      fileObj = open('message.txt', 'w')
+      count = fileObj.write('Codaro file')
+      fileObj.close()
+      count
     hints:
-    - 바꿀 지점은 `fileObj = ...` 오른쪽 값입니다.
-    - 실행 뒤 `fileObj` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "write() 괄호 안의 'Hello Python' 을 'Codaro file' 로 바꿉니다. open, close, 마지막 count 는 그대로 둡니다."
+    - "정답 형태: count = fileObj.write('Codaro file')"
   check:
-    noError: 파일 쓰기에서 `fileObj` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 파일 쓰기 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '11'
+    resultCheck: "출력이 정확히 일치해야 합니다: '11'"
 - id: with_statement
   title: with 문
   structuredPrimary: true
   subtitle: 자동으로 닫기
-  goal: with 문에서 `data` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: with 블록을 벗어난 파일 객체가 close()를 부르지 않았는데도 닫혀 있는 것을 확인한다.
+  why: close()를 빠뜨려도 프로그램은 대개 에러 없이 끝나서 실수를 알아채기 어려운데, with를 쓰면 블록을 벗어나는 순간 닫히는 것이 보장되어 그 실수 자체가 사라집니다.
   explanation: |-
     with 문을 사용하면 파일을 자동으로 닫아줍니다. with open(경로, 모드) as 변수: 형식으로 쓰며, 블록이 끝나면 자동으로 close()가 호출됩니다. 안전하고 권장되는 방법입니다.
 
@@ -161,7 +196,10 @@ sections:
 
     data
   exercise:
-    prompt: with 문 예제에서 `data` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      마지막 줄 data를 data, inFile.closed로 바꾸세요. 위의 with 블록 두 개는 그대로 둡니다.
+
+      close()를 한 번도 부르지 않았지만 with 블록을 벗어날 때 파일이 자동으로 닫힙니다. 그래서 ('With statement', True)가 나와야 합니다.
     starterCode: |-
       with open('test.txt', 'w') as outFile:
           outFile.write('With statement')
@@ -170,18 +208,28 @@ sections:
           data = inFile.read()
 
       data
+    solution: |-
+      with open('test.txt', 'w') as outFile:
+          outFile.write('With statement')
+
+      with open('test.txt', 'r') as inFile:
+          data = inFile.read()
+
+      data, inFile.closed
     hints:
-    - 바꿀 지점은 `data = ...` 오른쪽 값입니다.
-    - 실행 뒤 `data` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - 마지막 줄 data 를 data, inFile.closed 로 바꿉니다. 읽기 블록의 as inFile 이름을 그대로 써야 합니다.
+    - "정답 형태: data, inFile.closed"
   check:
-    noError: with 문에서 `data` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: with 문 실행 뒤 `data` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: "('With statement', True)"
+    resultCheck: "출력이 정확히 일치해야 합니다: \"('With statement', True)\""
 - id: file_modes
   title: 파일 모드
   structuredPrimary: true
   subtitle: 읽기/쓰기/추가
-  goal: 파일 모드에서 `readData` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: 같은 파일에 'w'로 쓴 뒤 'a'로 한 번 더 써서, 두 모드가 기존 내용을 다르게 다루는 것을 확인한다.
+  why: 쓰기 모드 'w'는 파일을 열자마자 기존 내용을 지우기 때문에, 로그처럼 계속 쌓아야 하는 파일에 'w'를 쓰면 어제 기록이 통째로 사라집니다. 이어 붙일 때는 'a'를 씁니다.
   explanation: |-
     파일 모드는 파일을 어떻게 열지 결정합니다. 'r'(읽기), 'w'(쓰기), 'a'(추가), 'r+'(읽기/쓰기) 등이 있습니다. 텍스트 모드가 기본이며, 'b'를 붙이면 바이너리 모드입니다.
 
@@ -195,7 +243,12 @@ sections:
 
     readData
   exercise:
-    prompt: 파일 모드 예제에서 `readData` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      읽기 블록 앞에 추가 모드 블록을 넣으세요. 빈 줄 하나를 두고 아래 두 줄을 추가하면 됩니다.
+      with open('test.txt', 'a') as af:
+          af.write(' and append')
+
+      먼저 쓴 Read mode test는 지워지지 않고 'a'가 그 뒤에 이어 붙이므로 Read mode test and append가 나와야 합니다.
     starterCode: |-
       with open('test.txt', 'w') as wf:
           wf.write('Read mode test')
@@ -204,18 +257,31 @@ sections:
           readData = rf.read()
 
       readData
+    solution: |-
+      with open('test.txt', 'w') as wf:
+          wf.write('Read mode test')
+
+      with open('test.txt', 'a') as af:
+          af.write(' and append')
+
+      with open('test.txt', 'r') as rf:
+          readData = rf.read()
+
+      readData
     hints:
-    - 바꿀 지점은 `readData = ...` 오른쪽 값입니다.
-    - 실행 뒤 `readData` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - "with open('test.txt', 'a') as af: 와 공백 4칸 들여쓴 af.write(' and append') 두 줄을 읽기 블록 바로 앞에 넣습니다. 앞뒤 블록은 그대로 둡니다."
+    - "정답 형태: 'a' 모드 with 블록을 가운데 추가"
   check:
-    noError: 파일 모드에서 `readData` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 파일 모드 실행 뒤 `readData` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'Read mode test and append'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Read mode test and append'"
 - id: line_iteration
   title: 줄 단위 순회
   structuredPrimary: true
   subtitle: for문으로 읽기
-  goal: 줄 단위 순회에서 반복 대상과 반복 결과의 개수나 값 변화를 확인한다.
-  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  goal: 파일에 쓰는 줄 수를 바꿔, for 문이 도는 횟수가 그대로 따라 바뀌는 것을 확인한다.
+  why: 파일 전체를 메모리에 올리지 않고 for 문으로 한 줄씩 처리하면 아무리 큰 로그 파일도 같은 코드로 셀 수 있고, 줄 수는 그 처리가 제대로 돌았는지 보는 첫 번째 숫자입니다.
   explanation: |-
     파일 객체는 for문으로 순회할 수 있습니다. 각 줄을 하나씩 가져오므로 메모리 효율적입니다. 큰 파일을 처리할 때 유용합니다.
 
@@ -231,7 +297,10 @@ sections:
 
     lineCount
   exercise:
-    prompt: 줄 단위 순회 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    prompt: |-
+      creator.write('Apple\nBanana\nCherry')를 creator.write('Apple\nBanana\nCherry\nDate\nFig')로 바꾸세요. 읽기 블록과 마지막 줄은 그대로 둡니다.
+
+      \n이 줄을 나누는 자리이고 마지막 Fig 뒤에는 \n을 붙이지 않습니다. 줄이 다섯 개가 되므로 for 문도 다섯 번 돌아 5가 나와야 합니다.
     starterCode: |-
       with open('items.txt', 'w') as creator:
           creator.write('Apple\nBanana\nCherry')
@@ -242,18 +311,30 @@ sections:
               lineCount = lineCount + 1
 
       lineCount
+    solution: |-
+      with open('items.txt', 'w') as creator:
+          creator.write('Apple\nBanana\nCherry\nDate\nFig')
+
+      with open('items.txt', 'r') as processor:
+          lineCount = 0
+          for line in processor:
+              lineCount = lineCount + 1
+
+      lineCount
     hints:
-    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
-    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+    - "write() 괄호 안 문자열 끝에 \\nDate\\nFig 를 이어 붙여 'Apple\\nBanana\\nCherry\\nDate\\nFig' 로 만듭니다."
+    - "정답 형태: creator.write('Apple\\nBanana\\nCherry\\nDate\\nFig')"
   check:
-    noError: 줄 단위 순회의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
-    resultCheck: 줄 단위 순회 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '5'
+    resultCheck: "출력이 정확히 일치해야 합니다: '5'"
 - id: workflow_validation
   title: '검증 루프: 임시 작업 폴더에서 리포트 파일 만들기'
   structuredPrimary: true
   subtitle: 로컬 파일을 안전하게 쓰고 읽고 검증하기
-  goal: '검증 루프: 임시 작업 폴더에서 리포트 파일 만들기에서 예상값과 실제 실행 결과를 비교하는 검증 흐름을 확인한다.'
-  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  goal: 임시 폴더가 사라지기 전에 결과 파일을 읽어, assert가 조용히 통과한 그 내용을 눈으로도 확인한다.
+  why: assert는 통과하면 아무 말도 하지 않기 때문에, 실제로 무엇이 저장됐는지 한 번은 출력해 봐야 검증이 헛돌고 있지 않다는 것을 알 수 있습니다.
   explanation: 로컬 Python에서는 파일 입출력 제약이 줄어드는 대신, 현재 작업 폴더를 지저분하게 만들 위험이 생깁니다. 실습과 자동화 코드는 임시 작업 폴더나 명시한
     출력 폴더를 쓰고, 파일 내용까지 검증해야 합니다.
   tips:
@@ -274,7 +355,12 @@ sections:
         assert lines[0] == 'orderId,total'
         assert len(lines) == 3
   exercise:
-    prompt: '검증 루프: 임시 작업 폴더에서 리포트 파일 만들기 예제에서 기대 문자열이나 실제 출력 문구를 바꾸고 assert 비교가 맞는지 확인하세요.'
+    prompt: |-
+      기존 줄은 하나도 바꾸지 마세요. 맨 아래 resultPath.name 줄 다음에 같은 들여쓰기로 print(resultPath.read_text(encoding='utf-8')) 한 줄만 추가하면 됩니다.
+
+      with 블록을 벗어나면 임시 폴더와 그 안의 파일이 함께 사라지므로 확인도 블록 안에서 합니다. assert가 통과한 그 내용이 그대로 나오므로 아래 두 줄이 나와야 합니다.
+      HELLO
+      PYTHON
     starterCode: |-
       from pathlib import Path
       import tempfile
@@ -292,19 +378,40 @@ sections:
 
           assert resultPath.read_text(encoding='utf-8') == 'HELLO\nPYTHON'
           resultPath.name
+    solution: |-
+      from pathlib import Path
+      import tempfile
+
+      with tempfile.TemporaryDirectory() as tempDir:
+          workDir = Path(tempDir)
+          sourcePath = workDir / 'raw.txt'
+          resultPath = workDir / 'upper.txt'
+          sourcePath.write_text('hello\npython\n', encoding='utf-8')
+
+          upperLines = []
+          for line in sourcePath.read_text(encoding='utf-8').splitlines():
+              upperLines.append(line.upper())
+          resultPath.write_text('\n'.join(upperLines), encoding='utf-8')
+
+          assert resultPath.read_text(encoding='utf-8') == 'HELLO\nPYTHON'
+          resultPath.name
+          print(resultPath.read_text(encoding='utf-8'))
     hints:
-    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
-    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+    - 코드는 하나도 고치지 말고, 맨 아래 resultPath.name 줄 다음에 print(resultPath.read_text(encoding='utf-8')) 한 줄을 같은 들여쓰기(공백 4칸)로 추가합니다.
+    - "정답 형태: 마지막 줄에 print(resultPath.read_text(encoding='utf-8'))"
   check:
-    type: noError
-    noError: '검증 루프: 임시 작업 폴더에서 리포트 파일 만들기의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.'
-    resultCheck: '검증 루프: 임시 작업 폴더에서 리포트 파일 만들기 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.'
+    type: outputExact
+    evidence: practice
+    outputExact: |-
+      HELLO
+      PYTHON
+    resultCheck: "출력이 정확히 일치해야 합니다: 'HELLO\nPYTHON'"
 - id: practice
   title: Day 19 종합 복습
   structuredPrimary: true
   subtitle: 파일 입출력 마스터하기
-  goal: Day 19 종합 복습에서 문자열, 숫자, 변수 같은 예제 값을 바꿨을 때 출력 또는 마지막 표현식 결과가 어떻게 달라지는지 확인한다.
-  why: 기초 문법은 나중에 자동화 스크립트의 입력과 결과를 안정적으로 다루는 기준이 됩니다.
+  goal: with로 파일에 쓰고 다시 with로 열어 read()로 읽어 오는 한 흐름을 직접 완성한다.
+  why: 쓰기만 하고 끝내면 파일이 제대로 만들어졌는지 알 수 없어서, 실제 자동화 코드는 거의 항상 쓴 다음 다시 읽어 확인하는 두 단계로 이루어집니다.
   explanation: Day 19에서 배운 파일 입출력을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로
     어떤 순서로 해도 괜찮습니다.
   tips:
@@ -315,18 +422,37 @@ sections:
 
     'File created'
   exercise:
-    prompt: Day 19 종합 복습 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    prompt: |-
+      쓰기만 하던 코드를 쓰고 다시 읽는 코드로 바꾸세요. 고칠 곳은 두 군데입니다.
+      1. dest.write('Hello World')를 dest.write('Hello Codaro')로 바꿉니다.
+      2. 마지막 줄 'File created'를 지우고 그 자리에 아래 코드를 넣습니다.
+      with open('hello.txt', 'r') as source:
+          text = source.read()
+
+      text
+
+      방금 쓴 내용을 그대로 읽어 오므로 Hello Codaro가 나와야 합니다.
     starterCode: |-
       with open('hello.txt', 'w') as dest:
           dest.write('Hello World')
 
       'File created'
+    solution: |-
+      with open('hello.txt', 'w') as dest:
+          dest.write('Hello Codaro')
+
+      with open('hello.txt', 'r') as source:
+          text = source.read()
+
+      text
     hints:
-    - 바꿀 지점은 문자열, 숫자, 변수 같은 예제 값을 만드는 첫 줄과 기초 문법 줄에서 찾으세요.
-    - 실행 뒤 출력 또는 마지막 표현식 결과 중 하나가 바꾼 값을 반영하는지 보세요.
+    - "dest.write 괄호 안을 'Hello Codaro' 로 바꾸고, 'File created' 자리에 읽기용 with 블록과 마지막 줄 text 를 넣습니다."
+    - "정답 형태: 마지막 줄 text 가 Hello Codaro"
   check:
-    noError: Day 19 종합 복습의 수정 코드가 기초 문법 단계의 마지막 확인 값까지 도달해야 합니다.
-    resultCheck: Day 19 종합 복습 실행 결과가 출력 또는 마지막 표현식 결과 기준으로 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'Hello Codaro'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Hello Codaro'"
 assessment:
   schemaVersion: 1
   performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
