@@ -886,7 +886,9 @@ def keyboardDialogAudit(page: Any, case: VisualAccessibilityCase) -> dict[str, A
                 "boxShadow": str(active.get("boxShadow") or ""),
             }
         page.keyboard.press("Tab")
-        if marker == "threads":
+        # 레일의 마지막 항목까지 담고 멈춘다. 마지막 id 를 글자로 박아 두면 registry 에
+        # 항목이 추가될 때 그 항목을 담기 전에 멈춰 순서가 어긋난 것처럼 보인다.
+        if marker == SOCIAL_ORDER[-1]:
             break
 
     support = page.locator('[data-social-link-id="support"]').first
