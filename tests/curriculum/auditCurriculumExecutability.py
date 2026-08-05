@@ -23,6 +23,7 @@ exec 한 뒤 각 exercise의 solution을 같은 시점 namespace를 복사한 �
 from __future__ import annotations
 
 import argparse
+import ast
 import functools
 import importlib.util
 import io
@@ -38,6 +39,8 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+
+from codaro.curriculum.outputMatch import matchLearningOutput, normalizeLearningOutput
 
 
 def _configureHeadless() -> None:
@@ -124,6 +127,8 @@ THRESHOLDS: dict[str, int] = {
     "real-bug": 0,
     "yaml-load-error": 0,
     "undeclared-package": 0,
+    # 기대 출력이 정답 코드의 실제 출력과 다르면 학습자는 정답을 써도 통과하지 못한다.
+    "expected-mismatch": 0,
 }
 
 REAL_BUG_TYPES = {
@@ -307,6 +312,78 @@ def execCode(code: str, namespace: dict[str, Any], label: str) -> tuple[str, str
     return ("ok", "")
 
 
+def execCodeCapturingOutput(
+    code: str,
+    namespace: dict[str, Any],
+    label: str,
+) -> tuple[str, str, str]:
+    """코드를 실행하고 학습자 화면에 보이는 출력까지 돌려준다.
+
+    비교 대상은 제품과 같아야 한다. editor/src/lib/learningAttemptCheck.ts 의
+    practiceActualOutput 규칙: stdout 이 있으면 stdout, 없으면 마지막 표현식 값이며
+    문자열이면 repr 이 아니라 문자열 자체다. 정규화는 outputMatch 의 line-trim 을 쓴다.
+    """
+    try:
+        tree = ast.parse(code, label)
+    except SyntaxError as exc:
+        return ("real-bug", f"SyntaxError: {exc.msg} (line {exc.lineno})", "")
+    lastExpression: ast.Expression | None = None
+    if tree.body and isinstance(tree.body[-1], ast.Expr):
+        lastExpression = ast.Expression(tree.body.pop().value)
+        ast.fix_missing_locations(lastExpression)
+    stdoutBuf, stderrBuf = io.StringIO(), io.StringIO()
+    savedOut, savedErr = sys.stdout, sys.stderr
+    sys.stdout, sys.stderr = stdoutBuf, stderrBuf
+    value: Any = None
+    try:
+        exec(compile(tree, label, "exec"), namespace)
+        if lastExpression is not None:
+            value = eval(compile(lastExpression, label, "eval"), namespace)
+    except SystemExit:
+        return ("ok", "", "")
+    except BaseException as exc:
+        return (*classifyException(exc), "")
+    finally:
+        sys.stdout, sys.stderr = savedOut, savedErr
+    stdout = normalizeLearningOutput(stdoutBuf.getvalue())
+    if stdout:
+        return ("ok", "", stdout)
+    if lastExpression is None or value is None:
+        return ("ok", "", "")
+    shown = value if isinstance(value, str) else repr(value)
+    return ("ok", "", normalizeLearningOutput(shown))
+
+
+def expectedOutputResult(
+    section: dict[str, Any],
+    solution: Any,
+    actual: str,
+    relPath: str,
+    sectionId: str,
+) -> dict[str, Any] | None:
+    """outputExact 검사의 기대값이 정답 코드의 실제 출력과 맞는지 본다.
+
+    맞지 않으면 학습자는 정답을 써도 통과하지 못한다. 정답 코드가 없으면 기대값을
+    기계로 확인할 방법이 없다는 사실 자체를 남긴다(면제가 아니라 미해결 항목)."""
+    check = section.get("check")
+    if not isinstance(check, dict) or check.get("type") != "outputExact":
+        return None
+    expected = check.get("outputExact")
+    if not isinstance(expected, str) or not expected.strip():
+        return None
+    if not (isinstance(solution, str) and solution.strip()):
+        return {"path": relPath, "section": sectionId, "kind": "expectedOutput",
+                "category": "expected-unverifiable",
+                "detail": "outputExact 기대값이 있으나 exercise.solution 이 없어 실행 대조 불가"}
+    verdict = matchLearningOutput(expected, actual, caseInsensitive=check.get("caseInsensitive") is True)
+    if verdict.passed:
+        return {"path": relPath, "section": sectionId, "kind": "expectedOutput",
+                "category": "ok", "detail": ""}
+    return {"path": relPath, "section": sectionId, "kind": "expectedOutput",
+            "category": "expected-mismatch",
+            "detail": f"기대 {expected!r} != 정답 실행 결과 {actual!r} ({verdict.tier})"}
+
+
 def auditLesson(path: Path) -> list[dict[str, Any]]:
     data = loadYaml(path)
     if data is None:
@@ -354,9 +431,13 @@ def auditLesson(path: Path) -> list[dict[str, Any]]:
         if not isinstance(exercise, dict):
             continue
         solution = exercise.get("solution")
+        solutionOutput = ""
+        solutionRan = False
         if isinstance(solution, str) and solution.strip():
             solutionNs = dict(namespace)
-            category, detail = execCode(solution, solutionNs, f"{relPath}::{sectionId}.solution")
+            category, detail, solutionOutput = execCodeCapturingOutput(
+                solution, solutionNs, f"{relPath}::{sectionId}.solution"
+            )
             if category in ("real-bug", "runtime-other") and declaredMissingModule(detail, declaredPackages):
                 category = "missing-package"
             if category == "real-bug" and isEnvCredentialError(detail):
@@ -367,8 +448,15 @@ def auditLesson(path: Path) -> list[dict[str, Any]]:
                 pkgName = packageFromMissingDetail(detail)
                 if pkgName and pkgName not in declaredPackages:
                     category = "undeclared-package"
+            solutionRan = category == "ok"
             results.append({"path": relPath, "section": sectionId, "kind": "solution",
                             "category": category, "detail": detail})
+        # 정답이 돌지 않은 섹션은 기대값 대조를 하지 않는다. 실행 실패가 이미 위에서
+        # 보고되었고, 여기서 또 세면 같은 결함을 두 번 세는 것이 된다.
+        if solutionRan or not (isinstance(solution, str) and solution.strip()):
+            expectedResult = expectedOutputResult(section, solution, solutionOutput, relPath, sectionId)
+            if expectedResult is not None:
+                results.append(expectedResult)
 
         # exercise.starterCode: 학습자가 노트북에서 실제로 실행하는 셀. blank("___") 자리표시자가
         # 없으면(= 완성된 코드면) 섹션 누적 namespace 복사본에서 실행한다. snippet/이전 snippet이
