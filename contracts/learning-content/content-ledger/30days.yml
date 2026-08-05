@@ -48,7 +48,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day03_연산자"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "20a31607802af577321dc40ce8b9580cf17ffd376563e40aa7e1270eccc1489d"
+    lessonContentHash: "509f0093f74f3e666aea0fb4f7f61e5c2cfacd4e9401521401b45f71e71b7e8f"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
