@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "wordmark": "Codaro",
+  "chrome": {
+    "avatarAsset": "avatar-small",
+    "avatarPx": 40,
+    "gapPx": 5
+  },
+  "hero": {
+    "avatarAsset": "avatar-full",
+    "avatarPx": 96
+  },
+  "footer": {
+    "avatarAsset": "avatar-small",
+    "avatarPx": 40,
+    "gapPx": 5
+  },
+  "assets": {
+    "workRoot": "assets/brand/mascot/work",
+    "avatarSmall": "avatar-small.png",
+    "avatarFace": "avatar-face.png",
+    "avatarFull": "avatar-full.png",
+    "favicon": "favicon.png",
+    "appleTouchIcon": "apple-touch-icon.png"
+  },
+  "favicon": {
+    "pngPx": 192,
+    "sourceAsset": "avatar-face"
+  }
+}

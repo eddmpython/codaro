@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 LANDING_ROOT = ROOT / "landing"
 REPORT_PATH = ROOT / "output" / "test-runner" / "repository-simplification" / "generated-source-policy-report.json"
 EXPECTED_OUTPUTS = {
+    "brandMark.json",
     "curriculum.js",
     "curriculumLessons",
     "docsNav.js",
@@ -52,7 +53,14 @@ def main() -> int:
     scripts = package.get("scripts", {})
     tracked = trackedGeneratedPaths()
     trackedAndPresent = [path for path in tracked if (ROOT / path).exists()]
-    editorResolver = "editor/src/lib/generated/visualAssetManifest.ts"
+    # editor는 자기 생성물의 owner다. 소스가 import하는 생성 모듈은 editor 빌드가 스스로
+    # 만들어야 하며(그래야 새 체크아웃과 editor 단독 CI에서 컴파일된다), 추적되지 않는다.
+    editorGenerated = {
+        "editor/src/lib/generated/brandMark.json": ("editor brand mark copy", "brand:sync"),
+        "editor/src/lib/generated/visualAssetManifest.ts": ("editor visual resolver", "visuals:sync"),
+    }
+    editorPackage = json.loads((ROOT / "editor" / "package.json").read_text(encoding="utf-8"))
+    editorScripts = editorPackage.get("scripts", {})
     failures: list[str] = []
 
     if manifest.get("root") != "src/lib/generated" or manifest.get("tracked") is not False:
@@ -80,16 +88,21 @@ def main() -> int:
             failures.append(f"generated output is not ignored: {output}")
     if trackedAndPresent:
         failures.append(f"generated modules are still tracked and present: {trackedAndPresent}")
-    if f"/{editorResolver}" not in ignore:
-        failures.append("editor visual resolver is not covered by generated-source ignore policy")
-    if subprocess.run(
-        ["git", "ls-files", "--error-unmatch", editorResolver],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    ).returncode == 0:
-        failures.append("editor visual resolver must remain lifecycle-generated and untracked")
+    for modulePath, (label, lifecycleScript) in editorGenerated.items():
+        if f"/{modulePath}" not in ignore:
+            failures.append(f"{label} is not covered by generated-source ignore policy")
+        if subprocess.run(
+            ["git", "ls-files", "--error-unmatch", modulePath],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        ).returncode == 0:
+            failures.append(f"{label} must remain lifecycle-generated and untracked")
+        if lifecycleScript not in editorScripts:
+            failures.append(f"{label} producer script is missing: {lifecycleScript}")
+        if f"npm run {lifecycleScript}" not in editorScripts.get("build", ""):
+            failures.append(f"{label} is not produced by the editor build: {lifecycleScript}")
     exceptions = manifest.get("trackedExceptions", [])
     if not any(row.get("path") == "src/styles/generated" and row.get("reason") for row in exceptions):
         failures.append("design token generated-source exception is undocumented")

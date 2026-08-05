@@ -40,6 +40,7 @@ import { cn } from "@/lib/utils";
 import { ACCENT_COLORS, type AccentColor, type AutomationSection, type SurfaceMode, type ThemeMode } from "@/lib/surfaceModel";
 import type { CodaroDocument, CurriculumCategory, CurriculumCategoryTreeNode, CurriculumContentSummary } from "@/types";
 import { accentSwatches } from "@/styles/generated/codaroTheme";
+import brandMark from "@/lib/generated/brandMark.json";
 
 type ProductSidebarProps = {
   categories: CurriculumCategory[];
@@ -165,10 +166,11 @@ export function ProductSidebar({
                   학습 모드에서는 기존 계약대로 도구(노트북)로 탈출한다. */}
               <button
                 aria-label={brandLabel}
-                className="flex min-h-10 w-full min-w-0 items-center gap-2 rounded-md px-2 py-1 text-left text-[13px] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:min-h-8! group-data-[collapsible=icon]:p-1!"
+                className="flex min-h-10 w-full min-w-0 items-center rounded-md px-2 py-1 text-left text-[13px] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:min-h-8! group-data-[collapsible=icon]:p-1!"
                 data-product-brand="escape"
                 title={brandLabel}
                 type="button"
+                style={{ gap: brandMark.chrome.gapPx }}
                 onClick={() => {
                   if (runtimeTier === "local") {
                     onSurfaceChange("home");
@@ -183,11 +185,15 @@ export function ProductSidebar({
               >
                 <img
                   alt=""
-                  className="size-8 rounded-md object-contain group-data-[collapsible=icon]:size-8!"
+                  className="rounded-md object-contain group-data-[collapsible=icon]:size-8!"
                   src={resolvePublicAsset("/brand/avatar-small.png")}
+                  style={{
+                    width: brandMark.chrome.avatarPx,
+                    height: brandMark.chrome.avatarPx,
+                  }}
                 />
                 <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
-                  <span className="break-all font-semibold">Codaro</span>
+                  <span className="break-all font-semibold">{brandMark.wordmark}</span>
                 </div>
               </button>
             </SidebarMenuItem>

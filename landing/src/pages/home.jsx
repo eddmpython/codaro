@@ -2,8 +2,10 @@ import { ChevronDown, Globe2, Play } from "lucide-react";
 import { Button } from "@astryxdesign/core/Button";
 import { Heading } from "@astryxdesign/core/Heading";
 
+import { brandAvatarUrl } from "../components/brandMark.jsx";
 import { LearningStudio } from "../components/learningStudio.jsx";
 import { LiveCodeCell } from "../components/liveCodeCell.jsx";
+import brandMark from "../lib/generated/brandMark.json";
 import { firstLessonHref } from "../lib/learningCatalog.js";
 
 // 홈은 두 칸이다. 첫 화면은 히어로 한 장, 스크롤하면 학습창.
@@ -12,11 +14,26 @@ import { firstLessonHref } from "../lib/learningCatalog.js";
 // 반응형: 760px 아래에서는 sticky를 풀고 두 칸을 그냥 세로로 잇는다.
 export function HomePage() {
   const curriculumUrl = firstLessonHref();
+  const heroAvatar = brandMark.hero || {};
+  const heroAvatarPx = Number(heroAvatar.avatarPx) || 96;
+  const heroAvatarUrl = brandAvatarUrl(heroAvatar.avatarAsset, "avatar-full");
 
   return (
     <main className="homeAstryx homeContinuous">
       <section className="homeProductHero" aria-labelledby="home-title">
         <div className="homeShell homeHeroLayout">
+          <img
+            className="homeHeroAvatar"
+            src={heroAvatarUrl}
+            alt=""
+            width={heroAvatarPx}
+            height={heroAvatarPx}
+            decoding="async"
+            style={{
+              width: `${heroAvatarPx}px`,
+              height: `${heroAvatarPx}px`,
+            }}
+          />
           <Heading id="home-title" level={1} className="homeHeroHeadline">
             <span>바로 공부한다.</span>
             <span>어디서나 공부한다.</span>

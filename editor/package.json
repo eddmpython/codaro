@@ -6,9 +6,11 @@
   "scripts": {
     "dev": "vite dev",
     "archive-state:check": "node scripts/verifyLearningArchiveState.mjs",
-    "build": "npm run visuals:sync && tsc -b && vite build && npm run pyproc:assets",
+    "brand:sync": "node scripts/syncBrandMark.mjs",
+    "build": "npm run brand:sync && npm run visuals:sync && tsc -b && vite build && npm run pyproc:assets",
     "check": "tsc -b",
     "pyproc:assets": "node scripts/generatePyprocAssets.mjs",
+    "predev": "npm run brand:sync && npm run visuals:sync",
     "visuals:sync": "node scripts/syncVisualAssets.mjs",
     "preview": "vite preview"
   },

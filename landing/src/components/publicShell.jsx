@@ -1,5 +1,6 @@
 import { ChevronDown, Menu, Moon, Search, Sun, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { BrandMark } from "./brandMark.jsx";
 import { brand } from "../lib/brand.js";
 import { appPath } from "../lib/publicRouting.js";
 import { SocialLinks } from "../styles/generated/socialLinks.tsx";
@@ -42,15 +43,11 @@ export function Header({ currentPath, onNavigate, themeMode, resolvedTheme, onTo
     <header className="publicHeader" data-public-shell="astryx" data-scrolled={scrolled ? "true" : undefined}>
       <a className="publicSkipLink" href="#public-main">본문으로 건너뛰기</a>
       <div className="publicHeaderInner">
-      <a
+      <BrandMark
         className="publicBrand"
         href={appPath("/")}
         onClick={(event) => navigate(event, "/")}
-        aria-label="Codaro 홈"
-      >
-        <img src={brand.avatarSmallUrl} alt="" width="30" height="30" />
-        <span>Codaro</span>
-      </a>
+      />
       <nav className="publicPrimaryNav" aria-label="주요 탐색">
         {primaryNavigation.map((item) => (
           <a
@@ -145,10 +142,7 @@ export function Footer() {
     <footer className="siteFooter">
       <div className="footerGrid">
         <div className="footerBrand">
-          <a className="brandMark" href={appPath("/")}>
-            <img src={brand.avatarSmallUrl} alt="" width="32" height="32" />
-            <span>Codaro</span>
-          </a>
+          <BrandMark className="brandMark" href={appPath("/")} variant="footer" />
           <p>브라우저에서 배우고 검증한 Python을 파일, 일정, 반복 업무를 다루는 Local 자동화로 확장합니다.</p>
           <SocialLinks className="footerSocialLinks" />
         </div>

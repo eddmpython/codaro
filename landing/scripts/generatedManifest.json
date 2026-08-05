@@ -4,6 +4,10 @@
   "tracked": false,
   "outputs": [
     {
+      "path": "brandMark.json",
+      "producer": "scripts/syncBrand.js"
+    },
+    {
       "path": "curriculum.js",
       "producer": "scripts/generateCurriculum.js"
     },

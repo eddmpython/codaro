@@ -29,10 +29,11 @@ whenToUse: 새 UI 컴포넌트 추가, 색/반지름/그림자 변경, 랜딩/�
 - 폐기된 이전 편집기는 현재 제품 기준에서 제외한다.
 - 기본 avatar와 favicon source는 `assets/brand/mascot/source/codaro-sheet-01.png`의 첫 번째 왼쪽 pose다.
 - pose sheet source는 `assets/brand/mascot/source/codaro-sheet-01.png`, `assets/brand/mascot/source/codaro-sheet-02.png`다.
+- 헤더/푸터 브랜드 마크(아바타 크기, 워드마크 간격, 쓰는 자산 키)의 SSOT는 `assets/brand/designSystem/brandMark.json`이다. 두 프론트엔드가 각자 자기 lifecycle에서 사본을 만든다. landing은 `landing/scripts/syncBrand.js`(raster 배포도 함께), editor는 `editor/scripts/syncBrandMark.mjs`가 소유하며, 생성된 `src/lib/generated/brandMark.json`은 양쪽 모두 추적하지 않는다.
 - 아바타는 항상 배경 제거 후 캐릭터만 사용한다.
 - Codaro 이름, 아바타, 마스코트, 로고, pose sheet, 브랜드 자산은 `TRADEMARKS.md` 기준으로 전권 보유한다.
 - 교육 콘텐츠 라이선스는 브랜드 자산 재사용 권한을 주지 않는다.
-- 제품 favicon/avatar source는 `editor/public/brand/`다.
+- 제품 favicon/avatar 배포 위치는 `landing/static/`과 `editor/public/`이며, 생성 SSOT는 `assets/brand/mascot/work/`와 `assets/brand/tools/buildBrandAssets.py`다.
 - 제품 색상/반지름/테두리 source of truth는 `assets/brand/designSystem/tokens.json`이다. `editor/src/index.css`의 shadcn token layer는 생성된 Astryx semantic token을 연결하는 호환 bridge다.
 - GitHub Pages 문서 표면은 `landing/`의 React + Vite 정적 사이트로 운영한다.
   - 문서와 글쓰기는 `docs/` 기준의 같은 React 표면에서 운영한다.

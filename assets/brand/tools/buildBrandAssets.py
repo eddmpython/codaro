@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from collections import deque
 from pathlib import Path
 
@@ -17,10 +18,14 @@ AVATAR_SOURCE_KEY = "sheet-01"
 AVATAR_SOURCE_INDEX = 0
 WORK_ROOT = PROJECT_ROOT / "assets" / "brand" / "mascot" / "work"
 WORK_POSE_ROOT = WORK_ROOT / "poses"
-EDITOR_BRAND_ROOT = PROJECT_ROOT / "editor" / "static" / "brand"
+EDITOR_BRAND_ROOT = PROJECT_ROOT / "editor" / "public" / "brand"
 EDITOR_POSE_ROOT = EDITOR_BRAND_ROOT / "mascot-poses"
-EDITOR_FAVICON_PATH = PROJECT_ROOT / "editor" / "static" / "favicon.png"
+EDITOR_FAVICON_PATH = PROJECT_ROOT / "editor" / "public" / "favicon.png"
 EDITOR_APPLE_TOUCH_PATH = EDITOR_BRAND_ROOT / "apple-touch-icon.png"
+LANDING_STATIC_ROOT = PROJECT_ROOT / "landing" / "static"
+LANDING_BRAND_ROOT = LANDING_STATIC_ROOT / "brand"
+LANDING_FAVICON_PATH = LANDING_STATIC_ROOT / "favicon.png"
+BRAND_MARK_PATH = PROJECT_ROOT / "assets" / "brand" / "designSystem" / "brandMark.json"
 SEED_COMPONENT_COUNT = 8
 SEED_MIN_AREA = 20000
 DECORATION_MIN_AREA = 120
@@ -296,7 +301,9 @@ def main() -> None:
     avatarSmall = makeSquareAsset(sidebarCrop, size=256, paddingRatio=0.12)
     faceCrop = createFaceCrop(avatarBase)
     avatarFace = makeSquareAsset(faceCrop, size=512, paddingRatio=0.12)
-    favicon = avatarFace.resize((64, 64), Image.Resampling.LANCZOS).filter(
+    brandMark = json.loads(BRAND_MARK_PATH.read_text(encoding="utf-8"))
+    faviconPx = int(brandMark.get("favicon", {}).get("pngPx", 192))
+    favicon = avatarFace.resize((faviconPx, faviconPx), Image.Resampling.LANCZOS).filter(
         ImageFilter.UnsharpMask(radius=1.2, percent=170, threshold=2)
     )
     appleTouch = avatarFull.resize((180, 180), Image.Resampling.LANCZOS)
@@ -314,6 +321,11 @@ def main() -> None:
     savePng(avatarFace, EDITOR_BRAND_ROOT / "avatar-face.png")
     savePng(favicon, EDITOR_FAVICON_PATH)
     savePng(appleTouch, EDITOR_APPLE_TOUCH_PATH)
+    savePng(avatarFull, LANDING_BRAND_ROOT / "avatar-hero.png")
+    savePng(avatarSmall, LANDING_BRAND_ROOT / "avatar-small.png")
+    savePng(avatarFace, LANDING_BRAND_ROOT / "avatar-face.png")
+    savePng(favicon, LANDING_FAVICON_PATH)
+    savePng(appleTouch, LANDING_BRAND_ROOT / "apple-touch-icon.png")
     for sheetKey, poses in poseSheets.items():
         savePoseAssets(EDITOR_POSE_ROOT, sheetKey, poses)
 
@@ -325,8 +337,9 @@ def main() -> None:
     print(f"[brand] avatar-full={EDITOR_BRAND_ROOT / 'avatar-full.png'}")
     print(f"[brand] avatar-small={EDITOR_BRAND_ROOT / 'avatar-small.png'}")
     print(f"[brand] avatar-face={EDITOR_BRAND_ROOT / 'avatar-face.png'}")
-    print(f"[brand] favicon={EDITOR_FAVICON_PATH}")
+    print(f"[brand] favicon={EDITOR_FAVICON_PATH} px={faviconPx}")
     print(f"[brand] apple-touch={EDITOR_APPLE_TOUCH_PATH}")
+    print(f"[brand] landing-favicon={LANDING_FAVICON_PATH}")
 
 
 if __name__ == "__main__":
