@@ -2293,7 +2293,7 @@
         "fixtureId": "python-fundamentals-domain-v1",
         "promptPath": "assets/brand/visuals/prompts/python-fundamentals-v1.txt",
         "promptHash": "sha256-45246801d7843b7af2cc0174e818e81a9d9e0d1925a4e7b738222dce3e4e5d38",
-        "lessonContentHash": "sha256-3694e3b0194a597946a358b5d3ca587176c8013ab61415380a93a4f07293649e"
+        "lessonContentHash": "sha256-af9573228145177bb1196b9546c9944552e7684d632c196ad32c24190dd2cd31"
       },
       "rendering": {
         "width": 1672,
