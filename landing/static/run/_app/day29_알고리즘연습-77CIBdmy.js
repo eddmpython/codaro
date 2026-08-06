@@ -1,0 +1,948 @@
+var e=`meta:
+  id: day29
+  title: 알고리즘 연습
+  day: 29
+  category: 30days
+  tags:
+  - 알고리즘
+  - 정렬
+  - 검색
+  - 재귀
+  - 복잡도
+  - 검증
+  seo:
+    title: 파이썬 알고리즘 연습 - 정렬, 검색, 재귀
+    description: 정렬 알고리즘, 검색 알고리즘, 재귀 함수를 배웁니다.
+    keywords:
+    - 알고리즘
+    - sorting
+    - searching
+    - recursion
+    - 재귀
+intro:
+  emoji: 🧮
+  points:
+  - 정렬 알고리즘 구현
+  - 검색 알고리즘 마스터
+  - 재귀 함수 활용
+  - 문제 해결 능력 향상
+  direction: 알고리즘 연습에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 알고리즘 연습 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 정렬 알고리즘 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 검색 알고리즘 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: 재귀 함수 기초 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 알고리즘 연습 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 알고리즘 연습 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 알고리즘 연습 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: sorting_basic
+  title: 정렬 알고리즘
+  structuredPrimary: true
+  subtitle: 데이터 정렬하기
+  goal: 비교 부등호 하나만 뒤집어 같은 버블 정렬이 내림차순으로 도는 것을 확인한다.
+  why: 정렬 방향은 별도 옵션이 아니라 두 값을 비교하는 부등호 한 곳에서 정해집니다. 이 자리를 알면 남이 쓴 정렬 코드를 읽을 때도 오름차순인지 내림차순인지 바로 판별할 수 있습니다.
+  explanation: |-
+    정렬은 데이터를 특정 순서로 배열하는 기본 알고리즘입니다. 버블 정렬은 인접한 요소를 비교하여 교환하고, 선택 정렬은 최솟값을 찾아 앞으로 이동시킵니다. 삽입 정렬은 각 요소를 적절한 위치에 삽입합니다. 각 알고리즘은 시간 복잡도와 공간 복잡도가 다릅니다.
+
+    정렬 알고리즘을 선택할 때는 데이터 크기와 특성을 고려해야 합니다.
+  snippet: |-
+    def bubbleSort(arr):
+        n = len(arr)
+        for i in range(n):
+            for j in range(n - i - 1):
+                if arr[j] > arr[j + 1]:
+                    arr[j], arr[j + 1] = arr[j + 1], arr[j]
+        return arr
+
+    unsorted = [64, 34, 25, 12, 22, 11, 90]
+    bubbleSort(unsorted[:])
+  exercise:
+    prompt: |-
+      안쪽 if 조건 arr[j] > arr[j + 1]의 부등호를 뒤집어 arr[j] < arr[j + 1]로 바꾸세요. 나머지 줄은 그대로 둡니다.
+
+      큰 값이 앞으로 밀려나 내림차순으로 정렬되므로 아래 리스트가 나와야 합니다.
+      [90, 64, 34, 25, 22, 12, 11]
+    starterCode: |-
+      def bubbleSort(arr):
+          n = len(arr)
+          for i in range(n):
+              for j in range(n - i - 1):
+                  if arr[j] > arr[j + 1]:
+                      arr[j], arr[j + 1] = arr[j + 1], arr[j]
+          return arr
+
+      unsorted = [64, 34, 25, 12, 22, 11, 90]
+      bubbleSort(unsorted[:])
+    solution: |-
+      def bubbleSort(arr):
+          n = len(arr)
+          for i in range(n):
+              for j in range(n - i - 1):
+                  if arr[j] < arr[j + 1]:
+                      arr[j], arr[j + 1] = arr[j + 1], arr[j]
+          return arr
+
+      unsorted = [64, 34, 25, 12, 22, 11, 90]
+      bubbleSort(unsorted[:])
+    hints:
+    - "if arr[j] > arr[j + 1] 의 > 를 < 로 바꿉니다. 값을 교환하는 줄과 unsorted 목록은 그대로 둡니다."
+    - "정답 형태: if arr[j] < arr[j + 1]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '[90, 64, 34, 25, 22, 12, 11]'
+    resultCheck: "출력이 정확히 일치해야 합니다: '[90, 64, 34, 25, 22, 12, 11]'"
+- id: searching_basic
+  title: 검색 알고리즘
+  structuredPrimary: true
+  subtitle: 데이터 찾기
+  goal: 목록에 없는 값을 찾게 해서 선형 검색이 마지막 줄의 -1로 끝나는 경로를 확인한다.
+  why: 검색 함수는 찾은 위치와 못 찾았다는 신호를 같은 자리에 돌려줍니다. 0번째 index와 "없음"을 구분하려고 -1을 쓰는 관례를 모르면 반환값을 그대로 조건문에 넣다가 틀립니다.
+  explanation: |-
+    검색은 특정 값을 찾는 기본 알고리즘입니다. 선형 검색은 처음부터 끝까지 순차적으로 탐색하며, 이진 검색은 정렬된 배열에서 중간값과 비교하여 범위를 절반씩 줄입니다. 이진 검색은 O(log n)으로 선형 검색의 O(n)보다 훨씬 빠릅니다.
+
+    이진 검색을 사용하려면 배열이 정렬되어 있어야 합니다.
+  snippet: |-
+    def linearSearch(arr, target):
+        for i in range(len(arr)):
+            if arr[i] == target:
+                return i
+        return -1
+
+    elements = [10, 23, 45, 70, 11, 15]
+    linearSearch(elements, 70)
+  exercise:
+    prompt: |-
+      마지막 줄 linearSearch(elements, 70)의 두 번째 인자 70을 99로 바꾸세요. elements 목록에는 99가 없습니다.
+
+      for 루프가 끝까지 돌아도 일치하는 값이 없으면 함수 맨 아래 return -1이 실행되므로 -1이 나와야 합니다.
+    starterCode: |-
+      def linearSearch(arr, target):
+          for i in range(len(arr)):
+              if arr[i] == target:
+                  return i
+          return -1
+
+      elements = [10, 23, 45, 70, 11, 15]
+      linearSearch(elements, 70)
+    solution: |-
+      def linearSearch(arr, target):
+          for i in range(len(arr)):
+              if arr[i] == target:
+                  return i
+          return -1
+
+      elements = [10, 23, 45, 70, 11, 15]
+      linearSearch(elements, 99)
+    hints:
+    - linearSearch(elements, 70) 을 linearSearch(elements, 99) 로 바꿉니다. 함수 본문과 elements 목록은 그대로 둡니다.
+    - "정답 형태: linearSearch(elements, 99)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '-1'
+    resultCheck: "출력이 정확히 일치해야 합니다: '-1'"
+- id: recursion_basic
+  title: 재귀 함수 기초
+  structuredPrimary: true
+  subtitle: 함수가 자기 자신을 호출
+  goal: 인자를 1만 키워 재귀 호출이 한 겹 늘고 결과에 곱셈이 한 번 더 쌓이는 것을 확인한다.
+  why: 재귀는 호출이 한 겹 늘 때마다 계산이 한 번씩 더 쌓입니다. 인자를 조금만 키워도 결과가 얼마나 커지는지 보면 재귀 깊이와 계산량이 함께 늘어난다는 감각이 생깁니다.
+  explanation: |-
+    재귀는 함수가 자기 자신을 호출하는 프로그래밍 기법입니다. 기저 조건(base case)과 재귀 조건(recursive case)으로 구성되며, 기저 조건이 없으면 무한 루프에 빠집니다. 팩토리얼, 피보나치, 하노이 탑 등 많은 문제를 재귀로 해결할 수 있습니다.
+
+    재귀 함수는 반드시 기저 조건을 가져야 무한 재귀를 방지할 수 있습니다.
+  snippet: |-
+    def factorial(n):
+        if n <= 1:
+            return 1
+        return n * factorial(n - 1)
+
+    factorial(5)
+  exercise:
+    prompt: |-
+      마지막 줄 factorial(5)를 factorial(6)으로 바꾸세요. 함수 본문은 그대로 둡니다.
+
+      5까지의 곱은 120이고 여기에 6이 한 번 더 곱해지므로 720이 나와야 합니다.
+    starterCode: |-
+      def factorial(n):
+          if n <= 1:
+              return 1
+          return n * factorial(n - 1)
+
+      factorial(5)
+    solution: |-
+      def factorial(n):
+          if n <= 1:
+              return 1
+          return n * factorial(n - 1)
+
+      factorial(6)
+    hints:
+    - "factorial(5) 를 factorial(6) 으로 바꿉니다. 기저 조건 if n <= 1 과 return 줄은 그대로 둡니다."
+    - "정답 형태: factorial(6)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '720'
+    resultCheck: "출력이 정확히 일치해야 합니다: '720'"
+- id: recursion_advanced
+  title: 재귀 심화
+  structuredPrimary: true
+  subtitle: 복잡한 재귀 문제
+  goal: 기저 조건이 돌려주는 값을 바꿔 그 값이 결과에 딱 한 번만 더해지는 것을 확인한다.
+  why: 기저 조건이 항목마다 실행된다고 오해하면 재귀 결과를 잘못 예상합니다. 기저 조건은 리스트가 완전히 빈 마지막 한 번에만 실행된다는 사실을 숫자로 확인해 두면 재귀를 손으로 따라갈 때 헷갈리지 않습니다.
+  explanation: |-
+    재귀는 트리 구조, 백트래킹, 분할 정복 등 복잡한 알고리즘에 사용됩니다. 리스트 합계, 문자열 뒤집기, 이진 검색 등도 재귀로 구현할 수 있습니다. 재귀는 코드를 간결하게 만들지만 스택 오버플로우에 주의해야 합니다.
+
+    재귀는 문제를 더 작은 부분 문제로 나누는 분할 정복 전략에 적합합니다.
+  snippet: |-
+    def sumList(lst):
+        if not lst:
+            return 0
+        return lst[0] + sumList(lst[1:])
+
+    values = [1, 2, 3, 4, 5]
+    sumList(values)
+  exercise:
+    prompt: |-
+      기저 조건 안의 return 0을 return 100으로 바꾸세요. 나머지 줄은 그대로 둡니다.
+
+      1부터 5까지의 합 15에 기저 조건의 100이 한 번만 더해지므로 115가 나와야 합니다. 항목마다 더해진다면 500이 넘었을 것입니다.
+    starterCode: |-
+      def sumList(lst):
+          if not lst:
+              return 0
+          return lst[0] + sumList(lst[1:])
+
+      values = [1, 2, 3, 4, 5]
+      sumList(values)
+    solution: |-
+      def sumList(lst):
+          if not lst:
+              return 100
+          return lst[0] + sumList(lst[1:])
+
+      values = [1, 2, 3, 4, 5]
+      sumList(values)
+    hints:
+    - "빈 리스트일 때 실행되는 return 0 을 return 100 으로 바꿉니다. 아래의 return lst[0] + sumList(lst[1:]) 줄과 values 목록은 그대로 둡니다."
+    - "정답 형태: return 100"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '115'
+    resultCheck: "출력이 정확히 일치해야 합니다: '115'"
+- id: algorithm_patterns
+  title: 알고리즘 패턴
+  structuredPrimary: true
+  subtitle: 자주 사용되는 패턴
+  goal: 회문이 아닌 문자열을 넣어 두 포인터가 첫 비교에서 바로 False로 빠져나오는 것을 확인한다.
+  why: 투 포인터는 양 끝에서 좁혀 오다가 어긋나는 순간 바로 멈춥니다. 끝까지 다 보지 않고도 답을 낼 수 있다는 점이 이 패턴이 빠른 이유입니다.
+  explanation: |-
+    알고리즘 문제 해결에는 반복되는 패턴이 있습니다. 투 포인터는 양 끝에서 시작하여 중간으로 이동하며, 슬라이딩 윈도우는 고정 크기의 구간을 이동시킵니다. 이러한 패턴을 익히면 다양한 문제를 효율적으로 해결할 수 있습니다.
+
+    알고리즘 패턴을 익히면 새로운 문제도 빠르게 해결할 수 있습니다.
+  snippet: |-
+    def isPalindrome(s):
+        left = 0
+        right = len(s) - 1
+        while left < right:
+            if s[left] != s[right]:
+                return False
+            left = left + 1
+            right = right - 1
+        return True
+
+    isPalindrome('radar')
+  exercise:
+    prompt: |-
+      마지막 줄 isPalindrome('radar')의 인자를 'python'으로 바꾸세요. 함수 본문은 그대로 둡니다.
+
+      첫 글자 p와 마지막 글자 n이 다르므로 while 루프의 첫 비교에서 곧바로 return False가 실행되어 False가 나와야 합니다.
+    starterCode: |-
+      def isPalindrome(s):
+          left = 0
+          right = len(s) - 1
+          while left < right:
+              if s[left] != s[right]:
+                  return False
+              left = left + 1
+              right = right - 1
+          return True
+
+      isPalindrome('radar')
+    solution: |-
+      def isPalindrome(s):
+          left = 0
+          right = len(s) - 1
+          while left < right:
+              if s[left] != s[right]:
+                  return False
+              left = left + 1
+              right = right - 1
+          return True
+
+      isPalindrome('python')
+    hints:
+    - "isPalindrome('radar') 를 isPalindrome('python') 으로 바꿉니다. left 와 right 를 움직이는 줄은 그대로 둡니다."
+    - "정답 형태: isPalindrome('python')"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'False'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'False'"
+- id: practical_problems
+  title: 실전 문제
+  structuredPrimary: true
+  subtitle: 종합 알고리즘 문제
+  goal: 숫자 목록을 문자열 목록으로 바꿔도 같은 중복 제거 함수가 그대로 동작하는 것을 확인한다.
+  why: 알고리즘은 특정 자료형에 묶여 있지 않습니다. 비교와 정렬이 되는 값이면 숫자든 파일 확장자든 같은 함수를 다시 씁니다. 이걸 확인해 두면 비슷한 함수를 자료형마다 새로 만드는 낭비를 피할 수 있습니다.
+  explanation: |-
+    실전 알고리즘 문제는 여러 개념을 조합하여 해결합니다. 중복 제거, 최빈값 찾기, 부분 배열 합계 등은 정렬, 검색, 카운팅을 함께 사용합니다. 문제를 작은 단계로 나누고 각 단계를 구현하는 것이 중요합니다.
+
+    복잡한 문제는 작은 함수로 나누어 구현하면 이해와 디버깅이 쉬워집니다.
+  snippet: |-
+    def removeDuplicates(arr):
+        seen = []
+        for item in arr:
+            if item not in seen:
+                seen.append(item)
+        return sorted(seen)
+
+    duplicated = [4, 2, 4, 1, 3, 2, 5, 3]
+    removeDuplicates(duplicated)
+  exercise:
+    prompt: |-
+      duplicated 목록을 숫자 대신 파일 확장자 문자열로 바꾸세요. 함수 본문과 마지막 호출 줄은 그대로 둡니다.
+      duplicated = ['pdf', 'csv', 'pdf', 'xlsx', 'csv']
+
+      중복이 사라지고 사전 순으로 정렬되므로 아래 리스트가 나와야 합니다.
+      ['csv', 'pdf', 'xlsx']
+    starterCode: |-
+      def removeDuplicates(arr):
+          seen = []
+          for item in arr:
+              if item not in seen:
+                  seen.append(item)
+          return sorted(seen)
+
+      duplicated = [4, 2, 4, 1, 3, 2, 5, 3]
+      removeDuplicates(duplicated)
+    solution: |-
+      def removeDuplicates(arr):
+          seen = []
+          for item in arr:
+              if item not in seen:
+                  seen.append(item)
+          return sorted(seen)
+
+      duplicated = ['pdf', 'csv', 'pdf', 'xlsx', 'csv']
+      removeDuplicates(duplicated)
+    hints:
+    - "duplicated = [4, 2, 4, 1, 3, 2, 5, 3] 을 duplicated = ['pdf', 'csv', 'pdf', 'xlsx', 'csv'] 로 바꿉니다."
+    - "정답 형태: duplicated = ['pdf', 'csv', 'pdf', 'xlsx', 'csv']"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "['csv', 'pdf', 'xlsx']"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"['csv', 'pdf', 'xlsx']\\""
+- id: workflow_validation
+  title: '현업 흐름 검증: 알고리즘 전제를 확인하고 선택하기'
+  structuredPrimary: true
+  subtitle: 예측 → 전제 검증 → 구현 → 경계값 테스트
+  goal: assert가 모두 통과한 뒤 원본과 정렬 결과에 같은 전제 검사를 걸어 이진 검색을 쓸 수 있는 목록이 어느 쪽인지 확인한다.
+  why: 통과 문구만 출력하면 어떤 전제가 성립했는지는 화면에 남지 않습니다. 전제 검사 함수를 직접 호출해 원본은 False, 정렬 결과는 True라는 것을 눈으로 확인해야 이진 검색을 어디에 써야 하는지가 분명해집니다.
+  explanation: 알고리즘은 답만 맞히는 코드가 아니라, 어떤 전제가 있을 때 빠르고 안전한지 판단하는 과정입니다. 이진 검색은 정렬된 데이터에서만 동작하고, 빈도 분석은 동률
+    처리 규칙이 있어야 합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def isSorted(values):
+        for index in range(len(values) - 1):
+            if values[index] > values[index + 1]:
+                return False
+        return True
+
+    def mergeSort(values):
+        if len(values) <= 1:
+            return values[:]
+
+        middle = len(values) // 2
+        left = mergeSort(values[:middle])
+        right = mergeSort(values[middle:])
+        merged = []
+        leftIndex = 0
+        rightIndex = 0
+
+        while leftIndex < len(left) and rightIndex < len(right):
+            if left[leftIndex] <= right[rightIndex]:
+                merged.append(left[leftIndex])
+                leftIndex += 1
+            else:
+                merged.append(right[rightIndex])
+                rightIndex += 1
+
+        return merged + left[leftIndex:] + right[rightIndex:]
+
+    def binarySearch(values, target):
+        if not isSorted(values):
+            raise ValueError("binary search requires sorted input")
+
+        left = 0
+        right = len(values) - 1
+        while left <= right:
+            middle = (left + right) // 2
+            if values[middle] == target:
+                return middle
+            if values[middle] < target:
+                left = middle + 1
+            else:
+                right = middle - 1
+        return -1
+
+    def topKFrequent(values, limit):
+        frequency = {}
+        for value in values:
+            frequency[value] = frequency.get(value, 0) + 1
+        ordered = sorted(frequency.items(), key=lambda item: (-item[1], item[0]))
+        return ordered[:limit]
+
+    def maxWindowSum(values, size):
+        if size <= 0:
+            raise ValueError("window size must be positive")
+        if len(values) < size:
+            return 0
+
+        currentSum = sum(values[:size])
+        bestSum = currentSum
+        for index in range(size, len(values)):
+            currentSum = currentSum - values[index - size] + values[index]
+            bestSum = max(bestSum, currentSum)
+        return bestSum
+
+    latencies = [310, 120, 480, 200, 900, 480]
+    sortedLatencies = mergeSort(latencies)
+
+    assert sortedLatencies == [120, 200, 310, 480, 480, 900]
+    assert binarySearch(sortedLatencies, 480) == 4
+    assert binarySearch(sortedLatencies, 777) == -1
+    assert topKFrequent(["E2", "E1", "E2", "E3", "E1", "E2"], 2) == [("E2", 3), ("E1", 2)]
+    assert maxWindowSum([3, 1, 8, 2, 5, 4], 3) == 15
+
+    try:
+        binarySearch(latencies, 480)
+    except ValueError as exc:
+        assert "sorted" in str(exc)
+
+    print("알고리즘 전제 검증 흐름 통과")
+  exercise:
+    prompt: |-
+      위쪽 함수 정의와 assert 줄은 모두 그대로 두고 마지막 줄만 바꿉니다.
+      print("알고리즘 전제 검증 흐름 통과")를 아래 줄로 바꾸세요.
+      print(isSorted(latencies), isSorted(sortedLatencies))
+
+      원본 latencies는 정렬되어 있지 않고 mergeSort가 돌려준 sortedLatencies는 정렬되어 있으므로 아래 한 줄이 나와야 합니다.
+      False True
+    starterCode: |-
+      def isSorted(values):
+          for index in range(len(values) - 1):
+              if values[index] > values[index + 1]:
+                  return False
+          return True
+
+      def mergeSort(values):
+          if len(values) <= 1:
+              return values[:]
+
+          middle = len(values) // 2
+          left = mergeSort(values[:middle])
+          right = mergeSort(values[middle:])
+          merged = []
+          leftIndex = 0
+          rightIndex = 0
+
+          while leftIndex < len(left) and rightIndex < len(right):
+              if left[leftIndex] <= right[rightIndex]:
+                  merged.append(left[leftIndex])
+                  leftIndex += 1
+              else:
+                  merged.append(right[rightIndex])
+                  rightIndex += 1
+
+          return merged + left[leftIndex:] + right[rightIndex:]
+
+      def binarySearch(values, target):
+          if not isSorted(values):
+              raise ValueError("binary search requires sorted input")
+
+          left = 0
+          right = len(values) - 1
+          while left <= right:
+              middle = (left + right) // 2
+              if values[middle] == target:
+                  return middle
+              if values[middle] < target:
+                  left = middle + 1
+              else:
+                  right = middle - 1
+          return -1
+
+      def topKFrequent(values, limit):
+          frequency = {}
+          for value in values:
+              frequency[value] = frequency.get(value, 0) + 1
+          ordered = sorted(frequency.items(), key=lambda item: (-item[1], item[0]))
+          return ordered[:limit]
+
+      def maxWindowSum(values, size):
+          if size <= 0:
+              raise ValueError("window size must be positive")
+          if len(values) < size:
+              return 0
+
+          currentSum = sum(values[:size])
+          bestSum = currentSum
+          for index in range(size, len(values)):
+              currentSum = currentSum - values[index - size] + values[index]
+              bestSum = max(bestSum, currentSum)
+          return bestSum
+
+      latencies = [310, 120, 480, 200, 900, 480]
+      sortedLatencies = mergeSort(latencies)
+
+      assert sortedLatencies == [120, 200, 310, 480, 480, 900]
+      assert binarySearch(sortedLatencies, 480) == 4
+      assert binarySearch(sortedLatencies, 777) == -1
+      assert topKFrequent(["E2", "E1", "E2", "E3", "E1", "E2"], 2) == [("E2", 3), ("E1", 2)]
+      assert maxWindowSum([3, 1, 8, 2, 5, 4], 3) == 15
+
+      try:
+          binarySearch(latencies, 480)
+      except ValueError as exc:
+          assert "sorted" in str(exc)
+
+      print("알고리즘 전제 검증 흐름 통과")
+    solution: |-
+      def isSorted(values):
+          for index in range(len(values) - 1):
+              if values[index] > values[index + 1]:
+                  return False
+          return True
+
+      def mergeSort(values):
+          if len(values) <= 1:
+              return values[:]
+
+          middle = len(values) // 2
+          left = mergeSort(values[:middle])
+          right = mergeSort(values[middle:])
+          merged = []
+          leftIndex = 0
+          rightIndex = 0
+
+          while leftIndex < len(left) and rightIndex < len(right):
+              if left[leftIndex] <= right[rightIndex]:
+                  merged.append(left[leftIndex])
+                  leftIndex += 1
+              else:
+                  merged.append(right[rightIndex])
+                  rightIndex += 1
+
+          return merged + left[leftIndex:] + right[rightIndex:]
+
+      def binarySearch(values, target):
+          if not isSorted(values):
+              raise ValueError("binary search requires sorted input")
+
+          left = 0
+          right = len(values) - 1
+          while left <= right:
+              middle = (left + right) // 2
+              if values[middle] == target:
+                  return middle
+              if values[middle] < target:
+                  left = middle + 1
+              else:
+                  right = middle - 1
+          return -1
+
+      def topKFrequent(values, limit):
+          frequency = {}
+          for value in values:
+              frequency[value] = frequency.get(value, 0) + 1
+          ordered = sorted(frequency.items(), key=lambda item: (-item[1], item[0]))
+          return ordered[:limit]
+
+      def maxWindowSum(values, size):
+          if size <= 0:
+              raise ValueError("window size must be positive")
+          if len(values) < size:
+              return 0
+
+          currentSum = sum(values[:size])
+          bestSum = currentSum
+          for index in range(size, len(values)):
+              currentSum = currentSum - values[index - size] + values[index]
+              bestSum = max(bestSum, currentSum)
+          return bestSum
+
+      latencies = [310, 120, 480, 200, 900, 480]
+      sortedLatencies = mergeSort(latencies)
+
+      assert sortedLatencies == [120, 200, 310, 480, 480, 900]
+      assert binarySearch(sortedLatencies, 480) == 4
+      assert binarySearch(sortedLatencies, 777) == -1
+      assert topKFrequent(["E2", "E1", "E2", "E3", "E1", "E2"], 2) == [("E2", 3), ("E1", 2)]
+      assert maxWindowSum([3, 1, 8, 2, 5, 4], 3) == 15
+
+      try:
+          binarySearch(latencies, 480)
+      except ValueError as exc:
+          assert "sorted" in str(exc)
+
+      print(isSorted(latencies), isSorted(sortedLatencies))
+    hints:
+    - 마지막 print 한 줄만 print(isSorted(latencies), isSorted(sortedLatencies)) 로 바꿉니다. 위쪽 함수 정의와 assert 줄은 건드리지 않습니다.
+    - "정답 형태: print(isSorted(latencies), isSorted(sortedLatencies))"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'False True'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'False True'"
+- id: practice
+  title: Day 29 종합 복습
+  structuredPrimary: true
+  subtitle: 알고리즘 마스터하기
+  goal: 슬라이스 복사를 빼고 호출해 이 뒤집기 함수가 원본 리스트를 직접 바꾼다는 것을 확인한다.
+  why: 리스트를 받아 안에서 값을 바꾸는 함수는 호출한 쪽의 원본까지 바꿉니다. 원본을 지키려면 슬라이스 복사를 넘겨야 한다는 것을 한 번 겪어 두면 나중에 원인 모를 데이터 변형에 시간을 덜 씁니다.
+  explanation: Day 29에서 배운 알고리즘을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def reverse(arr):
+        left = 0
+        right = len(arr) - 1
+        while left < right:
+            arr[left], arr[right] = arr[right], arr[left]
+            left = left + 1
+            right = right - 1
+        return arr
+
+    original = [1, 2, 3, 4, 5]
+    reverse(original[:])
+  exercise:
+    prompt: |-
+      마지막 줄 reverse(original[:])에서 슬라이스 복사 [:]를 지우고 print로 감싸 print(reverse(original))로 바꾸세요. 그리고 그 아래에 print(original) 한 줄을 추가하세요.
+
+      복사본이 아니라 original 자체를 넘겼으므로 함수가 원본을 직접 뒤집습니다. 두 줄이 똑같이 나오는 것이 이 연습의 핵심입니다.
+      [5, 4, 3, 2, 1]
+      [5, 4, 3, 2, 1]
+    starterCode: |-
+      def reverse(arr):
+          left = 0
+          right = len(arr) - 1
+          while left < right:
+              arr[left], arr[right] = arr[right], arr[left]
+              left = left + 1
+              right = right - 1
+          return arr
+
+      original = [1, 2, 3, 4, 5]
+      reverse(original[:])
+    solution: |-
+      def reverse(arr):
+          left = 0
+          right = len(arr) - 1
+          while left < right:
+              arr[left], arr[right] = arr[right], arr[left]
+              left = left + 1
+              right = right - 1
+          return arr
+
+      original = [1, 2, 3, 4, 5]
+      print(reverse(original))
+      print(original)
+    hints:
+    - "reverse(original[:]) 을 print(reverse(original)) 로 바꾸고 그 아래 줄에 print(original) 을 추가합니다. 함수 본문과 original 목록은 그대로 둡니다."
+    - "정답 형태: print(reverse(original)) 다음 줄에 print(original)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: |-
+      [5, 4, 3, 2, 1]
+      [5, 4, 3, 2, 1]
+    resultCheck: "출력이 정확히 일치해야 합니다: '[5, 4, 3, 2, 1]\\n[5, 4, 3, 2, 1]'"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
+  masteryVariants:
+  - id: day29-binary-search-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sorting_basic
+    - practice
+    title: 정렬 목록에서 이진 탐색하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 탐색 범위를 절반씩 줄여 index를 찾는다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: binary_search(items, target)가 정렬 목록의 target index를, 없으면 -1을 반환하도록 완성하세요.
+      starterCode: |-
+        def binary_search(items, target):
+            raise NotImplementedError
+      solution: |-
+        def binary_search(items, target):
+            low, high = 0, len(items) - 1
+            while low <= high:
+                middle = (low + high) // 2
+                if items[middle] == target:
+                    return middle
+                if items[middle] < target:
+                    low = middle + 1
+                else:
+                    high = middle - 1
+            return -1
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day29.binary-search.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day29.binary-search.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: binary_search
+        cases:
+        - id: found
+          arguments:
+          - value:
+            - 1
+            - 3
+            - 5
+            - 7
+            - 9
+          - value: 7
+          expectedReturn: 3
+        - id: first
+          arguments:
+          - value:
+            - 2
+            - 4
+            - 6
+          - value: 2
+          expectedReturn: 0
+        - id: missing
+          arguments:
+          - value:
+            - 1
+            - 2
+            - 3
+          - value: 8
+          expectedReturn: -1
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day29-dedupe-sorted-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day29-binary-search-mastery
+    title: 정렬 목록의 연속 중복 제거하기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 이전 값 추적을 데이터 정제 알고리즘에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: dedupe_sorted(items)가 순서를 유지하며 연속 중복을 제거한 목록을 반환하도록 완성하세요.
+      starterCode: |-
+        def dedupe_sorted(items):
+            raise NotImplementedError
+      solution: |-
+        def dedupe_sorted(items):
+            result = []
+            for item in items:
+                if not result or result[-1] != item:
+                    result.append(item)
+            return result
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day29.dedupe-sorted.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day29.dedupe-sorted.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: dedupe_sorted
+        cases:
+        - id: numbers
+          arguments:
+          - value:
+            - 1
+            - 1
+            - 2
+            - 2
+            - 2
+            - 3
+          expectedReturn:
+          - 1
+          - 2
+          - 3
+        - id: words
+          arguments:
+          - value:
+            - a
+            - a
+            - b
+          expectedReturn:
+          - a
+          - b
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day29-two-sum-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day29-dedupe-sorted-transfer
+    title: 두 수의 합 index 찾기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 딕셔너리 탐색 알고리즘을 기억에서 복원한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: two_sum(numbers, target)가 합이 target인 첫 두 index를 반환하고 없으면 빈 목록을 반환하도록 완성하세요.
+      starterCode: |-
+        def two_sum(numbers, target):
+            raise NotImplementedError
+      solution: |-
+        def two_sum(numbers, target):
+            seen = {}
+            for index, number in enumerate(numbers):
+                complement = target - number
+                if complement in seen:
+                    return [seen[complement], index]
+                seen[number] = index
+            return []
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day29.two-sum.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day29.two-sum.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: two_sum
+        cases:
+        - id: basic
+          arguments:
+          - value:
+            - 2
+            - 7
+            - 11
+            - 15
+          - value: 9
+          expectedReturn:
+          - 0
+          - 1
+        - id: later
+          arguments:
+          - value:
+            - 3
+            - 2
+            - 4
+          - value: 6
+          expectedReturn:
+          - 1
+          - 2
+        - id: missing
+          arguments:
+          - value:
+            - 1
+            - 2
+          - value: 8
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

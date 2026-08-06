@@ -1,0 +1,813 @@
+var e=`meta:
+  id: day22
+  title: 클래스 기초
+  day: 22
+  category: 30days
+  outcomes: ["python.oop"]
+  prerequisites: ["python.functions"]
+  estimatedMinutes: 45
+  tags:
+  - 클래스
+  - 객체
+  - 인스턴스
+  - 메서드
+  - 상태관리
+  - 검증
+  seo:
+    title: 파이썬 클래스 기초 - 객체지향 프로그래밍 시작
+    description: class, __init__, self, 메서드, 속성, 인스턴스를 배웁니다.
+    keywords:
+    - 클래스
+    - class
+    - init
+    - self
+    - 메서드
+    - 속성
+intro:
+  emoji: 🏗️
+  points:
+  - class로 클래스 정의
+  - __init__으로 초기화
+  - self로 인스턴스 참조
+  - 메서드와 속성 활용
+  direction: 클래스 기초에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 클래스 기초 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 클래스 정의 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: init 메서드 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: self 이해하기 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 클래스 기초 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 클래스 기초 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 클래스 기초 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: class_basic
+  title: 클래스 정의
+  structuredPrimary: true
+  subtitle: class 키워드
+  goal: Dog()로 만든 인스턴스가 어느 클래스에서 나왔는지 이름으로 직접 확인한다.
+  why: 실행 중에 받은 객체가 무엇인지 모르면 어떤 속성과 메서드를 쓸 수 있는지도 알 수 없어서, 오류가 났을 때 타입부터 찍어 보는 것이 첫 확인 방법이 됩니다.
+  explanation: |-
+    클래스는 객체를 만드는 설계도입니다. class 키워드로 클래스를 정의하고, 클래스명()으로 인스턴스를 생성합니다. 클래스명은 대문자로 시작하는 것이 관례입니다.
+
+    클래스는 데이터와 기능을 하나로 묶는 도구입니다.
+  snippet: |-
+    class Dog:
+        pass
+
+    myDog = Dog()
+    type(myDog)
+  exercise:
+    prompt: |-
+      마지막 줄 type(myDog)를 type(myDog).__name__으로 바꾸세요. 위의 클래스 정의와 myDog = Dog()는 그대로 둡니다.
+
+      type(myDog)는 클래스 Dog 자체를 돌려주고 거기서 __name__을 꺼내면 클래스 이름만 남으므로 Dog가 나와야 합니다.
+    starterCode: |-
+      class Dog:
+          pass
+
+      myDog = Dog()
+      type(myDog)
+    solution: |-
+      class Dog:
+          pass
+
+      myDog = Dog()
+      type(myDog).__name__
+    hints:
+    - "type(myDog) 뒤에 .__name__ 을 붙여 type(myDog).__name__ 으로 만듭니다. class Dog: 와 pass, myDog = Dog() 줄은 그대로 둡니다."
+    - "정답 형태: type(myDog).__name__"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'Dog'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Dog'"
+- id: init_method
+  title: __init__ 메서드
+  structuredPrimary: true
+  subtitle: 초기화 메서드
+  goal: __init__이 받는 매개변수를 하나 늘려 인스턴스가 갖고 시작하는 속성을 직접 추가한다.
+  why: 직원이든 주문이든 처음 만들 때 갖춰야 할 값이 정해져 있는데, __init__에 매개변수로 적어 두면 그 값을 빠뜨린 객체가 아예 만들어지지 않아 뒤늦게 빈 속성을 만나는 일이 줄어듭니다.
+  explanation: |-
+    __init__ 메서드는 인스턴스 생성 시 자동으로 호출되는 특별한 메서드입니다. 인스턴스의 초기 속성값을 설정하는 데 사용합니다. 첫 번째 매개변수는 항상 self입니다.
+
+    __init__은 생성자처럼 동작하지만 엄밀히는 초기화 메서드입니다.
+  snippet: |-
+    class Employee:
+        def __init__(self, name):
+            self.name = name
+
+    alice = Employee('Alice')
+    alice.name
+  exercise:
+    prompt: |-
+      Employee가 소속 팀도 함께 받도록 네 곳을 고치세요.
+      1. def __init__(self, name): 을 def __init__(self, name, team): 으로 바꿉니다.
+      2. self.name = name 아래에 같은 들여쓰기로 self.team = team 한 줄을 추가합니다.
+      3. alice = Employee('Alice')를 alice = Employee('Alice', 'Sales')로 바꿉니다.
+      4. 마지막 줄 alice.name을 alice.name, alice.team으로 바꿉니다.
+
+      인스턴스를 만들 때 넘긴 두 값이 각각 속성으로 저장되므로 ('Alice', 'Sales')가 나와야 합니다.
+    starterCode: |-
+      class Employee:
+          def __init__(self, name):
+              self.name = name
+
+      alice = Employee('Alice')
+      alice.name
+    solution: |-
+      class Employee:
+          def __init__(self, name, team):
+              self.name = name
+              self.team = team
+
+      alice = Employee('Alice', 'Sales')
+      alice.name, alice.team
+    hints:
+    - "def 줄 괄호 안에 , team 을 더하고, self.name = name 아래에 self.team = team 을 같은 들여쓰기로 넣습니다. 그리고 Employee('Alice', 'Sales') 로 만들어 마지막 줄에서 두 속성을 함께 봅니다."
+    - "정답 형태: alice = Employee('Alice', 'Sales') 뒤 alice.name, alice.team"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "('Alice', 'Sales')"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"('Alice', 'Sales')\\""
+- id: self_parameter
+  title: self 이해하기
+  structuredPrimary: true
+  subtitle: 인스턴스 자신을 가리키는 참조
+  goal: __init__ 안의 self가 지금 만들어지는 인스턴스라는 것을 값 하나를 바꿔 눈으로 잇는다.
+  why: self를 그냥 외워 두면 메서드 안에서 self를 빼먹고 count = 0이라고 써서 값이 인스턴스에 남지 않는 실수를 반복하는데, self.에 넣은 것만 인스턴스에 남는다는 것을 직접 봐야 그 실수가 줄어듭니다.
+  explanation: |-
+    self는 인스턴스 자신을 가리키는 참조입니다. 메서드의 첫 번째 매개변수로 self를 받고, self.속성명으로 인스턴스 속성에 접근합니다. 메서드 호출 시 self는 자동으로 전달됩니다.
+
+    self는 관례적인 이름이지만 다른 이름도 가능합니다. 하지만 self를 사용하는 것이 표준입니다.
+  snippet: |-
+    class Tracker:
+        def __init__(self):
+            self.count = 0
+
+    cnt = Tracker()
+    cnt.count
+  exercise:
+    prompt: |-
+      __init__ 안의 self.count = 0을 self.count = 3으로 바꾸세요. cnt = Tracker()와 마지막 줄 cnt.count는 그대로 둡니다.
+
+      __init__의 self가 곧 지금 만들어지는 cnt이므로 self.count에 넣은 값이 그대로 cnt.count로 읽힙니다. 그래서 3이 나와야 합니다.
+    starterCode: |-
+      class Tracker:
+          def __init__(self):
+              self.count = 0
+
+      cnt = Tracker()
+      cnt.count
+    solution: |-
+      class Tracker:
+          def __init__(self):
+              self.count = 3
+
+      cnt = Tracker()
+      cnt.count
+    hints:
+    - self.count = 0 을 self.count = 3 으로 바꿉니다. self. 는 지우지 않습니다. 지우면 값이 인스턴스에 남지 않습니다.
+    - "정답 형태: self.count = 3"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '3'
+    resultCheck: "출력이 정확히 일치해야 합니다: '3'"
+- id: instance_method
+  title: 인스턴스 메서드
+  structuredPrimary: true
+  subtitle: 클래스의 함수
+  goal: 메서드가 self 뒤에 매개변수를 더 받게 만들고 호출할 때는 self를 빼고 넘긴다는 것을 확인한다.
+  why: 메서드는 인스턴스가 가진 값(self.name)과 부를 때마다 달라지는 값(인사말)을 함께 쓰는 자리라서, 어느 쪽을 속성으로 두고 어느 쪽을 매개변수로 받을지 나누는 감각이 클래스 설계의 시작입니다.
+  explanation: |-
+    인스턴스 메서드는 클래스 내부에 정의된 함수입니다. 첫 번째 매개변수로 self를 받고, 인스턴스.메서드명()으로 호출합니다. 메서드는 인스턴스의 속성을 사용하거나 수정할 수 있습니다.
+
+    메서드는 인스턴스의 동작을 정의합니다.
+  snippet: |-
+    class Greeter:
+        def __init__(self, name):
+            self.name = name
+
+        def greet(self):
+            return 'Hello, ' + self.name
+
+    g = Greeter('Bob')
+    g.greet()
+  exercise:
+    prompt: |-
+      greet가 인사말을 골라 받도록 세 곳을 고치세요.
+      1. def greet(self): 를 def greet(self, greeting): 으로 바꿉니다.
+      2. return 'Hello, ' + self.name 을 return greeting + ', ' + self.name 으로 바꿉니다.
+      3. 마지막 줄 g.greet()를 g.greet('Hi')로 바꿉니다.
+
+      메서드를 부를 때 self 자리는 g가 자동으로 채우므로 괄호에는 greeting 하나만 넣습니다. 실행하면 Hi, Bob이 나와야 합니다.
+    starterCode: |-
+      class Greeter:
+          def __init__(self, name):
+              self.name = name
+
+          def greet(self):
+              return 'Hello, ' + self.name
+
+      g = Greeter('Bob')
+      g.greet()
+    solution: |-
+      class Greeter:
+          def __init__(self, name):
+              self.name = name
+
+          def greet(self, greeting):
+              return greeting + ', ' + self.name
+
+      g = Greeter('Bob')
+      g.greet('Hi')
+    hints:
+    - "def greet(self): 괄호 안에 , greeting 을 더하고, 본문의 'Hello, ' 자리를 greeting + ', ' 로 바꿉니다. 호출은 g.greet('Hi') 이고 self 는 넘기지 않습니다."
+    - "정답 형태: g.greet('Hi')"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'Hi, Bob'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Hi, Bob'"
+- id: instance_attribute
+  title: 인스턴스 속성
+  structuredPrimary: true
+  subtitle: 인스턴스의 데이터
+  goal: 이미 만들어진 인스턴스의 속성 하나만 바꿔 다른 인스턴스는 그대로인 것을 확인한다.
+  why: 나이, 잔액, 상태처럼 만든 뒤에도 바뀌는 값이 대부분인데, 인스턴스마다 속성이 따로 있어서 한 사람의 값을 고쳐도 다른 사람 값은 건드려지지 않는다는 점이 딕셔너리를 통째로 공유할 때와 다른 안전장치입니다.
+  explanation: |-
+    인스턴스 속성은 각 인스턴스가 가지는 고유한 데이터입니다. self.속성명으로 정의하고 접근합니다. 각 인스턴스는 독립적인 속성값을 가집니다.
+
+    속성은 인스턴스의 상태를 나타냅니다.
+  snippet: |-
+    class User:
+        def __init__(self, name, age):
+            self.name = name
+            self.age = age
+
+    user1 = User('Alice', 25)
+    user2 = User('Bob', 30)
+    user1.age, user2.age
+  exercise:
+    prompt: |-
+      마지막 줄 user1.age, user2.age 바로 위에 user1.age = 26 한 줄을 들여쓰기 없이 추가하세요. 클래스 정의와 두 인스턴스를 만드는 줄은 그대로 둡니다.
+
+      age는 user1과 user2가 각자 갖고 있는 속성이라 user1의 나이만 26으로 바뀌고 user2는 30 그대로입니다. 그래서 (26, 30)이 나와야 합니다.
+    starterCode: |-
+      class User:
+          def __init__(self, name, age):
+              self.name = name
+              self.age = age
+
+      user1 = User('Alice', 25)
+      user2 = User('Bob', 30)
+      user1.age, user2.age
+    solution: |-
+      class User:
+          def __init__(self, name, age):
+              self.name = name
+              self.age = age
+
+      user1 = User('Alice', 25)
+      user2 = User('Bob', 30)
+      user1.age = 26
+      user1.age, user2.age
+    hints:
+    - user2 = User('Bob', 30) 다음 줄에 user1.age = 26 을 넣습니다. 마지막 줄 user1.age, user2.age 는 그대로 둡니다.
+    - "정답 형태: user1.age = 26"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '(26, 30)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(26, 30)'"
+- id: multiple_instances
+  title: 여러 인스턴스
+  structuredPrimary: true
+  subtitle: 클래스로부터 여러 객체 생성
+  goal: 같은 클래스로 인스턴스를 하나 더 만들어 셋이 각자 자기 값을 갖는 것을 확인한다.
+  why: 차 100대든 주문 1000건이든 클래스는 한 번만 쓰고 인스턴스만 필요한 만큼 만들면 되므로, 데이터가 늘어도 고쳐야 할 코드는 클래스 한 곳으로 유지됩니다.
+  explanation: |-
+    하나의 클래스로부터 여러 인스턴스를 생성할 수 있습니다. 각 인스턴스는 같은 구조를 가지지만 독립적인 데이터를 저장합니다. 클래스는 설계도이고 인스턴스는 실제 객체입니다.
+
+    클래스는 재사용 가능한 코드 템플릿입니다.
+  snippet: |-
+    class Car:
+        def __init__(self, model, color):
+            self.model = model
+            self.color = color
+
+    car1 = Car('Tesla', 'red')
+    car2 = Car('BMW', 'blue')
+    car1.model, car2.model
+  exercise:
+    prompt: |-
+      두 곳을 고치세요. car2 = Car('BMW', 'blue') 아래에 car3 = Car('Kia', 'white')를 추가하고, 마지막 줄 car1.model, car2.model을 car1.model, car2.model, car3.model로 바꾸세요.
+
+      클래스 정의는 그대로 두고 인스턴스만 하나 더 만들면 되고, 셋이 각자 자기 model을 갖고 있으므로 ('Tesla', 'BMW', 'Kia')가 나와야 합니다.
+    starterCode: |-
+      class Car:
+          def __init__(self, model, color):
+              self.model = model
+              self.color = color
+
+      car1 = Car('Tesla', 'red')
+      car2 = Car('BMW', 'blue')
+      car1.model, car2.model
+    solution: |-
+      class Car:
+          def __init__(self, model, color):
+              self.model = model
+              self.color = color
+
+      car1 = Car('Tesla', 'red')
+      car2 = Car('BMW', 'blue')
+      car3 = Car('Kia', 'white')
+      car1.model, car2.model, car3.model
+    hints:
+    - "car2 줄 다음에 car3 = Car('Kia', 'white') 를 넣고, 마지막 줄 끝에 , car3.model 을 더합니다. class Car 정의는 그대로 둡니다."
+    - "정답 형태: car1.model, car2.model, car3.model"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "('Tesla', 'BMW', 'Kia')"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"('Tesla', 'BMW', 'Kia')\\""
+- id: workflow_validation
+  title: '현업 흐름 검증: 주문 객체로 상태와 합계 관리하기'
+  structuredPrimary: true
+  subtitle: 작게 실행하고 결과를 확인하는 단계
+  goal: assert 줄을 그대로 통과시킨 뒤 주문 객체에 항목을 더 넣어 total()이 다시 계산되는 것을 확인한다.
+  why: 객체는 값을 안에 담고 있어서 지금 상태가 눈에 보이지 않으므로, 기대값을 assert로 박아 두고 마지막에 실제 값을 찍어 보는 방식이 상태를 가진 코드를 다루는 기본 습관이 됩니다.
+  explanation: 클래스의 핵심은 관련 데이터와 행동을 한 곳에 묶는 것입니다. 주문처럼 상태가 변하고 규칙이 붙는 데이터는 딕셔너리만으로 계속 다루면 실수가 늘어납니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class Order:
+        def __init__(self, orderId):
+            self.orderId = orderId
+            self.items = []
+            self.status = "draft"
+
+        def addItem(self, name, price, quantity=1):
+            if price <= 0:
+                raise ValueError("price must be positive")
+            if quantity <= 0:
+                raise ValueError("quantity must be positive")
+
+            self.items.append({
+                "name": name,
+                "price": price,
+                "quantity": quantity,
+            })
+
+        def total(self):
+            amount = 0
+            for item in self.items:
+                amount += item["price"] * item["quantity"]
+            return amount
+
+        def markPaid(self):
+            if not self.items:
+                raise ValueError("empty order cannot be paid")
+            self.status = "paid"
+
+    firstOrder = Order("A-100")
+    secondOrder = Order("A-101")
+
+    firstOrder.addItem("keyboard", 50000, 1)
+    firstOrder.addItem("mouse", 20000, 2)
+    secondOrder.addItem("monitor", 180000, 1)
+
+    assert firstOrder.total() == 90000
+    assert secondOrder.total() == 180000
+    assert firstOrder.items != secondOrder.items
+
+    firstOrder.markPaid()
+    assert firstOrder.status == "paid"
+    assert secondOrder.status == "draft"
+
+    try:
+        secondOrder.addItem("broken item", -1000)
+    except ValueError as exc:
+        assert "price" in str(exc)
+
+    print("주문 객체 흐름 통과")
+  exercise:
+    prompt: |-
+      기존 줄은 하나도 바꾸지 말고 그대로 두세요. 맨 아래 print("주문 객체 흐름 통과") 다음에 아래 두 줄을 순서대로 추가하면 됩니다.
+      secondOrder.addItem("cable", 5000, 2)
+      print(secondOrder.total())
+
+      assert 줄이 모두 통과했다는 것은 secondOrder에 monitor 180000 하나만 담겨 있다는 뜻입니다. 5000짜리를 2개 더 넣으면 total()이 항목을 다시 훑어 계산하므로, 실행하면 아래 두 줄이 나와야 합니다.
+      주문 객체 흐름 통과
+      190000
+    starterCode: |-
+      class Order:
+          def __init__(self, orderId):
+              self.orderId = orderId
+              self.items = []
+              self.status = "draft"
+
+          def addItem(self, name, price, quantity=1):
+              if price <= 0:
+                  raise ValueError("price must be positive")
+              if quantity <= 0:
+                  raise ValueError("quantity must be positive")
+
+              self.items.append({
+                  "name": name,
+                  "price": price,
+                  "quantity": quantity,
+              })
+
+          def total(self):
+              amount = 0
+              for item in self.items:
+                  amount += item["price"] * item["quantity"]
+              return amount
+
+          def markPaid(self):
+              if not self.items:
+                  raise ValueError("empty order cannot be paid")
+              self.status = "paid"
+
+      firstOrder = Order("A-100")
+      secondOrder = Order("A-101")
+
+      firstOrder.addItem("keyboard", 50000, 1)
+      firstOrder.addItem("mouse", 20000, 2)
+      secondOrder.addItem("monitor", 180000, 1)
+
+      assert firstOrder.total() == 90000
+      assert secondOrder.total() == 180000
+      assert firstOrder.items != secondOrder.items
+
+      firstOrder.markPaid()
+      assert firstOrder.status == "paid"
+      assert secondOrder.status == "draft"
+
+      try:
+          secondOrder.addItem("broken item", -1000)
+      except ValueError as exc:
+          assert "price" in str(exc)
+
+      print("주문 객체 흐름 통과")
+    solution: |-
+      class Order:
+          def __init__(self, orderId):
+              self.orderId = orderId
+              self.items = []
+              self.status = "draft"
+
+          def addItem(self, name, price, quantity=1):
+              if price <= 0:
+                  raise ValueError("price must be positive")
+              if quantity <= 0:
+                  raise ValueError("quantity must be positive")
+
+              self.items.append({
+                  "name": name,
+                  "price": price,
+                  "quantity": quantity,
+              })
+
+          def total(self):
+              amount = 0
+              for item in self.items:
+                  amount += item["price"] * item["quantity"]
+              return amount
+
+          def markPaid(self):
+              if not self.items:
+                  raise ValueError("empty order cannot be paid")
+              self.status = "paid"
+
+      firstOrder = Order("A-100")
+      secondOrder = Order("A-101")
+
+      firstOrder.addItem("keyboard", 50000, 1)
+      firstOrder.addItem("mouse", 20000, 2)
+      secondOrder.addItem("monitor", 180000, 1)
+
+      assert firstOrder.total() == 90000
+      assert secondOrder.total() == 180000
+      assert firstOrder.items != secondOrder.items
+
+      firstOrder.markPaid()
+      assert firstOrder.status == "paid"
+      assert secondOrder.status == "draft"
+
+      try:
+          secondOrder.addItem("broken item", -1000)
+      except ValueError as exc:
+          assert "price" in str(exc)
+
+      print("주문 객체 흐름 통과")
+      secondOrder.addItem("cable", 5000, 2)
+      print(secondOrder.total())
+    hints:
+    - 클래스와 assert 부분은 하나도 고치지 말고, 맨 아래 print 줄 다음에 addItem 호출 한 줄과 print(secondOrder.total()) 한 줄을 들여쓰기 없이 추가합니다.
+    - '정답 형태: secondOrder.addItem("cable", 5000, 2) 뒤 print(secondOrder.total())'
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: |-
+      주문 객체 흐름 통과
+      190000
+    resultCheck: "출력이 정확히 일치해야 합니다: '주문 객체 흐름 통과\\n190000'"
+- id: practice
+  title: Day 22 종합 복습
+  structuredPrimary: true
+  subtitle: 클래스 기초 마스터하기
+  goal: 빈 클래스 하나를 받아 __init__과 메서드까지 직접 채워 넣어 쓸 수 있는 클래스로 만든다.
+  why: 클래스 정의, __init__, self, 속성, 메서드를 따로따로 아는 것과 빈 클래스에서 시작해 하나로 이어 쓰는 것은 다른 능력이고, 다음 강의의 상속은 이 다섯 가지가 손에 붙어 있다고 가정하고 진행됩니다.
+  explanation: Day 22에서 배운 클래스 기초를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로
+    어떤 순서로 해도 괜찮습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class Animal:
+        pass
+
+    pet = Animal()
+    type(pet).__name__
+  exercise:
+    prompt: |-
+      Animal이 이름과 울음소리를 갖고 말하도록 세 곳을 고치세요. 클래스 이름 Animal은 그대로 둡니다.
+      1. class Animal: 아래의 pass를 지우고 def __init__(self, name, sound): 를 정의한 뒤 그 안에 self.name = name과 self.sound = sound 두 줄을 넣습니다.
+      2. 그 아래 같은 들여쓰기로 def speak(self): 를 정의하고 return self.name + ' says ' + self.sound 한 줄을 넣습니다.
+      3. pet = Animal()을 pet = Animal('Rex', 'Woof')로 바꾸고, 마지막 줄 type(pet).__name__을 pet.speak()로 바꿉니다.
+
+      만들 때 넘긴 두 값이 속성으로 저장되고 speak가 그 둘을 이어 붙이므로 Rex says Woof가 나와야 합니다.
+    starterCode: |-
+      class Animal:
+          pass
+
+      pet = Animal()
+      type(pet).__name__
+    solution: |-
+      class Animal:
+          def __init__(self, name, sound):
+              self.name = name
+              self.sound = sound
+
+          def speak(self):
+              return self.name + ' says ' + self.sound
+
+      pet = Animal('Rex', 'Woof')
+      pet.speak()
+    hints:
+    - "__init__ 은 self 다음에 name 과 sound 를 받고 각각 self.name, self.sound 에 넣습니다. speak 는 self 만 받고 self.name + ' says ' + self.sound 를 return 합니다. def 두 줄은 class Animal: 보다 공백 4칸 안쪽입니다."
+    - "정답 형태: pet = Animal('Rex', 'Woof') 뒤 pet.speak()"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'Rex says Woof'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Rex says Woof'"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
+  masteryVariants:
+  - id: day22-counter-class-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - class_basic
+    - practice
+    title: 상태를 가진 Counter 클래스 만들기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 생성자와 인스턴스 메서드로 상태 변화를 표현한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: Counter와 counter_after(start, steps)를 완성해 steps만큼 증가한 최종 값을 반환하세요.
+      starterCode: |-
+        class Counter:
+            pass
+
+        def counter_after(start, steps):
+            raise NotImplementedError
+      solution: |-
+        class Counter:
+            def __init__(self, value):
+                self.value = value
+
+            def increment(self):
+                self.value += 1
+
+        def counter_after(start, steps):
+            counter = Counter(start)
+            for _ in range(steps):
+                counter.increment()
+            return counter.value
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day22.counter-class.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day22.counter-class.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: counter_after
+        cases:
+        - id: three
+          arguments:
+          - value: 5
+          - value: 3
+          expectedReturn: 8
+        - id: none
+          arguments:
+          - value: 10
+          - value: 0
+          expectedReturn: 10
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day22-inventory-item-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day22-counter-class-mastery
+    title: 객체로 재고 항목 합계 만들기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 클래스의 속성과 메서드를 가격 계산 문맥에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: InventoryItem과 item_summary(name, price, quantity)를 완성해 name과 total 딕셔너리를 반환하세요.
+      starterCode: |-
+        class InventoryItem:
+            pass
+
+        def item_summary(name, price, quantity):
+            raise NotImplementedError
+      solution: |-
+        class InventoryItem:
+            def __init__(self, name, price, quantity):
+                self.name = name
+                self.price = price
+                self.quantity = quantity
+
+            def total(self):
+                return self.price * self.quantity
+
+        def item_summary(name, price, quantity):
+            item = InventoryItem(name, price, quantity)
+            return {'name': item.name, 'total': item.total()}
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day22.inventory-item.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day22.inventory-item.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: item_summary
+        cases:
+        - id: pen
+          arguments:
+          - value: pen
+          - value: 1000
+          - value: 3
+          expectedReturn:
+            name: pen
+            total: 3000
+        - id: book
+          arguments:
+          - value: book
+          - value: 7500
+          - value: 2
+          expectedReturn:
+            name: book
+            total: 15000
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day22-temperature-class-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day22-inventory-item-transfer
+    title: 객체의 온도 변환 다시 만들기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 생성자와 계산 메서드를 기억에서 복원한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: Temperature와 fahrenheit_of(celsius)를 완성해 화씨 온도를 반환하세요.
+      starterCode: |-
+        class Temperature:
+            pass
+
+        def fahrenheit_of(celsius):
+            raise NotImplementedError
+      solution: |-
+        class Temperature:
+            def __init__(self, celsius):
+                self.celsius = celsius
+
+            def fahrenheit(self):
+                return self.celsius * 9 / 5 + 32
+
+        def fahrenheit_of(celsius):
+            return Temperature(celsius).fahrenheit()
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day22.temperature-class.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day22.temperature-class.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: fahrenheit_of
+        cases:
+        - id: freezing
+          arguments:
+          - value: 0
+          expectedReturn: 32.0
+        - id: boiling
+          arguments:
+          - value: 100
+          expectedReturn: 212.0
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

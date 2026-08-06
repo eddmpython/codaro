@@ -1,0 +1,1001 @@
+var e=`meta:
+  id: day25
+  title: 프로퍼티와 데코레이터
+  day: 25
+  category: 30days
+  outcomes: ["python.advancedSyntax"]
+  prerequisites: ["python.oop"]
+  estimatedMinutes: 45
+  tags:
+  - 프로퍼티
+  - 데코레이터
+  - classmethod
+  - staticmethod
+  - 검증
+  - 객체설계
+  seo:
+    title: 파이썬 프로퍼티와 데코레이터 - 메서드 활용 고급 기법
+    description: property, setter, deleter, staticmethod, classmethod, 데코레이터를 배웁니다.
+    keywords:
+    - 프로퍼티
+    - property
+    - setter
+    - staticmethod
+    - classmethod
+    - 데코레이터
+intro:
+  emoji: 🎨
+  points:
+  - '@property로 속성처럼 사용'
+  - setter/deleter로 값 제어
+  - '@staticmethod, @classmethod 활용'
+  - 데코레이터로 기능 확장
+  direction: 프로퍼티와 데코레이터에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 프로퍼티와 데코레이터 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 프로퍼티 기초 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: setter와 deleter 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: staticmethod 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 프로퍼티와 데코레이터 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 프로퍼티와 데코레이터 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 프로퍼티와 데코레이터 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: property_basic
+  title: 프로퍼티 기초
+  structuredPrimary: true
+  subtitle: '@property 데코레이터'
+  goal: 반지름을 바꾸고 area를 괄호 없이 읽어 @property가 메서드를 속성처럼 만든다는 것을 확인한다.
+  why: 넓이처럼 다른 값에서 계산되는 값을 메서드로 두면 부를 때마다 괄호를 붙여야 하고 괄호를 빠뜨리면 함수 자체가 나오는데, @property를 붙이면 radius와 area를 똑같이 점 하나로 읽을 수 있어 쓰는 쪽 코드가 단순해집니다.
+  explanation: |-
+    프로퍼티는 메서드를 속성처럼 사용할 수 있게 해주는 기능입니다. @property 데코레이터를 메서드에 붙이면 obj.method() 대신 obj.method로 접근할 수 있습니다. 이를 통해 계산된 값을 속성처럼 제공하거나, 내부 속성에 대한 접근을 제어할 수 있습니다.
+
+    프로퍼티는 읽기 전용 속성을 만들 때 매우 유용합니다.
+  snippet: |-
+    class Circle:
+        def __init__(self, radius):
+            self.radius = radius
+
+        @property
+        def area(self):
+            return 3.14 * self.radius ** 2
+
+    cir = Circle(5)
+    cir.area
+  exercise:
+    prompt: |-
+      두 곳을 고치세요. cir = Circle(5)를 cir = Circle(10)으로 바꾸고, 마지막 줄 cir.area를 cir.radius, cir.area로 바꾸세요. 클래스 본문은 그대로 둡니다.
+
+      area에는 @property가 붙어 있어 cir.area()가 아니라 cir.radius처럼 괄호 없이 읽습니다. 3.14 곱하기 10의 제곱이므로 (10, 314.0)이 나와야 합니다.
+    starterCode: |-
+      class Circle:
+          def __init__(self, radius):
+              self.radius = radius
+
+          @property
+          def area(self):
+              return 3.14 * self.radius ** 2
+
+      cir = Circle(5)
+      cir.area
+    solution: |-
+      class Circle:
+          def __init__(self, radius):
+              self.radius = radius
+
+          @property
+          def area(self):
+              return 3.14 * self.radius ** 2
+
+      cir = Circle(10)
+      cir.radius, cir.area
+    hints:
+    - "cir = Circle(5) 를 cir = Circle(10) 으로 바꾸고, 마지막 줄 cir.area 를 cir.radius, cir.area 로 바꿉니다. area 뒤에는 괄호를 붙이지 않습니다."
+    - "정답 형태: 마지막 줄에 cir.radius, cir.area"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '(10, 314.0)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(10, 314.0)'"
+- id: setter_deleter
+  title: setter와 deleter
+  structuredPrimary: true
+  subtitle: 값 설정과 삭제 제어
+  goal: 범위를 벗어난 값은 setter가 걸러 내고 정상 값은 그대로 저장된다는 것을 한 줄에 나란히 확인한다.
+  why: 값을 넣는 쪽 코드는 temp.celsius = 값 한 줄뿐인데도 setter가 그 자리에서 검사를 대신 하기 때문에, 값을 넣는 모든 자리에 검사 코드를 따로 적지 않아도 잘못된 값이 객체 안에 들어가지 않습니다.
+  explanation: |-
+    프로퍼티는 getter뿐만 아니라 setter와 deleter도 정의할 수 있습니다. @프로퍼티명.setter는 값을 설정할 때, @프로퍼티명.deleter는 값을 삭제할 때 호출됩니다. 이를 통해 값의 유효성 검사나 부가 작업을 수행할 수 있습니다.
+
+    setter를 사용하면 직접 속성에 접근하는 것처럼 보이지만 내부적으로 검증 로직을 실행할 수 있습니다.
+  snippet: |-
+    class Temperature:
+        def __init__(self):
+            self._celsius = 0
+
+        @property
+        def celsius(self):
+            return self._celsius
+
+        @celsius.setter
+        def celsius(self, value):
+            if value < -273:
+                self._celsius = -273
+            else:
+                self._celsius = value
+
+    temp = Temperature()
+    temp.celsius = -300
+    temp.celsius
+  exercise:
+    prompt: |-
+      마지막 줄 temp.celsius를 아래 세 줄로 바꾸세요. 클래스와 temp.celsius = -300 줄은 그대로 둡니다.
+      blocked = temp.celsius
+      temp.celsius = 25
+      blocked, temp.celsius
+
+      setter가 -273보다 작은 -300을 그대로 저장하지 않고 -273으로 걸러 두었고, 25는 범위 안이라 그대로 저장됩니다. 그래서 (-273, 25)가 나와야 합니다.
+    starterCode: |-
+      class Temperature:
+          def __init__(self):
+              self._celsius = 0
+
+          @property
+          def celsius(self):
+              return self._celsius
+
+          @celsius.setter
+          def celsius(self, value):
+              if value < -273:
+                  self._celsius = -273
+              else:
+                  self._celsius = value
+
+      temp = Temperature()
+      temp.celsius = -300
+      temp.celsius
+    solution: |-
+      class Temperature:
+          def __init__(self):
+              self._celsius = 0
+
+          @property
+          def celsius(self):
+              return self._celsius
+
+          @celsius.setter
+          def celsius(self, value):
+              if value < -273:
+                  self._celsius = -273
+              else:
+                  self._celsius = value
+
+      temp = Temperature()
+      temp.celsius = -300
+      blocked = temp.celsius
+      temp.celsius = 25
+      blocked, temp.celsius
+    hints:
+    - "마지막 줄 temp.celsius 를 blocked = temp.celsius, temp.celsius = 25, blocked, temp.celsius 세 줄로 나눠 적습니다. 세 줄 모두 들여쓰기 없이 씁니다."
+    - "정답 형태: 마지막 줄에 blocked, temp.celsius"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '(-273, 25)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(-273, 25)'"
+- id: staticmethod
+  title: '@staticmethod'
+  structuredPrimary: true
+  subtitle: 정적 메서드
+  goal: 정적 메서드를 클래스에서 불러도 인스턴스에서 불러도 인자가 그대로 전달된다는 것을 확인한다.
+  why: 계산만 하고 객체 상태를 쓰지 않는 함수는 @staticmethod로 클래스 안에 두면 관련 기능이 한 이름 아래 모이면서도, 객체를 만들지 않고 클래스 이름만으로 바로 부를 수 있습니다.
+  explanation: |-
+    정적 메서드는 클래스나 인스턴스와 무관하게 독립적으로 동작하는 메서드입니다. @staticmethod 데코레이터를 사용하며, self나 cls 매개변수를 받지 않습니다. 주로 유틸리티 함수나 헬퍼 함수를 클래스 내부에 정의할 때 사용합니다.
+
+    정적 메서드는 클래스 내부에 관련 함수를 그룹화하여 네임스페이스를 깔끔하게 유지합니다.
+  snippet: |-
+    class Math:
+        @staticmethod
+        def add(a, b):
+            return a + b
+
+        @staticmethod
+        def multiply(a, b):
+            return a * b
+
+    Math.add(3, 4)
+  exercise:
+    prompt: |-
+      마지막 줄 Math.add(3, 4)를 Math.add(6, 4), Math().multiply(6, 4)로 바꾸세요. 클래스 본문은 그대로 둡니다.
+
+      add와 multiply는 self를 받지 않으므로 클래스에서 불러도, Math()로 만든 객체에서 불러도 6과 4가 그대로 a, b에 들어갑니다. 6 더하기 4와 6 곱하기 4이므로 (10, 24)가 나와야 합니다.
+    starterCode: |-
+      class Math:
+          @staticmethod
+          def add(a, b):
+              return a + b
+
+          @staticmethod
+          def multiply(a, b):
+              return a * b
+
+      Math.add(3, 4)
+    solution: |-
+      class Math:
+          @staticmethod
+          def add(a, b):
+              return a + b
+
+          @staticmethod
+          def multiply(a, b):
+              return a * b
+
+      Math.add(6, 4), Math().multiply(6, 4)
+    hints:
+    - "Math.add(3, 4) 를 Math.add(6, 4), Math().multiply(6, 4) 로 바꿉니다. Math() 는 객체를 하나 만들어 같은 정적 메서드를 부르는 부분입니다."
+    - "정답 형태: Math.add(6, 4), Math().multiply(6, 4)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '(10, 24)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(10, 24)'"
+- id: classmethod
+  title: '@classmethod'
+  structuredPrimary: true
+  subtitle: 클래스 메서드
+  goal: 이름과 생년을 바꿔 팩토리 메서드가 계산한 나이로 객체가 만들어지는 것을 확인한다.
+  why: 같은 클래스라도 만드는 방법이 여럿일 때 __init__을 여러 개 둘 수는 없는데, @classmethod로 만든 팩토리를 옆에 두면 원본 데이터 모양(여기서는 생년)마다 객체를 만드는 입구를 하나씩 열어 둘 수 있습니다.
+  explanation: |-
+    클래스 메서드는 클래스 자체를 첫 번째 매개변수로 받는 메서드입니다. @classmethod 데코레이터를 사용하며, 첫 매개변수는 관례적으로 cls로 명명합니다. 주로 팩토리 메서드나 클래스 레벨의 작업을 수행할 때 사용합니다.
+
+    클래스 메서드는 상속 시 자식 클래스의 타입을 자동으로 따릅니다.
+  snippet: |-
+    class Person:
+        def __init__(self, name, age):
+            self.name = name
+            self.age = age
+
+        @classmethod
+        def fromBirthYear(cls, name, birthYear):
+            age = 2024 - birthYear
+            return cls(name, age)
+
+    p = Person.fromBirthYear('Alice', 2000)
+    p.age
+  exercise:
+    prompt: |-
+      두 곳을 고치세요. p = Person.fromBirthYear('Alice', 2000)을 p = Person.fromBirthYear('Mina', 1990)으로 바꾸고, 마지막 줄 p.age를 p.name, p.age로 바꾸세요. 클래스 본문은 그대로 둡니다.
+
+      fromBirthYear가 2024에서 1990을 빼 나이를 만든 뒤 cls(name, age)로 Person 객체를 만들어 돌려주므로 ('Mina', 34)가 나와야 합니다.
+    starterCode: |-
+      class Person:
+          def __init__(self, name, age):
+              self.name = name
+              self.age = age
+
+          @classmethod
+          def fromBirthYear(cls, name, birthYear):
+              age = 2024 - birthYear
+              return cls(name, age)
+
+      p = Person.fromBirthYear('Alice', 2000)
+      p.age
+    solution: |-
+      class Person:
+          def __init__(self, name, age):
+              self.name = name
+              self.age = age
+
+          @classmethod
+          def fromBirthYear(cls, name, birthYear):
+              age = 2024 - birthYear
+              return cls(name, age)
+
+      p = Person.fromBirthYear('Mina', 1990)
+      p.name, p.age
+    hints:
+    - "p = Person.fromBirthYear('Alice', 2000) 을 p = Person.fromBirthYear('Mina', 1990) 으로 바꾸고, 마지막 줄 p.age 를 p.name, p.age 로 바꿉니다."
+    - "정답 형태: 마지막 줄에 p.name, p.age"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "('Mina', 34)"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"('Mina', 34)\\""
+- id: decorator_basic
+  title: 데코레이터 기초
+  structuredPrimary: true
+  subtitle: 함수를 꾸미는 함수
+  goal: 데코레이터가 원래 함수를 감싼 새 함수로 바꿔 놓는다는 것을 반환값과 이름으로 함께 확인한다.
+  why: '@logger 한 줄만 붙이면 함수 본문을 건드리지 않고 기록 같은 공통 동작을 넣을 수 있는데, 이때 이름이 감싼 함수 것으로 바뀐다는 점을 알아 두어야 나중에 로그와 오류 메시지가 엉뚱한 이름으로 나오는 일을 막을 수 있습니다.'
+  explanation: |-
+    데코레이터는 다른 함수를 감싸서 기능을 추가하는 함수입니다. @데코레이터명 형태로 함수 위에 붙여 사용하며, 원래 함수의 동작을 변경하거나 확장할 수 있습니다. 로깅, 타이밍, 캐싱 등 다양한 용도로 활용됩니다.
+
+    데코레이터는 아래에서 위로 적용됩니다. @addOne @triple은 triple을 먼저 적용하고 addOne을 나중에 적용합니다.
+  snippet: |-
+    def logger(func):
+        def wrapper():
+            msg = 'Calling ' + func.__name__
+            result = func()
+            return msg + ' -> ' + str(result)
+        return wrapper
+
+    @logger
+    def greet():
+        return 'Hello'
+
+    greet()
+  exercise:
+    prompt: |-
+      두 곳을 고치세요. greet 안의 return 'Hello'를 return 'Codaro'로 바꾸고, 마지막 줄 greet()를 greet(), greet.__name__으로 바꾸세요. logger 함수는 그대로 둡니다.
+
+      @logger를 붙인 순간 이름 greet에는 wrapper 함수가 들어가므로 greet.__name__은 wrapper입니다. 감싸인 원래 함수의 이름은 wrapper 안의 func.__name__에 남아 있어 문장에는 greet이 그대로 찍힙니다. 그래서 ('Calling greet -> Codaro', 'wrapper')가 나와야 합니다.
+    starterCode: |-
+      def logger(func):
+          def wrapper():
+              msg = 'Calling ' + func.__name__
+              result = func()
+              return msg + ' -> ' + str(result)
+          return wrapper
+
+      @logger
+      def greet():
+          return 'Hello'
+
+      greet()
+    solution: |-
+      def logger(func):
+          def wrapper():
+              msg = 'Calling ' + func.__name__
+              result = func()
+              return msg + ' -> ' + str(result)
+          return wrapper
+
+      @logger
+      def greet():
+          return 'Codaro'
+
+      greet(), greet.__name__
+    hints:
+    - "return 'Hello' 를 return 'Codaro' 로 바꾸고, 마지막 줄 greet() 를 greet(), greet.__name__ 으로 바꿉니다. greet 뒤 괄호를 지우면 함수 자체가 결과가 되니 호출은 그대로 둡니다."
+    - "정답 형태: greet(), greet.__name__"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "('Calling greet -> Codaro', 'wrapper')"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"('Calling greet -> Codaro', 'wrapper')\\""
+- id: practical_patterns
+  title: 실전 패턴
+  structuredPrimary: true
+  subtitle: 프로퍼티와 데코레이터 활용
+  goal: 프로퍼티를 읽기 전과 읽은 뒤의 캐시 상태를 나란히 놓아 계산이 한 번만 일어난다는 것을 확인한다.
+  why: 계산이 무거운 값은 쓸 때마다 다시 세면 느려지는데, 프로퍼티 안에서 결과를 캐시에 넣어 두면 읽는 쪽 코드는 그대로 fib.tenth 한 줄인 채로 두 번째부터는 저장된 값을 바로 받습니다.
+  explanation: |-
+    프로퍼티와 데코레이터를 함께 사용하면 깔끔하고 유지보수하기 쉬운 코드를 작성할 수 있습니다. 캐싱, 유효성 검사, 접근 제어 등 다양한 패턴을 구현할 수 있습니다.
+
+    프로퍼티와 데코레이터를 적절히 조합하면 파이썬스러운 깔끔한 코드를 작성할 수 있습니다.
+  snippet: |-
+    class Fibonacci:
+        def __init__(self):
+            self._cache = {}
+
+        @property
+        def tenth(self):
+            if 10 not in self._cache:
+                self._cache[10] = self._fib(10)
+            return self._cache[10]
+
+        def _fib(self, n):
+            if n <= 1:
+                return n
+            return self._fib(n - 1) + self._fib(n - 2)
+
+    fib = Fibonacci()
+    fib.tenth
+  exercise:
+    prompt: |-
+      마지막 줄 fib.tenth를 아래 세 줄로 바꾸세요. fib = Fibonacci() 줄과 클래스 본문은 그대로 둡니다.
+      before = 10 in fib._cache
+      value = fib.tenth
+      before, value, 10 in fib._cache
+
+      프로퍼티를 읽기 전에는 캐시가 비어 있어 False이고, 한 번 읽으면 계산 결과 55가 캐시에 저장되어 True로 바뀝니다. 그래서 (False, 55, True)가 나와야 합니다.
+    starterCode: |-
+      class Fibonacci:
+          def __init__(self):
+              self._cache = {}
+
+          @property
+          def tenth(self):
+              if 10 not in self._cache:
+                  self._cache[10] = self._fib(10)
+              return self._cache[10]
+
+          def _fib(self, n):
+              if n <= 1:
+                  return n
+              return self._fib(n - 1) + self._fib(n - 2)
+
+      fib = Fibonacci()
+      fib.tenth
+    solution: |-
+      class Fibonacci:
+          def __init__(self):
+              self._cache = {}
+
+          @property
+          def tenth(self):
+              if 10 not in self._cache:
+                  self._cache[10] = self._fib(10)
+              return self._cache[10]
+
+          def _fib(self, n):
+              if n <= 1:
+                  return n
+              return self._fib(n - 1) + self._fib(n - 2)
+
+      fib = Fibonacci()
+      before = 10 in fib._cache
+      value = fib.tenth
+      before, value, 10 in fib._cache
+    hints:
+    - "fib = Fibonacci() 다음 줄에 before = 10 in fib._cache 와 value = fib.tenth 를 넣고, 마지막 줄을 before, value, 10 in fib._cache 로 만듭니다."
+    - "정답 형태: 마지막 줄에 before, value, 10 in fib._cache"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '(False, 55, True)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(False, 55, True)'"
+- id: workflow_validation
+  title: '현업 흐름 검증: 상품 입력값을 안전하게 객체로 만들기'
+  structuredPrimary: true
+  subtitle: 작게 실행하고 결과를 확인하는 단계
+  goal: assert 일곱 줄을 그대로 통과시킨 뒤 데코레이터가 남긴 기록을 출력해 확인한다.
+  why: 프로퍼티 검증과 데코레이터가 얽힌 코드는 눈으로 훑어서는 맞는지 알 수 없으므로, 기대값을 assert로 박아 두고 조용히 끝나는지 본 다음 마지막 한 줄만 눈으로 확인합니다.
+  explanation: 프로퍼티와 데코레이터는 문법 장식이 아니라, 객체의 규칙을 코드 안에 고정하는 도구입니다. 상품 행 데이터를 객체로 만들고 가격 규칙을 검증해봅니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from functools import wraps
+
+    class Product:
+        def __init__(self, name, price):
+            if not name.strip():
+                raise ValueError("name is required")
+            self.name = name.strip()
+            self.price = price
+
+        @property
+        def price(self):
+            return self._price
+
+        @price.setter
+        def price(self, value):
+            if value <= 0:
+                raise ValueError("price must be positive")
+            self._price = value
+
+        @property
+        def taxIncludedPrice(self):
+            return int(self.price * 1.1)
+
+        @staticmethod
+        def parsePrice(text):
+            cleanedText = text.replace(",", "").replace("원", "").strip()
+            return int(cleanedText)
+
+        @classmethod
+        def fromRow(cls, row):
+            return cls(row["name"], cls.parsePrice(row["price"]))
+
+    def auditCall(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            result = func(*args, **kwargs)
+            return {"function": func.__name__, "result": result}
+        return wrapper
+
+    @auditCall
+    def calculateMargin(salePrice, cost):
+        if salePrice < cost:
+            raise ValueError("sale price must be greater than or equal to cost")
+        return salePrice - cost
+
+    product = Product.fromRow({"name": "  keyboard ", "price": "50,000원"})
+
+    assert product.name == "keyboard"
+    assert product.price == 50000
+    assert product.taxIncludedPrice == 55000
+
+    product.price = 60000
+    assert product.taxIncludedPrice == 66000
+
+    auditedMargin = calculateMargin(product.price, 42000)
+    assert auditedMargin == {"function": "calculateMargin", "result": 18000}
+    assert calculateMargin.__name__ == "calculateMargin"
+
+    try:
+        product.price = 0
+    except ValueError as exc:
+        assert "price" in str(exc)
+
+    print("상품 객체 검증 흐름 통과")
+  exercise:
+    prompt: |-
+      기존 줄은 하나도 바꾸지 말고 그대로 두세요. 맨 아래 print 줄 다음에 print(auditedMargin) 한 줄만 추가하면 됩니다.
+
+      assert 일곱 줄이 조용히 통과한 뒤, auditCall이 만들어 둔 기록 딕셔너리가 찍힙니다. @wraps 덕분에 이름이 wrapper가 아니라 calculateMargin으로 남아 있으므로 아래 두 줄이 나와야 합니다.
+      상품 객체 검증 흐름 통과
+      {'function': 'calculateMargin', 'result': 18000}
+    starterCode: |-
+      from functools import wraps
+
+      class Product:
+          def __init__(self, name, price):
+              if not name.strip():
+                  raise ValueError("name is required")
+              self.name = name.strip()
+              self.price = price
+
+          @property
+          def price(self):
+              return self._price
+
+          @price.setter
+          def price(self, value):
+              if value <= 0:
+                  raise ValueError("price must be positive")
+              self._price = value
+
+          @property
+          def taxIncludedPrice(self):
+              return int(self.price * 1.1)
+
+          @staticmethod
+          def parsePrice(text):
+              cleanedText = text.replace(",", "").replace("원", "").strip()
+              return int(cleanedText)
+
+          @classmethod
+          def fromRow(cls, row):
+              return cls(row["name"], cls.parsePrice(row["price"]))
+
+      def auditCall(func):
+          @wraps(func)
+          def wrapper(*args, **kwargs):
+              result = func(*args, **kwargs)
+              return {"function": func.__name__, "result": result}
+          return wrapper
+
+      @auditCall
+      def calculateMargin(salePrice, cost):
+          if salePrice < cost:
+              raise ValueError("sale price must be greater than or equal to cost")
+          return salePrice - cost
+
+      product = Product.fromRow({"name": "  keyboard ", "price": "50,000원"})
+
+      assert product.name == "keyboard"
+      assert product.price == 50000
+      assert product.taxIncludedPrice == 55000
+
+      product.price = 60000
+      assert product.taxIncludedPrice == 66000
+
+      auditedMargin = calculateMargin(product.price, 42000)
+      assert auditedMargin == {"function": "calculateMargin", "result": 18000}
+      assert calculateMargin.__name__ == "calculateMargin"
+
+      try:
+          product.price = 0
+      except ValueError as exc:
+          assert "price" in str(exc)
+
+      print("상품 객체 검증 흐름 통과")
+    solution: |-
+      from functools import wraps
+
+      class Product:
+          def __init__(self, name, price):
+              if not name.strip():
+                  raise ValueError("name is required")
+              self.name = name.strip()
+              self.price = price
+
+          @property
+          def price(self):
+              return self._price
+
+          @price.setter
+          def price(self, value):
+              if value <= 0:
+                  raise ValueError("price must be positive")
+              self._price = value
+
+          @property
+          def taxIncludedPrice(self):
+              return int(self.price * 1.1)
+
+          @staticmethod
+          def parsePrice(text):
+              cleanedText = text.replace(",", "").replace("원", "").strip()
+              return int(cleanedText)
+
+          @classmethod
+          def fromRow(cls, row):
+              return cls(row["name"], cls.parsePrice(row["price"]))
+
+      def auditCall(func):
+          @wraps(func)
+          def wrapper(*args, **kwargs):
+              result = func(*args, **kwargs)
+              return {"function": func.__name__, "result": result}
+          return wrapper
+
+      @auditCall
+      def calculateMargin(salePrice, cost):
+          if salePrice < cost:
+              raise ValueError("sale price must be greater than or equal to cost")
+          return salePrice - cost
+
+      product = Product.fromRow({"name": "  keyboard ", "price": "50,000원"})
+
+      assert product.name == "keyboard"
+      assert product.price == 50000
+      assert product.taxIncludedPrice == 55000
+
+      product.price = 60000
+      assert product.taxIncludedPrice == 66000
+
+      auditedMargin = calculateMargin(product.price, 42000)
+      assert auditedMargin == {"function": "calculateMargin", "result": 18000}
+      assert calculateMargin.__name__ == "calculateMargin"
+
+      try:
+          product.price = 0
+      except ValueError as exc:
+          assert "price" in str(exc)
+
+      print("상품 객체 검증 흐름 통과")
+      print(auditedMargin)
+    hints:
+    - 코드는 하나도 고치지 말고, 맨 아래 print 줄 다음에 print(auditedMargin) 한 줄만 들여쓰기 없이 추가합니다.
+    - "정답 형태: 마지막 줄에 print(auditedMargin)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: |-
+      상품 객체 검증 흐름 통과
+      {'function': 'calculateMargin', 'result': 18000}
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"상품 객체 검증 흐름 통과\\n{'function': 'calculateMargin', 'result': 18000}\\""
+- id: practice
+  title: Day 25 종합 복습
+  structuredPrimary: true
+  subtitle: 프로퍼티와 데코레이터 마스터하기
+  goal: getter와 setter를 직접 붙여 잘못된 변의 길이는 거부하고 올바른 값만 저장하는 Square를 완성한다.
+  why: Day 25에서 배운 프로퍼티, setter 검증, 예외 처리를 한 클래스에 모아 봐야 값이 잘못 들어오는 자리를 클래스 안에서 막는 방법이 손에 익습니다.
+  explanation: Day 25에서 배운 프로퍼티와 데코레이터를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class Square:
+        def __init__(self, side):
+            self.side = side
+
+        @property
+        def area(self):
+            return self.side ** 2
+
+    sq = Square(4)
+    sq.area
+  exercise:
+    prompt: |-
+      두 곳을 고치세요. area는 그대로 둡니다.
+      1. 클래스 안 area 위에 side 프로퍼티를 추가합니다. @property를 붙인 def side(self): 안에는 return self._side 한 줄을 넣고, 이어서 @side.setter를 붙인 def side(self, value): 안에는 value가 0 이하이면 raise ValueError('side must be positive') 하고 아니면 self._side = value 하는 코드를 넣습니다.
+      2. 맨 아래 sq.area 한 줄을 아래 여섯 줄로 바꿉니다.
+      try:
+          sq.side = 0
+      except ValueError as exc:
+          blocked = str(exc)
+      sq.side = 9
+      sq.side, sq.area, blocked
+
+      __init__의 self.side = side도 이제 setter를 거치므로 4는 그대로 저장되고, 0은 거부되어 메시지가 blocked에 담기며, 9는 정상 저장되어 넓이가 81이 됩니다. 그래서 (9, 81, 'side must be positive')가 나와야 합니다.
+    starterCode: |-
+      class Square:
+          def __init__(self, side):
+              self.side = side
+
+          @property
+          def area(self):
+              return self.side ** 2
+
+      sq = Square(4)
+      sq.area
+    solution: |-
+      class Square:
+          def __init__(self, side):
+              self.side = side
+
+          @property
+          def side(self):
+              return self._side
+
+          @side.setter
+          def side(self, value):
+              if value <= 0:
+                  raise ValueError('side must be positive')
+              self._side = value
+
+          @property
+          def area(self):
+              return self.side ** 2
+
+      sq = Square(4)
+      try:
+          sq.side = 0
+      except ValueError as exc:
+          blocked = str(exc)
+      sq.side = 9
+      sq.side, sq.area, blocked
+    hints:
+    - "@property 를 붙인 def side(self): 와 @side.setter 를 붙인 def side(self, value): 를 area 위에 넣습니다. setter 안에서 value <= 0 이면 raise ValueError('side must be positive') 하고, 아니면 self._side = value 로 저장합니다."
+    - "정답 형태: 마지막 줄에 sq.side, sq.area, blocked"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "(9, 81, 'side must be positive')"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"(9, 81, 'side must be positive')\\""
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
+  masteryVariants:
+  - id: day25-temperature-property-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - property_basic
+    - practice
+    title: 검증되는 celsius property 만들기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: property getter와 setter로 객체 상태 계약을 지킨다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: Temperature.celsius property와 temperature_state(value)를 완성해 celsius와 fahrenheit를 반환하세요. -273.15 미만은 ValueError입니다.
+      starterCode: |-
+        class Temperature:
+            pass
+
+        def temperature_state(value):
+            raise NotImplementedError
+      solution: |-
+        class Temperature:
+            def __init__(self, celsius):
+                self.celsius = celsius
+
+            @property
+            def celsius(self):
+                return self._celsius
+
+            @celsius.setter
+            def celsius(self, value):
+                if value < -273.15:
+                    raise ValueError('below absolute zero')
+                self._celsius = value
+
+        def temperature_state(value):
+            item = Temperature(value)
+            return {'celsius': item.celsius, 'fahrenheit': item.celsius * 9 / 5 + 32}
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day25.temperature-property.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day25.temperature-property.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: temperature_state
+        cases:
+        - id: zero
+          arguments:
+          - value: 0
+          expectedReturn:
+            celsius: 0
+            fahrenheit: 32.0
+        - id: invalid
+          arguments:
+          - value: -300
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day25-positive-decorator-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day25-temperature-property-mastery
+    title: 반환값을 검증하는 decorator 적용하기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: decorator를 할인 계산의 불변 조건에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: positive_result decorator와 discounted(price, amount)를 완성해 음수 결과는 ValueError, 그 외는 할인 가격을 반환하세요.
+      starterCode: |-
+        def positive_result(function):
+            raise NotImplementedError
+
+        @positive_result
+        def discounted(price, amount):
+            return price - amount
+      solution: |-
+        def positive_result(function):
+            def wrapper(*args, **kwargs):
+                result = function(*args, **kwargs)
+                if result < 0:
+                    raise ValueError('negative result')
+                return result
+            return wrapper
+
+        @positive_result
+        def discounted(price, amount):
+            return price - amount
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day25.positive-decorator.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day25.positive-decorator.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: discounted
+        cases:
+        - id: valid
+          arguments:
+          - value: 100
+          - value: 30
+          expectedReturn: 70
+        - id: zero
+          arguments:
+          - value: 50
+          - value: 50
+          expectedReturn: 0
+        - id: invalid
+          arguments:
+          - value: 20
+          - value: 30
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day25-email-property-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day25-positive-decorator-transfer
+    title: 정규화되는 email property 복원하기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: setter에서 입력을 정리하는 객체 계약을 회상한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: User.email property와 normalized_email(value)를 완성해 공백을 지운 소문자 이메일을 반환하세요.
+      starterCode: |-
+        class User:
+            pass
+
+        def normalized_email(value):
+            raise NotImplementedError
+      solution: |-
+        class User:
+            def __init__(self, email):
+                self.email = email
+
+            @property
+            def email(self):
+                return self._email
+
+            @email.setter
+            def email(self, value):
+                self._email = value.strip().lower()
+
+        def normalized_email(value):
+            return User(value).email
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day25.email-property.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day25.email-property.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: normalized_email
+        cases:
+        - id: spaces
+          arguments:
+          - value: '  USER@Example.COM '
+          expectedReturn: user@example.com
+        - id: plain
+          arguments:
+          - value: hello@codaro.dev
+          expectedReturn: hello@codaro.dev
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

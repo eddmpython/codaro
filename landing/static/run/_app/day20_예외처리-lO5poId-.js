@@ -1,0 +1,692 @@
+var e=`meta:
+  id: day20
+  title: 예외처리
+  day: 20
+  category: 30days
+  outcomes: ["python.errorHandling"]
+  prerequisites: ["python.functions"]
+  estimatedMinutes: 40
+  tags:
+  - 예외처리
+  - try
+  - except
+  - finally
+  - raise
+  - validation
+  seo:
+    title: 파이썬 예외 처리 - try, except, finally
+    description: try, except, finally, raise로 에러를 처리하는 방법을 배웁니다.
+    keywords:
+    - 예외
+    - try
+    - except
+    - finally
+    - raise
+intro:
+  emoji: 🛡️
+  points:
+  - try-except로 에러 처리
+  - finally로 정리 작업
+  - raise로 예외 발생
+  - 안정적인 프로그램
+  direction: 예외처리에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 예외처리 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: tryexcept 기본 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 특정 예외 처리 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: 여러 예외 처리 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 예외처리 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 예외처리 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 예외처리 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: try_except_basic
+  title: try-except 기본
+  structuredPrimary: true
+  subtitle: 에러 처리하기
+  goal: 나누는 값을 바꿔 except 블록이 실행되지 않는 정상 경로를 직접 확인한다.
+  why: try 안에서 에러가 나지 않으면 except는 한 줄도 실행되지 않기 때문에, 예외 처리를 붙여도 정상 입력의 계산 결과는 그대로 남습니다.
+  explanation: |-
+    try-except 문으로 에러를 처리합니다. try 블록에서 에러가 발생하면 except 블록이 실행됩니다. 프로그램이 중단되지 않고 계속 실행됩니다.
+
+    try-except는 예상되는 에러를 처리할 때 사용합니다.
+  snippet: |-
+    try:
+        result = 10 / 0
+    except ZeroDivisionError:
+        result = 'Error occurred'
+
+    result
+  exercise:
+    prompt: |-
+      try 안의 10 / 0을 10 / 4로 바꾸세요.
+
+      에러가 나지 않아 except 블록을 건너뛰므로 2.5가 나와야 합니다.
+    starterCode: |-
+      try:
+          result = 10 / 0
+      except ZeroDivisionError:
+          result = 'Error occurred'
+
+      result
+    solution: |-
+      try:
+          result = 10 / 4
+      except ZeroDivisionError:
+          result = 'Error occurred'
+
+      result
+    hints:
+    - 10 / 0 을 10 / 4 로 바꿉니다. except 줄과 그 아래 문구, 마지막 줄 result는 그대로 둡니다.
+    - "정답 형태: result = 10 / 4"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '2.5'
+    resultCheck: "출력이 정확히 일치해야 합니다: '2.5'"
+- id: specific_exception
+  title: 특정 예외 처리
+  structuredPrimary: true
+  subtitle: 예외 타입 지정
+  goal: 발생하는 예외 종류를 바꾸고 except에 적는 타입도 함께 맞춰 그 분기가 실행되게 만든다.
+  why: except에 적은 타입과 실제로 발생한 타입이 다르면 예외는 잡히지 않고 그대로 프로그램을 멈추기 때문에, 어떤 코드가 어떤 예외를 내는지 알고 맞춰 적어야 합니다.
+  explanation: |-
+    except 뒤에 예외 타입을 지정할 수 있습니다. 특정 에러만 처리하고 다른 에러는 그대로 발생시킵니다. 더 정확한 에러 처리가 가능합니다.
+
+    예외 타입을 지정하면 의도하지 않은 에러를 놓치지 않습니다.
+  snippet: |-
+    try:
+        num = 10 / 0
+    except ZeroDivisionError:
+        num = 'Cannot divide by zero'
+
+    num
+  exercise:
+    prompt: |-
+      세 곳을 고치세요. try 안의 10 / 0을 int('10개')로, except 줄의 ZeroDivisionError를 ValueError로, 그 아래 문구를 '숫자가 아닙니다'로 바꾸세요.
+
+      int()는 숫자로 볼 수 없는 글자를 만나면 ValueError를 냅니다. 잡을 타입을 ValueError로 맞췄으니 except가 실행되어 숫자가 아닙니다가 나와야 합니다.
+    starterCode: |-
+      try:
+          num = 10 / 0
+      except ZeroDivisionError:
+          num = 'Cannot divide by zero'
+
+      num
+    solution: |-
+      try:
+          num = int('10개')
+      except ValueError:
+          num = '숫자가 아닙니다'
+
+      num
+    hints:
+    - "10 / 0 을 int('10개') 로, except ZeroDivisionError: 를 except ValueError: 로, 'Cannot divide by zero' 를 '숫자가 아닙니다' 로 바꿉니다."
+    - "정답 형태: int('10개') 와 except ValueError, 문구 '숫자가 아닙니다'"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 숫자가 아닙니다
+    resultCheck: "출력이 정확히 일치해야 합니다: '숫자가 아닙니다'"
+- id: multiple_except
+  title: 여러 예외 처리
+  structuredPrimary: true
+  subtitle: 다양한 에러 대응
+  goal: 나눗셈에서 예외가 나게 만들어 첫 번째가 아닌 두 번째 except가 실행되는 것을 확인한다.
+  why: 한 블록 안에서 여러 종류의 실패가 날 수 있을 때, 어느 except가 받았는지에 따라 남길 메시지와 복구 방법이 달라집니다.
+  explanation: |-
+    여러 except 블록으로 다양한 예외를 처리할 수 있습니다. 위에서부터 순서대로 검사하며, 처음 일치하는 except가 실행됩니다.
+
+    구체적인 예외를 먼저, 일반적인 예외를 나중에 배치하세요.
+  snippet: |-
+    try:
+        val = int('10')
+        ans = val / 2
+    except ValueError:
+        ans = 'Invalid number'
+    except ZeroDivisionError:
+        ans = 'Cannot divide'
+
+    ans
+  exercise:
+    prompt: |-
+      ans = val / 2를 ans = val / 0으로 바꾸세요.
+
+      int('10')은 성공해서 ValueError는 나지 않고 나눗셈에서 ZeroDivisionError가 나므로, 첫 번째 except를 건너뛰고 두 번째 except가 실행되어 Cannot divide가 나와야 합니다.
+    starterCode: |-
+      try:
+          val = int('10')
+          ans = val / 2
+      except ValueError:
+          ans = 'Invalid number'
+      except ZeroDivisionError:
+          ans = 'Cannot divide'
+
+      ans
+    solution: |-
+      try:
+          val = int('10')
+          ans = val / 0
+      except ValueError:
+          ans = 'Invalid number'
+      except ZeroDivisionError:
+          ans = 'Cannot divide'
+
+      ans
+    hints:
+    - "ans = val / 2 를 ans = val / 0 으로 바꿉니다. 첫 줄 val = int('10') 과 두 except 블록은 그대로 둡니다."
+    - "정답 형태: ans = val / 0"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: Cannot divide
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Cannot divide'"
+- id: finally_clause
+  title: finally 절
+  structuredPrimary: true
+  subtitle: 항상 실행되는 코드
+  goal: 예외가 난 경로에서도 finally가 실행된다는 것을 출력 순서로 확인한다.
+  why: 파일을 열었거나 자원을 잡아 둔 상태에서 예외가 나도 정리 코드는 반드시 돌아야 하는데, finally에 두면 정상 경로와 예외 경로 양쪽에서 실행됩니다.
+  explanation: |-
+    finally 블록은 예외 발생 여부와 관계없이 항상 실행됩니다. 파일 닫기, 리소스 해제 등 정리 작업에 사용합니다.
+
+    with 문을 사용하면 finally 없이도 자동으로 정리됩니다.
+  snippet: |-
+    try:
+        calc = 10 / 2
+    except ZeroDivisionError:
+        calc = 0
+    finally:
+        status = 'Completed'
+
+    calc, status
+  exercise:
+    prompt: |-
+      세 곳을 고치세요. calc = 10 / 2를 calc = 10 / 0으로 바꾸고, finally 안 status = 'Completed' 아래에 print('정리 작업 실행')을 같은 들여쓰기로 넣고, 마지막 줄 calc, status를 print(calc, status)로 바꾸세요.
+
+      예외가 났는데도 finally가 먼저 실행되고 그다음 값이 출력되므로, 아래 두 줄이 나와야 합니다.
+      정리 작업 실행
+      0 Completed
+    starterCode: |-
+      try:
+          calc = 10 / 2
+      except ZeroDivisionError:
+          calc = 0
+      finally:
+          status = 'Completed'
+
+      calc, status
+    solution: |-
+      try:
+          calc = 10 / 0
+      except ZeroDivisionError:
+          calc = 0
+      finally:
+          status = 'Completed'
+          print('정리 작업 실행')
+
+      print(calc, status)
+    hints:
+    - "10 / 2 를 10 / 0 으로 바꾸고, finally 블록의 status = 'Completed' 다음 줄에 같은 들여쓰기로 print('정리 작업 실행') 을 넣습니다. 마지막 줄 calc, status 는 print(calc, status) 로 바꿉니다."
+    - "정답 형태: calc = 10 / 0, finally 안 print('정리 작업 실행'), 마지막 줄 print(calc, status)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: |-
+      정리 작업 실행
+      0 Completed
+    resultCheck: "출력이 정확히 일치해야 합니다: '정리 작업 실행\\n0 Completed'"
+- id: raise_exception
+  title: raise로 예외 발생
+  structuredPrimary: true
+  subtitle: 의도적으로 에러 발생
+  goal: 함수에 정상 값을 넘겨 raise 줄이 실행되지 않는 경로를 확인한다.
+  why: raise는 잘못된 입력을 함수 안에서 즉시 막는 장치라, 조건을 만족하는 입력에서는 아무 일도 하지 않고 원래 계산 결과가 그대로 나옵니다.
+  explanation: |-
+    raise 키워드로 예외를 발생시킬 수 있습니다. 조건이 맞지 않을 때 강제로 에러를 내어 프로그램을 중단하거나 예외를 전달합니다.
+
+    raise는 함수의 입력값 검증에 유용합니다.
+  snippet: |-
+    def checkAge(age):
+        if age < 0:
+            raise ValueError('Age cannot be negative')
+        return age
+
+    try:
+        valid = checkAge(-5)
+    except ValueError:
+        valid = 'Invalid age'
+
+    valid
+  exercise:
+    prompt: |-
+      checkAge(-5)를 checkAge(30)으로 바꾸세요.
+
+      30은 음수가 아니라 raise 줄을 지나쳐 return age가 실행되고 except도 타지 않으므로 30이 나와야 합니다.
+    starterCode: |-
+      def checkAge(age):
+          if age < 0:
+              raise ValueError('Age cannot be negative')
+          return age
+
+      try:
+          valid = checkAge(-5)
+      except ValueError:
+          valid = 'Invalid age'
+
+      valid
+    solution: |-
+      def checkAge(age):
+          if age < 0:
+              raise ValueError('Age cannot be negative')
+          return age
+
+      try:
+          valid = checkAge(30)
+      except ValueError:
+          valid = 'Invalid age'
+
+      valid
+    hints:
+    - checkAge(-5) 를 checkAge(30) 으로 바꿉니다. 함수 본문과 except 블록, 마지막 줄 valid는 그대로 둡니다.
+    - "정답 형태: valid = checkAge(30)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '30'
+    resultCheck: "출력이 정확히 일치해야 합니다: '30'"
+- id: exception_info
+  title: 예외 정보
+  structuredPrimary: true
+  subtitle: 에러 메시지 받기
+  goal: as로 받은 예외 객체에서 메시지 대신 예외 종류 이름을 꺼내 본다.
+  why: 메시지 문구는 파이썬 버전에 따라 달라질 수 있지만 예외 종류 이름은 그대로여서, 로그를 남기거나 분기 조건으로 삼을 때는 종류 이름이 더 안전한 기준입니다.
+  explanation: |-
+    except 예외타입 as 변수: 형식으로 예외 객체를 받을 수 있습니다. 예외 객체는 에러 메시지와 정보를 담고 있습니다.
+
+    예외 메시지를 확인하면 문제를 파악하기 쉽습니다.
+  snippet: |-
+    try:
+        bad = 10 / 0
+    except ZeroDivisionError as err:
+        bad = str(err)
+
+    bad
+  exercise:
+    prompt: |-
+      bad = str(err)를 bad = type(err).__name__으로 바꾸세요. 밑줄은 앞뒤로 두 개씩입니다.
+
+      err에 담긴 예외 객체에서 종류 이름을 꺼내므로 ZeroDivisionError가 나와야 합니다.
+    starterCode: |-
+      try:
+          bad = 10 / 0
+      except ZeroDivisionError as err:
+          bad = str(err)
+
+      bad
+    solution: |-
+      try:
+          bad = 10 / 0
+      except ZeroDivisionError as err:
+          bad = type(err).__name__
+
+      bad
+    hints:
+    - bad = str(err) 를 bad = type(err).__name__ 으로 바꿉니다. try 안의 10 / 0 과 except 줄, 마지막 줄 bad는 그대로 둡니다.
+    - "정답 형태: bad = type(err).__name__"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: ZeroDivisionError
+    resultCheck: "출력이 정확히 일치해야 합니다: 'ZeroDivisionError'"
+- id: workflow_validation
+  title: '검증 루프: 실패를 설명하는 예외 처리'
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증
+  goal: 좁힌 예외로 다시 던진 메시지가 실패한 입력을 그대로 담고 있는지 assert로 못박아 확인한다.
+  why: 실패한 입력이 무엇이었는지 메시지에 남기지 않으면 로그만 보고는 원인을 찾을 수 없어서, 예외를 다시 던질 때 문제의 입력값을 함께 넣습니다.
+  explanation: 좋은 예외 처리는 프로그램을 조용히 살리는 것이 아니라, 어떤 입력이 왜 실패했는지 설명하고 필요한 곳에서만 복구하는 것입니다. 이 루프에서는 숫자 변환,
+    필수 필드 검증, 파일 읽기를 좁힌 예외로 처리합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def parseQuantity(text):
+        try:
+            quantity = int(text)
+        except ValueError as exc:
+            raise ValueError(f'quantity must be integer: {text!r}') from exc
+
+        if quantity <= 0:
+            raise ValueError('quantity must be positive')
+        return quantity
+
+    assert parseQuantity('3') == 3
+
+    try:
+        parseQuantity('3개')
+    except ValueError as exc:
+        quantityProblem = str(exc)
+
+    assert 'integer' in quantityProblem
+    quantityProblem
+  exercise:
+    prompt: |-
+      값은 바꾸지 말고 코드를 그대로 실행하세요.
+
+      int('3개')가 ValueError를 내고 parseQuantity가 그것을 입력값이 든 메시지로 바꿔 다시 던지므로, 두 assert가 모두 통과한 뒤 아래 한 줄이 나와야 합니다.
+      quantity must be integer: '3개'
+    starterCode: |-
+      def parseQuantity(text):
+          try:
+              quantity = int(text)
+          except ValueError as exc:
+              raise ValueError(f'quantity must be integer: {text!r}') from exc
+
+          if quantity <= 0:
+              raise ValueError('quantity must be positive')
+          return quantity
+
+      assert parseQuantity('3') == 3
+
+      try:
+          parseQuantity('3개')
+      except ValueError as exc:
+          quantityProblem = str(exc)
+
+      assert 'integer' in quantityProblem
+      quantityProblem
+    solution: |-
+      def parseQuantity(text):
+          try:
+              quantity = int(text)
+          except ValueError as exc:
+              raise ValueError(f'quantity must be integer: {text!r}') from exc
+
+          if quantity <= 0:
+              raise ValueError('quantity must be positive')
+          return quantity
+
+      assert parseQuantity('3') == 3
+
+      try:
+          parseQuantity('3개')
+      except ValueError as exc:
+          quantityProblem = str(exc)
+
+      assert 'integer' in quantityProblem
+      quantityProblem
+    hints:
+    - "assert parseQuantity('3') == 3 의 '3' 이나 아래 '3개' 를 바꾸면 assert가 AssertionError로 멈춥니다. 그때는 원래 값으로 되돌리세요."
+    - "정답 형태: 코드를 그대로 실행, 마지막 값 quantity must be integer: '3개'"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "quantity must be integer: '3개'"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"quantity must be integer: '3개'\\""
+- id: practice
+  title: Day 20 종합 복습
+  structuredPrimary: true
+  subtitle: 예외 처리 마스터하기
+  goal: 예외 객체 받기, 예외 종류 확인, finally 정리를 한 셀에 이어 붙여 본다.
+  why: 실제 코드는 예외를 잡는 것으로 끝나지 않고 무엇이 났는지 남기고 정리 작업까지 해야 다음 실행이 깨끗하게 이어집니다.
+  explanation: Day 20에서 배운 예외 처리를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤
+    순서로 해도 괜찮습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    try:
+        divResult = 10 / 0
+    except ZeroDivisionError:
+        divResult = 'Error'
+
+    divResult
+  exercise:
+    prompt: |-
+      네 곳을 고치세요. except ZeroDivisionError: 줄 끝에 as err를 붙이고, divResult = 'Error'를 divResult = type(err).__name__으로 바꾸고, 그 아래에 finally: 줄과 print('나눗셈 시도 완료') 줄을 추가한 뒤, 마지막 줄 divResult를 print(divResult)로 바꾸세요.
+
+      finally가 먼저 실행되고 그다음 마지막 줄이 값을 출력하므로, 아래 두 줄이 나와야 합니다.
+      나눗셈 시도 완료
+      ZeroDivisionError
+    starterCode: |-
+      try:
+          divResult = 10 / 0
+      except ZeroDivisionError:
+          divResult = 'Error'
+
+      divResult
+    solution: |-
+      try:
+          divResult = 10 / 0
+      except ZeroDivisionError as err:
+          divResult = type(err).__name__
+      finally:
+          print('나눗셈 시도 완료')
+
+      print(divResult)
+    hints:
+    - "except ZeroDivisionError: 를 except ZeroDivisionError as err: 로 바꾸고, divResult = 'Error' 를 divResult = type(err).__name__ 으로 바꿉니다. 그다음 finally: 를 try와 같은 열에 쓰고 그 안에 print('나눗셈 시도 완료') 를 들여써 넣은 뒤, 마지막 줄을 print(divResult) 로 바꿉니다."
+    - "정답 형태: except ZeroDivisionError as err 와 finally 안 print('나눗셈 시도 완료'), 마지막 줄 print(divResult)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: |-
+      나눗셈 시도 완료
+      ZeroDivisionError
+    resultCheck: "출력이 정확히 일치해야 합니다: '나눗셈 시도 완료\\nZeroDivisionError'"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
+  masteryVariants:
+  - id: day20-positive-int-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - try_except_basic
+    - practice
+    title: 양의 정수 입력 계약 지키기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 정상 반환과 ValueError 조건을 함께 구현한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: parse_positive_int(text)가 양의 정수를 반환하고 0 이하 또는 숫자가 아니면 ValueError를 내도록 완성하세요.
+      starterCode: |-
+        def parse_positive_int(text):
+            raise NotImplementedError
+      solution: |-
+        def parse_positive_int(text):
+            value = int(text)
+            if value <= 0:
+                raise ValueError('positive integer required')
+            return value
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day20.positive-int.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day20.positive-int.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: parse_positive_int
+        cases:
+        - id: valid
+          arguments:
+          - value: '12'
+          expectedReturn: 12
+        - id: zero
+          arguments:
+          - value: '0'
+          expectedException: ValueError
+        - id: invalid
+          arguments:
+          - value: abc
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day20-safe-divide-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day20-positive-int-mastery
+    title: 나눗셈 실패를 값으로 처리하기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 예외 처리를 새로운 계산 API 계약에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: safe_divide(a, b)가 정상 몫을 반환하고 0으로 나누면 None을 반환하도록 완성하세요.
+      starterCode: |-
+        def safe_divide(a, b):
+            raise NotImplementedError
+      solution: |-
+        def safe_divide(a, b):
+            try:
+                return a / b
+            except ZeroDivisionError:
+                return None
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day20.safe-divide.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day20.safe-divide.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: safe_divide
+        cases:
+        - id: normal
+          arguments:
+          - value: 10
+          - value: 4
+          expectedReturn: 2.5
+        - id: zero
+          arguments:
+          - value: 10
+          - value: 0
+          expectedReturn: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day20-required-value-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day20-safe-divide-transfer
+    title: 필수 key 누락 예외 다시 만들기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 명시적 KeyError 계약을 기억에서 복원한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: required_value(mapping, key)가 값을 반환하고 key가 없으면 KeyError를 내도록 완성하세요.
+      starterCode: |-
+        def required_value(mapping, key):
+            raise NotImplementedError
+      solution: |-
+        def required_value(mapping, key):
+            if key not in mapping:
+                raise KeyError(key)
+            return mapping[key]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day20.required-value.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day20.required-value.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: required_value
+        cases:
+        - id: present
+          arguments:
+          - value:
+              token: ready
+          - value: token
+          expectedReturn: ready
+        - id: missing
+          arguments:
+          - value: {}
+          - value: token
+          expectedException: KeyError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

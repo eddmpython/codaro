@@ -1,0 +1,786 @@
+var e=`meta:
+  id: day08
+  title: 리스트메서드
+  day: 8
+  category: 30days
+  tags:
+  - 리스트
+  - append
+  - remove
+  - sort
+  - queue
+  - 원본변경
+  - 검증
+  seo:
+    title: 파이썬 리스트 메서드 - 리스트 조작 완벽 가이드
+    description: append, insert, remove, pop, sort, reverse 등 리스트 메서드를 배웁니다.
+    keywords:
+    - 리스트메서드
+    - append
+    - insert
+    - remove
+    - pop
+    - sort
+intro:
+  emoji: 🔧
+  points:
+  - append/insert로 요소 추가
+  - remove/pop으로 요소 삭제
+  - sort/reverse로 정렬과 뒤집기
+  - extend/copy로 리스트 확장과 복사
+  direction: 리스트메서드에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 리스트메서드 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 리스트 메서드란? 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: append() 메서드 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: insert() 메서드 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 리스트메서드 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 리스트메서드 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 리스트메서드 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: method_intro
+  title: 리스트 메서드란?
+  structuredPrimary: true
+  subtitle: 리스트를 조작하는 내장 함수
+  goal: 리스트 이름 뒤에 점을 찍어 메서드를 호출하고 바뀐 리스트를 확인한다.
+  why: 리스트를 다룰 때 필요한 기능은 대부분 리스트 자체에 메서드로 붙어 있어서, 새 함수를 찾지 않고 점 하나로 꺼내 쓸 수 있습니다.
+  explanation: |-
+    메서드(Method)는 객체가 가지고 있는 함수입니다. 리스트에는 요소를 추가, 삭제, 정렬하는 다양한 메서드가 내장되어 있습니다. 메서드는 리스트 이름 뒤에 점(.)을 찍고 메서드 이름을 쓰는 형식으로 사용합니다. 대부분의 리스트 메서드는 원본 리스트를 직접 변경하며 None을 반환합니다.
+
+    메서드는 원본을 변경하므로 사용 후 리스트가 달라집니다.
+  snippet: |-
+    nums = [1, 2, 3]
+    nums.append(4)
+    nums
+  exercise:
+    prompt: |-
+      nums.append(4)를 nums.append(10)으로 바꾸세요.
+
+      실행하면 [1, 2, 3, 10]이 나와야 합니다.
+    starterCode: |-
+      nums = [1, 2, 3]
+      nums.append(4)
+      nums
+    solution: |-
+      nums = [1, 2, 3]
+      nums.append(10)
+      nums
+    hints:
+    - nums.append(4) 를 nums.append(10) 으로 바꿉니다. 마지막 줄 nums는 그대로 둡니다.
+    - "정답 형태: nums.append(10)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '[1, 2, 3, 10]'
+    resultCheck: "출력이 정확히 일치해야 합니다: '[1, 2, 3, 10]'"
+- id: append_method
+  title: append() 메서드
+  structuredPrimary: true
+  subtitle: 리스트 끝에 요소 추가
+  goal: append()로 리스트 끝에 값을 하나씩 덧붙인다.
+  why: 빈 목록에서 시작해 결과를 하나씩 모을 때, 예를 들어 처리한 파일 이름을 차곡차곡 쌓을 때 씁니다.
+  explanation: |-
+    append() 메서드는 리스트의 끝에 새로운 요소를 추가합니다. 괄호 안에 추가할 값을 넣으면 리스트 마지막에 그 값이 추가됩니다. 원본 리스트가 직접 변경되며, None을 반환합니다. 리스트를 점진적으로 만들어갈 때 가장 많이 사용하는 메서드입니다.
+
+    append()는 한 번에 하나의 요소만 추가합니다.
+  snippet: |-
+    fruits = ['사과', '바나나']
+    fruits.append('오렌지')
+    fruits.append('포도')
+    fruits
+  exercise:
+    prompt: |-
+      마지막 append 줄의 '포도'를 '딸기'로 바꾸세요.
+
+      실행하면 ['사과', '바나나', '오렌지', '딸기']가 나와야 합니다.
+    starterCode: |-
+      fruits = ['사과', '바나나']
+      fruits.append('오렌지')
+      fruits.append('포도')
+      fruits
+    solution: |-
+      fruits = ['사과', '바나나']
+      fruits.append('오렌지')
+      fruits.append('딸기')
+      fruits
+    hints:
+    - "fruits.append('포도') 를 fruits.append('딸기') 로 바꿉니다. 위의 오렌지 줄은 그대로 둡니다."
+    - "정답 형태: fruits.append('딸기')"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "['사과', '바나나', '오렌지', '딸기']"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"['사과', '바나나', '오렌지', '딸기']\\""
+- id: insert_method
+  title: insert() 메서드
+  structuredPrimary: true
+  subtitle: 원하는 위치에 요소 추가
+  goal: insert()로 원하는 인덱스 자리에 값을 끼워 넣는다.
+  why: 급한 작업을 대기열 맨 앞으로 올리는 것처럼 끝이 아니라 정해진 자리에 넣어야 할 때 씁니다.
+  explanation: |-
+    insert() 메서드는 리스트의 특정 위치에 요소를 추가합니다. 첫 번째 인수로 인덱스를, 두 번째 인수로 추가할 값을 받습니다. 그 위치에 값이 삽입되고, 기존 요소들은 뒤로 밀립니다. append()와 달리 원하는 위치에 정확히 추가할 수 있습니다.
+
+    insert(0, 값)은 리스트 맨 앞에 추가합니다.
+  snippet: |-
+    colors = ['빨강', '파랑']
+    colors.insert(1, '초록')
+    colors
+  exercise:
+    prompt: |-
+      insert의 첫 번째 인수 1을 0으로 바꾸세요.
+
+      초록이 맨 앞에 들어가므로 ['초록', '빨강', '파랑']이 나와야 합니다.
+    starterCode: |-
+      colors = ['빨강', '파랑']
+      colors.insert(1, '초록')
+      colors
+    solution: |-
+      colors = ['빨강', '파랑']
+      colors.insert(0, '초록')
+      colors
+    hints:
+    - "colors.insert(1, '초록') 을 colors.insert(0, '초록') 으로 바꿉니다. 넣는 값은 그대로 두고 위치 번호만 바꿉니다."
+    - "정답 형태: colors.insert(0, '초록')"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "['초록', '빨강', '파랑']"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"['초록', '빨강', '파랑']\\""
+- id: remove_method
+  title: remove() 메서드
+  structuredPrimary: true
+  subtitle: 값으로 요소 삭제
+  goal: remove()로 지울 값을 지정해 리스트에서 그 항목을 빼낸다.
+  why: 몇 번째인지 몰라도 지울 값만 알면 목록에서 뺄 수 있어서, 취소된 주문 번호를 대기열에서 제거할 때 씁니다.
+  explanation: |-
+    remove() 메서드는 리스트에서 특정 값을 찾아 삭제합니다. 괄호 안에 삭제할 값을 넣으면 그 값이 처음 나타나는 위치에서 제거됩니다. 같은 값이 여러 개 있어도 첫 번째 것만 삭제됩니다. 값이 리스트에 없으면 에러가 발생합니다.
+
+    값이 여러 개 있어도 첫 번째 것만 삭제됩니다.
+  snippet: |-
+    items = ['사과', '바나나', '오렌지', '바나나']
+    items.remove('바나나')
+    items
+  exercise:
+    prompt: |-
+      items.remove('바나나')를 items.remove('오렌지')로 바꾸세요.
+
+      실행하면 ['사과', '바나나', '바나나']가 나와야 합니다.
+    starterCode: |-
+      items = ['사과', '바나나', '오렌지', '바나나']
+      items.remove('바나나')
+      items
+    solution: |-
+      items = ['사과', '바나나', '오렌지', '바나나']
+      items.remove('오렌지')
+      items
+    hints:
+    - "괄호 안의 '바나나' 를 '오렌지' 로 바꿉니다. 첫 줄 리스트와 마지막 줄은 그대로 둡니다."
+    - "정답 형태: items.remove('오렌지')"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "['사과', '바나나', '바나나']"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"['사과', '바나나', '바나나']\\""
+- id: pop_method
+  title: pop() 메서드
+  structuredPrimary: true
+  subtitle: 인덱스로 요소 삭제하고 반환
+  goal: pop()에 인덱스를 줘서 원하는 자리의 값을 꺼내면서 그 값을 돌려받는다.
+  why: 대기열에서 처리할 항목을 꺼내 바로 쓰려면 목록에서 빼는 일과 값을 받는 일을 한 번에 해야 합니다.
+  explanation: |-
+    pop() 메서드는 리스트에서 특정 인덱스의 요소를 제거하고 그 값을 반환합니다. 괄호 안에 인덱스를 넣으면 그 위치의 요소가 삭제됩니다. 인덱스를 생략하면 마지막 요소가 삭제됩니다. remove()와 달리 삭제된 값을 받을 수 있어 유용합니다.
+
+    pop()은 스택(stack) 자료구조 구현에 자주 사용됩니다.
+  snippet: |-
+    nums = [10, 20, 30, 40, 50]
+    nums.pop()
+  exercise:
+    prompt: |-
+      마지막 줄 nums.pop()을 nums.pop(0)으로 바꾸세요.
+
+      맨 앞 값이 빠져나오므로 10이 나와야 합니다.
+    starterCode: |-
+      nums = [10, 20, 30, 40, 50]
+      nums.pop()
+    solution: |-
+      nums = [10, 20, 30, 40, 50]
+      nums.pop(0)
+    hints:
+    - 빈 괄호 안에 0을 넣습니다. 인덱스를 주면 마지막이 아니라 그 자리의 값이 빠집니다.
+    - "정답 형태: nums.pop(0)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '10'
+    resultCheck: "출력이 정확히 일치해야 합니다: '10'"
+- id: clear_method
+  title: clear() 메서드
+  structuredPrimary: true
+  subtitle: 모든 요소 삭제
+  goal: clear()로 리스트를 비운 뒤 같은 리스트를 다시 채워 쓴다.
+  why: 회차마다 결과를 모으는 목록처럼 한 번 만든 리스트를 비우고 계속 재사용할 때 씁니다.
+  explanation: |-
+    clear() 메서드는 리스트의 모든 요소를 삭제하여 빈 리스트로 만듭니다. 리스트 자체는 그대로 유지되고 내용만 비워집니다. 리스트를 초기화할 때 사용합니다. 변수에 []를 할당하는 것과 비슷하지만, 같은 리스트를 참조하는 다른 변수가 있을 때 차이가 있습니다.
+
+    clear()는 리스트를 재사용할 때 유용합니다.
+  snippet: |-
+    nums = [1, 2, 3, 4, 5]
+    nums.clear()
+    nums
+  exercise:
+    prompt: |-
+      nums.clear() 다음 줄에 nums.append(7)을 추가하세요.
+
+      다섯 개가 모두 비워진 뒤 7 하나만 들어가므로 [7]이 나와야 합니다.
+    starterCode: |-
+      nums = [1, 2, 3, 4, 5]
+      nums.clear()
+      nums
+    solution: |-
+      nums = [1, 2, 3, 4, 5]
+      nums.clear()
+      nums.append(7)
+      nums
+    hints:
+    - nums.clear() 와 마지막 줄 nums 사이에 nums.append(7) 한 줄을 넣습니다.
+    - "정답 형태: nums.append(7)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '[7]'
+    resultCheck: "출력이 정확히 일치해야 합니다: '[7]'"
+- id: extend_method
+  title: extend() 메서드
+  structuredPrimary: true
+  subtitle: 리스트 합치기
+  goal: extend()는 항목을 풀어 붙이고 append()는 리스트째로 하나 넣는 차이를 눈으로 확인한다.
+  why: 여러 항목을 이어 붙일 자리에 append()를 쓰면 리스트 안에 리스트가 생겨서, 나중에 항목을 하나씩 꺼내는 코드가 조용히 어긋납니다.
+  explanation: |-
+    extend() 메서드는 리스트에 다른 리스트의 모든 요소를 추가합니다. + 연산자와 비슷하지만, + 는 새 리스트를 만들고 extend()는 원본 리스트를 변경합니다. 여러 요소를 한 번에 추가할 때 append()를 반복하는 것보다 효율적입니다.
+
+    append([4,5,6])은 리스트를 통째로 추가하지만, extend([4,5,6])은 요소들을 개별적으로 추가합니다.
+  snippet: |-
+    base = [1, 2, 3]
+    extra = [4, 5, 6]
+    base.extend(extra)
+    base
+  exercise:
+    prompt: |-
+      base.extend(extra)를 base.append(extra)로 바꾸세요.
+
+      extra가 통째로 항목 하나가 되므로 [1, 2, 3, [4, 5, 6]]이 나와야 합니다.
+    starterCode: |-
+      base = [1, 2, 3]
+      extra = [4, 5, 6]
+      base.extend(extra)
+      base
+    solution: |-
+      base = [1, 2, 3]
+      extra = [4, 5, 6]
+      base.append(extra)
+      base
+    hints:
+    - 메서드 이름 extend 만 append 로 바꿉니다. 괄호 안 extra와 나머지 줄은 그대로 둡니다.
+    - "정답 형태: base.append(extra)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '[1, 2, 3, [4, 5, 6]]'
+    resultCheck: "출력이 정확히 일치해야 합니다: '[1, 2, 3, [4, 5, 6]]'"
+- id: sort_method
+  title: sort() 메서드
+  structuredPrimary: true
+  subtitle: 리스트 정렬
+  goal: sort()에 reverse=True를 줘서 큰 값부터 오도록 정렬한다.
+  why: 판매량이 많은 순서로 보여 주는 것처럼 목록의 순서를 먼저 정해 두면 상위 몇 개를 바로 집어낼 수 있습니다.
+  explanation: |-
+    sort() 메서드는 리스트의 요소를 오름차순으로 정렬합니다. 숫자는 작은 것부터, 문자열은 사전 순으로 정렬됩니다. reverse=True 인수를 주면 내림차순으로 정렬됩니다. 원본 리스트가 직접 변경되며, None을 반환합니다.
+
+    sorted() 함수는 원본을 유지하고 정렬된 새 리스트를 반환합니다.
+  snippet: |-
+    data = [5, 2, 8, 1, 9]
+    data.sort()
+    data
+  exercise:
+    prompt: |-
+      data.sort()를 data.sort(reverse=True)로 바꾸세요.
+
+      큰 값부터 정렬되므로 [9, 8, 5, 2, 1]이 나와야 합니다.
+    starterCode: |-
+      data = [5, 2, 8, 1, 9]
+      data.sort()
+      data
+    solution: |-
+      data = [5, 2, 8, 1, 9]
+      data.sort(reverse=True)
+      data
+    hints:
+    - 빈 괄호 안에 reverse=True 를 넣습니다. True는 대문자 T로 씁니다.
+    - "정답 형태: data.sort(reverse=True)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '[9, 8, 5, 2, 1]'
+    resultCheck: "출력이 정확히 일치해야 합니다: '[9, 8, 5, 2, 1]'"
+- id: reverse_method
+  title: reverse() 메서드
+  structuredPrimary: true
+  subtitle: 리스트 뒤집기
+  goal: reverse()가 정렬이 아니라 있는 순서를 그대로 뒤집는다는 것을 확인한다.
+  why: 기록이 뒤에 쌓인 목록을 최신순으로 보여 줄 때처럼 값의 크기와 상관없이 순서만 반대로 돌려야 할 때 씁니다.
+  explanation: |-
+    reverse() 메서드는 리스트의 순서를 완전히 뒤집습니다. 첫 번째와 마지막, 두 번째와 끝에서 두 번째 같은 식으로 위치를 바꿉니다. 정렬과는 다르며, 단순히 순서만 반대로 만듭니다. 원본 리스트가 직접 변경됩니다.
+
+    [::-1] 슬라이싱도 리스트를 뒤집지만 새 리스트를 만듭니다.
+  snippet: |-
+    chars = ['A', 'B', 'C', 'D', 'E']
+    chars.reverse()
+    chars
+  exercise:
+    prompt: |-
+      첫 줄 chars를 ['C', 'A', 'B']로 바꾸세요.
+
+      reverse()는 정렬이 아니라 순서만 뒤집으므로 ['B', 'A', 'C']가 나와야 합니다.
+    starterCode: |-
+      chars = ['A', 'B', 'C', 'D', 'E']
+      chars.reverse()
+      chars
+    solution: |-
+      chars = ['C', 'A', 'B']
+      chars.reverse()
+      chars
+    hints:
+    - "chars = ['A', 'B', 'C', 'D', 'E'] 를 chars = ['C', 'A', 'B'] 로 바꿉니다. 아래 두 줄은 그대로 둡니다."
+    - "정답 형태: chars = ['C', 'A', 'B']"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "['B', 'A', 'C']"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"['B', 'A', 'C']\\""
+- id: copy_method
+  title: copy() 메서드
+  structuredPrimary: true
+  subtitle: 리스트 복사
+  goal: copy()로 만든 사본을 고쳐도 원본 리스트는 그대로인지 확인한다.
+  why: 등호로 이름만 하나 더 붙이면 두 이름이 같은 리스트를 가리켜서 한쪽을 고칠 때 다른 쪽도 같이 바뀝니다. 원본을 지키려면 사본을 만들어야 합니다.
+  explanation: |-
+    copy() 메서드는 리스트의 얕은 복사본을 만듭니다. 원본과 똑같은 내용의 새로운 리스트가 생성됩니다. 단순히 변수에 할당(=)하면 같은 리스트를 참조하지만, copy()는 완전히 독립적인 리스트를 만듭니다. 한쪽을 변경해도 다른 쪽에 영향을 주지 않습니다.
+
+    list[:] 슬라이싱도 복사본을 만듭니다.
+  snippet: |-
+    orig = [1, 2, 3]
+    copy = orig.copy()
+    copy.append(4)
+    copy
+  exercise:
+    prompt: |-
+      마지막 줄 copy를 orig로 바꾸세요.
+
+      사본에만 4를 더했으므로 원본은 [1, 2, 3] 그대로 나와야 합니다.
+    starterCode: |-
+      orig = [1, 2, 3]
+      copy = orig.copy()
+      copy.append(4)
+      copy
+    solution: |-
+      orig = [1, 2, 3]
+      copy = orig.copy()
+      copy.append(4)
+      orig
+    hints:
+    - 마지막 줄 copy 를 orig 로 바꿉니다. 위의 세 줄은 그대로 둡니다.
+    - "정답 형태: 마지막 줄이 orig"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '[1, 2, 3]'
+    resultCheck: "출력이 정확히 일치해야 합니다: '[1, 2, 3]'"
+- id: count_method
+  title: count() 메서드
+  structuredPrimary: true
+  subtitle: 요소 개수 세기
+  goal: count()로 값이 몇 번 나오는지 세고, 없는 값에는 0이 나오는 것을 확인한다.
+  why: 같은 값이 몇 번 들어왔는지 세어 중복을 잡을 때 씁니다. 없는 값에도 에러 없이 0을 주므로 존재 여부를 먼저 볼 때도 안전합니다.
+  explanation: |-
+    count() 메서드는 리스트에서 특정 값이 몇 번 나타나는지 세어줍니다. 괄호 안에 찾을 값을 넣으면 그 값의 개수를 반환합니다. 값이 없으면 0을 반환합니다. 리스트를 변경하지 않고 정보만 알려줍니다.
+
+    count()는 데이터 분석에서 빈도 계산에 유용합니다.
+  snippet: |-
+    nums = [1, 2, 3, 2, 4, 2, 5]
+    nums.count(2)
+  exercise:
+    prompt: |-
+      마지막 줄 nums.count(2)를 nums.count(9)로 바꾸세요.
+
+      리스트에 9가 없으므로 에러 없이 0이 나와야 합니다.
+    starterCode: |-
+      nums = [1, 2, 3, 2, 4, 2, 5]
+      nums.count(2)
+    solution: |-
+      nums = [1, 2, 3, 2, 4, 2, 5]
+      nums.count(9)
+    hints:
+    - 괄호 안의 2 를 9 로 바꿉니다. 첫 줄 리스트는 그대로 둡니다.
+    - "정답 형태: nums.count(9)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '0'
+    resultCheck: "출력이 정확히 일치해야 합니다: '0'"
+- id: index_method
+  title: index() 메서드
+  structuredPrimary: true
+  subtitle: 요소 위치 찾기
+  goal: index()로 값이 처음 나오는 자리의 인덱스 번호를 찾는다.
+  why: 값은 아는데 몇 번째인지 모를 때 위치를 얻어야 그 자리를 고치거나 앞뒤를 잘라낼 수 있습니다.
+  explanation: |-
+    index() 메서드는 리스트에서 특정 값이 처음 나타나는 위치의 인덱스를 반환합니다. 같은 값이 여러 개 있어도 첫 번째 위치만 알려줍니다. 값이 리스트에 없으면 에러가 발생합니다. 요소의 위치를 알아야 할 때 사용합니다.
+
+    in 연산자로 값의 존재 여부를 먼저 확인한 후 index()를 사용하면 안전합니다.
+  snippet: |-
+    fruits = ['사과', '바나나', '오렌지', '바나나']
+    fruits.index('바나나')
+  exercise:
+    prompt: |-
+      마지막 줄 fruits.index('바나나')를 fruits.index('오렌지')로 바꾸세요.
+
+      오렌지는 세 번째 항목이고 인덱스는 0부터 세므로 2가 나와야 합니다.
+    starterCode: |-
+      fruits = ['사과', '바나나', '오렌지', '바나나']
+      fruits.index('바나나')
+    solution: |-
+      fruits = ['사과', '바나나', '오렌지', '바나나']
+      fruits.index('오렌지')
+    hints:
+    - "괄호 안의 '바나나' 를 '오렌지' 로 바꿉니다. 첫 줄 리스트는 그대로 둡니다."
+    - "정답 형태: fruits.index('오렌지')"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '2'
+    resultCheck: "출력이 정확히 일치해야 합니다: '2'"
+- id: workflow_validation
+  title: '검증 루프: 주문 처리 큐 관리하기'
+  structuredPrimary: true
+  subtitle: 리스트 메서드의 원본 변경을 업무 흐름으로 확인
+  goal: pop()으로 꺼낸 값을 append()로 옮기는 흐름이 두 리스트를 어떻게 바꾸는지 assert로 검증한다.
+  why: 원본을 바꾸는 메서드를 연달아 쓰면 두 목록의 상태가 눈에 띄지 않게 어긋나므로, 기대 상태를 assert로 코드에 박아 둡니다.
+  explanation: 리스트 메서드는 값을 추가하고 지우는 기능 목록이 아닙니다. 주문 처리 큐처럼 순서가 중요하고 상태가 계속 바뀌는 데이터를 다룰 때, 어떤 메서드가 원본을
+    바꾸는지와 실패 조건을 검증해야 합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    orderQueue = ['ORD-1001', 'ORD-1002']
+    orderQueue.append('ORD-1003')
+    orderQueue.insert(0, 'URG-9001')
+
+    processedOrder = orderQueue.pop(0)
+    orderQueue.remove('ORD-1002')
+
+    assert processedOrder == 'URG-9001'
+    assert orderQueue == ['ORD-1001', 'ORD-1003']
+    assert len(orderQueue) == 2
+  exercise:
+    prompt: |-
+      값은 바꾸지 말고 코드를 그대로 실행하세요.
+
+      assert 두 줄이 모두 통과하고 마지막에 ['메일 발송', '입금 확인']이 나와야 합니다.
+    starterCode: |-
+      pendingTasks = ['메일 발송', '입금 확인', '송장 출력']
+      doneTasks = []
+
+      doneTasks.append(pendingTasks.pop(0))
+      doneTasks.append(pendingTasks.pop(0))
+
+      assert doneTasks == ['메일 발송', '입금 확인']
+      assert pendingTasks == ['송장 출력']
+      doneTasks
+    solution: |-
+      pendingTasks = ['메일 발송', '입금 확인', '송장 출력']
+      doneTasks = []
+
+      doneTasks.append(pendingTasks.pop(0))
+      doneTasks.append(pendingTasks.pop(0))
+
+      assert doneTasks == ['메일 발송', '입금 확인']
+      assert pendingTasks == ['송장 출력']
+      doneTasks
+    hints:
+    - "pop(0) 을 pop() 으로 바꾸면 꺼내는 순서가 뒤집혀 assert가 AssertionError로 멈춥니다. 그때는 원래대로 되돌리세요."
+    - "정답 형태: 코드를 그대로 실행, 마지막 값 ['메일 발송', '입금 확인']"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "['메일 발송', '입금 확인']"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"['메일 발송', '입금 확인']\\""
+- id: practice
+  title: Day 8 종합 복습
+  structuredPrimary: true
+  subtitle: 리스트 메서드 마스터하기
+  goal: append()와 sort()를 한 셀에서 이어 써서 값을 더한 뒤 순서를 바꾼다.
+  why: 메서드는 하나씩 외우기보다 이어 붙여 써 봐야 어떤 것이 원본을 바꾸는지, 어떤 순서로 호출해야 하는지 손에 익습니다.
+  explanation: Day 8에서 배운 리스트 메서드를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로
+    어떤 순서로 해도 괜찮습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    nums = [10, 20, 30, 40]
+    last = nums.pop()
+    print('list:', nums)
+  exercise:
+    prompt: |-
+      두 번째 lst.append(5) 줄을 lst.sort(reverse=True)로 바꾸세요.
+
+      4까지 더해진 리스트가 큰 값부터 정렬되므로 [4, 3, 2, 1]이 나와야 합니다.
+    starterCode: |-
+      lst = [1, 2, 3]
+      lst.append(4)
+      lst.append(5)
+      lst
+    solution: |-
+      lst = [1, 2, 3]
+      lst.append(4)
+      lst.sort(reverse=True)
+      lst
+    hints:
+    - lst.append(5) 를 lst.sort(reverse=True) 로 바꿉니다. 위의 append(4) 줄과 마지막 줄 lst는 그대로 둡니다.
+    - "정답 형태: lst.sort(reverse=True)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '[4, 3, 2, 1]'
+    resultCheck: "출력이 정확히 일치해야 합니다: '[4, 3, 2, 1]'"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
+  masteryVariants:
+  - id: day08-prepare-queue-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - method_intro
+    - practice
+    title: 원본을 지키며 작업 큐 준비하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 리스트 덧붙이기와 정렬 결과를 새 목록으로 반환한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: prepare_queue(items)가 review를 더하고 정렬한 새 목록을 반환하도록 완성하세요.
+      starterCode: |-
+        def prepare_queue(items):
+            raise NotImplementedError
+      solution: |-
+        def prepare_queue(items):
+            queue = items.copy()
+            queue.append('review')
+            queue.sort()
+            return queue
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day08.prepare-queue.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day08.prepare-queue.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_queue
+        cases:
+        - id: tasks
+          arguments:
+          - value:
+            - write
+            - plan
+          expectedReturn:
+          - plan
+          - review
+          - write
+        - id: empty
+          arguments:
+          - value: []
+          expectedReturn:
+          - review
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day08-insert-priority-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day08-prepare-queue-mastery
+    title: 우선 항목을 목록 맨 앞에 넣기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: insert의 위치 개념을 작업 우선순위에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: insert_priority(items, item)가 item을 맨 앞에 둔 새 목록을 반환하도록 완성하세요.
+      starterCode: |-
+        def insert_priority(items, item):
+            raise NotImplementedError
+      solution: |-
+        def insert_priority(items, item):
+            result = items.copy()
+            result.insert(0, item)
+            return result
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day08.insert-priority.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day08.insert-priority.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: insert_priority
+        cases:
+        - id: numbers
+          arguments:
+          - value:
+            - 2
+            - 3
+          - value: 1
+          expectedReturn:
+          - 1
+          - 2
+          - 3
+        - id: words
+          arguments:
+          - value:
+            - later
+          - value: now
+          expectedReturn:
+          - now
+          - later
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day08-remove-all-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day08-insert-priority-transfer
+    title: 특정 값을 모두 제외하기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 목록 순회 결과를 새 리스트에 모으는 방식을 회상한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: remove_all(items, target)가 target과 다른 항목만 남긴 새 목록을 반환하도록 완성하세요.
+      starterCode: |-
+        def remove_all(items, target):
+            raise NotImplementedError
+      solution: |-
+        def remove_all(items, target):
+            return [item for item in items if item != target]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day08.remove-all.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day08.remove-all.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: remove_all
+        cases:
+        - id: duplicates
+          arguments:
+          - value:
+            - 1
+            - 2
+            - 1
+            - 3
+          - value: 1
+          expectedReturn:
+          - 2
+          - 3
+        - id: missing
+          arguments:
+          - value:
+            - a
+            - b
+          - value: x
+          expectedReturn:
+          - a
+          - b
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

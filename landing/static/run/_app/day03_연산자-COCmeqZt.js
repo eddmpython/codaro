@@ -1,0 +1,928 @@
+var e=`meta:
+  id: day03
+  title: 연산자
+  day: 3
+  category: 30days
+  outcomes: ["python.operators"]
+  prerequisites: ["python.variables"]
+  estimatedMinutes: 35
+  tags:
+  - 연산자
+  - 산술연산
+  - 비교연산
+  - 논리연산
+  - 멤버십
+  - 검증
+  seo:
+    title: 파이썬 연산자 완벽 가이드
+    description: 산술, 비교, 논리, 멤버십 연산자를 배우고 연산자 우선순위를 이해합니다.
+    keywords:
+    - 연산자
+    - operator
+    - 산술연산
+    - 비교연산
+    - 논리연산
+intro:
+  emoji: 🔢
+  points:
+  - 산술 연산자로 수학 계산하기
+  - 비교 연산자로 값 비교하기
+  - 논리 연산자로 조건 조합하기
+  - 멤버십 연산자로 포함 여부 확인하기
+  direction: 연산자에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 연산자 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 덧셈 연산자 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 뺄셈 연산자 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: 곱셈 연산자 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 연산자 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 연산자 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 연산자 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: add_operator
+  title: 덧셈 연산자
+  structuredPrimary: true
+  subtitle: + 기호로 더하기
+  goal: 덧셈 연산자로 두 수를 더한 결과를 확인한다.
+  why: 주문 금액 합계나 점수 총합처럼 흩어진 수를 하나로 모을 때 가장 먼저 쓰는 연산입니다.
+  explanation: |-
+    덧셈 연산자(+)는 두 숫자를 더합니다. 정수끼리, 소수끼리, 정수와 소수를 섞어서도 계산할 수 있습니다. 결과는 자동으로 화면에 표시됩니다.
+
+    결과를 변수에 저장하려면 result = price + qty처럼 사용합니다.
+  snippet: |-
+    itemA = 10
+    itemB = 20
+    itemA + itemB
+  exercise:
+    prompt: |-
+      itemB를 32로 바꾸세요.
+
+      실행하면 42가 나와야 합니다.
+    starterCode: |-
+      itemA = 10
+      itemB = 20
+      itemA + itemB
+    solution: |-
+      itemA = 10
+      itemB = 32
+      itemA + itemB
+    hints:
+    - itemB = 20 을 itemB = 32 로 바꿉니다.
+    - "정답 형태: itemB = 32"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '42'
+    resultCheck: "출력이 정확히 일치해야 합니다: '42'"
+- id: sub_operator
+  title: 뺄셈 연산자
+  structuredPrimary: true
+  subtitle: '- 기호로 빼기'
+  goal: 뺄셈 연산자로 예산에서 쓴 돈을 뺀 잔액을 구한다.
+  why: 예산에서 지출을 빼 남은 금액을 구하거나 재고에서 출고량을 빼는 계산에 그대로 쓰입니다.
+  explanation: 뺄셈 연산자(-)는 앞 숫자에서 뒤 숫자를 뺍니다. 음수 결과도 가능하며, 순서가 중요합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    budget = 100
+    spent = 35
+    budget - spent
+  exercise:
+    prompt: |-
+      spent를 40으로 바꾸세요.
+
+      실행하면 60이 나와야 합니다.
+    starterCode: |-
+      budget = 100
+      spent = 35
+      budget - spent
+    solution: |-
+      budget = 100
+      spent = 40
+      budget - spent
+    hints:
+    - spent = 35 를 spent = 40 으로 바꿉니다.
+    - "정답 형태: spent = 40"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '60'
+    resultCheck: "출력이 정확히 일치해야 합니다: '60'"
+- id: mul_operator
+  title: 곱셈 연산자
+  structuredPrimary: true
+  subtitle: '* 기호로 곱하기'
+  goal: 곱셈 연산자로 가로와 세로를 곱한 넓이를 구한다.
+  why: 단가 곱하기 수량, 가로 곱하기 세로처럼 같은 값을 여러 번 더하는 계산을 한 번에 끝냅니다.
+  explanation: 곱셈 연산자(*)는 두 숫자를 곱합니다. 수학에서는 ×를 사용하지만, 프로그래밍에서는 *를 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    width = 7
+    height = 8
+    width * height
+  exercise:
+    prompt: |-
+      height를 6으로 바꾸세요.
+
+      실행하면 42가 나와야 합니다.
+    starterCode: |-
+      width = 7
+      height = 8
+      width * height
+    solution: |-
+      width = 7
+      height = 6
+      width * height
+    hints:
+    - height = 8 을 height = 6 으로 바꿉니다.
+    - "정답 형태: height = 6"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '42'
+    resultCheck: "출력이 정확히 일치해야 합니다: '42'"
+- id: div_operator
+  title: 나눗셈 연산자
+  structuredPrimary: true
+  subtitle: / 기호로 나누기
+  goal: 나눗셈 연산자로 나눈 값이 소수로 나오는 것을 확인한다.
+  why: 총액을 인원수로 나눠 1인당 금액을 구하거나 합계를 개수로 나눠 평균을 낼 때 씁니다.
+  explanation: |-
+    나눗셈 연산자(/)는 앞 숫자를 뒤 숫자로 나눕니다. 결과는 항상 소수(float)로 나옵니다. 정수 나누기 정수도 결과는 소수입니다.
+
+    결과가 3.3333...처럼 소수로 나옵니다.
+  snippet: |-
+    dividend = 10
+    divisor = 3
+    dividend / divisor
+  exercise:
+    prompt: |-
+      dividend를 12로 바꾸세요.
+
+      실행하면 4.0이 나와야 합니다. 나누어떨어져도 / 결과는 소수입니다.
+    starterCode: |-
+      dividend = 10
+      divisor = 3
+      dividend / divisor
+    solution: |-
+      dividend = 12
+      divisor = 3
+      dividend / divisor
+    hints:
+    - dividend = 10 을 dividend = 12 로 바꿉니다.
+    - "정답 형태: dividend = 12"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '4.0'
+    resultCheck: "출력이 정확히 일치해야 합니다: '4.0'"
+- id: floordiv_operator
+  title: 몫 연산자
+  structuredPrimary: true
+  subtitle: // 기호로 몫 구하기
+  goal: 몫 연산자로 상자가 몇 개 가득 차는지 계산한다.
+  why: 물건을 몇 개씩 나눠 담을 때 가득 차는 상자 수, 초를 분으로 바꿀 때의 분 수처럼 정수 단위 개수를 구합니다.
+  explanation: 몫 연산자(//)는 나눗셈의 몫만 구합니다. 소수점 이하는 버리고 정수 부분만 반환합니다. 10 // 3 = 3 (나머지 1은 버림)
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    items = 17
+    boxes = 5
+    items // boxes
+  exercise:
+    prompt: |-
+      items를 20으로 바꾸세요.
+
+      실행하면 4가 나와야 합니다.
+    starterCode: |-
+      items = 17
+      boxes = 5
+      items // boxes
+    solution: |-
+      items = 20
+      boxes = 5
+      items // boxes
+    hints:
+    - items = 17 을 items = 20 으로 바꿉니다.
+    - "정답 형태: items = 20"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '4'
+    resultCheck: "출력이 정확히 일치해야 합니다: '4'"
+- id: mod_operator
+  title: 나머지 연산자
+  structuredPrimary: true
+  subtitle: '% 기호로 나머지 구하기'
+  goal: 나머지 연산자로 나눠 담고 남는 개수를 구한다.
+  why: 몇 개씩 나눠 담고 남는 수를 셀 때, 그리고 짝수인지 홀수인지 가릴 때 씁니다.
+  explanation: |-
+    나머지 연산자(%)는 나눗셈의 나머지를 구합니다. 10 % 3 = 1 (10을 3으로 나누면 몫 3, 나머지 1) 짝수/홀수 판별, 배수 확인 등에 자주 사용됩니다.
+
+    val % 2가 0이면 짝수, 1이면 홀수입니다.
+  snippet: |-
+    coins = 17
+    slots = 5
+    coins % slots
+  exercise:
+    prompt: |-
+      coins를 23으로 바꾸세요.
+
+      실행하면 3이 나와야 합니다.
+    starterCode: |-
+      coins = 17
+      slots = 5
+      coins % slots
+    solution: |-
+      coins = 23
+      slots = 5
+      coins % slots
+    hints:
+    - coins = 17 을 coins = 23 으로 바꿉니다.
+    - "정답 형태: coins = 23"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '3'
+    resultCheck: "출력이 정확히 일치해야 합니다: '3'"
+- id: pow_operator
+  title: 거듭제곱 연산자
+  structuredPrimary: true
+  subtitle: '** 기호로 제곱 계산'
+  goal: 거듭제곱 연산자로 같은 수를 여러 번 곱한 값을 구한다.
+  why: 저장 용량 단위나 복리 이자처럼 같은 수를 반복해서 곱하는 값을 한 줄로 구합니다.
+  explanation: 거듭제곱 연산자(**)는 앞 숫자를 뒤 숫자만큼 거듭제곱합니다. 2 ** 3 = 8 (2 × 2 × 2) 수학의 2³를 프로그래밍에서는 2 ** 3으로 씁니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    base = 2
+    power = 10
+    base ** power
+  exercise:
+    prompt: |-
+      power를 5로 바꾸세요.
+
+      실행하면 32가 나와야 합니다.
+    starterCode: |-
+      base = 2
+      power = 10
+      base ** power
+    solution: |-
+      base = 2
+      power = 5
+      base ** power
+    hints:
+    - power = 10 을 power = 5 로 바꿉니다.
+    - "정답 형태: power = 5"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '32'
+    resultCheck: "출력이 정확히 일치해야 합니다: '32'"
+- id: compare_equal
+  title: 같음 비교 연산자
+  structuredPrimary: true
+  subtitle: == 기호로 같은지 확인
+  goal: 같음 비교 연산자로 두 값이 같은지 판단하고 결과를 False로 바꿔 본다.
+  why: 입력한 값이 저장된 값과 같은지, 계산 결과가 기대한 값과 같은지 확인할 때 씁니다.
+  explanation: |-
+    같음 연산자(==)는 두 값이 같은지 비교합니다. 같으면 True, 다르면 False를 반환합니다. 주의: 대입(=)과 비교(==)는 다릅니다!
+
+    = 하나는 대입, == 두 개는 비교입니다.
+  snippet: |-
+    left = 10
+    right = 10
+    left == right
+  exercise:
+    prompt: |-
+      right를 7로 바꾸세요.
+
+      지금은 True가 나오지만, 바꾸면 False가 나와야 합니다.
+    starterCode: |-
+      left = 10
+      right = 10
+      left == right
+    solution: |-
+      left = 10
+      right = 7
+      left == right
+    hints:
+    - right = 10 을 right = 7 로 바꿉니다.
+    - "정답 형태: right = 7"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'False'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'False'"
+- id: compare_notequal
+  title: 다름 비교 연산자
+  structuredPrimary: true
+  subtitle: '!= 기호로 다른지 확인'
+  goal: 다름 비교 연산자로 두 값이 다른지 판단하고 결과를 False로 바꿔 본다.
+  why: 파일 내용이 이전과 달라졌는지, 설정이 기본값에서 바뀌었는지 감지할 때 씁니다.
+  explanation: 다름 연산자(!=)는 두 값이 다른지 비교합니다. 다르면 True, 같으면 False를 반환합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    first = 5
+    second = 8
+    first != second
+  exercise:
+    prompt: |-
+      second를 5로 바꾸세요.
+
+      두 값이 같아지므로 False가 나와야 합니다.
+    starterCode: |-
+      first = 5
+      second = 8
+      first != second
+    solution: |-
+      first = 5
+      second = 5
+      first != second
+    hints:
+    - second = 8 을 second = 5 로 바꿉니다.
+    - "정답 형태: second = 5"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'False'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'False'"
+- id: compare_greater
+  title: 크기 비교 연산자
+  structuredPrimary: true
+  subtitle: '> < >= <= 기호로 크기 비교'
+  goal: 크기 비교 연산자로 값이 기준보다 큰지 판단하고 결과를 False로 바꿔 본다.
+  why: 재고가 기준 수량보다 적은지, 점수가 합격선을 넘었는지 판단해 다음 동작을 정할 때 씁니다.
+  explanation: 크기 비교 연산자는 두 값의 대소를 비교합니다. > (크다), < (작다), >= (크거나 같다), <= (작거나 같다) 결과는 True 또는 False입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    val = 15
+    target = 10
+    val > target
+  exercise:
+    prompt: |-
+      val을 4로 바꾸세요.
+
+      기준보다 작아지므로 False가 나와야 합니다.
+    starterCode: |-
+      val = 15
+      target = 10
+      val > target
+    solution: |-
+      val = 4
+      target = 10
+      val > target
+    hints:
+    - val = 15 를 val = 4 로 바꿉니다.
+    - "정답 형태: val = 4"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'False'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'False'"
+- id: logical_and
+  title: and 논리 연산자
+  structuredPrimary: true
+  subtitle: 모두 참이어야 참
+  goal: and 연산자로 두 조건이 모두 참일 때만 통과하는 것을 확인한다.
+  why: 로그인도 되어 있고 권한도 있어야 실행하는 것처럼 조건을 전부 만족해야 할 때 씁니다.
+  explanation: and 연산자는 양쪽 조건이 모두 True일 때만 True를 반환합니다. 하나라도 False면 결과는 False입니다. '그리고'의 의미입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    adult = True
+    valid = True
+    adult and valid
+  exercise:
+    prompt: |-
+      valid를 False로 바꾸세요.
+
+      한쪽만 거짓이어도 결과는 False가 나와야 합니다.
+    starterCode: |-
+      adult = True
+      valid = True
+      adult and valid
+    solution: |-
+      adult = True
+      valid = False
+      adult and valid
+    hints:
+    - valid = True 를 valid = False 로 바꿉니다. False는 대문자 F로 씁니다.
+    - "정답 형태: valid = False"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'False'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'False'"
+- id: logical_or
+  title: or 논리 연산자
+  structuredPrimary: true
+  subtitle: 하나만 참이어도 참
+  goal: or 연산자로 둘 다 거짓일 때만 거짓이 되는 것을 확인한다.
+  why: 현금이든 카드든 하나만 있으면 결제되는 것처럼 서로 대신할 수 있는 조건을 묶을 때 씁니다.
+  explanation: or 연산자는 양쪽 조건 중 하나만 True여도 True를 반환합니다. 둘 다 False일 때만 False입니다. '또는'의 의미입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    cash = True
+    card = False
+    cash or card
+  exercise:
+    prompt: |-
+      cash를 False로 바꾸세요.
+
+      둘 다 거짓이 되므로 False가 나와야 합니다.
+    starterCode: |-
+      cash = True
+      card = False
+      cash or card
+    solution: |-
+      cash = False
+      card = False
+      cash or card
+    hints:
+    - cash = True 를 cash = False 로 바꿉니다. card는 그대로 둡니다.
+    - "정답 형태: cash = False"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'False'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'False'"
+- id: logical_not
+  title: not 논리 연산자
+  structuredPrimary: true
+  subtitle: 참과 거짓 반전
+  goal: not 연산자로 참과 거짓이 뒤집히는 것을 확인한다.
+  why: 비가 오지 않을 때만 알림을 보내는 것처럼 조건의 반대를 조건식 하나로 표현할 때 씁니다.
+  explanation: not 연산자는 True를 False로, False를 True로 바꿉니다. 조건의 반대를 표현할 때 사용합니다. '아니다'의 의미입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    rain = True
+    not rain
+  exercise:
+    prompt: |-
+      rain을 False로 바꾸세요.
+
+      not이 값을 뒤집으므로 True가 나와야 합니다.
+    starterCode: |-
+      rain = True
+      not rain
+    solution: |-
+      rain = False
+      not rain
+    hints:
+    - rain = True 를 rain = False 로 바꿉니다. 마지막 줄 not rain은 그대로 둡니다.
+    - "정답 형태: rain = False"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'True'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'True'"
+- id: membership_in
+  title: in 멤버십 연산자
+  structuredPrimary: true
+  subtitle: 포함 여부 확인
+  goal: in 연산자로 문자열 안에 특정 글자가 들어있는지 확인한다.
+  why: 긴 문자열에 특정 단어가 들어있는지 확인할 때, 예를 들어 파일 이름에 키워드가 있는지 볼 때 씁니다.
+  explanation: |-
+    in 연산자는 왼쪽 값이 오른쪽 문자열에 포함되어 있는지 확인합니다. 포함되어 있으면 True, 없으면 False를 반환합니다. 문자열에서 특정 문자나 단어를 찾을 때 사용합니다.
+
+    'not in'을 사용하면 포함되지 않았는지 확인할 수 있습니다.
+  snippet: |-
+    lang = 'Python'
+    'th' in lang
+  exercise:
+    prompt: |-
+      lang을 'Codaro'로 바꾸세요.
+
+      Codaro에는 th가 없으므로 False가 나와야 합니다.
+    starterCode: |-
+      lang = 'Python'
+      'th' in lang
+    solution: |-
+      lang = 'Codaro'
+      'th' in lang
+    hints:
+    - "lang = 'Python' 을 lang = 'Codaro' 로 바꿉니다. 마지막 줄은 그대로 둡니다."
+    - "정답 형태: lang = 'Codaro'"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'False'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'False'"
+- id: compound_assign
+  title: 복합 대입 연산자
+  structuredPrimary: true
+  subtitle: 연산과 대입을 한번에
+  goal: += 로 기존 변수 값에 더해서 갱신한다.
+  why: 장바구니 합계나 처리 건수처럼 이미 담긴 값에 계속 더해 나갈 때 씁니다.
+  explanation: 복합 대입 연산자는 연산과 대입을 동시에 합니다. x += 5는 x = x + 5와 같은 의미입니다. 코드를 더 간결하게 만들어줍니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    balance = 50
+    balance += 10
+    balance
+  exercise:
+    prompt: |-
+      첫 줄 balance를 90으로 바꾸세요.
+
+      90에 10이 더해져 100이 나와야 합니다.
+    starterCode: |-
+      balance = 50
+      balance += 10
+      balance
+    solution: |-
+      balance = 90
+      balance += 10
+      balance
+    hints:
+    - balance = 50 을 balance = 90 으로 바꿉니다. balance += 10 줄은 그대로 둡니다.
+    - "정답 형태: balance = 90"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '100'
+    resultCheck: "출력이 정확히 일치해야 합니다: '100'"
+- id: operator_priority
+  title: 연산자 우선순위
+  structuredPrimary: true
+  subtitle: 계산 순서 이해하기
+  goal: 같은 숫자라도 괄호가 있고 없고에 따라 결과가 달라지는 것을 확인한다.
+  why: 할인과 세금을 섞어 금액을 계산할 때 괄호 위치 하나가 최종 금액을 바꾸기 때문입니다.
+  explanation: |-
+    여러 연산자가 함께 사용될 때 계산 순서가 정해져 있습니다. 수학처럼 곱셈/나눗셈이 덧셈/뺄셈보다 먼저 계산됩니다. 괄호를 사용하면 우선순위를 변경할 수 있습니다.
+
+    헷갈릴 때는 괄호를 사용하면 명확해집니다.
+  snippet: |-
+    raw = 2 + 3 * 4
+    grouped = (2 + 3) * 4
+    print('without_paren:', raw)
+    print('with_paren:', grouped)
+  exercise:
+    prompt: |-
+      raw와 grouped 두 줄에 있는 4를 모두 10으로 바꾸세요.
+
+      실행하면 아래 두 줄이 나와야 합니다.
+      without_paren: 32
+      with_paren: 50
+    starterCode: |-
+      raw = 2 + 3 * 4
+      grouped = (2 + 3) * 4
+      print('without_paren:', raw)
+      print('with_paren:', grouped)
+    solution: |-
+      raw = 2 + 3 * 10
+      grouped = (2 + 3) * 10
+      print('without_paren:', raw)
+      print('with_paren:', grouped)
+    hints:
+    - 두 print() 줄은 건드리지 말고 계산식의 4만 10으로 바꿉니다.
+    - "정답 형태: raw = 2 + 3 * 10 과 grouped = (2 + 3) * 10"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: |-
+      without_paren: 32
+      with_paren: 50
+    resultCheck: "출력이 정확히 일치해야 합니다: 'without_paren: 32\\nwith_paren: 50'"
+- id: workflow_validation
+  title: '검증 루프: 주문 계산식과 승인 조건'
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증
+  goal: 주문 금액 계산이 기대한 값과 같은지 assert로 검증하는 흐름을 확인한다.
+  why: 할인과 세금이 섞인 금액은 눈으로 검산하기 어려워서 기준값을 assert로 코드에 박아 둡니다.
+  explanation: 연산자는 계산 결과를 맞히는 문법 문제가 아니라, 업무 규칙을 숫자와 조건식으로 정확히 옮기는 도구입니다. 실행 전에는 소계, 할인, 세금, 승인 여부를 먼저
+    예측하고, 괄호 하나가 결과를 어떻게 바꾸는지 검증해야 합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    unitPrice = 12000
+    quantity = 4
+    discountRate = 10
+    taxRate = 8
+
+    subtotal = unitPrice * quantity
+    discount = subtotal * discountRate / 100
+    taxableAmount = subtotal - discount
+    tax = taxableAmount * taxRate / 100
+    total = taxableAmount + tax
+
+    assert subtotal == 48000
+    assert discount == 4800
+    assert total == 46656
+    total
+  exercise:
+    prompt: |-
+      값은 바꾸지 말고 코드를 그대로 실행하세요.
+
+      assert 세 줄이 모두 통과하고 마지막에 46656.0이 나와야 합니다.
+    starterCode: |-
+      unitPrice = 12000
+      quantity = 4
+      discountRate = 10
+      taxRate = 8
+
+      subtotal = unitPrice * quantity
+      discount = subtotal * discountRate / 100
+      taxableAmount = subtotal - discount
+      tax = taxableAmount * taxRate / 100
+      total = taxableAmount + tax
+
+      assert subtotal == 48000
+      assert discount == 4800
+      assert total == 46656
+      total
+    solution: |-
+      unitPrice = 12000
+      quantity = 4
+      discountRate = 10
+      taxRate = 8
+
+      subtotal = unitPrice * quantity
+      discount = subtotal * discountRate / 100
+      taxableAmount = subtotal - discount
+      tax = taxableAmount * taxRate / 100
+      total = taxableAmount + tax
+
+      assert subtotal == 48000
+      assert discount == 4800
+      assert total == 46656
+      total
+    hints:
+    - 숫자를 바꾸면 assert가 AssertionError로 멈춥니다. 그때는 원래 값으로 되돌리세요.
+    - "정답 형태: 코드를 그대로 실행, 마지막 값 46656.0"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '46656.0'
+    resultCheck: "출력이 정확히 일치해야 합니다: '46656.0'"
+- id: practice
+  title: Day 3 종합 복습
+  structuredPrimary: true
+  subtitle: 연산자 마스터하기
+  goal: 배운 산술 연산자로 두 수량을 더한 합계를 구한다.
+  why: 오늘 배운 연산자를 다시 한 번 직접 손으로 써 봐야 다음 강의에서 조건문에 바로 쓸 수 있습니다.
+  explanation: Day 3에서 배운 연산자들을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤
+    순서로 해도 괜찮습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    math = 85
+    english = 90
+    total = math + english
+    print('total:', total)
+  exercise:
+    prompt: |-
+      oranges를 27로 바꾸세요.
+
+      실행하면 42가 나와야 합니다.
+    starterCode: |-
+      apples = 15
+      oranges = 25
+      apples + oranges
+    solution: |-
+      apples = 15
+      oranges = 27
+      apples + oranges
+    hints:
+    - oranges = 25 를 oranges = 27 로 바꿉니다.
+    - "정답 형태: oranges = 27"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '42'
+    resultCheck: "출력이 정확히 일치해야 합니다: '42'"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
+  masteryVariants:
+  - id: day03-calculate-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - add_operator
+    - practice
+    title: 연산 기호에 맞춰 계산하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 산술 연산자를 조건과 결합해 정확한 값을 반환한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: calculate(a, b, operator)가 +, -, * 연산을 처리하도록 완성하세요.
+      starterCode: |-
+        def calculate(a, b, operator):
+            raise NotImplementedError
+      solution: |-
+        def calculate(a, b, operator):
+            if operator == '+':
+                return a + b
+            if operator == '-':
+                return a - b
+            if operator == '*':
+                return a * b
+            raise ValueError('unsupported operator')
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day03.calculate.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day03.calculate.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: calculate
+        cases:
+        - id: add
+          arguments:
+          - value: 8
+          - value: 3
+          - value: +
+          expectedReturn: 11
+        - id: subtract
+          arguments:
+          - value: 8
+          - value: 3
+          - value: '-'
+          expectedReturn: 5
+        - id: multiply
+          arguments:
+          - value: 8
+          - value: 3
+          - value: '*'
+          expectedReturn: 24
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day03-final-price-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day03-calculate-mastery
+    title: 할인율을 최종 가격에 적용하기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 백분율 계산을 처음 보는 가격 문맥에 옮긴다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: final_price(price, discount_percent)가 정수 가격의 할인 적용 결과를 반환하도록 완성하세요.
+      starterCode: |-
+        def final_price(price, discount_percent):
+            raise NotImplementedError
+      solution: |-
+        def final_price(price, discount_percent):
+            return price * (100 - discount_percent) // 100
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day03.final-price.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day03.final-price.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: final_price
+        cases:
+        - id: ten-percent
+          arguments:
+          - value: 20000
+          - value: 10
+          expectedReturn: 18000
+        - id: quarter
+          arguments:
+          - value: 8000
+          - value: 25
+          expectedReturn: 6000
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day03-inside-range-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day03-final-price-transfer
+    title: 범위 안인지 다시 판단하기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 비교 연산과 논리 연산을 기억에서 다시 조합한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: inside_range(value, low, high)가 양 끝을 포함한 범위 여부를 반환하도록 완성하세요.
+      starterCode: |-
+        def inside_range(value, low, high):
+            raise NotImplementedError
+      solution: |-
+        def inside_range(value, low, high):
+            return low <= value <= high
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day03.inside-range.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day03.inside-range.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: inside_range
+        cases:
+        - id: inside
+          arguments:
+          - value: 5
+          - value: 1
+          - value: 10
+          expectedReturn: true
+        - id: edge
+          arguments:
+          - value: 10
+          - value: 1
+          - value: 10
+          expectedReturn: true
+        - id: outside
+          arguments:
+          - value: 11
+          - value: 1
+          - value: 10
+          expectedReturn: false
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

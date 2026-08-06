@@ -1,0 +1,760 @@
+var e=`meta:
+  id: day17
+  title: 스코프와클로저
+  day: 17
+  category: 30days
+  tags:
+  - 스코프
+  - 클로저
+  - nonlocal
+  - 상태관리
+  - 캡슐화
+  - 검증
+  seo:
+    title: 파이썬 스코프와 클로저 - 변수 범위와 함수 상태
+    description: 지역/전역 스코프, global, nonlocal, closure를 배웁니다.
+    keywords:
+    - 스코프
+    - scope
+    - global
+    - nonlocal
+    - closure
+intro:
+  emoji: 🔍
+  points:
+  - 변수 스코프 이해
+  - global과 nonlocal
+  - 클로저로 상태 보존
+  - 고급 함수 패턴
+  direction: 스코프와클로저에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 스코프와클로저 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 지역 변수 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 전역 변수 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: global 키워드 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 스코프와클로저 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 스코프와클로저 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 스코프와클로저 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: local_scope
+  title: 지역 변수
+  structuredPrimary: true
+  subtitle: 함수 내부 변수
+  goal: 함수 안에서 만든 변수가 같은 이름의 바깥 변수를 건드리지 않는다는 것을 눈으로 확인한다.
+  why: 함수마다 이름이 겹치지 않게 새로 지어야 한다면 코드가 금방 지저분해지는데, 지역 변수 덕분에 함수 안의 이름은 바깥과 부딪히지 않아 남이 만든 함수도 마음 놓고 가져다 쓸 수 있습니다.
+  explanation: |-
+    함수 안에서 만든 변수는 지역 변수입니다. 지역 변수는 함수 내부에서만 사용할 수 있고, 함수가 끝나면 사라집니다. 함수 밖에서는 접근할 수 없습니다.
+
+    지역 변수는 함수의 독립성을 보장합니다.
+  snippet: |-
+    def calculate():
+        result = 10 + 20
+        return result
+
+    calculate()
+  exercise:
+    prompt: |-
+      맨 위에 result = 100 한 줄을 추가하고, 마지막 줄 calculate()를 calculate(), result로 바꾸세요. 함수 본문은 그대로 둡니다.
+
+      함수 안의 result는 바깥 result와 이름만 같은 다른 변수라서 바깥 값 100은 그대로 남습니다. 그래서 (30, 100)이 나와야 합니다.
+    starterCode: |-
+      def calculate():
+          result = 10 + 20
+          return result
+
+      calculate()
+    solution: |-
+      result = 100
+
+      def calculate():
+          result = 10 + 20
+          return result
+
+      calculate(), result
+    hints:
+    - 맨 위에 result = 100 을 넣고, 마지막 줄을 calculate(), result 로 바꿉니다. 함수 안의 result = 10 + 20 은 그대로 둡니다.
+    - "정답 형태: 맨 위 result = 100, 마지막 줄 calculate(), result"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '(30, 100)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(30, 100)'"
+- id: global_scope
+  title: 전역 변수
+  structuredPrimary: true
+  subtitle: 함수 외부 변수
+  goal: 함수 밖 변수 하나만 고쳐서 그 값을 읽는 함수의 반환값이 따라 바뀌는 것을 확인한다.
+  why: 기준 금액이나 설정값처럼 여러 함수가 함께 보는 값은 함수 밖에 한 번만 두고 각 함수가 읽어 가면, 값을 고칠 때 그 한 줄만 고쳐도 모든 함수가 새 값으로 계산합니다.
+  explanation: |-
+    함수 밖에서 만든 변수는 전역 변수입니다. 전역 변수는 어디서든 읽을 수 있지만, 함수 안에서 수정하려면 global 키워드가 필요합니다.
+
+    전역 변수는 최소한으로 사용하는 것이 좋습니다.
+  snippet: |-
+    total = 100
+
+    def showTotal():
+        return total
+
+    showTotal()
+  exercise:
+    prompt: |-
+      첫 줄 total = 100을 total = 250으로 바꾸세요. 함수와 마지막 호출 줄은 그대로 둡니다.
+
+      showTotal은 total을 자기 안에 갖고 있지 않고 함수 밖 total을 호출할 때마다 읽어 오므로 250이 나와야 합니다.
+    starterCode: |-
+      total = 100
+
+      def showTotal():
+          return total
+
+      showTotal()
+    solution: |-
+      total = 250
+
+      def showTotal():
+          return total
+
+      showTotal()
+    hints:
+    - total = 100 을 total = 250 으로 바꿉니다. return total 줄과 마지막 showTotal() 은 그대로 둡니다.
+    - "정답 형태: total = 250"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '250'
+    resultCheck: "출력이 정확히 일치해야 합니다: '250'"
+- id: global_keyword
+  title: global 키워드
+  structuredPrimary: true
+  subtitle: 전역 변수 수정
+  goal: global로 선언한 함수가 전역 변수 자체를 바꿔 놓는다는 것을 호출 뒤의 값으로 확인한다.
+  why: global로 바깥 값을 직접 바꾸는 함수는 그 함수를 부른 적 없는 다른 코드의 계산까지 함께 바꿔 놓기 때문에, 어디서 값이 달라졌는지 알아 두어야 나중에 원인을 찾는 시간이 줄어듭니다.
+  explanation: |-
+    global 키워드를 사용하면 함수 안에서 전역 변수를 수정할 수 있습니다. global 변수명 형식으로 선언하고 사용합니다. 전역 상태를 변경할 때 사용합니다.
+
+    global은 필요할 때만 사용하고, 가급적 return으로 값을 전달하세요.
+  snippet: |-
+    balance = 1000
+
+    def deposit(amount):
+        global balance
+        balance = balance + amount
+        return balance
+
+    deposit(500)
+  exercise:
+    prompt: |-
+      마지막 줄 deposit(500) 아래에 deposit(200)과 balance를 한 줄씩 순서대로 추가하세요. 앞부분은 그대로 둡니다.
+
+      global balance라고 선언했기 때문에 두 번의 입금이 함수 밖 balance에 그대로 쌓입니다. 1000에 500과 200이 더해지므로 1700이 나와야 합니다.
+    starterCode: |-
+      balance = 1000
+
+      def deposit(amount):
+          global balance
+          balance = balance + amount
+          return balance
+
+      deposit(500)
+    solution: |-
+      balance = 1000
+
+      def deposit(amount):
+          global balance
+          balance = balance + amount
+          return balance
+
+      deposit(500)
+      deposit(200)
+      balance
+    hints:
+    - deposit(500) 다음 줄에 deposit(200) 을, 그 다음 줄에 balance 를 들여쓰기 없이 추가합니다. 함수 본문은 그대로 둡니다.
+    - "정답 형태: deposit(500), deposit(200), balance 세 줄"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '1700'
+    resultCheck: "출력이 정확히 일치해야 합니다: '1700'"
+- id: nested_function
+  title: 중첩 함수
+  structuredPrimary: true
+  subtitle: 함수 안의 함수
+  goal: 안쪽 함수가 바깥 함수의 변수를 그대로 읽어 쓴다는 것을 문구를 바꿔 확인한다.
+  why: 긴 함수의 일부를 안쪽 함수로 떼어 낼 때, 바깥에서 이미 만들어 둔 값을 인자로 다시 넘기지 않고 그대로 읽을 수 있어서 함수를 잘게 나누는 비용이 훨씬 낮아집니다.
+  explanation: |-
+    함수 안에 다른 함수를 정의할 수 있습니다. 내부 함수는 외부 함수의 변수에 접근할 수 있습니다. 외부 함수에서만 내부 함수를 호출할 수 있습니다.
+
+    중첩 함수는 관련된 기능을 그룹화할 때 유용합니다.
+  snippet: |-
+    def outer():
+        msg = 'Hello'
+        def inner():
+            return msg + ' World'
+        return inner()
+
+    outer()
+  exercise:
+    prompt: |-
+      바깥 함수의 msg = 'Hello'를 msg = 'Nested'로 바꾸세요. 나머지 줄은 그대로 둡니다.
+
+      msg는 outer의 지역 변수인데 inner가 그것을 그대로 읽어 뒤에 ' World'를 붙이므로 Nested World가 나와야 합니다.
+    starterCode: |-
+      def outer():
+          msg = 'Hello'
+          def inner():
+              return msg + ' World'
+          return inner()
+
+      outer()
+    solution: |-
+      def outer():
+          msg = 'Nested'
+          def inner():
+              return msg + ' World'
+          return inner()
+
+      outer()
+    hints:
+    - "msg = 'Hello' 를 msg = 'Nested' 로 바꿉니다. def inner(): 와 return msg + ' World', 마지막 outer() 는 그대로 둡니다."
+    - "정답 형태: msg = 'Nested'"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'Nested World'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Nested World'"
+- id: nonlocal_keyword
+  title: nonlocal 키워드
+  structuredPrimary: true
+  subtitle: 외부 함수 변수 수정
+  goal: nonlocal로 선언한 안쪽 함수가 바깥 함수의 변수를 실제로 늘려 놓는 것을 확인한다.
+  why: 실행 횟수나 누적 합계처럼 여러 번 호출하며 이어져야 하는 값은, 매번 값을 돌려받아 다시 넣어 주는 대신 nonlocal로 바깥 함수의 변수 한 곳에 모으는 편이 코드가 짧고 실수도 적습니다.
+  explanation: |-
+    nonlocal 키워드를 사용하면 내부 함수에서 외부 함수의 변수를 수정할 수 있습니다. nonlocal 변수명 형식으로 선언합니다. 클로저를 만들 때 중요합니다.
+
+    nonlocal은 가장 가까운 외부 함수의 변수를 참조합니다.
+  snippet: |-
+    def outer():
+        count = 0
+        def increment():
+            nonlocal count
+            count = count + 1
+            return count
+        return increment()
+
+    outer()
+  exercise:
+    prompt: |-
+      마지막 return increment() 한 줄을 같은 들여쓰기의 세 줄로 바꾸세요. 위에서부터 increment(), increment(), return count 순서입니다. 맨 아래 outer() 는 그대로 둡니다.
+
+      nonlocal count 덕분에 increment는 부를 때마다 outer의 count를 직접 1씩 늘립니다. 두 번 불렀으니 outer가 돌려주는 count는 2가 되어야 합니다.
+    starterCode: |-
+      def outer():
+          count = 0
+          def increment():
+              nonlocal count
+              count = count + 1
+              return count
+          return increment()
+
+      outer()
+    solution: |-
+      def outer():
+          count = 0
+          def increment():
+              nonlocal count
+              count = count + 1
+              return count
+          increment()
+          increment()
+          return count
+
+      outer()
+    hints:
+    - "return increment() 를 지우고 그 자리에 increment() 두 줄과 return count 한 줄을 넣습니다. 세 줄 모두 def increment(): 와 같은 들여쓰기(공백 4칸)입니다."
+    - "정답 형태: increment() 두 번 뒤 return count"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '2'
+    resultCheck: "출력이 정확히 일치해야 합니다: '2'"
+- id: closure_basic
+  title: 클로저 기본
+  structuredPrimary: true
+  subtitle: 상태를 기억하는 함수
+  goal: 같은 팩토리로 만든 두 함수가 각자 기억한 값을 따로 쓰는 것을 확인한다.
+  why: 규칙은 같고 기준값만 다른 함수가 여러 개 필요할 때, 비슷한 함수를 손으로 여러 개 적는 대신 팩토리 하나로 필요한 만큼 찍어 내면 계산 규칙을 고칠 때도 팩토리 한 곳만 고치면 됩니다.
+  explanation: |-
+    클로저는 외부 함수가 끝난 후에도 외부 함수의 변수를 기억하는 내부 함수입니다. 외부 함수가 내부 함수를 반환하면 클로저가 됩니다. 각 클로저는 독립적인 상태를 유지합니다.
+
+    클로저는 함수 팩토리 패턴을 구현할 때 유용합니다.
+  snippet: |-
+    def makeAdder(n):
+        def add(x):
+            return x + n
+        return add
+
+    add5 = makeAdder(5)
+    add5(10)
+  exercise:
+    prompt: |-
+      add5 = makeAdder(5) 아래에 add100 = makeAdder(100)을 추가하고, 마지막 줄 add5(10)을 add5(10), add100(10)으로 바꾸세요. 함수 정의는 그대로 둡니다.
+
+      add5와 add100은 만들어질 때 받은 n(5와 100)을 각자 기억하고 있어서, 같은 10을 넣어도 결과가 갈립니다. 그래서 (15, 110)이 나와야 합니다.
+    starterCode: |-
+      def makeAdder(n):
+          def add(x):
+              return x + n
+          return add
+
+      add5 = makeAdder(5)
+      add5(10)
+    solution: |-
+      def makeAdder(n):
+          def add(x):
+              return x + n
+          return add
+
+      add5 = makeAdder(5)
+      add100 = makeAdder(100)
+      add5(10), add100(10)
+    hints:
+    - add5 = makeAdder(5) 다음 줄에 add100 = makeAdder(100) 을 넣고, 마지막 줄을 add5(10), add100(10) 으로 바꿉니다.
+    - "정답 형태: add5(10), add100(10)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '(15, 110)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(15, 110)'"
+- id: closure_advanced
+  title: 클로저 활용
+  structuredPrimary: true
+  subtitle: 상태를 가진 함수
+  goal: 팩토리로 따로 만든 두 카운터가 서로의 숫자를 건드리지 않는 것을 확인한다.
+  why: 사용자별 시도 횟수처럼 절대 섞이면 안 되는 숫자를 전역 변수 하나에 담으면 서로 덮어쓰지만, 클로저로 하나씩 만들어 두면 각자의 상태가 자기 함수 안에만 남아 섞일 길이 없습니다.
+  explanation: |-
+    클로저를 사용하면 상태를 가진 함수를 만들 수 있습니다. nonlocal과 함께 사용하여 상태를 변경하고 유지할 수 있습니다. 카운터, 누적기 등을 구현할 때 유용합니다.
+
+    클로저는 클래스 없이도 상태를 관리할 수 있게 해줍니다.
+  snippet: |-
+    def makeCounter():
+        cnt = 0
+        def increment():
+            nonlocal cnt
+            cnt = cnt + 1
+            return cnt
+        return increment
+
+    counter = makeCounter()
+    counter(), counter(), counter()
+  exercise:
+    prompt: |-
+      counter = makeCounter() 아래에 other = makeCounter()를 추가하고, 마지막 줄 counter(), counter(), counter()를 counter(), counter(), other()로 바꾸세요.
+
+      counter는 두 번 불려 1, 2까지 세지만 other는 방금 따로 만든 카운터라 자기 cnt를 0부터 셉니다. 그래서 (1, 2, 1)이 나와야 합니다.
+    starterCode: |-
+      def makeCounter():
+          cnt = 0
+          def increment():
+              nonlocal cnt
+              cnt = cnt + 1
+              return cnt
+          return increment
+
+      counter = makeCounter()
+      counter(), counter(), counter()
+    solution: |-
+      def makeCounter():
+          cnt = 0
+          def increment():
+              nonlocal cnt
+              cnt = cnt + 1
+              return cnt
+          return increment
+
+      counter = makeCounter()
+      other = makeCounter()
+      counter(), counter(), other()
+    hints:
+    - counter = makeCounter() 다음 줄에 other = makeCounter() 를 넣고, 마지막 줄의 세 번째 counter() 를 other() 로 바꿉니다.
+    - "정답 형태: counter(), counter(), other()"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '(1, 2, 1)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(1, 2, 1)'"
+- id: workflow_validation
+  title: '검증 루프: 고객별 누적 결제 상태 만들기'
+  structuredPrimary: true
+  subtitle: global 대신 클로저로 상태를 격리하고 검증
+  goal: assert 세 줄을 그대로 통과시킨 뒤 클로저에 남아 있는 숫자를 한 번 더 호출해 확인한다.
+  why: 상태를 기억하는 코드는 눈으로 훑어서는 맞는지 알 수 없으므로, 기대값을 assert로 박아 두고 실행이 조용히 끝나는지로 확인하는 습관이 필요합니다.
+  explanation: 스코프와 클로저는 시험용 문법이 아니라, 상태가 섞이면 안 되는 업무 흐름을 안전하게 나누는 도구입니다. 고객별 누적 결제 금액처럼 서로 독립이어야 하는 상태는
+    전역 변수보다 클로저로 관리하는 편이 안전합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def makePaymentTracker(customerId):
+        totalPaid = 0
+        paymentCount = 0
+
+        def track(amount):
+            nonlocal totalPaid, paymentCount
+            if amount <= 0:
+                raise ValueError('결제 금액은 양수여야 합니다')
+            totalPaid = totalPaid + amount
+            paymentCount = paymentCount + 1
+            return {
+                'customerId': customerId,
+                'totalPaid': totalPaid,
+                'paymentCount': paymentCount,
+            }
+
+        return track
+
+
+    kimTracker = makePaymentTracker('kim')
+    leeTracker = makePaymentTracker('lee')
+
+    kimFirst = kimTracker(10000)
+    kimSecond = kimTracker(5000)
+    leeFirst = leeTracker(7000)
+
+    assert kimSecond == {'customerId': 'kim', 'totalPaid': 15000, 'paymentCount': 2}
+    assert leeFirst == {'customerId': 'lee', 'totalPaid': 7000, 'paymentCount': 1}
+    assert kimFirst['totalPaid'] == 10000
+  exercise:
+    prompt: |-
+      기존 줄은 하나도 바꾸지 말고 그대로 두세요. 맨 아래 assert 줄 다음에 successCounter() 한 줄만 추가하면 됩니다.
+
+      assert 세 줄이 통과했다는 것은 successCounter가 이미 두 번 불렸다는 뜻이고 그 숫자는 클로저 안에 남아 있습니다. 한 번 더 부르면 아래 한 줄이 나와야 합니다.
+      {'status': 'success', 'count': 3}
+    starterCode: |-
+      def makeStatusCounter(statusName):
+          count = 0
+          def mark():
+              nonlocal count
+              count = count + 1
+              return {'status': statusName, 'count': count}
+          return mark
+
+
+      successCounter = makeStatusCounter('success')
+      failedCounter = makeStatusCounter('failed')
+
+      assert successCounter()['count'] == 1
+      assert successCounter()['count'] == 2
+      assert failedCounter() == {'status': 'failed', 'count': 1}
+    solution: |-
+      def makeStatusCounter(statusName):
+          count = 0
+          def mark():
+              nonlocal count
+              count = count + 1
+              return {'status': statusName, 'count': count}
+          return mark
+
+
+      successCounter = makeStatusCounter('success')
+      failedCounter = makeStatusCounter('failed')
+
+      assert successCounter()['count'] == 1
+      assert successCounter()['count'] == 2
+      assert failedCounter() == {'status': 'failed', 'count': 1}
+      successCounter()
+    hints:
+    - 코드는 하나도 고치지 말고, 마지막 assert 줄 아래에 successCounter() 한 줄만 들여쓰기 없이 추가합니다.
+    - "정답 형태: 마지막 줄에 successCounter()"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "{'status': 'success', 'count': 3}"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"{'status': 'success', 'count': 3}\\""
+- id: practice
+  title: Day 17 종합 복습
+  structuredPrimary: true
+  subtitle: 스코프와 클로저 마스터하기
+  goal: 중첩 함수, nonlocal, 클로저를 한 셀에 모아 부를 때마다 값이 쌓이는 함수를 직접 만든다.
+  why: Day 17의 세 가지를 한 번에 엮어 봐야 진행 횟수나 누적 합계 같은 상태를 클래스 없이 함수만으로 관리할 수 있게 됩니다.
+  explanation: Day 17에서 배운 스코프와 클로저를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로
+    어떤 순서로 해도 괜찮습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def compute():
+        result = 15 * 3
+        return result
+
+    compute()
+  exercise:
+    prompt: |-
+      compute를 부를 때마다 15씩 쌓이는 클로저로 바꾸세요. 고칠 곳은 세 군데입니다.
+      1. def compute(): 를 def makeCompute(step): 로 바꾸고, 그 아래 첫 줄을 result = 0 으로 만듭니다.
+      2. 그 다음 줄에 def compute(): 를 새로 정의해 nonlocal result, result = result + step, return result 세 줄을 넣고, makeCompute의 마지막 줄은 return compute 로 안쪽 함수 자체를 돌려줍니다.
+      3. 맨 아래 compute() 를 compute = makeCompute(15) 와 compute(), compute(), compute() 두 줄로 바꿉니다.
+
+      step 15를 기억한 채로 세 번 불리므로 result가 15, 30, 45로 쌓여 (15, 30, 45)가 나와야 합니다.
+    starterCode: |-
+      def compute():
+          result = 15 * 3
+          return result
+
+      compute()
+    solution: |-
+      def makeCompute(step):
+          result = 0
+          def compute():
+              nonlocal result
+              result = result + step
+              return result
+          return compute
+
+      compute = makeCompute(15)
+      compute(), compute(), compute()
+    hints:
+    - "makeCompute(step) 안에 result = 0 을 두고, 안쪽 def compute(): 에서 nonlocal result 로 선언한 뒤 result = result + step 하고 return result 합니다. makeCompute 는 return compute 로 함수 자체를 돌려줍니다."
+    - "정답 형태: compute = makeCompute(15) 뒤 compute(), compute(), compute()"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '(15, 30, 45)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(15, 30, 45)'"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
+  masteryVariants:
+  - id: day17-counter-values-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - local_scope
+    - practice
+    title: nonlocal 상태를 여러 번 갱신하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 클로저가 바깥 함수의 상태를 기억하는 흐름을 확인한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: counter_values(start, step, count)가 클로저 카운터를 count번 호출한 결과 목록을 반환하도록 완성하세요.
+      starterCode: |-
+        def counter_values(start, step, count):
+            raise NotImplementedError
+      solution: |-
+        def counter_values(start, step, count):
+            current = start
+            def next_value():
+                nonlocal current
+                current += step
+                return current
+            return [next_value() for _ in range(count)]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day17.counter-values.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day17.counter-values.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: counter_values
+        cases:
+        - id: positive
+          arguments:
+          - value: 10
+          - value: 2
+          - value: 3
+          expectedReturn:
+          - 12
+          - 14
+          - 16
+        - id: negative
+          arguments:
+          - value: 5
+          - value: -1
+          - value: 2
+          expectedReturn:
+          - 4
+          - 3
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day17-scaled-values-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day17-counter-values-mastery
+    title: 설정값을 기억하는 변환 함수 만들기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 클로저를 데이터 변환 설정에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: scaled_values(values, factor)가 factor를 기억하는 내부 함수를 사용해 변환 목록을 반환하도록 완성하세요.
+      starterCode: |-
+        def scaled_values(values, factor):
+            raise NotImplementedError
+      solution: |-
+        def scaled_values(values, factor):
+            def scale(value):
+                return value * factor
+            return [scale(value) for value in values]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day17.scaled-values.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day17.scaled-values.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: scaled_values
+        cases:
+        - id: triple
+          arguments:
+          - value:
+            - 1
+            - 2
+            - 3
+          - value: 3
+          expectedReturn:
+          - 3
+          - 6
+          - 9
+        - id: half
+          arguments:
+          - value:
+            - 4
+            - 8
+          - value: 0.5
+          expectedReturn:
+          - 2.0
+          - 4.0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day17-nonlocal-total-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day17-scaled-values-transfer
+    title: 내부 함수로 누적 상태 다시 만들기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: nonlocal 선언과 호출 순서를 기억에서 복원한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: nonlocal_total(values)가 내부 add 함수로 값을 누적한 최종 합계를 반환하도록 완성하세요.
+      starterCode: |-
+        def nonlocal_total(values):
+            raise NotImplementedError
+      solution: |-
+        def nonlocal_total(values):
+            total = 0
+            def add(value):
+                nonlocal total
+                total += value
+            for value in values:
+                add(value)
+            return total
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day17.nonlocal-total.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day17.nonlocal-total.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: nonlocal_total
+        cases:
+        - id: positive
+          arguments:
+          - value:
+            - 3
+            - 4
+            - 5
+          expectedReturn: 12
+        - id: signed
+          arguments:
+          - value:
+            - 10
+            - -3
+          expectedReturn: 7
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

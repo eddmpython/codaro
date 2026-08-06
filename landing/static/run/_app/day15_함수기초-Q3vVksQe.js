@@ -1,0 +1,820 @@
+var e=`meta:
+  id: day15
+  title: 함수기초
+  day: 15
+  category: 30days
+  outcomes: ["python.functions"]
+  prerequisites: ["python.controlFlow"]
+  estimatedMinutes: 45
+  tags:
+  - 함수
+  - def
+  - return
+  - 매개변수
+  - 주문계산
+  - 검증
+  seo:
+    title: 파이썬 함수 기초 - def, return으로 코드 재사용
+    description: def, return, parameter, argument를 배웁니다.
+    keywords:
+    - 함수
+    - def
+    - return
+    - parameter
+    - argument
+intro:
+  emoji: ⚙️
+  points:
+  - def로 함수 정의
+  - return으로 값 반환
+  - 매개변수로 값 전달
+  - 함수로 코드 재사용
+  direction: 함수기초에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 함수기초 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 함수 정의 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: return 문 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: 매개변수 1개 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 함수기초 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 함수기초 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 함수기초 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: def_basic
+  title: 함수 정의
+  structuredPrimary: true
+  subtitle: def로 함수 만들기
+  goal: 함수 본문을 고쳐 같은 greet() 호출이 다른 값을 돌려주게 만든다.
+  why: 여러 곳에서 쓰는 인사말이나 계산을 함수 하나로 모아 두면, 문구가 바뀔 때 함수 본문 한 곳만 고쳐도 호출하는 자리 전부가 같이 바뀝니다.
+  explanation: |-
+    함수는 특정 작업을 수행하는 코드 블록입니다. def 함수명(): 형식으로 정의하며, 들여쓰기로 함수 본문을 작성합니다. 함수를 정의한 후 함수명()으로 호출하여 실행합니다.
+
+    함수명은 소문자와 언더스코어를 사용하거나 카멜케이스를 사용합니다.
+  snippet: |-
+    def greet():
+        msg = 'Hello'
+        return msg
+
+    greet()
+  exercise:
+    prompt: |-
+      함수 본문의 msg = 'Hello'를 msg = 'Good morning'으로 바꾸세요. 마지막 줄 greet() 호출은 그대로 둡니다.
+
+      실행하면 Good morning이 나와야 합니다.
+    starterCode: |-
+      def greet():
+          msg = 'Hello'
+          return msg
+
+      greet()
+    solution: |-
+      def greet():
+          msg = 'Good morning'
+          return msg
+
+      greet()
+    hints:
+    - "msg = 'Hello' 를 msg = 'Good morning' 으로 바꿉니다. def 줄과 return msg 줄, 마지막 greet() 는 그대로 둡니다."
+    - "정답 형태: msg = 'Good morning'"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'Good morning'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Good morning'"
+- id: return_statement
+  title: return 문
+  structuredPrimary: true
+  subtitle: 값 반환하기
+  goal: return 뒤의 식을 바꿔 호출한 곳으로 나가는 값이 달라지는 것을 확인한다.
+  why: 함수가 계산만 하고 return을 하지 않으면 그 결과를 함수 밖에서 쓸 수 없기 때문에, 무엇을 돌려줄지 정하는 것이 함수 만들기의 핵심입니다.
+  explanation: |-
+    return은 함수의 결과값을 반환합니다. return 값 형식으로 사용하며, 함수 실행을 즉시 종료하고 값을 호출한 곳으로 돌려줍니다. return이 없으면 None을 반환합니다.
+
+    return을 만나면 함수가 즉시 종료되므로 위치에 주의하세요.
+  snippet: |-
+    def add():
+        answer = 10 + 20
+        return answer
+
+    add()
+  exercise:
+    prompt: |-
+      return answer를 return answer * 2로 바꾸세요.
+
+      answer는 30이고 return이 30 * 2를 계산해 돌려주므로 60이 나와야 합니다.
+    starterCode: |-
+      def add():
+          answer = 10 + 20
+          return answer
+
+      add()
+    solution: |-
+      def add():
+          answer = 10 + 20
+          return answer * 2
+
+      add()
+    hints:
+    - return answer 를 return answer * 2 로 바꿉니다. answer = 10 + 20 줄과 마지막 add() 는 그대로 둡니다.
+    - "정답 형태: return answer * 2"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '60'
+    resultCheck: "출력이 정확히 일치해야 합니다: '60'"
+- id: parameter_one
+  title: 매개변수 1개
+  structuredPrimary: true
+  subtitle: 값을 받는 함수
+  goal: 함수는 그대로 두고 호출 인자만 바꿔 결과가 달라지는 것을 확인한다.
+  why: 계산할 값을 함수 안에 직접 적어 두면 값이 바뀔 때마다 함수를 새로 만들어야 하지만, 매개변수로 받으면 함수 하나로 모든 값을 처리합니다.
+  explanation: |-
+    매개변수는 함수가 받는 입력값입니다. def 함수명(매개변수): 형식으로 정의하며, 호출시 전달하는 값을 인자라고 합니다. 매개변수를 사용하면 함수를 더 유연하게 만들 수 있습니다.
+
+    매개변수명은 함수 안에서만 유효한 지역 변수입니다.
+  snippet: |-
+    def double(num):
+        return num * 2
+
+    double(5)
+  exercise:
+    prompt: |-
+      마지막 줄 double(5)를 double(21)로 바꾸세요.
+
+      함수 본문은 그대로 두고 넣어 주는 값만 바꾸면 42가 나와야 합니다.
+    starterCode: |-
+      def double(num):
+          return num * 2
+
+      double(5)
+    solution: |-
+      def double(num):
+          return num * 2
+
+      double(21)
+    hints:
+    - double(5) 를 double(21) 로 바꿉니다. def 줄과 return num * 2 줄은 그대로 둡니다.
+    - "정답 형태: double(21)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '42'
+    resultCheck: "출력이 정확히 일치해야 합니다: '42'"
+- id: parameter_multiple
+  title: 매개변수 여러 개
+  structuredPrimary: true
+  subtitle: 여러 값 받기
+  goal: 두 인자 중 뒤쪽만 바꿔 두 값을 함께 받는 함수의 결과를 맞춘다.
+  why: 단가와 수량, 시작과 끝처럼 값이 두 개 있어야 계산이 되는 일이 많아서, 업무 코드의 함수는 대부분 매개변수를 여러 개 받습니다.
+  explanation: |-
+    함수는 여러 개의 매개변수를 받을 수 있습니다. 쉼표로 구분하여 나열하며, 호출시에도 같은 순서로 인자를 전달해야 합니다.
+
+    매개변수 개수와 인자 개수가 일치해야 합니다.
+  snippet: |-
+    def addTwo(a, b):
+        return a + b
+
+    addTwo(10, 20)
+  exercise:
+    prompt: |-
+      마지막 줄 addTwo(10, 20)을 addTwo(10, 32)로 바꾸세요. 쓴 순서대로 앞은 a, 뒤는 b에 들어갑니다.
+
+      실행하면 42가 나와야 합니다.
+    starterCode: |-
+      def addTwo(a, b):
+          return a + b
+
+      addTwo(10, 20)
+    solution: |-
+      def addTwo(a, b):
+          return a + b
+
+      addTwo(10, 32)
+    hints:
+    - addTwo(10, 20) 을 addTwo(10, 32) 로 바꿉니다. 앞의 인자 10과 함수 본문은 그대로 둡니다.
+    - "정답 형태: addTwo(10, 32)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '42'
+    resultCheck: "출력이 정확히 일치해야 합니다: '42'"
+- id: return_multiple
+  title: 여러 값 반환
+  structuredPrimary: true
+  subtitle: 튜플로 반환
+  goal: 쉼표로 반환한 두 값이 튜플로 묶여 나오는 것을 다른 인자로 확인한다.
+  why: 최솟값과 최댓값처럼 짝으로 나오는 결과는 함수를 두 개 만들 필요 없이 한 번의 호출로 함께 받는 편이 계산도 한 번으로 끝납니다.
+  explanation: |-
+    함수는 여러 값을 반환할 수 있습니다. 쉼표로 구분하여 반환하면 튜플로 묶여서 반환됩니다. 호출한 곳에서 여러 변수로 받을 수 있습니다.
+
+    여러 값을 반환하면 자동으로 튜플이 됩니다.
+  snippet: |-
+    def minMax(a, b):
+        if a < b:
+            return a, b
+        else:
+            return b, a
+
+    minMax(10, 5)
+  exercise:
+    prompt: |-
+      마지막 줄 minMax(10, 5)를 minMax(3, 9)로 바꾸세요.
+
+      작은 값이 앞에 오도록 묶여서 (3, 9)가 나와야 합니다. 쉼표로 반환하면 이렇게 튜플이 됩니다.
+    starterCode: |-
+      def minMax(a, b):
+          if a < b:
+              return a, b
+          else:
+              return b, a
+
+      minMax(10, 5)
+    solution: |-
+      def minMax(a, b):
+          if a < b:
+              return a, b
+          else:
+              return b, a
+
+      minMax(3, 9)
+    hints:
+    - minMax(10, 5) 를 minMax(3, 9) 로 바꿉니다. 함수 안의 if/else는 그대로 둡니다.
+    - "정답 형태: minMax(3, 9)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '(3, 9)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(3, 9)'"
+- id: no_parameter
+  title: 매개변수 없는 함수
+  structuredPrimary: true
+  subtitle: 입력 없이 실행
+  goal: 매개변수가 없는 함수의 호출 결과를 그대로 다른 계산에 넣어 쓴다.
+  why: 원주율이나 기본 설정값처럼 늘 같은 값을 여러 곳에서 쓸 때, 숫자를 반복해 적는 대신 함수 하나에 모아 두면 값을 고칠 때 그 한 곳만 고치면 됩니다.
+  explanation: |-
+    함수는 매개변수가 없어도 됩니다. 항상 같은 값을 반환하거나 내부 로직만 실행하는 함수에 사용합니다. 호출시에도 괄호만 씁니다.
+
+    상수값이나 기본 설정을 반환할 때 유용합니다.
+  snippet: |-
+    def getPi():
+        return 3.14159
+
+    getPi()
+  exercise:
+    prompt: |-
+      마지막 줄 getPi()를 getPi() * 2로 바꾸세요. 괄호 안은 비워 두고 함수도 그대로 둡니다.
+
+      호출 결과 3.14159가 그 자리에 들어가 계산되므로 6.28318이 나와야 합니다.
+    starterCode: |-
+      def getPi():
+          return 3.14159
+
+      getPi()
+    solution: |-
+      def getPi():
+          return 3.14159
+
+      getPi() * 2
+    hints:
+    - 마지막 줄 getPi() 뒤에 * 2 를 붙여 getPi() * 2 로 만듭니다. 매개변수가 없으므로 괄호 안에는 아무것도 넣지 않습니다.
+    - "정답 형태: getPi() * 2"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '6.28318'
+    resultCheck: "출력이 정확히 일치해야 합니다: '6.28318'"
+- id: no_return
+  title: return 없는 함수
+  structuredPrimary: true
+  subtitle: 작업만 수행
+  goal: return이 없는 함수가 돌려주는 값이 None이라는 것을 화면으로 직접 확인한다.
+  why: return을 빠뜨린 함수는 에러 없이 None을 돌려주기 때문에, 이 사실을 모르면 계산이 조용히 사라진 것을 한참 뒤에야 발견합니다.
+  explanation: |-
+    함수는 return이 없어도 됩니다. return이 없으면 None을 반환합니다. 주로 작업만 수행하고 결과가 필요없을 때 사용합니다.
+
+    반환값이 필요한 함수는 항상 return을 명시하는 것이 좋습니다.
+  snippet: |-
+    def doSomething():
+        x = 10 + 20
+
+    output = doSomething()
+    output
+  exercise:
+    prompt: |-
+      두 곳을 고치세요. 함수 본문 x = 10 + 20 아래에 같은 들여쓰기로 print(x) 한 줄을 넣고, 마지막 줄 output을 print(output)으로 바꾸세요.
+
+      함수가 계산한 값은 print(x)로 보이고 return이 없어 돌려준 값은 None이므로, 아래 두 줄이 나와야 합니다.
+      30
+      None
+    starterCode: |-
+      def doSomething():
+          x = 10 + 20
+
+      output = doSomething()
+      output
+    solution: |-
+      def doSomething():
+          x = 10 + 20
+          print(x)
+
+      output = doSomething()
+      print(output)
+    hints:
+    - x = 10 + 20 다음 줄에 같은 들여쓰기로 print(x) 를 넣고, 마지막 줄 output 을 print(output) 으로 바꿉니다.
+    - "정답 형태: 함수 안에 print(x), 마지막 줄에 print(output)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: |-
+      30
+      None
+    resultCheck: "출력이 정확히 일치해야 합니다: '30\\nNone'"
+- id: function_conditional
+  title: 함수와 조건문
+  structuredPrimary: true
+  subtitle: 조건에 따른 처리
+  goal: 같은 함수에 다른 점수를 넣어 조건이 갈라지고 다른 등급이 나오는 것을 확인한다.
+  why: 합격 여부, 등급, 할인 대상처럼 값에 따라 답이 달라지는 규칙을 함수 안 조건문에 넣어 두면, 나중에는 호출 한 줄로 판정이 끝납니다.
+  explanation: |-
+    함수 안에서 조건문을 사용하여 매개변수에 따라 다른 결과를 반환할 수 있습니다. 함수의 유연성이 크게 증가합니다.
+
+    조건문으로 다양한 입력에 대응할 수 있습니다.
+  snippet: |-
+    def getGrade(score):
+        if score >= 90:
+            return 'A'
+        elif score >= 80:
+            return 'B'
+        elif score >= 70:
+            return 'C'
+        else:
+            return 'F'
+
+    getGrade(85)
+  exercise:
+    prompt: |-
+      마지막 줄 getGrade(85)를 getGrade(65)로 바꾸세요.
+
+      65는 앞의 세 조건에 모두 걸리지 않아 else로 내려가므로 F가 나와야 합니다.
+    starterCode: |-
+      def getGrade(score):
+          if score >= 90:
+              return 'A'
+          elif score >= 80:
+              return 'B'
+          elif score >= 70:
+              return 'C'
+          else:
+              return 'F'
+
+      getGrade(85)
+    solution: |-
+      def getGrade(score):
+          if score >= 90:
+              return 'A'
+          elif score >= 80:
+              return 'B'
+          elif score >= 70:
+              return 'C'
+          else:
+              return 'F'
+
+      getGrade(65)
+    hints:
+    - getGrade(85) 를 getGrade(65) 로 바꿉니다. if/elif/else 본문은 그대로 둡니다.
+    - "정답 형태: getGrade(65)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'F'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'F'"
+- id: function_loop
+  title: 함수와 반복문
+  structuredPrimary: true
+  subtitle: 반복 처리 함수
+  goal: 같은 합계 함수에 다른 리스트를 넘겨 반복 결과가 달라지는 것을 확인한다.
+  why: 합계를 낼 때마다 for 문을 다시 쓰는 대신 한 번 함수로 감싸 두면, 리스트만 바꿔 넣어 어디서든 같은 계산을 씁니다.
+  explanation: |-
+    함수 안에서 반복문을 사용하여 리스트나 문자열을 처리할 수 있습니다. 반복 로직을 함수로 만들면 재사용이 쉬워집니다.
+
+    복잡한 반복 로직을 함수로 만들면 코드가 깔끔해집니다.
+  snippet: |-
+    def sumList(numbers):
+        acc = 0
+        for num in numbers:
+            acc = acc + num
+        return acc
+
+    sumList([1, 2, 3, 4, 5])
+  exercise:
+    prompt: |-
+      마지막 줄 sumList([1, 2, 3, 4, 5])를 sumList([10, 20, 30])으로 바꾸세요.
+
+      함수는 그대로 두고 리스트만 바꾸면 60이 나와야 합니다.
+    starterCode: |-
+      def sumList(numbers):
+          acc = 0
+          for num in numbers:
+              acc = acc + num
+          return acc
+
+      sumList([1, 2, 3, 4, 5])
+    solution: |-
+      def sumList(numbers):
+          acc = 0
+          for num in numbers:
+              acc = acc + num
+          return acc
+
+      sumList([10, 20, 30])
+    hints:
+    - sumList([1, 2, 3, 4, 5]) 를 sumList([10, 20, 30]) 으로 바꿉니다. 함수 안의 for 문은 그대로 둡니다.
+    - "정답 형태: sumList([10, 20, 30])"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '60'
+    resultCheck: "출력이 정확히 일치해야 합니다: '60'"
+- id: function_reuse
+  title: 함수 재사용
+  structuredPrimary: true
+  subtitle: 같은 함수 여러 번 사용
+  goal: 한 번 정의한 square를 세 번 호출해 받은 값들을 하나로 합친다.
+  why: 같은 계산을 값만 바꿔 여러 번 해야 할 때, 함수 하나를 세 번 부르면 같은 코드를 세 번 복사하지 않아도 되고 계산식을 고칠 때도 한 곳만 고칩니다.
+  explanation: |-
+    함수의 가장 큰 장점은 재사용입니다. 한 번 정의한 함수를 여러 곳에서 다른 인자로 호출할 수 있습니다. 코드 중복을 줄이고 유지보수가 쉬워집니다.
+
+    자주 사용하는 로직은 함수로 만들어 재사용하세요.
+  snippet: |-
+    def square(n):
+        return n * n
+
+    sq3 = square(3)
+    sq5 = square(5)
+    sq7 = square(7)
+    sq3, sq5, sq7
+  exercise:
+    prompt: |-
+      마지막 줄 sq3, sq5, sq7을 sq3 + sq5 + sq7로 바꾸세요. 세 호출 줄은 그대로 둡니다.
+
+      세 번 호출해 받은 9, 25, 49를 더한 83이 나와야 합니다.
+    starterCode: |-
+      def square(n):
+          return n * n
+
+      sq3 = square(3)
+      sq5 = square(5)
+      sq7 = square(7)
+      sq3, sq5, sq7
+    solution: |-
+      def square(n):
+          return n * n
+
+      sq3 = square(3)
+      sq5 = square(5)
+      sq7 = square(7)
+      sq3 + sq5 + sq7
+    hints:
+    - 마지막 줄의 쉼표를 더하기로 바꿔 sq3 + sq5 + sq7 로 만듭니다. def 줄과 세 호출 줄은 그대로 둡니다.
+    - "정답 형태: sq3 + sq5 + sq7"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '83'
+    resultCheck: "출력이 정확히 일치해야 합니다: '83'"
+- id: workflow_validation
+  title: 실무 함수 설계 루프
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증
+  goal: 쿠폰 할인율 하나만 바꿔 함수가 돌려주는 소계, 할인, 합계가 어떻게 달라지는지 확인한다.
+  why: 주문 금액 규칙은 할인율 하나만 바뀌어도 최종 금액이 달라지므로, 계산을 함수 한 곳에 모아 두고 값을 바꿔 가며 결과를 직접 확인해야 합니다.
+  explanation: |-
+    업무 코드는 보통 숫자 하나를 출력하는 데서 끝나지 않습니다. 주문 금액처럼 규칙이 있는 계산을 함수로 감싸고, 실행 전에 결과를 예측한 뒤, 오류 메시지를 읽고 호출을 고치고, 마지막에 검증합니다.
+
+    함수 학습은 def 문법을 외우는 데서 끝내지 말고, 예측 → 실행 → 오류 수정 → 검증 루프를 한 번씩 통과해야 실제 업무 코드로 이어집니다.
+  snippet: |-
+    order = {
+        "items": [12000, 8000, 5000],
+        "couponRate": 0.1,
+        "deliveryFee": 3000,
+    }
+
+    def estimateOrderTotal(items, couponRate, deliveryFee):
+        subtotal = sum(items)
+        discount = int(subtotal * couponRate)
+        total = subtotal - discount + deliveryFee
+        return {
+            "subtotal": subtotal,
+            "discount": discount,
+            "total": total,
+        }
+
+    estimateOrderTotal(order["items"], order["couponRate"], order["deliveryFee"])
+  exercise:
+    prompt: |-
+      order의 쿠폰 할인율을 0.1에서 0.2로 바꾸세요. 함수 본문과 마지막 호출 줄은 그대로 둡니다.
+
+      소계 25000은 그대로이고 할인이 2500에서 5000으로 늘어, 실행하면 아래 한 줄이 나와야 합니다.
+      {'subtotal': 25000, 'discount': 5000, 'total': 23000}
+    starterCode: |-
+      order = {
+          "items": [12000, 8000, 5000],
+          "couponRate": 0.1,
+          "deliveryFee": 3000,
+      }
+
+      def estimateOrderTotal(items, couponRate, deliveryFee):
+          subtotal = sum(items)
+          discount = int(subtotal * couponRate)
+          total = subtotal - discount + deliveryFee
+          return {
+              "subtotal": subtotal,
+              "discount": discount,
+              "total": total,
+          }
+
+      estimateOrderTotal(order["items"], order["couponRate"], order["deliveryFee"])
+    solution: |-
+      order = {
+          "items": [12000, 8000, 5000],
+          "couponRate": 0.2,
+          "deliveryFee": 3000,
+      }
+
+      def estimateOrderTotal(items, couponRate, deliveryFee):
+          subtotal = sum(items)
+          discount = int(subtotal * couponRate)
+          total = subtotal - discount + deliveryFee
+          return {
+              "subtotal": subtotal,
+              "discount": discount,
+              "total": total,
+          }
+
+      estimateOrderTotal(order["items"], order["couponRate"], order["deliveryFee"])
+    hints:
+    - 'order 딕셔너리 안에서 "couponRate": 0.1 을 "couponRate": 0.2 로 바꿉니다. items와 deliveryFee는 그대로 둡니다.'
+    - '정답 형태: "couponRate": 0.2'
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "{'subtotal': 25000, 'discount': 5000, 'total': 23000}"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"{'subtotal': 25000, 'discount': 5000, 'total': 23000}\\""
+- id: practice
+  title: Day 15 종합 복습
+  structuredPrimary: true
+  subtitle: 함수 기초 마스터하기
+  goal: 이름을 받아 인사말을 만드는 함수로 매개변수, return, 호출 인자를 한 번에 써 본다.
+  why: 값을 매개변수로 받고 return으로 돌려주고 인자를 넣어 호출하는 세 가지를 직접 이어 봐야 다음 강의의 기본값 인자와 지역 변수를 바로 따라갈 수 있습니다.
+  explanation: Day 15에서 배운 함수 기초를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤
+    순서로 해도 괜찮습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def sayHello():
+        return 'Hello'
+
+    sayHello()
+  exercise:
+    prompt: |-
+      sayHello가 이름을 받도록 세 곳을 고치세요. def sayHello():를 def sayHello(name):으로, return 'Hello'를 return 'Hello, ' + name으로, 마지막 줄 sayHello()를 sayHello('Codaro')로 바꿉니다. 함수 이름은 그대로 둡니다.
+
+      실행하면 Hello, Codaro가 나와야 합니다.
+    starterCode: |-
+      def sayHello():
+          return 'Hello'
+
+      sayHello()
+    solution: |-
+      def sayHello(name):
+          return 'Hello, ' + name
+
+      sayHello('Codaro')
+    hints:
+    - "def 줄 괄호 안에 name 을 넣고, return 'Hello, ' + name 으로 이어 붙인 뒤, 호출할 때 괄호 안에 'Codaro' 를 넣습니다."
+    - "정답 형태: sayHello('Codaro') 호출로 Hello, Codaro"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'Hello, Codaro'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Hello, Codaro'"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
+  masteryVariants:
+  - id: day15-clamp-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - def_basic
+    - practice
+    title: 값을 허용 범위 안으로 제한하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 매개변수와 반환값으로 재사용 가능한 함수를 만든다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: clamp(value, low, high)가 범위 안 값은 그대로, 밖의 값은 가까운 경계를 반환하도록 완성하세요.
+      starterCode: |-
+        def clamp(value, low, high):
+            raise NotImplementedError
+      solution: |-
+        def clamp(value, low, high):
+            return max(low, min(value, high))
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day15.clamp.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day15.clamp.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: clamp
+        cases:
+        - id: inside
+          arguments:
+          - value: 5
+          - value: 1
+          - value: 10
+          expectedReturn: 5
+        - id: below
+          arguments:
+          - value: -2
+          - value: 0
+          - value: 8
+          expectedReturn: 0
+        - id: above
+          arguments:
+          - value: 12
+          - value: 0
+          - value: 8
+          expectedReturn: 8
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day15-receipt-line-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day15-clamp-mastery
+    title: 수량과 단가로 영수증 한 줄 만들기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 함수 입력을 계산과 문자열 결과에 함께 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: receipt_line(item, quantity, price)가 '품목:합계' 문자열을 반환하도록 완성하세요.
+      starterCode: |-
+        def receipt_line(item, quantity, price):
+            raise NotImplementedError
+      solution: |-
+        def receipt_line(item, quantity, price):
+            return f"{item}:{quantity * price}"
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day15.receipt-line.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day15.receipt-line.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: receipt_line
+        cases:
+        - id: pen
+          arguments:
+          - value: pen
+          - value: 3
+          - value: 1000
+          expectedReturn: pen:3000
+        - id: book
+          arguments:
+          - value: book
+          - value: 2
+          - value: 7500
+          expectedReturn: book:15000
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day15-rectangle-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day15-receipt-line-transfer
+    title: 함수로 넓이와 둘레 함께 반환하기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 여러 계산 결과를 하나의 반환 계약으로 다시 구성한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: rectangle(width, height)가 area와 perimeter를 가진 딕셔너리를 반환하도록 완성하세요.
+      starterCode: |-
+        def rectangle(width, height):
+            raise NotImplementedError
+      solution: |-
+        def rectangle(width, height):
+            return {'area': width * height, 'perimeter': 2 * (width + height)}
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day15.rectangle.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day15.rectangle.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: rectangle
+        cases:
+        - id: basic
+          arguments:
+          - value: 3
+          - value: 4
+          expectedReturn:
+            area: 12
+            perimeter: 14
+        - id: square
+          arguments:
+          - value: 5
+          - value: 5
+          expectedReturn:
+            area: 25
+            perimeter: 20
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

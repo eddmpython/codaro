@@ -1,0 +1,261 @@
+var e=`# Codaro local curriculum schema\r
+# This file documents the YAML shape used by curricula/python.\r
+\r
+# ============================================\r
+# Metadata\r
+# ============================================\r
+# meta:\r
+#   id: "day02"                    # unique content id\r
+#   title: "변수와 내장함수"         # lesson title\r
+#   day: 2                         # optional day number\r
+#   category: "30days"             # folder/category key\r
+#   packages: ["pandas"]           # lesson-local runtime packages; prepared lazily with uv\r
+#   source: "30-Days-Of-Python"    # optional source\r
+#   sourceUrl: "https://..."       # optional source URL\r
+#   tags: ["변수", "함수", "기초"]   # search tags\r
+\r
+# ============================================\r
+# Intro Contract\r
+# ============================================\r
+# intro:\r
+#   direction: "이 레슨에서 만드는 능력"\r
+#   benefits:\r
+#     - "과정 후 할 수 있는 일"\r
+#   diagram:\r
+#     steps:\r
+#       - label: "DataFrame 입력 확인"\r
+#         detail: "sales 열과 행 값을 먼저 고정"\r
+#     runtime:\r
+#       - label: "pandas 환경"\r
+#         detail: "pandas 기준으로 로컬 Python 실행 준비"\r
+\r
+# ============================================\r
+# Sections\r
+# ============================================\r
+# sections:\r
+#   - id: "section_id"\r
+#     title: "섹션 제목"\r
+#     structuredPrimary: true        # structured fields가 이 섹션의 1차 학습 계약일 때\r
+#     subtitle: "부제목"            # optional\r
+#     goal: "이 섹션을 끝내면 할 수 있는 일"\r
+#     why: "실무/학습에서 중요한 이유"\r
+#     explanation: "3문장 이내 핵심 설명"\r
+#     tips:\r
+#       - "막힐 때 확인할 기준"\r
+#     snippet: |\r
+#       print("read-only example")\r
+#     exercise:\r
+#       prompt: "학습자가 직접 할 일"\r
+#       starterCode: |\r
+#         result = ___\r
+#       solution: |\r
+#         result = "answer"\r
+#       hints:\r
+#         - "개념 힌트"\r
+#     check:\r
+#       # weak/practice check는 feedback만 만들고 completion이나 mastery를 만들지 않는다.\r
+#       type: "noError"\r
+#       noError: "섹션 예제의 입력 데이터, 처리 함수, 출력 확인 단계가 순서대로 실행되어야 한다."\r
+#       resultCheck: "출력 또는 변수 상태가 이 섹션에서 바꾼 업무 조건을 반영해야 한다."\r
+#     # outputExact practice check 의 비교 의미는 line-trim 이다(줄 끝 공백,\r
+#     # 마지막 줄바꿈, CRLF 는 자동 관용 - SSOT: src/codaro/curriculum/outputMatch.py).\r
+#     # 대소문자가 학습 목표와 무관한 검사(임의 인사말 등)만 caseInsensitive 를 켠다.\r
+#     # upper()/lower() 처럼 대소문자 자체가 목표인 검사에는 절대 켜지 않는다.\r
+#     # check:\r
+#     #   type: "outputExact"\r
+#     #   outputExact: "Hello Codaro"\r
+#     #   caseInsensitive: true\r
+#     # blocks는 structured card 뒤에 붙는 보조 자료 또는 legacy curriculum 변환용이다.\r
+#     # 신규 레슨은 위 structured section fields를 우선하고, 표/영상/참고 링크만 blocks로 보조한다.\r
+#     blocks:\r
+#       - type: "text"\r
+#         content: "..."\r
+\r
+# ============================================\r
+# CheckSpec v1 (Web output/behavior vertical slice)\r
+# ============================================\r
+# Run 뒤 별도 검증 버튼 없이 자동 실행된다. 아래 strong spec은 fresh browser Worker,\r
+# fixture hash, SRI asset graph, timeout을 모두 통과한 경우에만 strong evidence를 만든다.\r
+# check:\r
+#   id: "python.print.hello.output.v1"\r
+#   version: 1\r
+#   kind: "output"\r
+#   strength: "strong"\r
+#   executor: "browser-worker"\r
+#   timeoutMs: 8000\r
+#   fixtureId: "python.print.hello.fixture.v1"\r
+#   fixtureHash: "sha256-..."       # canonical compact JSON fixture의 SHA-256 SRI\r
+#   packageAssets:                   # 외부 패키지가 필요할 때만 사용\r
+#     - name: "schedule"\r
+#       version: "1.2.2"\r
+#       url: "check-packages/schedule-1.2.2-py3-none-any.whl"\r
+#       integrity: "sha256-..."     # same-origin wheel bytes의 SHA-256 SRI\r
+#   fixture:\r
+#     directories: []\r
+#     env:\r
+#       LANG: "C.UTF-8"\r
+#       TZ: "UTC"\r
+#     files: []\r
+#     stdin: []\r
+#   payload:\r
+#     comparator: "exact"\r
+#     expected: "Hello Codaro"\r
+#     normalization: "line-trim"\r
+# 현재 Web W0는 output과 callable return+fixture path를 함께 보는 behavior subset을 지원한다.\r
+# packageAssets는 저장소에 고정한 same-origin wheel만 허용하며 Worker boot 전에 SRI를 검증한다.\r
+# variable/file/table/image와 Local sandbox는 아직 지원된 척 작성하지 않는다.\r
+# behavior payload 예시:\r
+#   entry: "create_order_workspace"\r
+#   cases:\r
+#     - id: "creates-two-folders"\r
+#       arguments:\r
+#         - fixturePath: "workspace"\r
+#       expectedReturn: ["배송", "주문"]\r
+#   expectedPaths:\r
+#     - {path: "workspace/배송", kind: "directory", origin: "created"}\r
+#     - {path: "workspace/주문", kind: "directory", origin: "created"}\r
+\r
+# ============================================\r
+# Assessment progression\r
+# ============================================\r
+# acquisition section을 이름만 바꿔 세지 않는다. mastery는 base lesson 마지막에 보이고,\r
+# mastery의 strong evidence가 저장되면 transfer가 별도 클릭 없이 자동으로 열린다. retrieval은\r
+# source strong evidence에서 minimumDelayHours가 지난 뒤 자동 materialize한다. 세 variant 모두\r
+# snippet 없이 스스로 풀며 strong CheckSpec과 독립 fixture/check ID를 가진다.\r
+# assessment:\r
+#   performanceClaim: "이 평가가 증명하는 능력과 증명하지 않는 능력의 경계"\r
+#   tierParity: {web: "portable-concept", local: "package-practice-and-artifact"}\r
+#   supportPolicy: "실패 피드백과 hint 제공 원칙"\r
+#   authoring:\r
+#     source: "curated-blueprint"\r
+#     solutionVerification: "required"\r
+#     independentReview: "pending"\r
+#     reviewerId: "learning-qa"  # approved일 때 필수\r
+#     reviewedAt: "timezone 포함 ISO-8601 시각"\r
+#     evidenceCommit: "검수한 40자리 Git commit"\r
+#   masteryVariants:\r
+#     - id: "report-status-mastery"\r
+#       mode: "mastery"\r
+#       unseen: false\r
+#       claimScope: "portable-concept"\r
+#       sourceSectionIds: ["hello-world", "calculation"]\r
+#       title: "배운 규칙으로 상태 한 줄 완성하기"\r
+#       goal: "예시를 보지 않고 출력 규칙을 완성한다."\r
+#       exercise: {prompt: "...", starterCode: "...", solution: "...", hints: ["...", "..."]}\r
+#       check: {id: "...", version: 1, kind: "behavior", strength: "strong", executor: "browser-worker"}\r
+#   transferVariants:\r
+#     - id: "report-status-transfer"\r
+#       mode: "transfer"\r
+#       unseen: true\r
+#       sourceSectionIds: ["report-status-mastery"]\r
+#       title: "새 보고 상태 한 줄 만들기"\r
+#       goal: "처음 보는 상태 문구에 출력 규칙을 적용한다."\r
+#       exercise: {prompt: "...", starterCode: "...", solution: "...", hints: ["...", "..."]}\r
+#       check: {id: "...", version: 1, kind: "output", strength: "strong", executor: "browser-worker"}\r
+#   retrievalVariants:\r
+#     - id: "hello-retrieval-24h"\r
+#       mode: "retrieval"\r
+#       unseen: true\r
+#       minimumDelayHours: 24\r
+#       sourceSectionIds: ["hello-world"]\r
+#       title: "하루 뒤 첫 출력 다시 만들기"\r
+#       exercise: {prompt: "...", starterCode: "...", solution: "...", hints: ["...", "..."]}\r
+#       check: {id: "...", version: 1, kind: "output", strength: "strong", executor: "browser-worker"}\r
+\r
+# ============================================\r
+# Block Types\r
+# ============================================\r
+\r
+# prose blocks\r
+# - type: text | content | centerText\r
+#   title: "제목"                   # optional\r
+#   subtitle: "부제목"              # optional\r
+#   content: |\r
+#     Markdown content.\r
+\r
+# title blocks\r
+# - type: mainHeader | sectionHeader | sectionTitle\r
+#   title: "제목"\r
+#   subtitle: "부제목"              # optional\r
+\r
+# local workbench block\r
+# - type: localWorkbench\r
+#   title: "Codaro Local Workbench" # optional\r
+#   description: "Run the adjacent Python cells with the local Codaro kernel."\r
+\r
+# list blocks\r
+# - type: list\r
+#   style: "bullet" | "number" | "check"\r
+#   items:\r
+#     - "항목 1"\r
+#     - "항목 2"\r
+\r
+# code blocks\r
+# - type: code\r
+#   language: "python"             # python, shell, browser, task, skill\r
+#   title: "코드 제목"              # optional\r
+#   description: "코드 설명"        # optional\r
+#   content: |\r
+#     print("Hello")\r
+#   output: |                      # optional expected output\r
+#     Hello\r
+\r
+# practice blocks\r
+# - type: expansion\r
+#   title: "실습"\r
+#   description: "문제 설명"\r
+#   code: |                        # optional solution stored separately\r
+#     print("solution")\r
+#   blocks:                        # optional starter cells\r
+#     - type: code\r
+#       content: |\r
+#         # write your code\r
+\r
+# callout blocks\r
+# - type: note | tip | tipCard | warning | info | codeDescription\r
+#   title: "참고"                  # optional\r
+#   content: "참고 내용"\r
+\r
+# table blocks\r
+# - type: table\r
+#   headers: ["컬럼1", "컬럼2"]\r
+#   rows:\r
+#     - ["값1", "값2"]\r
+#     - ["값3", "값4"]\r
+\r
+# visual/media blocks\r
+# - type: hero | image | video | youtube | videoCarousel | pdf | MIME | tiobeIndex\r
+#   title: "제목"\r
+#   src: "path-or-url"             # image/pdf/video\r
+#   items: []                      # carousel/resource entries\r
+\r
+# cards and comparison blocks\r
+# - type: featureCards | choiceCards | resourceCards | threeColumnCards | stepCard | practiceCard\r
+#   cards:\r
+#     - title: "카드 제목"\r
+#       description: "카드 설명"\r
+#\r
+# - type: compare | fullWidthComparison\r
+#   left:\r
+#     title: "왼쪽"\r
+#     items: []\r
+#   right:\r
+#     title: "오른쪽"\r
+#     items: []\r
+\r
+# resource blocks\r
+# - type: link | links | linkButtons\r
+#   title: "자료"\r
+#   url: "https://..."             # for link\r
+#   links: []                      # for links\r
+#   buttons: []                    # for linkButtons\r
+\r
+# quiz blocks\r
+# - type: quiz\r
+#   question: "질문"\r
+#   options:\r
+#     - "선택지 1"\r
+#     - "선택지 2"\r
+#   answer: 0\r
+#   explanation: "해설"\r
+`;export{e as default};

@@ -1,0 +1,1016 @@
+var e=`meta:
+  id: day24
+  title: 특수 메서드
+  day: 24
+  category: 30days
+  tags:
+  - 특수메서드
+  - dunder
+  - repr
+  - 연산자오버로딩
+  - 컨테이너
+  - 검증
+  seo:
+    title: 파이썬 특수 메서드 - 매직 메서드로 객체 동작 정의
+    description: __str__, __repr__, __len__, __add__, __eq__, __getitem__ 등 특수 메서드를 배웁니다.
+    keywords:
+    - 특수메서드
+    - magic method
+    - dunder
+    - __str__
+    - __repr__
+intro:
+  emoji: ✨
+  points:
+  - __str__과 __repr__로 문자열 표현
+  - __len__으로 길이 정의
+  - __add__, __eq__로 연산자 구현
+  - __getitem__으로 인덱싱 지원
+  direction: 특수 메서드에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 특수 메서드 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: str 메서드 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: repr 메서드 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: len 메서드 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 특수 메서드 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 특수 메서드 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 특수 메서드 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: str_method
+  title: __str__ 메서드
+  structuredPrimary: true
+  subtitle: 사람이 읽기 쉬운 문자열 표현
+  goal: 책 정보를 바꾸고 print에 객체를 그대로 넣어 __str__이 자동으로 불리는 것을 확인한다.
+  why: 객체를 그냥 출력하면 기본값은 사람이 읽을 수 없는 주소인데, __str__을 한 번 정의해 두면 그 객체를 화면에 찍는 모든 자리가 한꺼번에 읽을 수 있는 문장으로 바뀝니다.
+  explanation: |-
+    __str__ 메서드는 객체를 문자열로 변환할 때 호출됩니다. str(객체)나 print(객체)를 사용하면 자동으로 __str__이 호출되어 사람이 읽기 쉬운 형태로 출력됩니다. 이 메서드를 정의하지 않으면 기본적으로 객체의 메모리 주소가 출력됩니다.
+
+    __str__은 최종 사용자를 위한 읽기 쉬운 출력을 만드는 데 사용합니다.
+  snippet: |-
+    class Book:
+        def __init__(self, title, author):
+            self.title = title
+            self.author = author
+
+        def __str__(self):
+            return self.title + ' by ' + self.author
+
+    book = Book('Python Guide', 'Kim')
+    str(book)
+  exercise:
+    prompt: |-
+      두 곳을 고치세요. book = Book('Python Guide', 'Kim')을 book = Book('Clean Code', 'Martin')으로 바꾸고, 마지막 줄 str(book)을 print(book)으로 바꾸세요. 클래스 본문은 그대로 둡니다.
+
+      print에 객체를 그대로 넣어도 __str__이 불리므로 Clean Code by Martin이 나와야 합니다.
+    starterCode: |-
+      class Book:
+          def __init__(self, title, author):
+              self.title = title
+              self.author = author
+
+          def __str__(self):
+              return self.title + ' by ' + self.author
+
+      book = Book('Python Guide', 'Kim')
+      str(book)
+    solution: |-
+      class Book:
+          def __init__(self, title, author):
+              self.title = title
+              self.author = author
+
+          def __str__(self):
+              return self.title + ' by ' + self.author
+
+      book = Book('Clean Code', 'Martin')
+      print(book)
+    hints:
+    - "book = Book('Python Guide', 'Kim') 을 book = Book('Clean Code', 'Martin') 으로 바꾸고, 마지막 줄 str(book) 을 print(book) 으로 바꿉니다. 클래스 안쪽은 건드리지 않습니다."
+    - "정답 형태: 마지막 줄 print(book)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'Clean Code by Martin'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Clean Code by Martin'"
+- id: repr_method
+  title: __repr__ 메서드
+  structuredPrimary: true
+  subtitle: 개발자를 위한 명확한 표현
+  goal: repr()로 감싸지 않고 객체 이름만 적어도 __repr__이 쓰이는 것을 다른 좌표로 확인한다.
+  why: 디버깅할 때 객체를 그냥 찍어 봤는데 주소만 나오면 아무 단서가 없지만, __repr__을 정의해 두면 안에 어떤 값이 들어 있는지 그 자리에서 바로 보입니다.
+  explanation: |-
+    __repr__ 메서드는 객체의 공식적인 문자열 표현을 정의합니다. repr(객체)를 호출하거나 인터프리터에서 객체를 직접 입력하면 호출됩니다. 주로 디버깅이나 로깅에 사용되며, 가능하면 객체를 재생성할 수 있는 형태의 문자열을 반환해야 합니다.
+
+    __str__이 없으면 __repr__이 대신 사용됩니다. 하나만 정의한다면 __repr__을 권장합니다.
+  snippet: |-
+    class Point:
+        def __init__(self, x, y):
+            self.x = x
+            self.y = y
+
+        def __repr__(self):
+            return 'Point(' + str(self.x) + ', ' + str(self.y) + ')'
+
+    pt = Point(3, 4)
+    repr(pt)
+  exercise:
+    prompt: |-
+      두 곳을 고치세요. pt = Point(3, 4)를 pt = Point(10, 20)으로 바꾸고, 마지막 줄 repr(pt)를 pt로 바꾸세요. 클래스 본문은 그대로 둡니다.
+
+      repr()로 감싸지 않고 객체 이름만 적어도 __repr__이 불리므로 Point(10, 20)이 나와야 합니다.
+    starterCode: |-
+      class Point:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+          def __repr__(self):
+              return 'Point(' + str(self.x) + ', ' + str(self.y) + ')'
+
+      pt = Point(3, 4)
+      repr(pt)
+    solution: |-
+      class Point:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+          def __repr__(self):
+              return 'Point(' + str(self.x) + ', ' + str(self.y) + ')'
+
+      pt = Point(10, 20)
+      pt
+    hints:
+    - pt = Point(3, 4) 를 pt = Point(10, 20) 으로 바꾸고, 마지막 줄 repr(pt) 를 pt 한 글자짜리 줄로 바꿉니다.
+    - "정답 형태: 마지막 줄에 pt"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'Point(10, 20)'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Point(10, 20)'"
+- id: len_method
+  title: __len__ 메서드
+  structuredPrimary: true
+  subtitle: 객체의 길이 정의
+  goal: 곡이 든 재생목록과 빈 재생목록을 나란히 놓아 __len__이 len()과 참거짓 판정에 함께 쓰이는 것을 확인한다.
+  why: 비어 있는지 확인할 때마다 len(x) == 0 이라고 적지 않고 if playlist 한 줄로 쓸 수 있는 이유가 __len__이며, 이 하나만 있으면 내가 만든 클래스도 리스트처럼 조건문에 바로 넣을 수 있습니다.
+  explanation: |-
+    __len__ 메서드는 객체의 길이를 정의합니다. len(객체)를 호출하면 자동으로 __len__이 호출되어 정수값을 반환합니다. 컬렉션 타입 클래스를 만들 때 매우 유용하며, 반드시 음이 아닌 정수를 반환해야 합니다.
+
+    __len__은 bool() 판단에도 사용됩니다. len이 0이면 False, 아니면 True입니다.
+  snippet: |-
+    class Playlist:
+        def __init__(self):
+            self.songs = []
+
+        def add(self, song):
+            self.songs.append(song)
+
+        def __len__(self):
+            return len(self.songs)
+
+    pl = Playlist()
+    pl.add('Song A')
+    pl.add('Song B')
+    len(pl)
+  exercise:
+    prompt: |-
+      두 곳을 고치세요. pl.add('Song B') 아래에 empty = Playlist() 한 줄을 들여쓰기 없이 추가하고, 마지막 줄 len(pl)을 len(pl), bool(pl), len(empty), bool(empty)로 바꾸세요.
+
+      __len__이 돌려준 수가 0이면 False, 0이 아니면 True로 판정되므로 (2, True, 0, False)가 나와야 합니다.
+    starterCode: |-
+      class Playlist:
+          def __init__(self):
+              self.songs = []
+
+          def add(self, song):
+              self.songs.append(song)
+
+          def __len__(self):
+              return len(self.songs)
+
+      pl = Playlist()
+      pl.add('Song A')
+      pl.add('Song B')
+      len(pl)
+    solution: |-
+      class Playlist:
+          def __init__(self):
+              self.songs = []
+
+          def add(self, song):
+              self.songs.append(song)
+
+          def __len__(self):
+              return len(self.songs)
+
+      pl = Playlist()
+      pl.add('Song A')
+      pl.add('Song B')
+      empty = Playlist()
+      len(pl), bool(pl), len(empty), bool(empty)
+    hints:
+    - "pl.add('Song B') 다음 줄에 empty = Playlist() 를 넣고, 마지막 줄을 len(pl), bool(pl), len(empty), bool(empty) 로 바꿉니다. empty에는 곡을 넣지 않습니다."
+    - "정답 형태: len(pl), bool(pl), len(empty), bool(empty)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '(2, True, 0, False)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(2, True, 0, False)'"
+- id: add_method
+  title: __add__ 메서드
+  structuredPrimary: true
+  subtitle: + 연산자 구현
+  goal: 더하기가 새 Vector를 만들어 돌려주고 원래 v1은 그대로 남는다는 것을 한 줄로 나란히 확인한다.
+  why: 좌표나 금액을 더할 때 v1 + v2 라고 쓸 수 있으면 계산식이 수식 그대로 읽히고, 새 객체를 돌려주므로 더하기 한 번에 원본이 바뀌는 사고도 나지 않습니다.
+  explanation: |-
+    __add__ 메서드는 + 연산자의 동작을 정의합니다. a + b를 실행하면 a.__add__(b)가 호출됩니다. 이를 통해 사용자 정의 클래스에서도 덧셈 연산을 의미있게 구현할 수 있습니다. 새로운 객체를 반환하는 것이 일반적입니다.
+
+    __sub__, __mul__, __div__ 등으로 다른 연산자도 구현할 수 있습니다.
+  snippet: |-
+    class Vector:
+        def __init__(self, x, y):
+            self.x = x
+            self.y = y
+
+        def __add__(self, other):
+            return Vector(self.x + other.x, self.y + other.y)
+
+        def __repr__(self):
+            return 'Vector(' + str(self.x) + ', ' + str(self.y) + ')'
+
+    v1 = Vector(1, 2)
+    v2 = Vector(3, 4)
+    v3 = v1 + v2
+    repr(v3)
+  exercise:
+    prompt: |-
+      두 곳을 고치세요. v2 = Vector(3, 4)를 v2 = Vector(9, 18)로 바꾸고, 마지막 줄 repr(v3)를 v3, v1로 바꾸세요. 클래스 본문은 그대로 둡니다.
+
+      __add__가 새 Vector를 만들어 v3에 넣고 v1은 손대지 않으므로 (Vector(10, 20), Vector(1, 2))가 나와야 합니다.
+    starterCode: |-
+      class Vector:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+          def __add__(self, other):
+              return Vector(self.x + other.x, self.y + other.y)
+
+          def __repr__(self):
+              return 'Vector(' + str(self.x) + ', ' + str(self.y) + ')'
+
+      v1 = Vector(1, 2)
+      v2 = Vector(3, 4)
+      v3 = v1 + v2
+      repr(v3)
+    solution: |-
+      class Vector:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+          def __add__(self, other):
+              return Vector(self.x + other.x, self.y + other.y)
+
+          def __repr__(self):
+              return 'Vector(' + str(self.x) + ', ' + str(self.y) + ')'
+
+      v1 = Vector(1, 2)
+      v2 = Vector(9, 18)
+      v3 = v1 + v2
+      v3, v1
+    hints:
+    - v2 = Vector(3, 4) 를 v2 = Vector(9, 18) 로 바꾸고, 마지막 줄 repr(v3) 를 v3, v1 로 바꿉니다. v3 = v1 + v2 줄은 그대로 둡니다.
+    - "정답 형태: 마지막 줄에 v3, v1"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '(Vector(10, 20), Vector(1, 2))'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(Vector(10, 20), Vector(1, 2))'"
+- id: eq_method
+  title: __eq__ 메서드
+  structuredPrimary: true
+  subtitle: == 연산자 구현
+  goal: 값이 같으면 ==는 True이지만 is는 여전히 False라는 것을 한 줄에 나란히 놓고 확인한다.
+  why: 좌표나 금액처럼 값이 같으면 같은 것으로 봐야 하는 자료는 __eq__가 없으면 내용이 똑같아도 다르다고 판정되어, 비교하는 코드가 전부 속성을 하나씩 꺼내 보는 모양이 됩니다.
+  explanation: |-
+    __eq__ 메서드는 == 연산자의 동작을 정의합니다. a == b를 실행하면 a.__eq__(b)가 호출됩니다. 기본적으로 객체는 같은 메모리 주소일 때만 같다고 판단하지만, __eq__를 정의하면 값 기반 비교가 가능합니다. True나 False를 반환해야 합니다.
+
+    __ne__(!=), __lt__(<), __le__(<=), __gt__(>), __ge__(>=)도 구현할 수 있습니다.
+  snippet: |-
+    class Location:
+        def __init__(self, x, y):
+            self.x = x
+            self.y = y
+
+        def __eq__(self, other):
+            return self.x == other.x and self.y == other.y
+
+    loc1 = Location(1, 2)
+    loc2 = Location(1, 2)
+    loc1 == loc2
+  exercise:
+    prompt: |-
+      마지막 줄 loc1 == loc2를 loc1 == loc2, loc1 is loc2로 바꾸세요. 클래스와 두 객체를 만드는 줄은 그대로 둡니다.
+
+      __eq__ 덕분에 값이 같으면 ==는 True이지만, 따로 만들어진 두 객체라서 같은 자리인지 묻는 is는 False입니다. 그래서 (True, False)가 나와야 합니다.
+    starterCode: |-
+      class Location:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+          def __eq__(self, other):
+              return self.x == other.x and self.y == other.y
+
+      loc1 = Location(1, 2)
+      loc2 = Location(1, 2)
+      loc1 == loc2
+    solution: |-
+      class Location:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+          def __eq__(self, other):
+              return self.x == other.x and self.y == other.y
+
+      loc1 = Location(1, 2)
+      loc2 = Location(1, 2)
+      loc1 == loc2, loc1 is loc2
+    hints:
+    - 마지막 줄 뒤에 쉼표를 찍고 loc1 is loc2 를 이어 붙여 loc1 == loc2, loc1 is loc2 로 만듭니다. 좌표 값은 두 객체 모두 그대로 둡니다.
+    - "정답 형태: loc1 == loc2, loc1 is loc2"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '(True, False)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(True, False)'"
+- id: getitem_method
+  title: __getitem__ 메서드
+  structuredPrimary: true
+  subtitle: 인덱싱과 슬라이싱 지원
+  goal: __getitem__ 하나만 정의해도 음수 인덱스와 목록 변환이 함께 되는 것을 확인한다.
+  why: 내가 만든 클래스에 __getitem__ 하나만 붙여도 대괄호 인덱싱과 반복이 같이 열리기 때문에, 그 객체를 받는 쪽 코드가 리스트를 다루던 방식 그대로 돌아갑니다.
+  explanation: |-
+    __getitem__ 메서드는 객체[키] 형태의 인덱싱을 가능하게 합니다. obj[key]를 실행하면 obj.__getitem__(key)가 호출됩니다. 리스트처럼 동작하는 커스텀 컨테이너를 만들 때 필수적이며, 슬라이싱도 지원할 수 있습니다.
+
+    __setitem__과 __delitem__으로 obj[key] = val과 del obj[key]도 구현할 수 있습니다.
+  snippet: |-
+    class Items:
+        def __init__(self):
+            self.data = []
+
+        def add(self, item):
+            self.data.append(item)
+
+        def __getitem__(self, idx):
+            return self.data[idx]
+
+    items = Items()
+    items.add('first')
+    items.add('second')
+    items[0]
+  exercise:
+    prompt: |-
+      마지막 줄 items[0]을 items[-1], list(items)로 바꾸세요. 클래스와 add 호출 두 줄은 그대로 둡니다.
+
+      안쪽 리스트가 음수 인덱스를 그대로 처리하고, list()는 __getitem__을 0번부터 차례로 불러 값을 모읍니다. 그래서 ('second', ['first', 'second'])가 나와야 합니다.
+    starterCode: |-
+      class Items:
+          def __init__(self):
+              self.data = []
+
+          def add(self, item):
+              self.data.append(item)
+
+          def __getitem__(self, idx):
+              return self.data[idx]
+
+      items = Items()
+      items.add('first')
+      items.add('second')
+      items[0]
+    solution: |-
+      class Items:
+          def __init__(self):
+              self.data = []
+
+          def add(self, item):
+              self.data.append(item)
+
+          def __getitem__(self, idx):
+              return self.data[idx]
+
+      items = Items()
+      items.add('first')
+      items.add('second')
+      items[-1], list(items)
+    hints:
+    - "items[0] 을 items[-1], list(items) 로 바꿉니다. 대괄호 안에 -1 을 넣으면 마지막 항목이고, list() 는 객체 전체를 목록으로 만듭니다."
+    - "정답 형태: items[-1], list(items)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "('second', ['first', 'second'])"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"('second', ['first', 'second'])\\""
+- id: special_methods_practice
+  title: 특수 메서드 실전
+  structuredPrimary: true
+  subtitle: 여러 특수 메서드 조합
+  goal: 할 일을 하나 더 넣어 __len__, __str__, __getitem__ 세 가지가 같은 변화에 함께 반응하는 것을 확인한다.
+  why: 특수 메서드를 여러 개 갖춘 객체는 길이 재기, 문자열 만들기, 인덱싱을 모두 파이썬 기본 문법으로 받아 주기 때문에, 그 객체를 쓰는 코드가 리스트를 다루던 코드와 똑같이 읽힙니다.
+  explanation: |-
+    실제 클래스는 여러 특수 메서드를 함께 구현하여 파이썬 내장 타입처럼 동작하게 만듭니다. __str__, __len__, __getitem__ 등을 조합하면 강력하고 직관적인 인터페이스를 제공할 수 있습니다.
+
+    특수 메서드를 잘 활용하면 사용자 정의 클래스가 파이썬 내장 타입만큼 자연스럽게 동작합니다.
+  snippet: |-
+    class TodoList:
+        def __init__(self):
+            self.tasks = []
+
+        def add(self, task):
+            self.tasks.append(task)
+
+        def __len__(self):
+            return len(self.tasks)
+
+        def __getitem__(self, idx):
+            return self.tasks[idx]
+
+        def __str__(self):
+            return str(len(self.tasks)) + ' tasks'
+
+    todo = TodoList()
+    todo.add('Study')
+    todo.add('Code')
+    len(todo), str(todo), todo[0]
+  exercise:
+    prompt: |-
+      두 곳을 고치세요. todo.add('Code') 아래에 todo.add('Rest') 한 줄을 추가하고, 마지막 줄의 todo[0]을 todo[-1]로 바꾸세요. 클래스 본문은 그대로 둡니다.
+
+      할 일이 셋이 되면 __len__은 3을, __str__은 그 수를 그대로 쓴 3 tasks를, __getitem__은 마지막 항목을 돌려줍니다. 그래서 (3, '3 tasks', 'Rest')가 나와야 합니다.
+    starterCode: |-
+      class TodoList:
+          def __init__(self):
+              self.tasks = []
+
+          def add(self, task):
+              self.tasks.append(task)
+
+          def __len__(self):
+              return len(self.tasks)
+
+          def __getitem__(self, idx):
+              return self.tasks[idx]
+
+          def __str__(self):
+              return str(len(self.tasks)) + ' tasks'
+
+      todo = TodoList()
+      todo.add('Study')
+      todo.add('Code')
+      len(todo), str(todo), todo[0]
+    solution: |-
+      class TodoList:
+          def __init__(self):
+              self.tasks = []
+
+          def add(self, task):
+              self.tasks.append(task)
+
+          def __len__(self):
+              return len(self.tasks)
+
+          def __getitem__(self, idx):
+              return self.tasks[idx]
+
+          def __str__(self):
+              return str(len(self.tasks)) + ' tasks'
+
+      todo = TodoList()
+      todo.add('Study')
+      todo.add('Code')
+      todo.add('Rest')
+      len(todo), str(todo), todo[-1]
+    hints:
+    - "todo.add('Code') 다음 줄에 todo.add('Rest') 를 들여쓰기 없이 넣고, 마지막 줄의 todo[0] 만 todo[-1] 로 바꿉니다. len(todo) 와 str(todo) 는 그대로 둡니다."
+    - "정답 형태: len(todo), str(todo), todo[-1]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "(3, '3 tasks', 'Rest')"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"(3, '3 tasks', 'Rest')\\""
+- id: workflow_validation
+  title: '현업 흐름 검증: 장바구니를 파이썬답게 다루기'
+  structuredPrimary: true
+  subtitle: 작게 실행하고 결과를 확인하는 단계
+  goal: assert 네 줄을 그대로 통과시킨 뒤 장바구니 합계를 출력해 __str__이 없으면 __repr__이 대신 쓰이는 것을 확인한다.
+  why: 특수 메서드가 여럿 얽힌 코드는 눈으로 훑어서는 맞는지 알 수 없으므로, 기대값을 assert로 박아 두고 조용히 끝나는지 본 다음 마지막 값 하나만 눈으로 확인합니다.
+  explanation: 특수 메서드는 객체를 len(), 인덱싱, 비교, 더하기 같은 파이썬 기본 문법과 자연스럽게 연결합니다. 장바구니 예제로 동작을 검증해봅니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class Money:
+        def __init__(self, amount):
+            if amount < 0:
+                raise ValueError("amount must not be negative")
+            self.amount = amount
+
+        def __add__(self, other):
+            if not isinstance(other, Money):
+                raise TypeError("Money can only be added to Money")
+            return Money(self.amount + other.amount)
+
+        def __eq__(self, other):
+            return isinstance(other, Money) and self.amount == other.amount
+
+        def __repr__(self):
+            return f"Money({self.amount})"
+
+    class Cart:
+        def __init__(self):
+            self.lines = []
+
+        def add(self, name, price):
+            self.lines.append({"name": name, "price": Money(price)})
+
+        def __len__(self):
+            return len(self.lines)
+
+        def __getitem__(self, index):
+            return self.lines[index]
+
+        def total(self):
+            totalMoney = Money(0)
+            for line in self.lines:
+                totalMoney = totalMoney + line["price"]
+            return totalMoney
+
+        def __repr__(self):
+            return f"Cart(lines={self.lines!r})"
+
+    cart = Cart()
+    cart.add("keyboard", 50000)
+    cart.add("mouse", 20000)
+
+    assert len(cart) == 2
+    assert cart[0]["name"] == "keyboard"
+    assert cart.total() == Money(70000)
+    assert repr(cart).startswith("Cart(")
+
+    try:
+        Money(1000) + 500
+    except TypeError as exc:
+        assert "Money" in str(exc)
+
+    print("장바구니 특수 메서드 흐름 통과")
+  exercise:
+    prompt: |-
+      기존 줄은 하나도 바꾸지 말고 그대로 두세요. 맨 아래 print 줄 다음에 print(cart.total()) 한 줄만 추가하면 됩니다.
+
+      assert 네 줄이 조용히 통과한 뒤, Money에는 __str__이 없어 print가 __repr__을 대신 쓰므로 아래 두 줄이 나와야 합니다.
+      장바구니 특수 메서드 흐름 통과
+      Money(70000)
+    starterCode: |-
+      class Money:
+          def __init__(self, amount):
+              if amount < 0:
+                  raise ValueError("amount must not be negative")
+              self.amount = amount
+
+          def __add__(self, other):
+              if not isinstance(other, Money):
+                  raise TypeError("Money can only be added to Money")
+              return Money(self.amount + other.amount)
+
+          def __eq__(self, other):
+              return isinstance(other, Money) and self.amount == other.amount
+
+          def __repr__(self):
+              return f"Money({self.amount})"
+
+      class Cart:
+          def __init__(self):
+              self.lines = []
+
+          def add(self, name, price):
+              self.lines.append({"name": name, "price": Money(price)})
+
+          def __len__(self):
+              return len(self.lines)
+
+          def __getitem__(self, index):
+              return self.lines[index]
+
+          def total(self):
+              totalMoney = Money(0)
+              for line in self.lines:
+                  totalMoney = totalMoney + line["price"]
+              return totalMoney
+
+          def __repr__(self):
+              return f"Cart(lines={self.lines!r})"
+
+      cart = Cart()
+      cart.add("keyboard", 50000)
+      cart.add("mouse", 20000)
+
+      assert len(cart) == 2
+      assert cart[0]["name"] == "keyboard"
+      assert cart.total() == Money(70000)
+      assert repr(cart).startswith("Cart(")
+
+      try:
+          Money(1000) + 500
+      except TypeError as exc:
+          assert "Money" in str(exc)
+
+      print("장바구니 특수 메서드 흐름 통과")
+    solution: |-
+      class Money:
+          def __init__(self, amount):
+              if amount < 0:
+                  raise ValueError("amount must not be negative")
+              self.amount = amount
+
+          def __add__(self, other):
+              if not isinstance(other, Money):
+                  raise TypeError("Money can only be added to Money")
+              return Money(self.amount + other.amount)
+
+          def __eq__(self, other):
+              return isinstance(other, Money) and self.amount == other.amount
+
+          def __repr__(self):
+              return f"Money({self.amount})"
+
+      class Cart:
+          def __init__(self):
+              self.lines = []
+
+          def add(self, name, price):
+              self.lines.append({"name": name, "price": Money(price)})
+
+          def __len__(self):
+              return len(self.lines)
+
+          def __getitem__(self, index):
+              return self.lines[index]
+
+          def total(self):
+              totalMoney = Money(0)
+              for line in self.lines:
+                  totalMoney = totalMoney + line["price"]
+              return totalMoney
+
+          def __repr__(self):
+              return f"Cart(lines={self.lines!r})"
+
+      cart = Cart()
+      cart.add("keyboard", 50000)
+      cart.add("mouse", 20000)
+
+      assert len(cart) == 2
+      assert cart[0]["name"] == "keyboard"
+      assert cart.total() == Money(70000)
+      assert repr(cart).startswith("Cart(")
+
+      try:
+          Money(1000) + 500
+      except TypeError as exc:
+          assert "Money" in str(exc)
+
+      print("장바구니 특수 메서드 흐름 통과")
+      print(cart.total())
+    hints:
+    - 코드는 하나도 고치지 말고, 맨 아래 print 줄 다음에 print(cart.total()) 한 줄만 들여쓰기 없이 추가합니다.
+    - "정답 형태: 마지막 줄에 print(cart.total())"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: |-
+      장바구니 특수 메서드 흐름 통과
+      Money(70000)
+    resultCheck: "출력이 정확히 일치해야 합니다: '장바구니 특수 메서드 흐름 통과\\nMoney(70000)'"
+- id: practice
+  title: Day 24 종합 복습
+  structuredPrimary: true
+  subtitle: 특수 메서드 마스터하기
+  goal: Person에 __repr__을 직접 붙여 같은 객체가 자리에 따라 다른 문자열로 보이게 만든다.
+  why: __str__은 사용자에게 보여 줄 문장이고 __repr__은 값을 그대로 드러내는 개발자용 표현이라, 둘을 함께 정의해 두면 화면과 로그가 각자 필요한 형태를 갖게 됩니다.
+  explanation: Day 24에서 배운 특수 메서드를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class Person:
+        def __init__(self, name, age):
+            self.name = name
+            self.age = age
+
+        def __str__(self):
+            return self.name + ' (' + str(self.age) + ')'
+
+    p = Person('Alice', 25)
+    str(p)
+  exercise:
+    prompt: |-
+      두 곳을 고치세요. __str__ 메서드 아래에 빈 줄 하나를 두고 __repr__ 메서드를 클래스 안에 추가하세요. 본문은 return 'Person(' + self.name + ', ' + str(self.age) + ')' 한 줄입니다. 그리고 마지막 줄 str(p)를 str(p), p로 바꾸세요.
+
+      같은 p 객체인데 str()은 __str__을 쓰고 이름만 적은 자리는 __repr__을 쓰므로 ('Alice (25)', Person(Alice, 25))가 나와야 합니다.
+    starterCode: |-
+      class Person:
+          def __init__(self, name, age):
+              self.name = name
+              self.age = age
+
+          def __str__(self):
+              return self.name + ' (' + str(self.age) + ')'
+
+      p = Person('Alice', 25)
+      str(p)
+    solution: |-
+      class Person:
+          def __init__(self, name, age):
+              self.name = name
+              self.age = age
+
+          def __str__(self):
+              return self.name + ' (' + str(self.age) + ')'
+
+          def __repr__(self):
+              return 'Person(' + self.name + ', ' + str(self.age) + ')'
+
+      p = Person('Alice', 25)
+      str(p), p
+    hints:
+    - "def __repr__(self): 를 __str__ 과 같은 들여쓰기(공백 4칸)로 적고, 그 안에 return 'Person(' + self.name + ', ' + str(self.age) + ')' 한 줄을 넣습니다. 그리고 마지막 줄을 str(p), p 로 바꿉니다."
+    - "정답 형태: __repr__ 추가 뒤 마지막 줄 str(p), p"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "('Alice (25)', Person(Alice, 25))"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"('Alice (25)', Person(Alice, 25))\\""
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
+  masteryVariants:
+  - id: day24-vector-add-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - str_method
+    - practice
+    title: __add__로 두 벡터 더하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 특수 메서드가 연산자 동작으로 연결되는 것을 구현한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: Vector.__add__와 vector_sum(left, right)를 완성해 합친 좌표 목록을 반환하세요.
+      starterCode: |-
+        class Vector:
+            pass
+
+        def vector_sum(left, right):
+            raise NotImplementedError
+      solution: |-
+        class Vector:
+            def __init__(self, x, y):
+                self.x = x
+                self.y = y
+
+            def __add__(self, other):
+                return Vector(self.x + other.x, self.y + other.y)
+
+        def vector_sum(left, right):
+            result = Vector(*left) + Vector(*right)
+            return [result.x, result.y]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day24.vector-add.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day24.vector-add.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: vector_sum
+        cases:
+        - id: positive
+          arguments:
+          - value:
+            - 1
+            - 2
+          - value:
+            - 3
+            - 4
+          expectedReturn:
+          - 4
+          - 6
+        - id: signed
+          arguments:
+          - value:
+            - -1
+            - 5
+          - value:
+            - 2
+            - -3
+          expectedReturn:
+          - 1
+          - 2
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day24-score-order-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day24-vector-add-mastery
+    title: 객체 비교로 점수 정렬하기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: __lt__를 정렬 계약에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: Score.__lt__와 sorted_scores(values)를 완성해 오름차순 숫자 목록을 반환하세요.
+      starterCode: |-
+        class Score:
+            pass
+
+        def sorted_scores(values):
+            raise NotImplementedError
+      solution: |-
+        class Score:
+            def __init__(self, value):
+                self.value = value
+
+            def __lt__(self, other):
+                return self.value < other.value
+
+        def sorted_scores(values):
+            return [score.value for score in sorted(Score(value) for value in values)]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day24.score-order.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day24.score-order.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: sorted_scores
+        cases:
+        - id: mixed
+          arguments:
+          - value:
+            - 30
+            - 10
+            - 20
+          expectedReturn:
+          - 10
+          - 20
+          - 30
+        - id: signed
+          arguments:
+          - value:
+            - 0
+            - -2
+            - 5
+          expectedReturn:
+          - -2
+          - 0
+          - 5
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day24-book-string-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day24-score-order-transfer
+    title: __str__ 표현 다시 만들기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 객체의 사용자 표시 문자열 계약을 기억에서 복원한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: Book.__str__와 book_label(title, author)를 완성해 'title by author'를 반환하세요.
+      starterCode: |-
+        class Book:
+            pass
+
+        def book_label(title, author):
+            raise NotImplementedError
+      solution: |-
+        class Book:
+            def __init__(self, title, author):
+                self.title = title
+                self.author = author
+
+            def __str__(self):
+                return f"{self.title} by {self.author}"
+
+        def book_label(title, author):
+            return str(Book(title, author))
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day24.book-string.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day24.book-string.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: book_label
+        cases:
+        - id: python
+          arguments:
+          - value: Python
+          - value: Mina
+          expectedReturn: Python by Mina
+        - id: codaro
+          arguments:
+          - value: Codaro
+          - value: Team
+          expectedReturn: Codaro by Team
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

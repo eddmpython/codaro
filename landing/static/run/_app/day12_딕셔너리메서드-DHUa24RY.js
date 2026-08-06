@@ -1,0 +1,690 @@
+var e=`meta:
+  id: day12
+  title: 딕셔너리메서드
+  day: 12
+  category: 30days
+  tags:
+  - 딕셔너리
+  - get
+  - update
+  - items
+  - 설정병합
+  - 검증
+  seo:
+    title: 파이썬 딕셔너리 메서드 - 효율적인 데이터 관리
+    description: get, keys, values, items, update, pop, popitem, clear 메서드를 배웁니다.
+    keywords:
+    - 딕셔너리메서드
+    - get
+    - keys
+    - values
+    - items
+    - update
+intro:
+  emoji: 🔧
+  points:
+  - 안전한 값 접근 get()
+  - 키, 값, 아이템 순회
+  - 딕셔너리 병합과 삭제
+  - 실전 데이터 처리
+  direction: 딕셔너리메서드에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 딕셔너리메서드 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: get() 메서드 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: keys() 메서드 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: values() 메서드 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 딕셔너리메서드 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 딕셔너리메서드 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 딕셔너리메서드 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: method_get
+  title: get() 메서드
+  structuredPrimary: true
+  subtitle: 안전한 값 접근
+  goal: get()으로 없는 키를 조회해 에러 대신 기본값을 돌려받는다.
+  why: 설정이나 요청 데이터는 항목이 빠질 수 있어서 대괄호로 읽으면 KeyError로 멈춥니다. get()은 기본값을 돌려주고 다음 줄로 흐름을 이어 줍니다.
+  explanation: |-
+    get() 메서드는 대괄호[] 접근의 안전한 대안입니다. 키가 없어도 에러 없이 None을 반환하며, 기본값을 지정할 수도 있습니다. dict.get(key) 또는 dict.get(key, default) 형식으로 사용합니다.
+
+    get()은 설정값이나 옵션 처리에 매우 유용합니다.
+  snippet: |-
+    config = {'host': 'localhost', 'port': 8080}
+    config.get('host')
+  exercise:
+    prompt: |-
+      마지막 줄 config.get('host')를 config.get('user', 'admin')으로 바꾸세요.
+
+      config에 user 키가 없으므로 기본값인 admin이 나와야 합니다.
+    starterCode: |-
+      config = {'host': 'localhost', 'port': 8080}
+      config.get('host')
+    solution: |-
+      config = {'host': 'localhost', 'port': 8080}
+      config.get('user', 'admin')
+    hints:
+    - "config.get('host') 를 config.get('user', 'admin') 으로 바꿉니다. 첫 줄 딕셔너리는 그대로 둡니다."
+    - "정답 형태: config.get('user', 'admin')"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'admin'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'admin'"
+- id: method_keys
+  title: keys() 메서드
+  structuredPrimary: true
+  subtitle: 모든 키 가져오기
+  goal: keys()가 돌려준 키 묶음을 list()로 감싸 보통의 리스트로 바꾼다.
+  why: 키만 따로 모아 두면 어떤 항목이 들어 있는지 한눈에 보이고, 인덱스로 꺼내거나 정렬하는 리스트 기능도 그대로 쓸 수 있습니다.
+  explanation: |-
+    keys() 메서드는 딕셔너리의 모든 키를 dict_keys 객체로 반환합니다. list()로 변환하여 리스트로 사용할 수 있습니다. 키만 필요할 때 유용합니다.
+
+    keys()는 딕셔너리 순회나 키 확인에 사용됩니다.
+  snippet: |-
+    grade = {'math': 85, 'english': 90, 'science': 88}
+    grade.keys()
+  exercise:
+    prompt: |-
+      마지막 줄 grade.keys()를 list(grade.keys())로 감싸세요.
+
+      dict_keys(...) 형태 대신 ['math', 'english', 'science']가 나와야 합니다.
+    starterCode: |-
+      grade = {'math': 85, 'english': 90, 'science': 88}
+      grade.keys()
+    solution: |-
+      grade = {'math': 85, 'english': 90, 'science': 88}
+      list(grade.keys())
+    hints:
+    - grade.keys() 를 list(grade.keys()) 로 감쌉니다. 첫 줄 딕셔너리는 그대로 둡니다.
+    - "정답 형태: list(grade.keys())"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "['math', 'english', 'science']"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"['math', 'english', 'science']\\""
+- id: method_values
+  title: values() 메서드
+  structuredPrimary: true
+  subtitle: 모든 값 가져오기
+  goal: values()가 돌려준 값들을 sum()에 넘겨 합계를 구한다.
+  why: 점수나 수량처럼 값만 필요한 계산에서는 키를 하나씩 거치지 않고 values()를 그대로 합계, 최댓값, 평균 함수에 넘길 수 있습니다.
+  explanation: |-
+    values() 메서드는 딕셔너리의 모든 값을 dict_values 객체로 반환합니다. list()로 변환하여 리스트로 사용할 수 있습니다. 값만 필요할 때 유용합니다.
+
+    values()는 값의 존재 확인이나 통계 계산에 유용합니다.
+  snippet: |-
+    exam = {'math': 85, 'english': 90, 'science': 88}
+    exam.values()
+  exercise:
+    prompt: |-
+      마지막 줄 exam.values()를 sum(exam.values())로 감싸세요.
+
+      세 과목 점수를 모두 더한 263이 나와야 합니다.
+    starterCode: |-
+      exam = {'math': 85, 'english': 90, 'science': 88}
+      exam.values()
+    solution: |-
+      exam = {'math': 85, 'english': 90, 'science': 88}
+      sum(exam.values())
+    hints:
+    - exam.values() 를 sum(exam.values()) 로 감쌉니다. 첫 줄 딕셔너리는 그대로 둡니다.
+    - "정답 형태: sum(exam.values())"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '263'
+    resultCheck: "출력이 정확히 일치해야 합니다: '263'"
+- id: method_items
+  title: items() 메서드
+  structuredPrimary: true
+  subtitle: 키-값 쌍 가져오기
+  goal: items()가 돌려준 키-값 쌍을 리스트로 바꿔 각 항목이 튜플인 것을 눈으로 확인한다.
+  why: 키와 값을 함께 꺼내야 표를 만들거나 조건에 맞는 항목만 골라낼 수 있고, 리스트로 바꿔 두면 인덱스로 한 쌍씩 확인할 수 있습니다.
+  explanation: |-
+    items() 메서드는 딕셔너리의 모든 키-값 쌍을 dict_items 객체로 반환합니다. 각 항목은 (키, 값) 튜플 형태입니다. list()로 변환하면 튜플의 리스트가 됩니다.
+
+    items()는 딕셔너리 전체를 순회하거나 변환할 때 사용됩니다.
+  snippet: |-
+    product = {'name': '노트북', 'price': 1200000, 'stock': 5}
+    product.items()
+  exercise:
+    prompt: |-
+      마지막 줄 product.items()를 list(product.items())로 감싸세요.
+
+      각 항목이 (키, 값) 튜플로 보이므로 [('name', '노트북'), ('price', 1200000), ('stock', 5)]가 나와야 합니다.
+    starterCode: |-
+      product = {'name': '노트북', 'price': 1200000, 'stock': 5}
+      product.items()
+    solution: |-
+      product = {'name': '노트북', 'price': 1200000, 'stock': 5}
+      list(product.items())
+    hints:
+    - product.items() 를 list(product.items()) 로 감쌉니다. 첫 줄 딕셔너리는 그대로 둡니다.
+    - "정답 형태: list(product.items())"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "[('name', '노트북'), ('price', 1200000), ('stock', 5)]"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"[('name', '노트북'), ('price', 1200000), ('stock', 5)]\\""
+- id: method_update
+  title: update() 메서드
+  structuredPrimary: true
+  subtitle: 딕셔너리 병합
+  goal: update()에 이미 있는 키를 넣어 기존 값이 덮어써지는 것을 확인한다.
+  why: 기본 설정 위에 사용자 설정을 얹는 것처럼 두 딕셔너리를 합칠 때, 겹치는 키는 나중에 넣은 쪽이 이긴다는 규칙을 알아야 최종 값을 예측할 수 있습니다.
+  explanation: |-
+    update() 메서드는 다른 딕셔너리의 키-값 쌍을 현재 딕셔너리에 추가하거나 업데이트합니다. dict1.update(dict2) 형식으로 사용하며, dict2의 내용이 dict1에 병합됩니다. 같은 키가 있으면 값이 덮어씌워집니다.
+
+    update()는 설정 병합이나 데이터 통합에 매우 유용합니다.
+  snippet: |-
+    user = {'name': '김철수', 'age': 30}
+    extra = {'city': '서울', 'job': 'developer'}
+    user.update(extra)
+    user
+  exercise:
+    prompt: |-
+      extra의 'city': '서울' 부분을 'age': 31로 바꾸세요.
+
+      user에 이미 있는 age가 31로 덮어써지므로 {'name': '김철수', 'age': 31, 'job': 'developer'}가 나와야 합니다.
+    starterCode: |-
+      user = {'name': '김철수', 'age': 30}
+      extra = {'city': '서울', 'job': 'developer'}
+      user.update(extra)
+      user
+    solution: |-
+      user = {'name': '김철수', 'age': 30}
+      extra = {'age': 31, 'job': 'developer'}
+      user.update(extra)
+      user
+    hints:
+    - "extra = {'city': '서울', 'job': 'developer'} 를 extra = {'age': 31, 'job': 'developer'} 로 바꿉니다. 나머지 세 줄은 그대로 둡니다."
+    - "정답 형태: extra = {'age': 31, 'job': 'developer'}"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "{'name': '김철수', 'age': 31, 'job': 'developer'}"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"{'name': '김철수', 'age': 31, 'job': 'developer'}\\""
+- id: method_pop
+  title: pop() 메서드
+  structuredPrimary: true
+  subtitle: 키로 값 제거하고 반환
+  goal: pop()에 기본값을 함께 줘서 없는 키에도 에러 없이 값을 돌려받는다.
+  why: 있을 수도 없을 수도 있는 키를 기본값 없이 pop()하면 KeyError로 작업 전체가 멈춥니다. 기본값을 주면 없을 때도 정해진 값으로 이어 갑니다.
+  explanation: |-
+    pop() 메서드는 지정한 키의 값을 제거하고 그 값을 반환합니다. dict.pop(key) 형식으로 사용하며, 없는 키를 pop하면 에러가 발생합니다. dict.pop(key, default)로 기본값을 지정할 수 있습니다.
+
+    pop()은 값을 꺼내면서 동시에 제거할 때 유용합니다.
+  snippet: |-
+    stock = {'laptop': 10, 'mouse': 50, 'keyboard': 30}
+    stock.pop('mouse')
+  exercise:
+    prompt: |-
+      마지막 줄 stock.pop('mouse')를 stock.pop('monitor', 0)으로 바꾸세요.
+
+      stock에 monitor 키가 없지만 기본값을 줬으므로 에러 없이 0이 나와야 합니다.
+    starterCode: |-
+      stock = {'laptop': 10, 'mouse': 50, 'keyboard': 30}
+      stock.pop('mouse')
+    solution: |-
+      stock = {'laptop': 10, 'mouse': 50, 'keyboard': 30}
+      stock.pop('monitor', 0)
+    hints:
+    - "stock.pop('mouse') 를 stock.pop('monitor', 0) 으로 바꿉니다. 기본값 0을 빠뜨리면 KeyError가 납니다."
+    - "정답 형태: stock.pop('monitor', 0)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '0'
+    resultCheck: "출력이 정확히 일치해야 합니다: '0'"
+- id: method_popitem
+  title: popitem() 메서드
+  structuredPrimary: true
+  subtitle: 마지막 키-값 쌍 제거
+  goal: 항목을 하나 더 넣어 popitem()이 항상 마지막에 들어간 항목을 빼낸다는 것을 확인한다.
+  why: 가장 최근에 담은 것부터 되돌려 처리해야 할 때, 몇 번째인지 세지 않고 순서대로 꺼낼 수 있습니다.
+  explanation: |-
+    popitem() 메서드는 딕셔너리의 마지막 키-값 쌍을 제거하고 (키, 값) 튜플로 반환합니다. dict.popitem() 형식으로 사용하며, 빈 딕셔너리에 사용하면 에러가 발생합니다.
+
+    popitem()은 LIFO(후입선출) 스택 구현에 유용합니다.
+  snippet: |-
+    queue = {'first': 1, 'second': 2, 'third': 3}
+    queue.popitem()
+  exercise:
+    prompt: |-
+      첫 줄과 마지막 줄 사이에 queue['fourth'] = 4 한 줄을 추가하세요.
+
+      popitem()은 마지막에 들어간 항목을 빼므로 ('fourth', 4)가 나와야 합니다.
+    starterCode: |-
+      queue = {'first': 1, 'second': 2, 'third': 3}
+      queue.popitem()
+    solution: |-
+      queue = {'first': 1, 'second': 2, 'third': 3}
+      queue['fourth'] = 4
+      queue.popitem()
+    hints:
+    - "queue 딕셔너리 줄과 queue.popitem() 줄 사이에 queue['fourth'] = 4 를 넣습니다. 첫 줄은 그대로 둡니다."
+    - "정답 형태: queue['fourth'] = 4"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "('fourth', 4)"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"('fourth', 4)\\""
+- id: method_clear
+  title: clear() 메서드
+  structuredPrimary: true
+  subtitle: 모든 항목 제거
+  goal: clear()로 비운 딕셔너리에 새 항목을 넣어 같은 딕셔너리를 다시 채워 쓴다.
+  why: 회차마다 집계를 다시 시작하는 딕셔너리처럼, 새로 만들지 않고 내용만 비워 계속 재사용할 때 씁니다.
+  explanation: |-
+    clear() 메서드는 딕셔너리의 모든 키-값 쌍을 제거하여 빈 딕셔너리로 만듭니다. dict.clear() 형식으로 사용하며, 반환값은 None입니다. 리스트의 clear()와 동일하게 작동합니다.
+
+    clear()는 원본 딕셔너리를 유지하면서 내용만 비웁니다.
+  snippet: |-
+    temp = {'a': 1, 'b': 2, 'c': 3}
+    temp.clear()
+    temp
+  exercise:
+    prompt: |-
+      temp.clear() 다음 줄에 temp['d'] = 9 한 줄을 추가하세요.
+
+      세 항목이 모두 비워진 뒤 d 하나만 들어가므로 {'d': 9}가 나와야 합니다.
+    starterCode: |-
+      temp = {'a': 1, 'b': 2, 'c': 3}
+      temp.clear()
+      temp
+    solution: |-
+      temp = {'a': 1, 'b': 2, 'c': 3}
+      temp.clear()
+      temp['d'] = 9
+      temp
+    hints:
+    - "temp.clear() 와 마지막 줄 temp 사이에 temp['d'] = 9 를 넣습니다."
+    - "정답 형태: temp['d'] = 9"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "{'d': 9}"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"{'d': 9}\\""
+- id: method_setdefault
+  title: setdefault() 메서드
+  structuredPrimary: true
+  subtitle: 키가 없으면 추가
+  goal: 없는 키로 setdefault()를 불러 기본값이 새로 저장되고 그대로 반환되는 것을 확인한다.
+  why: 있으면 그대로 두고 없으면 만들어 주기 때문에, 집계용 딕셔너리의 초기값을 if 문 없이 한 줄로 준비할 수 있습니다.
+  explanation: |-
+    setdefault() 메서드는 키가 있으면 그 값을 반환하고, 없으면 지정한 기본값으로 키를 추가하고 그 값을 반환합니다. dict.setdefault(key, default) 형식으로 사용합니다.
+
+    setdefault()는 딕셔너리 카운팅이나 그룹화에 매우 유용합니다.
+  snippet: |-
+    cache = {'name': '김철수', 'age': 30}
+    cache.setdefault('name', '이영희')
+  exercise:
+    prompt: |-
+      마지막 줄 cache.setdefault('name', '이영희')를 cache.setdefault('city', '서울')로 바꾸세요.
+
+      city는 cache에 없는 키라 새로 추가되고 그 값이 반환되므로 서울이 나와야 합니다.
+    starterCode: |-
+      cache = {'name': '김철수', 'age': 30}
+      cache.setdefault('name', '이영희')
+    solution: |-
+      cache = {'name': '김철수', 'age': 30}
+      cache.setdefault('city', '서울')
+    hints:
+    - "괄호 안의 'name', '이영희' 를 'city', '서울' 로 바꿉니다. 첫 줄 딕셔너리는 그대로 둡니다."
+    - "정답 형태: cache.setdefault('city', '서울')"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '서울'
+    resultCheck: "출력이 정확히 일치해야 합니다: '서울'"
+- id: method_comparison
+  title: 메서드 비교
+  structuredPrimary: true
+  subtitle: 언제 어떤 메서드를 사용할까?
+  goal: update()로 넣은 키를 바로 pop()으로 빼서 두 메서드가 서로 반대 방향인 것을 확인한다.
+  why: 설정을 합친 뒤 내부 전용 키만 빼고 넘기는 것처럼, 병합과 제거를 이어서 쓰는 일이 실제 코드에서 가장 흔합니다.
+  explanation: |-
+    딕셔너리 메서드는 각각 특정 상황에 최적화되어 있습니다. get()은 안전한 접근, keys/values/items는 순회, update는 병합, pop/popitem/clear는 제거 작업에 사용됩니다.
+
+    상황에 맞는 메서드를 선택하면 코드가 간결해집니다.
+  snippet: |-
+    setting = {'host': 'localhost', 'port': 8080}
+    setting.update({'user': 'admin', 'timeout': 30})
+    setting.pop('port')
+    setting
+  exercise:
+    prompt: |-
+      setting.pop('port')를 setting.pop('timeout')으로 바꾸세요.
+
+      바로 위 update()로 넣었던 timeout이 다시 빠지므로 {'host': 'localhost', 'port': 8080, 'user': 'admin'}이 나와야 합니다.
+    starterCode: |-
+      setting = {'host': 'localhost', 'port': 8080}
+      setting.update({'user': 'admin', 'timeout': 30})
+      setting.pop('port')
+      setting
+    solution: |-
+      setting = {'host': 'localhost', 'port': 8080}
+      setting.update({'user': 'admin', 'timeout': 30})
+      setting.pop('timeout')
+      setting
+    hints:
+    - "pop 괄호 안의 'port' 를 'timeout' 으로 바꿉니다. update 줄과 마지막 줄은 그대로 둡니다."
+    - "정답 형태: setting.pop('timeout')"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "{'host': 'localhost', 'port': 8080, 'user': 'admin'}"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"{'host': 'localhost', 'port': 8080, 'user': 'admin'}\\""
+- id: workflow_validation
+  title: '검증 루프: 기본 설정과 사용자 설정 병합하기'
+  structuredPrimary: true
+  subtitle: get, update, pop, items로 안전한 설정 레코드 만들기
+  goal: setdefault로 초기화한 집계 딕셔너리가 기대한 상태와 같은지 assert로 검증한다.
+  why: 집계나 설정 병합은 키 하나가 빠져도 에러 없이 조용히 틀린 값이 나오므로, 기대 상태를 assert로 코드에 박아 두고 실행할 때마다 확인합니다.
+  explanation: 딕셔너리 메서드는 설정, 요청 파라미터, 사용자 입력처럼 일부 값이 빠질 수 있는 데이터를 다룰 때 강합니다. 기본값을 안전하게 읽고, 사용자 설정으로 덮어쓰고,
+    내부 전용 키를 제거한 뒤 검증하는 흐름을 익혀야 합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    defaultConfig = {'timeout': 30, 'retries': 3, 'debug': False}
+    userConfig = {'timeout': 60, 'region': 'kr'}
+    finalConfig = {}
+    finalConfig.update(defaultConfig)
+    finalConfig.update(userConfig)
+
+    timeout = finalConfig.get('timeout', 10)
+    retries = finalConfig.get('retries', 1)
+    locale = finalConfig.get('locale', 'ko-KR')
+
+    assert timeout == 60
+    assert retries == 3
+    assert locale == 'ko-KR'
+    assert finalConfig['region'] == 'kr'
+  exercise:
+    prompt: |-
+      값은 바꾸지 말고 코드를 그대로 실행하세요.
+
+      assert가 통과하고 마지막에 {'success': 1, 'failed': 0}이 나와야 합니다.
+    starterCode: |-
+      counters = {}
+      counters.setdefault('success', 0)
+      counters.setdefault('failed', 0)
+      counters['success'] = counters['success'] + 1
+
+      assert counters == {'success': 1, 'failed': 0}
+      counters
+    solution: |-
+      counters = {}
+      counters.setdefault('success', 0)
+      counters.setdefault('failed', 0)
+      counters['success'] = counters['success'] + 1
+
+      assert counters == {'success': 1, 'failed': 0}
+      counters
+    hints:
+    - "setdefault('failed', 0) 줄을 지우면 failed 키가 없어져 assert가 AssertionError로 멈춥니다. 그때는 원래대로 되돌리세요."
+    - "정답 형태: 코드를 그대로 실행, 마지막 값 {'success': 1, 'failed': 0}"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "{'success': 1, 'failed': 0}"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"{'success': 1, 'failed': 0}\\""
+- id: practice
+  title: Day 12 종합 복습
+  structuredPrimary: true
+  subtitle: 딕셔너리 메서드 마스터하기
+  goal: update()로 키를 채운 뒤 get()이 기본값 대신 저장된 값을 돌려주는 것을 확인한다.
+  why: 오늘 배운 메서드는 하나씩 외우기보다 병합하고 읽는 순서로 이어 붙여 봐야 실제 설정 처리 코드에 그대로 쓸 수 있습니다.
+  explanation: Day 12에서 배운 딕셔너리 메서드를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로
+    어떤 순서로 해도 괜찮습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    cfg = {'host': 'localhost', 'port': 8080}
+    cfg.get('user', 'admin')
+  exercise:
+    prompt: |-
+      첫 줄과 마지막 줄 사이에 cfg.update({'user': 'guest'}) 한 줄을 추가하세요.
+
+      user 키가 생겼으므로 기본값 admin 대신 guest가 나와야 합니다.
+    starterCode: |-
+      cfg = {'host': 'localhost', 'port': 8080}
+      cfg.get('user', 'admin')
+    solution: |-
+      cfg = {'host': 'localhost', 'port': 8080}
+      cfg.update({'user': 'guest'})
+      cfg.get('user', 'admin')
+    hints:
+    - "cfg 딕셔너리 줄과 cfg.get('user', 'admin') 줄 사이에 cfg.update({'user': 'guest'}) 를 넣습니다."
+    - "정답 형태: cfg.update({'user': 'guest'})"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'guest'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'guest'"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
+  masteryVariants:
+  - id: day12-read-setting-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - method_get
+    - practice
+    title: 기본값이 있는 설정 읽기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: dict.get으로 누락 key를 안전하게 처리한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: read_setting(settings, key, default)가 key 값 또는 default를 반환하도록 완성하세요.
+      starterCode: |-
+        def read_setting(settings, key, default):
+            raise NotImplementedError
+      solution: |-
+        def read_setting(settings, key, default):
+            return settings.get(key, default)
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day12.read-setting.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day12.read-setting.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: read_setting
+        cases:
+        - id: present
+          arguments:
+          - value:
+              theme: dark
+          - value: theme
+          - value: light
+          expectedReturn: dark
+        - id: missing
+          arguments:
+          - value: {}
+          - value: theme
+          - value: light
+          expectedReturn: light
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day12-count-categories-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day12-read-setting-mastery
+    title: 항목별 범주 횟수 집계하기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: get 누적 패턴을 빈도표에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: count_categories(items)가 각 항목의 등장 횟수를 딕셔너리로 반환하도록 완성하세요.
+      starterCode: |-
+        def count_categories(items):
+            raise NotImplementedError
+      solution: |-
+        def count_categories(items):
+            counts = {}
+            for item in items:
+                counts[item] = counts.get(item, 0) + 1
+            return counts
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day12.count-categories.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day12.count-categories.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: count_categories
+        cases:
+        - id: colors
+          arguments:
+          - value:
+            - red
+            - blue
+            - red
+          expectedReturn:
+            red: 2
+            blue: 1
+        - id: single
+          arguments:
+          - value:
+            - python
+          expectedReturn:
+            python: 1
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day12-pop-copy-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day12-count-categories-transfer
+    title: 복사본에서 key 꺼내기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 원본 보존과 pop 반환값을 함께 회상한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: pop_copy(mapping, key)가 [꺼낸 값, 남은 복사본]을 반환하도록 완성하세요.
+      starterCode: |-
+        def pop_copy(mapping, key):
+            raise NotImplementedError
+      solution: |-
+        def pop_copy(mapping, key):
+            remaining = mapping.copy()
+            value = remaining.pop(key)
+            return [value, remaining]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day12.pop-copy.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day12.pop-copy.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: pop_copy
+        cases:
+        - id: two
+          arguments:
+          - value:
+              a: 1
+              b: 2
+          - value: a
+          expectedReturn:
+          - 1
+          - b: 2
+        - id: one
+          arguments:
+          - value:
+              done: true
+          - value: done
+          expectedReturn:
+          - true
+          - {}
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

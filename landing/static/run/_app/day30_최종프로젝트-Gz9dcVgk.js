@@ -1,0 +1,1140 @@
+var e=`meta:
+  id: day30
+  title: 최종 프로젝트
+  day: 30
+  category: 30days
+  outcomes: ["python.projectDelivery"]
+  prerequisites: ["python.advancedSyntax","python.oop","python.errorHandling"]
+  estimatedMinutes: 90
+  tags:
+  - 최종프로젝트
+  - 통합실습
+  - 로컬파일
+  - 객체지향
+  - 데이터처리
+  - 검증
+  seo:
+    title: 파이썬 최종 프로젝트 - 30일 완성
+    description: 30일간 배운 모든 파이썬 문법을 종합하여 실전 프로젝트를 완성합니다.
+    keywords:
+    - 최종프로젝트
+    - final project
+    - 종합
+    - 실전
+    - 파이썬완성
+intro:
+  emoji: 🎓
+  points:
+  - 30일간 배운 모든 개념 통합
+  - 실전 프로젝트 구현
+  - 문제 해결 능력 완성
+  - 파이썬 마스터 달성
+  direction: 최종 프로젝트에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 최종 프로젝트 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 텍스트 처리 프로젝트 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 데이터 관리 프로젝트 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: 게임 로직 프로젝트 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 최종 프로젝트 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 최종 프로젝트 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 최종 프로젝트 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: text_processing
+  title: 텍스트 처리 프로젝트
+  structuredPrimary: true
+  subtitle: 문자열과 파일 다루기
+  goal: 문장 부호가 붙은 단어도 같은 단어로 세고, 딕셔너리 결과를 정렬해 실행할 때마다 같은 순서로 보이게 만든다.
+  why: 리뷰나 메모처럼 사람이 쓴 문장에는 마침표와 느낌표가 섞여 있어서, 그것을 떼지 않고 세면 codaro와 codaro.가 서로 다른 단어로 잡힙니다.
+  explanation: |-
+    텍스트 처리는 파이썬의 대표적인 활용 분야입니다. 파일 읽기, 문자열 조작, 단어 카운팅, 텍스트 분석 등을 조합하여 실용적인 프로그램을 만들 수 있습니다. 딕셔너리와 리스트를 활용하여 효율적으로 데이터를 관리합니다.
+
+    텍스트 처리는 웹 크롤링, 데이터 분석, 자연어 처리의 기초입니다.
+  snippet: |-
+    def analyzeWords(text):
+        words = text.lower().split()
+        frequency = {}
+        for word in words:
+            cleaned = word.strip('.,!?')
+            if cleaned:
+                frequency[cleaned] = frequency.get(cleaned, 0) + 1
+        return frequency
+
+    sampleText = 'hello world hello python world'
+    analyzeWords(sampleText)
+  exercise:
+    prompt: |-
+      두 곳을 고치세요. sampleText를 'Codaro runs. Codaro checks! Codaro ships.'로 바꾸고, 마지막 줄 analyzeWords(sampleText)를 sorted(analyzeWords(sampleText).items())로 바꾸세요. 함수 본문은 그대로 둡니다.
+
+      lower()가 먼저 돌아 전부 소문자가 되고 strip('.,!?')이 마침표와 느낌표를 떼므로 codaro가 3번으로 세어집니다. 단어 순으로 정렬되어 아래 한 줄이 나와야 합니다.
+      [('checks', 1), ('codaro', 3), ('runs', 1), ('ships', 1)]
+    starterCode: |-
+      def analyzeWords(text):
+          words = text.lower().split()
+          frequency = {}
+          for word in words:
+              cleaned = word.strip('.,!?')
+              if cleaned:
+                  frequency[cleaned] = frequency.get(cleaned, 0) + 1
+          return frequency
+
+      sampleText = 'hello world hello python world'
+      analyzeWords(sampleText)
+    solution: |-
+      def analyzeWords(text):
+          words = text.lower().split()
+          frequency = {}
+          for word in words:
+              cleaned = word.strip('.,!?')
+              if cleaned:
+                  frequency[cleaned] = frequency.get(cleaned, 0) + 1
+          return frequency
+
+      sampleText = 'Codaro runs. Codaro checks! Codaro ships.'
+      sorted(analyzeWords(sampleText).items())
+    hints:
+    - "sampleText 값을 'Codaro runs. Codaro checks! Codaro ships.' 로 바꾸고, 마지막 줄을 sorted(analyzeWords(sampleText).items()) 로 바꿉니다."
+    - "정답 형태: sorted(analyzeWords(sampleText).items())"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "[('checks', 1), ('codaro', 3), ('runs', 1), ('ships', 1)]"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"[('checks', 1), ('codaro', 3), ('runs', 1), ('ships', 1)]\\""
+- id: data_management
+  title: 데이터 관리 프로젝트
+  structuredPrimary: true
+  subtitle: 자료구조 활용하기
+  goal: 한 GradeBook에 학생 두 명을 담고, 등록한 적 없는 이름을 물었을 때 돌아오는 기본값까지 한 번에 확인한다.
+  why: 이름으로 찾는 자료는 없는 이름을 물어보는 일이 반드시 생기므로, 그때 무엇을 돌려줄지 클래스 안에 정해 두어야 부르는 쪽에서 매번 먼저 검사하지 않아도 됩니다.
+  explanation: |-
+    데이터 관리는 리스트, 딕셔너리, 세트를 조합하여 효율적으로 정보를 저장하고 조회하는 것입니다. 학생 성적 관리, 재고 관리, 주소록 등 실생활 문제를 자료구조로 해결할 수 있습니다. 클래스를 사용하면 더욱 체계적으로 관리할 수 있습니다.
+
+    적절한 자료구조를 선택하면 프로그램의 효율성이 크게 향상됩니다.
+  snippet: |-
+    class GradeBook:
+        def __init__(self):
+            self.students = {}
+
+        def addScore(self, name, score):
+            if name not in self.students:
+                self.students[name] = []
+            self.students[name].append(score)
+
+        def getAverage(self, name):
+            if name in self.students:
+                scores = self.students[name]
+                return sum(scores) / len(scores)
+            return 0
+
+    gb = GradeBook()
+    gb.addScore('Alice', 90)
+    gb.addScore('Alice', 85)
+    gb.getAverage('Alice')
+  exercise:
+    prompt: |-
+      두 곳을 고치세요. gb.addScore('Alice', 85) 다음 줄에 gb.addScore('Bob', 70)을 추가하고, 마지막 줄 gb.getAverage('Alice')를 gb.getAverage('Alice'), gb.getAverage('Bob'), gb.getAverage('Carol')로 바꾸세요. 클래스 본문은 그대로 둡니다.
+
+      Alice는 90과 85의 평균이라 87.5, Bob은 점수가 하나뿐이라 70.0, Carol은 등록된 적이 없어 getAverage의 마지막 줄 return 0이 돌아옵니다. 그래서 아래 한 줄이 나와야 합니다.
+      (87.5, 70.0, 0)
+    starterCode: |-
+      class GradeBook:
+          def __init__(self):
+              self.students = {}
+
+          def addScore(self, name, score):
+              if name not in self.students:
+                  self.students[name] = []
+              self.students[name].append(score)
+
+          def getAverage(self, name):
+              if name in self.students:
+                  scores = self.students[name]
+                  return sum(scores) / len(scores)
+              return 0
+
+      gb = GradeBook()
+      gb.addScore('Alice', 90)
+      gb.addScore('Alice', 85)
+      gb.getAverage('Alice')
+    solution: |-
+      class GradeBook:
+          def __init__(self):
+              self.students = {}
+
+          def addScore(self, name, score):
+              if name not in self.students:
+                  self.students[name] = []
+              self.students[name].append(score)
+
+          def getAverage(self, name):
+              if name in self.students:
+                  scores = self.students[name]
+                  return sum(scores) / len(scores)
+              return 0
+
+      gb = GradeBook()
+      gb.addScore('Alice', 90)
+      gb.addScore('Alice', 85)
+      gb.addScore('Bob', 70)
+      gb.getAverage('Alice'), gb.getAverage('Bob'), gb.getAverage('Carol')
+    hints:
+    - "gb.addScore('Bob', 70) 한 줄을 Alice 두 줄 다음에 추가하고, 마지막 줄에 세 사람의 getAverage 호출을 쉼표로 나란히 씁니다."
+    - "정답 형태: gb.getAverage('Alice'), gb.getAverage('Bob'), gb.getAverage('Carol')"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '(87.5, 70.0, 0)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(87.5, 70.0, 0)'"
+- id: game_logic
+  title: 게임 로직 프로젝트
+  structuredPrimary: true
+  subtitle: 알고리즘으로 게임 만들기
+  goal: 한 판만 판정하던 함수를 세 판에 돌려 이김, 짐, 비김 세 갈래가 모두 나오는지 한 번에 확인한다.
+  why: 규칙을 담은 함수는 이기는 경우만 보고 넘어가기 쉬운데, 지는 경우와 비기는 경우까지 같이 돌려 봐야 빠뜨린 갈래를 그 자리에서 찾습니다.
+  explanation: |-
+    게임 로직은 조건문, 반복문, 함수를 조합하여 규칙을 구현합니다. 숫자 맞추기, 가위바위보, 틱택토 등 간단한 게임을 만들면서 프로그래밍 논리를 익힐 수 있습니다. 난수 생성과 사용자 입력 처리가 핵심입니다.
+
+    게임 로직은 조건문과 반복문을 연습하기에 좋은 주제입니다.
+  snippet: |-
+    def playRPS(player1, player2):
+        wins = {
+            'rock': 'scissors',
+            'scissors': 'paper',
+            'paper': 'rock'
+        }
+        if player1 == player2:
+            return 'draw'
+        elif wins[player1] == player2:
+            return 'player1'
+        else:
+            return 'player2'
+
+    playRPS('rock', 'scissors')
+  exercise:
+    prompt: |-
+      마지막 줄 playRPS('rock', 'scissors')를 지우고 그 자리에 아래 두 줄을 넣으세요. 함수 본문은 그대로 둡니다.
+      matches = [('rock', 'scissors'), ('paper', 'scissors'), ('rock', 'rock')]
+      [playRPS(first, second) for first, second in matches]
+
+      rock은 scissors를 이기고, paper는 scissors에게 지고, rock 대 rock은 비깁니다. 세 갈래가 순서대로 나오므로 아래 한 줄이 나와야 합니다.
+      ['player1', 'player2', 'draw']
+    starterCode: |-
+      def playRPS(player1, player2):
+          wins = {
+              'rock': 'scissors',
+              'scissors': 'paper',
+              'paper': 'rock'
+          }
+          if player1 == player2:
+              return 'draw'
+          elif wins[player1] == player2:
+              return 'player1'
+          else:
+              return 'player2'
+
+      playRPS('rock', 'scissors')
+    solution: |-
+      def playRPS(player1, player2):
+          wins = {
+              'rock': 'scissors',
+              'scissors': 'paper',
+              'paper': 'rock'
+          }
+          if player1 == player2:
+              return 'draw'
+          elif wins[player1] == player2:
+              return 'player1'
+          else:
+              return 'player2'
+
+      matches = [('rock', 'scissors'), ('paper', 'scissors'), ('rock', 'rock')]
+      [playRPS(first, second) for first, second in matches]
+    hints:
+    - 마지막 줄을 지우고 matches 목록 한 줄과 그 목록을 도는 리스트 컴프리헨션 한 줄을 넣습니다. 함수 정의는 손대지 않습니다.
+    - "정답 형태: [playRPS(first, second) for first, second in matches]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "['player1', 'player2', 'draw']"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"['player1', 'player2', 'draw']\\""
+- id: file_operations
+  title: 파일 처리 프로젝트
+  structuredPrimary: true
+  subtitle: 데이터 저장과 불러오기
+  goal: 코드 안에만 있던 CSV 문자열을 파일로 저장했다가 다시 읽어 같은 파서에 넣고, 필요한 열만 뽑아낸다.
+  why: 실제 데이터는 코드 안에 적혀 있지 않고 파일로 오가므로, 저장했다가 다시 읽어도 같은 결과가 나오는지 확인해야 그 파서를 내일도 그대로 쓸 수 있습니다.
+  explanation: |-
+    파일 처리는 데이터를 영구적으로 저장하고 불러오는 기능입니다. CSV 파일 읽기, JSON 형식 저장, 로그 파일 작성 등 실무에서 자주 사용됩니다. with 문을 사용하여 안전하게 파일을 관리하고, 예외 처리로 오류를 방지합니다.
+
+    파일 처리는 데이터 영속성을 위한 필수 기능입니다.
+  snippet: |-
+    def parseCSV(content):
+        lines = content.strip().split('\\n')
+        header = lines[0].split(',')
+        data = []
+        for line in lines[1:]:
+            values = line.split(',')
+            row = dict(zip(header, values))
+            data.append(row)
+        return data
+
+    csvContent = 'name,age\\nAlice,25\\nBob,30'
+    parseCSV(csvContent)
+  exercise:
+    prompt: |-
+      두 곳을 고치세요.
+      1. csvContent를 'name,age\\nCarol,41\\nDave,35\\nErin,29'로 바꿉니다.
+      2. 마지막 줄 parseCSV(csvContent)를 지우고 그 자리에 아래 코드를 넣습니다.
+      with open('people.csv', 'w', encoding='utf-8') as writer:
+          writer.write(csvContent)
+
+      with open('people.csv', 'r', encoding='utf-8') as reader:
+          loaded = reader.read()
+
+      [row['name'] for row in parseCSV(loaded)]
+
+      같은 셀 안에서 파일을 만들고 바로 다시 읽으므로 파일이 없어서 나는 오류는 생기지 않습니다. 읽어 온 문자열을 파서에 넣고 name 열만 뽑으면 아래 한 줄이 나와야 합니다.
+      ['Carol', 'Dave', 'Erin']
+    starterCode: |-
+      def parseCSV(content):
+          lines = content.strip().split('\\n')
+          header = lines[0].split(',')
+          data = []
+          for line in lines[1:]:
+              values = line.split(',')
+              row = dict(zip(header, values))
+              data.append(row)
+          return data
+
+      csvContent = 'name,age\\nAlice,25\\nBob,30'
+      parseCSV(csvContent)
+    solution: |-
+      def parseCSV(content):
+          lines = content.strip().split('\\n')
+          header = lines[0].split(',')
+          data = []
+          for line in lines[1:]:
+              values = line.split(',')
+              row = dict(zip(header, values))
+              data.append(row)
+          return data
+
+      csvContent = 'name,age\\nCarol,41\\nDave,35\\nErin,29'
+      with open('people.csv', 'w', encoding='utf-8') as writer:
+          writer.write(csvContent)
+
+      with open('people.csv', 'r', encoding='utf-8') as reader:
+          loaded = reader.read()
+
+      [row['name'] for row in parseCSV(loaded)]
+    hints:
+    - csvContent 값을 Carol, Dave, Erin 세 줄로 바꾸고, 마지막 줄 자리에 쓰기 with 블록, 읽기 with 블록, name 열을 뽑는 한 줄을 차례로 넣습니다.
+    - "정답 형태: [row['name'] for row in parseCSV(loaded)]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "['Carol', 'Dave', 'Erin']"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"['Carol', 'Dave', 'Erin']\\""
+- id: object_oriented
+  title: 객체지향 프로젝트
+  structuredPrimary: true
+  subtitle: 클래스로 모델링하기
+  goal: 잔액보다 큰 금액을 인출해 보고, 메서드가 False를 돌려주면서 잔액은 건드리지 않는 것을 확인한다.
+  why: 상태를 지키는 조건을 클래스 안에 두면 부르는 쪽에서 매번 잔액을 미리 검사하지 않아도 되고, 실패를 False로 알려 주면 호출한 자리에서 바로 다음 처리를 나눌 수 있습니다.
+  explanation: |-
+    객체지향 프로그래밍은 현실 세계를 클래스와 객체로 모델링합니다. 은행 계좌, 도서관 시스템, 쇼핑카트 등을 클래스로 설계하면 코드의 재사용성과 유지보수성이 향상됩니다. 상속과 캡슐화를 활용하여 체계적인 프로그램을 작성합니다.
+
+    클래스는 관련된 데이터와 기능을 하나로 묶어 관리합니다.
+  snippet: |-
+    class BankAccount:
+        def __init__(self, owner, balance=0):
+            self.owner = owner
+            self.balance = balance
+
+        def deposit(self, amount):
+            if amount > 0:
+                self.balance = self.balance + amount
+                return True
+            return False
+
+        def withdraw(self, amount):
+            if 0 < amount <= self.balance:
+                self.balance = self.balance - amount
+                return True
+            return False
+
+    account = BankAccount('Alice', 1000)
+    account.deposit(500)
+    account.withdraw(300)
+    account.balance
+  exercise:
+    prompt: |-
+      두 곳을 고치세요. account.withdraw(300)을 tooMuch = account.withdraw(2000)으로 바꾸고, 마지막 줄 account.balance를 account.balance, tooMuch로 바꾸세요. 클래스 본문은 그대로 둡니다.
+
+      1000에 500을 넣어 잔액은 1500인데 2000은 잔액보다 크므로 withdraw의 조건 0 < amount <= self.balance가 거짓이 되어 잔액을 그대로 두고 False를 돌려줍니다. 그래서 아래 한 줄이 나와야 합니다.
+      (1500, False)
+    starterCode: |-
+      class BankAccount:
+          def __init__(self, owner, balance=0):
+              self.owner = owner
+              self.balance = balance
+
+          def deposit(self, amount):
+              if amount > 0:
+                  self.balance = self.balance + amount
+                  return True
+              return False
+
+          def withdraw(self, amount):
+              if 0 < amount <= self.balance:
+                  self.balance = self.balance - amount
+                  return True
+              return False
+
+      account = BankAccount('Alice', 1000)
+      account.deposit(500)
+      account.withdraw(300)
+      account.balance
+    solution: |-
+      class BankAccount:
+          def __init__(self, owner, balance=0):
+              self.owner = owner
+              self.balance = balance
+
+          def deposit(self, amount):
+              if amount > 0:
+                  self.balance = self.balance + amount
+                  return True
+              return False
+
+          def withdraw(self, amount):
+              if 0 < amount <= self.balance:
+                  self.balance = self.balance - amount
+                  return True
+              return False
+
+      account = BankAccount('Alice', 1000)
+      account.deposit(500)
+      tooMuch = account.withdraw(2000)
+      account.balance, tooMuch
+    hints:
+    - withdraw 호출 줄을 tooMuch = account.withdraw(2000) 으로 바꾸고, 마지막 줄에 account.balance 와 tooMuch 를 쉼표로 나란히 씁니다.
+    - "정답 형태: account.balance, tooMuch"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '(1500, False)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(1500, False)'"
+- id: algorithm_projects
+  title: 알고리즘 프로젝트
+  structuredPrimary: true
+  subtitle: 효율적인 문제 해결
+  goal: 중복을 걸러 내는 함수에 문자열 목록을 넣어 정렬된 결과를 받고, 원본과 길이를 비교해 몇 개가 사라졌는지 센다.
+  why: 중복이 몇 개였는지는 걸러 내고 나면 사라지는 정보라서, 걸러 내기 전 개수와 뒤 개수를 함께 남겨야 데이터가 얼마나 지저분했는지 나중에 말할 수 있습니다.
+  explanation: |-
+    알고리즘 프로젝트는 정렬, 검색, 재귀를 조합하여 복잡한 문제를 해결합니다. 데이터 필터링, 패턴 찾기, 최적화 등 실무에서 자주 마주치는 문제들을 효율적으로 처리하는 방법을 배웁니다. 시간 복잡도를 고려하여 최적의 알고리즘을 선택합니다.
+
+    알고리즘은 문제를 효율적으로 해결하는 절차입니다.
+  snippet: |-
+    def uniqueSorted(arr):
+        seen = set()
+        unique = []
+        for item in arr:
+            if item not in seen:
+                seen.add(item)
+                unique.append(item)
+        return sorted(unique)
+
+    mixedData = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3]
+    uniqueSorted(mixedData)
+  exercise:
+    prompt: |-
+      두 곳을 고치세요. mixedData를 ['pear', 'fig', 'pear', 'apple', 'fig', 'pear']로 바꾸고, 마지막 줄 uniqueSorted(mixedData)를 uniqueSorted(mixedData), len(mixedData) - len(uniqueSorted(mixedData))로 바꾸세요. 함수 본문은 그대로 둡니다.
+
+      여섯 개 중 서로 다른 것은 세 개이고 반환값은 알파벳 순으로 정렬됩니다. 사라진 개수는 6에서 3을 뺀 3이므로 아래 한 줄이 나와야 합니다.
+      (['apple', 'fig', 'pear'], 3)
+    starterCode: |-
+      def uniqueSorted(arr):
+          seen = set()
+          unique = []
+          for item in arr:
+              if item not in seen:
+                  seen.add(item)
+                  unique.append(item)
+          return sorted(unique)
+
+      mixedData = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3]
+      uniqueSorted(mixedData)
+    solution: |-
+      def uniqueSorted(arr):
+          seen = set()
+          unique = []
+          for item in arr:
+              if item not in seen:
+                  seen.add(item)
+                  unique.append(item)
+          return sorted(unique)
+
+      mixedData = ['pear', 'fig', 'pear', 'apple', 'fig', 'pear']
+      uniqueSorted(mixedData), len(mixedData) - len(uniqueSorted(mixedData))
+    hints:
+    - "mixedData 를 ['pear', 'fig', 'pear', 'apple', 'fig', 'pear'] 로 바꾸고, 마지막 줄에 uniqueSorted(mixedData) 와 len(mixedData) - len(uniqueSorted(mixedData)) 를 쉼표로 나란히 씁니다."
+    - "정답 형태: uniqueSorted(mixedData), len(mixedData) - len(uniqueSorted(mixedData))"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "(['apple', 'fig', 'pear'], 3)"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"(['apple', 'fig', 'pear'], 3)\\""
+- id: workflow_validation
+  title: '현업 흐름 검증: 로컬 주문 리포트 미니 프로젝트'
+  structuredPrimary: true
+  subtitle: 입력 → 객체화 → 집계 → 파일 저장 → 재실행 검증
+  goal: CSV를 객체로 바꾸고 결제 건만 집계해 파일에 저장하는 흐름을 통째로 실행한 뒤, assert가 통과시킨 리포트 내용을 눈으로도 확인한다.
+  why: 이 흐름은 파싱, 집계, 저장, 재확인을 차례로 지나는데 assert는 통과하면 아무 말도 하지 않으므로, 저장된 리포트를 한 번 출력해 봐야 마지막 통과 문구가 실제 숫자 위에 서 있다는 것을 알 수 있습니다.
+  explanation: 최종 프로젝트는 문법을 많이 나열하는 것이 아니라, 작은 프로그램을 끝까지 완성하는 것입니다. 아래 흐름은 CSV 문자열을 객체로 바꾸고, 결제 주문만 집계한
+    뒤 로컬 파일에 리포트를 저장하고 다시 읽어 검증합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from pathlib import Path
+    import tempfile
+
+    class OrderLine:
+        def __init__(self, orderId, customer, sku, price, quantity, status):
+            if price <= 0:
+                raise ValueError("price must be positive")
+            if quantity <= 0:
+                raise ValueError("quantity must be positive")
+
+            self.orderId = orderId
+            self.customer = customer
+            self.sku = sku
+            self.price = price
+            self.quantity = quantity
+            self.status = status
+
+        @property
+        def amount(self):
+            return self.price * self.quantity
+
+    def parseInt(value, fieldName):
+        try:
+            return int(value)
+        except ValueError as exc:
+            raise ValueError(f"invalid number for {fieldName}: {value}") from exc
+
+    def parseOrderCsv(csvText):
+        lines = [line.strip() for line in csvText.strip().splitlines() if line.strip()]
+        headers = [header.strip() for header in lines[0].split(",")]
+        requiredHeaders = ["orderId", "customer", "sku", "price", "quantity", "status"]
+        if headers != requiredHeaders:
+            raise ValueError(f"unexpected headers: {headers}")
+
+        orderLines = []
+        for line in lines[1:]:
+            values = [value.strip() for value in line.split(",")]
+            row = dict(zip(headers, values))
+            orderLines.append(OrderLine(
+                row["orderId"],
+                row["customer"],
+                row["sku"],
+                parseInt(row["price"], "price"),
+                parseInt(row["quantity"], "quantity"),
+                row["status"].lower(),
+            ))
+        return orderLines
+
+    def summarizePaidOrders(orderLines):
+        paidLines = [line for line in orderLines if line.status == "paid"]
+        revenueByCustomer = {}
+        for line in paidLines:
+            revenueByCustomer[line.customer] = revenueByCustomer.get(line.customer, 0) + line.amount
+
+        topCustomer = None
+        if revenueByCustomer:
+            topCustomer = max(revenueByCustomer.items(), key=lambda item: item[1])[0]
+
+        return {
+            "paidCount": len(paidLines),
+            "paidRevenue": sum(line.amount for line in paidLines),
+            "revenueByCustomer": revenueByCustomer,
+            "topCustomer": topCustomer,
+        }
+
+    csvText = """orderId,customer,sku,price,quantity,status
+    A-100,kim,keyboard,50000,1,paid
+    A-101,lee,mouse,20000,2,pending
+    A-102,kim,monitor,180000,1,paid
+    """
+
+    orderLines = parseOrderCsv(csvText)
+    summary = summarizePaidOrders(orderLines)
+
+    assert summary["paidCount"] == 2
+    assert summary["paidRevenue"] == 230000
+    assert summary["revenueByCustomer"] == {"kim": 230000}
+    assert summary["topCustomer"] == "kim"
+
+    with tempfile.TemporaryDirectory() as tempDir:
+        reportPath = Path(tempDir) / "orderReport.txt"
+        reportPath.write_text(
+            f"paidCount={summary['paidCount']}\\npaidRevenue={summary['paidRevenue']}",
+            encoding="utf-8",
+        )
+        savedReport = reportPath.read_text(encoding="utf-8")
+
+    assert "paidCount=2" in savedReport
+    assert "paidRevenue=230000" in savedReport
+
+    try:
+        parseOrderCsv("orderId,customer,sku,price,quantity,status\\nA-999,kim,item,unknown,1,paid")
+    except ValueError as exc:
+        assert "invalid number" in str(exc)
+
+    print("최종 프로젝트 흐름 통과")
+  exercise:
+    prompt: |-
+      기존 줄은 하나도 바꾸지 마세요. 맨 아래 print("최종 프로젝트 흐름 통과") 바로 위에 print(savedReport) 한 줄만 같은 열에 추가하면 됩니다.
+
+      savedReport는 임시 폴더에 저장했다가 다시 읽어 온 리포트 문자열이고, 바로 위 assert 두 줄이 그 안의 숫자를 이미 확인했습니다. 그 내용이 먼저 나오고 통과 문구가 이어지므로 아래 세 줄이 나와야 합니다.
+      paidCount=2
+      paidRevenue=230000
+      최종 프로젝트 흐름 통과
+    starterCode: |-
+      from pathlib import Path
+      import tempfile
+
+      class OrderLine:
+          def __init__(self, orderId, customer, sku, price, quantity, status):
+              if price <= 0:
+                  raise ValueError("price must be positive")
+              if quantity <= 0:
+                  raise ValueError("quantity must be positive")
+
+              self.orderId = orderId
+              self.customer = customer
+              self.sku = sku
+              self.price = price
+              self.quantity = quantity
+              self.status = status
+
+          @property
+          def amount(self):
+              return self.price * self.quantity
+
+      def parseInt(value, fieldName):
+          try:
+              return int(value)
+          except ValueError as exc:
+              raise ValueError(f"invalid number for {fieldName}: {value}") from exc
+
+      def parseOrderCsv(csvText):
+          lines = [line.strip() for line in csvText.strip().splitlines() if line.strip()]
+          headers = [header.strip() for header in lines[0].split(",")]
+          requiredHeaders = ["orderId", "customer", "sku", "price", "quantity", "status"]
+          if headers != requiredHeaders:
+              raise ValueError(f"unexpected headers: {headers}")
+
+          orderLines = []
+          for line in lines[1:]:
+              values = [value.strip() for value in line.split(",")]
+              row = dict(zip(headers, values))
+              orderLines.append(OrderLine(
+                  row["orderId"],
+                  row["customer"],
+                  row["sku"],
+                  parseInt(row["price"], "price"),
+                  parseInt(row["quantity"], "quantity"),
+                  row["status"].lower(),
+              ))
+          return orderLines
+
+      def summarizePaidOrders(orderLines):
+          paidLines = [line for line in orderLines if line.status == "paid"]
+          revenueByCustomer = {}
+          for line in paidLines:
+              revenueByCustomer[line.customer] = revenueByCustomer.get(line.customer, 0) + line.amount
+
+          topCustomer = None
+          if revenueByCustomer:
+              topCustomer = max(revenueByCustomer.items(), key=lambda item: item[1])[0]
+
+          return {
+              "paidCount": len(paidLines),
+              "paidRevenue": sum(line.amount for line in paidLines),
+              "revenueByCustomer": revenueByCustomer,
+              "topCustomer": topCustomer,
+          }
+
+      csvText = """orderId,customer,sku,price,quantity,status
+      A-100,kim,keyboard,50000,1,paid
+      A-101,lee,mouse,20000,2,pending
+      A-102,kim,monitor,180000,1,paid
+      """
+
+      orderLines = parseOrderCsv(csvText)
+      summary = summarizePaidOrders(orderLines)
+
+      assert summary["paidCount"] == 2
+      assert summary["paidRevenue"] == 230000
+      assert summary["revenueByCustomer"] == {"kim": 230000}
+      assert summary["topCustomer"] == "kim"
+
+      with tempfile.TemporaryDirectory() as tempDir:
+          reportPath = Path(tempDir) / "orderReport.txt"
+          reportPath.write_text(
+              f"paidCount={summary['paidCount']}\\npaidRevenue={summary['paidRevenue']}",
+              encoding="utf-8",
+          )
+          savedReport = reportPath.read_text(encoding="utf-8")
+
+      assert "paidCount=2" in savedReport
+      assert "paidRevenue=230000" in savedReport
+
+      try:
+          parseOrderCsv("orderId,customer,sku,price,quantity,status\\nA-999,kim,item,unknown,1,paid")
+      except ValueError as exc:
+          assert "invalid number" in str(exc)
+
+      print("최종 프로젝트 흐름 통과")
+    solution: |-
+      from pathlib import Path
+      import tempfile
+
+      class OrderLine:
+          def __init__(self, orderId, customer, sku, price, quantity, status):
+              if price <= 0:
+                  raise ValueError("price must be positive")
+              if quantity <= 0:
+                  raise ValueError("quantity must be positive")
+
+              self.orderId = orderId
+              self.customer = customer
+              self.sku = sku
+              self.price = price
+              self.quantity = quantity
+              self.status = status
+
+          @property
+          def amount(self):
+              return self.price * self.quantity
+
+      def parseInt(value, fieldName):
+          try:
+              return int(value)
+          except ValueError as exc:
+              raise ValueError(f"invalid number for {fieldName}: {value}") from exc
+
+      def parseOrderCsv(csvText):
+          lines = [line.strip() for line in csvText.strip().splitlines() if line.strip()]
+          headers = [header.strip() for header in lines[0].split(",")]
+          requiredHeaders = ["orderId", "customer", "sku", "price", "quantity", "status"]
+          if headers != requiredHeaders:
+              raise ValueError(f"unexpected headers: {headers}")
+
+          orderLines = []
+          for line in lines[1:]:
+              values = [value.strip() for value in line.split(",")]
+              row = dict(zip(headers, values))
+              orderLines.append(OrderLine(
+                  row["orderId"],
+                  row["customer"],
+                  row["sku"],
+                  parseInt(row["price"], "price"),
+                  parseInt(row["quantity"], "quantity"),
+                  row["status"].lower(),
+              ))
+          return orderLines
+
+      def summarizePaidOrders(orderLines):
+          paidLines = [line for line in orderLines if line.status == "paid"]
+          revenueByCustomer = {}
+          for line in paidLines:
+              revenueByCustomer[line.customer] = revenueByCustomer.get(line.customer, 0) + line.amount
+
+          topCustomer = None
+          if revenueByCustomer:
+              topCustomer = max(revenueByCustomer.items(), key=lambda item: item[1])[0]
+
+          return {
+              "paidCount": len(paidLines),
+              "paidRevenue": sum(line.amount for line in paidLines),
+              "revenueByCustomer": revenueByCustomer,
+              "topCustomer": topCustomer,
+          }
+
+      csvText = """orderId,customer,sku,price,quantity,status
+      A-100,kim,keyboard,50000,1,paid
+      A-101,lee,mouse,20000,2,pending
+      A-102,kim,monitor,180000,1,paid
+      """
+
+      orderLines = parseOrderCsv(csvText)
+      summary = summarizePaidOrders(orderLines)
+
+      assert summary["paidCount"] == 2
+      assert summary["paidRevenue"] == 230000
+      assert summary["revenueByCustomer"] == {"kim": 230000}
+      assert summary["topCustomer"] == "kim"
+
+      with tempfile.TemporaryDirectory() as tempDir:
+          reportPath = Path(tempDir) / "orderReport.txt"
+          reportPath.write_text(
+              f"paidCount={summary['paidCount']}\\npaidRevenue={summary['paidRevenue']}",
+              encoding="utf-8",
+          )
+          savedReport = reportPath.read_text(encoding="utf-8")
+
+      assert "paidCount=2" in savedReport
+      assert "paidRevenue=230000" in savedReport
+
+      try:
+          parseOrderCsv("orderId,customer,sku,price,quantity,status\\nA-999,kim,item,unknown,1,paid")
+      except ValueError as exc:
+          assert "invalid number" in str(exc)
+
+      print(savedReport)
+      print("최종 프로젝트 흐름 통과")
+    hints:
+    - print("최종 프로젝트 흐름 통과") 줄 바로 위에 print(savedReport) 를 들여쓰기 없이 한 줄 추가합니다. 나머지 코드는 한 글자도 고치지 않습니다.
+    - "정답 형태: print(savedReport) 다음 줄에 print(\\"최종 프로젝트 흐름 통과\\")"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: |-
+      paidCount=2
+      paidRevenue=230000
+      최종 프로젝트 흐름 통과
+    resultCheck: "출력이 정확히 일치해야 합니다: 'paidCount=2\\npaidRevenue=230000\\n최종 프로젝트 흐름 통과'"
+- id: practice
+  title: Day 30 최종 복습
+  structuredPrimary: true
+  subtitle: 30일 완성 프로젝트
+  goal: 함수의 결과를 그 함수에 다시 넣어 원래 문장으로 돌아오는지 보는, 정답표 없이 스스로 확인하는 방법을 익힌다.
+  why: 여기까지 온 사람은 파일을 읽고 쓰고, 클래스로 자료를 묶고, CSV를 파싱해 집계하는 코드를 직접 만들 수 있습니다. 이제 남은 것은 기대 출력을 옆에 적어 주는 사람이 없는 곳에서도 결과가 맞는지 스스로 거는 일이고, 두 번 적용하면 제자리로 돌아온다 같은 성질이 그 첫 도구입니다.
+  explanation: 30일간 배운 모든 파이썬 문법을 종합하여 실전 프로젝트를 완성합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전하며 파이썬 마스터가 되어보세요.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def reverseWords(sentence):
+        words = sentence.split()
+        reversed_words = []
+        for word in words:
+            reversed_words.append(word[::-1])
+        return ' '.join(reversed_words)
+
+    reverseWords('hello world python')
+  exercise:
+    prompt: |-
+      마지막 줄 reverseWords('hello world python')을 지우고 그 자리에 아래 두 줄을 넣으세요. 함수 본문은 그대로 둡니다.
+      sentence = 'thirty days of python'
+      reverseWords(sentence), reverseWords(reverseWords(sentence)) == sentence
+
+      단어마다 글자를 뒤집으므로 thirty는 ytriht가 되고, 뒤집은 것을 한 번 더 뒤집으면 원래 문장으로 돌아오니 뒤쪽 비교는 True가 됩니다. 그래서 아래 한 줄이 나와야 합니다.
+      ('ytriht syad fo nohtyp', True)
+    starterCode: |-
+      def reverseWords(sentence):
+          words = sentence.split()
+          reversed_words = []
+          for word in words:
+              reversed_words.append(word[::-1])
+          return ' '.join(reversed_words)
+
+      reverseWords('hello world python')
+    solution: |-
+      def reverseWords(sentence):
+          words = sentence.split()
+          reversed_words = []
+          for word in words:
+              reversed_words.append(word[::-1])
+          return ' '.join(reversed_words)
+
+      sentence = 'thirty days of python'
+      reverseWords(sentence), reverseWords(reverseWords(sentence)) == sentence
+    hints:
+    - "마지막 줄을 지우고 sentence = 'thirty days of python' 한 줄과 두 값을 쉼표로 나란히 쓰는 한 줄을 넣습니다."
+    - "정답 형태: reverseWords(sentence), reverseWords(reverseWords(sentence)) == sentence"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "('ytriht syad fo nohtyp', True)"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"('ytriht syad fo nohtyp', True)\\""
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
+  masteryVariants:
+  - id: day30-sales-report-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - text_processing
+    - practice
+    title: CSV 두 종류를 JSON 보고서로 변환하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 파일 읽기, 숫자 변환, 집계, 산출물 저장을 하나의 capstone으로 완성한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: build_sales_report(source_path, output_name)가 CSV item,amount를 읽어 count, total, average JSON을 저장하고 같은 딕셔너리를
+        반환하도록 완성하세요.
+      starterCode: |-
+        def build_sales_report(source_path, output_name):
+            raise NotImplementedError
+      solution: |-
+        def build_sales_report(source_path, output_name):
+            import csv
+            import json
+            from pathlib import Path
+            with Path(source_path).open(encoding='utf-8', newline='') as stream:
+                rows = list(csv.DictReader(stream))
+            amounts = [int(row['amount']) for row in rows]
+            report = {
+                'count': len(amounts),
+                'total': sum(amounts),
+                'average': sum(amounts) / len(amounts) if amounts else 0,
+            }
+            Path(output_name).write_text(json.dumps(report, ensure_ascii=False, sort_keys=True), encoding='utf-8')
+            return report
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day30.sales-report.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day30.sales-report.mastery.behavior.v1.fixture
+      fixtureHash: sha256-ryx2Y6JbI/ENxR5KudfXYARxzgQEfGuS2W7sfTs1P0M=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: sales-a.csv
+          content: |
+            item,amount
+            pen,1000
+            book,2500
+        - path: sales-b.csv
+          content: |
+            item,amount
+            a,100
+            b,200
+            c,300
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_sales_report
+        cases:
+        - id: first
+          arguments:
+          - fixturePath: sales-a.csv
+          - value: report-a.json
+          expectedReturn:
+            count: 2
+            total: 3500
+            average: 1750.0
+        - id: second
+          arguments:
+          - fixturePath: sales-b.csv
+          - value: report-b.json
+          expectedReturn:
+            count: 3
+            total: 600
+            average: 200.0
+        expectedPaths:
+        - path: sales-a.csv
+          kind: file
+          origin: fixture
+        - path: sales-b.csv
+          kind: file
+          origin: fixture
+        - path: report-a.json
+          kind: file
+          origin: created
+        - path: report-b.json
+          kind: file
+          origin: created
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day30-status-summary-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day30-sales-report-mastery
+    title: 로그 상태를 집계해 새 요약 만들기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: capstone의 집계 흐름을 상태 레코드에 옮긴다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: status_summary(rows)가 status별 개수와 전체 건수를 반환하도록 완성하세요.
+      starterCode: |-
+        def status_summary(rows):
+            raise NotImplementedError
+      solution: |-
+        def status_summary(rows):
+            counts = {}
+            for row in rows:
+                status = row['status']
+                counts[status] = counts.get(status, 0) + 1
+            return {'total': len(rows), 'statuses': counts}
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day30.status-summary.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day30.status-summary.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: status_summary
+        cases:
+        - id: mixed
+          arguments:
+          - value:
+            - status: ok
+            - status: fail
+            - status: ok
+          expectedReturn:
+            total: 3
+            statuses:
+              ok: 2
+              fail: 1
+        - id: empty
+          arguments:
+          - value: []
+          expectedReturn:
+            total: 0
+            statuses: {}
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day30-validate-pipeline-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day30-status-summary-transfer
+    title: 입력 정제와 오류 분리 다시 구성하기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 여러 기초 개념을 기억에서 결합해 파이프라인 결과를 만든다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: validate_pipeline(rows)가 양의 정수 amount만 합산하고 invalid 행 수를 함께 반환하도록 완성하세요.
+      starterCode: |-
+        def validate_pipeline(rows):
+            raise NotImplementedError
+      solution: |-
+        def validate_pipeline(rows):
+            valid = []
+            invalid = 0
+            for row in rows:
+                try:
+                    amount = int(row['amount'])
+                    if amount <= 0:
+                        raise ValueError
+                    valid.append(amount)
+                except (KeyError, TypeError, ValueError):
+                    invalid += 1
+            return {'valid_count': len(valid), 'total': sum(valid), 'invalid_count': invalid}
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day30.validate-pipeline.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day30.validate-pipeline.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: validate_pipeline
+        cases:
+        - id: mixed
+          arguments:
+          - value:
+            - amount: '10'
+            - amount: bad
+            - {}
+            - amount: '5'
+          expectedReturn:
+            valid_count: 2
+            total: 15
+            invalid_count: 2
+        - id: nonpositive
+          arguments:
+          - value:
+            - amount: '0'
+            - amount: '-2'
+          expectedReturn:
+            valid_count: 0
+            total: 0
+            invalid_count: 2
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

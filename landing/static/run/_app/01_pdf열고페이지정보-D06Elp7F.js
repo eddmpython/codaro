@@ -1,0 +1,813 @@
+var e=`meta:
+  id: pdf_01
+  title: PDF 열고 페이지 정보 추출
+  order: 1
+  category: pdf
+  difficulty: ⭐
+  badge: 입문
+  packages:
+    - pypdf
+    - reportlab
+  tags:
+    - pypdf
+    - PdfReader
+    - metadata
+    - 일괄점검
+  outcomes:
+    - automation.pdf.read
+  prerequisites:
+    - automation.pdf.intro
+    - python.functions
+    - python.modulesAndIo
+  estimatedMinutes: 40
+  seo:
+    title: "pypdf로 PDF 열기 - PdfReader, pages, metadata 일괄 점검"
+    description: "받은 50개 PDF의 페이지 수와 작성자·제목 메타데이터를 코드 한 번으로 표로 정리한다. PdfReader 기본 흐름과 함수화 패턴을 익힌다."
+    keywords:
+      - pypdf PdfReader
+      - PDF 페이지 수
+      - PDF 메타데이터
+      - 일괄 PDF 점검
+
+intro:
+  direction: "받은 PDF에서 페이지 수·제목·작성자·작성일 같은 메타 정보를 코드로 뽑아 표로 정리한다. 50개 PDF 일괄 점검이 25분에서 2초로 줄어드는 흐름을 만든다."
+  benefits:
+    - "총무 박과장의 협력사 PDF 50개 일괄 점검을 25분에서 2초로 줄인다."
+    - "PdfReader 객체와 pages 컬렉션, metadata 딕셔너리의 구조를 손에 익힌다."
+    - "여러 PDF를 한 함수로 점검하고 결과를 dict 리스트로 모으는 자동화 패턴을 만든다."
+  diagram:
+    steps:
+      - label: "1. PdfReader로 열기"
+        detail: "PdfReader(path)로 PDF 객체를 만든다."
+      - label: "2. 페이지 수와 본문 길이"
+        detail: "len(reader.pages)와 reader.pages[0].extract_text() 일부로 빠르게 점검."
+      - label: "3. 메타데이터"
+        detail: "reader.metadata의 title·author·creator·created 정보 추출."
+      - label: "4. 여러 PDF 일괄 점검"
+        detail: "함수화하고 폴더의 모든 PDF에 반복 적용해 표로 정리."
+    runtime:
+      - label: "샘플 PDF 즉석 생성"
+        detail: "reportlab으로 강의 시작에 점검 대상 PDF를 임시 폴더에 만든다. 외부 다운로드 의존 없음."
+      - label: "결과 검증"
+        detail: "각 PDF의 페이지 수와 메타가 의도한 값과 같은지 assert로 자동 검증."
+
+sections:
+  - id: step1_open
+    title: "1단계. PDF 열고 페이지 수 확인"
+    structuredPrimary: true
+    subtitle: "PdfReader(path), len(reader.pages)"
+    goal: "임시 PDF를 하나 만들고 PdfReader로 열어 페이지 수를 확인한다."
+    why: "협력사·정부·내부 PDF 점검의 모든 후속 작업이 PdfReader 객체 위에서 일어납니다. 객체가 잘 만들어졌다는 사실 하나로 페이지 수, 메타데이터, 본문, 표 추출이 전부 열립니다. 이 한 줄이 막히면 01-10강 모든 자동화가 멈춥니다."
+    explanation: |-
+      reportlab의 Canvas로 3페이지 PDF를 임시 폴더에 만든 뒤 PdfReader(path)로 엽니다. reader.pages는 인덱싱 가능한 시퀀스이고 len()으로 페이지 수를 즉시 알 수 있습니다.
+    tips:
+      - "PdfReader는 파일 경로 문자열·Path·바이트 스트림 모두 받습니다. 가장 흔한 형태는 Path 인스턴스입니다."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.pdfgen.canvas import Canvas
+
+      workdir = TemporaryDirectory()
+      samplePath = Path(workdir.name) / "sample.pdf"
+      canvas = Canvas(str(samplePath))
+      for idx in range(3):
+          canvas.drawString(72, 720, f"page {idx + 1}")
+          canvas.showPage()
+      canvas.save()
+
+      reader = PdfReader(samplePath)
+      len(reader.pages)
+    exercise:
+      prompt: "페이지 수를 5로 늘려 PDF를 다시 만들고 len(reader.pages)를 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader
+        from reportlab.pdfgen.canvas import Canvas
+
+        workdir = TemporaryDirectory()
+        samplePath = Path(workdir.name) / "sample.pdf"
+        canvas = Canvas(str(samplePath))
+        for idx in range(___):
+            canvas.drawString(72, 720, f"page {idx + 1}")
+            canvas.showPage()
+        canvas.save()
+
+        reader = PdfReader(samplePath)
+        len(reader.pages)
+      hints:
+        - "range(N)에 페이지 수를 직접 넣습니다."
+    check:
+      noError: "Canvas는 str(path)를 요구합니다. Path 객체를 직접 넣으면 TypeError가 나는 경우가 있으니 str()로 감싸세요."
+      resultCheck: "출력값이 5여야 합니다."
+
+  - id: step2_metadata
+    title: "2단계. 메타데이터 추출"
+    structuredPrimary: true
+    subtitle: "reader.metadata, title·author·creator"
+    goal: "PDF에 작성자와 제목을 심고, 다시 열어 메타데이터를 읽어낸다."
+    why: "협력사가 보낸 50개 PDF에서 누가 만들었고 언제 만들었는지 빠르게 분류하려면 metadata가 가장 빠른 열쇠입니다."
+    explanation: |-
+      reportlab Canvas의 setAuthor·setTitle·setCreator로 메타를 심을 수 있습니다. PdfReader.metadata는 IndirectObject를 감싼 객체로, dict처럼 접근하거나 .title·.author 속성으로 직접 읽습니다.
+    tips:
+      - "reader.metadata는 PDF에 메타가 없으면 None이 될 수 있습니다. 함수에서 다룰 때는 None 가드를 두세요."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.pdfgen.canvas import Canvas
+
+      workdir = TemporaryDirectory()
+      pdfPath = Path(workdir.name) / "report.pdf"
+      writer = Canvas(str(pdfPath))
+      writer.setTitle("월간 보고서")
+      writer.setAuthor("김대리")
+      writer.setCreator("Codaro PDF 트랙")
+      writer.drawString(72, 720, "body")
+      writer.showPage()
+      writer.save()
+
+      meta = PdfReader(pdfPath).metadata
+      meta.title, meta.author, meta.creator
+    exercise:
+      prompt: "setTitle을 '분기 보고서'로, setAuthor를 '박과장'으로 바꾸고 meta를 다시 읽으세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader
+        from reportlab.pdfgen.canvas import Canvas
+
+        workdir = TemporaryDirectory()
+        pdfPath = Path(workdir.name) / "report.pdf"
+        writer = Canvas(str(pdfPath))
+        writer.setTitle(___)
+        writer.setAuthor(___)
+        writer.setCreator("Codaro PDF 트랙")
+        writer.drawString(72, 720, "body")
+        writer.showPage()
+        writer.save()
+
+        meta = PdfReader(pdfPath).metadata
+        meta.title, meta.author
+      hints:
+        - "문자열은 반드시 따옴표로 감싸세요."
+    check:
+      noError: "setAuthor/setTitle은 문자열만 받습니다."
+      resultCheck: "출력 튜플이 ('분기 보고서', '박과장')과 같아야 합니다."
+
+  - id: step3_bulk
+    title: "3단계. 여러 PDF 일괄 점검"
+    structuredPrimary: true
+    subtitle: "함수화 + dict 리스트로 결과 모으기"
+    goal: "임시 폴더에 5개 PDF를 만들고, 한 함수로 모두 점검해 결과를 리스트에 모은다."
+    why: "PDF 1개 점검은 의미 없습니다. 50개·100개를 일괄로 처리해 표로 만드는 게 자동화의 본질입니다."
+    explanation: |-
+      inspectPdf(path)라는 함수가 path 하나를 받아 {파일명, 페이지수, 제목, 작성자} dict를 돌려주게 합니다. 그런 다음 폴더의 모든 PDF에 함수를 적용해 리스트로 모으면 표 형태로 정리 가능합니다.
+    tips:
+      - "함수 인자는 Path 또는 str을 모두 허용하도록 Path()로 한 번 감싸세요. 함수 사용자가 어느 쪽을 넣어도 동작합니다."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.pdfgen.canvas import Canvas
+
+      def makeSample(path, pageCount, title, author):
+          canvas = Canvas(str(path))
+          canvas.setTitle(title)
+          canvas.setAuthor(author)
+          for _ in range(pageCount):
+              canvas.drawString(72, 720, "x")
+              canvas.showPage()
+          canvas.save()
+
+      def inspectPdf(path):
+          reader = PdfReader(path)
+          meta = reader.metadata
+          return {
+              "file": Path(path).name,
+              "pages": len(reader.pages),
+              "title": meta.title if meta else None,
+              "author": meta.author if meta else None,
+          }
+
+      workdir = TemporaryDirectory()
+      folder = Path(workdir.name)
+      makeSample(folder / "a.pdf", 2, "기획안", "김대리")
+      makeSample(folder / "b.pdf", 5, "계약서", "박과장")
+      makeSample(folder / "c.pdf", 1, "안내문", "이주임")
+
+      report = [inspectPdf(p) for p in sorted(folder.glob("*.pdf"))]
+      report
+    exercise:
+      prompt: "샘플 d.pdf(페이지 7, 제목 '견적서', 작성자 '윤대리')를 하나 더 만들고, inspectPdf가 4개 결과를 돌려주는지 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader
+        from reportlab.pdfgen.canvas import Canvas
+
+        def makeSample(path, pageCount, title, author):
+            canvas = Canvas(str(path))
+            canvas.setTitle(title)
+            canvas.setAuthor(author)
+            for _ in range(pageCount):
+                canvas.drawString(72, 720, "x")
+                canvas.showPage()
+            canvas.save()
+
+        def inspectPdf(path):
+            reader = PdfReader(path)
+            meta = reader.metadata
+            return {
+                "file": Path(path).name,
+                "pages": len(reader.pages),
+                "title": meta.title if meta else None,
+                "author": meta.author if meta else None,
+            }
+
+        workdir = TemporaryDirectory()
+        folder = Path(workdir.name)
+        makeSample(folder / "a.pdf", 2, "기획안", "김대리")
+        makeSample(folder / "b.pdf", 5, "계약서", "박과장")
+        makeSample(folder / "c.pdf", 1, "안내문", "이주임")
+        makeSample(folder / "d.pdf", ___, ___, ___)
+
+        report = [inspectPdf(p) for p in sorted(folder.glob("*.pdf"))]
+        len(report), report[-1]
+      hints:
+        - "정수는 따옴표 없이, 문자열은 따옴표로."
+    check:
+      noError: "makeSample 인자가 4개 모두 채워져야 합니다."
+      resultCheck: "len(report)가 4이고 마지막 dict의 author가 '윤대리'여야 합니다."
+
+  - id: validation
+    title: "4단계. 검증 루프 - 일괄 점검 결과 자동 확인"
+    structuredPrimary: true
+    subtitle: "리스트 결과를 assert로 통째 검증"
+    goal: "5개 PDF를 만들고 일괄 점검 결과를 assert 한 묶음으로 검증한다."
+    why: "사람 눈으로 50개 PDF 메타를 비교하는 건 자동화의 의미를 깎습니다. 결과 자체를 자동 검증해야 진짜 자동화입니다."
+    explanation: |-
+      inspectPdfFolder(folder)라는 함수에 폴더 경로 하나만 넘기면 리스트가 나오게 합니다. 결과 리스트의 페이지 합계와 작성자 집합을 assert로 한 번에 검증합니다.
+    tips:
+      - "TemporaryDirectory는 컨텍스트 매니저로도, 인스턴스로도 쓸 수 있습니다. 인스턴스로 두면 셀 끝나도 폴더가 유지되어 후속 셀에서 재사용 가능합니다."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.pdfgen.canvas import Canvas
+
+      def makeSample(path, pageCount, title, author):
+          canvas = Canvas(str(path))
+          canvas.setTitle(title)
+          canvas.setAuthor(author)
+          for _ in range(pageCount):
+              canvas.drawString(72, 720, "x")
+              canvas.showPage()
+          canvas.save()
+
+      def inspectPdfFolder(folder):
+          rows = []
+          for path in sorted(Path(folder).glob("*.pdf")):
+              reader = PdfReader(path)
+              meta = reader.metadata
+              rows.append({
+                  "file": path.name,
+                  "pages": len(reader.pages),
+                  "title": meta.title if meta else None,
+                  "author": meta.author if meta else None,
+              })
+          return rows
+
+      vault = TemporaryDirectory()
+      base = Path(vault.name)
+      makeSample(base / "01.pdf", 2, "A", "김대리")
+      makeSample(base / "02.pdf", 5, "B", "박과장")
+      makeSample(base / "03.pdf", 1, "C", "이주임")
+      makeSample(base / "04.pdf", 4, "D", "윤대리")
+      makeSample(base / "05.pdf", 3, "E", "김대리")
+
+      rows = inspectPdfFolder(base)
+      assert len(rows) == 5
+      assert sum(row["pages"] for row in rows) == 15
+      assert {row["author"] for row in rows} == {"김대리", "박과장", "이주임", "윤대리"}
+      rows
+    exercise:
+      prompt: "inspectPdfFolder의 본문을 직접 작성하세요. 폴더의 모든 PDF를 순회하며 파일명·페이지수·제목·작성자 dict 리스트를 돌려줘야 합니다. metadata가 None인 PDF도 안전하게 처리해야 합니다."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader
+        from reportlab.pdfgen.canvas import Canvas
+
+        def makeSample(path, pageCount, title, author):
+            canvas = Canvas(str(path))
+            canvas.setTitle(title)
+            canvas.setAuthor(author)
+            for _ in range(pageCount):
+                canvas.drawString(72, 720, "x")
+                canvas.showPage()
+            canvas.save()
+
+        def inspectPdfFolder(folder):
+            rows = []
+            for path in sorted(Path(folder).glob("*.pdf")):
+                ___  # PdfReader 열고 metadata None 가드 후 dict append
+            return rows
+
+        vault = TemporaryDirectory()
+        base = Path(vault.name)
+        for idx, author in enumerate(["김대리", "박과장", "이주임", "윤대리", "최팀장", "김대리", "박과장"], start=1):
+            makeSample(base / f"{idx:02d}.pdf", idx, f"T{idx}", author)
+
+        rows = inspectPdfFolder(base)
+        assert len(rows) == 7
+        assert sum(row["pages"] for row in rows) == 28
+        assert len({row["author"] for row in rows}) == 5
+        rows
+      hints:
+        - "reader = PdfReader(path), meta = reader.metadata, meta is None 가드 후 rows.append(dict)."
+        - "dict 키: file, pages, title, author (snippet과 동일 구조)."
+    check:
+      noError: "리스트 길이와 enumerate 인자 수가 맞아야 합니다."
+      resultCheck: "len(rows)가 7, 작성자 unique 수가 5여야 합니다."
+
+  - id: misconception
+    title: "5단계. 흔한 오개념 차단"
+    structuredPrimary: false
+    subtitle: "metadata가 None일 때, Path 객체 직접 전달"
+    goal: "초보자가 빠지는 두 가지 함정을 미리 차단한다."
+    why: "이 두 가지를 사전에 알면 다음 강의들에서 디버깅 시간이 0이 됩니다."
+    explanation: |-
+      함정1: PDF에 메타가 없으면 reader.metadata는 None입니다. None.title은 AttributeError를 냅니다. 함정2: Canvas(path) 인자는 str을 요구합니다. Path 인스턴스를 넘기면 일부 버전에서 TypeError가 납니다.
+    tips:
+      - "메타 없는 PDF는 외부에서 받는 케이스에서 흔합니다. 함수에서 항상 None 가드를 두세요."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.pdfgen.canvas import Canvas
+
+      def safeAuthor(path):
+          meta = PdfReader(path).metadata
+          if meta is None:
+              return None
+          return meta.author
+
+      workdir = TemporaryDirectory()
+      noMetaPath = Path(workdir.name) / "raw.pdf"
+      blank = Canvas(str(noMetaPath))
+      blank.drawString(72, 720, "no meta")
+      blank.showPage()
+      blank.save()
+
+      safeAuthor(noMetaPath)
+    exercise:
+      prompt: "safeAuthor가 None을 돌려주는지 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader
+        from reportlab.pdfgen.canvas import Canvas
+
+        def safeAuthor(path):
+            meta = PdfReader(path).metadata
+            if meta is ___:
+                return ___
+            return meta.author
+
+        workdir = TemporaryDirectory()
+        noMetaPath = Path(workdir.name) / "raw.pdf"
+        blank = Canvas(str(noMetaPath))
+        blank.drawString(72, 720, "no meta")
+        blank.showPage()
+        blank.save()
+
+        safeAuthor(noMetaPath)
+      hints:
+        - "None 비교는 is None, 반환값도 None."
+    check:
+      noError: "is None 비교와 return None이 일관되어야 합니다."
+      resultCheck: "결과가 None이어야 합니다."
+
+  - id: practice
+    title: "실습 - 종합 미션 2개"
+    structuredPrimary: true
+    subtitle: "독립 실행 가능한 PDF 일괄 점검 도구"
+    goal: "PdfReader + metadata + 일괄 점검을 결합한 작은 도구 두 개를 직접 작성한다."
+    why: "처음부터 끝까지 한 흐름을 손으로 쳐봐야 PdfReader 객체 감각이 굳어집니다."
+    explanation: |-
+      미션1은 폴더의 모든 PDF에서 페이지 수 합계가 N 이상인지 확인하는 함수, 미션2는 특정 작성자의 PDF만 골라 리스트로 돌려주는 함수입니다.
+    tips:
+      - "각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다."
+      - "변수 prefix는 sum*(미션1), pick*(미션2)로 격리됩니다."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.pdfgen.canvas import Canvas
+    exercise:
+      prompt: "두 미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader
+        from reportlab.pdfgen.canvas import Canvas
+
+        ___
+      hints:
+        - "미션1 함수 시그니처: totalPagesAtLeast(folder, threshold) -> bool"
+        - "미션2 함수 시그니처: pickByAuthor(folder, authorName) -> list[Path]"
+    check:
+      noError: "함수가 정의되어야 하고 호출 결과가 True/list여야 합니다."
+      resultCheck: "미션1은 임계값 비교 결과, 미션2는 매칭 파일 리스트가 정확해야 합니다."
+    blocks:
+      - type: tip
+        content: "PdfReader는 매 호출마다 파일을 다시 엽니다. 같은 PDF를 여러 번 점검하면 한 번만 열어 결과를 캐싱하는 게 효율적입니다."
+      - type: expansion
+        title: "미션1: 총 페이지 임계값 점검"
+        blocks:
+          - type: code
+            title: "데이터 준비"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from pypdf import PdfReader
+              from reportlab.pdfgen.canvas import Canvas
+
+              def makeSampleSum(path, pageCount):
+                  canvas = Canvas(str(path))
+                  for _ in range(pageCount):
+                      canvas.drawString(72, 720, "x")
+                      canvas.showPage()
+                  canvas.save()
+
+              sumDir = TemporaryDirectory()
+              sumBase = Path(sumDir.name)
+              for idx, pages in enumerate([3, 7, 2, 5], start=1):
+                  makeSampleSum(sumBase / f"{idx}.pdf", pages)
+              sorted(p.name for p in sumBase.glob("*.pdf"))
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              def totalPagesAtLeast(folder, threshold):
+                  total = sum(len(PdfReader(p).pages) for p in Path(folder).glob("*.pdf"))
+                  return total >= threshold
+
+              assert totalPagesAtLeast(sumBase, 15) is True
+              assert totalPagesAtLeast(sumBase, 20) is False
+              totalPagesAtLeast(sumBase, 17)
+      - type: expansion
+        title: "미션2: 작성자별 필터"
+        blocks:
+          - type: code
+            title: "데이터 준비"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from pypdf import PdfReader
+              from reportlab.pdfgen.canvas import Canvas
+
+              def makeSamplePick(path, author):
+                  canvas = Canvas(str(path))
+                  canvas.setAuthor(author)
+                  canvas.drawString(72, 720, "x")
+                  canvas.showPage()
+                  canvas.save()
+
+              pickDir = TemporaryDirectory()
+              pickBase = Path(pickDir.name)
+              for idx, author in enumerate(["김대리", "박과장", "김대리", "이주임"], start=1):
+                  makeSamplePick(pickBase / f"{idx}.pdf", author)
+              sorted(p.name for p in pickBase.glob("*.pdf"))
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              def pickByAuthor(folder, authorName):
+                  matched = []
+                  for path in sorted(Path(folder).glob("*.pdf")):
+                      meta = PdfReader(path).metadata
+                      if meta is not None and meta.author == authorName:
+                          matched.append(path)
+                  return matched
+
+              assert len(pickByAuthor(pickBase, "김대리")) == 2
+              assert len(pickByAuthor(pickBase, "박과장")) == 1
+              [p.name for p in pickByAuthor(pickBase, "김대리")]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: text
+        content: |-
+          본 강의 패턴을 응용하면 사무에서 다음 작업을 즉시 자동화할 수 있습니다. 본인 업무에 가까운 변주를 골라 시도해 보세요.
+      - type: list
+        style: bullet
+        items:
+          - "내 다운로드 폴더의 모든 PDF 메타 일괄 추출 후 CSV로 저장"
+          - "페이지 수 N 이상인 PDF만 별도 폴더로 자동 이동"
+          - "작성자별로 PDF를 묶어 별도 폴더에 정리"
+          - "메타가 비어있는 PDF만 찾아 일괄 메타 채워 다시 저장"
+          - "월별로 만들어진 PDF를 created 기준으로 분류"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
+  masteryVariants:
+  - id: pdf_01-pdf-page-info-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_open
+    - extensions
+    title: PDF page count·size·rotation·encryption 정보 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 열기 전에 password 필요 여부와 비정상 geometry를 보고한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 페이지 수만 보지 말고 각 page media box와 rotation을 검사하세요.
+    - 암호화 PDF는 password 제공 상태를 별도 failure로 기록하세요.
+    exercise:
+      prompt: audit_pdf_pages(document, allowed_page_sizes)를 완성하세요.
+      starterCode: |-
+        def audit_pdf_pages(document, allowed_page_sizes):
+            raise NotImplementedError
+      solution: |
+        def audit_pdf_pages(document, allowed_page_sizes):
+            failures = []
+            if document.get("encrypted", False) and not document.get("passwordProvided", False):
+                failures.append("password")
+            invalid_pages = []
+            for page in document.get("pages", []):
+                size = [page.get("width"), page.get("height")]
+                reasons = []
+                if size not in allowed_page_sizes:
+                    reasons.append("size")
+                if page.get("rotation") not in {0, 90, 180, 270}:
+                    reasons.append("rotation")
+                if reasons:
+                    invalid_pages.append({"page": page["number"], "reasons": reasons})
+            if invalid_pages:
+                failures.append("pages")
+            if not document.get("pages"):
+                failures.append("empty")
+            return {"readable": not failures, "failures": failures, "pageCount": len(document.get("pages", [])), "invalidPages": invalid_pages}
+      hints: *id001
+    check:
+      id: python.pdf.pdf_01.pdf-page-info-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_01.pdf-page-info-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_pdf_pages
+        cases:
+        - id: accepts-two-a4-pages
+          arguments:
+          - value:
+              encrypted: false
+              pages:
+              - number: 1
+                width: 595
+                height: 842
+                rotation: 0
+              - number: 2
+                width: 595
+                height: 842
+                rotation: 90
+          - value:
+            - - 595
+              - 842
+          expectedReturn:
+            readable: true
+            failures: []
+            pageCount: 2
+            invalidPages: []
+        - id: reports-password-size-and-rotation
+          arguments:
+          - value:
+              encrypted: true
+              passwordProvided: false
+              pages:
+              - number: 1
+                width: 100
+                height: 100
+                rotation: 45
+          - value:
+            - - 595
+              - 842
+          expectedReturn:
+            readable: false
+            failures:
+            - password
+            - pages
+            pageCount: 1
+            invalidPages:
+            - page: 1
+              reasons:
+              - size
+              - rotation
+        - id: reports-empty-document
+          arguments:
+          - value:
+              pages: []
+          - value:
+            - - 595
+              - 842
+          expectedReturn:
+            readable: false
+            failures:
+            - empty
+            pageCount: 0
+            invalidPages: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pdf_01-pdf-page-fingerprint-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_01-pdf-page-info-audit-mastery
+    title: 새 PDF의 페이지별 fingerprint manifest 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: page text·resource·geometry hash를 순서와 함께 정규화한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 페이지 identity에 geometry·text·resource hash를 분리해 보존하세요.
+    - page number는 1부터 연속인지 검사하세요.
+    exercise:
+      prompt: build_page_manifest(pages)를 완성하세요.
+      starterCode: |-
+        def build_page_manifest(pages):
+            raise NotImplementedError
+      solution: |
+        def build_page_manifest(pages):
+            numbers = [page["number"] for page in pages]
+            if numbers != list(range(1, len(pages) + 1)):
+                raise ValueError("page numbers must be contiguous")
+            entries = []
+            for page in pages:
+                entries.append({"page": page["number"], "geometryHash": page["geometryHash"], "textHash": page["textHash"], "resourceHash": page["resourceHash"]})
+            return {"pageCount": len(entries), "pages": entries}
+      hints: *id002
+    check:
+      id: python.pdf.pdf_01.pdf-page-fingerprint.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_01.pdf-page-fingerprint.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_page_manifest
+        cases:
+        - id: builds-contiguous-manifest
+          arguments:
+          - value:
+            - number: 1
+              geometryHash: g1
+              textHash: t1
+              resourceHash: r1
+            - number: 2
+              geometryHash: g2
+              textHash: t2
+              resourceHash: r2
+          expectedReturn:
+            pageCount: 2
+            pages:
+            - page: 1
+              geometryHash: g1
+              textHash: t1
+              resourceHash: r1
+            - page: 2
+              geometryHash: g2
+              textHash: t2
+              resourceHash: r2
+        - id: handles-empty-document
+          arguments:
+          - value: []
+          expectedReturn:
+            pageCount: 0
+            pages: []
+        - id: rejects-page-number-gap
+          arguments:
+          - value:
+            - number: 2
+              geometryHash: g
+              textHash: t
+              resourceHash: r
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pdf_01-pdf-page-info-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_01-pdf-page-fingerprint-transfer
+    title: PDF page 정보 검증 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 암호화·geometry·page fingerprint 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - PDF 저장 성공과 페이지 내용·geometry·업무 값의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 판단을 연습하고 Local에서는 재개방·render artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_pdf_page_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_pdf_page_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_pdf_page_evidence(situation):
+            table = {'open': {'action': 'check encryption and password', 'evidence': 'document security state', 'risk': 'unreadable input'}, 'geometry': {'action': 'inspect size and rotation', 'evidence': 'page boxes', 'risk': 'unexpected page layout'}, 'identity': {'action': 'hash text resource and geometry', 'evidence': 'ordered page manifest', 'risk': 'page drift'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pdf.pdf_01.pdf-page-info-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_01.pdf-page-info-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_pdf_page_evidence
+        cases:
+        - id: recalls-open
+          arguments:
+          - value: open
+          expectedReturn:
+            action: check encryption and password
+            evidence: document security state
+            risk: unreadable input
+        - id: recalls-geometry
+          arguments:
+          - value: geometry
+          expectedReturn:
+            action: inspect size and rotation
+            evidence: page boxes
+            risk: unexpected page layout
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

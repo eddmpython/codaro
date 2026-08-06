@@ -1,0 +1,679 @@
+var e=`meta:
+  id: day05
+  title: 문자열 인덱싱/슬라이싱
+  day: 5
+  category: 30days
+  tags:
+  - 문자열
+  - 인덱싱
+  - 슬라이싱
+  - 오프바이원
+  - 전화번호
+  - 검증
+  seo:
+    title: 파이썬 문자열 인덱싱과 슬라이싱 완벽 가이드
+    description: 문자열 인덱싱, 음수 인덱싱, 슬라이싱, 스텝 슬라이싱을 배웁니다.
+    keywords:
+    - 인덱싱
+    - indexing
+    - 슬라이싱
+    - slicing
+    - 문자열
+intro:
+  emoji: 🔍
+  points:
+  - 인덱스로 문자열의 특정 위치 접근하기
+  - 음수 인덱스로 뒤에서부터 접근하기
+  - 슬라이싱으로 부분 문자열 추출하기
+  - 스텝을 사용한 다양한 슬라이싱 패턴
+  direction: 문자열 인덱싱/슬라이싱에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 문자열 인덱싱/슬라이싱 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 인덱싱 기초 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 마지막 문자 접근 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: 음수 인덱싱 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 문자열 인덱싱/슬라이싱 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 문자열 인덱싱/슬라이싱 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 문자열 인덱싱/슬라이싱 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: index_basic
+  title: 인덱싱 기초
+  structuredPrimary: true
+  subtitle: 0부터 시작하는 위치 접근
+  goal: 인덱스가 0부터 시작한다는 규칙에 맞춰 원하는 순서의 글자를 꺼낸다.
+  why: 인덱스는 1이 아니라 0부터 세기 때문에, 이 규칙이 익숙하지 않으면 계속 한 칸씩 밀린 글자를 읽게 됩니다.
+  explanation: 문자열의 각 문자는 인덱스(위치 번호)를 가집니다. 인덱스는 0부터 시작하며, 대괄호 []를 사용하여 특정 위치의 문자를 가져올 수 있습니다. 첫 번째 문자는
+    [0], 두 번째 문자는 [1]입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    lang = 'Python'
+    lang[0]
+  exercise:
+    prompt: |-
+      마지막 줄 lang[0]을 lang[3]으로 바꾸세요.
+
+      인덱스는 0부터 세므로 4번째 글자인 h가 나와야 합니다.
+    starterCode: |-
+      lang = 'Python'
+      lang[0]
+    solution: |-
+      lang = 'Python'
+      lang[3]
+    hints:
+    - "lang[0] 을 lang[3] 으로 바꿉니다. 첫 줄은 그대로 둡니다."
+    - "정답 형태: lang[3]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'h'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'h'"
+- id: index_last
+  title: 마지막 문자 접근
+  structuredPrimary: true
+  subtitle: 길이를 이용한 마지막 문자
+  goal: len()으로 마지막 인덱스를 구해 길이가 달라져도 마지막 글자를 꺼낸다.
+  why: 길이를 모르는 문자열의 마지막 글자를 읽어야 할 때, 마지막 자리가 len() - 1 이라는 사실이 계산의 출발점입니다.
+  explanation: 마지막 문자의 인덱스는 문자열 길이 - 1입니다. len() 함수를 사용하여 길이를 구한 후 1을 빼면 마지막 인덱스를 얻을 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    greet = 'Hello'
+    greet[len(greet) - 1]
+  exercise:
+    prompt: |-
+      첫 줄 greet를 'Programming'으로 바꾸세요.
+
+      길이가 11로 늘어나도 마지막 인덱스는 10이므로 g가 나와야 합니다.
+    starterCode: |-
+      greet = 'Hello'
+      greet[len(greet) - 1]
+    solution: |-
+      greet = 'Programming'
+      greet[len(greet) - 1]
+    hints:
+    - "greet = 'Hello' 를 greet = 'Programming' 으로 바꿉니다. 마지막 줄은 그대로 둡니다."
+    - "정답 형태: greet = 'Programming'"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'g'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'g'"
+- id: negative_index
+  title: 음수 인덱싱
+  structuredPrimary: true
+  subtitle: 뒤에서부터 접근하기
+  goal: 음수 인덱스로 뒤에서 몇 번째 글자인지 세어 꺼낸다.
+  why: 확장자나 국가 코드처럼 뒤에서부터 자리가 정해진 값은 길이를 몰라도 음수 인덱스로 바로 집을 수 있습니다.
+  explanation: 음수 인덱스를 사용하면 문자열의 뒤에서부터 접근할 수 있습니다. -1은 마지막 문자, -2는 마지막에서 두 번째 문자입니다. 길이를 계산할 필요 없이 편리하게
+    사용할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    word = 'Python'
+    word[-1]
+  exercise:
+    prompt: |-
+      마지막 줄 word[-1]을 word[-2]로 바꾸세요.
+
+      뒤에서 첫 번째가 -1이므로 -2는 뒤에서 두 번째 글자인 o가 나와야 합니다.
+    starterCode: |-
+      word = 'Python'
+      word[-1]
+    solution: |-
+      word = 'Python'
+      word[-2]
+    hints:
+    - "word[-1] 을 word[-2] 로 바꿉니다. 음수 인덱스는 -0 이 아니라 -1 부터 셉니다."
+    - "정답 형태: word[-2]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'o'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'o'"
+- id: slice_basic
+  title: 슬라이싱 기초
+  structuredPrimary: true
+  subtitle: '[start:end]로 부분 문자열 추출'
+  goal: 시작과 끝 인덱스를 지정해 문자열의 원하는 구간만 잘라 낸다.
+  why: 끝 인덱스가 포함되지 않는 규칙 때문에 한 글자가 잘리거나 남는 실수가 가장 자주 나는 자리입니다.
+  explanation: |-
+    슬라이싱은 문자열의 일부분을 추출합니다. [start:end] 형태로 사용하며, start 인덱스부터 end-1 인덱스까지 가져옵니다. end 위치는 포함되지 않는다는 점에 주의해야 합니다.
+
+    [0:6]은 인덱스 0부터 5까지, 총 6개의 문자를 가져옵니다.
+  snippet: |-
+    phrase = 'Python Programming'
+    phrase[0:6]
+  exercise:
+    prompt: |-
+      마지막 줄 phrase[0:6]을 phrase[7:18]로 바꾸세요.
+
+      마지막 글자 g의 인덱스는 17이지만 끝 인덱스는 포함되지 않으므로 18까지 적어야 하고, 실행하면 Programming이 나와야 합니다.
+    starterCode: |-
+      phrase = 'Python Programming'
+      phrase[0:6]
+    solution: |-
+      phrase = 'Python Programming'
+      phrase[7:18]
+    hints:
+    - "phrase[0:6] 을 phrase[7:18] 로 바꿉니다. 7 은 뒤쪽 대문자 P 의 인덱스입니다."
+    - "정답 형태: phrase[7:18]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'Programming'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Programming'"
+- id: slice_omit_start
+  title: 시작 생략 슬라이싱
+  structuredPrimary: true
+  subtitle: '[:end]는 처음부터'
+  goal: 시작을 생략한 슬라이스로 앞에서부터 원하는 글자 수만큼 잘라 낸다.
+  why: 앞자리가 고정 길이인 코드에서 앞 몇 글자만 떼어 낼 때, 끝 인덱스 숫자가 곧 가져올 글자 수가 됩니다.
+  explanation: 시작 인덱스를 생략하면 처음부터 추출합니다. [:end]는 [0:end]와 같은 의미입니다. 문자열의 앞부분을 가져올 때 편리합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    msg = 'Hello World'
+    msg[:5]
+  exercise:
+    prompt: |-
+      마지막 줄 msg[:5]를 msg[:8]로 바꾸세요.
+
+      앞에서 8글자를 가져오므로 Hello Wo가 나와야 합니다. 인덱스 8인 r은 포함되지 않습니다.
+    starterCode: |-
+      msg = 'Hello World'
+      msg[:5]
+    solution: |-
+      msg = 'Hello World'
+      msg[:8]
+    hints:
+    - "msg[:5] 를 msg[:8] 로 바꿉니다. 콜론 앞자리는 비워 둡니다."
+    - "정답 형태: msg[:8]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'Hello Wo'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Hello Wo'"
+- id: slice_omit_end
+  title: 끝 생략 슬라이싱
+  structuredPrimary: true
+  subtitle: '[start:]는 끝까지'
+  goal: 끝을 생략한 슬라이스로 지정한 위치부터 문자열 끝까지 가져온다.
+  why: 앞부분만 떼어 내고 나머지 전부가 필요할 때, 뒤쪽 길이를 세지 않아도 되게 해 줍니다.
+  explanation: 끝 인덱스를 생략하면 마지막까지 추출합니다. [start:]는 start 인덱스부터 문자열 끝까지 가져옵니다. 문자열의 뒷부분을 가져올 때 유용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    text = 'Hello World'
+    text[6:]
+  exercise:
+    prompt: |-
+      마지막 줄 text[6:]를 text[3:]로 바꾸세요.
+
+      시작 인덱스는 포함되므로 인덱스 3인 l부터 끝까지인 lo World가 나와야 합니다.
+    starterCode: |-
+      text = 'Hello World'
+      text[6:]
+    solution: |-
+      text = 'Hello World'
+      text[3:]
+    hints:
+    - "text[6:] 를 text[3:] 로 바꿉니다. 콜론 뒷자리는 비워 둡니다."
+    - "정답 형태: text[3:]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'lo World'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'lo World'"
+- id: slice_both_omit
+  title: 전체 슬라이싱
+  structuredPrimary: true
+  subtitle: '[:]는 전체 복사'
+  goal: 시작과 끝을 모두 생략한 슬라이스가 문자열 전체를 그대로 돌려주는 것을 확인한다.
+  why: 원본을 그대로 둔 채 같은 내용을 한 벌 더 만드는 관용 표현이라, 남의 코드에서 자주 마주칩니다.
+  explanation: 시작과 끝을 모두 생략하면 전체 문자열을 복사합니다. [:]는 원본과 같은 내용의 새로운 문자열을 만듭니다. 문자열 전체를 복사할 때 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    source = 'Python'
+    source[:]
+  exercise:
+    prompt: |-
+      첫 줄 source를 'Codaro'로 바꾸세요.
+
+      시작과 끝을 비운 슬라이스는 전체를 그대로 돌려주므로 Codaro가 나와야 합니다.
+    starterCode: |-
+      source = 'Python'
+      source[:]
+    solution: |-
+      source = 'Codaro'
+      source[:]
+    hints:
+    - "source = 'Python' 을 source = 'Codaro' 로 바꿉니다. 마지막 줄 source[:] 는 그대로 둡니다."
+    - "정답 형태: source = 'Codaro'"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'Codaro'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Codaro'"
+- id: slice_negative
+  title: 음수 슬라이싱
+  structuredPrimary: true
+  subtitle: 음수 인덱스로 슬라이싱
+  goal: 음수로 지정한 슬라이스에서도 끝 인덱스가 빠진다는 것을 눈으로 확인한다.
+  why: 뒤에서부터 구간을 자를 때 끝을 -1로 두면 마지막 한 글자가 조용히 사라지는데, 이 차이를 모르면 잘못된 값을 그대로 저장하게 됩니다.
+  explanation: 슬라이싱에서도 음수 인덱스를 사용할 수 있습니다. 뒤에서부터 계산하여 원하는 부분을 추출할 수 있습니다. [-5:-2]는 뒤에서 5번째부터 뒤에서 3번째까지입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    sentence = 'Python Programming'
+    sentence[-11:-7]
+  exercise:
+    prompt: |-
+      마지막 줄 sentence[-11:-7]을 sentence[-11:-1]로 바꾸세요.
+
+      끝 인덱스 -1은 포함되지 않아 마지막 g가 빠지므로 Programmin이 나와야 합니다.
+    starterCode: |-
+      sentence = 'Python Programming'
+      sentence[-11:-7]
+    solution: |-
+      sentence = 'Python Programming'
+      sentence[-11:-1]
+    hints:
+    - "sentence[-11:-7] 에서 끝값 -7 만 -1 로 바꿉니다. 시작값 -11 은 그대로 둡니다."
+    - "정답 형태: sentence[-11:-1]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'Programmin'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Programmin'"
+- id: slice_step
+  title: 스텝 슬라이싱
+  structuredPrimary: true
+  subtitle: '[start:end:step]으로 간격 지정'
+  goal: 시작, 끝, 스텝 세 자리를 모두 지정해 일정 간격으로 글자를 골라 낸다.
+  why: 일정 간격으로 반복되는 문자열에서 필요한 자리만 뽑을 때, 반복문 없이 대괄호 한 줄로 끝납니다.
+  explanation: 스텝을 지정하면 일정 간격으로 문자를 추출할 수 있습니다. [start:end:step] 형태로 사용하며, step은 간격을 의미합니다. [::2]는 처음부터
+    끝까지 2칸씩 건너뛰며 추출합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    sample = 'Python Programming'
+    sample[::2]
+  exercise:
+    prompt: |-
+      마지막 줄 sample[::2]를 sample[0:6:2]로 바꾸세요.
+
+      인덱스 0, 2, 4만 뽑히고 끝 인덱스 6은 포함되지 않으므로 Pto가 나와야 합니다.
+    starterCode: |-
+      sample = 'Python Programming'
+      sample[::2]
+    solution: |-
+      sample = 'Python Programming'
+      sample[0:6:2]
+    hints:
+    - "sample[::2] 를 sample[0:6:2] 로 바꿉니다. 콜론은 두 개 그대로 두고 앞뒤 숫자만 채웁니다."
+    - "정답 형태: sample[0:6:2]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'Pto'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Pto'"
+- id: slice_reverse
+  title: 역순 슬라이싱
+  structuredPrimary: true
+  subtitle: '[::-1]로 문자열 뒤집기'
+  goal: 스텝에 -1을 주어 문자열 전체를 뒤집는다.
+  why: 뒤집은 값과 원래 값을 비교하면 회문 판별이나 뒤에서부터 읽는 처리를 한 줄로 끝낼 수 있습니다.
+  explanation: 스텝을 -1로 지정하면 문자열을 거꾸로 뒤집을 수 있습니다. [::-1]은 문자열 전체를 역순으로 만듭니다. 회문(palindrome) 확인이나 문자열 반전에
+    자주 사용됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    title = 'Python'
+    title[::-1]
+  exercise:
+    prompt: |-
+      첫 줄 title을 'Codaro'로 바꾸세요.
+
+      마지막 글자부터 거꾸로 읽으므로 oradoC가 나와야 합니다.
+    starterCode: |-
+      title = 'Python'
+      title[::-1]
+    solution: |-
+      title = 'Codaro'
+      title[::-1]
+    hints:
+    - "title = 'Python' 을 title = 'Codaro' 로 바꿉니다. 마지막 줄 title[::-1] 은 그대로 둡니다."
+    - "정답 형태: title = 'Codaro'"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'oradoC'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'oradoC'"
+- id: slice_pattern
+  title: 슬라이싱 패턴
+  structuredPrimary: true
+  subtitle: 다양한 슬라이싱 조합
+  goal: 음수 스텝으로 뒤에서부터 간격을 두고 골라 내는 조합을 확인한다.
+  why: 스텝이 음수면 시작 자리가 문자열 끝으로 바뀌는데, 이 규칙을 모르면 결과가 통째로 비어 버리는 슬라이스를 쓰게 됩니다.
+  explanation: 슬라이싱의 start, end, step을 다양하게 조합하여 원하는 패턴을 추출할 수 있습니다. 홀수 번째 문자만, 짝수 번째 문자만, 또는 역순으로 일부만
+    등 다양한 패턴이 가능합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    alpha = 'abcdefghij'
+    alpha[1::2]
+  exercise:
+    prompt: |-
+      마지막 줄 alpha[1::2]를 alpha[::-2]로 바꾸세요.
+
+      맨 뒤 j부터 두 칸씩 앞으로 가므로 jhfdb가 나와야 합니다.
+    starterCode: |-
+      alpha = 'abcdefghij'
+      alpha[1::2]
+    solution: |-
+      alpha = 'abcdefghij'
+      alpha[::-2]
+    hints:
+    - "alpha[1::2] 를 alpha[::-2] 로 바꿉니다. 시작과 끝은 비우고 스텝 자리에만 -2 를 씁니다."
+    - "정답 형태: alpha[::-2]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'jhfdb'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'jhfdb'"
+- id: workflow_validation
+  title: '검증 루프: 주문코드와 전화번호 파싱하기'
+  structuredPrimary: true
+  subtitle: 고정 형식 문자열을 잘라 업무 데이터로 바꾸기
+  goal: 파일명에서 잘라 낸 날짜 조각이 기대값과 같은지 assert로 검증하는 흐름을 확인한다.
+  why: 자른 자리가 한 칸만 밀려도 값은 그럴듯해 보이기 때문에, 기준값을 assert로 코드에 박아 두고 실행할 때마다 확인합니다.
+  explanation: 인덱싱과 슬라이싱은 글자를 꺼내는 문법이 아니라, 주문코드·전화번호·파일명처럼 정해진 형식의 문자열을 데이터로 바꾸는 도구입니다. 특히 끝 인덱스가 포함되지
+    않는 규칙 때문에 한 칸씩 밀리는 오류를 직접 확인해야 합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    orderCode = 'ORD-2026-0007-KR'
+
+    prefix = orderCode[:3]
+    orderYear = orderCode[4:8]
+    sequence = orderCode[9:13]
+    country = orderCode[-2:]
+
+    assert prefix == 'ORD'
+    assert orderYear == '2026'
+    assert sequence == '0007'
+    assert country == 'KR'
+
+    summary = f'{orderYear}년 주문 {sequence}번 ({country})'
+    assert summary == '2026년 주문 0007번 (KR)'
+    summary
+  exercise:
+    prompt: |-
+      값은 바꾸지 말고 코드를 그대로 실행하세요.
+
+      assert 두 줄이 모두 통과하고 마지막에 2026-05-24가 나와야 합니다.
+    starterCode: |-
+      fileName = 'sales_20260524.csv'
+      datePart = fileName[6:14]
+      year = datePart[:4]
+      month = datePart[4:6]
+      day = datePart[6:]
+
+      assert datePart == '20260524'
+      assert f'{year}-{month}-{day}' == '2026-05-24'
+      f'{year}-{month}-{day}'
+    solution: |-
+      fileName = 'sales_20260524.csv'
+      datePart = fileName[6:14]
+      year = datePart[:4]
+      month = datePart[4:6]
+      day = datePart[6:]
+
+      assert datePart == '20260524'
+      assert f'{year}-{month}-{day}' == '2026-05-24'
+      f'{year}-{month}-{day}'
+    hints:
+    - 인덱스를 한 칸이라도 옮기면 assert 가 AssertionError 로 멈춥니다. 그때는 원래 값으로 되돌리세요.
+    - "정답 형태: 코드를 그대로 실행, 마지막 값 2026-05-24"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '2026-05-24'
+    resultCheck: "출력이 정확히 일치해야 합니다: '2026-05-24'"
+- id: practice
+  title: Day 5 종합 복습
+  structuredPrimary: true
+  subtitle: 인덱싱과 슬라이싱 마스터하기
+  goal: 음수 인덱스와 끝 제외 규칙을 한 번에 써서 가운데 구간을 잘라 낸다.
+  why: 오늘 배운 두 경계인 뒤에서 세기와 끝 인덱스 제외를 같이 쓰면, 어디서 헷갈리는지가 결과에 바로 드러납니다.
+  explanation: Day 5에서 배운 인덱싱과 슬라이싱을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로
+    어떤 순서로 해도 괜찮습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    mail1 = 'user@example.com'
+    mail1[5:]
+  exercise:
+    prompt: |-
+      마지막 줄 hello[0]을 hello[-4:-1]로 바꾸세요.
+
+      뒤에서 네 번째인 e부터 시작하고 끝 인덱스 -1의 o는 빠지므로 ell이 나와야 합니다.
+    starterCode: |-
+      hello = 'Hello'
+      hello[0]
+    solution: |-
+      hello = 'Hello'
+      hello[-4:-1]
+    hints:
+    - "hello[0] 을 hello[-4:-1] 로 바꿉니다. 같은 구간을 hello[1:4] 로도 쓸 수 있습니다."
+    - "정답 형태: hello[-4:-1]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'ell'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'ell'"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
+  masteryVariants:
+  - id: day05-edge-pair-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - index_basic
+    - practice
+    title: 문자열 양 끝 문자 고르기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 양수와 음수 인덱스로 경계 문자를 조합한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: edge_pair(text)가 첫 문자와 마지막 문자를 이어 반환하도록 완성하세요.
+      starterCode: |-
+        def edge_pair(text):
+            raise NotImplementedError
+      solution: |-
+        def edge_pair(text):
+            return text[0] + text[-1]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day05.edge-pair.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day05.edge-pair.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: edge_pair
+        cases:
+        - id: codaro
+          arguments:
+          - value: Codaro
+          expectedReturn: Co
+        - id: python
+          arguments:
+          - value: Python
+          expectedReturn: Pn
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day05-mask-tail-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day05-edge-pair-mastery
+    title: 식별자의 끝부분만 남기기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 슬라이싱을 개인정보 마스킹 문맥에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: mask_tail(code, visible)가 마지막 visible글자만 남기고 앞을 *로 바꾸도록 완성하세요.
+      starterCode: |-
+        def mask_tail(code, visible):
+            raise NotImplementedError
+      solution: |-
+        def mask_tail(code, visible):
+            return '*' * max(0, len(code) - visible) + code[-visible:]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day05.mask-tail.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day05.mask-tail.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: mask_tail
+        cases:
+        - id: card
+          arguments:
+          - value: '12345678'
+          - value: 4
+          expectedReturn: '****5678'
+        - id: short
+          arguments:
+          - value: ABC
+          - value: 2
+          expectedReturn: '*BC'
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day05-reverse-text-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day05-mask-tail-transfer
+    title: 슬라이스로 문자열 뒤집기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 시간이 지난 뒤 step 슬라이스를 다시 구성한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: reverse_text(text)가 문자열을 거꾸로 반환하도록 완성하세요.
+      starterCode: |-
+        def reverse_text(text):
+            raise NotImplementedError
+      solution: |-
+        def reverse_text(text):
+            return text[::-1]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day05.reverse-text.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day05.reverse-text.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reverse_text
+        cases:
+        - id: ascii
+          arguments:
+          - value: stressed
+          expectedReturn: desserts
+        - id: korean
+          arguments:
+          - value: 파이썬
+          expectedReturn: 썬이파
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

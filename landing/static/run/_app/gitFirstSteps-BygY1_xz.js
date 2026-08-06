@@ -1,0 +1,659 @@
+var e=`meta:
+  id: devTools_gitFirstSteps
+  title: Git 첫 사이클 - 상태를 읽고 다음 명령 결정하기
+  order: 2
+  category: devTools
+  difficulty: ⭐⭐
+  badge: 실전
+  packages: []
+  tags:
+    - Git
+    - 버전관리
+    - commit
+    - status
+    - log
+    - 개발교양
+  outcomes:
+    - devLiteracy.gitBasics
+  prerequisites:
+    - devLiteracy.git
+    - devLiteracy.commandLine
+  estimatedMinutes: 35
+  seo:
+    title: Git 첫 사이클 - status를 읽고 add·commit·log 결정하기
+    description: 실제 git status와 git log 출력을 읽고 작업트리·스테이징·이력을 구분해 다음 명령과 커밋 범위를 결정하는 실행형 Git 입문 레슨.
+    keywords:
+      - git status 읽기
+      - git add staging
+      - git commit 범위
+      - git log oneline
+      - Git 기초 실습
+
+intro:
+  direction: 실제 Git 출력에서 현재 상태를 읽고, add·commit·log 가운데 다음 행동을 스스로 결정하는 첫 사이클을 완성합니다.
+  benefits:
+    - 작업트리·스테이징·이력의 차이를 실제 status 문구와 연결합니다.
+    - 변경 상태에 맞는 다음 Git 명령을 근거와 함께 선택합니다.
+    - 한 커밋에 넣을 파일과 남겨 둘 파일을 분리해 작은 이력을 만듭니다.
+    - git log --oneline 결과에서 최신 커밋과 메시지를 읽습니다.
+  diagram:
+    steps:
+      - label: status 상태 판독
+        detail: Untracked, modified, staged, conflict, clean 문구를 저장소 상태로 분류합니다.
+      - label: 다음 명령 결정
+        detail: 현재 상태에 따라 add, commit, log 또는 충돌 해결을 선택합니다.
+      - label: 커밋 범위 분리
+        detail: 같은 목적의 staged 파일만 한 커밋에 넣고 나머지는 다음 작업으로 남깁니다.
+      - label: log 결과 검증
+        detail: 짧은 해시와 메시지를 읽어 방금 만든 이력이 기대한 순서인지 확인합니다.
+    runtime:
+      - label: Web 판단 실습
+        detail: 격리된 Python 실행기가 처음 보는 Git 상태 입력으로 분류와 다음 행동을 검증합니다.
+      - label: Local 명령 실습
+        detail: Web에서 검증한 판단을 Codaro Local 터미널의 실제 git init·status·add·commit·log에 적용합니다.
+      - label: 완료 기준
+        detail: 실행 성공이 아니라 숨은 상태 입력에서도 올바른 명령과 커밋 범위를 반환해야 통과합니다.
+
+sections:
+  - id: classify-status
+    title: git status에서 현재 상태 찾기
+    structuredPrimary: true
+    blocks:
+      - type: image
+        assetId: developerLiteracy
+    subtitle: 출력 문구를 저장소 상태로 바꾸기
+    goal: git status의 핵심 문구를 untracked, modified, staged, conflict, clean 상태로 분류한다.
+    why: 명령을 외워도 현재 상태를 잘못 읽으면 add나 commit을 엉뚱한 시점에 실행하게 됩니다.
+    explanation: |-
+      git status는 지금 저장소가 어느 단계에 있는지 직접 알려줍니다. 새 파일은 Untracked files, 수정했지만 아직 담지 않은 파일은 Changes not staged for commit, 다음 커밋에 담긴 변경은 Changes to be committed로 표시됩니다.
+
+      충돌 중에는 Unmerged paths가 보이며, 모든 변경을 기록한 뒤에는 nothing to commit, working tree clean이 나타납니다. 여러 문구가 함께 보일 수 있으므로 충돌처럼 더 긴급한 상태를 먼저 판정해야 합니다.
+    tips:
+      - Unmerged paths가 있으면 add나 commit보다 충돌 해결이 먼저입니다.
+      - Untracked와 modified는 둘 다 아직 스테이징되지 않았지만 원인은 서로 다릅니다.
+      - clean은 파일이 없는 상태가 아니라 기록할 변경이 남지 않은 상태입니다.
+    snippet: |-
+      def classify_git_state(status_lines):
+          text = "\\n".join(status_lines)
+          if "Unmerged paths:" in text:
+              return "conflict"
+          if "Changes to be committed:" in text:
+              return "staged"
+          if "Changes not staged for commit:" in text:
+              return "modified"
+          if "Untracked files:" in text:
+              return "untracked"
+          if "working tree clean" in text:
+              return "clean"
+          return "unknown"
+    exercise:
+      prompt: classify_git_state(status_lines)가 다섯 핵심 문구를 우선순위에 맞게 분류하도록 완성하세요.
+      starterCode: |-
+        def classify_git_state(status_lines):
+            text = "\\n".join(status_lines)
+            if "Unmerged paths:" in text:
+                return "___"
+            if "Changes to be committed:" in text:
+                return "___"
+            if "Changes not staged for commit:" in text:
+                return "___"
+            if "Untracked files:" in text:
+                return "___"
+            if "working tree clean" in text:
+                return "___"
+            return "unknown"
+      solution: |-
+        def classify_git_state(status_lines):
+            text = "\\n".join(status_lines)
+            if "Unmerged paths:" in text:
+                return "conflict"
+            if "Changes to be committed:" in text:
+                return "staged"
+            if "Changes not staged for commit:" in text:
+                return "modified"
+            if "Untracked files:" in text:
+                return "untracked"
+            if "working tree clean" in text:
+                return "clean"
+            return "unknown"
+      hints:
+        - 반환 문자열은 conflict, staged, modified, untracked, clean 순서입니다.
+        - 충돌과 staged 문구가 함께 있어도 conflict가 먼저 반환돼야 합니다.
+    check:
+      id: python.git.classify-status.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.git.classify-status.fixture.v1
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      payload:
+        entry: classify_git_state
+        cases:
+          - id: new-file
+            arguments:
+              - value:
+                  - On branch main
+                  - "Untracked files:"
+                  - "  notes.txt"
+            expectedReturn: untracked
+          - id: modified-file
+            arguments:
+              - value:
+                  - On branch main
+                  - "Changes not staged for commit:"
+                  - "  modified: notes.txt"
+            expectedReturn: modified
+          - id: staged-file
+            arguments:
+              - value:
+                  - On branch main
+                  - "Changes to be committed:"
+                  - "  new file: notes.txt"
+            expectedReturn: staged
+          - id: conflict-before-staged
+            arguments:
+              - value:
+                  - "Changes to be committed:"
+                  - "Unmerged paths:"
+                  - "  both modified: notes.txt"
+            expectedReturn: conflict
+          - id: clean-tree
+            arguments:
+              - value:
+                  - On branch main
+                  - nothing to commit, working tree clean
+            expectedReturn: clean
+        expectedPaths: []
+
+  - id: choose-command
+    title: 상태에 맞는 다음 명령 고르기
+    structuredPrimary: true
+    assessmentMode: mastery
+    unseen: true
+    subtitle: 상태와 행동을 한 단계씩 연결하기
+    goal: 저장소 상태에 따라 다음에 실행할 명령 또는 행동을 정확히 반환한다.
+    why: Git은 명령 순서를 무조건 반복하는 도구가 아니라 현재 상태를 읽고 다음 행동을 선택하는 도구입니다.
+    explanation: |-
+      untracked와 modified는 이번 커밋에 담을 파일을 git add로 골라야 합니다. staged라면 담을 범위를 다시 확인하고 git commit으로 이력에 새깁니다. clean이라면 새 커밋을 만들 이유가 없으므로 git log로 지나온 이력을 확인합니다.
+
+      conflict는 자동으로 add나 commit을 진행하지 않습니다. 충돌 표시가 있는 파일을 직접 고치고 다시 status를 확인해야 합니다.
+    tips:
+      - 실제 명령을 실행하기 전 git status를 다시 읽는 습관을 들이세요.
+      - git add .보다 파일명을 명시하면 커밋 범위를 통제하기 쉽습니다.
+      - clean 상태에서 commit을 반복해도 새 변경이 없으므로 커밋이 만들어지지 않습니다.
+    snippet: |-
+      def recommend_git_command(state):
+          commands = {
+              "untracked": "git add <file>",
+              "modified": "git add <file>",
+              "staged": 'git commit -m "<message>"',
+              "clean": "git log --oneline",
+              "conflict": "resolve-conflict",
+          }
+          return commands.get(state, "git status")
+    exercise:
+      prompt: recommend_git_command(state)가 각 상태에 맞는 다음 명령을 반환하도록 완성하세요.
+      starterCode: |-
+        def recommend_git_command(state):
+            commands = {
+                "untracked": "___",
+                "modified": "___",
+                "staged": "___",
+                "clean": "___",
+                "conflict": "___",
+            }
+            return commands.get(state, "git status")
+      solution: |-
+        def recommend_git_command(state):
+            commands = {
+                "untracked": "git add <file>",
+                "modified": "git add <file>",
+                "staged": 'git commit -m "<message>"',
+                "clean": "git log --oneline",
+                "conflict": "resolve-conflict",
+            }
+            return commands.get(state, "git status")
+      hints:
+        - untracked와 modified는 같은 add 단계로 이동합니다.
+        - staged는 commit, clean은 log, conflict는 resolve-conflict를 반환합니다.
+    check:
+      id: python.git.recommend-command.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.git.recommend-command.mastery.fixture.v1
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      payload:
+        entry: recommend_git_command
+        cases:
+          - id: add-new-file
+            arguments:
+              - value: untracked
+            expectedReturn: git add <file>
+          - id: add-modified-file
+            arguments:
+              - value: modified
+            expectedReturn: git add <file>
+          - id: commit-staged-change
+            arguments:
+              - value: staged
+            expectedReturn: 'git commit -m "<message>"'
+          - id: inspect-clean-history
+            arguments:
+              - value: clean
+            expectedReturn: git log --oneline
+          - id: stop-on-conflict
+            arguments:
+              - value: conflict
+            expectedReturn: resolve-conflict
+          - id: inspect-unknown-state
+            arguments:
+              - value: detached
+            expectedReturn: git status
+        expectedPaths: []
+
+  - id: commit-scope
+    title: 한 커밋의 범위 분리하기
+    structuredPrimary: true
+    subtitle: staged와 pending 파일을 섞지 않기
+    goal: 변경 목록에서 이번 커밋에 담긴 파일과 아직 남은 파일을 나눠 안정된 요약을 만든다.
+    why: 무관한 변경을 한 커밋에 섞으면 일부만 되돌리거나 이력을 읽기가 어려워집니다.
+    explanation: |-
+      git add는 모든 변경을 자동으로 담는 명령이 아니라 다음 커밋에 넣을 범위를 고르는 단계입니다. 로그인 오류 처리와 문서 오타처럼 목적이 다른 변경은 파일이 가까이 있어도 서로 다른 커밋으로 나누는 편이 좋습니다.
+
+      아래 실습은 status에서 읽은 staged 여부를 기준으로 commit과 pending 목록을 분리합니다. 입력 순서가 달라도 같은 결과가 나오도록 경로를 정렬합니다.
+    tips:
+      - 커밋 제목으로 한 문장에 설명하기 어려운 파일 묶음은 범위가 너무 넓을 가능성이 큽니다.
+      - staged 파일이 무엇인지 commit 전에 git diff --cached로 확인할 수 있습니다.
+      - pending 변경은 사라진 것이 아니라 다음 커밋을 위해 작업트리에 남습니다.
+    snippet: |-
+      def build_commit_scope(changes):
+          commit = sorted(item["path"] for item in changes if item["staged"])
+          pending = sorted(item["path"] for item in changes if not item["staged"])
+          return {"commit": commit, "pending": pending, "total": len(changes)}
+    exercise:
+      prompt: build_commit_scope(changes)가 staged 파일과 나머지 파일을 정렬해 서로 다른 목록으로 반환하도록 완성하세요.
+      starterCode: |-
+        def build_commit_scope(changes):
+            commit = sorted(
+                item["path"] for item in changes if item["___"]
+            )
+            pending = sorted(
+                item["path"] for item in changes if not item["___"]
+            )
+            return {
+                "commit": commit,
+                "pending": pending,
+                "total": len(changes),
+            }
+      solution: |-
+        def build_commit_scope(changes):
+            commit = sorted(item["path"] for item in changes if item["staged"])
+            pending = sorted(item["path"] for item in changes if not item["staged"])
+            return {"commit": commit, "pending": pending, "total": len(changes)}
+      hints:
+        - 두 빈칸 모두 staged 키를 사용하되 두 번째 조건에는 not이 있습니다.
+        - 반환 전에 두 목록을 정렬해야 입력 순서와 무관한 결과가 됩니다.
+    check:
+      id: python.git.build-commit-scope.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.git.build-commit-scope.fixture.v1
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      payload:
+        entry: build_commit_scope
+        cases:
+          - id: mixed-scope
+            arguments:
+              - value:
+                  - path: docs/guide.md
+                    staged: false
+                  - path: src/login.py
+                    staged: true
+                  - path: tests/test_login.py
+                    staged: true
+            expectedReturn:
+              commit:
+                - src/login.py
+                - tests/test_login.py
+              pending:
+                - docs/guide.md
+              total: 3
+          - id: no-staged-files
+            arguments:
+              - value:
+                  - path: README.md
+                    staged: false
+                  - path: notes.txt
+                    staged: false
+            expectedReturn:
+              commit: []
+              pending:
+                - README.md
+                - notes.txt
+              total: 2
+        expectedPaths: []
+
+  - id: read-log
+    title: git log --oneline에서 이력 읽기
+    structuredPrimary: true
+    subtitle: 짧은 해시와 메시지를 구조화하기
+    goal: 한 줄 로그 목록에서 최신 커밋, 커밋 수와 메시지 목록을 추출한다.
+    why: commit 뒤 log를 읽어야 의도한 메시지와 순서로 이력이 실제 생성됐는지 확인할 수 있습니다.
+    explanation: |-
+      git log --oneline은 최신 커밋을 가장 위에 두고 각 줄을 짧은 해시와 메시지로 보여줍니다. 짧은 해시는 커밋을 가리키는 주소이고, 메시지는 변경 목적을 설명합니다.
+
+      해시 자체를 외울 필요는 없습니다. 최신 줄의 해시와 메시지를 함께 읽고, 무의미한 메시지가 보이면 다음 커밋부터 더 구체적으로 작성하면 됩니다.
+    tips:
+      - 최신 커밋은 목록의 첫 번째 줄입니다.
+      - split(maxsplit=1)을 쓰면 메시지 안의 공백을 보존할 수 있습니다.
+      - 빈 log는 오류가 아니라 아직 커밋이 없는 저장소일 수 있습니다.
+    snippet: |-
+      def summarize_git_log(lines):
+          rows = [line.strip() for line in lines if line.strip()]
+          if not rows:
+              return {"count": 0, "latest": None, "messages": []}
+          parsed = [row.split(maxsplit=1) for row in rows]
+          if any(len(parts) != 2 for parts in parsed):
+              raise ValueError("해시와 메시지가 필요합니다")
+          return {
+              "count": len(parsed),
+              "latest": parsed[0][0],
+              "messages": [parts[1] for parts in parsed],
+          }
+    exercise:
+      prompt: summarize_git_log(lines)가 빈 줄을 제외하고 최신 해시, 커밋 수와 전체 메시지를 반환하도록 완성하세요.
+      starterCode: |-
+        def summarize_git_log(lines):
+            rows = [line.___() for line in lines if line.___()]
+            if not rows:
+                return {"count": 0, "latest": None, "messages": []}
+            parsed = [row.___(maxsplit=1) for row in rows]
+            if any(len(parts) != 2 for parts in parsed):
+                raise ValueError("해시와 메시지가 필요합니다")
+            return {
+                "count": len(parsed),
+                "latest": parsed[0][0],
+                "messages": [parts[1] for parts in parsed],
+            }
+      solution: |-
+        def summarize_git_log(lines):
+            rows = [line.strip() for line in lines if line.strip()]
+            if not rows:
+                return {"count": 0, "latest": None, "messages": []}
+            parsed = [row.split(maxsplit=1) for row in rows]
+            if any(len(parts) != 2 for parts in parsed):
+                raise ValueError("해시와 메시지가 필요합니다")
+            return {
+                "count": len(parsed),
+                "latest": parsed[0][0],
+                "messages": [parts[1] for parts in parsed],
+            }
+      hints:
+        - 양끝 공백 제거는 strip, 한 번만 나누기는 split(maxsplit=1)을 사용합니다.
+        - 최신 해시는 parsed의 첫 항목에서 가져옵니다.
+    check:
+      id: python.git.summarize-log.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.git.summarize-log.fixture.v1
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      payload:
+        entry: summarize_git_log
+        cases:
+          - id: three-commits
+            arguments:
+              - value:
+                  - "f3a10bc 로그인 실패 안내 추가"
+                  - "9d220a1 사용자 입력 검증"
+                  - "1ab42de 첫 커밋"
+            expectedReturn:
+              count: 3
+              latest: f3a10bc
+              messages:
+                - 로그인 실패 안내 추가
+                - 사용자 입력 검증
+                - 첫 커밋
+          - id: empty-history
+            arguments:
+              - value: []
+            expectedReturn:
+              count: 0
+              latest: null
+              messages: []
+          - id: rejects-message-less-row
+            arguments:
+              - value:
+                  - f3a10bc
+            expectedException: ValueError
+        expectedPaths: []
+
+assessment:
+  schemaVersion: 1
+  performanceClaim: Web에서는 실제 Git 출력과 같은 숨은 입력으로 상태 판독과 커밋 범위 결정을 검증하고, 실제 저장소 변경과 commit 생성은 Codaro Local 터미널 실습으로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: actual-git-command-practice
+  supportPolicy: 첫 실패는 반환된 상태·명령과 기대 계약의 차이를 바로 보여주고 정답 함수 전체는 자동 노출하지 않습니다.
+  transferVariants:
+    - id: git-topic-commit-transfer
+      mode: transfer
+      unseen: true
+      sourceSectionIds:
+        - choose-command
+        - commit-scope
+      title: 여러 변경에서 한 목적의 커밋만 고르기
+      subtitle: staged 여부와 작업 목적을 함께 판단
+      goal: 준비된 변경 중 지정한 목적에 해당하는 파일만 커밋 후보로 선택한다.
+      why: staged 여부만 맞아도 무관한 작업을 한 커밋에 섞으면 이력의 의미가 흐려집니다.
+      explanation: 예제와 다른 파일 목록과 목적을 입력해 같은 함수가 안정적으로 커밋 후보를 고르는지 검사합니다.
+      tips:
+        - ready와 topic 두 조건을 모두 만족해야 합니다.
+        - 선택된 파일이 하나도 없으면 빈 커밋을 만들지 않도록 ValueError를 냅니다.
+      exercise:
+        prompt: select_topic_commit(changes, topic)이 ready 상태이면서 topic이 일치하는 경로만 정렬해 반환하고 후보가 없으면 ValueError를 내도록 완성하세요.
+        starterCode: |-
+          def select_topic_commit(changes, topic):
+              raise NotImplementedError
+        solution: |-
+          def select_topic_commit(changes, topic):
+              selected = sorted(
+                  item["path"]
+                  for item in changes
+                  if item["ready"] and item["topic"] == topic
+              )
+              if not selected:
+                  raise ValueError("커밋 후보가 없습니다")
+              return selected
+        hints:
+          - item["ready"]와 item["topic"] == topic을 and로 연결하세요.
+          - 정렬한 결과가 비어 있으면 ValueError를 발생시키세요.
+      check:
+        id: python.git.select-topic-commit.transfer.behavior.v1
+        version: 1
+        kind: behavior
+        strength: strong
+        executor: browser-worker
+        timeoutMs: 8000
+        fixtureId: python.git.select-topic-commit.transfer.fixture.v1
+        fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+        fixture:
+          directories: []
+          env:
+            LANG: C.UTF-8
+            TZ: UTC
+          files: []
+          stdin: []
+        payload:
+          entry: select_topic_commit
+          cases:
+            - id: login-topic-only
+              arguments:
+                - value:
+                    - path: docs/guide.md
+                      topic: docs
+                      ready: true
+                    - path: tests/test_login.py
+                      topic: login
+                      ready: true
+                    - path: src/login.py
+                      topic: login
+                      ready: true
+                    - path: src/session.py
+                      topic: login
+                      ready: false
+                - value: login
+              expectedReturn:
+                - src/login.py
+                - tests/test_login.py
+            - id: rejects-empty-topic
+              arguments:
+                - value:
+                    - path: docs/guide.md
+                      topic: docs
+                      ready: true
+                - value: login
+              expectedException: ValueError
+          expectedPaths: []
+      claimScope: portable-concept
+      reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+    - id: git-status-recovery-retrieval
+      mode: retrieval
+      unseen: true
+      minimumDelayHours: 168
+      sourceSectionIds:
+        - git-topic-commit-transfer
+      title: 일주일 뒤 status에서 다음 행동 복원하기
+      subtitle: 상태 분류와 명령 선택을 한 함수로 재구성
+      goal: 처음 보는 git status 문구를 상태와 다음 명령으로 동시에 변환한다.
+      why: 시간이 지난 뒤에도 출력 근거를 읽고 행동을 결정해야 명령 순서 암기에서 벗어날 수 있습니다.
+      explanation: base 예제와 문장 순서가 다른 status 입력을 사용해 분류와 명령 선택을 함께 검사합니다.
+      tips:
+        - conflict를 가장 먼저 확인하고 clean을 마지막에 확인하세요.
+        - 반환값에는 state와 command 두 키가 모두 있어야 합니다.
+      exercise:
+        prompt: recover_git_action(status_lines)가 conflict, staged, modified·untracked, clean 상태를 판독해 state와 command를 반환하도록 완성하세요.
+        starterCode: |-
+          def recover_git_action(status_lines):
+              raise NotImplementedError
+        solution: |-
+          def recover_git_action(status_lines):
+              text = "\\n".join(status_lines)
+              if "Unmerged paths:" in text:
+                  state, command = "conflict", "resolve-conflict"
+              elif "Changes to be committed:" in text:
+                  state, command = "staged", 'git commit -m "<message>"'
+              elif (
+                  "Changes not staged for commit:" in text
+                  or "Untracked files:" in text
+              ):
+                  state, command = "pending", "git add <file>"
+              elif "working tree clean" in text:
+                  state, command = "clean", "git log --oneline"
+              else:
+                  state, command = "unknown", "git status"
+              return {"state": state, "command": command}
+        hints:
+          - status 문구의 우선순위는 conflict, staged, pending, clean입니다.
+          - modified와 untracked는 이번 함수에서 pending으로 합칩니다.
+      check:
+        id: python.git.recover-action.retrieval.behavior.v1
+        version: 1
+        kind: behavior
+        strength: strong
+        executor: browser-worker
+        timeoutMs: 8000
+        fixtureId: python.git.recover-action.retrieval.fixture.v1
+        fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+        fixture:
+          directories: []
+          env:
+            LANG: C.UTF-8
+            TZ: UTC
+          files: []
+          stdin: []
+        payload:
+          entry: recover_git_action
+          cases:
+            - id: conflict
+              arguments:
+                - value:
+                    - On branch main
+                    - "Unmerged paths:"
+                    - "  both modified: app.py"
+              expectedReturn:
+                state: conflict
+                command: resolve-conflict
+            - id: staged
+              arguments:
+                - value:
+                    - "Changes to be committed:"
+                    - "  modified: app.py"
+              expectedReturn:
+                state: staged
+                command: 'git commit -m "<message>"'
+            - id: pending-new-file
+              arguments:
+                - value:
+                    - "Untracked files:"
+                    - "  report.py"
+              expectedReturn:
+                state: pending
+                command: git add <file>
+            - id: clean
+              arguments:
+                - value:
+                    - nothing to commit, working tree clean
+              expectedReturn:
+                state: clean
+                command: git log --oneline
+          expectedPaths: []
+      claimScope: portable-concept
+      reviewStatus: machine-verified-pending-independent-review
+  authoring:
+    source: curated-lesson-rewrite
+    solutionVerification: required
+    independentReview: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
+`;export{e as default};

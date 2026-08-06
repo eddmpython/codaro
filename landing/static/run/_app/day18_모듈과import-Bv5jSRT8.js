@@ -1,0 +1,607 @@
+var e=`meta:
+  id: day18
+  title: 모듈과import
+  day: 18
+  category: 30days
+  outcomes: ["python.modulesAndIo"]
+  prerequisites: ["python.functions"]
+  estimatedMinutes: 35
+  tags:
+  - 모듈
+  - import
+  - 표준라이브러리
+  - datetime
+  - pathlib
+  - 리포트
+  - 검증
+  seo:
+    title: 파이썬 모듈과 import - 표준 라이브러리 활용
+    description: import, from, as와 math, random, datetime 모듈을 배웁니다.
+    keywords:
+    - 모듈
+    - import
+    - math
+    - random
+    - datetime
+intro:
+  emoji: 📦
+  points:
+  - import로 모듈 가져오기
+  - from, as로 유연하게
+  - math, random, datetime 활용
+  - 표준 라이브러리 사용
+  direction: 모듈과import에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 모듈과import 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: import 기본 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: from import 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: as 별칭 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 모듈과import 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 모듈과import 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 모듈과import 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: import_basic
+  title: import 기본
+  structuredPrimary: true
+  subtitle: 모듈 가져오기
+  goal: import로 가져온 모듈을 모듈명.함수명() 형태로 호출해 값을 얻는다.
+  why: 제곱근 같은 계산은 직접 만들 필요 없이 파이썬이 표준 모듈로 이미 갖고 있어서, import 한 줄이면 검증된 함수를 그대로 씁니다.
+  explanation: |-
+    모듈은 함수와 변수를 담은 파이썬 파일입니다. import 모듈명으로 모듈을 가져오고, 모듈명.함수명()으로 사용합니다. 파이썬은 많은 표준 모듈을 제공합니다.
+
+    처음에는 필요한 모듈을 노트북 위쪽 한 셀에 모아 import하면 흐름을 이해하기 쉽습니다.
+  snippet: |-
+    import math
+
+    math.sqrt(16)
+  exercise:
+    prompt: |-
+      마지막 줄 math.sqrt(16)을 math.sqrt(49)로 바꾸세요. 첫 줄 import math는 그대로 둡니다.
+
+      sqrt는 정수를 넣어도 실수를 돌려주므로 7.0이 나와야 합니다.
+    starterCode: |-
+      import math
+
+      math.sqrt(16)
+    solution: |-
+      import math
+
+      math.sqrt(49)
+    hints:
+    - math.sqrt(16) 을 math.sqrt(49) 로 바꿉니다. 첫 줄 import math 는 그대로 둡니다.
+    - "정답 형태: math.sqrt(49)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '7.0'
+    resultCheck: "출력이 정확히 일치해야 합니다: '7.0'"
+- id: from_import
+  title: from import
+  structuredPrimary: true
+  subtitle: 특정 함수만 가져오기
+  goal: 필요한 함수 두 개를 쉼표로 함께 가져와 모듈명 없이 바로 호출한다.
+  why: 한 파일에서 sqrt와 floor처럼 몇 개만 반복해 쓸 때는 필요한 이름만 가져오면 호출 줄이 짧아지고, 이 파일이 무엇을 쓰는지 첫 줄만 봐도 드러납니다.
+  explanation: |-
+    from 모듈명 import 함수명으로 특정 함수만 가져올 수 있습니다. 모듈명 없이 함수명만으로 사용할 수 있습니다. 여러 함수를 쉼표로 구분하여 가져올 수 있습니다.
+
+    필요한 함수만 가져오면 코드가 깔끔해집니다.
+  snippet: |-
+    from math import sqrt
+
+    sqrt(25)
+  exercise:
+    prompt: |-
+      두 곳을 고치세요. 첫 줄 from math import sqrt를 from math import sqrt, floor로 바꾸고, 마지막 줄 sqrt(25)를 floor(sqrt(200))으로 바꾸세요.
+
+      sqrt(200)은 14.142...이고 floor가 소수점 아래를 버리므로 14가 나와야 합니다.
+    starterCode: |-
+      from math import sqrt
+
+      sqrt(25)
+    solution: |-
+      from math import sqrt, floor
+
+      floor(sqrt(200))
+    hints:
+    - 첫 줄 끝에 쉼표를 찍고 floor 를 더해 from math import sqrt, floor 로 만든 뒤, 마지막 줄을 floor(sqrt(200)) 으로 바꿉니다.
+    - "정답 형태: floor(sqrt(200))"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '14'
+    resultCheck: "출력이 정확히 일치해야 합니다: '14'"
+- id: import_as
+  title: as 별칭
+  structuredPrimary: true
+  subtitle: 모듈/함수 이름 바꾸기
+  goal: 별칭을 바꾸면 그 별칭을 쓰는 호출 줄도 함께 바꿔야 한다는 것을 확인한다.
+  why: 별칭은 import 줄에서만 정해지고 나머지 코드는 그 이름에 매여 있어서, 별칭 하나만 고치고 호출 줄을 놓치면 바로 NameError가 납니다.
+  explanation: |-
+    as 키워드로 모듈이나 함수에 별칭을 붙일 수 있습니다. import 모듈명 as 별칭 또는 from 모듈명 import 함수명 as 별칭 형식입니다. 긴 이름을 짧게 만들거나 충돌을 피할 때 사용합니다.
+
+    별칭은 짧고 의미있게 지으세요.
+  snippet: |-
+    import math as m
+
+    m.sqrt(36)
+  exercise:
+    prompt: |-
+      별칭을 m에서 mt로 바꾸세요. 첫 줄을 import math as mt로 바꾸고, 마지막 줄도 mt.sqrt(64)로 바꿉니다.
+
+      실행하면 8.0이 나와야 합니다.
+    starterCode: |-
+      import math as m
+
+      m.sqrt(36)
+    solution: |-
+      import math as mt
+
+      mt.sqrt(64)
+    hints:
+    - 첫 줄의 as m 을 as mt 로 바꾸고, 마지막 줄도 m.sqrt(36) 에서 mt.sqrt(64) 로 바꿉니다.
+    - "정답 형태: mt.sqrt(64)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '8.0'
+    resultCheck: "출력이 정확히 일치해야 합니다: '8.0'"
+- id: math_module
+  title: math 모듈
+  structuredPrimary: true
+  subtitle: 수학 함수
+  goal: math 모듈에서 sqrt 대신 ceil을 가져와 올림 결과를 확인한다.
+  why: 인원수나 상자 개수처럼 나누어떨어지지 않아도 정수로 올려야 하는 계산이 많고, 그때 직접 조건문을 쓰는 대신 ceil 한 번으로 끝냅니다.
+  explanation: |-
+    math 모듈은 수학 함수를 제공합니다. sqrt(제곱근), ceil(올림), floor(내림), pow(거듭제곱), pi(파이), e(자연상수) 등을 사용할 수 있습니다.
+
+    math.pow는 실수를 반환하고, ** 연산자는 정수도 유지합니다.
+  snippet: |-
+    from math import sqrt
+
+    sqrt(144)
+  exercise:
+    prompt: |-
+      두 곳을 고치세요. 첫 줄 from math import sqrt를 from math import ceil로 바꾸고, 마지막 줄 sqrt(144)를 ceil(12.01)로 바꾸세요.
+
+      ceil은 올림이라 소수점 아래가 조금이라도 있으면 위 정수로 올라가므로 13이 나와야 합니다.
+    starterCode: |-
+      from math import sqrt
+
+      sqrt(144)
+    solution: |-
+      from math import ceil
+
+      ceil(12.01)
+    hints:
+    - 첫 줄의 sqrt 를 ceil 로 바꾸고, 마지막 줄도 sqrt(144) 에서 ceil(12.01) 로 바꿉니다.
+    - "정답 형태: ceil(12.01)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '13'
+    resultCheck: "출력이 정확히 일치해야 합니다: '13'"
+- id: random_module
+  title: random 모듈
+  structuredPrimary: true
+  subtitle: 난수 생성
+  goal: 뽑은 난수가 매번 달라져도 randint가 정한 범위 안에 있다는 것을 참거짓으로 확인한다.
+  why: 난수는 실행할 때마다 값이 달라져서 결과를 그대로 비교할 수 없기 때문에, 뽑힌 값이 허용 범위 안인지를 확인하는 방식으로 검증합니다.
+  explanation: |-
+    random 모듈은 난수를 생성합니다. randint(정수 난수), choice(리스트에서 선택), shuffle(리스트 섞기), random(0~1 실수) 등을 제공합니다.
+
+    난수는 실행할 때마다 다른 값이 나옵니다.
+  snippet: |-
+    from random import randint
+
+    randint(1, 100)
+  exercise:
+    prompt: |-
+      마지막 줄 randint(1, 100)을 두 줄로 바꾸세요. 먼저 dice = randint(1, 6)으로 주사위 눈을 하나 뽑고, 그 아래 줄에 1 <= dice <= 6을 씁니다.
+
+      뽑히는 숫자는 실행할 때마다 달라지지만 1 이상 6 이하라는 범위는 늘 지켜지므로, 몇이 나오든 True가 나와야 합니다.
+    starterCode: |-
+      from random import randint
+
+      randint(1, 100)
+    solution: |-
+      from random import randint
+
+      dice = randint(1, 6)
+      1 <= dice <= 6
+    hints:
+    - randint(1, 100) 줄을 dice = randint(1, 6) 으로 바꾸고, 그 아래에 1 <= dice <= 6 줄을 새로 씁니다. 첫 줄 import 는 그대로 둡니다.
+    - "정답 형태: 1 <= dice <= 6"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'True'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'True'"
+- id: datetime_module
+  title: datetime 모듈
+  structuredPrimary: true
+  subtitle: 날짜와 시간
+  goal: 현재 시각 대신 날짜를 직접 지정해 datetime 객체의 year, month, day를 확인한다.
+  why: 오늘 날짜에 기대어 만든 코드는 내일 실행하면 결과가 달라져 맞는지 확인할 수 없으므로, 확인이 필요할 때는 날짜를 직접 지정해 결과를 고정합니다.
+  explanation: |-
+    datetime 모듈은 날짜와 시간을 다룹니다. datetime.now(현재 시각), date(날짜), time(시간), timedelta(시간 차이) 등을 제공합니다.
+
+    datetime 객체는 여러 속성과 메서드를 제공합니다.
+  snippet: |-
+    from datetime import datetime
+
+    now = datetime.now()
+    now.year, now.month, now.day
+  exercise:
+    prompt: |-
+      now = datetime.now()를 now = datetime(2026, 1, 1)로 바꾸세요. 마지막 줄 now.year, now.month, now.day는 그대로 둡니다.
+
+      datetime.now()는 실행하는 순간의 시각이라 매번 달라지지만 날짜를 직접 지정하면 결과가 고정되므로, (2026, 1, 1)이 나와야 합니다.
+    starterCode: |-
+      from datetime import datetime
+
+      now = datetime.now()
+      now.year, now.month, now.day
+    solution: |-
+      from datetime import datetime
+
+      now = datetime(2026, 1, 1)
+      now.year, now.month, now.day
+    hints:
+    - now = datetime.now() 를 now = datetime(2026, 1, 1) 로 바꿉니다. 괄호 안은 연, 월, 일 순서입니다.
+    - "정답 형태: now = datetime(2026, 1, 1)"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '(2026, 1, 1)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(2026, 1, 1)'"
+- id: workflow_validation
+  title: 실무 import 조합 루프
+  structuredPrimary: true
+  subtitle: 필요한 도구를 고르고 오류를 읽기
+  goal: 로그 한 줄을 고쳐 datetime, statistics, pathlib이 함께 만드는 요약 값이 어떻게 달라지는지 확인한다.
+  why: 실무 리포트는 모듈 하나로 끝나지 않고 날짜 해석, 평균 계산, 파일 이름 만들기가 한 흐름으로 이어지므로, 입력 한 줄이 바뀔 때 어느 값까지 따라 바뀌는지 볼 수 있어야 합니다.
+  explanation: |-
+    실무에서는 모듈 하나만 외워서 쓰기보다, 표준 라이브러리 여러 개를 필요한 만큼 가져와 작은 리포트 흐름을 만듭니다. 실행 전에 어떤 모듈이 어떤 역할을 하는지 예측하고, 이름 오류가 나면 import 방식과 별칭을 확인해 고칩니다.
+
+    import는 코드 맨 위를 꾸미는 문장이 아니라, 문제를 해결할 도구를 명확히 고르는 과정입니다. 모듈 이름을 바꾸거나 별칭을 쓰면 호출 코드도 함께 검증하세요.
+  snippet: |-
+    from datetime import datetime
+    from pathlib import Path
+    from statistics import mean
+
+    workLogs = [
+        {"startedAt": "2026-05-01 09:15", "minutes": 18, "status": "done"},
+        {"startedAt": "2026-05-02 10:30", "minutes": 32, "status": "done"},
+        {"startedAt": "2026-05-03 13:10", "minutes": 21, "status": "done"},
+        {"startedAt": "2026-05-03 16:00", "minutes": 12, "status": "todo"},
+    ]
+
+    def summarizeWorkLogs(logs):
+        finishedLogs = [log for log in logs if log["status"] == "done"]
+        latestStartedAt = max(
+            datetime.strptime(log["startedAt"], "%Y-%m-%d %H:%M")
+            for log in finishedLogs
+        )
+        reportPath = Path("reports") / f"daily-{latestStartedAt:%Y-%m-%d}.txt"
+        return {
+            "doneCount": len(finishedLogs),
+            "averageMinutes": round(mean(log["minutes"] for log in finishedLogs), 1),
+            "latestDate": latestStartedAt.strftime("%Y-%m-%d"),
+            "reportFile": reportPath.name,
+        }
+
+    workSummary = summarizeWorkLogs(workLogs)
+    workSummary
+  exercise:
+    prompt: |-
+      workLogs의 마지막 로그 한 줄을 아래 줄로 바꾸세요. 날짜는 2026-05-06 09:00으로, status는 done으로 바뀝니다.
+      {"startedAt": "2026-05-06 09:00", "minutes": 12, "status": "done"},
+
+      done인 로그가 3개에서 4개로 늘고 가장 늦은 날짜도 바뀌므로, 실행하면 아래 한 줄이 나와야 합니다.
+      {'doneCount': 4, 'averageMinutes': 20.8, 'latestDate': '2026-05-06', 'reportFile': 'daily-2026-05-06.txt'}
+    starterCode: |-
+      from datetime import datetime
+      from pathlib import Path
+      from statistics import mean
+
+      workLogs = [
+          {"startedAt": "2026-05-01 09:15", "minutes": 18, "status": "done"},
+          {"startedAt": "2026-05-02 10:30", "minutes": 32, "status": "done"},
+          {"startedAt": "2026-05-03 13:10", "minutes": 21, "status": "done"},
+          {"startedAt": "2026-05-03 16:00", "minutes": 12, "status": "todo"},
+      ]
+
+      def summarizeWorkLogs(logs):
+          finishedLogs = [log for log in logs if log["status"] == "done"]
+          latestStartedAt = max(
+              datetime.strptime(log["startedAt"], "%Y-%m-%d %H:%M")
+              for log in finishedLogs
+          )
+          reportPath = Path("reports") / f"daily-{latestStartedAt:%Y-%m-%d}.txt"
+          return {
+              "doneCount": len(finishedLogs),
+              "averageMinutes": round(mean(log["minutes"] for log in finishedLogs), 1),
+              "latestDate": latestStartedAt.strftime("%Y-%m-%d"),
+              "reportFile": reportPath.name,
+          }
+
+      workSummary = summarizeWorkLogs(workLogs)
+      workSummary
+    solution: |-
+      from datetime import datetime
+      from pathlib import Path
+      from statistics import mean
+
+      workLogs = [
+          {"startedAt": "2026-05-01 09:15", "minutes": 18, "status": "done"},
+          {"startedAt": "2026-05-02 10:30", "minutes": 32, "status": "done"},
+          {"startedAt": "2026-05-03 13:10", "minutes": 21, "status": "done"},
+          {"startedAt": "2026-05-06 09:00", "minutes": 12, "status": "done"},
+      ]
+
+      def summarizeWorkLogs(logs):
+          finishedLogs = [log for log in logs if log["status"] == "done"]
+          latestStartedAt = max(
+              datetime.strptime(log["startedAt"], "%Y-%m-%d %H:%M")
+              for log in finishedLogs
+          )
+          reportPath = Path("reports") / f"daily-{latestStartedAt:%Y-%m-%d}.txt"
+          return {
+              "doneCount": len(finishedLogs),
+              "averageMinutes": round(mean(log["minutes"] for log in finishedLogs), 1),
+              "latestDate": latestStartedAt.strftime("%Y-%m-%d"),
+              "reportFile": reportPath.name,
+          }
+
+      workSummary = summarizeWorkLogs(workLogs)
+      workSummary
+    hints:
+    - 'workLogs의 네 번째 줄 하나만 바꿉니다. "2026-05-03 16:00" 을 "2026-05-06 09:00" 으로, "todo" 를 "done" 으로 바꾸고 minutes 12는 그대로 둡니다.'
+    - '정답 형태: {"startedAt": "2026-05-06 09:00", "minutes": 12, "status": "done"},'
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "{'doneCount': 4, 'averageMinutes': 20.8, 'latestDate': '2026-05-06', 'reportFile': 'daily-2026-05-06.txt'}"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"{'doneCount': 4, 'averageMinutes': 20.8, 'latestDate': '2026-05-06', 'reportFile': 'daily-2026-05-06.txt'}\\""
+- id: practice
+  title: Day 18 종합 복습
+  structuredPrimary: true
+  subtitle: 모듈과 import 마스터하기
+  goal: 별칭 import와 두 함수 조합을 한 셀에서 이어 써 본다.
+  why: 별칭을 붙이고 그 별칭으로 여러 함수를 이어 부르는 것이 표준 라이브러리를 쓰는 가장 흔한 형태라, 여기까지 직접 해 봐야 다음 강의의 파일 입출력을 바로 따라갈 수 있습니다.
+  explanation: Day 18에서 배운 모듈과 import를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로
+    어떤 순서로 해도 괜찮습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import math  # 첫 번째 셀에서 import
+
+    math.sqrt(81)
+  exercise:
+    prompt: |-
+      두 곳을 고치세요. 첫 줄 import math를 import math as m으로 바꾸고, 마지막 줄 math.sqrt(81)을 m.floor(m.sqrt(300))으로 바꾸세요. 첫 줄 뒤에 붙은 설명 문구는 그대로 둡니다.
+
+      sqrt(300)은 17.32...이고 floor가 소수점 아래를 버리므로 17이 나와야 합니다.
+    starterCode: |-
+      import math  # 첫 번째 셀에서 import
+
+      math.sqrt(81)
+    solution: |-
+      import math as m  # 첫 번째 셀에서 import
+
+      m.floor(m.sqrt(300))
+    hints:
+    - 첫 줄 import math 뒤에 as m 을 붙이고, 마지막 줄은 별칭 m 으로 두 함수를 이어 m.floor(m.sqrt(300)) 으로 씁니다.
+    - "정답 형태: m.floor(m.sqrt(300))"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '17'
+    resultCheck: "출력이 정확히 일치해야 합니다: '17'"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
+  masteryVariants:
+  - id: day18-circle-area-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - import_basic
+    - practice
+    title: 표준 모듈 상수로 원 넓이 계산하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: math 모듈을 함수 내부에서 가져와 계산한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: circle_area(radius)가 math.pi를 사용한 넓이를 소수 셋째 자리에서 반올림해 반환하도록 완성하세요.
+      starterCode: |-
+        def circle_area(radius):
+            raise NotImplementedError
+      solution: |-
+        def circle_area(radius):
+            import math
+            return round(math.pi * radius ** 2, 2)
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day18.circle-area.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day18.circle-area.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: circle_area
+        cases:
+        - id: one
+          arguments:
+          - value: 1
+          expectedReturn: 3.14
+        - id: two
+          arguments:
+          - value: 2
+          expectedReturn: 12.57
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day18-path-name-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day18-circle-area-mastery
+    title: 경로 문자열에서 파일 이름 분리하기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 모듈의 객체를 처음 보는 경로 처리에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: path_name(path_text)가 POSIX 경로의 마지막 파일 이름을 반환하도록 완성하세요.
+      starterCode: |-
+        def path_name(path_text):
+            raise NotImplementedError
+      solution: |-
+        def path_name(path_text):
+            from pathlib import PurePosixPath
+            return PurePosixPath(path_text).name
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day18.path-name.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day18.path-name.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: path_name
+        cases:
+        - id: nested
+          arguments:
+          - value: reports/2026/july.csv
+          expectedReturn: july.csv
+        - id: single
+          arguments:
+          - value: notes.txt
+          expectedReturn: notes.txt
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day18-json-keys-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day18-path-name-transfer
+    title: JSON 문자열을 모듈로 해석하기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: import와 함수 호출을 기억에서 다시 연결한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: json_keys(text)가 JSON object의 key를 정렬한 목록으로 반환하도록 완성하세요.
+      starterCode: |-
+        def json_keys(text):
+            raise NotImplementedError
+      solution: |-
+        def json_keys(text):
+            import json
+            return sorted(json.loads(text).keys())
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day18.json-keys.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day18.json-keys.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: json_keys
+        cases:
+        - id: two
+          arguments:
+          - value: '{"b": 2, "a": 1}'
+          expectedReturn:
+          - a
+          - b
+        - id: one
+          arguments:
+          - value: '{"name": "Codaro"}'
+          expectedReturn:
+          - name
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

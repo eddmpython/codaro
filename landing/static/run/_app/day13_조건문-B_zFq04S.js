@@ -1,0 +1,828 @@
+var e=`meta:
+  id: day13
+  title: 조건문
+  day: 13
+  category: 30days
+  outcomes: ["python.controlFlow"]
+  prerequisites: ["python.operators"]
+  estimatedMinutes: 40
+  tags:
+  - 조건문
+  - if
+  - elif
+  - else
+  - 승인규칙
+  - 경계값
+  - 검증
+  seo:
+    title: 파이썬 조건문 - if, elif, else로 흐름 제어
+    description: if, elif, else, 삼항연산자, 중첩 조건문을 배웁니다.
+    keywords:
+    - 조건문
+    - if
+    - elif
+    - else
+    - 삼항연산자
+intro:
+  emoji: 🔀
+  points:
+  - if로 조건 분기
+  - elif와 else로 다중 분기
+  - 중첩 조건문과 삼항연산자
+  - 실전 조건 처리
+  direction: 조건문에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 조건문 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: if 기본 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: ifelse 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: ifelifelse 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 조건문 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 조건문 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 조건문 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: if_basic
+  title: if 기본
+  structuredPrimary: true
+  subtitle: 조건이 참일 때 실행
+  goal: 조건이 거짓이면 if 블록을 통째로 건너뛴다는 것을 결과로 확인한다.
+  why: 조건에 걸리지 않는 값이 들어오면 그 안의 코드는 한 줄도 실행되지 않아서, 미리 넣어 둔 기본값이 그대로 남습니다.
+  explanation: |-
+    if문은 조건이 True일 때만 코드를 실행합니다. if 조건: 형식으로 쓰며, 조건 뒤에 콜론(:)을 붙이고 실행할 코드는 들여쓰기합니다. 조건이 False면 if 블록을 건너뜁니다.
+
+    if문의 조건은 비교 연산자, 논리 연산자, in 연산자 등을 사용할 수 있습니다.
+  snippet: |-
+    age = 20
+    if age >= 18:
+        result = 'adult'
+    result
+  exercise:
+    prompt: |-
+      맨 위에 result = 'minor' 한 줄을 추가하고, age를 15로 바꾸세요.
+
+      조건이 거짓이 되어 if 블록을 건너뛰므로 minor가 나와야 합니다.
+    starterCode: |-
+      age = 20
+      if age >= 18:
+          result = 'adult'
+      result
+    solution: |-
+      result = 'minor'
+      age = 15
+      if age >= 18:
+          result = 'adult'
+      result
+    hints:
+    - "첫 줄 age = 20 위에 result = 'minor' 를 넣고, age = 20 을 age = 15 로 바꿉니다. if 블록과 마지막 줄 result는 그대로 둡니다."
+    - "정답 형태: 맨 위에 result = 'minor' 추가 + age = 15"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: minor
+    resultCheck: "출력이 정확히 일치해야 합니다: 'minor'"
+- id: if_else
+  title: if-else
+  structuredPrimary: true
+  subtitle: 조건에 따른 양방향 분기
+  goal: 조건을 참으로 뒤집어 else 대신 if 쪽 결과가 나오게 만든다.
+  why: 짝수와 홀수, 성공과 실패처럼 반드시 둘 중 하나로 갈라야 하는 판정에 그대로 쓰입니다.
+  explanation: |-
+    else는 if 조건이 False일 때 실행됩니다. if-else를 사용하면 조건에 따라 둘 중 하나가 반드시 실행됩니다. else 뒤에도 콜론(:)을 붙이고 들여쓰기합니다.
+
+    if-else는 둘 중 하나를 반드시 선택해야 할 때 유용합니다.
+  snippet: |-
+    num = 7
+    if num % 2 == 0:
+        parity = 'even'
+    else:
+        parity = 'odd'
+    parity
+  exercise:
+    prompt: |-
+      num을 8로 바꾸세요.
+
+      8은 짝수라 if 쪽이 실행되므로 even이 나와야 합니다.
+    starterCode: |-
+      num = 7
+      if num % 2 == 0:
+          parity = 'even'
+      else:
+          parity = 'odd'
+      parity
+    solution: |-
+      num = 8
+      if num % 2 == 0:
+          parity = 'even'
+      else:
+          parity = 'odd'
+      parity
+    hints:
+    - num = 7 을 num = 8 로 바꿉니다. if-else 블록과 마지막 줄 parity는 그대로 둡니다.
+    - "정답 형태: num = 8"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: even
+    resultCheck: "출력이 정확히 일치해야 합니다: 'even'"
+- id: if_elif_else
+  title: if-elif-else
+  structuredPrimary: true
+  subtitle: 다중 조건 분기
+  goal: 어느 조건에도 걸리지 않는 값을 넣어 마지막 else가 받는 것을 확인한다.
+  why: 점수 구간처럼 여러 등급을 나눌 때 마지막 else가 나머지 전부를 받아 주어야 빠지는 경우가 생기지 않습니다.
+  explanation: |-
+    elif는 else if의 줄임말로, 여러 조건을 순차적으로 검사합니다. if-elif-else를 사용하면 3개 이상의 경우를 나눌 수 있습니다. 위에서부터 조건을 검사하여 처음 True인 블록만 실행됩니다.
+
+    elif는 여러 개 사용할 수 있으며, else는 생략 가능합니다.
+  snippet: |-
+    point = 85
+    if point >= 90:
+        level = 'A'
+    elif point >= 80:
+        level = 'B'
+    elif point >= 70:
+        level = 'C'
+    else:
+        level = 'F'
+    level
+  exercise:
+    prompt: |-
+      point를 65로 바꾸세요.
+
+      90, 80, 70 어느 조건에도 걸리지 않아 else가 실행되므로 F가 나와야 합니다.
+    starterCode: |-
+      point = 85
+      if point >= 90:
+          level = 'A'
+      elif point >= 80:
+          level = 'B'
+      elif point >= 70:
+          level = 'C'
+      else:
+          level = 'F'
+      level
+    solution: |-
+      point = 65
+      if point >= 90:
+          level = 'A'
+      elif point >= 80:
+          level = 'B'
+      elif point >= 70:
+          level = 'C'
+      else:
+          level = 'F'
+      level
+    hints:
+    - point = 85 를 point = 65 로 바꿉니다. 조건 줄과 마지막 줄 level은 그대로 둡니다.
+    - "정답 형태: point = 65"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'F'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'F'"
+- id: condition_compare
+  title: 비교 연산자와 조건문
+  structuredPrimary: true
+  subtitle: 크기 비교로 조건 판별
+  goal: 비교 대상 값을 어긋나게 만들어 else 쪽 결과가 나오게 한다.
+  why: 입력한 값이 기준과 정확히 같은지에 따라 허용과 거절이 갈리는 검사에 그대로 쓰입니다.
+  explanation: |-
+    비교 연산자(==, !=, >, <, >=, <=)는 조건문에서 가장 많이 사용됩니다. 두 값을 비교하여 True/False를 반환하며, 이를 if문의 조건으로 사용합니다.
+
+    문자열도 비교 연산자로 비교할 수 있습니다(사전 순서).
+  snippet: |-
+    password = '1234'
+    if password == '1234':
+        access = 'granted'
+    else:
+        access = 'denied'
+    access
+  exercise:
+    prompt: |-
+      첫 줄 password를 '9999'로 바꾸세요.
+
+      if 안의 기준값 '1234'와 달라지므로 denied가 나와야 합니다.
+    starterCode: |-
+      password = '1234'
+      if password == '1234':
+          access = 'granted'
+      else:
+          access = 'denied'
+      access
+    solution: |-
+      password = '9999'
+      if password == '1234':
+          access = 'granted'
+      else:
+          access = 'denied'
+      access
+    hints:
+    - "첫 줄 password = '1234' 를 password = '9999' 로 바꿉니다. if 줄의 비교값 '1234'는 그대로 둡니다."
+    - "정답 형태: password = '9999'"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: denied
+    resultCheck: "출력이 정확히 일치해야 합니다: 'denied'"
+- id: condition_and
+  title: 논리 연산자 and
+  structuredPrimary: true
+  subtitle: 여러 조건을 모두 만족
+  goal: and로 묶은 조건은 한쪽만 거짓이어도 else로 간다는 것을 확인한다.
+  why: 나이 조건과 회원 여부를 동시에 만족해야 할인해 주는 규칙처럼, 전부 통과해야 하는 검사를 한 줄로 씁니다.
+  explanation: |-
+    and 연산자는 양쪽 조건이 모두 True일 때만 True를 반환합니다. 여러 조건을 동시에 만족해야 할 때 사용합니다. 조건1 and 조건2 형식입니다.
+
+    범위 검사는 50 <= value <= 100 형식으로도 가능합니다.
+  snippet: |-
+    userAge = 25
+    isMember = True
+    if userAge >= 18 and isMember:
+        rate = 0.2
+    else:
+        rate = 0
+    rate
+  exercise:
+    prompt: |-
+      isMember를 False로 바꾸세요.
+
+      나이 조건은 그대로 참이지만 한쪽이 거짓이라 else가 실행되므로 0이 나와야 합니다.
+    starterCode: |-
+      userAge = 25
+      isMember = True
+      if userAge >= 18 and isMember:
+          rate = 0.2
+      else:
+          rate = 0
+      rate
+    solution: |-
+      userAge = 25
+      isMember = False
+      if userAge >= 18 and isMember:
+          rate = 0.2
+      else:
+          rate = 0
+      rate
+    hints:
+    - isMember = True 를 isMember = False 로 바꿉니다. False는 대문자 F로 씁니다.
+    - "정답 형태: isMember = False"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '0'
+    resultCheck: "출력이 정확히 일치해야 합니다: '0'"
+- id: condition_or
+  title: 논리 연산자 or
+  structuredPrimary: true
+  subtitle: 조건 중 하나만 만족
+  goal: or로 묶은 조건은 둘 다 거짓일 때만 else로 간다는 것을 확인한다.
+  why: 주말이거나 공휴일이면 쉬는 것처럼 이유가 여러 개여도 하나만 해당하면 같은 처리를 할 때 씁니다.
+  explanation: |-
+    or 연산자는 양쪽 조건 중 하나라도 True면 True를 반환합니다. 여러 조건 중 하나만 만족해도 될 때 사용합니다. 조건1 or 조건2 형식입니다.
+
+    or는 첫 번째 True를 만나면 나머지 조건은 검사하지 않습니다.
+  snippet: |-
+    weekend = False
+    holiday = True
+    if weekend or holiday:
+        day = 'off'
+    else:
+        day = 'work'
+    day
+  exercise:
+    prompt: |-
+      holiday를 False로 바꾸세요.
+
+      weekend와 holiday가 둘 다 거짓이 되어 else가 실행되므로 work가 나와야 합니다.
+    starterCode: |-
+      weekend = False
+      holiday = True
+      if weekend or holiday:
+          day = 'off'
+      else:
+          day = 'work'
+      day
+    solution: |-
+      weekend = False
+      holiday = False
+      if weekend or holiday:
+          day = 'off'
+      else:
+          day = 'work'
+      day
+    hints:
+    - holiday = True 를 holiday = False 로 바꿉니다. 첫 줄 weekend = False는 그대로 둡니다.
+    - "정답 형태: holiday = False"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: work
+    resultCheck: "출력이 정확히 일치해야 합니다: 'work'"
+- id: condition_not
+  title: 논리 연산자 not
+  structuredPrimary: true
+  subtitle: 조건 반대로 뒤집기
+  goal: not이 붙은 조건은 값이 참일 때 오히려 else로 간다는 것을 확인한다.
+  why: 로그인하지 않은 사람에게만 안내를 띄우는 것처럼 "아닐 때"를 조건으로 삼을 때 씁니다.
+  explanation: |-
+    not 연산자는 조건의 결과를 반대로 뒤집습니다. True는 False로, False는 True로 바꿉니다. not 조건 형식으로 사용합니다.
+
+    not count == 0 대신 count != 0을 사용하는 것이 더 읽기 쉽습니다.
+  snippet: |-
+    logged = False
+    if not logged:
+        action = 'login required'
+    else:
+        action = 'proceed'
+    action
+  exercise:
+    prompt: |-
+      logged를 True로 바꾸세요.
+
+      not True는 거짓이라 else가 실행되므로 proceed가 나와야 합니다.
+    starterCode: |-
+      logged = False
+      if not logged:
+          action = 'login required'
+      else:
+          action = 'proceed'
+      action
+    solution: |-
+      logged = True
+      if not logged:
+          action = 'login required'
+      else:
+          action = 'proceed'
+      action
+    hints:
+    - logged = False 를 logged = True 로 바꿉니다. if not logged 줄은 그대로 둡니다.
+    - "정답 형태: logged = True"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: proceed
+    resultCheck: "출력이 정확히 일치해야 합니다: 'proceed'"
+- id: condition_in
+  title: in 연산자와 조건문
+  structuredPrimary: true
+  subtitle: 포함 여부 검사
+  goal: 목록에 없는 값으로 바꿔 in 조건이 거짓이 되게 만든다.
+  why: 허용된 사용자 목록에 있는지 확인하고 통과 여부를 정하는 검사를 조건문 한 줄로 만들 수 있습니다.
+  explanation: |-
+    in 연산자는 값이 리스트, 튜플, 집합, 딕셔너리, 문자열에 포함되어 있는지 검사합니다. 값 in 컬렉션 형식으로 사용하며, True/False를 반환합니다.
+
+    not in 연산자로 포함되지 않은 것을 검사할 수 있습니다.
+  snippet: |-
+    users = ['admin', 'user1', 'user2']
+    user = 'user1'
+    if user in users:
+        permission = 'granted'
+    else:
+        permission = 'denied'
+    permission
+  exercise:
+    prompt: |-
+      user를 'guest'로 바꾸세요.
+
+      guest는 users 목록에 없어 else가 실행되므로 denied가 나와야 합니다.
+    starterCode: |-
+      users = ['admin', 'user1', 'user2']
+      user = 'user1'
+      if user in users:
+          permission = 'granted'
+      else:
+          permission = 'denied'
+      permission
+    solution: |-
+      users = ['admin', 'user1', 'user2']
+      user = 'guest'
+      if user in users:
+          permission = 'granted'
+      else:
+          permission = 'denied'
+      permission
+    hints:
+    - "user = 'user1' 을 user = 'guest' 로 바꿉니다. 첫 줄 users 목록은 그대로 둡니다."
+    - "정답 형태: user = 'guest'"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: denied
+    resultCheck: "출력이 정확히 일치해야 합니다: 'denied'"
+- id: nested_if
+  title: 중첩 조건문
+  structuredPrimary: true
+  subtitle: 조건 안에 조건
+  goal: 바깥 조건이 거짓이면 안쪽 if는 검사조차 되지 않는다는 것을 확인한다.
+  why: 앞 단계를 통과하지 못하면 뒤 조건은 볼 필요도 없는 단계별 심사를 코드 구조 그대로 표현합니다.
+  explanation: |-
+    if문 안에 다시 if문을 넣을 수 있습니다. 이를 중첩 조건문이라고 하며, 복잡한 조건을 단계적으로 검사할 때 사용합니다. 들여쓰기 단계가 늘어납니다.
+
+    중첩이 깊어지면 and 연산자로 단순화할 수 있습니다.
+  snippet: |-
+    driverAge = 25
+    hasLicense = True
+    if driverAge >= 18:
+        if hasLicense:
+            canDrive = 'yes'
+        else:
+            canDrive = 'no license'
+    else:
+        canDrive = 'too young'
+    canDrive
+  exercise:
+    prompt: |-
+      driverAge를 16으로 바꾸세요.
+
+      hasLicense가 True여도 바깥 조건이 거짓이라 안쪽 if는 실행되지 않으므로 too young이 나와야 합니다.
+    starterCode: |-
+      driverAge = 25
+      hasLicense = True
+      if driverAge >= 18:
+          if hasLicense:
+              canDrive = 'yes'
+          else:
+              canDrive = 'no license'
+      else:
+          canDrive = 'too young'
+      canDrive
+    solution: |-
+      driverAge = 16
+      hasLicense = True
+      if driverAge >= 18:
+          if hasLicense:
+              canDrive = 'yes'
+          else:
+              canDrive = 'no license'
+      else:
+          canDrive = 'too young'
+      canDrive
+    hints:
+    - driverAge = 25 를 driverAge = 16 으로 바꿉니다. hasLicense = True와 나머지 줄은 그대로 둡니다.
+    - "정답 형태: driverAge = 16"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: too young
+    resultCheck: "출력이 정확히 일치해야 합니다: 'too young'"
+- id: ternary_operator
+  title: 삼항 연산자
+  structuredPrimary: true
+  subtitle: 한 줄로 조건 분기
+  goal: 한 줄 조건식의 조건을 거짓으로 만들어 else 쪽 값이 선택되게 한다.
+  why: 값 하나를 조건에 따라 정할 때 if-else 네 줄 대신 한 줄로 끝낼 수 있습니다.
+  explanation: |-
+    삼항 연산자는 if-else를 한 줄로 표현합니다. 값1 if 조건 else 값2 형식으로 쓰며, 조건이 True면 값1, False면 값2를 반환합니다. 간단한 조건 분기에 유용합니다.
+
+    삼항 연산자는 간단한 조건에만 사용하세요. 복잡하면 일반 if-else가 더 읽기 쉽습니다.
+  snippet: |-
+    n = 10
+    category = 'even' if n % 2 == 0 else 'odd'
+    category
+  exercise:
+    prompt: |-
+      n을 7로 바꾸세요.
+
+      7은 홀수라 else 쪽 값이 선택되므로 odd가 나와야 합니다.
+    starterCode: |-
+      n = 10
+      category = 'even' if n % 2 == 0 else 'odd'
+      category
+    solution: |-
+      n = 7
+      category = 'even' if n % 2 == 0 else 'odd'
+      category
+    hints:
+    - n = 10 을 n = 7 로 바꿉니다. 가운데 한 줄 조건식과 마지막 줄 category는 그대로 둡니다.
+    - "정답 형태: n = 7"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: odd
+    resultCheck: "출력이 정확히 일치해야 합니다: 'odd'"
+- id: workflow_validation
+  title: '검증 루프: 주문 승인 규칙 만들기'
+  structuredPrimary: true
+  subtitle: 조건 순서와 경계값을 테스트하는 실무 분기
+  goal: 경보 등급 규칙이 기대한 등급을 내는지 assert로 못박아 확인한다.
+  why: 조건 순서가 한 칸만 어긋나도 등급이 조용히 바뀌기 때문에, 기준 등급을 assert로 코드에 박아 둡니다.
+  explanation: 조건문은 참/거짓 예제를 맞히는 데서 끝나지 않습니다. 실제 업무에서는 승인, 반려, 검토 같은 상태를 결정하므로 조건 순서와 경계값이 틀리면 결과가 바로
+    잘못됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    stockCount = 5
+    requestCount = 3
+    paidAmount = 90000
+    riskScore = 20
+
+    if riskScore >= 80:
+        orderStatus = 'review'
+    elif requestCount > stockCount:
+        orderStatus = 'rejected'
+    elif paidAmount <= 0:
+        orderStatus = 'rejected'
+    else:
+        orderStatus = 'confirmed'
+
+    assert orderStatus == 'confirmed'
+  exercise:
+    prompt: |-
+      값은 바꾸지 말고 코드를 그대로 실행하세요.
+
+      errorCount가 3이라 두 번째 조건에 걸리고, assert가 통과한 뒤 마지막에 warning이 나와야 합니다.
+    starterCode: |-
+      errorCount = 3
+      latencyMs = 850
+      if errorCount >= 10 or latencyMs >= 1000:
+          alertLevel = 'critical'
+      elif errorCount >= 3 or latencyMs >= 700:
+          alertLevel = 'warning'
+      else:
+          alertLevel = 'normal'
+
+      assert alertLevel == 'warning'
+      alertLevel
+    solution: |-
+      errorCount = 3
+      latencyMs = 850
+      if errorCount >= 10 or latencyMs >= 1000:
+          alertLevel = 'critical'
+      elif errorCount >= 3 or latencyMs >= 700:
+          alertLevel = 'warning'
+      else:
+          alertLevel = 'normal'
+
+      assert alertLevel == 'warning'
+      alertLevel
+    hints:
+    - errorCount나 latencyMs를 바꾸면 assert가 AssertionError로 멈춥니다. 그때는 원래 값으로 되돌리세요.
+    - "정답 형태: 코드를 그대로 실행, 마지막 값 warning"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: warning
+    resultCheck: "출력이 정확히 일치해야 합니다: 'warning'"
+- id: practice
+  title: Day 13 종합 복습
+  structuredPrimary: true
+  subtitle: 조건문 마스터하기
+  goal: if만 있던 코드에 else를 직접 붙여 조건이 거짓일 때 갈 곳을 만든다.
+  why: else가 없으면 조건이 거짓일 때 변수 자체가 만들어지지 않아 다음 줄에서 에러가 나므로, 나머지 경우를 else로 받아 두어야 합니다.
+  explanation: Day 13에서 배운 조건문을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤
+    순서로 해도 괜찮습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    val = 15
+    if val > 10:
+        msg = 'big'
+    msg
+  exercise:
+    prompt: |-
+      val을 5로 바꾸고, msg = 'big' 아래에 else: 줄과 msg = 'small' 줄을 추가하세요.
+
+      조건이 거짓이라 else 쪽이 실행되므로 small이 나와야 합니다.
+    starterCode: |-
+      val = 15
+      if val > 10:
+          msg = 'big'
+      msg
+    solution: |-
+      val = 5
+      if val > 10:
+          msg = 'big'
+      else:
+          msg = 'small'
+      msg
+    hints:
+    - "val = 15 를 val = 5 로 바꿉니다. 그다음 msg = 'big' 아래에 else: 를 if와 같은 열에 쓰고, 그 아래 줄에 msg = 'small' 을 들여써 넣습니다."
+    - "정답 형태: val = 5 와 else: 아래 msg = 'small'"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: small
+    resultCheck: "출력이 정확히 일치해야 합니다: 'small'"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
+  masteryVariants:
+  - id: day13-shipping-fee-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - if_basic
+    - practice
+    title: 주문 조건으로 배송비 결정하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 여러 조건의 우선순서를 if 문으로 표현한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: shipping_fee(total, member)가 회원 또는 5만원 이상이면 0, 3만원 이상이면 2500, 그 외 3000을 반환하도록 완성하세요.
+      starterCode: |-
+        def shipping_fee(total, member):
+            raise NotImplementedError
+      solution: |-
+        def shipping_fee(total, member):
+            if member or total >= 50000:
+                return 0
+            if total >= 30000:
+                return 2500
+            return 3000
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day13.shipping-fee.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day13.shipping-fee.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: shipping_fee
+        cases:
+        - id: member
+          arguments:
+          - value: 10000
+          - value: true
+          expectedReturn: 0
+        - id: mid
+          arguments:
+          - value: 35000
+          - value: false
+          expectedReturn: 2500
+        - id: low
+          arguments:
+          - value: 12000
+          - value: false
+          expectedReturn: 3000
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day13-risk-level-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day13-shipping-fee-mastery
+    title: 점수 구간을 위험 등급으로 바꾸기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 조건 분기를 새로운 임계값 문제에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: risk_level(score)가 80 이상 high, 50 이상 medium, 그 외 low를 반환하도록 완성하세요.
+      starterCode: |-
+        def risk_level(score):
+            raise NotImplementedError
+      solution: |-
+        def risk_level(score):
+            if score >= 80:
+                return 'high'
+            if score >= 50:
+                return 'medium'
+            return 'low'
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day13.risk-level.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day13.risk-level.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: risk_level
+        cases:
+        - id: high
+          arguments:
+          - value: 91
+          expectedReturn: high
+        - id: edge
+          arguments:
+          - value: 50
+          expectedReturn: medium
+        - id: low
+          arguments:
+          - value: 49
+          expectedReturn: low
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day13-leap-year-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day13-risk-level-transfer
+    title: 윤년 조건 다시 조합하기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: and와 or가 섞인 조건 우선순위를 기억에서 복원한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: is_leap_year(year)가 윤년이면 True를 반환하도록 완성하세요.
+      starterCode: |-
+        def is_leap_year(year):
+            raise NotImplementedError
+      solution: |-
+        def is_leap_year(year):
+            return year % 400 == 0 or (year % 4 == 0 and year % 100 != 0)
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day13.leap-year.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day13.leap-year.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: is_leap_year
+        cases:
+        - id: four-hundred
+          arguments:
+          - value: 2000
+          expectedReturn: true
+        - id: century
+          arguments:
+          - value: 1900
+          expectedReturn: false
+        - id: ordinary
+          arguments:
+          - value: 2024
+          expectedReturn: true
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};
