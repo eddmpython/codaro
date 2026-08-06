@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 import re
 
 
@@ -378,7 +379,13 @@ def testNotebookKeepsMobileTitleAndCollapsesSecondaryCellActions() -> None:
     autosaveGate = _read("tests/surface/verifyNotebookAutosavePlaywright.py")
     productGate = _read("tests/surface/verifyProductExperiencePlaywright.py")
 
-    assert 'left-11 right-[9.5rem]' in topBar
+    # 좁은 화면에서 제목은 오른쪽 컨트롤 묶음(테마 1 + SNS registry 항목 수) 자리를 비켜야
+    # 한다. 예약 폭이 컨트롤보다 좁으면 제목과 아이콘이 겹친다. registry 에 항목을 추가하면
+    # 이 값과 topBar 의 right 예약을 함께 넓혀야 한다.
+    socialLinks = json.loads(_read("assets/brand/designSystem/socialLinks.json"))
+    controlCount = 1 + len(socialLinks["links"])
+    assert controlCount == 6, f"SNS registry 항목이 바뀌었다. 상단 레인 예약 폭을 다시 계산하라: {controlCount}"
+    assert 'left-11 right-[12rem]' in topBar
     assert 'className="absolute left-1.5 top-1/2 z-30 -translate-y-1/2"' in topBar
     assert 'className="absolute left-11 top-1/2 z-20 hidden' in topBar
     assert 'surface === "editor" && "sm:hidden"' not in topBar

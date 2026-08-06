@@ -85,8 +85,11 @@ export function TopControls({
         </div>
       ) : null}
 
+      {/* 좁은 화면에서 제목은 오른쪽 컨트롤 묶음 자리를 비켜야 한다. right 예약 폭은 컨트롤
+          개수(테마 1 + SNS registry 항목 수)에 맞춘다. registry 에 항목이 늘면 여기도 함께
+          넓히지 않으면 제목과 아이콘이 겹친다. */}
       {surface === "editor" && notebookTitle && onRenameNotebook ? (
-        <div className="absolute left-11 right-[9.5rem] top-1.5 z-20 sm:left-1/2 sm:right-auto sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2">
+        <div className="absolute left-11 right-[12rem] top-1.5 z-20 sm:left-1/2 sm:right-auto sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2">
           <input
             aria-label="노트북 파일명"
             className="h-7 w-full border-0 border-b border-transparent bg-transparent px-1 text-center font-mono text-[11px] text-muted-foreground outline-none hover:text-foreground focus:border-primary focus:text-foreground sm:w-[clamp(140px,24vw,320px)] sm:px-2 sm:text-xs"
