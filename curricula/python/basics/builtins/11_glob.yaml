@@ -216,9 +216,9 @@ sections:
     glob 검색은 현재 디렉터리 상태에 영향을 받기 쉽습니다. 실습용 임시 작업공간을 만들고 기대 파일을 고정하면, 패턴이 정확히 무엇을 포함하고 제외하는지 검증할 수 있습니다.
 
     변주 실험
-    `**/*.log` 검색에 `recursive=True`를 반드시 넘기도록 `safeGlob`을 확장하고, 하위 로그 파일 2개가 잡히는지 확인하세요.
+    `logFiles` 줄에서 `recursive=True`를 빼고 실행해 보세요. `**`가 하위 폴더로 내려가지 못해 결과가 빈 목록이 되고 assert가 멈춥니다.
   tips:
-  - 변주 실험 `**/*.log` 검색에 `recursive=True`를 반드시 넘기도록 `safeGlob`을 확장하고, 하위 로그 파일 2개가 잡히는지 확인하세요.
+  - 변주 실험 `logFiles` 줄에서 `recursive=True`를 빼고 실행해 보세요. `**`가 하위 폴더로 내려가지 못해 결과가 빈 목록이 되고 assert가 멈춥니다.
   snippet: |-
     globRoot = tempfile.mkdtemp(prefix='codaro_glob_workflow_')
     dataDir = os.path.join(globRoot, 'data')

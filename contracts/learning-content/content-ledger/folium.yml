@@ -180,7 +180,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "folium/08_히트맵"
     identityLedgerRef: "identity-ledger/folium.yml"
-    lessonContentHash: "1194d6ecdcf13ddcd4a84f511e12dd5839bf297fd80eec32354b4b304253da6f"
+    lessonContentHash: "c7c03c3c748275a215998ab9685f2e7b56fbb9ada2ea4befced8151961d89692"
     disposition: migrate
     ownerPacket: "07-remaining-domains/06-geo-visualization"
     eligiblePathIds: ["geoVisualization"]

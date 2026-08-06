@@ -464,7 +464,7 @@ sections:
 
       m10
     hints:
-    - 바꿀 지점은 `complaintHeatRows`의 `district`, `loc`, `weight` 값입니다.
+    - 바꿀 지점은 두 `range(...)`의 반복 횟수와 `storeLocations`에 넣는 위도, 경도 범위입니다.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
   check:
     noError: 9단계. 마커와 조합의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.

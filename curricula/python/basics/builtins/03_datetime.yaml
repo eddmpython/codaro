@@ -316,9 +316,9 @@ sections:
     날짜 코드는 현재 날짜에 의존하면 테스트가 흔들립니다. 기준일을 고정하고, 문자열 파싱 실패와 마감 상태 계산을 검증하면 일정 관리나 운영 리포트에 그대로 재사용할 수 있습니다.
 
     변주 실험
-    한국 공휴일 목록을 set으로 추가하고, 주말이 아니어도 휴일이면 영업일에서 제외되도록 `countBusinessDays`를 확장하세요.
+    referenceDate를 2026년 6월 1일로 바꾸고 statusCounts가 어떻게 달라지는지 확인하세요. assert 줄의 기대값도 함께 고쳐야 합니다.
   tips:
-  - 변주 실험 한국 공휴일 목록을 set으로 추가하고, 주말이 아니어도 휴일이면 영업일에서 제외되도록 `countBusinessDays`를 확장하세요.
+  - 변주 실험 referenceDate를 2026년 6월 1일로 바꾸고 statusCounts가 어떻게 달라지는지 확인하세요. assert 줄의 기대값도 함께 고쳐야 합니다.
   snippet: |-
     referenceDate = date(2026, 5, 24)
     taskRows = [
