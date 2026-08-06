@@ -1,5 +1,5 @@
 import type { BlockConfig, CodaroDocument, CurriculumContentSummary } from "@/types";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { readLearningEvidenceEvents } from "@/lib/learningEvidenceOperations";
 import { PROGRESS_UPDATED_EVENT } from "@/lib/curriculumProgressEvent";
@@ -66,6 +66,46 @@ export function CurriculumView({
     () => lessonVerifySections(groupCurriculumSections(document.blocks).sections),
     [document.blocks],
   );
+  // 완성 예제 자동 실행 큐.
+  //
+  // 예제는 코드만 보여 주고 결과는 감춰 두던 자리였다. 차트를 만드는 예제조차 학습자 화면에는
+  // 글자만 남아, 그 절이 무엇을 만드는지 눈으로 볼 방법이 없었다. 예제가 만드는 결과는 시스템이
+  // 이미 아는 내용이라 학습자가 따로 눌러 확인할 이유가 없다.
+  //
+  // 큐를 부모가 들고 한 번에 하나씩 보내는 이유는 두 가지다. 커널 세션이 하나라 동시에 보내면
+  // 서로의 순서를 밀어내고, 앞 예제가 만든 변수를 뒤 예제가 그대로 쓰기 때문에 순서가 곧
+  // 정확성이다.
+  const autoRunQueueRef = useRef<string[]>([]);
+  const autoRunLessonRef = useRef("");
+  const autoRunPendingRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const lessonKey = `${selectedCategory}/${selectedContentId}`;
+    if (autoRunLessonRef.current === lessonKey) return;
+    autoRunLessonRef.current = lessonKey;
+    autoRunPendingRef.current = null;
+    autoRunQueueRef.current = document.blocks
+      .filter((block) => block.type === "code" && block.role === "snippet" && block.content.trim())
+      .map((block) => block.id);
+  }, [document.blocks, selectedCategory, selectedContentId]);
+
+  useEffect(() => {
+    if (!canRun || runningBlockId) return;
+    const pending = autoRunPendingRef.current;
+    if (pending && !results[pending]) return;
+    autoRunPendingRef.current = null;
+    const queue = autoRunQueueRef.current;
+    while (queue.length) {
+      const nextId = queue.shift();
+      if (!nextId || results[nextId]) continue;
+      const block = document.blocks.find((item) => item.id === nextId);
+      if (!block) continue;
+      autoRunPendingRef.current = block.id;
+      onRunBlock(block, block.content);
+      return;
+    }
+  }, [canRun, document.blocks, onRunBlock, results, runningBlockId]);
+
   const introBlock = curriculumSections.introBlocks[0] ?? document.blocks.find((block) => block.displayKind === "hero" || block.sourceType === "intro");
   const selectedContentIndex = contents.findIndex((content) => content.contentId === selectedContentId);
   const previousLesson = selectedContentIndex > 0 ? contents[selectedContentIndex - 1] : null;

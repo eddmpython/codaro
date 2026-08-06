@@ -1,4 +1,4 @@
-import type { BlockConfig } from "@/types";
+import type { BlockConfig, ExecutionResult } from "@/types";
 import type { WebStrongCheckEvidenceEvent, WebStrongCheckEvidenceInput } from "@/lib/webLearningEvidence";
 import { blockLabel, stripBullet, stripMarkdown } from "@/lib/cellModel";
 import { useEffect, useRef, useState } from "react";
@@ -247,6 +247,20 @@ export function sectionInfo(block: BlockConfig) {
   };
 }
 
+/**
+ * 자동 실행한 완성 예제의 결과를 화면에 낼지 판정한다.
+ *
+ * 실패한 실행과 내보일 것이 없는 실행을 모두 뺀다. 앞의 것은 학습자가 만들지 않은 오류라 지금
+ * 배우는 개념에서 주의만 뺏고, 뒤의 것은 `import`만 하는 절처럼 결과가 원래 없는 경우여서
+ * "출력 없음" 상자만 남는다. 둘 다 절마다 붙으면 읽는 흐름을 끊는다.
+ */
+function snippetHasVisibleOutput(result: ExecutionResult | undefined): result is ExecutionResult {
+  if (!result || result.status === "error" || result.stderr) return false;
+  if (typeof result.data === "string") return result.data.trim().length > 0;
+  if (result.data !== null && result.data !== undefined) return true;
+  return (result.stdout || "").trim().length > 0;
+}
+
 export function StructuredSectionLearningBody({
   canRun,
   category,
@@ -275,6 +289,10 @@ export function StructuredSectionLearningBody({
   onSelectBlock: (blockId: string) => void;
 }) {
   const parts = structuredSectionParts(section);
+  const snippet = parts.snippet;
+  const snippetResult = snippet ? results[snippet.id] : undefined;
+  const snippetRunning = snippet ? runningBlockId === snippet.id : false;
+  const snippetOutput = snippetHasVisibleOutput(snippetResult) ? snippetResult : null;
   const exercise = parts.exercise;
   const exerciseDraft = exercise ? drafts[exercise.id] ?? curriculumInitialDraft(exercise) : "";
   const exerciseResult = exercise ? results[exercise.id] : undefined;
@@ -377,6 +395,20 @@ export function StructuredSectionLearningBody({
         <div data-learning-section-part="snippet">
           <div className="pb-1.5 text-xs font-medium text-muted-foreground" data-learning-snippet-kicker="true">완성 예제</div>
           <CodePayload label="코드" value={parts.snippet.content} />
+          {snippetRunning ? (
+            <div className="mt-3">
+              <LoadingInline label="예제 실행 중" />
+            </div>
+          ) : null}
+          {/* 실패한 예제는 감춘다. 자동 실행은 결과를 보여주려는 것이고, 학습자가 만들지 않은
+              오류를 오류 박스로 들이밀면 지금 배우는 개념에서 주의만 뺏긴다.
+              import만 하는 절처럼 내보일 것이 없는 예제도 감춘다. "출력 없음" 상자는 정보가
+              아니라 빈 칸이고, 절마다 붙으면 읽는 흐름만 끊는다. */}
+          {!snippetRunning && snippetOutput ? (
+            <div className="mt-3" data-learning-snippet-output="true">
+              <ExecutionOutput ariaLabel="완성 예제 실행 결과" result={snippetOutput} />
+            </div>
+          ) : null}
         </div>
       ) : null}
 
