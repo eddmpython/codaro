@@ -72,6 +72,9 @@ sections:
     starterCode: |-
       add = lambda x, y: x + y
       add(3, 5)
+    solution: |-
+      add = lambda x, y: x + y
+      add(10, 2)
     hints:
     - 마지막 줄 숫자만 바꿉니다.
     - lambda 정의는 그대로 둡니다.
@@ -101,6 +104,10 @@ sections:
       실행하면 [4, 9, 16]이 나와야 합니다.
     starterCode: |-
       nums = [1, 2, 3, 4, 5]
+      squared = map(lambda x: x ** 2, nums)
+      list(squared)
+    solution: |-
+      nums = [2, 3, 4]
       squared = map(lambda x: x ** 2, nums)
       list(squared)
     hints:
@@ -133,6 +140,10 @@ sections:
       numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
       evens = filter(lambda x: x % 2 == 0, numbers)
       list(evens)
+    solution: |-
+      numbers = [1, 2, 3, 4]
+      evens = filter(lambda x: x % 2 == 0, numbers)
+      list(evens)
     hints:
     - "numbers 리스트만 [1, 2, 3, 4]로 바꿉니다."
   check:
@@ -163,6 +174,11 @@ sections:
     starterCode: |-
       from functools import reduce
       vals = [1, 2, 3, 4, 5]
+      total = reduce(lambda acc, x: acc + x, vals)
+      total
+    solution: |-
+      from functools import reduce
+      vals = [1, 2, 3]
       total = reduce(lambda acc, x: acc + x, vals)
       total
     hints:
@@ -199,6 +215,12 @@ sections:
 
       double = lambda n: n * 2
       applyTwice(double, 3)
+    solution: |-
+      def applyTwice(func, x):
+          return func(func(x))
+
+      double = lambda n: n * 2
+      applyTwice(double, 5)
     hints:
     - 마지막 호출의 숫자만 5로 바꿉니다.
     - "double은 두 번 곱하므로 5 -> 10 -> 20입니다."
@@ -232,6 +254,13 @@ sections:
     starterCode: |-
       from functools import reduce
       data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      step1 = map(lambda x: x ** 2, data)
+      step2 = filter(lambda x: x > 20, step1)
+      step3 = reduce(lambda a, b: a + b, step2)
+      step3
+    solution: |-
+      from functools import reduce
+      data = [1, 2, 3, 4, 5]
       step1 = map(lambda x: x ** 2, data)
       step2 = filter(lambda x: x > 20, step1)
       step3 = reduce(lambda a, b: a + b, step2)
@@ -333,6 +362,41 @@ sections:
           assert "invalid amount" in str(exc)
 
       print("고차 함수 결제 파이프라인 통과")
+    solution: |-
+      from functools import reduce
+
+      rawEvents = [
+          {"id": "P-100", "status": "paid", "amount": "12000"},
+          {"id": "P-101", "status": "failed", "amount": "9000"},
+          {"id": "P-102", "status": "paid", "amount": "18000"},
+          {"id": "P-103", "status": "refunded", "amount": "5000"},
+      ]
+
+      def normalizePayment(event):
+          amountText = event["amount"].strip()
+          if not amountText.isdigit():
+              raise ValueError(f"invalid amount: {event['amount']}")
+          return {
+              "id": event["id"],
+              "status": event["status"].lower(),
+              "amount": int(amountText),
+          }
+
+      normalizedEvents = list(map(normalizePayment, rawEvents))
+      paidEvents = list(filter(lambda event: event["status"] == "paid", normalizedEvents))
+      paidRevenue = reduce(lambda total, event: total + event["amount"], paidEvents, 0)
+      paidIds = list(map(lambda event: event["id"], paidEvents))
+
+      assert paidIds == ["P-100", "P-102"]
+      assert paidRevenue == 30000
+      assert normalizedEvents[1]["status"] == "failed"
+
+      try:
+          normalizePayment({"id": "P-999", "status": "paid", "amount": "unknown"})
+      except ValueError as exc:
+          assert "invalid amount" in str(exc)
+
+      print("고차 함수 결제 파이프라인 통과")
     hints:
     - paid 이벤트만 합산되는지 assert로 확인합니다.
     - 출력 문구가 고차 함수 결제 파이프라인 통과이면 통과입니다.
@@ -364,6 +428,9 @@ sections:
     starterCode: |-
       cube = lambda x: x ** 3
       cube(4)
+    solution: |-
+      cube = lambda x: x ** 3
+      cube(3)
     hints:
     - 마지막 줄 숫자만 3으로 바꿉니다.
   check:

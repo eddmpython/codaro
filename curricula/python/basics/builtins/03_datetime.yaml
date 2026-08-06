@@ -53,8 +53,8 @@ sections:
   title: datetime 모듈 불러오기
   structuredPrimary: true
   subtitle: ⚠️ 가장 먼저 실행하세요
-  goal: datetime 모듈 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 표준 라이브러리는 외부 의존성 없이 파일, 시간, 문자열, 직렬화 같은 업무 코드를 구성하는 기반입니다.
+  goal: from datetime import로 가져온 이름을 직접 호출해 정말 쓸 수 있는 상태인지 확인한다.
+  why: 날짜 코드는 date, datetime, timedelta 중 무엇을 가져왔는지에 따라 쓸 수 있는 이름이 달라지고, 이 셀을 먼저 실행해야 아래 모든 예제가 같은 이름을 공유합니다.
   explanation: |-
     datetime은 파이썬 표준 라이브러리입니다. 날짜와 시간을 처리하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
 
@@ -65,25 +65,34 @@ sections:
     # 모듈 로드 확인
     'datetime 모듈이 정상적으로 로드되었습니다'
   exercise:
-    prompt: datetime 모듈 불러오기 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    prompt: |-
+      마지막 줄의 문장은 로드되었다고 주장할 뿐 실제로 확인한 것이 없습니다. 마지막 줄 'datetime 모듈이 정상적으로 로드되었습니다'를 date(2026, 1, 1)로 바꿔 가져온 이름을 직접 써 보세요. 첫 줄 import는 그대로 둡니다.
+
+      date는 datetime 모듈에서 온 이름이라 화면에는 모듈 이름까지 붙어 datetime.date(2026, 1, 1)이 나와야 합니다.
     starterCode: |-
       from datetime import date, datetime, timedelta
 
       # 모듈 로드 확인
       'datetime 모듈이 정상적으로 로드되었습니다'
+    solution: |-
+      from datetime import date, datetime, timedelta
+
+      # 모듈 로드 확인
+      date(2026, 1, 1)
     hints:
-    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
-    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+    - 마지막 줄의 문자열을 지우고 그 자리에 date(2026, 1, 1) 을 씁니다. 괄호 안은 연, 월, 일 순서입니다.
+    - "정답 형태: date(2026, 1, 1)"
   check:
-    type: noError
-    noError: datetime 모듈 불러오기의 수정 코드가 모듈 함수 호출 단계의 마지막 확인 값까지 도달해야 합니다.
-    resultCheck: datetime 모듈 불러오기 실행 결과가 반환값, stdout, 객체 상태 기준으로 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'datetime.date(2026, 1, 1)'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'datetime.date(2026, 1, 1)'"
 - id: datetime_objects
   title: 날짜와 시간 객체
   structuredPrimary: true
   subtitle: date, time, datetime
-  goal: 날짜와 시간 객체에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: 같은 날짜라도 date로 만들면 날짜만, datetime으로 만들면 시각까지 담긴다는 차이를 눈으로 확인한다.
+  why: 출근 기록이나 로그처럼 몇 시 몇 분이 필요한 데이터를 date로 만들면 시각 정보가 통째로 사라져 나중에 되살릴 수 없으므로, 만들 때 어느 쪽인지 정해야 합니다.
   explanation: |-
     datetime 모듈은 날짜와 시간을 다루는 파이썬 표준 라이브러리입니다. date는 날짜만, time은 시간만, datetime은 날짜와 시간을 함께 표현합니다. 각 객체는 불변이므로 연산 결과로 새 객체가 생성됩니다. 일정 관리, 로그 분석, 데이터 처리에 필수적입니다.
 
@@ -92,23 +101,30 @@ sections:
     birthday = date(2000, 1, 15)
     birthday
   exercise:
-    prompt: 날짜와 시간 객체 예제에서 `birthday` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      birthday = date(2000, 1, 15)을 birthday = datetime(2000, 1, 15, 9, 30)으로 바꾸세요. 마지막 줄 birthday는 그대로 둡니다.
+
+      datetime은 연, 월, 일 뒤에 시와 분을 더 받으므로 datetime.datetime(2000, 1, 15, 9, 30)이 나와야 합니다.
     starterCode: |-
       birthday = date(2000, 1, 15)
       birthday
+    solution: |-
+      birthday = datetime(2000, 1, 15, 9, 30)
+      birthday
     hints:
-    - 바꿀 지점은 `birthday = ...` 오른쪽 값입니다.
-    - 실행 뒤 `birthday` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - date(2000, 1, 15) 를 datetime(2000, 1, 15, 9, 30) 으로 바꿉니다. 뒤에 붙는 두 숫자가 시와 분입니다.
+    - "정답 형태: birthday = datetime(2000, 1, 15, 9, 30)"
   check:
-    type: noError
-    noError: 날짜와 시간 객체에서 `birthday` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 날짜와 시간 객체 실행 뒤 `birthday` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'datetime.datetime(2000, 1, 15, 9, 30)'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'datetime.datetime(2000, 1, 15, 9, 30)'"
 - id: date_arithmetic
   title: 날짜 연산
   structuredPrimary: true
   subtitle: timedelta로 날짜 계산
-  goal: 날짜 연산에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: 기준 날짜를 코드에 직접 지정한 뒤 timedelta를 더해 어떤 날짜가 나오는지 확인한다.
+  why: date.today()로 계산하면 실행하는 날마다 답이 달라져 맞는지 틀린지 확인할 방법이 없으므로, 날짜 계산을 검증할 때는 기준일을 코드에 고정합니다.
   explanation: |-
     timedelta는 두 날짜 사이의 차이를 나타내거나 날짜에 더하고 뺄 수 있습니다. days, seconds, microseconds로 시간 간격을 표현하며, weeks 파라미터도 사용할 수 있습니다. D-day 계산, 기한 설정, 일정 관리에 활용됩니다.
 
@@ -118,24 +134,32 @@ sections:
     weekLater = currentDate + timedelta(days=7)
     weekLater
   exercise:
-    prompt: 날짜 연산 예제에서 `currentDate`, `weekLater` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    prompt: |-
+      currentDate = date.today()를 currentDate = date(2026, 1, 1)로 바꾸세요. 나머지 두 줄은 그대로 둡니다.
+
+      2026년 1월 1일에 7일을 더하면 1월 8일이므로 datetime.date(2026, 1, 8)이 나와야 합니다.
     starterCode: |-
       currentDate = date.today()
       weekLater = currentDate + timedelta(days=7)
       weekLater
+    solution: |-
+      currentDate = date(2026, 1, 1)
+      weekLater = currentDate + timedelta(days=7)
+      weekLater
     hints:
-    - 바꿀 지점은 `currentDate = ...` 오른쪽 값입니다.
-    - 실행 뒤 `currentDate` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - date.today() 를 date(2026, 1, 1) 로 바꿉니다. today() 는 실행하는 날마다 값이 달라져 기대 결과를 정할 수 없습니다.
+    - "정답 형태: currentDate = date(2026, 1, 1)"
   check:
-    type: noError
-    noError: 날짜 연산에서 `currentDate` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 날짜 연산 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'datetime.date(2026, 1, 8)'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'datetime.date(2026, 1, 8)'"
 - id: formatting
   title: 포매팅과 파싱
   structuredPrimary: true
   subtitle: strftime과 strptime
-  goal: 포매팅과 파싱에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: 문자열로 받은 날짜를 strptime으로 날짜 객체로 세운 뒤 strftime으로 다른 형식으로 다시 쓴다.
+  why: 밖에서 들어오는 날짜는 대부분 문자열이고 우리가 써야 할 형식은 또 다르기 때문에, 문자열을 한 번 날짜 객체로 바꾼 뒤 원하는 형식으로 다시 찍는 왕복이 가장 자주 쓰입니다.
   explanation: |-
     strftime()은 날짜를 문자열로 변환하고, strptime()은 문자열을 날짜로 변환합니다. 포맷 코드(%Y, %m, %d 등)로 원하는 형식을 지정할 수 있습니다. 로그 파일 분석, 사용자 입력 처리, API 통신에서 필수적입니다.
 
@@ -145,24 +169,32 @@ sections:
     formatted = myDate.strftime('%Y-%m-%d')
     formatted
   exercise:
-    prompt: 포매팅과 파싱 예제에서 `myDate`, `formatted` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    prompt: |-
+      두 곳을 고치세요. 첫 줄 myDate = date(2024, 3, 15)를 myDate = datetime.strptime('2024-03-15', '%Y-%m-%d').date()로 바꾸고, 둘째 줄의 형식 문자열 '%Y-%m-%d'를 '%Y%m%d'로 바꾸세요.
+
+      같은 날짜를 문자열에서 읽어 하이픈 없이 붙여 쓴 형식으로 다시 찍는 것이므로 20240315가 나와야 합니다.
     starterCode: |-
       myDate = date(2024, 3, 15)
       formatted = myDate.strftime('%Y-%m-%d')
       formatted
+    solution: |-
+      myDate = datetime.strptime('2024-03-15', '%Y-%m-%d').date()
+      formatted = myDate.strftime('%Y%m%d')
+      formatted
     hints:
-    - 바꿀 지점은 `myDate = ...` 오른쪽 값입니다.
-    - 실행 뒤 `myDate` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - strptime 은 문자열을 datetime 으로 돌려주므로 뒤에 .date() 를 붙여 날짜만 남깁니다. 둘째 줄은 하이픈 두 개를 지워 '%Y%m%d' 로 만듭니다.
+    - "정답 형태: myDate.strftime('%Y%m%d')"
   check:
-    type: noError
-    noError: 포매팅과 파싱에서 `myDate` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 포매팅과 파싱 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '20240315'
+    resultCheck: "출력이 정확히 일치해야 합니다: '20240315'"
 - id: datetime_components
   title: 날짜 구성 요소
   structuredPrimary: true
   subtitle: 년, 월, 일, 시, 분, 초 추출
-  goal: 날짜 구성 요소에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: 고정한 날짜 하나에서 연, 월, 일과 요일 번호를 함께 꺼낸다.
+  why: 주간 집계나 영업일 판정은 날짜 자체보다 요일 번호로 갈리는데 weekday()는 월요일을 0으로 세기 때문에, 실제 값을 한 번 확인해 두지 않으면 조건을 하루씩 밀려 쓰게 됩니다.
   explanation: |-
     날짜 객체에서 개별 구성 요소를 추출할 수 있습니다. year, month, day, hour, minute, second, microsecond 속성으로 각 요소에 접근합니다. weekday()는 요일을, isocalendar()는 ISO 주차를 반환합니다.
 
@@ -174,26 +206,36 @@ sections:
     dayValue = someDate.day
     yearValue, monthValue, dayValue
   exercise:
-    prompt: 날짜 구성 요소 예제에서 `someDate`, `yearValue`, `monthValue` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    prompt: |-
+      두 곳을 고치세요. 첫 줄 someDate = date(2024, 12, 25)를 someDate = date(2026, 3, 2)로 바꾸고, 마지막 줄 끝에 쉼표를 찍고 someDate.weekday()를 이어 붙이세요.
+
+      2026년 3월 2일은 월요일이고 weekday()는 월요일을 0으로 세므로 (2026, 3, 2, 0)이 나와야 합니다.
     starterCode: |-
       someDate = date(2024, 12, 25)
       yearValue = someDate.year
       monthValue = someDate.month
       dayValue = someDate.day
       yearValue, monthValue, dayValue
+    solution: |-
+      someDate = date(2026, 3, 2)
+      yearValue = someDate.year
+      monthValue = someDate.month
+      dayValue = someDate.day
+      yearValue, monthValue, dayValue, someDate.weekday()
     hints:
-    - 바꿀 지점은 `someDate = ...` 오른쪽 값입니다.
-    - 실행 뒤 `someDate` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - 첫 줄 날짜를 date(2026, 3, 2) 로 바꾸고, 마지막 줄을 yearValue, monthValue, dayValue, someDate.weekday() 로 만듭니다.
+    - "정답 형태: yearValue, monthValue, dayValue, someDate.weekday()"
   check:
-    type: noError
-    noError: 날짜 구성 요소에서 `someDate` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 날짜 구성 요소 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '(2026, 3, 2, 0)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(2026, 3, 2, 0)'"
 - id: comparison
   title: 날짜 비교
   structuredPrimary: true
   subtitle: 날짜 크기 비교와 정렬
-  goal: 날짜 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: 한쪽 날짜를 더 늦은 날로 바꿔 비교 결과가 True에서 False로 뒤집히는 것을 확인한다.
+  why: 마감이 지났는지, 유효기간이 남았는지 같은 판정은 결국 날짜 두 개의 크기 비교 한 줄이라, 어느 쪽이 크면 True인지 직접 뒤집어 봐야 조건문을 거꾸로 쓰지 않습니다.
   explanation: |-
     날짜 객체는 비교 연산자(<, >, ==, !=, <=, >=)를 지원합니다. 과거 날짜가 미래 날짜보다 작으므로 날짜 리스트를 정렬할 수 있습니다. 기한 체크, 유효성 검증, 일정 정렬에 활용됩니다.
 
@@ -204,25 +246,34 @@ sections:
     isEarlier = date1 < date2
     isEarlier
   exercise:
-    prompt: 날짜 비교 예제에서 `date1`, `date2`, `isEarlier` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    prompt: |-
+      date1 = date(2024, 1, 1)을 date1 = date(2025, 6, 1)로 바꾸세요. 나머지 세 줄은 그대로 둡니다.
+
+      date1이 date2인 2024년 12월 31일보다 늦어지므로 date1 < date2는 뒤집혀 False가 나와야 합니다.
     starterCode: |-
       date1 = date(2024, 1, 1)
       date2 = date(2024, 12, 31)
       isEarlier = date1 < date2
       isEarlier
+    solution: |-
+      date1 = date(2025, 6, 1)
+      date2 = date(2024, 12, 31)
+      isEarlier = date1 < date2
+      isEarlier
     hints:
-    - 바꿀 지점은 `date1 = ...` 오른쪽 값입니다.
-    - 실행 뒤 `date1` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - date(2024, 1, 1) 을 date(2025, 6, 1) 로 바꿔 date1 이 date2 보다 뒤 날짜가 되게 만듭니다.
+    - "정답 형태: date1 = date(2025, 6, 1)"
   check:
-    type: noError
-    noError: 날짜 비교에서 `date1` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 날짜 비교 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 'False'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'False'"
 - id: practical
   title: 실전 활용
   structuredPrimary: true
   subtitle: 날짜 처리 실무 패턴
-  goal: 실전 활용에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: 기준일과 목표일을 모두 고정해 남은 날짜를 세는 D-day 계산을 만든다.
+  why: D-day 코드에 date.today()를 그대로 넣으면 오늘 하루만 맞는 계산이 되어 다시 확인할 수 없으므로, 기준일도 값으로 받아 두면 어떤 날짜 조합이든 나중에 재현할 수 있습니다.
   explanation: |-
     실무에서 자주 사용하는 날짜 처리 패턴을 살펴봅니다. D-day 계산, 나이 계산, 영업일 계산, 월말/월초 처리 등 실생활 문제를 datetime으로 해결할 수 있습니다.
 
@@ -233,25 +284,34 @@ sections:
     daysLeft = (targetDate - todayDate).days
     daysLeft
   exercise:
-    prompt: 실전 활용 예제에서 `targetDate`, `todayDate`, `daysLeft` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    prompt: |-
+      두 곳을 고치세요. targetDate = date(2025, 1, 1)을 targetDate = date(2026, 12, 25)로 바꾸고, todayDate = date.today()를 todayDate = date(2026, 12, 1)로 바꾸세요.
+
+      12월 1일에서 12월 25일까지는 24일이 남았으므로 24가 나와야 합니다.
     starterCode: |-
       targetDate = date(2025, 1, 1)
       todayDate = date.today()
       daysLeft = (targetDate - todayDate).days
       daysLeft
+    solution: |-
+      targetDate = date(2026, 12, 25)
+      todayDate = date(2026, 12, 1)
+      daysLeft = (targetDate - todayDate).days
+      daysLeft
     hints:
-    - 바꿀 지점은 `targetDate = ...` 오른쪽 값입니다.
-    - 실행 뒤 `targetDate` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - 두 날짜를 모두 직접 지정합니다. date.today() 자리에 date(2026, 12, 1) 을 넣으면 실행하는 날과 상관없이 같은 결과가 나옵니다.
+    - "정답 형태: todayDate = date(2026, 12, 1)"
   check:
-    type: noError
-    noError: 실전 활용에서 `targetDate` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 실전 활용 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '24'
+    resultCheck: "출력이 정확히 일치해야 합니다: '24'"
 - id: workflow_validation
   title: '검증 루프: 일정 데이터 품질'
   structuredPrimary: true
   subtitle: 파싱, 마감 상태, 영업일 계산
-  goal: '검증 루프: 일정 데이터 품질에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
-  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  goal: 기준일을 고정한 마감 상태 계산이 assert 세 줄을 모두 통과하는지 실행으로 확인한다.
+  why: 날짜 조건은 마감 당일이나 사흘 뒤 같은 경계에서 가장 자주 어긋나므로, 기준일을 고정하고 상태별 개수와 경계값을 assert로 박아 두면 나중에 로직을 고쳐도 어긋난 자리가 바로 드러납니다.
   explanation: |-
     날짜 코드는 현재 날짜에 의존하면 테스트가 흔들립니다. 기준일을 고정하고, 문자열 파싱 실패와 마감 상태 계산을 검증하면 일정 관리나 운영 리포트에 그대로 재사용할 수 있습니다.
 
@@ -299,7 +359,11 @@ sections:
 
     taskSchedule
   exercise:
-    prompt: '검증 루프: 일정 데이터 품질 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
+    prompt: |-
+      이 셀은 고칠 곳이 없습니다. 기준일이나 마감일을 바꾸면 아래 assert 세 줄이 깨지므로 그대로 실행하세요.
+
+      기준일 2026년 5월 24일을 기준으로 마감이 지난 것 1건, 사흘 안쪽 2건, 그 뒤 1건으로 갈리고 마지막 줄 taskSchedule이 그대로 표시되므로 아래 한 줄이 나와야 합니다.
+      [{'task': 'invoiceClose', 'due': datetime.date(2026, 5, 20), 'daysLeft': -4, 'status': 'overdue'}, {'task': 'releaseReview', 'due': datetime.date(2026, 5, 24), 'daysLeft': 0, 'status': 'dueSoon'}, {'task': 'securityAudit', 'due': datetime.date(2026, 5, 27), 'daysLeft': 3, 'status': 'dueSoon'}, {'task': 'quarterReport', 'due': datetime.date(2026, 6, 2), 'daysLeft': 9, 'status': 'scheduled'}]
     starterCode: |-
       referenceDate = date(2026, 5, 24)
       taskRows = [
@@ -339,19 +403,59 @@ sections:
       assert taskSchedule[-1]["due"] == date(2026, 6, 2)
 
       taskSchedule
+    solution: |-
+      referenceDate = date(2026, 5, 24)
+      taskRows = [
+          {"task": "invoiceClose", "due": "2026-05-20"},
+          {"task": "releaseReview", "due": "2026-05-24"},
+          {"task": "securityAudit", "due": "2026-05-27"},
+          {"task": "quarterReport", "due": "2026-06-02"},
+      ]
+
+      def parseTaskRows(rows, today):
+          parsedRows = []
+          for row in rows:
+              dueDate = datetime.strptime(row["due"], "%Y-%m-%d").date()
+              daysLeft = (dueDate - today).days
+              if daysLeft < 0:
+                  status = "overdue"
+              elif daysLeft <= 3:
+                  status = "dueSoon"
+              else:
+                  status = "scheduled"
+
+              parsedRows.append({
+                  "task": row["task"],
+                  "due": dueDate,
+                  "daysLeft": daysLeft,
+                  "status": status,
+              })
+          return parsedRows
+
+      taskSchedule = parseTaskRows(taskRows, referenceDate)
+      statusCounts = {}
+      for item in taskSchedule:
+          statusCounts[item["status"]] = statusCounts.get(item["status"], 0) + 1
+
+      assert statusCounts == {"overdue": 1, "dueSoon": 2, "scheduled": 1}
+      assert taskSchedule[0]["daysLeft"] == -4
+      assert taskSchedule[-1]["due"] == date(2026, 6, 2)
+
+      taskSchedule
     hints:
-    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
-    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    - 코드를 바꾸지 말고 그대로 실행합니다. assert 세 줄이 아무 말 없이 지나가면 계산이 기대대로 된 것입니다.
+    - '정답 형태: starterCode 그대로 실행, 마지막 줄 taskSchedule 이 네 건의 dict 목록으로 표시됩니다.'
   check:
-    type: noError
-    noError: '검증 루프: 일정 데이터 품질의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
-    resultCheck: '검증 루프: 일정 데이터 품질 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+    type: outputExact
+    evidence: practice
+    outputExact: "[{'task': 'invoiceClose', 'due': datetime.date(2026, 5, 20), 'daysLeft': -4, 'status': 'overdue'}, {'task': 'releaseReview', 'due': datetime.date(2026, 5, 24), 'daysLeft': 0, 'status': 'dueSoon'}, {'task': 'securityAudit', 'due': datetime.date(2026, 5, 27), 'daysLeft': 3, 'status': 'dueSoon'}, {'task': 'quarterReport', 'due': datetime.date(2026, 6, 2), 'daysLeft': 9, 'status': 'scheduled'}]"
+    resultCheck: "출력이 정확히 일치해야 합니다: [{'task': 'invoiceClose', 'due': datetime.date(2026, 5, 20), 'daysLeft': -4, 'status': 'overdue'}, {'task': 'releaseReview', 'due': datetime.date(2026, 5, 24), 'daysLeft': 0, 'status': 'dueSoon'}, {'task': 'securityAudit', 'due': datetime.date(2026, 5, 27), 'daysLeft': 3, 'status': 'dueSoon'}, {'task': 'quarterReport', 'due': datetime.date(2026, 6, 2), 'daysLeft': 9, 'status': 'scheduled'}]"
 - id: practice
   title: datetime 모듈 종합 복습
   structuredPrimary: true
   subtitle: 날짜와 시간 마스터하기
-  goal: datetime 모듈 종합 복습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
-  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  goal: 고정한 날짜에 timedelta를 더하고 그 결과를 형식 문자열로 바꾸는 흐름을 한 줄로 이어 쓴다.
+  why: 실제 날짜 작업은 언제부터 며칠 뒤인지를 구한 다음 그 날짜를 파일 이름이나 리포트 제목에 넣는 형태가 대부분이라, 계산과 서식을 한 줄로 이어 쓸 수 있으면 다음 강의의 파일 다루기까지 그대로 이어집니다.
   explanation: datetime 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
   tips:
   - 작게 실행하고 결과를 바로 확인하세요.
@@ -359,17 +463,24 @@ sections:
     myBirthday = date(1995, 7, 20)
     myBirthday
   exercise:
-    prompt: datetime 모듈 종합 복습 예제에서 `myBirthday` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    prompt: |-
+      마지막 줄 myBirthday를 (myBirthday + timedelta(days=100)).strftime('%Y%m%d')로 바꾸세요. 첫 줄 myBirthday = date(1995, 7, 20)은 그대로 둡니다.
+
+      1995년 7월 20일에서 100일 뒤는 10월 28일이고 %Y%m%d는 하이픈 없이 붙여 쓰므로 19951028이 나와야 합니다.
     starterCode: |-
       myBirthday = date(1995, 7, 20)
       myBirthday
+    solution: |-
+      myBirthday = date(1995, 7, 20)
+      (myBirthday + timedelta(days=100)).strftime('%Y%m%d')
     hints:
-    - 바꿀 지점은 `myBirthday = ...` 오른쪽 값입니다.
-    - 실행 뒤 `myBirthday` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    - 날짜에 timedelta(days=100) 을 더한 식을 괄호로 묶은 뒤 .strftime('%Y%m%d') 를 붙입니다.
+    - "정답 형태: (myBirthday + timedelta(days=100)).strftime('%Y%m%d')"
   check:
-    type: noError
-    noError: datetime 모듈 종합 복습에서 `myBirthday` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: datetime 모듈 종합 복습 실행 뒤 `myBirthday` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '19951028'
+    resultCheck: "출력이 정확히 일치해야 합니다: '19951028'"
 assessment:
   masteryVariants:
   - id: 03_datetime-due-date-mastery

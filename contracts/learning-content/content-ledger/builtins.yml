@@ -4,7 +4,7 @@ canonicalRows: 35
 lessons:
   - lessonRef: "builtins/01_math"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "446e3ab14eda82af61a35b542880a4a62af07de877f5b2665f1854d6d4b002dc"
+    lessonContentHash: "a872cfc9ebf84953b4758ba49db0d8431a57573a0f7886c222953920170c5dc3"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -26,7 +26,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/02_random"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "61470ee19fb852d7eec1b5ed766cc27193b8dfa288747b630907eab80b2802dd"
+    lessonContentHash: "3d644cc1c6b7c8c2da79f273c98a325e97d1bc5efeed63273f1342c70eaaaff9"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -48,7 +48,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/03_datetime"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "1adfb5eecac5b99542aa17b2d61454ee52fa9b9b5321bcd79cf1ec28fa40d949"
+    lessonContentHash: "6ee8a5fd768bfcfc3358d1331e8eef4daeaaf6a9a0048bdb9654640be001c55b"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
