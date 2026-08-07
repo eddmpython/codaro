@@ -48,7 +48,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "advancedPython/03_클로저와상태관리"
     identityLedgerRef: "identity-ledger/advancedPython.yml"
-    lessonContentHash: "f52fbe4180f717384f1d0db966174ce67d4de3bb8301f358b72c3b94398b1bbb"
+    lessonContentHash: "93136d7962e4b23bb435a2f9108db46889cc64229bb61643864b37fc8a6ec68c"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -70,7 +70,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "advancedPython/04_functools완벽가이드"
     identityLedgerRef: "identity-ledger/advancedPython.yml"
-    lessonContentHash: "37fd77b5d4f9fb25b66362f87890fcf8544f6053064c58fcb4dbf65a75e1d016"
+    lessonContentHash: "2801219ee5a80a20e83887f4b478519fd7a7de63f16ef60f4ca665285fccda8e"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -92,7 +92,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "advancedPython/05_itertools마스터"
     identityLedgerRef: "identity-ledger/advancedPython.yml"
-    lessonContentHash: "285b2dcfb603de469db69c94b8ba4d2f1aa1ab4f195af2801e0479d236427084"
+    lessonContentHash: "602bac006d35c51bd7c28e56b1adf28c1d25e076950cb76a2e2161d5be3b306b"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]

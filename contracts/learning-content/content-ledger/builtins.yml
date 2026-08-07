@@ -48,7 +48,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/03_datetime"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "e2ec75de07465cefbf1cf7869c706d2f483080e2dd785b25d2a7070471204bf3"
+    lessonContentHash: "c25966c4ec7271511f435dd6ac66963ff524ac465b01e28dd5b4bc3573168cb9"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -70,7 +70,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/04_time"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "1673b8d6cb78e853f91500d9e00e0447a9daf0c63269a57832cf10f07f31cb8a"
+    lessonContentHash: "cbef14517732df2e2d24688c18c02d08da373610d2559f77775372c28b95cd4c"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -92,7 +92,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/05_collections"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "81b85c779e0f5641d37c660e659394d1b1df3f5e8e5f7bd728d4396910860b14"
+    lessonContentHash: "7ffacc2eb85745f34ce169594ed291319271bf0fb314e3c3ae6bb2c11a9bd234"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -114,7 +114,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/06_itertools"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "13dec4c1437e2ca842393e85f42210e5b6c3d60677346ae03f51f8aedf9cb78a"
+    lessonContentHash: "a240211ba8734cc0b45e46431a9bc06840f8c2877d0b7b6a37022b9b903ab9b0"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]
@@ -136,7 +136,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "builtins/07_functools"
     identityLedgerRef: "identity-ledger/builtins.yml"
-    lessonContentHash: "e8df67abd1cfd2a32c96300b88016698f5a13cbd4d37ffd15c0af1eff7259201"
+    lessonContentHash: "20a3c4e02356438ef779012ad8a9868120f62be2be8edd842e2d7216a5a60862"
     disposition: migrate
     ownerPacket: "07-remaining-domains/23-standard-library-mastery"
     eligiblePathIds: ["standardLibraryMastery"]

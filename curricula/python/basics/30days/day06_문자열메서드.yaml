@@ -534,12 +534,14 @@ sections:
   title: '검증 루프: 고객 행 정제하기'
   structuredPrimary: true
   subtitle: 공백, 대소문자, 쉼표 형식을 업무 데이터로 정리
-  goal: strip, lower, replace를 이어 붙인 정제 결과가 기준값과 같은지 assert로 검증하는 흐름을 확인한다.
+  goal: 하이픈이 섞여 들어온 파일명을 보고 정제 체인에 어떤 단계를 더 이어 붙여야 하는지 직접 고쳐 본다.
   why: 정제는 한 단계만 빠져도 결과가 그럴듯해 보여서, 기준 문자열을 assert로 코드에 박아 두어야 어긋난 순간 바로 멈춥니다.
-  explanation: 문자열 메서드는 입력값을 보기 좋게 꾸미는 기능이 아니라, 사람이 넣은 거친 텍스트를 프로그램이 믿고 처리할 수 있는 데이터로 바꾸는 도구입니다. 공백 제거,
-    대소문자 통일, 구분자 검사, 숫자 변환까지 한 흐름으로 묶어야 실무에서 다시 쓸 수 있습니다.
+  explanation: |-
+    문자열 메서드는 입력값을 보기 좋게 꾸미는 기능이 아니라, 사람이 넣은 거친 텍스트를 프로그램이 믿고 처리할 수 있는 데이터로 바꾸는 도구입니다. 공백 제거, 대소문자 통일, 구분자 검사, 숫자 변환까지 한 흐름으로 묶어야 실무에서 다시 쓸 수 있습니다.
+
+    메서드를 점으로 이어 붙이면 앞 단계가 돌려준 문자열에 다음 단계가 적용됩니다. 그래서 정제 체인은 입력에 실제로 무엇이 섞여 있는지에 맞춰 늘어나고, 한 종류를 처리하는 단계가 빠지면 그 글자만 조용히 살아남습니다.
   tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
+  - 변주 실험 lower() 를 체인 맨 앞으로 옮겨도 결과가 같은지, strip() 을 맨 뒤로 옮기면 어떻게 되는지 확인하세요.
   snippet: |-
     rawLine = '  KIM@Example.COM ,  PAID ,  15000원  '
     fields = rawLine.split(',')
@@ -556,9 +558,9 @@ sections:
     assert cleanLine == 'kim@example.com|paid|15000'
   exercise:
     prompt: |-
-      값은 바꾸지 말고 코드를 그대로 실행하세요.
+      이번 분기 파일은 이름에 하이픈이 섞여 들어옵니다. 첫 줄을 rawFileName = '  Q3 Sales-Report 2026 DRAFT.CSV  '로 바꾸고, 하이픈도 밑줄로 바뀌도록 정제 체인에 replace를 한 번 더 이어 붙인 뒤, assert 기대값을 새 결과로 고치세요. endswith를 검사하는 줄은 그대로 둡니다.
 
-      assert 두 줄이 모두 통과하고 마지막에 sales_report_2026_final.csv가 나와야 합니다.
+      공백만 바꾸는 체인으로는 q3_sales-report_2026_draft.csv 처럼 하이픈이 그대로 남습니다. 하이픈 단계를 더하면 q3_sales_report_2026_draft.csv 가 됩니다.
     starterCode: |-
       rawFileName = '  Sales Report 2026 FINAL.CSV  '
       cleanFileName = rawFileName.strip().lower().replace(' ', '_')
@@ -567,20 +569,21 @@ sections:
       assert cleanFileName.endswith('.csv')
       cleanFileName
     solution: |-
-      rawFileName = '  Sales Report 2026 FINAL.CSV  '
-      cleanFileName = rawFileName.strip().lower().replace(' ', '_')
+      rawFileName = '  Q3 Sales-Report 2026 DRAFT.CSV  '
+      cleanFileName = rawFileName.strip().lower().replace(' ', '_').replace('-', '_')
 
-      assert cleanFileName == 'sales_report_2026_final.csv'
+      assert cleanFileName == 'q3_sales_report_2026_draft.csv'
       assert cleanFileName.endswith('.csv')
       cleanFileName
     hints:
-    - 값이나 메서드 순서를 바꾸면 assert가 AssertionError로 멈춥니다. 그때는 원래 코드로 되돌리세요.
-    - "정답 형태: 코드를 그대로 실행, 마지막 값 sales_report_2026_final.csv"
+    - 체인 맨 뒤에 .replace('-', '_') 를 하나 더 붙입니다. 앞 단계가 돌려준 문자열에 이어서 적용되므로 순서는 공백 처리 뒤여도 됩니다.
+    - 새 입력에는 Q3 가 앞에 붙었고 FINAL 이 DRAFT 로 바뀌었으므로 assert 기대값도 q3_sales_report_2026_draft.csv 로 고칩니다.
+    - "정답 형태: .strip().lower().replace(' ', '_').replace('-', '_') 와 assert cleanFileName == 'q3_sales_report_2026_draft.csv'"
   check:
     type: outputExact
     evidence: practice
-    outputExact: 'sales_report_2026_final.csv'
-    resultCheck: "출력이 정확히 일치해야 합니다: 'sales_report_2026_final.csv'"
+    outputExact: 'q3_sales_report_2026_draft.csv'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'q3_sales_report_2026_draft.csv'"
 - id: practice
   title: Day 6 종합 복습
   structuredPrimary: true

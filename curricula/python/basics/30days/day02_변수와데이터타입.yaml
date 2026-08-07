@@ -511,12 +511,14 @@ sections:
   title: '검증 루프: 입력값을 업무 데이터로 바꾸기'
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증
-  goal: 문자열 입력을 숫자로 바꾼 뒤 assert로 검증하는 흐름을 확인한다.
+  goal: 소수점이 섞인 가격 문자열이 들어왔을 때 어떤 변환 함수로 바꿔야 하는지 직접 고쳐 보며 확인한다.
   why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
-  explanation: 변수와 타입은 값을 담는 문법이 아니라, 외부에서 들어온 문자열을 계산 가능한 데이터로 바꾸고 검증하는 출발점입니다. 실행 전에 어떤 값이 str/int/float/bool이
-    될지 예측하고, 변환 실패를 직접 확인한 뒤, 업무 리포트에 쓸 수 있는 구조로 정리합니다.
+  explanation: |-
+    변수와 타입은 값을 담는 문법이 아니라, 외부에서 들어온 문자열을 계산 가능한 데이터로 바꾸고 검증하는 출발점입니다.
+
+    바깥에서 들어오는 값은 늘 문자열이고, 그 안에 무엇이 들었는지는 우리가 고르지 못합니다. int는 소수점이 섞인 문자열을 만나면 ValueError로 멈추므로, 변환 함수는 데이터의 실제 모양을 보고 골라야 합니다. 타입을 assert로 박아 두면 잘못 고른 변환이 계산까지 흘러가기 전에 멈춥니다.
   tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
+  - 변주 실험 rawQuantity를 "2개"처럼 단위가 붙은 문자열로 바꾸면 int가 어디서 멈추는지 확인하세요.
   snippet: |-
     rawProduct = "notebook"
     rawPrice = "1200000"
@@ -537,10 +539,9 @@ sections:
     orderSubtotal
   exercise:
     prompt: |-
-      코드를 그대로 실행하세요.
-      
-      값을 마음대로 바꾸면 assert가 깨질 수 있습니다.
-      assert가 모두 통과하고 마지막에 2400000이 나오면 맞습니다.
+      소수점이 붙은 가격이 들어왔다고 보고 세 곳을 고치세요. rawPrice = "1200000"을 "1250000.5"로 바꾸고, unitPrice = int(rawPrice)를 float(rawPrice)로 바꾸고, unitPrice 타입을 검사하는 assert의 "int"를 "float"로 고칩니다. 나머지 줄은 그대로 둡니다.
+
+      int는 소수점이 든 문자열을 그대로 받지 못하고 ValueError로 멈추므로 float를 써야 합니다. 1250000.5에 수량 2를 곱하면 2500001.0이 나옵니다.
     starterCode: |-
       rawProduct = "notebook"
       rawPrice = "1200000"
@@ -561,30 +562,31 @@ sections:
       orderSubtotal
     solution: |-
       rawProduct = "notebook"
-      rawPrice = "1200000"
+      rawPrice = "1250000.5"
       rawQuantity = "2"
       rawMember = "yes"
 
       productName = rawProduct
-      unitPrice = int(rawPrice)
+      unitPrice = float(rawPrice)
       quantity = int(rawQuantity)
       isMember = rawMember == "yes"
 
       assert type(productName).__name__ == "str"
-      assert type(unitPrice).__name__ == "int"
+      assert type(unitPrice).__name__ == "float"
       assert type(quantity).__name__ == "int"
       assert type(isMember).__name__ == "bool"
 
       orderSubtotal = unitPrice * quantity
       orderSubtotal
     hints:
-    - rawPrice와 rawQuantity를 정수로 바꾼 뒤 곱합니다.
-    - 마지막 값 orderSubtotal이 2400000이면 통과입니다.
+    - rawPrice 를 "1250000.5" 로 바꾸면 int(rawPrice) 가 ValueError 로 멈춥니다. int 는 소수점이 든 문자열을 받지 못합니다.
+    - int(rawPrice) 를 float(rawPrice) 로 바꾸고, unitPrice 타입을 검사하는 assert 의 "int" 도 "float" 로 함께 고칩니다. rawQuantity 는 "2" 라 int 그대로 둡니다.
+    - '정답 형태: rawPrice = "1250000.5", unitPrice = float(rawPrice), assert type(unitPrice).__name__ == "float"'
   check:
     type: outputExact
     evidence: practice
-    outputExact: '2400000'
-    resultCheck: "출력이 정확히 일치해야 합니다: '2400000'"
+    outputExact: '2500001.0'
+    resultCheck: "출력이 정확히 일치해야 합니다: '2500001.0'"
 - id: practice
   title: Day 2 종합 복습
   structuredPrimary: true

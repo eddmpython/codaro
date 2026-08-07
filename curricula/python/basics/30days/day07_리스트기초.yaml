@@ -412,12 +412,14 @@ sections:
   title: '검증 루프: 재고 목록 정합성 확인'
   structuredPrimary: true
   subtitle: 여러 리스트를 같은 순서로 맞춰 업무 데이터로 쓰기
-  goal: 슬라이싱으로 나눈 목록을 다시 합쳐 원본과 같은지 assert로 검증한다.
+  goal: 목록에 항목이 하나 늘었을 때 나누는 두 지점을 함께 옮겨야 원본이 그대로 복원된다는 것을 직접 고쳐 보며 확인한다.
   why: 목록을 나눠 처리하고 다시 합칠 때 항목이 빠지거나 순서가 뒤바뀌면 눈으로는 잘 보이지 않아서 assert로 잡습니다.
-  explanation: 리스트는 값 여러 개를 담는 상자에서 끝나지 않습니다. 제품명 리스트와 재고 수량 리스트처럼 서로 같은 순서를 공유하는 데이터를 다룰 때는 길이, 인덱스,
-    수정 결과를 계속 검증해야 합니다.
+  explanation: |-
+    리스트는 값 여러 개를 담는 상자에서 끝나지 않습니다. 제품명 리스트와 재고 수량 리스트처럼 서로 같은 순서를 공유하는 데이터를 다룰 때는 길이, 인덱스, 수정 결과를 계속 검증해야 합니다.
+
+    목록을 두 덩이로 가를 때 앞쪽 끝 번호와 뒤쪽 시작 번호는 같은 숫자여야 합니다. 한쪽만 옮기면 겹치는 항목이 두 번 들어가거나 사이의 항목이 통째로 빠지는데, 합친 목록만 봐서는 잘 보이지 않습니다. 원본과 비교하는 assert 한 줄이 그 어긋남을 잡아 줍니다.
   tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
+  - 변주 실험 urgentTasks 와 laterTasks 를 더하는 순서를 뒤집으면 orderedTasks == dailyTasks 가 왜 깨지는지 확인하세요.
   snippet: |-
     productNames = ['노트북', '마우스', '키보드', '모니터']
     stockCounts = [5, 20, 0, 8]
@@ -435,9 +437,9 @@ sections:
     assert lastStock == 8
   exercise:
     prompt: |-
-      값은 바꾸지 말고 코드를 그대로 실행하세요.
+      급한 업무로 '재고 확인'이 하나 늘었습니다. dailyTasks의 '견적서 작성' 뒤에 '재고 확인'을 넣어 다섯 항목으로 만들고, 앞 세 건이 급한 일이 되도록 슬라이스 두 줄의 번호를 함께 옮긴 뒤, urgentTasks와 laterTasks를 검사하는 assert 두 줄을 새 목록에 맞게 고치세요. orderedTasks를 원본과 비교하는 마지막 assert는 그대로 둡니다.
 
-      assert 세 줄이 모두 통과하고 마지막에 ['메일 확인', '견적서 작성', '고객 연락', '보고서 정리']가 나와야 합니다.
+      앞쪽 끝 번호와 뒤쪽 시작 번호를 둘 다 3으로 맞춰야 합칠 때 원본이 그대로 복원됩니다. 한쪽만 옮기면 '재고 확인'이 두 번 들어가거나 빠져서 마지막 assert가 멈춥니다.
     starterCode: |-
       dailyTasks = ['메일 확인', '견적서 작성', '고객 연락', '보고서 정리']
       urgentTasks = dailyTasks[:2]
@@ -449,23 +451,24 @@ sections:
       assert orderedTasks == dailyTasks
       orderedTasks
     solution: |-
-      dailyTasks = ['메일 확인', '견적서 작성', '고객 연락', '보고서 정리']
-      urgentTasks = dailyTasks[:2]
-      laterTasks = dailyTasks[2:]
+      dailyTasks = ['메일 확인', '견적서 작성', '재고 확인', '고객 연락', '보고서 정리']
+      urgentTasks = dailyTasks[:3]
+      laterTasks = dailyTasks[3:]
       orderedTasks = urgentTasks + laterTasks
 
-      assert urgentTasks == ['메일 확인', '견적서 작성']
+      assert urgentTasks == ['메일 확인', '견적서 작성', '재고 확인']
       assert laterTasks == ['고객 연락', '보고서 정리']
       assert orderedTasks == dailyTasks
       orderedTasks
     hints:
-    - "슬라이스 범위를 바꾸면 assert가 AssertionError로 멈춥니다. 그때는 원래 값으로 되돌리세요."
-    - "정답 형태: 코드를 그대로 실행, 마지막 값 ['메일 확인', '견적서 작성', '고객 연락', '보고서 정리']"
+    - dailyTasks 를 다섯 항목으로 늘린 뒤 [:2] 를 [:3] 으로, [2:] 를 [3:] 으로 함께 바꿉니다. 두 숫자가 어긋나면 마지막 assert 가 멈춥니다.
+    - urgentTasks 기대값에 '재고 확인' 을 더합니다. laterTasks 는 뒤 두 건 그대로라 고칠 필요가 없습니다.
+    - "정답 형태: dailyTasks[:3] 과 dailyTasks[3:], assert urgentTasks == ['메일 확인', '견적서 작성', '재고 확인']"
   check:
     type: outputExact
     evidence: practice
-    outputExact: "['메일 확인', '견적서 작성', '고객 연락', '보고서 정리']"
-    resultCheck: "출력이 정확히 일치해야 합니다: \"['메일 확인', '견적서 작성', '고객 연락', '보고서 정리']\""
+    outputExact: "['메일 확인', '견적서 작성', '재고 확인', '고객 연락', '보고서 정리']"
+    resultCheck: "출력이 정확히 일치해야 합니다: \"['메일 확인', '견적서 작성', '재고 확인', '고객 연락', '보고서 정리']\""
 - id: practice
   title: Day 7 종합 복습
   structuredPrimary: true

@@ -26,7 +26,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day02_변수와데이터타입"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "af9573228145177bb1196b9546c9944552e7684d632c196ad32c24190dd2cd31"
+    lessonContentHash: "7815f6d1ad32ac775889079afc16700d91d468794f4264aa1b9dfefbffae7765"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["computerVision","dataReporting","dataVisualization","geoVisualization","imageProcessing","officeAutomation","pythonFoundation","scriptingAutomation","sqlAnalysis","webMonitoring"]
@@ -48,7 +48,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day03_연산자"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "509f0093f74f3e666aea0fb4f7f61e5c2cfacd4e9401521401b45f71e71b7e8f"
+    lessonContentHash: "673ad55ca2c6e02fb02a37a1550bc549ffd894feffd5c82f9a600bd6de25e242"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -70,7 +70,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day04_문자열기초"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "d0abef3e293d71337d999c5e665629a646de6ccb925fe4f197b90369b435be86"
+    lessonContentHash: "8ae024ea6b02522ac7040f414416fb28c25ef1a4cf3c614eff5073b3b1d94459"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation","textProcessing"]
@@ -92,7 +92,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day05_문자열인덱싱슬라이싱"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "434850156f76084eb607bd6ac9b38f528e254c17ffa61def27e024b8439ec218"
+    lessonContentHash: "05f957c91ee617ad8d869912b204fc199b63949b546293223d47fd21ee1a3924"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation","textProcessing"]
@@ -114,7 +114,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day06_문자열메서드"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "419c939ad2d45f25837d2d48aaf889a8fd53cf69c09d196bc6251283d919e143"
+    lessonContentHash: "7b16a5fd7a0d2196012fa6bbe6970b80ce880a4fd774367844099958c57eeb6f"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation","textProcessing"]
@@ -136,7 +136,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day07_리스트기초"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "b17dbc013779604e91ec4ba2479c28f113453def39cbfaf308bf3291ec82caf9"
+    lessonContentHash: "ff790a78c49cfd4e6f31f24053e59812f94d7fdabc0ac189969c71d53e33f049"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -158,7 +158,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day08_리스트메서드"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "638791808e6c663c5e10700e247cd33b98b7c053938ab67e55643e4afb6ef111"
+    lessonContentHash: "43001b909393df7db92547c4968de8824948a7b73d039ff542c3068e8e6e866a"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -180,7 +180,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day09_튜플"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "b14271fa931614904f76052da59ac49077a964152284212b80271889b5e65cbb"
+    lessonContentHash: "5a4c3a5d8e179bf90c11501654966337915875f13deb66c7833a9dff5589b0a9"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]

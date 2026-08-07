@@ -400,12 +400,14 @@ sections:
   title: '검증 루프: 주문코드와 전화번호 파싱하기'
   structuredPrimary: true
   subtitle: 고정 형식 문자열을 잘라 업무 데이터로 바꾸기
-  goal: 파일명에서 잘라 낸 날짜 조각이 기대값과 같은지 assert로 검증하는 흐름을 확인한다.
+  goal: 파일명 앞머리가 길어졌을 때 잘라 낼 자리를 다시 세어 맞추고 assert까지 함께 고친다.
   why: 자른 자리가 한 칸만 밀려도 값은 그럴듯해 보이기 때문에, 기준값을 assert로 코드에 박아 두고 실행할 때마다 확인합니다.
-  explanation: 인덱싱과 슬라이싱은 글자를 꺼내는 문법이 아니라, 주문코드·전화번호·파일명처럼 정해진 형식의 문자열을 데이터로 바꾸는 도구입니다. 특히 끝 인덱스가 포함되지
-    않는 규칙 때문에 한 칸씩 밀리는 오류를 직접 확인해야 합니다.
+  explanation: |-
+    인덱싱과 슬라이싱은 글자를 꺼내는 문법이 아니라, 주문코드·전화번호·파일명처럼 정해진 형식의 문자열을 데이터로 바꾸는 도구입니다. 특히 끝 인덱스가 포함되지 않는 규칙 때문에 한 칸씩 밀리는 오류를 직접 확인해야 합니다.
+
+    슬라이스 번호는 문자열 자체가 아니라 그 앞에 무엇이 몇 글자 있는지에 묶여 있습니다. 그래서 파일명 규칙이 조금만 바뀌어도 잘라 낼 자리를 처음부터 다시 세야 하고, 세지 않고 넘어가면 엉뚱한 자리에서 여덟 글자를 가져와 놓고도 날짜처럼 보이는 값을 얻습니다.
   tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
+  - 변주 실험 day = datePart[6:] 를 datePart[6:8] 로 바꿔도 같은 결과가 나오는 이유를 확인하세요.
   snippet: |-
     orderCode = 'ORD-2026-0007-KR'
 
@@ -424,9 +426,9 @@ sections:
     summary
   exercise:
     prompt: |-
-      값은 바꾸지 말고 코드를 그대로 실행하세요.
+      파일명 규칙이 sales_에서 revenue_로 바뀌고 날짜도 6월 1일자가 들어왔습니다. 첫 줄을 fileName = 'revenue_20260601.csv'로 바꾸고, 앞머리가 길어진 만큼 datePart의 슬라이스 번호를 다시 세어 고친 뒤, assert 두 줄의 기대값도 새 날짜로 맞추세요. year, month, day를 자르는 세 줄은 그대로 둡니다.
 
-      assert 두 줄이 모두 통과하고 마지막에 2026-05-24가 나와야 합니다.
+      sales_는 여섯 글자였지만 revenue_는 여덟 글자라 날짜가 8번 자리에서 시작합니다. 여덟 글자를 가져와야 하므로 끝 번호도 함께 밀리고, 결과는 2026-06-01이 됩니다.
     starterCode: |-
       fileName = 'sales_20260524.csv'
       datePart = fileName[6:14]
@@ -438,23 +440,24 @@ sections:
       assert f'{year}-{month}-{day}' == '2026-05-24'
       f'{year}-{month}-{day}'
     solution: |-
-      fileName = 'sales_20260524.csv'
-      datePart = fileName[6:14]
+      fileName = 'revenue_20260601.csv'
+      datePart = fileName[8:16]
       year = datePart[:4]
       month = datePart[4:6]
       day = datePart[6:]
 
-      assert datePart == '20260524'
-      assert f'{year}-{month}-{day}' == '2026-05-24'
+      assert datePart == '20260601'
+      assert f'{year}-{month}-{day}' == '2026-06-01'
       f'{year}-{month}-{day}'
     hints:
-    - 인덱스를 한 칸이라도 옮기면 assert 가 AssertionError 로 멈춥니다. 그때는 원래 값으로 되돌리세요.
-    - "정답 형태: 코드를 그대로 실행, 마지막 값 2026-05-24"
+    - revenue_ 의 글자를 세어 보세요. r 이 0번이고 밑줄이 7번이므로 날짜 첫 글자 2 는 8번 자리입니다.
+    - 슬라이스는 끝 번호를 포함하지 않으므로 여덟 글자를 가져오려면 [8:16] 이 됩니다. 시작만 옮기고 끝을 그대로 두면 여섯 글자만 잘려 assert 가 멈춥니다.
+    - "정답 형태: fileName = 'revenue_20260601.csv', datePart = fileName[8:16], assert datePart == '20260601'"
   check:
     type: outputExact
     evidence: practice
-    outputExact: '2026-05-24'
-    resultCheck: "출력이 정확히 일치해야 합니다: '2026-05-24'"
+    outputExact: '2026-06-01'
+    resultCheck: "출력이 정확히 일치해야 합니다: '2026-06-01'"
 - id: practice
   title: Day 5 종합 복습
   structuredPrimary: true

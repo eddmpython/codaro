@@ -607,12 +607,14 @@ sections:
   title: '검증 루프: 주문 계산식과 승인 조건'
   structuredPrimary: true
   subtitle: 예측 → 실행 → 오류 수정 → 검증
-  goal: 주문 금액 계산이 기대한 값과 같은지 assert로 검증하는 흐름을 확인한다.
+  goal: 할인율 하나를 올렸을 때 assert 세 줄 중 어느 것이 깨지고 어느 것이 그대로인지 직접 고쳐 보며 확인한다.
   why: 할인과 세금이 섞인 금액은 눈으로 검산하기 어려워서 기준값을 assert로 코드에 박아 둡니다.
-  explanation: 연산자는 계산 결과를 맞히는 문법 문제가 아니라, 업무 규칙을 숫자와 조건식으로 정확히 옮기는 도구입니다. 실행 전에는 소계, 할인, 세금, 승인 여부를 먼저
-    예측하고, 괄호 하나가 결과를 어떻게 바꾸는지 검증해야 합니다.
+  explanation: |-
+    연산자는 계산 결과를 맞히는 문법 문제가 아니라, 업무 규칙을 숫자와 조건식으로 정확히 옮기는 도구입니다.
+
+    계산식이 사슬로 이어져 있으면 입력 하나를 바꿨을 때 어디까지 함께 움직이는지가 중요합니다. 할인율은 소계 뒤에 붙으므로 소계는 건드리지 않지만 할인, 과세 대상 금액, 세금, 총액을 연쇄로 바꿉니다. assert를 여러 줄로 나눠 두면 그 사슬의 어느 마디가 움직였는지 실행 한 번으로 드러납니다.
   tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
+  - 변주 실험 taxRate를 8에서 10으로 바꾸면 subtotal과 discount는 그대로인데 total만 움직이는 것을 확인하세요.
   snippet: |-
     unitPrice = 12000
     quantity = 4
@@ -631,9 +633,9 @@ sections:
     total
   exercise:
     prompt: |-
-      값은 바꾸지 말고 코드를 그대로 실행하세요.
+      할인율을 올리고 그 때문에 깨지는 assert를 맞추세요. discountRate = 10을 discountRate = 15로 바꾸고, 아래 assert 세 줄 중 값이 달라진 줄만 새 값으로 고칩니다. unitPrice, quantity, taxRate와 계산식 다섯 줄은 그대로 둡니다.
 
-      assert 세 줄이 모두 통과하고 마지막에 46656.0이 나와야 합니다.
+      할인율만 올렸으므로 소계 48000은 그대로고, 할인이 4800에서 7200.0으로 오르면서 총액은 44064.0이 됩니다. 세 줄 중 subtotal을 보는 줄은 고칠 필요가 없습니다.
     starterCode: |-
       unitPrice = 12000
       quantity = 4
@@ -653,7 +655,7 @@ sections:
     solution: |-
       unitPrice = 12000
       quantity = 4
-      discountRate = 10
+      discountRate = 15
       taxRate = 8
 
       subtotal = unitPrice * quantity
@@ -663,17 +665,18 @@ sections:
       total = taxableAmount + tax
 
       assert subtotal == 48000
-      assert discount == 4800
-      assert total == 46656
+      assert discount == 7200
+      assert total == 44064
       total
     hints:
-    - 숫자를 바꾸면 assert가 AssertionError로 멈춥니다. 그때는 원래 값으로 되돌리세요.
-    - "정답 형태: 코드를 그대로 실행, 마지막 값 46656.0"
+    - discountRate = 10 을 discountRate = 15 로 바꿉니다. 그러면 discount 와 total 을 검사하는 assert 두 줄이 옛 값을 들고 있어 AssertionError 로 멈춥니다.
+    - 할인은 48000 의 15% 라 7200.0 이고, 남은 40800 에 세금 8% 인 3264 가 붙어 44064.0 이 됩니다. subtotal 은 할인 앞에서 계산되므로 그대로입니다.
+    - '정답 형태: discountRate = 15 와 assert discount == 7200, assert total == 44064'
   check:
     type: outputExact
     evidence: practice
-    outputExact: '46656.0'
-    resultCheck: "출력이 정확히 일치해야 합니다: '46656.0'"
+    outputExact: '44064.0'
+    resultCheck: "출력이 정확히 일치해야 합니다: '44064.0'"
 - id: practice
   title: Day 3 종합 복습
   structuredPrimary: true

@@ -462,12 +462,14 @@ sections:
   title: '검증 루프: 영수증 문자열을 안전하게 만들기'
   structuredPrimary: true
   subtitle: 문자열을 업무 출력물로 조립하고 검증하기
-  goal: 영수증과 로그 문자열을 조립한 뒤 빠진 조각이 없는지 assert로 검증하는 흐름을 확인한다.
+  goal: 로그를 정상 기록에서 실패 기록으로 바꿀 때 f-string에 끼워 넣는 값과 검사 조건이 어떻게 함께 움직이는지 직접 고쳐 보며 확인한다.
   why: 사람이 읽을 출력물은 한 조각만 어긋나도 눈으로는 잘 안 보이므로 기준을 assert로 코드에 박아 둡니다.
-  explanation: 문자열 기초는 단어를 붙이는 데서 끝나지 않습니다. 실제 업무에서는 영수증, 알림 문구, 로그 메시지처럼 사람이 읽을 출력물을 만들고, 빠진 줄이나 잘못된
-    변환이 없는지 검증해야 합니다.
+  explanation: |-
+    문자열 기초는 단어를 붙이는 데서 끝나지 않습니다. 실제 업무에서는 영수증, 알림 문구, 로그 메시지처럼 사람이 읽을 출력물을 만들고, 빠진 줄이나 잘못된 변환이 없는지 검증해야 합니다.
+
+    로그 한 줄은 나중에 검색으로 찾아 쓰는 데이터이기도 합니다. 레벨과 동작 이름을 f-string으로 끼워 넣으면 형식은 늘 같게 유지되고, 그 안의 값만 상황에 따라 달라집니다. 값을 바꿀 때 검사 조건도 같이 옮겨야 로그가 실제로 무엇을 기록했는지 보증할 수 있습니다.
   tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
+  - 변주 실험 divider = '=' * 24 의 24를 30으로 바꾸면 영수증 너비만 달라지고 assert 세 줄은 그대로 통과하는 것을 확인하세요.
   snippet: |-
     storeName = '코다로 문구'
     itemName = '노트'
@@ -491,9 +493,9 @@ sections:
     print(receipt)
   exercise:
     prompt: |-
-      값은 바꾸지 말고 코드를 그대로 실행하세요.
+      같은 주문에서 결제가 실패했다고 보고 로그를 실패 기록으로 바꾸세요. level을 'ERROR'로, action을 'payment_failed'로 바꾸고, 그 아래 assert 세 줄을 새 로그에 맞게 고칩니다. logLine을 만드는 f-string과 orderId는 그대로 둡니다.
 
-      assert 세 줄이 모두 통과하고 마지막에 [INFO] order_created: ORD-2026-0007 이 나와야 합니다.
+      f-string 형식은 그대로라 값만 갈아 끼워지므로 [ERROR] payment_failed: ORD-2026-0007 이 나옵니다. 이제 이 줄에 INFO는 들어 있지 않으므로 마지막 assert도 방향을 바꿔야 합니다.
     starterCode: |-
       level = 'INFO'
       action = 'order_created'
@@ -505,23 +507,24 @@ sections:
       assert 'ERROR' not in logLine
       logLine
     solution: |-
-      level = 'INFO'
-      action = 'order_created'
+      level = 'ERROR'
+      action = 'payment_failed'
       orderId = 'ORD-2026-0007'
       logLine = f'[{level}] {action}: {orderId}'
 
-      assert logLine.startswith('[INFO]')
-      assert 'order_created' in logLine
-      assert 'ERROR' not in logLine
+      assert logLine.startswith('[ERROR]')
+      assert 'payment_failed' in logLine
+      assert 'INFO' not in logLine
       logLine
     hints:
-    - 값을 바꾸면 assert가 AssertionError로 멈춥니다. 그때는 원래 값으로 되돌리세요.
-    - "정답 형태: 코드를 그대로 실행, 마지막 값 [INFO] order_created: ORD-2026-0007"
+    - 첫 두 줄을 level = 'ERROR' 와 action = 'payment_failed' 로 바꿉니다. f-string 줄은 값을 그대로 끼워 넣으므로 고치지 않습니다.
+    - startswith 는 '[ERROR]' 로, 두 번째 assert 는 'payment_failed' 로 바꿉니다. 마지막 줄은 이제 로그에 없는 문자열을 검사해야 하므로 'ERROR' not in 을 'INFO' not in 으로 뒤집습니다.
+    - "정답 형태: level = 'ERROR', action = 'payment_failed', assert logLine.startswith('[ERROR]')"
   check:
     type: outputExact
     evidence: practice
-    outputExact: '[INFO] order_created: ORD-2026-0007'
-    resultCheck: "출력이 정확히 일치해야 합니다: '[INFO] order_created: ORD-2026-0007'"
+    outputExact: '[ERROR] payment_failed: ORD-2026-0007'
+    resultCheck: "출력이 정확히 일치해야 합니다: '[ERROR] payment_failed: ORD-2026-0007'"
 - id: practice
   title: Day 4 종합 복습
   structuredPrimary: true

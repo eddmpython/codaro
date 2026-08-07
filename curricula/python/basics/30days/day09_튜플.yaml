@@ -461,12 +461,14 @@ sections:
   title: '검증 루프: 변경되면 안 되는 설정값 다루기'
   structuredPrimary: true
   subtitle: 튜플의 불변성과 언패킹을 안전한 데이터 계약으로 사용
-  goal: 언패킹으로 계산한 상자 크기가 기대한 튜플과 같은지 assert로 검증한다.
+  goal: 튜플에 값이 하나 더 붙어 들어왔을 때 언패킹 변수도 같은 개수로 맞춰야 한다는 것을 직접 고쳐 보며 확인한다.
   why: 좌표는 자리 하나가 뒤바뀌어도 계산이 그냥 돌아가 버리기 때문에, 기준값을 assert로 코드에 못박아 둡니다.
-  explanation: 튜플은 리스트의 불편한 버전이 아니라, 바뀌면 안 되는 값 묶음을 표현하는 방법입니다. 좌표, 색상, 설정값, 함수 반환값처럼 길이와 순서가 계약인 데이터를
-    다룰 때 튜플을 쓰면 실수로 수정되는 일을 막을 수 있습니다.
+  explanation: |-
+    튜플은 리스트의 불편한 버전이 아니라, 바뀌면 안 되는 값 묶음을 표현하는 방법입니다. 좌표, 색상, 설정값, 함수 반환값처럼 길이와 순서가 계약인 데이터를 다룰 때 튜플을 쓰면 실수로 수정되는 일을 막을 수 있습니다.
+
+    길이가 계약이라는 말은 언패킹에서 가장 분명하게 드러납니다. 왼쪽 변수 개수와 오른쪽 튜플 길이가 다르면 파이썬은 조용히 넘어가지 않고 그 자리에서 ValueError로 멈춥니다. 데이터에 항목이 하나 늘면 받는 쪽도 같이 늘려야 한다는 신호입니다.
   tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
+  - 변주 실험 left, top = topLeft 를 left, top, extra = topLeft 로 바꿔 개수가 안 맞을 때 나오는 오류 메시지를 확인하세요.
   snippet: |-
     serverConfig = ('localhost', 8080, True)
     hostName, portNumber, secureMode = serverConfig
@@ -481,9 +483,9 @@ sections:
     assert endpoint == 'https://localhost:8080'
   exercise:
     prompt: |-
-      값은 바꾸지 말고 코드를 그대로 실행하세요.
+      도면 좌표에 레이어 이름이 함께 들어오게 됐습니다. bottomRight를 (70, 95, 'main')으로 바꾸고, 그 튜플을 받는 언패킹 줄을 right, bottom, layer로 늘린 뒤, boxSize 마지막 자리에 layer를 넣고 assert 기대값도 맞추세요. topLeft와 그것을 받는 줄은 그대로 둡니다.
 
-      assert 두 줄이 모두 통과하고 마지막에 (60, 75)가 나와야 합니다.
+      언패킹은 왼쪽 변수 개수와 오른쪽 튜플 길이가 같아야 하므로 받는 쪽을 늘리지 않으면 ValueError로 멈춥니다. 폭과 높이는 그대로라 결과는 (60, 75, 'main')이 됩니다.
     starterCode: |-
       topLeft = (10, 20)
       bottomRight = (70, 95)
@@ -496,22 +498,23 @@ sections:
       boxSize
     solution: |-
       topLeft = (10, 20)
-      bottomRight = (70, 95)
+      bottomRight = (70, 95, 'main')
       left, top = topLeft
-      right, bottom = bottomRight
-      boxSize = (right - left, bottom - top)
+      right, bottom, layer = bottomRight
+      boxSize = (right - left, bottom - top, layer)
 
-      assert boxSize == (60, 75)
+      assert boxSize == (60, 75, 'main')
       assert topLeft == (10, 20)
       boxSize
     hints:
-    - 좌표 숫자를 바꾸면 assert가 AssertionError로 멈춥니다. 그때는 원래 값으로 되돌리세요.
-    - "정답 형태: 코드를 그대로 실행, 마지막 값 (60, 75)"
+    - bottomRight 를 세 항목으로 늘리면 right, bottom = bottomRight 가 개수 불일치로 멈춥니다. 받는 변수를 right, bottom, layer 로 늘립니다.
+    - boxSize 는 폭과 높이를 계산한 뒤 layer 를 세 번째 자리에 그대로 넣습니다. 뺄셈 두 개는 고치지 않습니다.
+    - "정답 형태: right, bottom, layer = bottomRight 와 boxSize = (right - left, bottom - top, layer)"
   check:
     type: outputExact
     evidence: practice
-    outputExact: '(60, 75)'
-    resultCheck: "출력이 정확히 일치해야 합니다: '(60, 75)'"
+    outputExact: "(60, 75, 'main')"
+    resultCheck: "출력이 정확히 일치해야 합니다: \"(60, 75, 'main')\""
 - id: practice
   title: Day 9 종합 복습
   structuredPrimary: true

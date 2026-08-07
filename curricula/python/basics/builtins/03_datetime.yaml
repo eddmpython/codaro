@@ -310,15 +310,17 @@ sections:
   title: '검증 루프: 일정 데이터 품질'
   structuredPrimary: true
   subtitle: 파싱, 마감 상태, 영업일 계산
-  goal: 기준일을 고정한 마감 상태 계산이 assert 세 줄을 모두 통과하는지 실행으로 확인한다.
+  goal: 기준일 하나를 옮기면 마감 상태와 assert 기대값이 어디까지 함께 움직이는지 직접 고쳐 보며 확인한다.
   why: 날짜 조건은 마감 당일이나 사흘 뒤 같은 경계에서 가장 자주 어긋나므로, 기준일을 고정하고 상태별 개수와 경계값을 assert로 박아 두면 나중에 로직을 고쳐도 어긋난 자리가 바로 드러납니다.
   explanation: |-
     날짜 코드는 현재 날짜에 의존하면 테스트가 흔들립니다. 기준일을 고정하고, 문자열 파싱 실패와 마감 상태 계산을 검증하면 일정 관리나 운영 리포트에 그대로 재사용할 수 있습니다.
 
+    기준일을 옮기면 데이터는 그대로여도 상태 분류가 통째로 달라집니다. assert는 그 변화를 놓치지 않게 잡아 주는 안전망이라, 기준일을 고칠 때는 기대값도 같이 고쳐야 합니다.
+
     변주 실험
-    referenceDate를 2026년 6월 1일로 바꾸고 statusCounts가 어떻게 달라지는지 확인하세요. assert 줄의 기대값도 함께 고쳐야 합니다.
+    dueSoon 경계를 daysLeft <= 3에서 daysLeft <= 7로 넓히면 어떤 항목이 scheduled에서 dueSoon으로 넘어오는지 확인하세요.
   tips:
-  - 변주 실험 referenceDate를 2026년 6월 1일로 바꾸고 statusCounts가 어떻게 달라지는지 확인하세요. assert 줄의 기대값도 함께 고쳐야 합니다.
+  - 변주 실험 dueSoon 경계를 daysLeft <= 3에서 daysLeft <= 7로 넓히면 어떤 항목이 scheduled에서 dueSoon으로 넘어오는지 확인하세요.
   snippet: |-
     referenceDate = date(2026, 5, 24)
     taskRows = [
@@ -360,10 +362,9 @@ sections:
     taskSchedule
   exercise:
     prompt: |-
-      이 셀은 고칠 곳이 없습니다. 기준일이나 마감일을 바꾸면 아래 assert 세 줄이 깨지므로 그대로 실행하세요.
+      기준일을 일주일 뒤로 옮기고 깨지는 assert를 맞추세요. 첫 줄 referenceDate = date(2026, 5, 24)를 date(2026, 6, 1)로 바꾸고, 그다음 assert 두 줄의 기대값을 새 기준일에 맞게 고칩니다. taskRows와 parseTaskRows 함수 본문은 그대로 둡니다.
 
-      기준일 2026년 5월 24일을 기준으로 마감이 지난 것 1건, 사흘 안쪽 2건, 그 뒤 1건으로 갈리고 마지막 줄 taskSchedule이 그대로 표시되므로 아래 한 줄이 나와야 합니다.
-      [{'task': 'invoiceClose', 'due': datetime.date(2026, 5, 20), 'daysLeft': -4, 'status': 'overdue'}, {'task': 'releaseReview', 'due': datetime.date(2026, 5, 24), 'daysLeft': 0, 'status': 'dueSoon'}, {'task': 'securityAudit', 'due': datetime.date(2026, 5, 27), 'daysLeft': 3, 'status': 'dueSoon'}, {'task': 'quarterReport', 'due': datetime.date(2026, 6, 2), 'daysLeft': 9, 'status': 'scheduled'}]
+      6월 1일에서 보면 5월 마감 세 건이 모두 지나가 overdue가 되고 6월 2일 한 건만 하루를 남겨 dueSoon이 되므로, statusCounts assert는 {"overdue": 3, "dueSoon": 1}로, 첫 항목 daysLeft assert는 -12로 바꿔야 합니다. 마지막 assert는 마감일 자체를 보는 줄이라 고칠 필요가 없습니다.
     starterCode: |-
       referenceDate = date(2026, 5, 24)
       taskRows = [
@@ -404,7 +405,7 @@ sections:
 
       taskSchedule
     solution: |-
-      referenceDate = date(2026, 5, 24)
+      referenceDate = date(2026, 6, 1)
       taskRows = [
           {"task": "invoiceClose", "due": "2026-05-20"},
           {"task": "releaseReview", "due": "2026-05-24"},
@@ -437,19 +438,20 @@ sections:
       for item in taskSchedule:
           statusCounts[item["status"]] = statusCounts.get(item["status"], 0) + 1
 
-      assert statusCounts == {"overdue": 1, "dueSoon": 2, "scheduled": 1}
-      assert taskSchedule[0]["daysLeft"] == -4
+      assert statusCounts == {"overdue": 3, "dueSoon": 1}
+      assert taskSchedule[0]["daysLeft"] == -12
       assert taskSchedule[-1]["due"] == date(2026, 6, 2)
 
       taskSchedule
     hints:
-    - 코드를 바꾸지 말고 그대로 실행합니다. assert 세 줄이 아무 말 없이 지나가면 계산이 기대대로 된 것입니다.
-    - '정답 형태: starterCode 그대로 실행, 마지막 줄 taskSchedule 이 네 건의 dict 목록으로 표시됩니다.'
+    - 첫 줄 date(2026, 5, 24) 를 date(2026, 6, 1) 로 바꿉니다. 그러면 아래 assert 두 줄이 옛 기준일 기대값을 들고 있어 AssertionError 가 납니다.
+    - 5월 20일, 5월 24일, 5월 27일은 모두 6월 1일보다 앞이라 overdue 로 몰리고 scheduled 는 한 건도 남지 않으므로, statusCounts 기대값에서 scheduled 항목을 지웁니다.
+    - '정답 형태: referenceDate = date(2026, 6, 1) 과 assert statusCounts == {"overdue": 3, "dueSoon": 1}, assert taskSchedule[0]["daysLeft"] == -12'
   check:
     type: outputExact
     evidence: practice
-    outputExact: "[{'task': 'invoiceClose', 'due': datetime.date(2026, 5, 20), 'daysLeft': -4, 'status': 'overdue'}, {'task': 'releaseReview', 'due': datetime.date(2026, 5, 24), 'daysLeft': 0, 'status': 'dueSoon'}, {'task': 'securityAudit', 'due': datetime.date(2026, 5, 27), 'daysLeft': 3, 'status': 'dueSoon'}, {'task': 'quarterReport', 'due': datetime.date(2026, 6, 2), 'daysLeft': 9, 'status': 'scheduled'}]"
-    resultCheck: "출력이 정확히 일치해야 합니다: [{'task': 'invoiceClose', 'due': datetime.date(2026, 5, 20), 'daysLeft': -4, 'status': 'overdue'}, {'task': 'releaseReview', 'due': datetime.date(2026, 5, 24), 'daysLeft': 0, 'status': 'dueSoon'}, {'task': 'securityAudit', 'due': datetime.date(2026, 5, 27), 'daysLeft': 3, 'status': 'dueSoon'}, {'task': 'quarterReport', 'due': datetime.date(2026, 6, 2), 'daysLeft': 9, 'status': 'scheduled'}]"
+    outputExact: "[{'task': 'invoiceClose', 'due': datetime.date(2026, 5, 20), 'daysLeft': -12, 'status': 'overdue'}, {'task': 'releaseReview', 'due': datetime.date(2026, 5, 24), 'daysLeft': -8, 'status': 'overdue'}, {'task': 'securityAudit', 'due': datetime.date(2026, 5, 27), 'daysLeft': -5, 'status': 'overdue'}, {'task': 'quarterReport', 'due': datetime.date(2026, 6, 2), 'daysLeft': 1, 'status': 'dueSoon'}]"
+    resultCheck: "출력이 정확히 일치해야 합니다: [{'task': 'invoiceClose', 'due': datetime.date(2026, 5, 20), 'daysLeft': -12, 'status': 'overdue'}, {'task': 'releaseReview', 'due': datetime.date(2026, 5, 24), 'daysLeft': -8, 'status': 'overdue'}, {'task': 'securityAudit', 'due': datetime.date(2026, 5, 27), 'daysLeft': -5, 'status': 'overdue'}, {'task': 'quarterReport', 'due': datetime.date(2026, 6, 2), 'daysLeft': 1, 'status': 'dueSoon'}]"
 - id: practice
   title: datetime 모듈 종합 복습
   structuredPrimary: true

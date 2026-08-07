@@ -476,12 +476,14 @@ sections:
   title: '검증 루프: 주문 처리 큐 관리하기'
   structuredPrimary: true
   subtitle: 리스트 메서드의 원본 변경을 업무 흐름으로 확인
-  goal: pop()으로 꺼낸 값을 append()로 옮기는 흐름이 두 리스트를 어떻게 바꾸는지 assert로 검증한다.
+  goal: pop에 인덱스를 주는지 마는지에 따라 처리 순서가 통째로 뒤집힌다는 것을 직접 고쳐 보며 확인한다.
   why: 원본을 바꾸는 메서드를 연달아 쓰면 두 목록의 상태가 눈에 띄지 않게 어긋나므로, 기대 상태를 assert로 코드에 박아 둡니다.
-  explanation: 리스트 메서드는 값을 추가하고 지우는 기능 목록이 아닙니다. 주문 처리 큐처럼 순서가 중요하고 상태가 계속 바뀌는 데이터를 다룰 때, 어떤 메서드가 원본을
-    바꾸는지와 실패 조건을 검증해야 합니다.
+  explanation: |-
+    리스트 메서드는 값을 추가하고 지우는 기능 목록이 아닙니다. 주문 처리 큐처럼 순서가 중요하고 상태가 계속 바뀌는 데이터를 다룰 때, 어떤 메서드가 원본을 바꾸는지와 실패 조건을 검증해야 합니다.
+
+    pop은 인덱스를 주면 그 자리를, 안 주면 맨 뒤를 꺼냅니다. 괄호 안의 0 하나가 있고 없고에 따라 먼저 들어온 것부터 처리하는 대기열이 되기도 하고 마지막에 들어온 것부터 처리하는 더미가 되기도 합니다. 게다가 pop은 원본을 그 자리에서 줄이므로, 두 번째 호출은 이미 줄어든 목록을 보게 됩니다.
   tips:
-  - 작게 실행하고 결과를 바로 확인하세요.
+  - 변주 실험 pop 을 두 번 부르는 대신 pendingTasks[:2] 로 잘라 보면 원본이 줄지 않는 차이를 확인하세요.
   snippet: |-
     orderQueue = ['ORD-1001', 'ORD-1002']
     orderQueue.append('ORD-1003')
@@ -495,9 +497,9 @@ sections:
     assert len(orderQueue) == 2
   exercise:
     prompt: |-
-      값은 바꾸지 말고 코드를 그대로 실행하세요.
+      가장 최근에 들어온 일부터 처리하도록 바꾸세요. pop(0) 두 곳에서 인덱스 0을 지워 pop()으로 만들고, doneTasks와 pendingTasks를 검사하는 assert 두 줄을 새 순서에 맞게 고칩니다. pendingTasks의 항목 세 개는 그대로 둡니다.
 
-      assert 두 줄이 모두 통과하고 마지막에 ['메일 발송', '입금 확인']이 나와야 합니다.
+      pop()은 맨 뒤를 꺼내므로 '송장 출력'이 먼저 처리되고, 그 다음 호출은 이미 줄어든 목록의 맨 뒤인 '입금 확인'을 가져갑니다. 결과는 ['송장 출력', '입금 확인']이고 대기 목록에는 '메일 발송' 하나만 남습니다.
     starterCode: |-
       pendingTasks = ['메일 발송', '입금 확인', '송장 출력']
       doneTasks = []
@@ -512,20 +514,21 @@ sections:
       pendingTasks = ['메일 발송', '입금 확인', '송장 출력']
       doneTasks = []
 
-      doneTasks.append(pendingTasks.pop(0))
-      doneTasks.append(pendingTasks.pop(0))
+      doneTasks.append(pendingTasks.pop())
+      doneTasks.append(pendingTasks.pop())
 
-      assert doneTasks == ['메일 발송', '입금 확인']
-      assert pendingTasks == ['송장 출력']
+      assert doneTasks == ['송장 출력', '입금 확인']
+      assert pendingTasks == ['메일 발송']
       doneTasks
     hints:
-    - "pop(0) 을 pop() 으로 바꾸면 꺼내는 순서가 뒤집혀 assert가 AssertionError로 멈춥니다. 그때는 원래대로 되돌리세요."
-    - "정답 형태: 코드를 그대로 실행, 마지막 값 ['메일 발송', '입금 확인']"
+    - pop(0) 의 괄호 안 0 을 지워 pop() 으로 만듭니다. 두 줄 다 고쳐야 합니다.
+    - 맨 뒤부터 꺼내므로 doneTasks 는 ['송장 출력', '입금 확인'] 이 되고, pendingTasks 에는 맨 앞의 '메일 발송' 만 남습니다.
+    - "정답 형태: pendingTasks.pop() 과 assert doneTasks == ['송장 출력', '입금 확인']"
   check:
     type: outputExact
     evidence: practice
-    outputExact: "['메일 발송', '입금 확인']"
-    resultCheck: "출력이 정확히 일치해야 합니다: \"['메일 발송', '입금 확인']\""
+    outputExact: "['송장 출력', '입금 확인']"
+    resultCheck: "출력이 정확히 일치해야 합니다: \"['송장 출력', '입금 확인']\""
 - id: practice
   title: Day 8 종합 복습
   structuredPrimary: true
