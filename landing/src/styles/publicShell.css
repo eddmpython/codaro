@@ -1,3 +1,9 @@
+:root {
+  /* 투명 헤더의 높이. 홈은 이 값만큼 위로 올라와 히어로 배경을 헤더 뒤까지 잇는다
+     (homeAstryx.css). 값을 바꾸면 두 파일이 같이 움직인다. */
+  --public-header-height: 52px;
+}
+
 .publicHeader {
   position: sticky;
   top: 0;
@@ -15,7 +21,7 @@
 .publicHeaderInner {
   display: grid;
   width: min(1200px, calc(100% - 40px));
-  min-height: 52px;
+  min-height: var(--public-header-height);
   margin-inline: auto;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
@@ -206,9 +212,13 @@
 }
 
 @media (max-width: 820px) {
+  :root {
+    --public-header-height: 56px;
+  }
+
   .publicHeaderInner {
     width: min(100% - 28px, 720px);
-    min-height: 56px;
+    min-height: var(--public-header-height);
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 12px;
   }

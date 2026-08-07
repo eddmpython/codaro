@@ -49,6 +49,11 @@
    sticky는 스크롤 조상이 없어야 동작하므로 여기에 overflow를 걸지 않는다. */
 .homeContinuous {
   position: relative;
+  /* 헤더는 sticky라 flow에서 자기 높이만큼 자리를 차지한다. 홈이 그 높이만큼
+     위로 올라와야 히어로의 그리드/틴트 배경이 투명 헤더 뒤까지 이어지고,
+     페이지 맨 위에 민짜 배경 띠(경계선)가 생기지 않는다. 헤더와 겹치는 만큼은
+     .homeProductHero의 상단 패딩이 비워 준다. */
+  margin-top: calc(-1 * var(--public-header-height));
 }
 
 .homeProductHero {
@@ -58,8 +63,8 @@
   display: grid;
   min-height: 100svh;
   align-content: center;
-  /* 투명 헤더(52px)가 히어로 위에 떠 있다. 그만큼을 위쪽에 비워 겹치지 않게 한다. */
-  padding-block: calc(52px + 28px) 32px;
+  /* 투명 헤더가 히어로 위에 떠 있다. 그 높이만큼 위쪽을 비워 겹치지 않게 한다. */
+  padding-block: calc(var(--public-header-height) + 28px) 32px;
   /* 라이트 모드는 흰 바탕 그대로 둔다. accent 틴트는 다크에서만 깐다. */
   background:
     radial-gradient(ellipse 90% 55% at 50% -8%,
@@ -598,7 +603,7 @@
   .homeProductHero {
     position: static;
     min-height: 0;
-    padding-block: calc(56px + 24px) 40px;
+    padding-block: calc(var(--public-header-height) + 24px) 40px;
   }
 
   .homeHeroLayout {

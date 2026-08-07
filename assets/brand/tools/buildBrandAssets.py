@@ -34,6 +34,21 @@ DECORATION_TOP_MARGIN = 64
 DECORATION_BOTTOM_MARGIN = 48
 
 
+def trimTransparentPadding(image: Image.Image, alphaThreshold: int = 8) -> Image.Image:
+    """캐릭터 주변의 투명 여백을 잘라낸다.
+
+    소스 캔버스에는 저알파 찌꺼기 픽셀이 흩어져 있어 getbbox()를 그대로 쓰면
+    사실상 전체 캔버스가 잡힌다. 알파 임계값을 넘는 픽셀만으로 bbox를 구해
+    실제 캐릭터 영역만 남긴다. 이걸 건너뛰면 makeSquareAsset이 빈 여백까지
+    포함해 스케일을 계산해서 최종 자산 안의 캐릭터가 절반 이하로 작아진다.
+    """
+    alphaMask = image.getchannel("A").point(lambda alpha: 255 if alpha > alphaThreshold else 0)
+    bbox = alphaMask.getbbox()
+    if bbox is None:
+        raise ValueError("Avatar source has no visible pixels above the alpha threshold")
+    return image.crop(bbox)
+
+
 def makeSquareAsset(image: Image.Image, size: int, paddingRatio: float) -> Image.Image:
     canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     usableSize = int(size * (1 - paddingRatio * 2))
@@ -46,24 +61,6 @@ def makeSquareAsset(image: Image.Image, size: int, paddingRatio: float) -> Image
     offsetY = (size - resized.height) // 2
     canvas.paste(resized, (offsetX, offsetY), resized)
     return canvas
-
-
-def createFaceCrop(image: Image.Image) -> Image.Image:
-    width, height = image.size
-    left = int(width * 0.18)
-    top = int(height * 0.02)
-    right = int(width * 0.82)
-    bottom = int(height * 0.76)
-    return image.crop((left, top, right, bottom))
-
-
-def createSidebarCrop(image: Image.Image) -> Image.Image:
-    width, height = image.size
-    left = int(width * 0.12)
-    top = int(height * 0.02)
-    right = int(width * 0.88)
-    bottom = int(height * 0.86)
-    return image.crop((left, top, right, bottom))
 
 
 def savePng(image: Image.Image, targetPath: Path) -> None:
@@ -296,11 +293,13 @@ def main() -> None:
             )
         avatarBase = Image.open(CHARACTER_SOURCE).convert("RGBA")
         avatarSource = CHARACTER_SOURCE
+    avatarBase = trimTransparentPadding(avatarBase)
+    # 마스코트는 몸통이 곧 얼굴인 블롭이라 확대 크롭은 실루엣만 자른다.
+    # 세 자산 모두 전신을 쓰고 용도별 패딩만 달리한다.
+    # full=히어로(여유 있는 그림자 공간), small=크롬/에디터 아바타, face=파비콘(최대 크기).
     avatarFull = makeSquareAsset(avatarBase, size=512, paddingRatio=0.06)
-    sidebarCrop = createSidebarCrop(avatarBase)
-    avatarSmall = makeSquareAsset(sidebarCrop, size=256, paddingRatio=0.12)
-    faceCrop = createFaceCrop(avatarBase)
-    avatarFace = makeSquareAsset(faceCrop, size=512, paddingRatio=0.12)
+    avatarSmall = makeSquareAsset(avatarBase, size=256, paddingRatio=0.08)
+    avatarFace = makeSquareAsset(avatarBase, size=512, paddingRatio=0.02)
     brandMark = json.loads(BRAND_MARK_PATH.read_text(encoding="utf-8"))
     faviconPx = int(brandMark.get("favicon", {}).get("pngPx", 192))
     favicon = avatarFace.resize((faviconPx, faviconPx), Image.Resampling.LANCZOS).filter(
