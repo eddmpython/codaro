@@ -61,53 +61,52 @@
   content: "";
 }
 
-/* ── 홈의 두 칸 ──────────────────────────────────────────────────────────────
-   히어로는 뷰포트 한 장을 차지한 채 제자리에 서 있고(sticky), 학습창이 그 위를
-   덮으며 올라온다. 스크롤 한 번에 "보는 화면"에서 "하는 화면"으로 넘어간다.
-   sticky는 스크롤 조상이 없어야 동작하므로 여기에 overflow를 걸지 않는다. */
+/* ── 홈의 네 층 ──────────────────────────────────────────────────────────────
+   히어로 → 규모 → 실행 데모 → 학습창. 각 층은 본문 칸 전체를 쓰고, 배경 격자와
+   좌우 프레임선이 네 층을 하나로 꿰맨다. */
 .homeContinuous {
   position: relative;
   /* 헤더는 sticky라 flow에서 자기 높이만큼 자리를 차지한다. 홈이 그 높이만큼
-     위로 올라와야 히어로의 그리드/틴트 배경이 투명 헤더 뒤까지 이어지고,
-     페이지 맨 위에 민짜 배경 띠(경계선)가 생기지 않는다. 헤더와 겹치는 만큼은
-     .homeProductHero의 상단 패딩이 비워 준다. */
+     위로 올라와야 배경이 투명 헤더 뒤까지 이어지고, 페이지 맨 위에 민짜 배경
+     띠(경계선)가 생기지 않는다. 헤더와 겹치는 만큼은 히어로 상단 패딩이 비운다. */
   margin-top: calc(-1 * var(--public-header-height));
+  background: var(--color-background-body);
+}
+
+/* ── 배경 격자 ──────────────────────────────────────────────────────────────
+   페이지 전체에 가는 세로선을 깐다. 모든 층이 같은 격자 위에 놓여야 문서가
+   조판된 것처럼 읽힌다. fixed 라 스크롤해도 선이 제자리에 서 있고, 층이
+   바뀌어도 같은 자리를 지킨다. 가로선은 넣지 않는다. 층을 가르는 가로선은
+   프레임이 이미 긋고 있어서 겹치면 지저분해진다. */
+.homeContinuous::before {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: linear-gradient(
+    90deg,
+    light-dark(
+      color-mix(in srgb, var(--color-border) 42%, transparent),
+      color-mix(in srgb, var(--color-border) 62%, transparent)
+    ) 1px,
+    transparent 1px
+  );
+  background-size: 72px 100%;
+  pointer-events: none;
+  content: "";
 }
 
 /* 층을 쌓는 구성에서는 히어로를 고정하지 않는다. 고정하면 다음 층이 덮을 때
-   헤드라인이 뒤에 반쯤 남아 비쳐 보인다. 그냥 흐름대로 올라가게 둔다. */
+   헤드라인이 뒤에 반쯤 남아 비쳐 보인다. 그냥 흐름대로 올라가게 둔다.
+   배경은 칠하지 않는다. 배경 격자가 층 사이로 그대로 비쳐야 한다. */
 .homeProductHero {
   position: relative;
-  z-index: 0;
+  z-index: 1;
   display: grid;
   /* 뷰포트를 통째로 채우고 가운데 정렬하면 헤드라인 위아래에 큰 빈 띠가 생겨
      글자 덩어리가 오히려 작아 보인다. 콘텐츠 높이에 맡기고 위에서부터 쌓는다. */
   align-content: start;
   /* 투명 헤더가 히어로 위에 떠 있다. 그 높이만큼 위쪽을 비워 겹치지 않게 한다. */
-  padding-block: calc(var(--public-header-height) + 72px) 72px;
-  /* 라이트 모드는 흰 바탕 그대로 둔다. accent 틴트는 다크에서만 깐다. */
-  background:
-    radial-gradient(ellipse 90% 55% at 50% -8%,
-      light-dark(transparent, color-mix(in srgb, var(--color-accent) 12%, transparent)),
-      transparent 62%),
-    var(--color-background-body);
-}
-
-.homeProductHero::before {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  /* 그리드 텍스처도 다크 전용. 라이트는 아무 장식 없는 흰 화면이다.
-     light-dark()는 색상 전용이라 opacity 가 아니라 선 색으로 끈다. */
-  background-image:
-    linear-gradient(light-dark(transparent, color-mix(in srgb, var(--color-border) 60%, transparent)) 1px, transparent 1px),
-    linear-gradient(90deg, light-dark(transparent, color-mix(in srgb, var(--color-border) 60%, transparent)) 1px, transparent 1px);
-  background-size: 56px 56px;
-  -webkit-mask: radial-gradient(ellipse 70% 60% at 50% 0%, #000 35%, transparent 72%);
-          mask: radial-gradient(ellipse 70% 60% at 50% 0%, #000 35%, transparent 72%);
-  opacity: 0.5;
-  pointer-events: none;
-  content: "";
+  padding-block: calc(var(--public-header-height) + 96px) 96px;
 }
 
 /* ── 격자 프레임 ──────────────────────────────────────────────────────────────
@@ -146,7 +145,8 @@
 }
 
 
-/* 세 박자를 한 문장씩 끊어 읽힌다. 마지막 줄이 제품이 데려가는 곳이다.
+/* 두 박자다. 앞줄이 조건이고 뒷줄이 제품이 데려가는 곳이다. 줄이 짧아야 글자를
+   키울 수 있으므로 여기에 문장을 더 붙이지 않는다.
    선택자에 .homeAstryx 를 붙여 두는 이유가 있다. Astryx Heading 이 자기 트래킹을
    들고 오는데 그게 클래스 하나짜리 규칙을 이기므로, 여기서 특이도를 맞춰야
    letter-spacing 이 실제로 적용된다. 떼면 조판이 조용히 느슨해진다. */
@@ -183,7 +183,6 @@
 .homeProofBand {
   position: relative;
   z-index: 1;
-  background: var(--color-background-body);
 }
 
 .homeProofBand::before {
@@ -210,7 +209,6 @@
 .homeRunBand {
   position: relative;
   z-index: 1;
-  background: var(--color-background-body);
 }
 
 /* 세로 프레임선과 층을 가르는 가로선을 한 요소로 그린다. 가로선을 본문 칸에
@@ -308,7 +306,6 @@
 .homeStudio {
   position: relative;
   z-index: 1;
-  background: var(--color-background-body);
 }
 
 .homeStudioInner {

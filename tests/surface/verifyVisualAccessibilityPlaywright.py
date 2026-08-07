@@ -730,11 +730,11 @@ def publicExperienceSnapshot(page: Any) -> dict[str, Any]:
               index: elementIndex(selector),
             })),
             requiredKoreanLabels: routeKind === "home"
-              ? ["바로 공부한다.", "어디서나 공부한다.", "자동화를 배운다.", "학습창"]
+              ? ["어디서나 공부한다.", "자동화를 배운다.", "학습창"]
               : ["CODARO 학습", "결과 경로", "레슨 찾기"],
             missingKoreanLabels: (
               routeKind === "home"
-                ? ["바로 공부한다.", "어디서나 공부한다.", "자동화를 배운다.", "학습창"]
+                ? ["어디서나 공부한다.", "자동화를 배운다.", "학습창"]
                 : ["CODARO 학습", "결과 경로", "레슨 찾기"]
             ).filter((label) => !bodyText.includes(label)),
             forbiddenEditorialLabels: forbiddenEditorialLabels.filter(

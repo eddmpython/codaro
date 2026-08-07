@@ -21,7 +21,6 @@ export function HomePage() {
         <div className="homeShell homeHeroLayout">
           <span className="homeKicker">Python 학습 스튜디오</span>
           <Heading id="home-title" level={1} className="homeHeroHeadline">
-            <span>바로 공부한다.</span>
             <span>어디서나 공부한다.</span>
             <span className="homeHeroHeadlineAccent">자동화를 배운다.</span>
           </Heading>
