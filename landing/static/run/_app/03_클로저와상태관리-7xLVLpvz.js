@@ -1,0 +1,1033 @@
+var e=`meta:
+  id: '03'
+  title: 클로저와 상태 관리
+  day: 3
+  category: advancedPython
+  tags:
+  - closure
+  - nonlocal
+  - 상태관리
+  - 메모이제이션
+  - 검증
+  - 캡슐화
+  seo:
+    title: 파이썬 클로저와 상태 관리 - 함수형 프로그래밍 핵심
+    description: 클로저의 정의와 동작 원리를 이해하고 상태 캡슐화, 메모이제이션 패턴을 마스터합니다.
+    keywords:
+    - closure
+    - 클로저
+    - nonlocal
+    - 메모이제이션
+    - 상태관리
+intro:
+  emoji: 🔒
+  points:
+  - 클로저의 정의와 자유 변수 개념
+  - nonlocal 키워드로 외부 스코프 변수 수정
+  - 클로저를 이용한 상태 캡슐화 패턴
+  - 메모이제이션으로 성능 최적화
+  direction: 클로저와 상태 관리에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.
+  benefits:
+  - 작은 함수와 상태 확인 후 추상화 패턴에 맞는 코드 입력을 고릅니다.
+  - 클로저와 상태 관리 결과를 호출 결과와 예외 경계 기준으로 즉시 점검합니다.
+  - 완료한 코드를 라이브러리성 유틸리티에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 클로저 정의 입력 확인
+      detail: 입력 기준(작은 함수와 상태)과 필요한 조건을 먼저 고정합니다.
+    - label: 상태 캡슐화 처리 실행
+      detail: 추상화 패턴 코드를 실행해 중간 결과를 확인합니다.
+    - label: 팩토리 패턴 결과 검증
+      detail: 호출 결과와 예외 경계 기준으로 실행 결과를 비교합니다.
+    - label: 클로저와 상태 관리 재사용
+      detail: 완성 코드를 라이브러리성 유틸리티에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 고급 설계 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 클로저와 상태 관리 실행
+      detail: 셀을 실행해 호출 결과와 예외 경계와 예외 상태를 확인합니다.
+    - label: 클로저와 상태 관리 완료
+      detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
+sections:
+- id: closure_definition
+  title: 클로저 정의
+  structuredPrimary: true
+  subtitle: 자유 변수를 기억하는 함수
+  goal: outer가 끝난 뒤에도 inner가 x를 붙잡고 있다는 사실을 셀에 실제로 담긴 값으로 확인한다.
+  why: 클로저가 값을 언제 어디에 붙잡아 두는지 모르면 나중에 상태가 왜 남아 있는지 설명할 수 없으므로, 함수 객체에 셀이 달려 있고 그 안에 값이 들어 있다는 것을 먼저 눈으로 봅니다.
+  explanation: |-
+    클로저는 자기가 정의된 자리의 변수를 기억하는 함수입니다. 내부 함수가 바깥 함수의 지역 변수를 참조하면 바깥 함수가 끝나도 그 변수는 사라지지 않고 셀(cell) 객체에 남습니다. 이렇게 붙잡힌 이름을 자유 변수(free variable)라고 부릅니다.
+
+    함수 객체에서 두 가지를 직접 볼 수 있습니다. __code__.co_freevars는 붙잡은 이름 목록이고, __closure__는 그 이름에 대응하는 셀 튜플입니다. 셀 객체를 그대로 출력하면 메모리 주소가 보이므로, 값이 필요하면 cell_contents로 꺼냅니다.
+  snippet: |-
+    def outer(x):
+        def inner(y):
+            return x + y
+        return inner
+
+    addFive = outer(5)
+    addFive(3)
+  exercise:
+    prompt: |-
+      마지막 줄 addFive(3)을 addFive(3), addFive.__code__.co_freevars, [cell.cell_contents for cell in addFive.__closure__]로 바꾸세요. outer 정의와 addFive = outer(5)는 그대로 둡니다.
+
+      outer는 이미 끝났는데도 inner가 붙잡은 x가 셀 하나에 5로 남아 있으므로 (8, ('x',), [5])가 나와야 합니다.
+    starterCode: |-
+      def outer(x):
+          def inner(y):
+              return x + y
+          return inner
+
+      addFive = outer(5)
+      addFive(3)
+    solution: |-
+      def outer(x):
+          def inner(y):
+              return x + y
+          return inner
+
+      addFive = outer(5)
+      addFive(3), addFive.__code__.co_freevars, [cell.cell_contents for cell in addFive.__closure__]
+    hints:
+    - 마지막 줄 끝에 쉼표를 찍고 addFive.__code__.co_freevars 와 [cell.cell_contents for cell in addFive.__closure__] 를 이어 붙입니다. __closure__ 를 그대로 찍으면 셀 주소가 보여 실행할 때마다 값이 달라집니다.
+    - '정답 형태: addFive(3), addFive.__code__.co_freevars, [cell.cell_contents for cell in addFive.__closure__]'
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "(8, ('x',), [5])"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"(8, ('x',), [5])\\""
+- id: state_encapsulation
+  title: 상태 캡슐화
+  structuredPrimary: true
+  subtitle: 프라이빗 변수 흉내내기
+  goal: makeCounter를 시작값과 증가폭을 받는 형태로 바꿔 만들어진 카운터마다 count 셀이 따로 생긴다는 것을 두 인스턴스로 확인한다.
+  why: 전역 변수 하나로 카운터를 만들면 두 번째 카운터가 첫 번째 값을 이어받아 망가지지만, 클로저는 호출할 때마다 새 셀을 만들기 때문에 같은 코드로 서로 간섭하지 않는 카운터를 몇 개든 찍어 낼 수 있습니다.
+  explanation: |-
+    바깥 함수의 지역 변수는 반환된 내부 함수를 통해서만 읽거나 바꿀 수 있습니다. 이름 앞에 밑줄을 붙여 두는 관례가 아니라, 바깥에서 참조할 경로 자체가 없는 은닉입니다. 카운터, 누산기, 토글처럼 값 하나와 동작 하나로 끝나는 상태에 잘 맞습니다.
+
+    중요한 것은 셀이 함수 정의가 아니라 호출마다 새로 만들어진다는 점입니다. makeCounter()를 두 번 부르면 count 셀도 두 개가 되어 한쪽을 아무리 올려도 다른 쪽은 그대로입니다.
+  snippet: |-
+    def makeCounter():
+        count = 0
+        def counter():
+            nonlocal count
+            count += 1
+            return count
+        return counter
+
+    counter1 = makeCounter()
+    counter1(), counter1(), counter1()
+  exercise:
+    prompt: |-
+      세 곳을 고치세요.
+      1. def makeCounter(): 를 def makeCounter(start=0, step=1): 로 바꿉니다.
+      2. count = 0 을 count = start 로, count += 1 을 count += step 으로 바꿉니다.
+      3. 아래 두 줄을 지우고 counterA = makeCounter() 와 counterB = makeCounter(100, 10) 을 만든 다음, 마지막 줄에 counterA(), counterB(), counterA(), counterB() 를 표시합니다.
+
+      counterA와 counterB는 각각 자기 count 셀을 갖고 있어 번갈아 불러도 서로 값을 건드리지 않으므로 (1, 110, 2, 120)이 나와야 합니다.
+    starterCode: |-
+      def makeCounter():
+          count = 0
+          def counter():
+              nonlocal count
+              count += 1
+              return count
+          return counter
+
+      counter1 = makeCounter()
+      counter1(), counter1(), counter1()
+    solution: |-
+      def makeCounter(start=0, step=1):
+          count = start
+          def counter():
+              nonlocal count
+              count += step
+              return count
+          return counter
+
+      counterA = makeCounter()
+      counterB = makeCounter(100, 10)
+      counterA(), counterB(), counterA(), counterB()
+    hints:
+    - 'def 줄을 def makeCounter(start=0, step=1): 로 바꾸고 본문의 0 과 1 을 start 와 step 으로 갈아 끼웁니다. 카운터 두 개는 makeCounter 를 두 번 불러 각각 만듭니다.'
+    - '정답 형태: counterA(), counterB(), counterA(), counterB()'
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '(1, 110, 2, 120)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '(1, 110, 2, 120)'"
+- id: factory_pattern
+  title: 팩토리 패턴
+  structuredPrimary: true
+  subtitle: 함수 생성기
+  goal: 팩토리로 만든 함수와 반복문 안에서 만든 lambda를 같은 입력에 돌려 이름을 언제 찾는지에 따라 결과가 갈리는 것을 드러낸다.
+  why: 반복문 안에서 lambda를 모아 두는 코드는 예외 없이 조용히 마지막 값만 쓰게 되고, 이 사고는 콜백 목록이나 핸들러 표를 한꺼번에 만들 때 실제로 자주 나므로 팩토리를 한 번 호출해 값을 그 자리에서 묶어 두어야 합니다.
+  explanation: |-
+    팩토리는 설정값을 받아 그 설정이 박힌 함수를 돌려주는 바깥 함수입니다. 호출할 때마다 새 셀이 생기므로, makeFormatter("A")와 makeFormatter("B")가 만든 두 함수는 서로 다른 template을 붙잡습니다.
+
+    반면 반복문 안에서 만든 lambda는 셀 하나를 공유합니다. 클로저는 정의 시점의 값을 복사하지 않고 이름만 붙잡고, 실제 값은 호출할 때 그 셀에서 읽습니다. 그래서 반복이 끝난 뒤 lambda를 부르면 모두 마지막 회차의 값을 봅니다. 이것을 늦은 바인딩(late binding)이라고 부르며, 값을 미리 묶고 싶으면 팩토리 호출로 감싸거나 기본 인자로 받아야 합니다.
+  snippet: |-
+    def makeFormatter(template):
+        def formatter(value):
+            return template.format(value=value)
+        return formatter
+
+    dollarFormat = makeFormatter("\${value:.2f}")
+    percentFormat = makeFormatter("{value:.1%}")
+    dollarFormat(1234.5), percentFormat(0.856)
+  exercise:
+    prompt: |-
+      세 곳을 고치세요.
+      1. makeFormatter 정의 아래에 makeLateBound(templates)를 새로 만듭니다. 빈 리스트 made를 두고 for template in templates: 안에서 made.append(lambda value: template.format(value=value))를 한 뒤 made를 반환합니다.
+      2. dollarFormat과 percentFormat 두 줄을 지우고 templates = ["\${value:.2f}", "{value:.1%}"], byFactory = [makeFormatter(template) for template in templates], byLoop = makeLateBound(templates) 세 줄을 씁니다.
+      3. 마지막 줄을 [fmt(0.5) for fmt in byFactory], [fmt(0.5) for fmt in byLoop] 로 바꿉니다.
+
+      byFactory의 두 함수는 각자 template를 붙잡았지만, byLoop의 두 lambda는 같은 셀을 보고 있어 반복이 끝난 뒤의 마지막 템플릿만 씁니다. 그래서 (['$0.50', '50.0%'], ['50.0%', '50.0%'])가 나와야 합니다.
+    starterCode: |-
+      def makeFormatter(template):
+          def formatter(value):
+              return template.format(value=value)
+          return formatter
+
+      dollarFormat = makeFormatter("\${value:.2f}")
+      percentFormat = makeFormatter("{value:.1%}")
+      dollarFormat(1234.5), percentFormat(0.856)
+    solution: |-
+      def makeFormatter(template):
+          def formatter(value):
+              return template.format(value=value)
+          return formatter
+
+      def makeLateBound(templates):
+          made = []
+          for template in templates:
+              made.append(lambda value: template.format(value=value))
+          return made
+
+      templates = ["\${value:.2f}", "{value:.1%}"]
+      byFactory = [makeFormatter(template) for template in templates]
+      byLoop = makeLateBound(templates)
+      [fmt(0.5) for fmt in byFactory], [fmt(0.5) for fmt in byLoop]
+    hints:
+    - makeLateBound 안의 lambda 는 template 를 값으로 복사하지 않고 이름만 붙잡습니다. 반복이 끝나면 그 이름이 마지막 템플릿을 가리키므로 두 함수가 같은 결과를 냅니다.
+    - '정답 형태: [fmt(0.5) for fmt in byFactory], [fmt(0.5) for fmt in byLoop]'
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "(['$0.50', '50.0%'], ['50.0%', '50.0%'])"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"(['$0.50', '50.0%'], ['50.0%', '50.0%'])\\""
+- id: memoization
+  title: 메모이제이션
+  structuredPrimary: true
+  subtitle: 결과 캐싱으로 성능 최적화
+  goal: 캐시 딕셔너리만 보여 주던 예제에 적중과 실패 횟수를 더해 두 번째 호출이 정말 원본 함수를 건너뛰었는지 세어 본다.
+  why: 캐시를 붙였다는 것과 캐시가 실제로 맞았다는 것은 다른 이야기이고 키를 잘못 잡은 캐시는 예외 없이 매번 새로 계산하므로, 적중 횟수를 함께 세어야 이 캐시가 일하고 있는지 판정할 수 있습니다.
+  explanation: |-
+    메모이제이션은 호출 결과를 캐시에 담아 두고 같은 인자로 다시 들어오면 계산을 건너뛰는 기법입니다. 캐시를 클로저 안에 두면 함수와 캐시가 한 덩어리로 묶여, 바깥에서 캐시를 실수로 비우거나 다른 함수와 공유할 일이 없습니다.
+
+    이 구현의 키는 args 튜플 그대로입니다. 그래서 (1, 2)와 (2, 1)은 결과가 같아도 서로 다른 키이고, 리스트처럼 해시할 수 없는 인자가 들어오면 TypeError가 납니다. 적중과 실패를 따로 세어 두면 이런 키 설계 문제를 숫자로 잡을 수 있습니다. 실무에서는 같은 일을 해 주는 functools.lru_cache를 쓰지만, 무엇을 키로 삼는지는 여전히 직접 정해야 합니다.
+  snippet: |-
+    def memoize(func):
+        cache = {}
+        def wrapper(*args):
+            if args not in cache:
+                cache[args] = func(*args)
+            return cache[args]
+        wrapper.cache = cache
+        return wrapper
+
+    @memoize
+    def slowAdd(a, b):
+        return a + b
+
+    slowAdd(1, 2), slowAdd(1, 2), slowAdd.cache
+  exercise:
+    prompt: |-
+      네 곳을 고치세요.
+      1. cache = {} 아래에 calls = {"hit": 0, "miss": 0} 한 줄을 추가합니다.
+      2. wrapper 안 cache[args] = func(*args) 바로 위에 calls["miss"] += 1 을 넣습니다.
+      3. 그 if 블록 뒤에 else: 를 두고 calls["hit"] += 1 을 넣습니다.
+      4. wrapper.cache = cache 아래에 wrapper.calls = calls 를 추가하고, 마지막 줄을 slowAdd(1, 2), slowAdd(1, 2), slowAdd(2, 1), slowAdd.calls 로 바꿉니다.
+
+      두 번째 slowAdd(1, 2)만 캐시에 맞습니다. slowAdd(2, 1)은 답이 같아도 (1, 2)와 다른 키라 새로 계산합니다. 그래서 (3, 3, 3, {'hit': 1, 'miss': 2})가 나와야 합니다.
+    starterCode: |-
+      def memoize(func):
+          cache = {}
+          def wrapper(*args):
+              if args not in cache:
+                  cache[args] = func(*args)
+              return cache[args]
+          wrapper.cache = cache
+          return wrapper
+
+      @memoize
+      def slowAdd(a, b):
+          return a + b
+
+      slowAdd(1, 2), slowAdd(1, 2), slowAdd.cache
+    solution: |-
+      def memoize(func):
+          cache = {}
+          calls = {"hit": 0, "miss": 0}
+          def wrapper(*args):
+              if args not in cache:
+                  calls["miss"] += 1
+                  cache[args] = func(*args)
+              else:
+                  calls["hit"] += 1
+              return cache[args]
+          wrapper.cache = cache
+          wrapper.calls = calls
+          return wrapper
+
+      @memoize
+      def slowAdd(a, b):
+          return a + b
+
+      slowAdd(1, 2), slowAdd(1, 2), slowAdd(2, 1), slowAdd.calls
+    hints:
+    - calls 는 wrapper 바깥, cache 와 같은 자리에 둡니다. 딕셔너리 항목을 바꾸는 것이라 nonlocal 은 필요 없습니다.
+    - '정답 형태: slowAdd(1, 2), slowAdd(1, 2), slowAdd(2, 1), slowAdd.calls'
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "(3, 3, 3, {'hit': 1, 'miss': 2})"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"(3, 3, 3, {'hit': 1, 'miss': 2})\\""
+- id: nonlocal_keyword
+  title: nonlocal 키워드
+  structuredPrimary: true
+  subtitle: 외부 스코프 변수 수정
+  goal: 같은 카운터를 재할당, nonlocal, 가변 컨테이너 세 가지로 만들어 어느 쪽만 UnboundLocalError로 끊기는지 한 셀에서 갈라 본다.
+  why: nonlocal을 습관처럼 붙이면 딕셔너리 항목 수정처럼 필요 없는 자리까지 따라붙고 반대로 빠뜨리면 실행할 때까지 모르므로, 이름을 다시 묶을 때만 필요하고 객체 내용을 고칠 때는 필요 없다는 경계를 직접 만들어 둡니다.
+  explanation: |-
+    파이썬은 함수 안에서 이름에 대입하는 문장이 하나라도 있으면 그 이름을 그 함수의 지역 변수로 정합니다. 이 판단은 실행 전에 끝나므로, count = count + 1 은 아직 값이 없는 지역 변수 count를 읽으려다 UnboundLocalError로 끊깁니다. 바깥에 count가 있어도 소용없습니다.
+
+    nonlocal count는 그 이름을 지역 변수로 만들지 말고 감싸는 함수의 것을 쓰라는 선언입니다. global이 모듈 수준을 가리키는 것과 달리 nonlocal은 바로 바깥 함수 스코프를 가리킵니다.
+
+    반대로 box["count"] += 1 처럼 객체 내용만 바꿀 때는 box라는 이름을 다시 묶지 않으므로 nonlocal이 필요 없습니다. 필요한지 아닌지는 대입이 이름을 향하는지 객체 내부를 향하는지로 갈립니다.
+  snippet: |-
+    def outerBad():
+        count = 0
+        def inner():
+            count = count + 1
+            return count
+        return inner
+
+    badCounter = outerBad()
+    try:
+        badCounter()
+        badResult = "no error"
+    except UnboundLocalError as exc:
+        badResult = type(exc).__name__
+
+    badResult
+  exercise:
+    prompt: |-
+      outerBad와 try 블록은 그대로 두고 세 곳을 더하세요.
+      1. outerBad 아래에 outerNonlocal()을 만듭니다. 본문은 outerBad와 같되 inner 첫 줄에 nonlocal count 를 넣습니다.
+      2. 그 아래에 outerMutable()을 만듭니다. box = {"count": 0} 을 두고 inner에서 box["count"] += 1 을 한 뒤 box["count"] 를 반환합니다. nonlocal은 쓰지 않습니다.
+      3. 마지막 줄 badResult 를 지우고, nonlocalCounter = outerNonlocal() 과 mutableCounter = outerMutable() 을 만든 다음 badResult, (nonlocalCounter(), nonlocalCounter()), (mutableCounter(), mutableCounter()) 를 표시합니다.
+
+      이름을 다시 묶는 outerBad만 끊기고, nonlocal을 붙인 쪽과 딕셔너리 내용만 고치는 쪽은 똑같이 1, 2로 올라갑니다. 그래서 ('UnboundLocalError', (1, 2), (1, 2))가 나와야 합니다.
+    starterCode: |-
+      def outerBad():
+          count = 0
+          def inner():
+              count = count + 1
+              return count
+          return inner
+
+      badCounter = outerBad()
+      try:
+          badCounter()
+          badResult = "no error"
+      except UnboundLocalError as exc:
+          badResult = type(exc).__name__
+
+      badResult
+    solution: |-
+      def outerBad():
+          count = 0
+          def inner():
+              count = count + 1
+              return count
+          return inner
+
+      def outerNonlocal():
+          count = 0
+          def inner():
+              nonlocal count
+              count = count + 1
+              return count
+          return inner
+
+      def outerMutable():
+          box = {"count": 0}
+          def inner():
+              box["count"] += 1
+              return box["count"]
+          return inner
+
+      badCounter = outerBad()
+      try:
+          badCounter()
+          badResult = "no error"
+      except UnboundLocalError as exc:
+          badResult = type(exc).__name__
+
+      nonlocalCounter = outerNonlocal()
+      mutableCounter = outerMutable()
+      badResult, (nonlocalCounter(), nonlocalCounter()), (mutableCounter(), mutableCounter())
+    hints:
+    - outerNonlocal 은 inner 첫 줄에 nonlocal count 만 더하면 됩니다. outerMutable 은 nonlocal 없이 box 딕셔너리의 항목만 고칩니다.
+    - '정답 형태: badResult, (nonlocalCounter(), nonlocalCounter()), (mutableCounter(), mutableCounter())'
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "('UnboundLocalError', (1, 2), (1, 2))"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"('UnboundLocalError', (1, 2), (1, 2))\\""
+- id: closure_vs_class
+  title: 클로저 vs 클래스
+  structuredPrimary: true
+  subtitle: 언제 무엇을 사용할까
+  goal: 같은 카운터를 클로저 한 벌과 클래스 한 벌로 만들어 동작은 같지만 바깥에서 상태를 덮어쓸 수 있는지가 갈린다는 것을 확인한다.
+  why: 둘 중 무엇을 쓸지는 취향이 아니라 상태를 바깥에 열어 둘지로 갈리는데, 클래스 속성은 누구든 대입 한 줄로 바꿔 불변 조건을 깰 수 있고 클로저 셀은 일반 속성 접근으로는 아예 닿지 않습니다.
+  explanation: |-
+    둘 다 상태를 한 곳에 묶어 두지만 노출 범위가 다릅니다. 클래스는 self.value라는 이름으로 상태를 밖에 드러내므로 읽기도 쉽고 실수로 덮어쓰기도 쉽습니다. 클로저는 상태에 붙은 이름이 밖에 없어 정해 준 함수를 거치지 않으면 값을 바꿀 수 없습니다.
+
+    대신 클래스가 유리한 자리도 분명합니다. 동작이 여러 개로 늘어나면 메서드 이름이 목록으로 보이고, 상속과 타입 힌팅, 디버거의 객체 검사도 모두 클래스 쪽이 낫습니다. 상태 하나에 동작 한둘이면 클로저, 필드와 동작이 함께 늘어나면 클래스가 기준입니다.
+  snippet: |-
+    def makeClosureCounter():
+        value = 0
+        def increment():
+            nonlocal value
+            value += 1
+            return value
+        def get():
+            return value
+        return increment, get
+
+    inc, get = makeClosureCounter()
+    inc(), inc(), get()
+  exercise:
+    prompt: |-
+      클래스 쪽을 직접 만들어 나란히 세우세요. 고칠 곳은 세 군데입니다.
+      1. 맨 위에 ClassCounter 클래스를 만듭니다. __init__에서 self.value = 0 을 두고, increment는 self.value를 1 늘려 반환하며, get은 self.value를 반환합니다.
+      2. inc, get = makeClosureCounter() 아래에 obj = ClassCounter() 를 만들고, closureRun = (inc(), inc(), get()) 과 classRun = (obj.increment(), obj.increment(), obj.get()) 을 만듭니다.
+      3. 그 아래에 obj.value = 99 를 넣고, 마지막 줄을 closureRun, classRun, obj.get(), hasattr(inc, "value") 로 바꿉니다.
+
+      두 구현은 똑같이 (1, 2, 2)를 냅니다. 그런데 클래스는 바깥에서 value에 99를 대입한 것이 그대로 통하고, 클로저 쪽 inc에는 value라는 속성 자체가 없습니다. 그래서 ((1, 2, 2), (1, 2, 2), 99, False)가 나와야 합니다.
+    starterCode: |-
+      def makeClosureCounter():
+          value = 0
+          def increment():
+              nonlocal value
+              value += 1
+              return value
+          def get():
+              return value
+          return increment, get
+
+      inc, get = makeClosureCounter()
+      inc(), inc(), get()
+    solution: |-
+      class ClassCounter:
+          def __init__(self):
+              self.value = 0
+
+          def increment(self):
+              self.value += 1
+              return self.value
+
+          def get(self):
+              return self.value
+
+      def makeClosureCounter():
+          value = 0
+          def increment():
+              nonlocal value
+              value += 1
+              return value
+          def get():
+              return value
+          return increment, get
+
+      inc, get = makeClosureCounter()
+      obj = ClassCounter()
+      closureRun = (inc(), inc(), get())
+      classRun = (obj.increment(), obj.increment(), obj.get())
+      obj.value = 99
+      closureRun, classRun, obj.get(), hasattr(inc, "value")
+    hints:
+    - ClassCounter 는 __init__ 에서 self.value = 0 을 두고 increment 와 get 두 메서드만 있으면 됩니다. 두 카운터를 각각 두 번씩 올린 뒤 obj.value 에 99 를 대입합니다.
+    - '정답 형태: closureRun, classRun, obj.get(), hasattr(inc, "value")'
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '((1, 2, 2), (1, 2, 2), 99, False)'
+    resultCheck: "출력이 정확히 일치해야 합니다: '((1, 2, 2), (1, 2, 2), 99, False)'"
+- id: workflow_validation
+  title: '현업 흐름 검증: 클로저로 요청 제한기와 캐시 만들기'
+  structuredPrimary: true
+  subtitle: 예측 → 상태 캡슐화 → 초과 오류 → 캐시 검증
+  goal: assert 여섯 줄을 그대로 통과시킨 뒤 새로 만든 제한기와 캐시 통계를 출력해 인스턴스마다 상태가 0부터 다시 시작하는지 확인한다.
+  why: 남은 횟수와 캐시 적중은 화면에 드러나지 않아 잘못 만들어도 조용히 돌아가므로, 경계값을 assert로 박아 두고 새 인스턴스가 앞의 사용량을 물려받지 않는지까지 출력으로 확인해야 운영에 올릴 수 있습니다.
+  explanation: |-
+    클로저는 상태를 함수 안에 숨기고 정해진 동작으로만 바꾸게 할 때 좋습니다. 요청 제한기는 used를 감추고 allowRequest 하나만 노출하며, 캐시는 cache와 callCount를 감추고 square와 stats만 노출합니다.
+
+    이 셀에서 확인할 것은 세 가지입니다. 한도를 넘으면 상태를 늘리지 않고 예외로 끊는지, 캐시가 두 번째 같은 입력에서 callCount를 올리지 않는지, 그리고 makeRateLimiter를 다시 부르면 앞 인스턴스와 상태를 공유하지 않는지입니다. 셋 다 예외가 아니라 숫자로만 드러나므로 assert와 출력으로 고정합니다.
+  tips:
+  - makeRateLimiter 를 다시 부르면 used 셀도 새로 생깁니다. 같은 제한기를 재사용할지 요청마다 새로 만들지는 정책이므로 코드로 못 박아 두세요.
+  snippet: |-
+    def makeRateLimiter(limit):
+        if limit <= 0:
+            raise ValueError("limit must be positive")
+
+        used = 0
+
+        def allowRequest():
+            nonlocal used
+            if used >= limit:
+                raise RuntimeError("request limit exceeded")
+            used += 1
+            return {"allowed": True, "remaining": limit - used}
+
+        return allowRequest
+
+    def makeMemoizedSquare():
+        cache = {}
+        callCount = 0
+
+        def square(value):
+            nonlocal callCount
+            if value not in cache:
+                callCount += 1
+                cache[value] = value * value
+            return cache[value]
+
+        def stats():
+            return {"callCount": callCount, "cacheKeys": sorted(cache)}
+
+        return square, stats
+
+    limiter = makeRateLimiter(2)
+    assert limiter() == {"allowed": True, "remaining": 1}
+    assert limiter() == {"allowed": True, "remaining": 0}
+
+    try:
+        limiter()
+    except RuntimeError as exc:
+        assert "limit" in str(exc)
+
+    square, stats = makeMemoizedSquare()
+    assert [square(4), square(4), square(5)] == [16, 16, 25]
+    assert stats() == {"callCount": 2, "cacheKeys": [4, 5]}
+
+    try:
+        makeRateLimiter(0)
+    except ValueError as exc:
+        assert "positive" in str(exc)
+
+    print("클로저 상태 관리 흐름 통과")
+  exercise:
+    prompt: |-
+      기존 줄은 하나도 바꾸지 마세요. 맨 아래 print 줄 다음에 세 줄만 들여쓰기 없이 덧붙이면 됩니다.
+      1. freshLimiter = makeRateLimiter(3)
+      2. print([freshLimiter()["remaining"] for _ in range(3)])
+      3. print(square(4), square(6), stats())
+
+      앞에서 limiter를 한도까지 다 썼어도 freshLimiter는 자기 used 셀을 0부터 시작하므로 남은 횟수가 2, 1, 0으로 내려갑니다. square(4)는 이미 캐시에 있어 callCount를 올리지 않고 square(6)만 새로 계산하므로 callCount는 3이 됩니다. 그래서 아래 세 줄이 나와야 합니다.
+      클로저 상태 관리 흐름 통과
+      [2, 1, 0]
+      16 36 {'callCount': 3, 'cacheKeys': [4, 5, 6]}
+    starterCode: |-
+      def makeRateLimiter(limit):
+          if limit <= 0:
+              raise ValueError("limit must be positive")
+
+          used = 0
+
+          def allowRequest():
+              nonlocal used
+              if used >= limit:
+                  raise RuntimeError("request limit exceeded")
+              used += 1
+              return {"allowed": True, "remaining": limit - used}
+
+          return allowRequest
+
+      def makeMemoizedSquare():
+          cache = {}
+          callCount = 0
+
+          def square(value):
+              nonlocal callCount
+              if value not in cache:
+                  callCount += 1
+                  cache[value] = value * value
+              return cache[value]
+
+          def stats():
+              return {"callCount": callCount, "cacheKeys": sorted(cache)}
+
+          return square, stats
+
+      limiter = makeRateLimiter(2)
+      assert limiter() == {"allowed": True, "remaining": 1}
+      assert limiter() == {"allowed": True, "remaining": 0}
+
+      try:
+          limiter()
+      except RuntimeError as exc:
+          assert "limit" in str(exc)
+
+      square, stats = makeMemoizedSquare()
+      assert [square(4), square(4), square(5)] == [16, 16, 25]
+      assert stats() == {"callCount": 2, "cacheKeys": [4, 5]}
+
+      try:
+          makeRateLimiter(0)
+      except ValueError as exc:
+          assert "positive" in str(exc)
+
+      print("클로저 상태 관리 흐름 통과")
+    solution: |-
+      def makeRateLimiter(limit):
+          if limit <= 0:
+              raise ValueError("limit must be positive")
+
+          used = 0
+
+          def allowRequest():
+              nonlocal used
+              if used >= limit:
+                  raise RuntimeError("request limit exceeded")
+              used += 1
+              return {"allowed": True, "remaining": limit - used}
+
+          return allowRequest
+
+      def makeMemoizedSquare():
+          cache = {}
+          callCount = 0
+
+          def square(value):
+              nonlocal callCount
+              if value not in cache:
+                  callCount += 1
+                  cache[value] = value * value
+              return cache[value]
+
+          def stats():
+              return {"callCount": callCount, "cacheKeys": sorted(cache)}
+
+          return square, stats
+
+      limiter = makeRateLimiter(2)
+      assert limiter() == {"allowed": True, "remaining": 1}
+      assert limiter() == {"allowed": True, "remaining": 0}
+
+      try:
+          limiter()
+      except RuntimeError as exc:
+          assert "limit" in str(exc)
+
+      square, stats = makeMemoizedSquare()
+      assert [square(4), square(4), square(5)] == [16, 16, 25]
+      assert stats() == {"callCount": 2, "cacheKeys": [4, 5]}
+
+      try:
+          makeRateLimiter(0)
+      except ValueError as exc:
+          assert "positive" in str(exc)
+
+      print("클로저 상태 관리 흐름 통과")
+      freshLimiter = makeRateLimiter(3)
+      print([freshLimiter()["remaining"] for _ in range(3)])
+      print(square(4), square(6), stats())
+    hints:
+    - 기존 코드는 손대지 말고 맨 아래에 세 줄만 들여쓰기 없이 덧붙입니다. freshLimiter 는 makeRateLimiter 를 다시 불러 만든 새 인스턴스라 앞의 limiter 와 used 셀을 공유하지 않습니다.
+    - '정답 형태: 마지막 줄에 print(square(4), square(6), stats())'
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: |-
+      클로저 상태 관리 흐름 통과
+      [2, 1, 0]
+      16 36 {'callCount': 3, 'cacheKeys': [4, 5, 6]}
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"클로저 상태 관리 흐름 통과\\n[2, 1, 0]\\n16 36 {'callCount': 3, 'cacheKeys': [4, 5, 6]}\\""
+- id: practice
+  title: 종합 복습
+  structuredPrimary: true
+  subtitle: 클로저와 상태 관리 마스터하기
+  goal: 인사말 하나를 공유하는 함수 세 개를 한 팩토리에서 돌려주고, 재할당은 nonlocal로 목록 누적은 그대로 처리해 본다.
+  why: 실무에서 클로저가 나타나는 모양은 함수 하나가 아니라 같은 숨은 상태를 나눠 쓰는 함수 묶음이므로, 어떤 이름에는 nonlocal이 필요하고 어떤 이름에는 필요 없는지를 한 셀에서 엮어 봐야 라이브러리 코드를 읽어 낼 수 있습니다.
+  explanation: |-
+    이 셀은 앞의 여섯 절을 한 덩어리로 묶습니다. 팩토리 하나가 상태 둘(인사말, 기록)을 감추고 함수 셋(인사, 조회, 변경)을 돌려주는 형태입니다.
+
+    두 상태의 처리 방식이 다릅니다. greeting은 rename에서 새 문자열로 다시 묶으므로 nonlocal이 필요하고, calls는 append로 내용만 늘리므로 필요 없습니다. history가 calls를 그대로 돌려주지 않고 list(calls) 복사본을 주는 것도 의도입니다. 원본을 넘기면 바깥에서 기록을 지울 수 있어 숨긴 의미가 사라집니다.
+  tips:
+  - 어떤 이름에 nonlocal 이 필요한지 헷갈리면 그 줄이 이름을 다시 묶는지 객체 내부를 고치는지만 보세요.
+  snippet: |-
+    def greetMaker(greeting):
+        def greet(name):
+            return f"{greeting}, {name}!"
+        return greet
+
+    sayHello = greetMaker("Hello")
+    sayHello("World")
+  exercise:
+    prompt: |-
+      greetMaker를 함수 세 개를 돌려주는 makeGreeter로 바꾸세요. 고칠 곳은 네 군데입니다.
+      1. def greetMaker(greeting): 을 def makeGreeter(greeting): 으로 바꾸고 그 아래에 calls = [] 를 둡니다.
+      2. greet 안에서 message = f"{greeting}, {name}!" 를 만들고 calls.append(message) 를 한 뒤 message 를 반환합니다.
+      3. greet 아래에 history()를 두어 list(calls) 를 반환하고, rename(newGreeting)을 두어 nonlocal greeting 뒤 greeting 을 새 값으로 바꿉니다. 팩토리는 return greet, history, rename 으로 끝냅니다.
+      4. 아래 두 줄을 지우고 greet, history, rename = makeGreeter("Hello"), first = greet("World"), rename("Hi"), second = greet("Codaro") 를 차례로 쓴 다음 마지막 줄에 first, second, history() 를 표시합니다.
+
+      greeting은 다시 묶는 이름이라 nonlocal이 필요하지만 calls는 append로 내용만 바꾸므로 필요 없습니다. rename 뒤에 부른 greet은 바뀐 인사말을 쓰고 기록에는 두 건이 모두 남으므로 ('Hello, World!', 'Hi, Codaro!', ['Hello, World!', 'Hi, Codaro!'])가 나와야 합니다.
+    starterCode: |-
+      def greetMaker(greeting):
+          def greet(name):
+              return f"{greeting}, {name}!"
+          return greet
+
+      sayHello = greetMaker("Hello")
+      sayHello("World")
+    solution: |-
+      def makeGreeter(greeting):
+          calls = []
+
+          def greet(name):
+              message = f"{greeting}, {name}!"
+              calls.append(message)
+              return message
+
+          def history():
+              return list(calls)
+
+          def rename(newGreeting):
+              nonlocal greeting
+              greeting = newGreeting
+              return greeting
+
+          return greet, history, rename
+
+      greet, history, rename = makeGreeter("Hello")
+      first = greet("World")
+      rename("Hi")
+      second = greet("Codaro")
+      first, second, history()
+    hints:
+    - greeting 은 rename 에서 다시 묶으므로 nonlocal 이 필요하고, calls 는 append 로 내용만 바꾸므로 필요 없습니다. history 는 calls 자체가 아니라 list(calls) 복사본을 돌려줍니다.
+    - '정답 형태: first, second, history()'
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "('Hello, World!', 'Hi, Codaro!', ['Hello, World!', 'Hi, Codaro!'])"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"('Hello, World!', 'Hi, Codaro!', ['Hello, World!', 'Hi, Codaro!'])\\""
+assessment:
+  masteryVariants:
+  - id: 03_advanced_closure-independent-counter-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - closure_definition
+    - state_encapsulation
+    - nonlocal_keyword
+    title: 클로저 카운터 두 개가 독립 상태를 유지하는지 검증하기
+    subtitle: private state with nonlocal
+    goal: 시작값과 증가량 목록을 받아 첫 번째 카운터의 변화, 두 번째 카운터의 독립성, 자유 변수를 반환한다.
+    why: 클로저 학습의 핵심은 함수가 값을 기억한다는 설명보다, 반환된 함수마다 상태가 따로 살아 있음을 직접 증명하는 것입니다.
+    explanation: run_independent_counters(start, steps)를 완성해 nonlocal 상태 변경, 독립 인스턴스, free variable 정보를 함께 확인하세요.
+    tips:
+    - steps가 비어 있으면 검증할 상태 변화가 없으므로 ValueError로 막으세요.
+    - 두 번째 카운터를 따로 만들어 첫 번째 호출 기록과 섞이지 않는지 확인하세요.
+    exercise:
+      prompt: run_independent_counters(start, steps)를 완성해 첫 번째 카운터 값 변화와 두 번째 카운터의 독립성을 반환하세요.
+      starterCode: |-
+        def run_independent_counters(start, steps):
+            raise NotImplementedError
+      solution: |-
+        def run_independent_counters(start, steps):
+            if not steps:
+                raise ValueError("steps are required")
+
+            def make_counter(initial):
+                count = initial
+
+                def counter(delta=1):
+                    nonlocal count
+                    count += delta
+                    return count
+
+                return counter
+
+            first = make_counter(start)
+            second = make_counter(start)
+            first_values = [first(delta) for delta in steps]
+            second_first_value = second(10)
+            return {
+                "firstValues": first_values,
+                "secondFirstValue": second_first_value,
+                "independent": second_first_value != first_values[-1],
+                "freeVars": sorted(first.__code__.co_freevars),
+            }
+      hints:
+      - count를 다시 할당하려면 counter 안에서 nonlocal count가 필요합니다.
+      - __code__.co_freevars는 내부 함수가 붙잡은 외부 변수 이름을 보여줍니다.
+    check:
+      id: python.advanced.closure.independent-counter.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.closure.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: run_independent_counters
+        cases:
+        - id: tracks-state-and-independent-counter
+          arguments:
+          - value: 0
+          - value:
+            - 1
+            - 2
+            - 3
+          expectedReturn:
+            firstValues:
+            - 1
+            - 3
+            - 6
+            secondFirstValue: 10
+            independent: true
+            freeVars:
+            - count
+        - id: rejects-empty-steps
+          arguments:
+          - value: 0
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 03_advanced_closure-quota-limiter-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - state_encapsulation
+    - factory_pattern
+    - workflow_validation
+    title: 요청 비용을 기억하는 클로저 제한기로 승인과 거부 기록하기
+    subtitle: quota limiter closure
+    goal: 총 quota와 요청 목록을 받아 각 요청의 승인 여부, 남은 quota, 사용량을 반환한다.
+    why: 전이 과제에서는 단순 카운터를 벗어나, 실제 요청 제한처럼 상태를 숨기고 정책만 함수로 노출하는 설계를 확인합니다.
+    explanation: run_quota_limiter(limit, requests)를 완성해 각 요청 cost가 남은 quota 이하일 때만 승인하고, 거부된 요청은 상태를 바꾸지 않도록 만드세요.
+    tips:
+    - 남은 quota는 클로저 내부에 숨기세요.
+    - 거부된 요청은 remaining 값을 그대로 유지해야 합니다.
+    exercise:
+      prompt: run_quota_limiter(limit, requests)를 완성해 요청별 decision과 최종 remaining, spent를 반환하세요.
+      starterCode: |-
+        def run_quota_limiter(limit, requests):
+            raise NotImplementedError
+      solution: |-
+        def run_quota_limiter(limit, requests):
+            if limit <= 0:
+                raise ValueError("limit must be positive")
+
+            remaining = limit
+
+            def decide(request):
+                nonlocal remaining
+                cost = request["cost"]
+                allowed = cost <= remaining
+                if allowed:
+                    remaining -= cost
+                return {
+                    "id": request["id"],
+                    "allowed": allowed,
+                    "remaining": remaining,
+                }
+
+            decisions = [decide(request) for request in requests]
+            return {
+                "decisions": decisions,
+                "remaining": remaining,
+                "spent": limit - remaining,
+                "acceptedCount": sum(1 for decision in decisions if decision["allowed"]),
+            }
+      hints:
+      - decide 안에서 remaining을 줄이려면 nonlocal이 필요합니다.
+      - denied 요청은 remaining을 줄이지 않습니다.
+    check:
+      id: python.advanced.closure.quota-limiter.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.closure.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: run_quota_limiter
+        cases:
+        - id: records-allowed-and-denied-requests
+          arguments:
+          - value: 5
+          - value:
+            - id: R1
+              cost: 2
+            - id: R2
+              cost: 4
+            - id: R3
+              cost: 1
+          expectedReturn:
+            decisions:
+            - id: R1
+              allowed: true
+              remaining: 3
+            - id: R2
+              allowed: false
+              remaining: 3
+            - id: R3
+              allowed: true
+              remaining: 2
+            remaining: 2
+            spent: 3
+            acceptedCount: 2
+        - id: rejects-non-positive-limit
+          arguments:
+          - value: 0
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 03_advanced_closure-pattern-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 03_advanced_closure-quota-limiter-transfer
+    title: 클로저, 클래스, 캐시 중 맞는 상태 관리 도구 고르기
+    subtitle: state pattern recall
+    goal: 상황 이름을 받아 적절한 패턴, 이유, nonlocal 필요 여부를 반환한다.
+    why: 시간이 지나도 남아야 할 감각은 상태가 하나인 콜백은 클로저, 여러 동작과 필드는 클래스, 반복 계산은 캐시라는 선택 기준입니다.
+    explanation: choose_state_pattern(situation)를 완성해 단일 숨김 상태, 여러 필드와 동작, 반복 계산 상황별 도구를 고르세요.
+    tips:
+    - 클로저는 간단한 상태와 단일 동작에 잘 맞습니다.
+    - 상태를 다시 할당할 때만 nonlocal이 필요합니다.
+    exercise:
+      prompt: choose_state_pattern(situation)를 완성해 상황별 상태 관리 패턴을 반환하세요.
+      starterCode: |-
+        def choose_state_pattern(situation):
+            raise NotImplementedError
+      solution: |-
+        def choose_state_pattern(situation):
+            table = {
+                "single-hidden-counter": {
+                    "pattern": "closure",
+                    "reason": "one private value and one behavior",
+                    "usesNonlocal": True,
+                },
+                "many-fields-many-actions": {
+                    "pattern": "class",
+                    "reason": "several fields and methods need explicit names",
+                    "usesNonlocal": False,
+                },
+                "expensive-repeat-call": {
+                    "pattern": "lru_cache",
+                    "reason": "same arguments should reuse a computed result",
+                    "usesNonlocal": False,
+                },
+            }
+            if situation not in table:
+                raise ValueError("unknown state situation")
+            return table[situation]
+      hints:
+      - nonlocal은 외부 스코프 변수를 다시 할당할 때 씁니다.
+      - 메서드가 여러 개면 클래스가 더 읽기 쉽습니다.
+    check:
+      id: python.advanced.closure.pattern-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.closure.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_state_pattern
+        cases:
+        - id: chooses-closure-for-one-hidden-counter
+          arguments:
+          - value: single-hidden-counter
+          expectedReturn:
+            pattern: closure
+            reason: one private value and one behavior
+            usesNonlocal: true
+        - id: chooses-class-for-many-fields
+          arguments:
+          - value: many-fields-many-actions
+          expectedReturn:
+            pattern: class
+            reason: several fields and methods need explicit names
+            usesNonlocal: false
+        - id: rejects-unknown-situation
+          arguments:
+          - value: global-magic
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
+`;export{e as default};

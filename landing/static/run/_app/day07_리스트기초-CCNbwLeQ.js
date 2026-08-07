@@ -1,0 +1,743 @@
+var e=`meta:
+  id: day07
+  title: 리스트기초
+  day: 7
+  category: 30days
+  outcomes: ["python.lists"]
+  prerequisites: ["python.variables"]
+  estimatedMinutes: 40
+  tags:
+  - 리스트
+  - 인덱싱
+  - 슬라이싱
+  - 재고관리
+  - 정합성
+  - 검증
+  seo:
+    title: 파이썬 리스트 기초 - 리스트 생성과 활용
+    description: 리스트의 기본 개념, 생성, 인덱싱, 슬라이싱, 수정 방법을 배웁니다.
+    keywords:
+    - 리스트
+    - list
+    - 인덱싱
+    - 슬라이싱
+    - indexing
+intro:
+  emoji: 📦
+  points:
+  - 리스트로 여러 값을 한 번에 관리
+  - 인덱스로 원하는 요소에 접근
+  - 슬라이싱으로 부분 리스트 추출
+  - 리스트 수정과 연산
+  direction: 리스트기초에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 리스트기초 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 리스트란? 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 다양한 리스트 생성 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: 리스트 인덱싱 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 리스트기초 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 리스트기초 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 리스트기초 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: list_intro
+  title: 리스트란?
+  structuredPrimary: true
+  subtitle: 여러 값을 담는 상자
+  goal: 여러 값을 대괄호 하나에 담고 리스트 전체를 확인한다.
+  why: 값 하나마다 변수를 따로 만들면 개수가 늘 때마다 코드를 고쳐야 하지만, 리스트에 모아 두면 항목이 늘어도 다루는 방식이 같습니다.
+  explanation: |-
+    리스트(List)는 여러 개의 값을 순서대로 담을 수 있는 자료구조입니다. 대괄호 []로 만들고, 쉼표로 값을 구분합니다. 숫자, 문자열, 불린 등 어떤 타입의 값도 담을 수 있습니다. 리스트는 순서가 있어서 첫 번째, 두 번째 같은 위치로 값에 접근할 수 있습니다.
+
+    리스트는 프로그래밍에서 가장 많이 사용하는 자료구조 중 하나입니다.
+  snippet: |-
+    items = [1, 2, 3, 4, 5]
+    items
+  exercise:
+    prompt: |-
+      items의 마지막 값 5를 50으로 바꾸세요.
+
+      실행하면 [1, 2, 3, 4, 50]이 나와야 합니다.
+    starterCode: |-
+      items = [1, 2, 3, 4, 5]
+      items
+    solution: |-
+      items = [1, 2, 3, 4, 50]
+      items
+    hints:
+    - "대괄호 안 맨 뒤의 5를 50으로 바꿉니다. 마지막 줄 items는 그대로 둡니다."
+    - "정답 형태: items = [1, 2, 3, 4, 50]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '[1, 2, 3, 4, 50]'
+    resultCheck: "출력이 정확히 일치해야 합니다: '[1, 2, 3, 4, 50]'"
+- id: list_create
+  title: 다양한 리스트 생성
+  structuredPrimary: true
+  subtitle: 타입 제한 없이 자유롭게
+  goal: 숫자, 문자열, 참거짓 값을 한 리스트에 섞어 담는다.
+  why: 실제 데이터는 이름, 수량, 사용 여부처럼 타입이 섞여 들어오기 때문에 리스트가 타입을 가리지 않는다는 점을 알아야 합니다.
+  explanation: |-
+    리스트는 숫자만, 문자열만 담을 수도 있고, 여러 타입을 섞어서 담을 수도 있습니다. 빈 리스트도 만들 수 있습니다. 리스트 안에 리스트를 넣어 중첩 리스트도 만들 수 있습니다.
+
+    빈 리스트는 나중에 값을 추가할 때 유용합니다.
+  snippet: |-
+    nums = [10, 20, 30]
+    nums
+  exercise:
+    prompt: |-
+      nums를 [10, '이십', True]로 바꾸세요. 숫자, 문자열, 참거짓을 한 리스트에 담는 것입니다.
+
+      실행하면 [10, '이십', True]가 나와야 합니다.
+    starterCode: |-
+      nums = [10, 20, 30]
+      nums
+    solution: |-
+      nums = [10, '이십', True]
+      nums
+    hints:
+    - "nums = [10, 20, 30] 을 nums = [10, '이십', True] 로 바꿉니다. 문자열에는 따옴표가 필요합니다."
+    - "정답 형태: nums = [10, '이십', True]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "[10, '이십', True]"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"[10, '이십', True]\\""
+- id: list_indexing
+  title: 리스트 인덱싱
+  structuredPrimary: true
+  subtitle: 위치로 값 가져오기
+  goal: 인덱스 번호로 리스트에서 원하는 항목 하나를 꺼낸다.
+  why: 목록 전체가 아니라 특정 위치의 값 하나만 필요할 때, 예를 들어 첫 번째 주문이나 세 번째 항목을 꺼낼 때 씁니다.
+  explanation: |-
+    리스트의 각 요소는 인덱스(위치 번호)로 접근할 수 있습니다. 인덱스는 0부터 시작합니다. 첫 번째 요소는 [0], 두 번째는 [1], 세 번째는 [2]입니다. 리스트 이름 뒤에 대괄호를 쓰고 인덱스를 넣으면 그 위치의 값을 가져옵니다.
+
+    리스트 길이보다 큰 인덱스를 사용하면 에러가 발생합니다.
+  snippet: |-
+    basket = ['사과', '바나나', '오렌지', '포도']
+    basket[0]
+  exercise:
+    prompt: |-
+      마지막 줄 basket[0]을 basket[2]로 바꾸세요.
+
+      인덱스는 0부터 세므로 오렌지가 나와야 합니다.
+    starterCode: |-
+      basket = ['사과', '바나나', '오렌지', '포도']
+      basket[0]
+    solution: |-
+      basket = ['사과', '바나나', '오렌지', '포도']
+      basket[2]
+    hints:
+    - "basket[0] 을 basket[2] 로 바꿉니다. 첫 줄 리스트는 그대로 둡니다."
+    - "정답 형태: basket[2]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 오렌지
+    resultCheck: "출력이 정확히 일치해야 합니다: '오렌지'"
+- id: list_negative
+  title: 음수 인덱싱
+  structuredPrimary: true
+  subtitle: 뒤에서부터 접근하기
+  goal: 음수 인덱스로 리스트 뒤에서부터 항목을 꺼낸다.
+  why: 길이가 매번 달라지는 목록에서도 마지막 값이나 끝에서 몇 번째 값을 길이 계산 없이 바로 꺼낼 수 있습니다.
+  explanation: |-
+    음수 인덱스를 사용하면 리스트의 뒤에서부터 접근할 수 있습니다. -1은 마지막 요소, -2는 뒤에서 두 번째 요소, -3은 뒤에서 세 번째 요소입니다. 리스트가 길 때 마지막 요소에 접근하는 간편한 방법입니다.
+
+    리스트 길이를 몰라도 [-1]로 마지막 요소에 접근할 수 있습니다.
+  snippet: |-
+    values = [10, 20, 30, 40, 50]
+    values[-1]
+  exercise:
+    prompt: |-
+      마지막 줄 values[-1]을 values[-3]으로 바꾸세요.
+
+      뒤에서 세 번째 값인 30이 나와야 합니다.
+    starterCode: |-
+      values = [10, 20, 30, 40, 50]
+      values[-1]
+    solution: |-
+      values = [10, 20, 30, 40, 50]
+      values[-3]
+    hints:
+    - "values[-1] 을 values[-3] 으로 바꿉니다. 첫 줄 리스트는 그대로 둡니다."
+    - "정답 형태: values[-3]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '30'
+    resultCheck: "출력이 정확히 일치해야 합니다: '30'"
+- id: list_slicing
+  title: 리스트 슬라이싱
+  structuredPrimary: true
+  subtitle: 범위로 잘라내기
+  goal: 시작과 끝 인덱스를 지정해 리스트의 일부만 잘라낸다.
+  why: 긴 목록에서 앞 몇 개만 보여 주거나 가운데 구간만 따로 처리할 때 씁니다.
+  explanation: |-
+    슬라이싱은 리스트의 일부분을 잘라내어 새 리스트를 만듭니다. [시작:끝] 형식으로 사용하며, 시작 인덱스부터 끝 인덱스 직전까지 가져옵니다. 시작을 생략하면 처음부터, 끝을 생략하면 끝까지 가져옵니다.
+
+    슬라이싱은 원본 리스트를 변경하지 않고 새 리스트를 만듭니다.
+  snippet: |-
+    rainbow = ['빨강', '주황', '노랑', '초록', '파랑', '남색', '보라']
+    rainbow[:3]
+  exercise:
+    prompt: |-
+      마지막 줄 rainbow[:3]을 rainbow[2:5]로 바꾸세요.
+
+      실행하면 ['노랑', '초록', '파랑']이 나와야 합니다. 끝 인덱스 5는 포함되지 않습니다.
+    starterCode: |-
+      rainbow = ['빨강', '주황', '노랑', '초록', '파랑', '남색', '보라']
+      rainbow[:3]
+    solution: |-
+      rainbow = ['빨강', '주황', '노랑', '초록', '파랑', '남색', '보라']
+      rainbow[2:5]
+    hints:
+    - "rainbow[:3] 을 rainbow[2:5] 로 바꿉니다. 색 목록 줄은 그대로 둡니다."
+    - "정답 형태: rainbow[2:5]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "['노랑', '초록', '파랑']"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"['노랑', '초록', '파랑']\\""
+- id: list_step
+  title: 슬라이싱 step
+  structuredPrimary: true
+  subtitle: 간격을 두고 가져오기
+  goal: step을 지정해 일정 간격으로 항목을 골라낸다.
+  why: 짝수 번째만 뽑거나 순서를 통째로 뒤집는 일을 반복문 없이 슬라이스 한 줄로 끝냅니다.
+  explanation: |-
+    슬라이싱에 step을 추가하면 지정한 간격으로 요소를 가져올 수 있습니다. [시작:끝:step] 형식으로 사용합니다. step이 2면 하나 건너 하나씩, 3이면 두 개 건너 하나씩 가져옵니다. 음수 step을 사용하면 역순으로 가져옵니다.
+
+    [::-1]은 리스트를 뒤집는 간편한 방법입니다.
+  snippet: |-
+    sequence = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    sequence[::2]
+  exercise:
+    prompt: |-
+      마지막 줄 sequence[::2]를 sequence[1::2]로 바꾸세요.
+
+      1부터 시작해 하나씩 건너뛰므로 [1, 3, 5, 7, 9]가 나와야 합니다.
+    starterCode: |-
+      sequence = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+      sequence[::2]
+    solution: |-
+      sequence = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+      sequence[1::2]
+    hints:
+    - "sequence[::2] 를 sequence[1::2] 로 바꿉니다. 시작 위치만 0에서 1로 옮기는 것입니다."
+    - "정답 형태: sequence[1::2]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '[1, 3, 5, 7, 9]'
+    resultCheck: "출력이 정확히 일치해야 합니다: '[1, 3, 5, 7, 9]'"
+- id: list_modify
+  title: 리스트 수정
+  structuredPrimary: true
+  subtitle: 인덱스로 값 변경하기
+  goal: 인덱스에 값을 대입해 리스트의 특정 항목만 바꾼다.
+  why: 재고 수량이나 처리 상태처럼 목록의 한 칸만 갱신해야 할 때 리스트를 새로 만들지 않고 그 자리를 고칩니다.
+  explanation: 리스트는 수정 가능한(mutable) 자료구조입니다. 인덱스를 사용하여 특정 위치의 값을 다른 값으로 변경할 수 있습니다. list[0] = 'new value'
+    형식으로 할당하면 그 위치의 값이 바뀝니다. 문자열과 달리 리스트는 생성 후에도 내용을 변경할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    before = ['사과', '바나나', '오렌지']
+    print('before:', before)
+  exercise:
+    prompt: |-
+      print() 줄 앞에 before[1] = '딸기' 한 줄을 추가하세요.
+
+      실행하면 before: ['사과', '딸기', '오렌지']가 나와야 합니다.
+    starterCode: |-
+      before = ['사과', '바나나', '오렌지']
+      print('before:', before)
+    solution: |-
+      before = ['사과', '바나나', '오렌지']
+      before[1] = '딸기'
+      print('before:', before)
+    hints:
+    - "두 번째 줄에 before[1] = '딸기' 를 넣습니다. 리스트를 새로 만들지 않고 두 번째 칸만 바꾸는 것입니다."
+    - "정답 형태: before[1] = '딸기'"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "before: ['사과', '딸기', '오렌지']"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"before: ['사과', '딸기', '오렌지']\\""
+- id: list_length
+  title: 리스트 길이
+  structuredPrimary: true
+  subtitle: len() 함수 사용
+  goal: len()으로 리스트에 담긴 항목 개수를 센다.
+  why: 처리할 건수를 세거나 두 목록의 길이가 같은지 확인할 때, 그리고 마지막 인덱스를 구할 때 씁니다.
+  explanation: |-
+    len() 함수는 리스트에 담긴 요소의 개수를 반환합니다. 리스트가 몇 개의 항목을 가지고 있는지 알아야 할 때 사용합니다. 빈 리스트의 길이는 0입니다. 리스트의 마지막 인덱스는 len(list) - 1입니다.
+
+    len() 함수는 문자열의 길이도 확인할 수 있습니다.
+  snippet: |-
+    goods = ['사과', '바나나', '오렌지', '포도', '딸기']
+    len(goods)
+  exercise:
+    prompt: |-
+      goods에서 '딸기'를 지워 항목을 네 개로 만드세요.
+
+      실행하면 4가 나와야 합니다.
+    starterCode: |-
+      goods = ['사과', '바나나', '오렌지', '포도', '딸기']
+      len(goods)
+    solution: |-
+      goods = ['사과', '바나나', '오렌지', '포도']
+      len(goods)
+    hints:
+    - "리스트 끝의 , '딸기' 부분을 지웁니다. 마지막 줄 len(goods)는 그대로 둡니다."
+    - "정답 형태: goods = ['사과', '바나나', '오렌지', '포도']"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '4'
+    resultCheck: "출력이 정확히 일치해야 합니다: '4'"
+- id: list_concat
+  title: 리스트 연결
+  structuredPrimary: true
+  subtitle: + 연산자로 합치기
+  goal: + 연산자로 두 리스트를 이어 붙인 새 리스트를 만든다.
+  why: 나눠서 만든 목록을 하나로 합칠 때, 예를 들어 오전 접수분과 오후 접수분을 이어 붙일 때 씁니다.
+  explanation: |-
+    두 개 이상의 리스트를 + 연산자로 연결하여 하나의 긴 리스트를 만들 수 있습니다. 원본 리스트는 변경되지 않고 새로운 리스트가 생성됩니다. 여러 리스트를 순서대로 합칠 때 유용합니다.
+
+    리스트 + 리스트만 가능합니다. 리스트 + 숫자는 에러가 발생합니다.
+  snippet: |-
+    front = [1, 2, 3]
+    back = [4, 5, 6]
+    front + back
+  exercise:
+    prompt: |-
+      back을 [7, 8]로 바꾸세요.
+
+      실행하면 [1, 2, 3, 7, 8]이 나와야 합니다.
+    starterCode: |-
+      front = [1, 2, 3]
+      back = [4, 5, 6]
+      front + back
+    solution: |-
+      front = [1, 2, 3]
+      back = [7, 8]
+      front + back
+    hints:
+    - "back = [4, 5, 6] 을 back = [7, 8] 로 바꿉니다. front와 마지막 줄은 그대로 둡니다."
+    - "정답 형태: back = [7, 8]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '[1, 2, 3, 7, 8]'
+    resultCheck: "출력이 정확히 일치해야 합니다: '[1, 2, 3, 7, 8]'"
+- id: list_repeat
+  title: 리스트 반복
+  structuredPrimary: true
+  subtitle: '* 연산자로 복제하기'
+  goal: '* 연산자로 같은 값이 여러 개인 리스트를 만든다.'
+  why: 0으로 채운 자리를 미리 준비하는 것처럼 같은 값을 정해진 개수만큼 만들어 둘 때 씁니다.
+  explanation: |-
+    리스트에 * 연산자를 사용하면 리스트를 여러 번 반복한 새 리스트를 만들 수 있습니다. list * 3은 리스트를 3번 반복합니다. 같은 값을 여러 개 가진 리스트를 만들 때 편리합니다.
+
+    [0] * 10으로 0이 10개인 리스트를 쉽게 만들 수 있습니다.
+  snippet: |-
+    base = [1, 2, 3]
+    base * 3
+  exercise:
+    prompt: |-
+      base를 [0]으로 바꾸고, 마지막 줄 base * 3을 base * 5로 바꾸세요.
+
+      실행하면 [0, 0, 0, 0, 0]이 나와야 합니다.
+    starterCode: |-
+      base = [1, 2, 3]
+      base * 3
+    solution: |-
+      base = [0]
+      base * 5
+    hints:
+    - "base = [1, 2, 3] 을 base = [0] 으로, base * 3 을 base * 5 로 바꿉니다."
+    - "정답 형태: base = [0] 과 base * 5"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '[0, 0, 0, 0, 0]'
+    resultCheck: "출력이 정확히 일치해야 합니다: '[0, 0, 0, 0, 0]'"
+- id: list_membership
+  title: in/not in 연산자
+  structuredPrimary: true
+  subtitle: 요소 포함 여부 확인
+  goal: in 연산자로 특정 값이 리스트에 있는지 True와 False로 확인한다.
+  why: 목록에 이미 있는 항목인지 먼저 검사하면 중복으로 넣거나 없는 값을 꺼내다 에러가 나는 일을 막을 수 있습니다.
+  explanation: |-
+    in 연산자는 특정 값이 리스트에 있는지 확인합니다. not in은 그 반대입니다. 결과는 True 또는 False입니다. 리스트에서 값을 찾을 때 인덱스를 모두 확인할 필요 없이 간편하게 검사할 수 있습니다.
+
+    in 연산자는 문자열에서 부분 문자열 검색에도 사용됩니다.
+  snippet: |-
+    bucket = ['사과', '바나나', '오렌지']
+    '바나나' in bucket
+  exercise:
+    prompt: |-
+      마지막 줄에서 찾는 값 '바나나'를 '딸기'로 바꾸세요.
+
+      bucket에 딸기가 없으므로 False가 나와야 합니다.
+    starterCode: |-
+      bucket = ['사과', '바나나', '오렌지']
+      '바나나' in bucket
+    solution: |-
+      bucket = ['사과', '바나나', '오렌지']
+      '딸기' in bucket
+    hints:
+    - "'바나나' in bucket 을 '딸기' in bucket 으로 바꿉니다. 첫 줄 리스트는 그대로 둡니다."
+    - "정답 형태: '딸기' in bucket"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'False'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'False'"
+- id: workflow_validation
+  title: '검증 루프: 재고 목록 정합성 확인'
+  structuredPrimary: true
+  subtitle: 여러 리스트를 같은 순서로 맞춰 업무 데이터로 쓰기
+  goal: 목록에 항목이 하나 늘었을 때 나누는 두 지점을 함께 옮겨야 원본이 그대로 복원된다는 것을 직접 고쳐 보며 확인한다.
+  why: 목록을 나눠 처리하고 다시 합칠 때 항목이 빠지거나 순서가 뒤바뀌면 눈으로는 잘 보이지 않아서 assert로 잡습니다.
+  explanation: |-
+    리스트는 값 여러 개를 담는 상자에서 끝나지 않습니다. 제품명 리스트와 재고 수량 리스트처럼 서로 같은 순서를 공유하는 데이터를 다룰 때는 길이, 인덱스, 수정 결과를 계속 검증해야 합니다.
+
+    목록을 두 덩이로 가를 때 앞쪽 끝 번호와 뒤쪽 시작 번호는 같은 숫자여야 합니다. 한쪽만 옮기면 겹치는 항목이 두 번 들어가거나 사이의 항목이 통째로 빠지는데, 합친 목록만 봐서는 잘 보이지 않습니다. 원본과 비교하는 assert 한 줄이 그 어긋남을 잡아 줍니다.
+  tips:
+  - 변주 실험 urgentTasks 와 laterTasks 를 더하는 순서를 뒤집으면 orderedTasks == dailyTasks 가 왜 깨지는지 확인하세요.
+  snippet: |-
+    productNames = ['노트북', '마우스', '키보드', '모니터']
+    stockCounts = [5, 20, 0, 8]
+
+    assert len(productNames) == len(stockCounts)
+
+    firstProduct = productNames[0]
+    firstStock = stockCounts[0]
+    lastProduct = productNames[-1]
+    lastStock = stockCounts[-1]
+
+    assert firstProduct == '노트북'
+    assert firstStock == 5
+    assert lastProduct == '모니터'
+    assert lastStock == 8
+  exercise:
+    prompt: |-
+      급한 업무로 '재고 확인'이 하나 늘었습니다. dailyTasks의 '견적서 작성' 뒤에 '재고 확인'을 넣어 다섯 항목으로 만들고, 앞 세 건이 급한 일이 되도록 슬라이스 두 줄의 번호를 함께 옮긴 뒤, urgentTasks와 laterTasks를 검사하는 assert 두 줄을 새 목록에 맞게 고치세요. orderedTasks를 원본과 비교하는 마지막 assert는 그대로 둡니다.
+
+      앞쪽 끝 번호와 뒤쪽 시작 번호를 둘 다 3으로 맞춰야 합칠 때 원본이 그대로 복원됩니다. 한쪽만 옮기면 '재고 확인'이 두 번 들어가거나 빠져서 마지막 assert가 멈춥니다.
+    starterCode: |-
+      dailyTasks = ['메일 확인', '견적서 작성', '고객 연락', '보고서 정리']
+      urgentTasks = dailyTasks[:2]
+      laterTasks = dailyTasks[2:]
+      orderedTasks = urgentTasks + laterTasks
+
+      assert urgentTasks == ['메일 확인', '견적서 작성']
+      assert laterTasks == ['고객 연락', '보고서 정리']
+      assert orderedTasks == dailyTasks
+      orderedTasks
+    solution: |-
+      dailyTasks = ['메일 확인', '견적서 작성', '재고 확인', '고객 연락', '보고서 정리']
+      urgentTasks = dailyTasks[:3]
+      laterTasks = dailyTasks[3:]
+      orderedTasks = urgentTasks + laterTasks
+
+      assert urgentTasks == ['메일 확인', '견적서 작성', '재고 확인']
+      assert laterTasks == ['고객 연락', '보고서 정리']
+      assert orderedTasks == dailyTasks
+      orderedTasks
+    hints:
+    - dailyTasks 를 다섯 항목으로 늘린 뒤 [:2] 를 [:3] 으로, [2:] 를 [3:] 으로 함께 바꿉니다. 두 숫자가 어긋나면 마지막 assert 가 멈춥니다.
+    - urgentTasks 기대값에 '재고 확인' 을 더합니다. laterTasks 는 뒤 두 건 그대로라 고칠 필요가 없습니다.
+    - "정답 형태: dailyTasks[:3] 과 dailyTasks[3:], assert urgentTasks == ['메일 확인', '견적서 작성', '재고 확인']"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "['메일 확인', '견적서 작성', '재고 확인', '고객 연락', '보고서 정리']"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"['메일 확인', '견적서 작성', '재고 확인', '고객 연락', '보고서 정리']\\""
+- id: practice
+  title: Day 7 종합 복습
+  structuredPrimary: true
+  subtitle: 리스트 기초 마스터하기
+  goal: 슬라이싱으로 리스트 가운데 구간만 잘라 오늘 배운 표기를 복습한다.
+  why: 인덱스와 슬라이스는 직접 여러 번 써 봐야 시작은 포함하고 끝은 제외한다는 규칙이 손에 붙습니다.
+  explanation: Day 7에서 배운 리스트 기초를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤
+    순서로 해도 괜찮습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    students = ['김철수', '이영희', '박민수', '정지은', '최동욱']
+    print('students:', students)
+  exercise:
+    prompt: |-
+      마지막 줄 nums를 nums[1:4]로 바꾸세요.
+
+      실행하면 [20, 30, 40]이 나와야 합니다.
+    starterCode: |-
+      nums = [10, 20, 30, 40, 50]
+      nums
+    solution: |-
+      nums = [10, 20, 30, 40, 50]
+      nums[1:4]
+    hints:
+    - "마지막 줄 nums 를 nums[1:4] 로 바꿉니다. 첫 줄 리스트는 그대로 둡니다."
+    - "정답 형태: nums[1:4]"
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '[20, 30, 40]'
+    resultCheck: "출력이 정확히 일치해야 합니다: '[20, 30, 40]'"
+- id: reflection
+  title: Day 7 회고 - 리스트 첫 감각 굳히기
+  structuredPrimary: true
+  subtitle: 기억 굳히기
+  goal: 리스트 생성, 인덱싱, 슬라이싱 중 아직 헷갈리는 지점을 자기 말로 짚어 둔다.
+  why: 직접 문장으로 다시 설명해 보면 인덱스가 0부터 시작한다는 점과 슬라이스가 끝 인덱스를 포함하지 않는다는 점 중 어디가 흔들리는지 스스로 드러납니다.
+  explanation: 오늘 다룬 리스트 생성, append/insert, 인덱싱과 슬라이싱 표기 중에서 가장 익숙해진 점과 아직 헷갈리는 지점을 한 단락으로 적어보세요.
+  reflection:
+    prompt: 리스트 인덱싱과 슬라이싱 중 아직 헷갈리는 한 가지를 예시 코드와 함께 적어주세요.
+    expectedKeywords:
+    - list
+    - 인덱싱
+    - 슬라이싱
+    aiFollowup: 학습자가 적은 헷갈림 지점에 대해 다음 day08(리스트 메서드) 또는 day26(컴프리헨션)에서 어떻게 다시 다루는지 안내한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
+  masteryVariants:
+  - id: day07-score-summary-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - list_intro
+    - reflection
+    title: 점수 목록의 핵심 값 요약하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 리스트에서 최솟값, 최댓값, 합계를 순서대로 만든다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: score_summary(scores)가 [최솟값, 최댓값, 합계]를 반환하도록 완성하세요.
+      starterCode: |-
+        def score_summary(scores):
+            raise NotImplementedError
+      solution: |-
+        def score_summary(scores):
+            return [min(scores), max(scores), sum(scores)]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day07.score-summary.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day07.score-summary.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: score_summary
+        cases:
+        - id: mixed
+          arguments:
+          - value:
+            - 30
+            - 10
+            - 20
+          expectedReturn:
+          - 10
+          - 30
+          - 60
+        - id: single
+          arguments:
+          - value:
+            - 7
+          expectedReturn:
+          - 7
+          - 7
+          - 7
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day07-rotate-left-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day07-score-summary-mastery
+    title: 목록을 원하는 칸만큼 회전하기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 슬라이싱을 변경 가능한 항목 목록에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: rotate_left(items, steps)가 목록을 왼쪽으로 steps칸 회전한 새 목록을 반환하도록 완성하세요.
+      starterCode: |-
+        def rotate_left(items, steps):
+            raise NotImplementedError
+      solution: |-
+        def rotate_left(items, steps):
+            steps %= len(items)
+            return items[steps:] + items[:steps]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day07.rotate-left.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day07.rotate-left.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: rotate_left
+        cases:
+        - id: one
+          arguments:
+          - value:
+            - 1
+            - 2
+            - 3
+            - 4
+          - value: 1
+          expectedReturn:
+          - 2
+          - 3
+          - 4
+          - 1
+        - id: wrapped
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+          - value: 4
+          expectedReturn:
+          - b
+          - c
+          - a
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day07-second-last-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day07-rotate-left-transfer
+    title: 두 위치의 목록 값 다시 고르기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 양수와 음수 인덱스를 리스트에서 다시 사용한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: second_and_last(items)가 두 번째 값과 마지막 값을 새 목록으로 반환하도록 완성하세요.
+      starterCode: |-
+        def second_and_last(items):
+            raise NotImplementedError
+      solution: |-
+        def second_and_last(items):
+            return [items[1], items[-1]]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day07.second-last.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day07.second-last.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: second_and_last
+        cases:
+        - id: numbers
+          arguments:
+          - value:
+            - 5
+            - 6
+            - 7
+            - 8
+          expectedReturn:
+          - 6
+          - 8
+        - id: words
+          arguments:
+          - value:
+            - first
+            - middle
+            - last
+          expectedReturn:
+          - middle
+          - last
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,817 @@
+var e=`meta:
+  id: day02
+  title: 변수와 데이터 타입
+  day: 2
+  category: 30days
+  outcomes: ["python.variables"]
+  prerequisites: ["python.intro"]
+  estimatedMinutes: 40
+  tags:
+  - 변수
+  - 데이터타입
+  - type
+  - len
+  - 형변환
+  - 검증
+  seo:
+    title: 파이썬 변수와 데이터 타입
+    description: 변수에 값을 저장하고 다양한 데이터 타입을 다루는 방법을 배웁니다.
+    keywords:
+    - 변수
+    - variable
+    - int
+    - float
+    - str
+    - bool
+    - type
+intro:
+  emoji: 📦
+  points:
+  - 변수의 개념과 값 저장 방법
+  - 정수, 실수, 문자열, 불린 데이터 타입
+  - type() 함수로 타입 확인하기
+  - len() 함수로 길이 측정하기
+  - 타입 변환 (int, float, str)
+  - 다중 변수 할당 기법
+  direction: 변수와 데이터 타입에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 변수와 데이터 타입 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 변수란? 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 변수명 작성 스타일 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: 변수 값 변경하기 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 변수와 데이터 타입 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 변수와 데이터 타입 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 변수와 데이터 타입 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: variable_concept
+  title: 변수란?
+  structuredPrimary: true
+  subtitle: 데이터를 저장하는 이름표
+  blocks:
+  - type: image
+    assetId: pythonFundamentals
+  goal: 변수에 문자열을 넣고 그 값이 화면에 나오는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    변수(Variable)는 데이터를 저장하는 메모리 공간에 붙인 이름표입니다. 마치 상자에 물건을 넣고 라벨을 붙이는 것과 같습니다. 변수를 사용하면 데이터를 저장했다가 나중에 다시 사용할 수 있습니다. = 기호는 수학의 "같다"가 아니라 "오른쪽 값을 왼쪽 변수에 저장한다"는 의미입니다.
+
+    변수명은 영문자, 숫자, 밑줄(_)만 사용 가능하며, 숫자로 시작할 수 없습니다.
+  snippet: |-
+    msg = 'Python'
+    msg
+  exercise:
+    prompt: |-
+      msg의 값을 'Codaro'로 바꾸세요.
+      
+      실행하면 Codaro가 보여야 합니다.
+    starterCode: |-
+      msg = 'Python'
+      msg
+    solution: |-
+      msg = 'Codaro'
+      msg
+    hints:
+    - "msg = 'Python'을 msg = 'Codaro'로 바꿉니다."
+    - 마지막 줄 msg는 그대로 둡니다.
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: Codaro
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Codaro'"
+- id: naming_convention
+  title: 변수명 작성 스타일
+  structuredPrimary: true
+  subtitle: 카멜케이스 vs 스네이크케이스
+  goal: 카멜케이스와 스네이크케이스 변수로 이름을 출력한다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  explanation: |-
+    변수명을 지을 때 단어를 연결하는 방법에는 크게 두 가지 스타일이 있습니다. 카멜케이스(camelCase)는 첫 단어는 소문자로 시작하고 이후 단어의 첫 글자를 대문자로 쓰는 방식입니다. 스네이크케이스(snake_case)는 모든 단어를 소문자로 쓰고 밑줄(_)로 연결하는 방식입니다. 파이썬 공식 스타일 가이드(PEP 8)는 스네이크케이스를 권장하지만, 이 학습 컨텐츠는 작성자의 코딩 스타일에 따라 카멜케이스를 사용합니다.
+
+    이 학습 컨텐츠는 카멜케이스로 작성되었지만, 여러분은 원하는 스타일을 선택하여 사용하세요. 중요한 것은 선택한 스타일을 일관되게 유지하는 것입니다.
+  snippet: |-
+    userName = 'John Doe'
+    user_name = 'Jane Smith'
+    print('카멜케이스 : ', userName, '\\n스네이크케이스 : ', user_name)
+  exercise:
+    prompt: |-
+      userName 값을 'Codaro User'로, user_name 값을 'Codaro Learner'로 바꾸세요.
+      
+      실행하면 두 이름이 모두 출력되어야 합니다.
+    starterCode: |-
+      userName = 'John Doe'
+      user_name = 'Jane Smith'
+      print('카멜케이스 : ', userName, '\\n스네이크케이스 : ', user_name)
+    solution: |-
+      userName = 'Codaro User'
+      user_name = 'Codaro Learner'
+      print('카멜케이스 : ', userName, '\\n스네이크케이스 : ', user_name)
+    hints:
+    - 따옴표 안 글자만 바꿉니다. 변수 이름은 그대로 둡니다.
+    - 출력에 Codaro User와 Codaro Learner가 보이면 맞습니다.
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: |-
+      카멜케이스 :  Codaro User 
+      스네이크케이스 :  Codaro Learner
+    resultCheck: "출력이 정확히 일치해야 합니다: '카멜케이스 :  Codaro User \\n스네이크케이스 :  Codaro Learner'"
+- id: variable_reassign
+  title: 변수 값 변경하기
+  structuredPrimary: true
+  subtitle: 저장된 값을 새 값으로 교체
+  goal: 같은 변수에 새 값을 넣으면 마지막 값만 남는다는 걸 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    변수는 언제든지 새로운 값으로 변경할 수 있습니다. 같은 변수에 새 값을 할당하면 이전 값은 사라지고 새 값으로 대체됩니다. 이것이 "변수(Variable)"라는 이름의 의미입니다.
+
+    변수는 최종적으로 할당된 값을 가집니다.
+  snippet: |-
+    score = 80
+    score = 95
+    score
+  exercise:
+    prompt: |-
+      두 번째 줄 score를 100으로 바꾸세요.
+      
+      실행하면 최종 값 100이 보여야 합니다.
+    starterCode: |-
+      score = 80
+      score = 95
+      score
+    solution: |-
+      score = 80
+      score = 100
+      score
+    hints:
+    - score = 95를 score = 100으로 바꿉니다.
+    - 첫 줄 score = 80은 그대로 둬도 됩니다.
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '100'
+    resultCheck: "출력이 정확히 일치해야 합니다: '100'"
+- id: type_integer
+  title: 정수 타입
+  structuredPrimary: true
+  subtitle: 소수점 없는 숫자
+  goal: 정수(int) 값을 변수에 넣고 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 정수(Integer)는 소수점이 없는 숫자입니다. 1, 100, -5처럼 양수, 0, 음수 모두 정수입니다. 파이썬에서 정수 타입은 int로 표시됩니다. int는
+    integer(정수)의 줄임말입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    years = 25
+    years
+  exercise:
+    prompt: |-
+      years를 30으로 바꾸세요.
+      
+      실행하면 30이 보여야 합니다.
+    starterCode: |-
+      years = 25
+      years
+    solution: |-
+      years = 30
+      years
+    hints:
+    - years = 25를 years = 30으로 바꿉니다.
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '30'
+    resultCheck: "출력이 정확히 일치해야 합니다: '30'"
+- id: type_float
+  title: 실수 타입
+  structuredPrimary: true
+  subtitle: 소수점 있는 숫자
+  goal: 실수(float) 값을 변수에 넣고 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 실수(Float)는 소수점이 있는 숫자입니다. 3.14, 2.5, -1.5처럼 소수점을 포함한 숫자입니다. 파이썬에서 실수 타입은 float로 표시됩니다.
+    float는 floating point(부동소수점)의 줄임말입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    pi = 3.14159
+    pi
+  exercise:
+    prompt: |-
+      pi를 3.14로 바꾸세요.
+      
+      실행하면 3.14가 보여야 합니다.
+    starterCode: |-
+      pi = 3.14159
+      pi
+    solution: |-
+      pi = 3.14
+      pi
+    hints:
+    - pi = 3.14159를 pi = 3.14로 바꿉니다.
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '3.14'
+    resultCheck: "출력이 정확히 일치해야 합니다: '3.14'"
+- id: type_string
+  title: 문자열 타입
+  structuredPrimary: true
+  subtitle: 따옴표로 감싼 텍스트
+  goal: 문자열(str) 값을 변수에 넣고 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 문자열(String)은 따옴표로 감싼 텍스트입니다. 'Hello', "Python"처럼 작은따옴표나 큰따옴표로 만듭니다. 문자 하나('A')도 문자열이고,
+    긴 문장도 문자열입니다. 파이썬에서 문자열 타입은 str로 표시됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    town = 'Seoul'
+    town
+  exercise:
+    prompt: |-
+      town을 'Busan'으로 바꾸세요.
+      
+      실행하면 Busan이 보여야 합니다.
+    starterCode: |-
+      town = 'Seoul'
+      town
+    solution: |-
+      town = 'Busan'
+      town
+    hints:
+    - "town = 'Seoul'을 town = 'Busan'으로 바꿉니다."
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: Busan
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Busan'"
+- id: type_boolean
+  title: 불린 타입
+  structuredPrimary: true
+  subtitle: 참과 거짓
+  goal: 불린(bool) 값을 변수에 넣고 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 불린(Boolean)은 참(True) 또는 거짓(False) 두 가지 값만 가지는 타입입니다. 영국 수학자 조지 불(George Boole)의 이름에서 유래했습니다.
+    True와 False는 첫 글자가 반드시 대문자여야 합니다. 조건 판단, 비교 연산에서 주로 사용됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    active = True
+    active
+  exercise:
+    prompt: |-
+      active를 False로 바꾸세요.
+      
+      실행하면 False가 보여야 합니다.
+    starterCode: |-
+      active = True
+      active
+    solution: |-
+      active = False
+      active
+    hints:
+    - active = True를 active = False로 바꿉니다.
+    - False는 대문자 F로 씁니다.
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: 'False'
+    resultCheck: "출력이 정확히 일치해야 합니다: 'False'"
+- id: type_function
+  title: type() 함수
+  structuredPrimary: true
+  subtitle: 데이터 타입 확인하기
+  goal: type()으로 값의 타입을 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: type() 함수는 값이나 변수의 데이터 타입을 알려줍니다. 괄호 안에 변수나 값을 넣으면 그것의 타입을 반환합니다. 결과는 <class 'int'>, <class
+    'str'> 같은 형태로 표시됩니다. 디버깅이나 타입 확인에 매우 유용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    point = 100
+    type(point)
+  exercise:
+    prompt: |-
+      point를 3.5로 바꾼 뒤 type(point)를 실행하세요.
+      
+      결과는 float 타입이어야 합니다.
+    starterCode: |-
+      point = 100
+      type(point)
+    solution: |-
+      point = 3.5
+      type(point)
+    hints:
+    - point = 100을 point = 3.5로 바꿉니다.
+    - "화면에 <class 'float'>가 보이면 맞습니다."
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "<class 'float'>"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"<class 'float'>\\""
+- id: len_function
+  title: len() 함수
+  structuredPrimary: true
+  subtitle: 문자열 길이 측정
+  goal: len()으로 문자열 길이를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    len() 함수는 문자열의 길이(문자 개수)를 반환합니다. len은 length(길이)의 줄임말입니다. 공백, 특수문자, 한글 모두 각각 1로 계산됩니다. 빈 문자열('')의 길이는 0입니다.
+
+    'Hello World'의 길이는 11입니다. 공백도 문자로 계산됩니다.
+  snippet: |-
+    email = 'python@example.com'
+    len(email)
+  exercise:
+    prompt: |-
+      email을 'a@example.com'으로 바꾸세요.
+
+      실행하면 길이 13이 나와야 합니다.
+    starterCode: |-
+      email = 'python@example.com'
+      len(email)
+    solution: |-
+      email = 'a@example.com'
+      len(email)
+    hints:
+    - "email = 'python@example.com'을 email = 'a@example.com'으로 바꿉니다."
+    - "len('a@example.com')은 13입니다."
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '13'
+    resultCheck: "출력이 정확히 일치해야 합니다: '13'"
+- id: convert_to_int
+  title: int() 변환
+  structuredPrimary: true
+  subtitle: 정수로 변환하기
+  goal: int()로 문자열을 정수로 바꾼다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: int() 함수는 다른 타입을 정수로 변환합니다. 문자열 '100'을 숫자 100으로 바꿀 수 있습니다. 단, 문자열은 숫자로만 이루어져 있어야 합니다. 실수를
+    정수로 변환하면 소수점 이하는 버려집니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    text = '100'
+    int(text)
+  exercise:
+    prompt: |-
+      text를 '42'로 바꾸세요.
+      
+      실행하면 정수 42가 나와야 합니다.
+    starterCode: |-
+      text = '100'
+      int(text)
+    solution: |-
+      text = '42'
+      int(text)
+    hints:
+    - "text = '100'을 text = '42'로 바꿉니다."
+    - "int('42') 결과는 42입니다."
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '42'
+    resultCheck: "출력이 정확히 일치해야 합니다: '42'"
+- id: convert_to_float
+  title: float() 변환
+  structuredPrimary: true
+  subtitle: 실수로 변환하기
+  goal: float()로 정수를 실수로 바꾼다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: float() 함수는 다른 타입을 실수로 변환합니다. 정수 10을 실수 10.0으로 바꿀 수 있습니다. 문자열 '3.14'를 숫자 3.14로 변환할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    val = 42
+    float(val)
+  exercise:
+    prompt: |-
+      val을 7로 바꾸세요.
+      
+      실행하면 7.0이 나와야 합니다.
+    starterCode: |-
+      val = 42
+      float(val)
+    solution: |-
+      val = 7
+      float(val)
+    hints:
+    - val = 42를 val = 7로 바꿉니다.
+    - float(7) 결과는 7.0입니다.
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '7.0'
+    resultCheck: "출력이 정확히 일치해야 합니다: '7.0'"
+- id: convert_to_str
+  title: str() 변환
+  structuredPrimary: true
+  subtitle: 문자열로 변환하기
+  goal: str()로 숫자를 문자열로 바꾼다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: str() 함수는 어떤 값이든 문자열로 변환합니다. 숫자 25를 문자열 '25'로 바꿀 수 있습니다. 문자열 연결이나 출력 메시지를 만들 때 자주 사용됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    code = 123
+    str(code)
+  exercise:
+    prompt: |-
+      code를 7로 바꾸세요.
+      
+      실행하면 문자열 '7'이 나와야 합니다.
+    starterCode: |-
+      code = 123
+      str(code)
+    solution: |-
+      code = 7
+      str(code)
+    hints:
+    - code = 123을 code = 7로 바꿉니다.
+    - 화면에 따옴표 없이 7처럼 보여도 문자열입니다.
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '7'
+    resultCheck: "출력이 정확히 일치해야 합니다: '7'"
+- id: multiple_assign
+  title: 다중 변수 할당
+  structuredPrimary: true
+  subtitle: 한 줄로 여러 변수 선언
+  goal: 한 줄에서 여러 변수에 값을 넣는다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 쉼표로 구분하여 한 줄에 여러 변수를 선언할 수 있습니다. 순서대로 매칭되므로 첫 번째 변수에 첫 번째 값이 저장됩니다. 코드를 더 간결하게 만들 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    name, age, city = 'Alice', 25, 'Seoul'
+    name, age, city
+  exercise:
+    prompt: |-
+      name을 'Codaro'로 바꾸세요.
+      
+      실행하면 Codaro가 포함된 결과가 나와야 합니다.
+    starterCode: |-
+      name, age, city = 'Alice', 25, 'Seoul'
+      name, age, city
+    solution: |-
+      name, age, city = 'Codaro', 25, 'Seoul'
+      name, age, city
+    hints:
+    - "'Alice'만 'Codaro'로 바꿉니다."
+    - age와 city는 그대로 둬도 됩니다.
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: "('Codaro', 25, 'Seoul')"
+    resultCheck: "출력이 정확히 일치해야 합니다: \\"('Codaro', 25, 'Seoul')\\""
+- id: same_value_assign
+  title: 같은 값 할당
+  structuredPrimary: true
+  subtitle: 여러 변수에 동일한 값
+  goal: 여러 변수에 같은 값을 한 번에 넣는다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: = 연산자를 연결하면 여러 변수에 같은 값을 동시에 할당할 수 있습니다. 모든 변수가 동일한 값을 가지게 됩니다. 초기화할 때 자주 사용하는 패턴입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    a = b = c = 0
+    a
+  exercise:
+    prompt: |-
+      a = b = c = 0의 0을 5로 바꾸세요.
+      
+      실행하면 5가 보여야 합니다.
+    starterCode: |-
+      a = b = c = 0
+      a
+    solution: |-
+      a = b = c = 5
+      a
+    hints:
+    - 오른쪽 숫자만 5로 바꿉니다.
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '5'
+    resultCheck: "출력이 정확히 일치해야 합니다: '5'"
+- id: workflow_validation
+  title: '검증 루프: 입력값을 업무 데이터로 바꾸기'
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증
+  goal: 소수점이 섞인 가격 문자열이 들어왔을 때 어떤 변환 함수로 바꿔야 하는지 직접 고쳐 보며 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    변수와 타입은 값을 담는 문법이 아니라, 외부에서 들어온 문자열을 계산 가능한 데이터로 바꾸고 검증하는 출발점입니다.
+
+    바깥에서 들어오는 값은 늘 문자열이고, 그 안에 무엇이 들었는지는 우리가 고르지 못합니다. int는 소수점이 섞인 문자열을 만나면 ValueError로 멈추므로, 변환 함수는 데이터의 실제 모양을 보고 골라야 합니다. 타입을 assert로 박아 두면 잘못 고른 변환이 계산까지 흘러가기 전에 멈춥니다.
+  tips:
+  - 변주 실험 rawQuantity를 "2개"처럼 단위가 붙은 문자열로 바꾸면 int가 어디서 멈추는지 확인하세요.
+  snippet: |-
+    rawProduct = "notebook"
+    rawPrice = "1200000"
+    rawQuantity = "2"
+    rawMember = "yes"
+
+    productName = rawProduct
+    unitPrice = int(rawPrice)
+    quantity = int(rawQuantity)
+    isMember = rawMember == "yes"
+
+    assert type(productName).__name__ == "str"
+    assert type(unitPrice).__name__ == "int"
+    assert type(quantity).__name__ == "int"
+    assert type(isMember).__name__ == "bool"
+
+    orderSubtotal = unitPrice * quantity
+    orderSubtotal
+  exercise:
+    prompt: |-
+      소수점이 붙은 가격이 들어왔다고 보고 세 곳을 고치세요. rawPrice = "1200000"을 "1250000.5"로 바꾸고, unitPrice = int(rawPrice)를 float(rawPrice)로 바꾸고, unitPrice 타입을 검사하는 assert의 "int"를 "float"로 고칩니다. 나머지 줄은 그대로 둡니다.
+
+      int는 소수점이 든 문자열을 그대로 받지 못하고 ValueError로 멈추므로 float를 써야 합니다. 1250000.5에 수량 2를 곱하면 2500001.0이 나옵니다.
+    starterCode: |-
+      rawProduct = "notebook"
+      rawPrice = "1200000"
+      rawQuantity = "2"
+      rawMember = "yes"
+
+      productName = rawProduct
+      unitPrice = int(rawPrice)
+      quantity = int(rawQuantity)
+      isMember = rawMember == "yes"
+
+      assert type(productName).__name__ == "str"
+      assert type(unitPrice).__name__ == "int"
+      assert type(quantity).__name__ == "int"
+      assert type(isMember).__name__ == "bool"
+
+      orderSubtotal = unitPrice * quantity
+      orderSubtotal
+    solution: |-
+      rawProduct = "notebook"
+      rawPrice = "1250000.5"
+      rawQuantity = "2"
+      rawMember = "yes"
+
+      productName = rawProduct
+      unitPrice = float(rawPrice)
+      quantity = int(rawQuantity)
+      isMember = rawMember == "yes"
+
+      assert type(productName).__name__ == "str"
+      assert type(unitPrice).__name__ == "float"
+      assert type(quantity).__name__ == "int"
+      assert type(isMember).__name__ == "bool"
+
+      orderSubtotal = unitPrice * quantity
+      orderSubtotal
+    hints:
+    - rawPrice 를 "1250000.5" 로 바꾸면 int(rawPrice) 가 ValueError 로 멈춥니다. int 는 소수점이 든 문자열을 받지 못합니다.
+    - int(rawPrice) 를 float(rawPrice) 로 바꾸고, unitPrice 타입을 검사하는 assert 의 "int" 도 "float" 로 함께 고칩니다. rawQuantity 는 "2" 라 int 그대로 둡니다.
+    - '정답 형태: rawPrice = "1250000.5", unitPrice = float(rawPrice), assert type(unitPrice).__name__ == "float"'
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: '2500001.0'
+    resultCheck: "출력이 정확히 일치해야 합니다: '2500001.0'"
+- id: practice
+  title: Day 2 종합 복습
+  structuredPrimary: true
+  subtitle: 변수와 타입 마스터하기
+  goal: 변수를 만들고 값을 확인하는 Day 2 복습을 한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: Day 2에서 배운 변수, 데이터 타입, 타입 변환을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    name = '홍길동'
+    print('name:', name)
+  exercise:
+    prompt: |-
+      lang을 'Codaro'로 바꾸세요.
+      
+      실행하면 Codaro가 보여야 합니다.
+    starterCode: |-
+      lang = 'Python'
+      lang
+    solution: |-
+      lang = 'Codaro'
+      lang
+    hints:
+    - "lang = 'Python'을 lang = 'Codaro'로 바꿉니다."
+  check:
+    type: outputExact
+    evidence: practice
+    outputExact: Codaro
+    resultCheck: "출력이 정확히 일치해야 합니다: 'Codaro'"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: approved
+    reviewerId: "curriculum-integrity-review"
+    reviewedAt: "2026-08-02T13:06:47+09:00"
+    evidenceCommit: "22505301c65a9621c9e3321759115562ffa5e136"
+  masteryVariants:
+  - id: day02-describe-value-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - variable_concept
+    - practice
+    title: 값과 타입을 한 줄로 설명하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 값에 맞는 타입 이름과 값을 함께 반환한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: describe_value(value)가 타입이름:값 형식의 문자열을 반환하도록 완성하세요.
+      starterCode: |-
+        def describe_value(value):
+            raise NotImplementedError
+      solution: |-
+        def describe_value(value):
+            return f"{type(value).__name__}:{value}"
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day02.describe-value.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day02.describe-value.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: describe_value
+        cases:
+        - id: integer
+          arguments:
+          - value: 7
+          expectedReturn: int:7
+        - id: text
+          arguments:
+          - value: Codaro
+          expectedReturn: str:Codaro
+        - id: boolean
+          arguments:
+          - value: true
+          expectedReturn: bool:True
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day02-profile-line-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day02-describe-value-mastery
+    title: 문자 나이를 프로필 문구로 바꾸기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 문자열 입력을 정수로 바꿔 새 출력 형식에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: profile_line(name, age)가 이름(나이) 형식의 문자열을 반환하도록 완성하세요.
+      starterCode: |-
+        def profile_line(name, age):
+            raise NotImplementedError
+      solution: |-
+        def profile_line(name, age):
+            return f"{name}({int(age)})"
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day02.profile-line.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day02.profile-line.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: profile_line
+        cases:
+        - id: text-age
+          arguments:
+          - value: Mina
+          - value: '21'
+          expectedReturn: Mina(21)
+        - id: number-age
+          arguments:
+          - value: Jun
+          - value: 30
+          expectedReturn: Jun(30)
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day02-reassign-score-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day02-profile-line-transfer
+    title: 점수를 다시 할당해 갱신하기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 시간이 지난 뒤 변수 재할당 결과를 스스로 구성한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: reassign_score(start, bonus)가 시작 점수에 보너스를 반영한 최종 값을 반환하도록 완성하세요.
+      starterCode: |-
+        def reassign_score(start, bonus):
+            raise NotImplementedError
+      solution: |-
+        def reassign_score(start, bonus):
+            score = start
+            score += bonus
+            return score
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day02.reassign-score.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day02.reassign-score.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reassign_score
+        cases:
+        - id: positive
+          arguments:
+          - value: 80
+          - value: 15
+          expectedReturn: 95
+        - id: negative
+          arguments:
+          - value: 50
+          - value: -8
+          expectedReturn: 42
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};
