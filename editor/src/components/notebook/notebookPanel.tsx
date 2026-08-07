@@ -471,7 +471,7 @@ class AiCommentGutterMarker extends GutterMarker {
     node.style.cursor = this.onClick ? "pointer" : "default";
     node.style.fontSize = "11px";
     node.style.padding = "0 2px";
-    node.style.color = "var(--primary, #6b7280)";
+    node.style.color = "var(--primary)";
     if (this.onClick) {
       const clickHandler = (event: MouseEvent) => {
         event.preventDefault();

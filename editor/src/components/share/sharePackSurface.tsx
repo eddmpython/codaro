@@ -396,7 +396,7 @@ function IssueRow({ issue }: { issue: SharePackIssue }) {
   const Icon = isError ? AlertTriangle : CheckCircle2;
   return (
     <div className="flex gap-2 rounded-md border px-3 py-2 text-sm">
-      <Icon className={isError ? "mt-0.5 size-4 shrink-0 text-destructive" : "mt-0.5 size-4 shrink-0 text-amber-500"} />
+      <Icon className={isError ? "mt-0.5 size-4 shrink-0 text-destructive" : "mt-0.5 size-4 shrink-0 text-warning"} />
       <div className="min-w-0">
         <div className="font-medium">{issue.message}</div>
         <div className="mt-0.5 break-all text-xs text-muted-foreground">
@@ -531,7 +531,7 @@ function SurfaceAlert({ tone, text }: { tone: "success" | "error"; text: string 
   const Icon = tone === "success" ? CheckCircle2 : AlertTriangle;
   return (
     <div className={tone === "success"
-      ? "flex items-start gap-2 rounded-md border border-emerald-500/30 bg-emerald-500/5 px-3 py-2 text-sm text-emerald-700 dark:text-emerald-300"
+      ? "flex items-start gap-2 rounded-md border border-success/30 bg-success/5 px-3 py-2 text-sm text-success"
       : "flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive"
     }>
       <Icon className="mt-0.5 size-4 shrink-0" />

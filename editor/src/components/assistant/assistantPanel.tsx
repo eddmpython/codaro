@@ -269,7 +269,7 @@ function AssistantWorkLoop({ steps, trace }: { steps?: AssistantWorkStep[]; trac
         ) : hasError ? (
           <AlertCircle className="size-3.5 text-destructive" />
         ) : (
-          <CheckCircle2 className="size-3.5 text-emerald-500" />
+          <CheckCircle2 className="size-3.5 text-success" />
         )}
         <span>{label}</span>
       </summary>
@@ -303,7 +303,7 @@ function AssistantWorkStepRow({ step }: { step: AssistantWorkStep }) {
   ) : step.status === "error" ? (
     <AlertCircle className="mt-1 size-3 text-destructive" />
   ) : (
-    <CheckCircle2 className="mt-1 size-3 text-emerald-500" />
+    <CheckCircle2 className="mt-1 size-3 text-success" />
   );
 
   if (!step.toolName) {

@@ -11,8 +11,41 @@ import { terminalLaunchInput, type TerminalLaunchIntent } from "@/lib/terminalLa
 // 전역 터미널 패널: 백엔드 /ws/terminal(PTY)에 붙어 xterm.js로 실제 로컬 셸을 렌더한다.
 // 백엔드가 주입한 패키지 환경 PATH를 그대로 쓰므로 설치형 런타임과 같은 셸이 열린다.
 
-const DARK_THEME = { background: "#09090b", foreground: "#e4e4e7", cursor: "#e4e4e7" };
-const LIGHT_THEME = { background: "#ffffff", foreground: "#18181b", cursor: "#18181b" };
+// xterm.js는 CSS 변수를 직접 읽지 못하므로 실제 색 문자열을 넘겨야 한다.
+//
+// 주의: custom property를 getPropertyValue로 그냥 읽으면 안 된다. 등록되지 않은
+// custom property는 "계산된 값"이 아니라 선언된 토큰 문자열 그대로 나오고, 우리
+// 토큰은 `light-dark(#f5f6f8, #151619)` 형태다. xterm은 이걸 파싱하지 못해
+// 조용히 기본값(검은 배경/흰 글자)으로 떨어진다. 다크에서는 티가 안 나고
+// 라이트에서만 터미널이 새까매지는 형태로 드러난다.
+//
+// 그래서 실제 엘리먼트에 색을 적용해 브라우저가 해석한 rgb() 값을 되읽는다.
+// 인자로 받은 요소는 이미 문서에 붙어 있어야 하며(그래야 테마 스코프가 걸린다),
+// 여기서 만드는 프로브 요소는 화면에 영향을 주지 않는다.
+function resolveColor(host: HTMLElement, cssValue: string): string | undefined {
+  const probe = document.createElement("span");
+  probe.style.display = "none";
+  probe.style.color = cssValue;
+  host.appendChild(probe);
+  const resolved = getComputedStyle(probe).color;
+  probe.remove();
+  // 해석 실패 시 브라우저는 상속색을 주므로, 빈 값만 걸러 낸다.
+  return resolved || undefined;
+}
+
+function readTerminalTheme(host: HTMLElement | null): {
+  background?: string;
+  cursor?: string;
+  foreground?: string;
+} {
+  if (typeof document === "undefined" || !host) return {};
+  const foreground = resolveColor(host, "var(--foreground)");
+  return {
+    background: resolveColor(host, "var(--background)"),
+    cursor: foreground,
+    foreground,
+  };
+}
 
 export function TerminalPanel({
   launchIntent,
@@ -29,8 +62,6 @@ export function TerminalPanel({
   const socketRef = useRef<WebSocket | null>(null);
   const launchIntentRef = useRef<TerminalLaunchIntent | null | undefined>(launchIntent);
   const lastLaunchIntentIdRef = useRef<number | null>(null);
-  const themeRef = useRef(themeMode);
-  themeRef.current = themeMode;
 
   const sendLaunchIntent = useCallback((intent?: TerminalLaunchIntent | null) => {
     if (!intent || lastLaunchIntentIdRef.current === intent.id) return;
@@ -51,6 +82,13 @@ export function TerminalPanel({
     sendLaunchIntent(launchIntent);
   }, [launchIntent, sendLaunchIntent]);
 
+  // 라이트/다크 전환 시 이미 생성된 터미널의 색도 토큰을 다시 읽어 맞춘다.
+  useEffect(() => {
+    const term = termRef.current;
+    if (!term) return;
+    term.options.theme = readTerminalTheme(containerRef.current);
+  }, [themeMode]);
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return undefined;
@@ -59,7 +97,7 @@ export function TerminalPanel({
       fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
       fontSize: 13,
       cursorBlink: true,
-      theme: themeRef.current === "dark" ? DARK_THEME : LIGHT_THEME,
+      theme: readTerminalTheme(container),
     });
     const fit = new FitAddon();
     term.loadAddon(fit);

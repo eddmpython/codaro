@@ -431,7 +431,7 @@ function providerStatusCopy({
   if (validation?.valid) {
     const liveActive = active && ready;
     return {
-      className: "border-emerald-500/30 bg-emerald-500/10 text-emerald-900 dark:text-emerald-100",
+      className: "border-success/30 bg-success/10 text-success",
       detail: liveActive
         ? locale === "en"
           ? `${validation.model ?? providerId} passed response verification.`
@@ -451,7 +451,7 @@ function providerStatusCopy({
   if (validation?.pending) {
     return {
       action: providerActionLabel(validation.diagnostic?.action, locale) ?? (locale === "en" ? "Finish the login tab" : "로그인 탭 완료"),
-      className: "border-sky-500/30 bg-sky-500/10 text-sky-950 dark:text-sky-100",
+      className: "border-info/30 bg-info/10 text-info",
       detail: validation.diagnostic?.message ?? (locale === "en" ? "Checking the browser login state." : "브라우저 로그인 상태를 확인하는 중입니다."),
       icon: Loader2,
       meta: validationMeta(validation, locale),
@@ -464,7 +464,7 @@ function providerStatusCopy({
   if (validation && !validation.valid) {
     return {
       action: providerActionLabel(validation.diagnostic?.action, locale),
-      className: "border-amber-500/30 bg-amber-500/10 text-amber-950 dark:text-amber-100",
+      className: "border-warning/30 bg-warning/10 text-warning",
       detail: validation.diagnostic?.message ?? validation.error ?? (locale === "en" ? "Could not verify the provider response." : "Provider 응답을 확인하지 못했습니다."),
       icon: AlertTriangle,
       meta: validationMeta(validation, locale),
@@ -475,7 +475,7 @@ function providerStatusCopy({
 
   if (active && ready) {
     return {
-      className: "border-sky-500/25 bg-sky-500/10 text-sky-950 dark:text-sky-100",
+      className: "border-info/25 bg-info/10 text-info",
       detail: locale === "en"
         ? "The profile is connected. Run response verification to confirm the current model replies."
         : "프로필은 연결됨 상태입니다. 응답 검증으로 현재 모델의 실제 응답까지 확인하세요.",

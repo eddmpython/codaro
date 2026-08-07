@@ -67,7 +67,7 @@ function barConfig(
   if (variant === "offline") {
     return {
       action: t("connection.retry"),
-      className: "bg-amber-500/10 text-amber-950 dark:text-amber-100",
+      className: "bg-warning/10 text-warning",
       detail: t("connection.offline.detail"),
       icon: WifiOff,
       title: t("connection.offline.title"),
@@ -76,7 +76,7 @@ function barConfig(
   if (variant === "dropped") {
     return {
       action: t("provider.reconnect.action"),
-      className: "bg-amber-500/10 text-amber-950 dark:text-amber-100",
+      className: "bg-warning/10 text-warning",
       detail: t("provider.reconnect.droppedDetail"),
       icon: AlertTriangle,
       title: t("provider.reconnect.droppedTitle"),

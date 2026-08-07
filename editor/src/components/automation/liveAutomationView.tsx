@@ -166,7 +166,7 @@ export function LiveAutomationView({
         </Card>
 
         {run?.pending ? (
-          <Card className="border-amber-500/40">
+          <Card className="border-warning/40">
             <CardContent className="space-y-2 pt-4">
               <p className="text-xs text-muted-foreground">{t("automation.live.pending")}</p>
               <p className="text-sm font-medium">

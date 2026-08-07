@@ -215,7 +215,7 @@ function StatusNotice({ notice }: { notice: AppNotice }) {
         className={cn(
           "size-3.5 shrink-0 text-muted-foreground",
           notice.tone === "error" && "text-destructive",
-          notice.tone === "warning" && "text-amber-500",
+          notice.tone === "warning" && "text-warning",
         )}
       />
       <div className="min-w-0 flex-1">

@@ -112,7 +112,7 @@ function CustomWidget({ descriptor }: { descriptor: WidgetDescriptor }) {
   if (!Renderer) {
     return (
       <div
-        className="rounded-md border border-dashed border-amber-400/40 bg-amber-100/30 px-2 py-1 text-xs text-amber-700"
+        className="rounded-md border border-dashed border-warning/40 bg-warning/10 px-2 py-1 text-xs text-warning"
         data-widget="custom-missing"
         data-custom-name={name}
       >
@@ -217,8 +217,8 @@ function ContainerWidget({
           className={cn(
             "rounded-md border px-3 py-2 text-sm",
             tone === "danger" && "border-destructive/40 bg-destructive/10 text-destructive",
-            tone === "warning" && "border-amber-400/40 bg-amber-100/40 text-amber-700",
-            tone === "success" && "border-emerald-400/40 bg-emerald-100/40 text-emerald-700",
+            tone === "warning" && "border-warning/40 bg-warning/10 text-warning",
+            tone === "success" && "border-success/40 bg-success/10 text-success",
             (tone === "neutral" || tone === "info") && "border-border bg-muted/40 text-foreground",
           )}
           data-widget="callout"
@@ -309,7 +309,7 @@ function ContainerWidget({
       const caption = (descriptor as { caption?: string }).caption;
       const kind = String((descriptor as { kind?: string }).kind ?? "neutral");
       return (
-        <Card data-widget="stat" className={cn(kind === "warning" && "border-amber-400/40")}>
+        <Card data-widget="stat" className={cn(kind === "warning" && "border-warning/40")}>
           <CardContent className="p-3">
             <div className="text-xs text-muted-foreground">{label}</div>
             <div className="mt-1 text-lg font-semibold">{value}</div>

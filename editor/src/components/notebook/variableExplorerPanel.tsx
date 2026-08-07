@@ -68,7 +68,7 @@ export function VariableExplorerPanel({
                     {multiDefined.has(variable.name) ? (
                       <Badge
                         variant="outline"
-                        className="ml-auto shrink-0 border-amber-500/40 text-amber-700 dark:text-amber-400"
+                        className="ml-auto shrink-0 border-warning/40 text-warning"
                       >
                         다중정의
                       </Badge>

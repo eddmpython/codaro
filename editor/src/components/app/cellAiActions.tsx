@@ -140,7 +140,7 @@ export function CellAiActions({
               data-cell-ai-answer="true"
             >
               <div className="mb-1 flex items-center gap-1.5 font-medium">
-                {helpState.loading ? <Loader2 className="size-3 animate-spin" /> : <CheckCircle2 className="size-3 text-emerald-500" />}
+                {helpState.loading ? <Loader2 className="size-3 animate-spin" /> : <CheckCircle2 className="size-3 text-success" />}
                 <span>{helpState.loading ? "AI가 이 셀을 보고 답변 중" : "이 셀 답변"}</span>
               </div>
               <div className="mb-1 text-[11px] text-muted-foreground">{helpState.question}</div>
