@@ -1844,8 +1844,8 @@
       "kind": "outcomeProof",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/outcomes/dataReportOutcome.png",
-      "sourceHash": "sha256-ec957d18c47b7601355a4ae34fa065f024becf24178692e66a8055663ddc3ff7",
-      "sourceGitHead": "ff476a02f52a1875273252a251dff7047896ded6",
+      "sourceHash": "sha256-1e011a5ec5a13556bfacdae13529a07c32ebb11232ddfe6379026c3b2ee2f1d0",
+      "sourceGitHead": "b52482130e44dff840c65237e6442e562f8a4370",
       "provenance": {
         "author": "Codaro outcome capture pipeline",
         "license": "proprietary-project",
@@ -1911,7 +1911,7 @@
           "assets/brand/tools/captureOutcomeProofs.py",
           "assets/brand/visuals/outcomes/fixtures.json"
         ],
-        "sourceSetHash": "sha256-8c92ba3676a0f0826f094330f171b2960964add612bbbb585e62d62a938a2197"
+        "sourceSetHash": "sha256-a9a41054cfe948924155d5c5a030e697720b3e9d884e89c47fa413743257e2f1"
       }
     },
     {
@@ -1919,8 +1919,8 @@
       "kind": "outcomeProof",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/outcomes/fileAutomationOutcome.png",
-      "sourceHash": "sha256-ce17121e083ea0e261de403e19eaefb5c5ed9e59b493d57dd40c13974468d728",
-      "sourceGitHead": "ff476a02f52a1875273252a251dff7047896ded6",
+      "sourceHash": "sha256-02a098e11af90d77aa983673037ce4e6b44538d08bc1c3263d8083182148cfc6",
+      "sourceGitHead": "b52482130e44dff840c65237e6442e562f8a4370",
       "provenance": {
         "author": "Codaro outcome capture pipeline",
         "license": "proprietary-project",
@@ -1986,7 +1986,7 @@
           "assets/brand/tools/captureOutcomeProofs.py",
           "assets/brand/visuals/outcomes/fixtures.json"
         ],
-        "sourceSetHash": "sha256-8c92ba3676a0f0826f094330f171b2960964add612bbbb585e62d62a938a2197"
+        "sourceSetHash": "sha256-a9a41054cfe948924155d5c5a030e697720b3e9d884e89c47fa413743257e2f1"
       }
     },
     {
@@ -1994,8 +1994,8 @@
       "kind": "outcomeProof",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/outcomes/officeAutomationOutcome.png",
-      "sourceHash": "sha256-f1c770d50406d59749e42c04c5a24c4359cca201c38290ffb904981423a98197",
-      "sourceGitHead": "ff476a02f52a1875273252a251dff7047896ded6",
+      "sourceHash": "sha256-6f3e7f662d797535d00d31ab594f82c7cd20ecb432c52dce3e24285d4eb108ca",
+      "sourceGitHead": "b52482130e44dff840c65237e6442e562f8a4370",
       "provenance": {
         "author": "Codaro outcome capture pipeline",
         "license": "proprietary-project",
@@ -2061,7 +2061,7 @@
           "assets/brand/tools/captureOutcomeProofs.py",
           "assets/brand/visuals/outcomes/fixtures.json"
         ],
-        "sourceSetHash": "sha256-8c92ba3676a0f0826f094330f171b2960964add612bbbb585e62d62a938a2197"
+        "sourceSetHash": "sha256-a9a41054cfe948924155d5c5a030e697720b3e9d884e89c47fa413743257e2f1"
       }
     },
     {
@@ -2069,8 +2069,8 @@
       "kind": "outcomeProof",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/outcomes/webMonitoringOutcome.png",
-      "sourceHash": "sha256-9fc0240d4f0ffd145d15c4d013fd0a73d2237078791806bc8f924458a6d5d00d",
-      "sourceGitHead": "ff476a02f52a1875273252a251dff7047896ded6",
+      "sourceHash": "sha256-95cd1e8ded595302e2a10951e1df999a528a594af323c0ea02c6d4ff38126ed7",
+      "sourceGitHead": "b52482130e44dff840c65237e6442e562f8a4370",
       "provenance": {
         "author": "Codaro outcome capture pipeline",
         "license": "proprietary-project",
@@ -2136,7 +2136,7 @@
           "assets/brand/tools/captureOutcomeProofs.py",
           "assets/brand/visuals/outcomes/fixtures.json"
         ],
-        "sourceSetHash": "sha256-8c92ba3676a0f0826f094330f171b2960964add612bbbb585e62d62a938a2197"
+        "sourceSetHash": "sha256-a9a41054cfe948924155d5c5a030e697720b3e9d884e89c47fa413743257e2f1"
       }
     },
     {
@@ -2144,8 +2144,8 @@
       "kind": "outcomeProof",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/outcomes/pythonFoundationOutcome.png",
-      "sourceHash": "sha256-f6dc75e2fa349545a7a1d399f3121af390d3307bd09478ce628283999244c1d3",
-      "sourceGitHead": "ff476a02f52a1875273252a251dff7047896ded6",
+      "sourceHash": "sha256-b3ae4e5b3cbf1a9ab6127fd6f0b1e8f9738b8775e06739531b3dc7463f62c48e",
+      "sourceGitHead": "b52482130e44dff840c65237e6442e562f8a4370",
       "provenance": {
         "author": "Codaro outcome capture pipeline",
         "license": "proprietary-project",
@@ -2211,7 +2211,7 @@
           "assets/brand/tools/captureOutcomeProofs.py",
           "assets/brand/visuals/outcomes/fixtures.json"
         ],
-        "sourceSetHash": "sha256-8c92ba3676a0f0826f094330f171b2960964add612bbbb585e62d62a938a2197"
+        "sourceSetHash": "sha256-a9a41054cfe948924155d5c5a030e697720b3e9d884e89c47fa413743257e2f1"
       }
     },
     {
@@ -2219,8 +2219,8 @@
       "kind": "outcomeProof",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/outcomes/dataVisualizationOutcome.png",
-      "sourceHash": "sha256-3e10f67c139c1d2d0866588d82e31db62fb59f4128f874235fbd55ee2794e61f",
-      "sourceGitHead": "ff476a02f52a1875273252a251dff7047896ded6",
+      "sourceHash": "sha256-4e9d2d826a8be2679e8b872241fe940c62de4092c0f97f751533e9af30200e46",
+      "sourceGitHead": "b52482130e44dff840c65237e6442e562f8a4370",
       "provenance": {
         "author": "Codaro outcome capture pipeline",
         "license": "proprietary-project",
@@ -2286,7 +2286,7 @@
           "assets/brand/tools/captureOutcomeProofs.py",
           "assets/brand/visuals/outcomes/fixtures.json"
         ],
-        "sourceSetHash": "sha256-8c92ba3676a0f0826f094330f171b2960964add612bbbb585e62d62a938a2197"
+        "sourceSetHash": "sha256-a9a41054cfe948924155d5c5a030e697720b3e9d884e89c47fa413743257e2f1"
       }
     },
     {
