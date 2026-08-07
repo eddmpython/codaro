@@ -1,3 +1,18 @@
+/* 레슨 상세(/learn/lesson/...)의 시각 언어
+ *
+ * 이 화면은 읽고 따라 치는 곳이다. 그래서 규칙의 우선순위가 하나 더 있다.
+ * 본문과 코드의 크기와 대비는 어떤 장식보다 앞선다. 줄이지 않는다.
+ *
+ * 1. hairline 격자: 개요와 각 섹션은 채운 카드가 아니라 아래쪽 가는 선으로 나뉜다.
+ * 2. 좌측 rail: 목표와 팁처럼 "신호"에 해당하는 덩어리는 면을 채우지 않고
+ *    왼쪽 세로선 하나로 표시한다. accent rail 은 목표, 무채 rail 은 팁이다.
+ * 3. 모노 마이크로 라벨: 섹션 번호, 코드 캡션, 목표/팁/실습 라벨은 코드 서체로
+ *    통일한다. 본문 문단은 절대 모노로 바꾸지 않는다. 자간은 숫자 전용 라벨에만
+ *    준다. 한글을 벌려 놓으면 음절이 흩어져 읽기가 나빠진다.
+ * 4. 하드 엣지: radius 토큰이 전부 0 이므로 모서리 선언을 따로 두지 않는다.
+ *
+ * font-size 는 typeScale.css 스텝만 쓴다. px 리터럴 총량은 게이트의 ratchet 예산이다.
+ */
 .lessonPage {
   min-height: 100svh;
   background: var(--color-background-body);
@@ -26,9 +41,12 @@
   min-width: 0;
 }
 
+/* 큰 타이포는 여기까지다. 본문에는 쓰지 않는다. */
 .lessonTitleColumn h1 {
   max-width: 760px;
   margin-block: 20px 14px;
+  font-size: var(--type-display);
+  line-height: var(--leading-display);
   letter-spacing: 0;
 }
 
@@ -65,6 +83,7 @@
   gap: 10px 20px;
   margin-top: 24px;
   color: var(--color-text-secondary);
+  font-family: var(--font-family-code);
   font-size: var(--type-sm);
 }
 
@@ -109,7 +128,6 @@
   aspect-ratio: 4 / 3;
   overflow: hidden;
   border: 1px solid var(--color-border-default);
-  border-radius: 8px;
   background: var(--color-background-muted);
   object-fit: cover;
   object-position: center;
@@ -166,9 +184,9 @@
 
 .lessonRailLabel {
   color: var(--color-text-tertiary);
+  font-family: var(--font-family-code);
   font-size: var(--type-2xs);
   font-weight: 700;
-  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -183,7 +201,8 @@
 .lessonToc a {
   width: 100%;
   border-left: 2px solid transparent;
-  padding: 7px 0 7px 12px;
+  padding-block: 7px;
+  padding-left: 12px;
   color: var(--color-text-secondary);
   line-height: 1.45;
   text-decoration: none;
@@ -225,15 +244,24 @@
   line-height: 1.7;
 }
 
+/* 하드 엣지 일관성. 목록 표식도 원이 아니라 정사각형이다. */
 .lessonOverview > ul li::before {
   position: absolute;
-  top: 0.68em;
+  top: 0.72em;
   left: 2px;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
+  width: 6px;
+  height: 6px;
   background: var(--color-background-accent-strong);
   content: "";
+}
+
+/* 고대비 모드는 background 를 시스템 색으로 눌러 버려 표식이 통째로 사라진다.
+   면 대신 테두리로 그려야 살아남는다. */
+@media (forced-colors: active) {
+  .lessonOverview > ul li::before {
+    border: 1px solid CanvasText;
+    forced-color-adjust: none;
+  }
 }
 
 .lessonSection {
@@ -249,33 +277,60 @@
   align-items: start;
 }
 
+/* 섹션 번호는 왼쪽 여백에 세우는 모노 숫자다. 제목과 같은 줄에서 읽힌다. */
 .lessonSection > header > span {
-  padding-top: 5px;
+  padding-top: 4px;
   color: var(--color-text-accent);
-  font-family: var(--font-family-mono);
-  font-size: var(--type-xs);
+  font-family: var(--font-family-code);
+  font-size: var(--type-lg);
   font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: var(--leading-lg);
 }
 
 .lessonSection > header p {
   margin-top: 5px;
 }
 
+/* 목표는 accent rail, 팁은 무채 rail. 둘 다 면을 채우지 않는다. */
 .lessonGoal {
   display: grid;
-  grid-template-columns: 72px minmax(0, 1fr);
-  gap: 16px;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 12px;
   margin: 28px 0 0;
   border-left: 2px solid var(--color-border-accent);
-  padding: 12px 16px;
-  background: var(--color-background-accent-subtle);
+  padding-block: 2px;
+  padding-left: 18px;
   color: var(--color-text-primary);
   line-height: 1.65;
 }
 
+.lessonTips {
+  margin-top: 28px;
+  border-left: 2px solid var(--color-border-default);
+  padding-block: 2px;
+  padding-left: 18px;
+  color: var(--color-text-secondary);
+  font-size: var(--type-base);
+}
+
+.lessonGoal strong,
+.lessonTips strong,
+.lessonExercise > span {
+  color: var(--color-text-primary);
+  font-family: var(--font-family-code);
+  font-size: var(--type-xs);
+  font-weight: 700;
+}
+
 .lessonGoal strong {
   color: var(--color-text-accent);
-  font-size: var(--type-xs);
+}
+
+.lessonTips ul {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  line-height: 1.75;
 }
 
 .lessonWhy,
@@ -285,25 +340,45 @@
   line-height: 1.85;
 }
 
+/* 설명 문단이 이 화면의 본문이다. 크기는 유지하고 줄 간격만 넓혀 읽기를 돕는다.
+   한국어는 어절 단위로 끊어야 줄 끝이 깨지지 않는다. */
+.lessonExplanation p {
+  color: var(--color-text-primary);
+  font-size: var(--type-md);
+  line-height: 1.85;
+}
+
+.lessonWhy,
+.lessonGoal,
+.lessonExplanation p,
+.lessonOverview > ul li,
+.lessonExercise > p {
+  overflow-wrap: break-word;
+  word-break: keep-all;
+}
+
 .lessonExplanation p + p {
   margin-top: 18px;
 }
 
+/* 코드는 테마를 뒤집지 않는다. 어두운 화면에서 흰 판이 튀어나오면 눈이 먼저 지친다.
+   대신 같은 테마 안에서 한 단 눌린 면(muted)에 가는 테두리를 둘러 본문과 구분한다.
+   라이트에서는 본문보다 어둡고 다크에서는 밝아서 두 테마 모두 코드가 먼저 보인다. */
 .lessonCode {
   overflow: hidden;
   margin: 28px 0 0;
   border: 1px solid var(--color-border-default);
-  border-radius: 6px;
-  background: var(--color-background-inverse);
-  color: var(--color-text-inverse);
+  background: var(--color-background-muted);
+  color: var(--color-text-primary);
 }
 
 .lessonCode figcaption {
-  border-bottom: 1px solid color-mix(in srgb, var(--color-text-inverse) 16%, transparent);
+  border-bottom: 1px solid var(--color-border-default);
   padding: 9px 14px;
-  color: color-mix(in srgb, var(--color-text-inverse) 72%, transparent);
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-code);
   font-size: var(--type-2xs);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .lessonCode pre {
@@ -311,31 +386,11 @@
   overflow-x: auto;
   margin: 0;
   padding: 18px;
-  font-family: var(--font-family-mono);
-  font-size: var(--type-sm);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-code);
+  font-size: var(--type-md);
   line-height: 1.7;
   white-space: pre;
-}
-
-.lessonTips {
-  margin-top: 28px;
-  border-left: 2px solid var(--color-border-default);
-  padding: 2px 0 2px 18px;
-  color: var(--color-text-secondary);
-  font-size: var(--type-base);
-}
-
-.lessonTips strong,
-.lessonExercise > span {
-  color: var(--color-text-primary);
-  font-size: var(--type-xs);
-  font-weight: 700;
-}
-
-.lessonTips ul {
-  margin: 10px 0 0;
-  padding-left: 18px;
-  line-height: 1.75;
 }
 
 .lessonExercise {
@@ -354,7 +409,7 @@
 .lessonExercise > small {
   display: block;
   margin-top: 12px;
-  color: var(--color-text-tertiary);
+  color: var(--color-text-secondary);
 }
 
 .lessonRunBand {

@@ -499,11 +499,11 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
 # 줄이는 커밋에서 예산도 같이 내리고, 올리는 변경은 여기서 막힌다.
 LANDING_TYPE_SCALE_PATH = "landing/src/styles/typeScale.css"
 LANDING_SURFACE_CSS_PX_BUDGET = {
-    "landing/src/styles/homeAstryx.css": 131,
-    "landing/src/styles/learnExplorer.css": 173,
-    "landing/src/styles/publicShell.css": 58,
-    "landing/src/styles/lessonAstryx.css": 126,
-    "landing/src/styles.css": 240,
+    "landing/src/styles/homeAstryx.css": 122,
+    "landing/src/styles/learnExplorer.css": 162,
+    "landing/src/styles/publicShell.css": 55,
+    "landing/src/styles/lessonAstryx.css": 123,
+    "landing/src/styles.css": 156,
 }
 
 

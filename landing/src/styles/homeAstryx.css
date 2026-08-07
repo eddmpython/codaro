@@ -25,9 +25,12 @@
   color: inherit;
 }
 
+/* 본문 칸은 페이지 격자 안쪽이다. 칸의 폭과 여백은 publicShell.css 가 소유하고
+   (--public-frame-width / --public-frame-inset), 헤더와 홈이 같은 x 를 쓴다. */
 .homeShell {
-  width: min(1200px, calc(100% - 80px));
+  width: var(--public-frame-width);
   margin-inline: auto;
+  padding-inline: var(--public-frame-inset);
 }
 
 .homeKicker,
@@ -41,6 +44,21 @@
   font-weight: 700;
   line-height: var(--leading-xs);
   letter-spacing: 0;
+}
+
+/* 마이크로 라벨. 짧은 가로선이 라벨을 격자에 매달아 섹션 시작을 알린다.
+   자간은 주지 않는다. 이 라벨은 한글을 포함하는데 한글에 트래킹을 주면 음절이
+   흩어져("학 습  스 튜 디 오") 읽기가 나빠진다. learnExplorer.css 와
+   lessonAstryx.css 가 같은 규칙을 명문화하고 있으므로 여기서도 지킨다. */
+.homeKicker {
+  text-transform: uppercase;
+}
+
+.homeKicker::before {
+  width: 20px;
+  height: 1px;
+  background: currentColor;
+  content: "";
 }
 
 /* ── 홈의 두 칸 ──────────────────────────────────────────────────────────────
@@ -90,33 +108,72 @@
   content: "";
 }
 
+/* ── 격자 프레임 ──────────────────────────────────────────────────────────────
+   본문 칸의 좌우에 1px 세로선을 세운다. 히어로와 학습창이 같은 x 에 선을 세우므로
+   스크롤 내내 한 줄로 이어져 페이지가 "격자 위의 문서"로 읽힌다. 선 하나에
+   요소 하나를 쓰지 않고 border-inline 으로 두 줄을 한 번에 긋는다. */
+.homeProductHero::after,
+.homeStudio::before {
+  position: absolute;
+  z-index: 0;
+  inset-block: 0;
+  left: 50%;
+  width: var(--public-frame-width);
+  transform: translateX(-50%);
+  border-inline: 1px solid var(--color-border);
+  pointer-events: none;
+  content: "";
+}
+
+/* 히어로는 두 칸이다. 왼쪽은 읽는 칸(헤드라인/설명/CTA), 오른쪽은 하는 칸이다.
+   DOM 순서는 헤드라인 → 설명 → 코드셀 → CTA 로 고정이고(공개 표면 읽기 순서 계약),
+   화면 배치는 grid-template-areas 가 따로 정한다. */
 .homeHeroLayout {
   position: relative;
   z-index: 1;
   display: grid;
-  max-width: 720px;
-  justify-items: center;
-  gap: 18px;
-  text-align: center;
+  /* 읽는 칸의 폭은 헤드라인이 정한다. 가장 긴 줄("어디서나 공부한다.")은 hero
+     스텝 최대치에서 568 만큼 넓고, 1.38fr 이면 어느 폭에서도 세 줄이 세 줄로
+     남는다. 비율을 내리면 그 줄이 네 줄로 부서지니 바꾸려면 다시 재어라. */
+  grid-template-columns: minmax(0, 1.38fr) minmax(0, 1fr);
+  grid-template-areas:
+    "mark    cell"
+    "kicker  cell"
+    "head    cell"
+    "lede    cell"
+    "actions cell"
+    "cue     cell";
+  align-content: center;
+  column-gap: 40px;
+  row-gap: 16px;
+  text-align: start;
 }
 
 .homeHeroAvatar {
-  width: 96px;
-  height: 96px;
+  grid-area: mark;
+  justify-self: start;
   object-fit: contain;
-  filter: drop-shadow(0 12px 28px color-mix(in srgb, var(--color-shadow) 45%, transparent));
 }
 
-/* 세 박자를 한 문장씩 끊어 읽힌다. 마지막 줄이 제품이 데려가는 곳이다. */
-.homeHeroHeadline {
+.homeHeroLayout .homeKicker {
+  grid-area: kicker;
+  justify-self: start;
+}
+
+/* 세 박자를 한 문장씩 끊어 읽힌다. 마지막 줄이 제품이 데려가는 곳이다.
+   선택자에 .homeAstryx 를 붙여 두는 이유가 있다. Astryx Heading 이 자기 트래킹을
+   들고 오는데 그게 클래스 하나짜리 규칙을 이기므로, 여기서 특이도를 맞춰야
+   letter-spacing 이 실제로 적용된다. 떼면 조판이 조용히 느슨해진다. */
+.homeAstryx .homeHeroHeadline {
+  grid-area: head;
   display: grid;
   gap: 2px;
   color: var(--color-text-primary);
   font-family: var(--font-family-heading);
-  font-size: var(--type-display);
+  font-size: var(--type-hero);
   font-weight: 700;
-  line-height: 1.18;
-  letter-spacing: -0.03em;
+  line-height: var(--leading-hero);
+  letter-spacing: -0.032em;
 }
 
 .homeHeroHeadline span {
@@ -128,31 +185,32 @@
 }
 
 .homeProductStatement {
+  grid-area: lede;
   max-width: 46ch;
   color: var(--color-text-secondary);
   font-size: var(--type-lg);
   line-height: 1.55;
-  text-wrap: balance;
 }
 
+/* 오른쪽 칸. 광고 목업이 아니라 실제로 Python 이 도는 셀이다. 그림자를 걷고
+   hairline 만 남겨 격자 위에 놓인 한 장으로 읽히게 한다. */
 .homeHeroProductFrame {
   position: relative;
+  grid-area: cell;
   display: grid;
-  width: 100%;
+  align-self: center;
   min-width: 0;
-  max-width: 560px;
   overflow: hidden;
   border: 1px solid var(--color-border-emphasized);
-  border-radius: var(--radius-container);
   background: var(--color-background-card);
-  box-shadow: 0 24px 72px color-mix(in srgb, var(--color-shadow) 55%, transparent);
   text-align: start;
 }
 
 .homeHeroActions {
+  grid-area: actions;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  margin-top: 12px;
   gap: 10px;
 }
 
@@ -165,8 +223,10 @@
 }
 
 .homeHeroScrollCue {
+  grid-area: cue;
   display: inline-flex;
   align-items: center;
+  margin-top: 8px;
   gap: 6px;
   color: var(--color-text-tertiary);
   font-size: var(--type-xs);
@@ -218,16 +278,17 @@
 
 /* ── 학습창 ────────────────────────────────────────────────────────────────
    히어로 위로 올라오는 판이다. 배경이 불투명해야 히어로를 덮는다. */
+/* 올라오는 판이라는 것은 모서리가 아니라 격자 위의 가로선 하나로 알린다. */
 .homeStudio {
   position: relative;
   z-index: 1;
-  /* 선을 긋지 않는다. 올라오는 판이라는 것은 모서리와 그림자로만 알린다. */
-  border-radius: 20px 20px 0 0;
+  border-top: 1px solid var(--color-border);
   background: var(--color-background-body);
-  box-shadow: 0 -18px 44px color-mix(in srgb, var(--color-shadow) 26%, transparent);
 }
 
 .homeStudioInner {
+  position: relative;
+  z-index: 1;
   display: grid;
   gap: 40px;
   padding-block: 64px 88px;
@@ -235,15 +296,8 @@
 
 .homeStudioHead {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
-  gap: 24px;
-}
-
-.homeStudioHead > div {
-  display: grid;
-  gap: 10px;
   max-width: 60ch;
+  gap: 10px;
 }
 
 .homeStudioHead h2 {
@@ -253,39 +307,47 @@
   line-height: 1.25;
 }
 
+/* 교육과정 규모는 구석에 몰아넣는 메타데이터가 아니라 읽어야 할 숫자다.
+   본문 폭 전체를 쓰고, 칸은 세로 hairline 으로만 나눈다. */
 .homeStudioSummary {
-  display: flex;
-  margin: 0;
-  gap: 0;
+  display: grid;
+  /* 가로선은 본문이 아니라 격자에 속한다. 여백만큼 밖으로 나가 세로선까지 닿는다. */
+  margin: 0 calc(-1 * var(--public-frame-inset));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding-inline: var(--public-frame-inset);
+  border-block: 1px solid var(--color-border);
 }
 
 .homeStudioSummary > div {
   display: grid;
-  min-width: 88px;
-  gap: 2px;
-  padding: 8px 16px;
+  gap: 6px;
+  padding: 18px 20px 20px;
   border-left: 1px solid var(--color-border);
-  text-align: center;
 }
 
 .homeStudioSummary > div:first-child {
+  padding-left: 0;
   border-left: 0;
 }
 
+/* 라벨에 "전체", "분야" 처럼 한글이 섞이므로 자간은 주지 않는다(음절이 흩어진다).
+   모노 + 대문자만으로도 격자 라벨로 읽힌다. */
 .homeStudioSummary dt {
   color: var(--color-text-tertiary);
   font-family: var(--font-family-code);
   font-size: var(--type-2xs);
   font-weight: 700;
+  text-transform: uppercase;
 }
 
 .homeStudioSummary dd {
   margin: 0;
   color: var(--color-text-primary);
   font-family: var(--font-family-code);
-  font-size: var(--type-2xl);
+  font-size: var(--type-display);
   font-weight: 700;
-  line-height: var(--leading-2xl);
+  line-height: var(--leading-display);
+  letter-spacing: -0.02em;
 }
 
 .homeStudioResume {
@@ -575,12 +637,24 @@
 }
 
 @media (max-width: 1050px) {
-  .homeShell {
-    width: min(100% - 48px, 1200px);
-  }
-
   .homeStudioPaths {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* 두 칸이 좁아지면 헤드라인이 먼저 부서진다. 그 전에 세로로 쌓고,
+   하는 칸(코드셀)을 CTA 바로 위로 올린다. DOM 순서는 그대로 둔다. */
+@media (max-width: 900px) {
+  .homeHeroLayout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "mark"
+      "kicker"
+      "head"
+      "lede"
+      "cell"
+      "actions"
+      "cue";
   }
 }
 
@@ -595,10 +669,6 @@
 }
 
 @media (max-width: 760px) {
-  .homeShell {
-    width: calc(100% - 40px);
-  }
-
   /* 좁은 화면에서는 sticky 겹침을 쓰지 않는다. 두 칸을 그냥 세로로 잇는다. */
   .homeProductHero {
     position: static;
@@ -607,11 +677,7 @@
   }
 
   .homeHeroLayout {
-    gap: 14px;
-  }
-
-  .homeStudio {
-    box-shadow: none;
+    row-gap: 14px;
   }
 
   .homeStudioInner {
@@ -619,22 +685,17 @@
     padding-block: 40px 64px;
   }
 
-  .homeStudioHead {
-    grid-template-columns: minmax(0, 1fr);
-    align-items: start;
-  }
-
   .homeStudioSummary {
-    justify-self: start;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .homeStudioSummary > div {
-    min-width: 0;
-    padding-inline: 14px;
-  }
-
-  .homeStudioSummary > div:first-child {
+  .homeStudioSummary > div:nth-child(3) {
     padding-left: 0;
+    border-left: 0;
+  }
+
+  .homeStudioSummary > div:nth-child(n + 3) {
+    border-top: 1px solid var(--color-border);
   }
 
   .homeStudioPaths {
@@ -701,7 +762,7 @@
 .liveCodeCellDot {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   background: var(--color-icon-accent);
 }
 
@@ -710,7 +771,6 @@
   font-family: var(--font-family-code);
   font-size: var(--type-2xs);
   font-weight: 700;
-  letter-spacing: 0.02em;
 }
 
 .liveCodeCellStatus {
@@ -738,6 +798,14 @@
   line-height: var(--leading-sm);
   resize: vertical;
   outline: none;
+}
+
+/* 이 셀은 히어로의 주역이고 키보드로도 닿는다. outline 을 끈 대신 포커스 표식을
+   반드시 되돌려 준다. typeScale.css 의 공용 규칙은 :where(a, button, summary,
+   [role="button"]) 이라 textarea 를 덮지 않는다. */
+.liveCodeCellEditor:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
 }
 
 .liveCodeCellActions {

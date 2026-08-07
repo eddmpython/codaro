@@ -2,6 +2,10 @@
   /* 투명 헤더의 높이. 홈은 이 값만큼 위로 올라와 히어로 배경을 헤더 뒤까지 잇는다
      (homeAstryx.css). 값을 바꾸면 두 파일이 같이 움직인다. */
   --public-header-height: 52px;
+  /* 페이지 격자의 기하. width 는 세로 hairline 이 서는 칸의 폭이고, inset 은 그
+     선에서 본문까지의 여백이다. 헤더와 홈(homeAstryx.css)이 같은 x 를 쓴다. */
+  --public-frame-width: min(1200px, calc(100% - 64px));
+  --public-frame-inset: 32px;
 }
 
 .publicHeader {
@@ -20,9 +24,10 @@
 
 .publicHeaderInner {
   display: grid;
-  width: min(1200px, calc(100% - 40px));
+  width: var(--public-frame-width);
   min-height: var(--public-header-height);
   margin-inline: auto;
+  padding-inline: var(--public-frame-inset);
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 24px;
@@ -85,6 +90,9 @@
   font-size: var(--type-sm);
   font-weight: 700;
   line-height: 40px;
+  /* 헤더 라벨은 절대 꺾이지 않는다. 폭이 모자라면 두 줄이 되는 게 아니라
+     모바일 메뉴 분기로 넘어가야 한다("학/습" 같은 어절 파손 방지). */
+  white-space: nowrap;
   text-decoration: none;
 }
 
@@ -211,13 +219,18 @@
   outline: none;
 }
 
-@media (max-width: 820px) {
+/* 데스크톱 내비가 한 줄로 들어가는 하한이 이 폭이다. 프레임 좌우 여백이 헤더
+   콘텐츠 폭을 그만큼 줄이므로, 여백을 도입하기 전 기준을 그대로 두면 이 경계
+   바로 위 구간에서 "학/습" 처럼 어절이 꺾여 헤더가 두 줄이 되고, 그 아래
+   sticky 로 붙는 요소들이 헤더 뒤로 숨는다. 실측으로 잡은 경계다. */
+@media (max-width: 860px) {
   :root {
     --public-header-height: 56px;
+    --public-frame-width: min(100% - 24px, 720px);
+    --public-frame-inset: 14px;
   }
 
   .publicHeaderInner {
-    width: min(100% - 28px, 720px);
     min-height: var(--public-header-height);
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 12px;
@@ -245,18 +258,19 @@
 
   .publicMobileMenu {
     display: grid;
-    width: min(100% - 28px, 720px);
+    width: var(--public-frame-width);
     max-height: calc(100svh - 68px);
     margin-inline: auto;
     overflow-y: auto;
     border-top: 1px solid var(--color-border);
     padding-block: 10px 16px;
+    padding-inline: var(--public-frame-inset);
   }
 
   .publicMobileMenu a {
     min-height: 46px;
     border-bottom: 1px solid var(--color-border);
-    padding: 13px 4px;
+    padding-block: 13px;
     color: var(--color-text-secondary);
     font-size: var(--type-base);
     font-weight: 700;
@@ -277,13 +291,6 @@
 @media (max-width: 480px) {
   .publicHeaderInner {
     gap: 8px;
-  }
-}
-
-@media (max-width: 360px) {
-  .publicHeaderInner,
-  .publicMobileMenu {
-    width: calc(100% - 20px);
   }
 }
 

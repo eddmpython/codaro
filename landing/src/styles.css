@@ -27,15 +27,11 @@
   --shadow-sm: var(--shadow-low);
   --shadow-brand: 0 0 0 1px var(--border-brand), 0 14px 40px color-mix(in srgb, var(--color-accent) 16%, transparent);
   --mascot-glow: none;
-  --header-bg: rgba(245, 246, 248, 0.92);
-  --header-fg: #18191d;
-  --paper: #ffffff;
-  --paper-fg: #18191d;
-  --paper-muted: #eceff3;
-  --paper-muted-fg: #5d626d;
-  --paper-border: #d9dde3;
-  --code: #f8f9fa;
-  --code-fg: #18191d;
+  /* 코드 블록은 토큰을 그대로 받는다. 예전에는 여기에 light/dark hex 를 두 벌
+     적어 두었는데, 생성 토큰이 이미 light-dark() 로 두 모드를 담당하므로
+     중복이었고 테마를 바꿔도 따라오지 않는 사각지대였다. */
+  --code: var(--color-background-muted);
+  --code-fg: var(--color-text-primary);
   --font-sans: var(--font-family-body);
   --font-display: var(--font-family-heading);
   --font-mono: var(--font-family-code);
@@ -48,18 +44,7 @@
 }
 
 :root[data-resolved-theme="dark"] {
-  --shadow: 0 12px 28px rgba(0, 0, 0, 0.38);
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.16);
   --shadow-brand: 0 0 0 1px var(--border-brand), 0 14px 40px color-mix(in srgb, var(--color-accent) 12%, transparent);
-  --header-bg: rgba(21, 22, 25, 0.92);
-  --header-fg: #f5f6f8;
-  --paper: #222327;
-  --paper-fg: #f5f6f8;
-  --paper-muted: #202226;
-  --paper-muted-fg: #aeb3bd;
-  --paper-border: #34373d;
-  --code: #17181b;
-  --code-fg: #eceef2;
 }
 
 * {
@@ -112,32 +97,12 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   min-height: 100vh;
 }
 
-.siteHeader {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  min-height: 58px;
-  padding: 0 24px;
-  border-bottom: 1px solid var(--border);
-  background: var(--header-bg);
-  color: var(--header-fg);
-  backdrop-filter: blur(18px);
-}
-
-.brandMark,
-.siteHeader nav a,
-.iconButton {
+.brandMark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius);
   white-space: nowrap;
-}
-
-.brandMark {
   gap: var(--brand-mark-gap-px, 5px);
   min-height: 40px;
   padding-right: 8px;
@@ -154,206 +119,26 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   flex: 0 0 var(--brand-mark-avatar-px, 40px);
 }
 
-.siteHeader nav {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  margin-left: auto;
-  padding: 3px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--muted);
-}
-
-.siteHeader nav a {
-  min-height: 32px;
-  padding: 0 12px;
-  color: var(--muted-foreground);
-  font-family: var(--font-mono);
-  font-size: var(--type-sm);
-  font-weight: 400;
-  letter-spacing: 0.01em;
-}
-
-.siteHeader nav a:hover,
-.siteHeader nav a[aria-current="page"] {
-  background: var(--card);
-  color: var(--card-foreground);
-}
-
-.headerActions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.iconButton {
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--card-foreground);
-}
-
-.iconButton:hover {
-  border-color: var(--border-strong);
-}
-
-/* ── Floating controls (no top header bar — matches editor) ─────── */
-.floatBrand {
-  position: fixed;
-  top: 14px;
-  left: 18px;
-  z-index: 40;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 12px 5px 6px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border);
-  background: color-mix(in oklab, var(--card) 60%, transparent);
-  backdrop-filter: blur(10px);
-  color: var(--foreground);
-  font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-.floatBrand img {
-  width: 30px;
-  height: 30px;
-  object-fit: contain;
-}
-
-.floatControls {
-  position: fixed;
-  top: 14px;
-  right: 16px;
-  z-index: 40;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border);
-  background: color-mix(in oklab, var(--card) 60%, transparent);
-  backdrop-filter: blur(10px);
-}
-
-.floatControls .iconButton {
-  border-color: transparent;
-  background: transparent;
-}
-
-.floatControls .iconButton:hover {
-  border-color: transparent;
-  background: var(--muted);
-}
-
-.floatControls .downloadChip {
-  height: 30px;
-  margin-left: 2px;
-}
-
 .htmlContent pre {
   overflow-x: auto;
   margin: 0;
   padding: 16px;
-  border-radius: 0;
+  border-radius: var(--radius-none);
   background: var(--code);
   color: var(--code-fg);
   font-size: var(--type-sm);
   line-height: 1.6;
 }
 
-.contentBand,
-.splitSection,
 .pageShell,
 .articleLayout,
 .siteFooter {
-  /* 셸 폭은 homeShell 과 한 벌이다: 1200px, 여백 80(데스크톱)/40(모바일). */
-  width: min(1200px, calc(100% - 80px));
+  /* 셸 폭은 페이지 격자와 한 벌이다. 헤더, 홈, 문서, 푸터가 모두 같은 x 에
+     서야 스크롤 내내 좌우 세로선이 한 줄로 이어진다. 기하의 owner 는
+     publicShell.css 다(--public-frame-width / --public-frame-inset). */
+  width: var(--public-frame-width);
   margin: 0 auto;
-}
-
-.homePage {
-  position: relative;
-  background: var(--background);
-}
-
-/* ── Atmosphere: grain + plum/amber mesh (never flat) ───────────── */
-.homePage::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.06;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-.homePage::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(60% 50% at 12% 6%, oklch(0.55 0.12 350 / 0.2), transparent 70%),
-    radial-gradient(52% 46% at 88% 20%, oklch(0.72 0.16 65 / 0.16), transparent 72%),
-    radial-gradient(72% 60% at 50% 110%, oklch(0.4 0.1 330 / 0.22), transparent 75%);
-  animation: meshDrift 22s ease-in-out infinite alternate;
-}
-
-:root[data-resolved-theme="light"] .homePage::before {
-  opacity: 0.04;
-}
-
-:root[data-resolved-theme="light"] .homePage::after {
-  background:
-    radial-gradient(60% 50% at 12% 6%, rgba(124, 58, 90, 0.1), transparent 70%),
-    radial-gradient(52% 46% at 88% 20%, rgba(245, 165, 36, 0.12), transparent 72%),
-    radial-gradient(72% 60% at 50% 110%, rgba(124, 58, 90, 0.1), transparent 75%);
-}
-
-.homePage > * {
-  position: relative;
-  z-index: 1;
-}
-
-@keyframes meshDrift {
-  from {
-    transform: translate3d(0, 0, 0);
-    opacity: 0.92;
-  }
-  to {
-    transform: translate3d(-1.5%, 1%, 0);
-    opacity: 1;
-  }
-}
-
-/* ── Header download chip ───────────────────────────────────────── */
-.downloadChip {
-  display: none;
-  align-items: center;
-  gap: 6px;
-  height: 32px;
-  padding: 0 14px;
-  border-radius: var(--radius-pill);
-  background: var(--brand-emphasis);
-  color: var(--brand-emphasis-foreground);
-  font-weight: 700;
-  font-size: var(--type-sm);
-}
-
-.downloadChip:hover {
-  box-shadow: var(--shadow-brand);
-}
-
-@media (min-width: 900px) {
-  .downloadChip {
-    display: inline-flex;
-  }
+  padding-inline: var(--public-frame-inset);
 }
 
 /* ── Multi-column footer ────────────────────────────────────────── */
@@ -416,10 +201,6 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   font-size: var(--type-xs);
 }
 
-.heroKicker,
-.heroMetrics,
-.releaseLinks,
-.heroActions,
 .downloadActions,
 .taxonomyBar,
 .tagRow {
@@ -427,62 +208,6 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   flex-wrap: wrap;
   align-items: center;
   gap: 9px;
-}
-
-.heroKicker {
-  margin-bottom: 16px;
-}
-
-.heroKicker span,
-.heroMetrics span {
-  min-height: 28px;
-  padding: 6px 9px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--card);
-  color: var(--muted-foreground);
-  font-size: var(--type-xs);
-  font-weight: 700;
-}
-
-.heroActions {
-  margin-top: 28px;
-}
-
-.heroMetrics {
-  margin-top: 18px;
-}
-
-.heroProofGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 18px;
-}
-
-.proofTile {
-  min-height: 122px;
-  padding: 13px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--card);
-}
-
-.proofTile strong,
-.proofTile span {
-  display: block;
-}
-
-.proofTile strong {
-  color: var(--card-foreground);
-  font-size: var(--type-sm);
-}
-
-.proofTile span {
-  margin-top: 8px;
-  color: var(--muted-foreground);
-  font-size: var(--type-sm);
-  line-height: 1.55;
 }
 
 .eyebrow {
@@ -496,8 +221,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 }
 
 .primaryButton,
-.secondaryButton,
-.textLink {
+.secondaryButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -534,49 +258,12 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   border-color: var(--border-brand);
 }
 
-.textLink {
-  padding: 0 4px;
-  color: var(--brand-emphasis);
-}
-
-.contentBand,
-.splitSection,
 .pageShell {
-  padding: 60px 0;
+  /* padding shorthand 를 쓰면 위에서 준 padding-inline(격자 여백)이 0 으로
+     리셋된다. 세로 여백만 건드릴 때는 반드시 padding-block 을 쓴다. */
+  padding-block: 60px;
 }
 
-.productBand + .seeItWork,
-.seeItWork + .flowSection,
-.flowSection + .releaseSection,
-.releaseSection + .contentBand {
-  padding-top: 24px;
-}
-
-.productBand {
-  border-top: 1px solid var(--border);
-}
-
-.proofGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 28px;
-}
-
-.sectionIntro {
-  max-width: 760px;
-}
-
-.sectionIntro h2,
-.splitSection h2 {
-  font-size: var(--type-display);
-  line-height: 1.12;
-  letter-spacing: -0.01em;
-  font-weight: 700;
-}
-
-.sectionIntro p,
-.splitSection p,
 .pageHeader p,
 .articleDescription {
   color: var(--muted-foreground);
@@ -633,14 +320,6 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   margin-top: 10px;
   color: var(--muted-foreground);
   line-height: 1.65;
-}
-
-.splitSection {
-  display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
-  gap: 30px;
-  align-items: start;
-  border-top: 1px solid var(--border);
 }
 
 .shareHowTo svg {
@@ -796,7 +475,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   grid-template-columns: 248px minmax(0, 840px);
   gap: 42px;
   align-items: start;
-  padding: 62px 0 82px;
+  padding-block: 62px 82px;
 }
 
 .articleLayout.compact {
@@ -889,7 +568,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 
 .htmlContent code {
   padding: 2px 5px;
-  border-radius: 6px;
+  border-radius: var(--radius-inner);
   background: var(--muted);
   color: var(--foreground);
   font-size: 0.92em;
@@ -1112,7 +791,7 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   margin-top: 4px;
   padding: 8px 12px;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: var(--radius);
   background: var(--card);
   color: var(--card-foreground);
   font: inherit;
@@ -1168,28 +847,10 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 }
 
 @media (max-width: 900px) {
-  .siteHeader {
-    flex-wrap: wrap;
-    min-height: auto;
-    padding: 11px 18px;
-  }
-
   .footerGrid {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .siteHeader nav {
-    order: 3;
-    width: 100%;
-    overflow-x: auto;
-    margin-left: 0;
-  }
-
-  .headerActions {
-    margin-left: auto;
-  }
-
-  .splitSection,
   .articleLayout,
   .articleLayout.compact {
     grid-template-columns: 1fr;
@@ -1221,20 +882,10 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 }
 
 @media (max-width: 680px) {
-  .contentBand,
-  .splitSection,
-  .pageShell,
-  .articleLayout,
-  .siteFooter,
-  .footerGrid,
-  .footerBottom {
-    width: min(100% - 40px, 1200px);
-  }
-
-  .contentBand,
-  .splitSection,
+  /* 폭은 --public-frame-width 가 820px 브레이크포인트에서 이미 좁혀 준다.
+     여기서 다시 선언하면 격자가 헤더와 어긋나므로 세로 여백만 손본다. */
   .pageShell {
-    padding: 52px 0;
+    padding-block: 52px;
   }
 
   .pageHeader h1,
@@ -1242,9 +893,6 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
     font-size: var(--type-display);
   }
 
-  .heroLead,
-  .sectionIntro p,
-  .splitSection p,
   .pageHeader p,
   .articleDescription,
   .htmlContent {
@@ -1268,80 +916,9 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
 
 @media (max-width: 430px) {
   .primaryButton,
-  .secondaryButton,
-  .textLink {
+  .secondaryButton {
     width: 100%;
   }
-
-  .heroActions {
-    align-items: stretch;
-    flex-direction: column;
-  }
-}
-
-.faqBand {
-  border-top: 1px solid var(--border);
-}
-
-.faqList {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  margin-top: 32px;
-  max-width: 920px;
-}
-
-.faqItem {
-  border: 1px solid var(--border);
-  background: var(--card);
-  border-radius: 14px;
-  padding: 0;
-  overflow: hidden;
-  transition: border-color 160ms ease, background 160ms ease;
-}
-
-.faqItem[open] {
-  border-color: var(--border-strong);
-  background: color-mix(in oklab, var(--card) 92%, var(--background));
-}
-
-.faqItem > summary {
-  list-style: none;
-  cursor: pointer;
-  padding: 18px 22px;
-  font-size: 1.02rem;
-  font-weight: 600;
-  color: var(--foreground);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.faqItem > summary::-webkit-details-marker {
-  display: none;
-}
-
-.faqItem > summary::after {
-  content: "+";
-  font-size: 1.2rem;
-  color: var(--muted-foreground);
-  font-weight: 400;
-  flex-shrink: 0;
-  transition: transform 200ms ease;
-}
-
-.faqItem[open] > summary::after {
-  content: "−";
-  transform: rotate(0deg);
-}
-
-.faqItem > p {
-  padding: 0 22px 20px;
-  margin: 0;
-  color: var(--muted-foreground);
-  line-height: 1.7;
-  font-size: 0.96rem;
 }
 
 }
