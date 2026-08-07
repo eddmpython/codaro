@@ -29,6 +29,10 @@
   --leading-title: 1.25;
   --type-display: clamp(30px, 3.7vw, 46px);
   --leading-display: 1.16;
+  /* hero 는 마케팅 표면(홈 히어로)의 단독 스텝이다. display 는 문서·블로그 제목이
+     함께 쓰므로 그쪽을 키우면 학습 문서가 망가진다. 둘을 분리해 둔다. */
+  --type-hero: clamp(38px, 5.4vw, 76px);
+  --leading-hero: 1.04;
 }
 
 /* 포커스 표식 한 벌. :where 로 특이도를 0 으로 눌러 컴포넌트 자체 링(astryx

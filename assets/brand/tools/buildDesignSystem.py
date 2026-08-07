@@ -413,6 +413,9 @@ def renderAppBridge(appName: str) -> str:
             "--success-foreground": "var(--color-on-success)",
             "--warning": "var(--color-warning)",
             "--warning-foreground": "var(--color-on-warning)",
+            # info 는 semanticRoles 에 이미 있던 역할인데 shadcn 별칭만 빠져 있었다.
+            # 그래서 대기·안내 상태가 Tailwind 고정 팔레트(sky-500)로 새고 있었다.
+            "--info": "var(--color-text-blue)",
             "--accent-brand": "var(--color-accent)",
             "--accent-brand-foreground": "var(--color-on-accent)",
             "--chart-1": "var(--color-text-blue)",
