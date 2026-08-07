@@ -6,7 +6,7 @@ import { Text } from "@astryxdesign/core/Text";
 import { LessonRow } from "./lessonRow.jsx";
 import { ProductVisual } from "./productVisual.jsx";
 import { brand } from "../lib/brand.js";
-import { curriculumLessonCount, curriculumRuntimeCounts, curriculumTree } from "../lib/generated/curriculum.js";
+import { curriculumLessonCount, curriculumTree } from "../lib/generated/curriculum.js";
 import {
   domainCopy,
   firstBrowserLesson,
@@ -31,15 +31,6 @@ export function LearningStudio() {
             브라우저에서 실행하고 강하게 검증합니다. 운영체제 권한이 필요한 단계만 Local로 이어집니다.
           </Text>
         </header>
-
-        {/* 교육과정 규모는 구석에 접어 두는 메타데이터가 아니다. 본문 폭을 다 쓰고
-            세로 hairline 으로만 나눠 네 숫자를 그대로 읽게 한다. */}
-        <dl className="homeStudioSummary" aria-label="교육과정 지원 범위">
-          <div><dt>Web</dt><dd>{curriculumRuntimeCounts.browser}</dd></div>
-          <div><dt>Local</dt><dd>{curriculumRuntimeCounts.local}</dd></div>
-          <div><dt>전체</dt><dd>{curriculumLessonCount}</dd></div>
-          <div><dt>분야</dt><dd>{curriculumTree.length}</dd></div>
-        </dl>
 
         <ResumeBand />
 
