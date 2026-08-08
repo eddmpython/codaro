@@ -1224,6 +1224,7 @@ function CellMetaBar({
             )}
             disabled={!canRun}
             label={`${cellLabel} 실행`}
+            preserveEditorFocusOnTouch
             variant="ghost"
             onClick={(event) => {
               event.stopPropagation();

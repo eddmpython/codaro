@@ -132,6 +132,27 @@ def testCheckExpectedOutputAcceptsCaseByDefaultAndSupportsExactMode() -> None:
     session.dispose()
 
 
+def testCheckExpectedOutputAppliesPolicyOnlyToThatExercise() -> None:
+    session = KernelSession()
+    tolerant = _run(checkExpectedOutput(
+        session,
+        "print([3, 2, 1])",
+        "[1, 2, 3]",
+        gradingPolicy={"listOrder": "any"},
+    ))
+    strict = _run(checkExpectedOutput(
+        session,
+        "print([3, 2, 1])",
+        "[1, 2, 3]",
+    ))
+
+    assert tolerant.passed is True
+    assert "목록 순서는 이 문제에서 허용" in tolerant.feedback
+    assert strict.passed is False
+    assert "순서가 다릅니다" in strict.feedback
+    session.dispose()
+
+
 def testCheckExpectedOutputComparesNumbersByValueByDefault() -> None:
     session = KernelSession()
     result = _run(checkExpectedOutput(

@@ -134,6 +134,13 @@ checkExercise: (payload: {
     hints?: string[];
     currentHintLevel?: number;
     comparator?: "auto" | "exact" | "text";
+    gradingPolicy?: {
+      absoluteTolerance?: number;
+      caseSensitive?: boolean;
+      listOrder?: "any" | "ordered";
+      relativeTolerance?: number;
+      whitespace?: "collapse" | "line-trim";
+    };
     category?: string;
     contentId?: string;
     sectionId?: string;

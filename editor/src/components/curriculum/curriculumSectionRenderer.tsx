@@ -456,6 +456,7 @@ export function StructuredSectionLearningBody({
                 className="astryxWorkCellAction size-8 [&_svg]:size-3.5"
                 disabled={!canRun || exerciseRunning}
                 label="셀 실행"
+                preserveEditorFocusOnTouch
                 variant="outline"
                 onClick={(event) => {
                   event.stopPropagation();

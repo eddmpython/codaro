@@ -8,17 +8,22 @@ from pathlib import Path
 import pytest
 import yaml
 
-from codaro.curriculum.outputMatch import matchLearningOutput, normalizeLearningOutput
+from codaro.curriculum.outputMatch import (
+    matchLearningOutput,
+    normalizeLearningOutput,
+    normalizeOutputGradingPolicy,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 VECTORS_PATH = ROOT / "contracts" / "learning-content" / "outputMatchVectors.json"
 TS_MIRROR_PATH = ROOT / "editor" / "src" / "lib" / "learningOutputMatch.ts"
 DAY06_PATH = ROOT / "curricula" / "python" / "basics" / "30days" / "day06_문자열메서드.yaml"
+DAY01_PATH = ROOT / "curricula" / "python" / "basics" / "30days" / "day01_헬로월드.yaml"
 
 
 def loadVectors() -> list[dict]:
     payload = json.loads(VECTORS_PATH.read_text(encoding="utf-8"))
-    assert payload["schemaVersion"] == 2
+    assert payload["schemaVersion"] == 3
     vectors = payload["vectors"]
     assert vectors, "계약 벡터가 비어 있다"
     assert len({vector["id"] for vector in vectors}) == len(vectors)
@@ -31,6 +36,7 @@ def testPythonMatcherSatisfiesContractVectors(vector: dict) -> None:
         vector["expected"],
         vector["actual"],
         comparator=vector["comparator"],
+        gradingPolicy=vector.get("gradingPolicy"),
     )
     assert verdict.passed == vector["passed"], verdict.feedback
     assert verdict.tier == vector["tier"], verdict.feedback
@@ -82,6 +88,45 @@ def testAutoComparatorExplainsStructuredMismatch() -> None:
 def testUnknownComparatorIsRejected() -> None:
     with pytest.raises(ValueError, match="지원하지 않는 출력 비교 방식"):
         matchLearningOutput("Hello", "hello", comparator="guess")
+
+
+@pytest.mark.parametrize(
+    "policy",
+    [
+        {"caseSensitive": "no"},
+        {"whitespace": "loose"},
+        {"relativeTolerance": -1},
+        {"absoluteTolerance": float("inf")},
+        {"listOrder": "sorted"},
+        {"typo": True},
+    ],
+)
+def testInvalidPerExercisePolicyIsRejected(policy: dict) -> None:
+    with pytest.raises(ValueError):
+        normalizeOutputGradingPolicy(policy)
+
+
+def testOrderedListMismatchExplainsTheOrderProblem() -> None:
+    verdict = matchLearningOutput("[1, 2, 3]", "[3, 2, 1]")
+    assert verdict.passed is False
+    assert "원소는 맞지만 순서" in verdict.feedback
+
+
+def testNumericMismatchExplainsTheAllowedTolerance() -> None:
+    verdict = matchLearningOutput("10", "12", gradingPolicy={"absoluteTolerance": 1})
+    assert verdict.passed is False
+    assert "허용 오차" in verdict.feedback
+
+
+def testDayOneReplacementTargetIsInlineAndConsistent() -> None:
+    lesson = yaml.safe_load(DAY01_PATH.read_text(encoding="utf-8"))
+    sections = {section["id"]: section for section in lesson["sections"]}
+    exercise = sections["print_multiple"]["exercise"]
+    check = sections["print_multiple"]["check"]
+    assert "____를 '바뀐 두 번째 줄'로 바꾸세요" in exercise["prompt"]
+    assert "아래 글자로 바꾸세요" not in exercise["prompt"]
+    assert "바뀐 두 번째 줄" in exercise["solution"]
+    assert "바뀐 두 번째 줄" in check["outputExact"]
 
 
 def testCaseTransformationExercisesKeepExactComparison() -> None:

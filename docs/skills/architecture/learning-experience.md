@@ -53,7 +53,7 @@ provider는 deterministic feedback 뒤 사용자가 요청할 때만 열고, 연
 
 `noError`와 `contains`는 weak evidence다. 설명용 feedback에는 쓸 수 있지만 completion, mastery, transfer, retrieval credit을 단독으로 만들지 않는다. structured strong kind는 `output`, `variable`, `file`, `table`, `image`, `behavior`다.
 
-일반 출력은 결정적 `auto` 비교가 기본이다. 먼저 line-trim과 대소문자를 비교하고, 차이가 남으면 양쪽 전체가 제한된 Python 표시값으로 안전하게 해석될 때만 숫자와 컨테이너 구조를 비교한다. 숫자는 상대 오차 `1e-9`, 절대 오차 `1e-12` 안에서 같게 보고, dict와 set의 순서는 무시하지만 list와 tuple의 순서와 타입은 보존한다. 양쪽 중 하나라도 값으로 해석되지 않으면 일반 텍스트 비교에 머물며 줄 안 공백과 실제 내용 차이는 통과시키지 않는다. `text`는 대소문자 차이만 허용하고, 대소문자 변환이나 표기 형식 자체를 배우는 검사는 `exact`를 명시한다. 허용한 차이는 성공 feedback에 남긴다.
+일반 출력은 결정적 `auto` 비교가 기본이다. 먼저 line-trim과 대소문자를 비교하고, 차이가 남으면 양쪽 전체가 제한된 Python 표시값으로 안전하게 해석될 때만 숫자와 컨테이너 구조를 비교한다. 숫자는 상대 오차 `1e-9`, 절대 오차 `1e-12` 안에서 같게 보고, dict와 set의 순서는 무시하지만 list와 tuple의 순서와 타입은 보존한다. 양쪽 중 하나라도 값으로 해석되지 않으면 일반 텍스트 비교에 머물며 줄 안 공백과 실제 내용 차이는 통과시키지 않는다. `text`는 대소문자 차이만 허용하고, 대소문자 변환이나 표기 형식 자체를 배우는 검사는 `exact`를 명시한다. 문제별 `gradingPolicy`는 필요한 경우에만 `caseSensitive`, `whitespace`, 숫자 허용 오차, `listOrder`를 덮어쓰며 다른 문제의 기본 규칙을 바꾸지 않는다. 허용한 차이와 숫자 또는 목록 순서 불일치는 구체적인 feedback에 남긴다.
 
 현재 browser release subset은 `output`과 `variable`이다. browser strong check는 main 학습 kernel과 분리된 새 pyproc Worker에서 실행한다. `behavior`와 OS capability가 필요한 검사는 `localRequired`다. Local strong completion은 지원 OS의 launcher broker와 `contracts/checkSandboxFeasibilityDecision.json` 판정을 따라야 한다. 응답의 AppContainer isolation과 지원 Windows build가 확인되지 않은 일반 subprocess 결과는 practice로 유지한다.
 

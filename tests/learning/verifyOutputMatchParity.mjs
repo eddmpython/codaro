@@ -17,6 +17,7 @@ let failures = 0;
 for (const vector of payload.vectors) {
   const verdict = matchLearningOutput(vector.expected, vector.actual, {
     comparator: vector.comparator,
+    gradingPolicy: vector.gradingPolicy,
   });
   if (verdict.passed !== vector.passed || verdict.tier !== vector.tier) {
     failures += 1;
@@ -45,6 +46,10 @@ try {
 if (!checkSpecSource.includes('comparator: "auto" | "exact" | "text"')) {
   failures += 1;
   console.error("FAIL strong output contract does not declare auto comparator");
+}
+if (!checkSpecSource.includes("gradingPolicy: LearningOutputGradingPolicy")) {
+  failures += 1;
+  console.error("FAIL strong output contract does not declare per-exercise grading policy");
 }
 
 if (failures) {

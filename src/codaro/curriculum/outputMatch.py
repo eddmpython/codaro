@@ -15,8 +15,8 @@ from __future__ import annotations
 import math
 import re
 import unicodedata
-from dataclasses import dataclass
-from typing import Any
+from dataclasses import dataclass, replace
+from typing import Any, Mapping
 
 
 MAX_LITERAL_LENGTH = 20_000
@@ -26,6 +26,13 @@ MAX_SAFE_NUMBER = 9_007_199_254_740_991
 NUMBER_RELATIVE_TOLERANCE = 1e-9
 NUMBER_ABSOLUTE_TOLERANCE = 1e-12
 NUMBER_PATTERN = re.compile(r"[+-]?(?:(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)")
+OUTPUT_GRADING_POLICY_KEYS = frozenset({
+    "absoluteTolerance",
+    "caseSensitive",
+    "listOrder",
+    "relativeTolerance",
+    "whitespace",
+})
 
 
 @dataclass(slots=True)
@@ -33,6 +40,15 @@ class OutputMatchVerdict:
     passed: bool
     tier: str
     feedback: str
+
+
+@dataclass(frozen=True, slots=True)
+class OutputGradingPolicy:
+    absoluteTolerance: float
+    caseSensitive: bool
+    listOrder: str
+    relativeTolerance: float
+    whitespace: str
 
 
 @dataclass(slots=True)
@@ -241,22 +257,76 @@ def normalizeLearningOutput(value: str) -> str:
     return "\n".join(lines)
 
 
+def normalizeOutputGradingPolicy(
+    value: Mapping[str, Any] | None,
+    *,
+    comparator: str = "auto",
+) -> OutputGradingPolicy:
+    if comparator not in {"auto", "exact", "text"}:
+        raise ValueError(f"지원하지 않는 출력 비교 방식입니다: {comparator!r}")
+    if value is None:
+        raw: Mapping[str, Any] = {}
+    elif isinstance(value, Mapping):
+        raw = value
+    else:
+        raise ValueError("출력 채점 정책은 object여야 합니다.")
+
+    unknownKeys = set(raw) - OUTPUT_GRADING_POLICY_KEYS
+    if unknownKeys:
+        raise ValueError("지원하지 않는 출력 채점 정책입니다: " + ", ".join(sorted(unknownKeys)))
+
+    caseSensitive = raw.get("caseSensitive", comparator == "exact")
+    if not isinstance(caseSensitive, bool):
+        raise ValueError("caseSensitive는 boolean이어야 합니다.")
+    whitespace = raw.get("whitespace", "line-trim")
+    if whitespace not in {"line-trim", "collapse"}:
+        raise ValueError("whitespace는 line-trim 또는 collapse여야 합니다.")
+    listOrder = raw.get("listOrder", "ordered")
+    if listOrder not in {"ordered", "any"}:
+        raise ValueError("listOrder는 ordered 또는 any여야 합니다.")
+    relativeTolerance = _policyTolerance(
+        raw.get("relativeTolerance", NUMBER_RELATIVE_TOLERANCE),
+        "relativeTolerance",
+        maximum=1.0,
+    )
+    absoluteTolerance = _policyTolerance(
+        raw.get("absoluteTolerance", NUMBER_ABSOLUTE_TOLERANCE),
+        "absoluteTolerance",
+        maximum=MAX_SAFE_NUMBER,
+    )
+    return OutputGradingPolicy(
+        absoluteTolerance=absoluteTolerance,
+        caseSensitive=caseSensitive,
+        listOrder=listOrder,
+        relativeTolerance=relativeTolerance,
+        whitespace=whitespace,
+    )
+
+
 def matchLearningOutput(
     expected: str,
     actual: str,
     *,
     comparator: str = "auto",
+    gradingPolicy: Mapping[str, Any] | None = None,
 ) -> OutputMatchVerdict:
-    if comparator not in {"auto", "exact", "text"}:
-        raise ValueError(f"지원하지 않는 출력 비교 방식입니다: {comparator!r}")
+    policy = normalizeOutputGradingPolicy(gradingPolicy, comparator=comparator)
 
-    expectedNorm = normalizeLearningOutput(expected)
-    actualNorm = normalizeLearningOutput(actual)
+    expectedBase = normalizeLearningOutput(expected)
+    actualBase = normalizeLearningOutput(actual)
+    expectedNorm = _collapse(expectedBase) if policy.whitespace == "collapse" else expectedBase
+    actualNorm = _collapse(actualBase) if policy.whitespace == "collapse" else actualBase
 
     if expectedNorm == actualNorm:
+        if expectedBase != actualBase:
+            return OutputMatchVerdict(
+                True,
+                "whitespace",
+                "공백 개수와 줄바꿈 차이는 이 문제에서 허용했고, 내용은 맞습니다.",
+            )
         return OutputMatchVerdict(True, "exact", "목표한 출력과 일치합니다.")
 
-    if comparator in {"auto", "text"} and _foldText(expectedNorm) == _foldText(actualNorm):
+    if not policy.caseSensitive and _foldText(expectedNorm) == _foldText(actualNorm):
         return OutputMatchVerdict(
             True,
             "text",
@@ -266,17 +336,60 @@ def matchLearningOutput(
     expectedValue = _parseLiteral(expectedNorm) if comparator == "auto" else None
     actualValue = _parseLiteral(actualNorm) if comparator == "auto" else None
     if expectedValue is not None and actualValue is not None:
-        if _literalValuesEqual(expectedValue, actualValue):
+        if _literalValuesEqual(expectedValue, actualValue, policy):
             if expectedValue.kind == "number" and actualValue.kind == "number":
                 return OutputMatchVerdict(
                     True,
                     "number",
                     "숫자 표기나 미세한 계산 오차는 허용했고, 값은 맞습니다.",
                 )
+            orderedPolicy = replace(policy, listOrder="ordered")
+            if (
+                policy.listOrder == "any"
+                and not _literalValuesEqual(expectedValue, actualValue, orderedPolicy)
+            ):
+                return OutputMatchVerdict(
+                    True,
+                    "order",
+                    "목록 순서는 이 문제에서 허용했고, 원소와 구조는 맞습니다.",
+                )
             return OutputMatchVerdict(
                 True,
                 "value",
                 "표현 방식의 차이는 허용했고, Python 값과 구조는 맞습니다.",
+            )
+        if (
+            expectedValue.kind == "number"
+            and actualValue.kind == "number"
+        ):
+            allowedDifference = _allowedNumberDifference(expectedValue, actualValue, policy)
+            return OutputMatchVerdict(
+                False,
+                "valueDifferent",
+                "숫자 값이 허용 오차를 벗어났습니다. "
+                f"기대 {_preview(expectedNorm)} ↔ 현재 {_preview(actualNorm)} "
+                f"(허용 오차 {allowedDifference:.12g}).",
+            )
+        if (
+            policy.listOrder == "ordered"
+            and expectedValue.kind == "list"
+            and actualValue.kind == "list"
+            and _literalValuesEqual(expectedValue, actualValue, replace(policy, listOrder="any"))
+        ):
+            return OutputMatchVerdict(
+                False,
+                "valueDifferent",
+                "목록 원소는 맞지만 순서가 다릅니다. 기대한 순서대로 배치해 주세요. "
+                f"기대 {_preview(expectedNorm)} ↔ 현재 {_preview(actualNorm)}",
+            )
+        if (
+            policy.caseSensitive
+            and _literalValuesEqual(expectedValue, actualValue, replace(policy, caseSensitive=False))
+        ):
+            return OutputMatchVerdict(
+                False,
+                "caseOnly",
+                f"값과 구조는 맞는데 대소문자만 다릅니다. 기대 {_preview(expectedNorm)} ↔ 현재 {_preview(actualNorm)}",
             )
         return OutputMatchVerdict(
             False,
@@ -327,31 +440,42 @@ def _parseLiteral(value: str) -> _LiteralValue | None:
         return None
 
 
-def _literalValuesEqual(expected: _LiteralValue, actual: _LiteralValue) -> bool:
+def _literalValuesEqual(
+    expected: _LiteralValue,
+    actual: _LiteralValue,
+    policy: OutputGradingPolicy,
+) -> bool:
     if expected.kind != actual.kind:
         return False
     if expected.kind == "number":
         difference = abs(float(expected.value) - float(actual.value))
-        scale = max(abs(float(expected.value)), abs(float(actual.value)))
-        return difference <= max(NUMBER_ABSOLUTE_TOLERANCE, NUMBER_RELATIVE_TOLERANCE * scale)
+        return difference <= _allowedNumberDifference(expected, actual, policy)
     if expected.kind == "string":
+        if policy.caseSensitive:
+            return unicodedata.normalize("NFC", str(expected.value)) == unicodedata.normalize("NFC", str(actual.value))
         return _foldText(str(expected.value)) == _foldText(str(actual.value))
     if expected.kind in {"none", "boolean"}:
         return expected.value == actual.value
     if expected.kind in {"list", "tuple"}:
-        return len(expected.value) == len(actual.value) and all(
-            _literalValuesEqual(left, right) for left, right in zip(expected.value, actual.value, strict=True)
+        if len(expected.value) != len(actual.value):
+            return False
+        if expected.kind == "list" and policy.listOrder == "any":
+            return _unorderedValuesEqual(expected.value, actual.value, policy)
+        return all(
+            _literalValuesEqual(left, right, policy)
+            for left, right in zip(expected.value, actual.value, strict=True)
         )
     if expected.kind == "dict":
-        return _unorderedPairsEqual(expected.value, actual.value)
+        return _unorderedPairsEqual(expected.value, actual.value, policy)
     if expected.kind == "set":
-        return _unorderedValuesEqual(expected.value, actual.value)
+        return _unorderedValuesEqual(expected.value, actual.value, policy)
     return False
 
 
 def _unorderedPairsEqual(
     expected: list[tuple[_LiteralValue, _LiteralValue]],
     actual: list[tuple[_LiteralValue, _LiteralValue]],
+    policy: OutputGradingPolicy,
 ) -> bool:
     if len(expected) != len(actual):
         return False
@@ -361,7 +485,8 @@ def _unorderedPairsEqual(
             (
                 index
                 for index, (actualKey, actualValue) in enumerate(unmatched)
-                if _literalValuesEqual(expectedKey, actualKey) and _literalValuesEqual(expectedValue, actualValue)
+                if _literalValuesEqual(expectedKey, actualKey, policy)
+                and _literalValuesEqual(expectedValue, actualValue, policy)
             ),
             None,
         )
@@ -371,19 +496,45 @@ def _unorderedPairsEqual(
     return True
 
 
-def _unorderedValuesEqual(expected: list[_LiteralValue], actual: list[_LiteralValue]) -> bool:
+def _unorderedValuesEqual(
+    expected: list[_LiteralValue],
+    actual: list[_LiteralValue],
+    policy: OutputGradingPolicy,
+) -> bool:
     if len(expected) != len(actual):
         return False
     unmatched = list(actual)
     for expectedValue in expected:
         matchIndex = next(
-            (index for index, actualValue in enumerate(unmatched) if _literalValuesEqual(expectedValue, actualValue)),
+            (
+                index
+                for index, actualValue in enumerate(unmatched)
+                if _literalValuesEqual(expectedValue, actualValue, policy)
+            ),
             None,
         )
         if matchIndex is None:
             return False
         unmatched.pop(matchIndex)
     return True
+
+
+def _allowedNumberDifference(
+    expected: _LiteralValue,
+    actual: _LiteralValue,
+    policy: OutputGradingPolicy,
+) -> float:
+    scale = max(abs(float(expected.value)), abs(float(actual.value)))
+    return max(policy.absoluteTolerance, policy.relativeTolerance * scale)
+
+
+def _policyTolerance(value: Any, name: str, *, maximum: float) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(f"{name}는 0 이상의 유한한 숫자여야 합니다.")
+    parsed = float(value)
+    if not math.isfinite(parsed) or parsed < 0 or parsed > maximum:
+        raise ValueError(f"{name}는 0 이상 {maximum:g} 이하의 유한한 숫자여야 합니다.")
+    return parsed
 
 
 def _foldText(value: str) -> str:

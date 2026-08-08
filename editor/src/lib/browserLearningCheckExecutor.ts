@@ -401,6 +401,7 @@ export async function executeBrowserStrongCheck(
     if (spec.kind === "output") {
       const verdict = matchLearningOutput(expected, actual, {
         comparator: spec.payload.comparator,
+        gradingPolicy: spec.payload.gradingPolicy,
       });
       if (!verdict.passed) {
         return failed("mismatch", expected, actual, verdict.feedback);

@@ -65,6 +65,13 @@
 #     #   type: "outputExact"
 #     #   outputExact: "Hello Codaro"
 #     #   comparator: "auto"
+#     #   # 문제별로 필요한 항목만 선택한다. 생략하면 기존 auto 규칙을 쓴다.
+#     #   gradingPolicy:
+#     #     caseSensitive: false
+#     #     whitespace: "line-trim" # 또는 collapse
+#     #     relativeTolerance: 1.0e-9
+#     #     absoluteTolerance: 1.0e-12
+#     #     listOrder: "ordered" # 또는 any
 #     # blocks는 structured card 뒤에 붙는 보조 자료 또는 legacy curriculum 변환용이다.
 #     # 신규 레슨은 위 structured section fields를 우선하고, 표/영상/참고 링크만 blocks로 보조한다.
 #     blocks:
@@ -100,6 +107,7 @@
 #   payload:
 #     comparator: "auto"
 #     expected: "Hello Codaro"
+#     gradingPolicy: {}
 #     normalization: "line-trim"
 # 현재 Web W0는 output과 callable return+fixture path를 함께 보는 behavior subset을 지원한다.
 # packageAssets는 저장소에 고정한 same-origin wheel만 허용하며 Worker boot 전에 SRI를 검증한다.

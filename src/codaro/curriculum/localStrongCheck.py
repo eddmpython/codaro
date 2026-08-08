@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from .checkSandboxBrokerClient import checkSandboxBrokerAvailable, runCheckSandboxBroker
-from .outputMatch import matchLearningOutput, normalizeLearningOutput
+from .outputMatch import matchLearningOutput, normalizeLearningOutput, normalizeOutputGradingPolicy
 
 
 WORKER_PATH = Path(__file__).with_name("_localStrongCheckWorker.py")
@@ -150,6 +150,7 @@ def runLocalStrongCheckAttempt(
                 expected,
                 actual,
                 comparator=normalized["payload"]["comparator"],
+                gradingPolicy=normalized["payload"]["gradingPolicy"],
             )
             if not verdict.passed:
                 return failedResult("mismatch", expected, actual, verdict.feedback), False
@@ -224,9 +225,15 @@ def validateLocalStrongCheck(spec: dict[str, Any], source: str) -> dict[str, Any
             raise LocalStrongCheckInvalid("지원하지 않는 output comparator입니다.")
         if not isinstance(payload.get("expected"), str) or not payload["expected"]:
             raise LocalStrongCheckInvalid("output expected가 비어 있습니다.")
+        gradingPolicy = payload.get("gradingPolicy")
+        try:
+            normalizeOutputGradingPolicy(gradingPolicy, comparator=payload["comparator"])
+        except ValueError as error:
+            raise LocalStrongCheckInvalid(str(error)) from error
         normalizedPayload = {
             "comparator": payload["comparator"],
             "expected": payload["expected"],
+            "gradingPolicy": dict(gradingPolicy or {}),
             "normalization": "line-trim",
         }
     elif kind == "variable":

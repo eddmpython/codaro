@@ -135,9 +135,7 @@ sections:
     print('세 번째 줄')
   exercise:
     prompt: |-
-      두 번째 print() 안의 ____만 아래 글자로 바꾸세요.
-      
-      바꾼 두 번째 줄
+      두 번째 print() 안의 ____를 '바뀐 두 번째 줄'로 바꾸세요.
       
       다른 줄은 그대로 두고 실행하세요. 결과는 세 줄이어야 합니다.
     starterCode: |-
@@ -146,20 +144,20 @@ sections:
       print('세 번째 줄')
     solution: |-
       print('첫 번째 줄')
-      print('바꾼 두 번째 줄')
+      print('바뀐 두 번째 줄')
       print('세 번째 줄')
     hints:
     - ____가 있는 줄만 고치면 됩니다.
-    - "따옴표는 그대로 두고 안만 바꿉니다. 예: print('바꾼 두 번째 줄')"
-    - "실행 후 화면에 세 줄이 이 순서로 보이면 맞습니다: 첫 번째 줄 / 바꾼 두 번째 줄 / 세 번째 줄"
+    - "따옴표는 그대로 두고 안만 바꿉니다. 예: print('바뀐 두 번째 줄')"
+    - "실행 후 화면에 세 줄이 이 순서로 보이면 맞습니다: 첫 번째 줄 / 바뀐 두 번째 줄 / 세 번째 줄"
   check:
     type: outputExact
     evidence: practice
     outputExact: |-
       첫 번째 줄
-      바꾼 두 번째 줄
+      바뀐 두 번째 줄
       세 번째 줄
-    resultCheck: "출력이 정확히 일치해야 합니다: '첫 번째 줄\n바꾼 두 번째 줄\n세 번째 줄'"
+    resultCheck: "출력이 정확히 일치해야 합니다: '첫 번째 줄\n바뀐 두 번째 줄\n세 번째 줄'"
 - id: print_newline
   title: 줄바꿈 문자
   structuredPrimary: true
@@ -173,7 +171,7 @@ sections:
   snippet: print('첫 번째 줄\n두 번째 줄\n세 번째 줄')
   exercise:
     prompt: |-
-      print() 안의 ____를 두 번째 줄로 바꾸세요.
+      print() 안의 ____를 '두 번째 줄'로 바꾸세요.
       
       줄바꿈 문자(백슬래시와 n)는 그대로 둡니다. 실행하면 세 줄이 나와야 합니다.
     starterCode: print('첫 번째 줄\n____\n세 번째 줄')

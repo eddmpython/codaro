@@ -10,10 +10,20 @@
 
 export type LearningOutputComparator = "auto" | "exact" | "text";
 
+export type LearningOutputGradingPolicy = {
+  absoluteTolerance?: number;
+  caseSensitive?: boolean;
+  listOrder?: "any" | "ordered";
+  relativeTolerance?: number;
+  whitespace?: "collapse" | "line-trim";
+};
+
 export type OutputMatchTier =
   | "exact"
   | "text"
+  | "whitespace"
   | "number"
+  | "order"
   | "value"
   | "caseOnly"
   | "whitespaceOnly"
@@ -40,6 +50,21 @@ const MAX_LITERAL_ITEMS = 2_000;
 const NUMBER_RELATIVE_TOLERANCE = 1e-9;
 const NUMBER_ABSOLUTE_TOLERANCE = 1e-12;
 const NUMBER_PATTERN = /^[+-]?(?:(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)/;
+const OUTPUT_GRADING_POLICY_KEYS = new Set([
+  "absoluteTolerance",
+  "caseSensitive",
+  "listOrder",
+  "relativeTolerance",
+  "whitespace",
+]);
+
+type ResolvedOutputGradingPolicy = {
+  absoluteTolerance: number;
+  caseSensitive: boolean;
+  listOrder: "any" | "ordered";
+  relativeTolerance: number;
+  whitespace: "collapse" | "line-trim";
+};
 
 class LiteralParseError extends Error {}
 
@@ -223,22 +248,54 @@ export function normalizeLearningOutput(value: string): string {
   return lines.join("\n");
 }
 
+export function parseLearningOutputGradingPolicy(value: unknown): LearningOutputGradingPolicy | null {
+  if (value === undefined) return {};
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const raw = value as Record<string, unknown>;
+  if (Object.keys(raw).some((key) => !OUTPUT_GRADING_POLICY_KEYS.has(key))) return null;
+  if (raw.caseSensitive !== undefined && typeof raw.caseSensitive !== "boolean") return null;
+  if (raw.whitespace !== undefined && raw.whitespace !== "line-trim" && raw.whitespace !== "collapse") return null;
+  if (raw.listOrder !== undefined && raw.listOrder !== "ordered" && raw.listOrder !== "any") return null;
+  if (!validTolerance(raw.relativeTolerance, 1)) return null;
+  if (!validTolerance(raw.absoluteTolerance, Number.MAX_SAFE_INTEGER)) return null;
+  return {
+    ...(raw.absoluteTolerance !== undefined ? { absoluteTolerance: raw.absoluteTolerance as number } : {}),
+    ...(raw.caseSensitive !== undefined ? { caseSensitive: raw.caseSensitive } : {}),
+    ...(raw.listOrder !== undefined ? { listOrder: raw.listOrder } : {}),
+    ...(raw.relativeTolerance !== undefined ? { relativeTolerance: raw.relativeTolerance as number } : {}),
+    ...(raw.whitespace !== undefined ? { whitespace: raw.whitespace } : {}),
+  } as LearningOutputGradingPolicy;
+}
+
 export function matchLearningOutput(
   expected: string,
   actual: string,
-  options: { comparator?: LearningOutputComparator } = {},
+  options: {
+    comparator?: LearningOutputComparator;
+    gradingPolicy?: LearningOutputGradingPolicy;
+  } = {},
 ): OutputMatchVerdict {
   const comparator = options.comparator ?? "auto";
   if (comparator !== "auto" && comparator !== "exact" && comparator !== "text") {
     throw new Error(`지원하지 않는 출력 비교 방식입니다: ${String(comparator)}`);
   }
-  const expectedNorm = normalizeLearningOutput(expected);
-  const actualNorm = normalizeLearningOutput(actual);
+  const policy = resolveOutputGradingPolicy(options.gradingPolicy, comparator);
+  const expectedBase = normalizeLearningOutput(expected);
+  const actualBase = normalizeLearningOutput(actual);
+  const expectedNorm = policy.whitespace === "collapse" ? collapse(expectedBase) : expectedBase;
+  const actualNorm = policy.whitespace === "collapse" ? collapse(actualBase) : actualBase;
 
   if (expectedNorm === actualNorm) {
+    if (expectedBase !== actualBase) {
+      return {
+        feedback: "공백 개수와 줄바꿈 차이는 이 문제에서 허용했고, 내용은 맞습니다.",
+        passed: true,
+        tier: "whitespace",
+      };
+    }
     return { feedback: "목표한 출력과 일치합니다.", passed: true, tier: "exact" };
   }
-  if ((comparator === "auto" || comparator === "text") && foldText(expectedNorm) === foldText(actualNorm)) {
+  if (!policy.caseSensitive && foldText(expectedNorm) === foldText(actualNorm)) {
     return {
       feedback: "대소문자 차이는 허용했고, 나머지 출력은 맞습니다.",
       passed: true,
@@ -249,7 +306,7 @@ export function matchLearningOutput(
   const expectedValue = comparator === "auto" ? parseLiteral(expectedNorm) : null;
   const actualValue = comparator === "auto" ? parseLiteral(actualNorm) : null;
   if (expectedValue && actualValue) {
-    if (literalValuesEqual(expectedValue, actualValue)) {
+    if (literalValuesEqual(expectedValue, actualValue, policy)) {
       if (expectedValue.kind === "number" && actualValue.kind === "number") {
         return {
           feedback: "숫자 표기나 미세한 계산 오차는 허용했고, 값은 맞습니다.",
@@ -257,10 +314,50 @@ export function matchLearningOutput(
           tier: "number",
         };
       }
+      if (
+        policy.listOrder === "any"
+        && !literalValuesEqual(expectedValue, actualValue, { ...policy, listOrder: "ordered" })
+      ) {
+        return {
+          feedback: "목록 순서는 이 문제에서 허용했고, 원소와 구조는 맞습니다.",
+          passed: true,
+          tier: "order",
+        };
+      }
       return {
         feedback: "표현 방식의 차이는 허용했고, Python 값과 구조는 맞습니다.",
         passed: true,
         tier: "value",
+      };
+    }
+    if (expectedValue.kind === "number" && actualValue.kind === "number") {
+      const allowedDifference = allowedNumberDifference(expectedValue, actualValue, policy);
+      return {
+        feedback: `숫자 값이 허용 오차를 벗어났습니다. 기대 ${preview(expectedNorm)} ↔ 현재 ${preview(actualNorm)} (허용 오차 ${formatTolerance(allowedDifference)}).`,
+        passed: false,
+        tier: "valueDifferent",
+      };
+    }
+    if (
+      policy.listOrder === "ordered"
+      && expectedValue.kind === "list"
+      && actualValue.kind === "list"
+      && literalValuesEqual(expectedValue, actualValue, { ...policy, listOrder: "any" })
+    ) {
+      return {
+        feedback: `목록 원소는 맞지만 순서가 다릅니다. 기대한 순서대로 배치해 주세요. 기대 ${preview(expectedNorm)} ↔ 현재 ${preview(actualNorm)}`,
+        passed: false,
+        tier: "valueDifferent",
+      };
+    }
+    if (
+      policy.caseSensitive
+      && literalValuesEqual(expectedValue, actualValue, { ...policy, caseSensitive: false })
+    ) {
+      return {
+        feedback: `값과 구조는 맞는데 대소문자만 다릅니다. 기대 ${preview(expectedNorm)} ↔ 현재 ${preview(actualNorm)}`,
+        passed: false,
+        tier: "caseOnly",
       };
     }
     return {
@@ -321,31 +418,37 @@ function parseLiteral(value: string): LiteralValue | null {
   }
 }
 
-function literalValuesEqual(expected: LiteralValue, actual: LiteralValue): boolean {
+function literalValuesEqual(
+  expected: LiteralValue,
+  actual: LiteralValue,
+  policy: ResolvedOutputGradingPolicy,
+): boolean {
   if (expected.kind !== actual.kind) return false;
   if (expected.kind === "none" && actual.kind === "none") return true;
   if (expected.kind === "boolean" && actual.kind === "boolean") return expected.value === actual.value;
   if (expected.kind === "number" && actual.kind === "number") {
     const difference = Math.abs(expected.value - actual.value);
-    const scale = Math.max(Math.abs(expected.value), Math.abs(actual.value));
-    return difference <= Math.max(NUMBER_ABSOLUTE_TOLERANCE, NUMBER_RELATIVE_TOLERANCE * scale);
+    return difference <= allowedNumberDifference(expected, actual, policy);
   }
   if (expected.kind === "string" && actual.kind === "string") {
+    if (policy.caseSensitive) return expected.value.normalize("NFC") === actual.value.normalize("NFC");
     return foldText(expected.value) === foldText(actual.value);
   }
   if (
     (expected.kind === "list" || expected.kind === "tuple")
     && (actual.kind === "list" || actual.kind === "tuple")
   ) {
-    return expected.kind === actual.kind
-      && expected.value.length === actual.value.length
-      && expected.value.every((item, index) => literalValuesEqual(item, actual.value[index]));
+    if (expected.kind !== actual.kind || expected.value.length !== actual.value.length) return false;
+    if (expected.kind === "list" && policy.listOrder === "any") {
+      return unorderedValuesEqual(expected.value, actual.value, policy);
+    }
+    return expected.value.every((item, index) => literalValuesEqual(item, actual.value[index], policy));
   }
   if (expected.kind === "dict" && actual.kind === "dict") {
-    return unorderedPairsEqual(expected.value, actual.value);
+    return unorderedPairsEqual(expected.value, actual.value, policy);
   }
   if (expected.kind === "set" && actual.kind === "set") {
-    return unorderedValuesEqual(expected.value, actual.value);
+    return unorderedValuesEqual(expected.value, actual.value, policy);
   }
   return false;
 }
@@ -353,12 +456,13 @@ function literalValuesEqual(expected: LiteralValue, actual: LiteralValue): boole
 function unorderedPairsEqual(
   expected: Array<[LiteralValue, LiteralValue]>,
   actual: Array<[LiteralValue, LiteralValue]>,
+  policy: ResolvedOutputGradingPolicy,
 ): boolean {
   if (expected.length !== actual.length) return false;
   const unmatched = [...actual];
   for (const [expectedKey, expectedValue] of expected) {
     const matchIndex = unmatched.findIndex(([actualKey, actualValue]) => (
-      literalValuesEqual(expectedKey, actualKey) && literalValuesEqual(expectedValue, actualValue)
+      literalValuesEqual(expectedKey, actualKey, policy) && literalValuesEqual(expectedValue, actualValue, policy)
     ));
     if (matchIndex < 0) return false;
     unmatched.splice(matchIndex, 1);
@@ -366,15 +470,52 @@ function unorderedPairsEqual(
   return true;
 }
 
-function unorderedValuesEqual(expected: LiteralValue[], actual: LiteralValue[]): boolean {
+function unorderedValuesEqual(
+  expected: LiteralValue[],
+  actual: LiteralValue[],
+  policy: ResolvedOutputGradingPolicy,
+): boolean {
   if (expected.length !== actual.length) return false;
   const unmatched = [...actual];
   for (const expectedValue of expected) {
-    const matchIndex = unmatched.findIndex((actualValue) => literalValuesEqual(expectedValue, actualValue));
+    const matchIndex = unmatched.findIndex((actualValue) => literalValuesEqual(expectedValue, actualValue, policy));
     if (matchIndex < 0) return false;
     unmatched.splice(matchIndex, 1);
   }
   return true;
+}
+
+function resolveOutputGradingPolicy(
+  value: LearningOutputGradingPolicy | undefined,
+  comparator: LearningOutputComparator,
+): ResolvedOutputGradingPolicy {
+  const parsed = parseLearningOutputGradingPolicy(value);
+  if (parsed === null) throw new Error("지원하지 않는 출력 채점 정책입니다.");
+  return {
+    absoluteTolerance: parsed.absoluteTolerance ?? NUMBER_ABSOLUTE_TOLERANCE,
+    caseSensitive: parsed.caseSensitive ?? comparator === "exact",
+    listOrder: parsed.listOrder ?? "ordered",
+    relativeTolerance: parsed.relativeTolerance ?? NUMBER_RELATIVE_TOLERANCE,
+    whitespace: parsed.whitespace ?? "line-trim",
+  };
+}
+
+function allowedNumberDifference(
+  expected: Extract<LiteralValue, { kind: "number" }>,
+  actual: Extract<LiteralValue, { kind: "number" }>,
+  policy: ResolvedOutputGradingPolicy,
+): number {
+  const scale = Math.max(Math.abs(expected.value), Math.abs(actual.value));
+  return Math.max(policy.absoluteTolerance, policy.relativeTolerance * scale);
+}
+
+function validTolerance(value: unknown, maximum: number): boolean {
+  return value === undefined
+    || (typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= maximum);
+}
+
+function formatTolerance(value: number): string {
+  return Number(value.toPrecision(12)).toString();
 }
 
 function foldText(value: string): string {

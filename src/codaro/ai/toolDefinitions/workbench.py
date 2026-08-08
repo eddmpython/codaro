@@ -157,6 +157,18 @@ TOOL_CELL_CALL = ToolDef(
                 "enum": ["auto", "text", "exact"],
                 "description": "Auto compares safe Python values, text ignores letter case, and exact preserves formatting.",
             },
+            "gradingPolicy": {
+                "type": "object",
+                "additionalProperties": False,
+                "properties": {
+                    "absoluteTolerance": {"type": "number", "minimum": 0},
+                    "caseSensitive": {"type": "boolean"},
+                    "listOrder": {"type": "string", "enum": ["ordered", "any"]},
+                    "relativeTolerance": {"type": "number", "minimum": 0, "maximum": 1},
+                    "whitespace": {"type": "string", "enum": ["line-trim", "collapse"]},
+                },
+                "description": "Optional per-exercise output grading rules.",
+            },
         },
         "required": ["operation", "blockId"],
     },

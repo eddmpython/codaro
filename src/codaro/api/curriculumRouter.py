@@ -270,6 +270,7 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
                     hints=request.hints,
                     currentHintLevel=request.currentHintLevel,
                     comparator=request.comparator,
+                    gradingPolicy=request.gradingPolicy,
                     category=request.category,
                     contentId=request.contentId,
                     sectionId=request.sectionId,

@@ -1,6 +1,6 @@
 {
   "description": "결정적 학습 출력 비교 계약 벡터. Python(src/codaro/curriculum/outputMatch.py)과 TS(editor/src/lib/learningOutputMatch.ts)가 같은 결과를 내야 한다.",
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "vectors": [
     {
       "id": "exact-plain",
@@ -273,6 +273,73 @@
       "comparator": "auto",
       "passed": false,
       "tier": "different"
+    },
+    {
+      "id": "per-exercise-case-sensitive-auto",
+      "expected": "Hello Codaro",
+      "actual": "hello codaro",
+      "comparator": "auto",
+      "gradingPolicy": {
+        "caseSensitive": true
+      },
+      "passed": false,
+      "tier": "caseOnly"
+    },
+    {
+      "id": "per-exercise-case-insensitive-exact",
+      "expected": "Hello Codaro",
+      "actual": "hello codaro",
+      "comparator": "exact",
+      "gradingPolicy": {
+        "caseSensitive": false
+      },
+      "passed": true,
+      "tier": "text"
+    },
+    {
+      "id": "per-exercise-collapsed-whitespace",
+      "expected": "합계 : 100",
+      "actual": "합계  :   100",
+      "comparator": "auto",
+      "gradingPolicy": {
+        "whitespace": "collapse"
+      },
+      "passed": true,
+      "tier": "whitespace"
+    },
+    {
+      "id": "per-exercise-number-tolerance",
+      "expected": "100",
+      "actual": "101",
+      "comparator": "auto",
+      "gradingPolicy": {
+        "absoluteTolerance": 1
+      },
+      "passed": true,
+      "tier": "number"
+    },
+    {
+      "id": "per-exercise-zero-number-tolerance",
+      "expected": "0.3",
+      "actual": "0.30000000000000004",
+      "comparator": "auto",
+      "gradingPolicy": {
+        "absoluteTolerance": 0,
+        "relativeTolerance": 0
+      },
+      "passed": false,
+      "tier": "valueDifferent"
+    },
+    {
+      "id": "per-exercise-list-order-any",
+      "expected": "[1, 2, 3]",
+      "actual": "[3, 2, 1]",
+      "comparator": "auto",
+      "gradingPolicy": {
+        "listOrder": "any"
+      },
+      "passed": true,
+      "tier": "order"
     }
   ]
 }

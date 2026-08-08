@@ -810,6 +810,20 @@ def jsAssertStructuredCardControls(viewport: str) -> str:
   if (card.querySelector('[data-learning-section-part="result"]')) {{
     throw new Error('result should be hidden before execution');
   }}
+  let mobileTouchFocus = false;
+  if ({json.dumps(viewport)} === 'mobile') {{
+    const runButton = exercise.querySelector('button[data-preserve-editor-focus-on-touch="true"]');
+    if (!(runButton instanceof HTMLButtonElement)) throw new Error('touch focus preserving run button missing');
+    const pointerDownAccepted = runButton.dispatchEvent(new PointerEvent('pointerdown', {{
+      bubbles: true,
+      cancelable: true,
+      pointerId: 1,
+      pointerType: 'touch',
+    }}));
+    if (pointerDownAccepted) throw new Error('touch run button would take editor focus');
+    if (document.activeElement !== content) throw new Error('touch run pointerdown moved editor focus');
+    mobileTouchFocus = true;
+  }}
 
   return JSON.stringify({{
     viewport: {json.dumps(viewport)},
@@ -819,6 +833,7 @@ def jsAssertStructuredCardControls(viewport: str) -> str:
     whitespaceVisible: true,
     snippetCopy: true,
     manualAiControls: 0,
+    mobileTouchFocus,
   }});
 }})()
 """)

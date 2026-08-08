@@ -26,6 +26,7 @@ def outputSpec(
     expected: str,
     *,
     comparator: str = "exact",
+    gradingPolicy: dict[str, object] | None = None,
     timeoutMs: int = 2_000,
 ) -> dict[str, object]:
     return {
@@ -42,6 +43,7 @@ def outputSpec(
         "payload": {
             "comparator": comparator,
             "expected": expected,
+            "gradingPolicy": gradingPolicy or {},
             "normalization": "line-trim",
         },
     }
@@ -112,6 +114,24 @@ def testLocalStrongAutoComparatorAcceptsEquivalentPythonValue() -> None:
 
     assert result["passed"] is True
     assert result["detail"] == "표현 방식의 차이는 허용했고, Python 값과 구조는 맞습니다."
+
+
+def testLocalStrongOutputUsesPerExerciseListOrderPolicy() -> None:
+    result = runLocalStrongCheck(
+        outputSpec("[1, 2, 3]", comparator="auto", gradingPolicy={"listOrder": "any"}),
+        "print([3, 2, 1])",
+    )
+
+    assert result["passed"] is True
+    assert result["detail"] == "목록 순서는 이 문제에서 허용했고, 원소와 구조는 맞습니다."
+
+
+def testLocalStrongOutputRejectsInvalidGradingPolicy() -> None:
+    with pytest.raises(LocalStrongCheckInvalid, match="relativeTolerance"):
+        runLocalStrongCheck(
+            outputSpec("1", comparator="auto", gradingPolicy={"relativeTolerance": -1}),
+            "print(1)",
+        )
 
 
 def testLocalStrongBehaviorCheckUsesFixtureAndCreatedPath() -> None:

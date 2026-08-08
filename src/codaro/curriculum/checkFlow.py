@@ -54,6 +54,7 @@ class CurriculumCheckInput:
     hints: list[str] = field(default_factory=list)
     currentHintLevel: int = 0
     comparator: str = "auto"
+    gradingPolicy: dict[str, Any] = field(default_factory=dict)
     category: str = ""
     contentId: str = ""
     sectionId: str = ""
@@ -84,6 +85,7 @@ async def runCurriculumCheckFlow(
                 hints=list(request.hints),
                 currentHintLevel=request.currentHintLevel,
                 comparator=request.comparator,
+                gradingPolicy=dict(request.gradingPolicy),
             ),
         )
     except InvalidExerciseCheck as exc:

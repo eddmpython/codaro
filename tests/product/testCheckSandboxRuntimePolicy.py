@@ -58,6 +58,7 @@ def test_runtime_policy_requires_native_isolation_before_local_strong_evidence()
         tier: "exact",
       }}),
       normalizeLearningOutput: (value) => value,
+      parseLearningOutputGradingPolicy: () => ({{}}),
     }};
     if (specifier === "@/lib/learningCheckSpec") return {{}};
     return require(specifier);
@@ -101,6 +102,7 @@ def test_runtime_policy_requires_native_isolation_before_local_strong_evidence()
         tier: "exact",
       }}),
       normalizeLearningOutput: (value) => value,
+      parseLearningOutputGradingPolicy: () => ({{}}),
     }};
     if (specifier === "@/lib/learningCheckSpec") return {{
       normalizeLearningOutput: (value) => value,
@@ -145,6 +147,7 @@ def test_runtime_policy_requires_native_isolation_before_local_strong_evidence()
         tier: "exact",
       }}),
       normalizeLearningOutput: (value) => value,
+      parseLearningOutputGradingPolicy: () => ({{}}),
     }};
     if (specifier === "@/lib/learningCheckSpec") return {{}};
     return require(specifier);
@@ -187,6 +190,7 @@ def test_runtime_policy_requires_native_isolation_before_local_strong_evidence()
         tier: "exact",
       }}),
       normalizeLearningOutput: (value) => value,
+      parseLearningOutputGradingPolicy: () => ({{}}),
     }};
     if (specifier === "@/lib/learningCheckSpec") return {{ parseStrongLearningCheckSpec: () => behaviorSpec }};
     if (specifier === "@/lib/localLearningCheckExecutor") return {{

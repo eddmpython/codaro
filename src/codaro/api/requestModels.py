@@ -115,6 +115,7 @@ class CheckExerciseRequest(BaseModel):
     hints: list[str] = Field(default_factory=list)
     currentHintLevel: int = 0
     comparator: str = "auto"
+    gradingPolicy: dict[str, Any] = Field(default_factory=dict)
     category: str = ""
     contentId: str = ""
     sectionId: str = ""

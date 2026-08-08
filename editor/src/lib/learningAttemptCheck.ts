@@ -5,7 +5,9 @@ import { parseStrongLearningCheckSpec } from "@/lib/learningCheckSpec";
 import {
   matchLearningOutput,
   normalizeLearningOutput,
+  parseLearningOutputGradingPolicy,
   type LearningOutputComparator,
+  type LearningOutputGradingPolicy,
 } from "@/lib/learningOutputMatch";
 import { executeLocalStrongCheck } from "@/lib/localLearningCheckExecutor";
 import type { LearningEvidenceArtifact, LearningEvidencePackageAsset } from "@/lib/webLearningEvidence";
@@ -95,6 +97,7 @@ export async function evaluateLearningAttempt(
   }
   const verdict = matchLearningOutput(expected, actual, {
     comparator: practiceOutputComparator(checkConfig),
+    gradingPolicy: practiceOutputGradingPolicy(checkConfig),
   });
   if (!verdict.passed) {
     return {
@@ -126,8 +129,10 @@ export async function evaluateLearningAttempt(
 
 export function isDeterministicPracticeCheckConfig(checkConfig: Record<string, unknown> | undefined): boolean {
   const comparator = checkConfig?.comparator;
+  const gradingPolicy = parseLearningOutputGradingPolicy(checkConfig?.gradingPolicy);
   return checkConfig?.type === "outputExact"
     && typeof checkConfig.outputExact === "string"
+    && gradingPolicy !== null
     && (
       comparator === undefined
       || comparator === "auto"
@@ -223,9 +228,17 @@ function practiceOutputComparator(
   return "auto";
 }
 
+function practiceOutputGradingPolicy(
+  checkConfig: Record<string, unknown> | undefined,
+): LearningOutputGradingPolicy {
+  return parseLearningOutputGradingPolicy(checkConfig?.gradingPolicy) ?? {};
+}
+
 function acceptedDifferenceFeedback(detail: string): boolean {
   return detail.startsWith("대소문자 차이는 허용")
+    || detail.startsWith("공백 개수와 줄바꿈 차이는 이 문제에서 허용")
     || detail.startsWith("숫자 표기나 미세한 계산 오차는 허용")
+    || detail.startsWith("목록 순서는 이 문제에서 허용")
     || detail.startsWith("표현 방식의 차이는 허용");
 }
 

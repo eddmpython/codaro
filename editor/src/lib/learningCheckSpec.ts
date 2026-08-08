@@ -1,3 +1,8 @@
+import {
+  parseLearningOutputGradingPolicy,
+  type LearningOutputGradingPolicy,
+} from "./learningOutputMatch";
+
 export type LearningFixtureFile = {
   content?: string;
   contentBase64?: string;
@@ -38,6 +43,7 @@ export type StrongOutputCheckSpecV1 = {
   payload: {
     comparator: "auto" | "exact" | "text";
     expected: string;
+    gradingPolicy: LearningOutputGradingPolicy;
     normalization: "line-trim";
   };
   strength: "strong";
@@ -82,9 +88,11 @@ export function parseStrongLearningCheckSpec(
   if (value.kind === "output") {
     const expected = textValue(payload.expected);
     const comparator = payload.comparator;
+    const gradingPolicy = parseLearningOutputGradingPolicy(payload.gradingPolicy);
     const normalization = payload.normalization;
     if (
       !expected
+      || gradingPolicy === null
       || (comparator !== "auto" && comparator !== "exact" && comparator !== "text")
       || normalization !== "line-trim"
     ) return null;
@@ -94,6 +102,7 @@ export function parseStrongLearningCheckSpec(
       payload: {
         comparator,
         expected,
+        gradingPolicy,
         normalization: "line-trim",
       },
     };

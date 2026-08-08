@@ -30,10 +30,15 @@ export function IconButton({
   children,
   className,
   label,
+  onPointerDown,
+  preserveEditorFocusOnTouch = false,
   size = "icon",
   variant = "outline",
   ...props
-}: ComponentProps<typeof Button> & { label: string }) {
+}: ComponentProps<typeof Button> & {
+  label: string;
+  preserveEditorFocusOnTouch?: boolean;
+}) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -43,6 +48,16 @@ export function IconButton({
           size={size}
           title={label}
           variant={variant}
+          data-preserve-editor-focus-on-touch={preserveEditorFocusOnTouch ? "true" : undefined}
+          onPointerDown={(event) => {
+            onPointerDown?.(event);
+            if (event.defaultPrevented || !preserveEditorFocusOnTouch || event.pointerType !== "touch") return;
+            const activeElement = document.activeElement;
+            if (!(activeElement instanceof HTMLElement) || !activeElement.classList.contains("cm-content")) return;
+            const scopeSelector = "[data-notebook-cell], [data-learning-section-part='exercise'], [data-learning-cell]";
+            if (activeElement.closest(scopeSelector) !== event.currentTarget.closest(scopeSelector)) return;
+            event.preventDefault();
+          }}
           {...props}
         >
           {children}

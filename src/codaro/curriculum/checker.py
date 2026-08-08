@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Any, Mapping
 
 from ..kernel.session import KernelSession
 from .outputMatch import matchLearningOutput, normalizeLearningOutput
@@ -73,6 +74,7 @@ async def checkByOutput(
     hints: list[str] | None = None,
     currentHintLevel: int = 0,
     comparator: str = "auto",
+    gradingPolicy: Mapping[str, Any] | None = None,
 ) -> CheckResult:
     studentResult = await session.execute(studentCode, blockId="_check_student")
     expectedResult = await session.execute(expectedCode, blockId="_check_expected")
@@ -92,7 +94,12 @@ async def checkByOutput(
     studentOut = normalizeLearningOutput(studentResult.stdout + studentResult.data)
     expectedOut = normalizeLearningOutput(expectedResult.stdout + expectedResult.data)
 
-    verdict = matchLearningOutput(expectedOut, studentOut, comparator=comparator)
+    verdict = matchLearningOutput(
+        expectedOut,
+        studentOut,
+        comparator=comparator,
+        gradingPolicy=gradingPolicy,
+    )
     if verdict.passed:
         return CheckResult(
             passed=True,
@@ -183,6 +190,7 @@ async def checkExpectedOutput(
     studentCode: str,
     expectedOutput: str,
     comparator: str = "auto",
+    gradingPolicy: Mapping[str, Any] | None = None,
 ) -> CheckResult:
     result = await session.execute(studentCode, blockId="_check_expected_output")
     if result.status == "error":
@@ -196,7 +204,12 @@ async def checkExpectedOutput(
 
     actual = _composeOutput(result)
     expected = expectedOutput.strip()
-    verdict = matchLearningOutput(expected, actual, comparator=comparator)
+    verdict = matchLearningOutput(
+        expected,
+        actual,
+        comparator=comparator,
+        gradingPolicy=gradingPolicy,
+    )
     if verdict.passed:
         return CheckResult(
             passed=True,

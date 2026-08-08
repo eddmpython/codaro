@@ -109,6 +109,7 @@ class RuntimeToolHandlers:
         checkType = args["checkType"]
         expected = args.get("expected", "")
         comparator = str(args.get("comparator") or "auto")
+        gradingPolicy = args.get("gradingPolicy") or {}
 
         try:
             block = getDocumentBlock(doc, blockId=blockId)
@@ -123,6 +124,7 @@ class RuntimeToolHandlers:
                     checkType=checkType,
                     expected=expected,
                     comparator=comparator,
+                    gradingPolicy=gradingPolicy,
                 ),
             )
         except InvalidExerciseCheck as exc:

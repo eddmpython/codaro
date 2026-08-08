@@ -25,6 +25,20 @@ def _rel(path: Path) -> str:
     return path.relative_to(ROOT).as_posix()
 
 
+def testMobileRunButtonsPreserveTheActiveCodeEditor() -> None:
+    primitives = _read("editor/src/components/app/appPrimitives.tsx")
+    runSurfaces = [
+        _read("editor/src/components/curriculum/curriculumSectionRenderer.tsx"),
+        _read("editor/src/components/curriculum/curriculumLearningCell.tsx"),
+        _read("editor/src/components/notebook/notebookPanel.tsx"),
+    ]
+
+    assert 'event.pointerType !== "touch"' in primitives
+    assert 'activeElement.classList.contains("cm-content")' in primitives
+    assert "event.preventDefault()" in primitives
+    assert all("preserveEditorFocusOnTouch" in source for source in runSurfaces)
+
+
 def testProductSurfaceNavKeepsWebLearningFirstAndLocalHomeFirst() -> None:
     source = _read("editor/src/lib/surfaceModel.ts")
     items = re.findall(

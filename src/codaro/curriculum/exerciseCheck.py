@@ -13,6 +13,7 @@ from .checker import (
     checkOutputContains,
     checkVariableSnapshotContains,
 )
+from .outputMatch import normalizeOutputGradingPolicy
 
 
 EVAL_RESERVED_KEYS: frozenset[str] = frozenset({
@@ -21,6 +22,7 @@ EVAL_RESERVED_KEYS: frozenset[str] = frozenset({
     "variableName",
     "expectedValue",
     "comparator",
+    "gradingPolicy",
     "requiredPatterns",
     "hints",
 })
@@ -41,6 +43,7 @@ class ExerciseCheckInput:
     hints: list[str] = field(default_factory=list)
     currentHintLevel: int = 0
     comparator: str = "auto"
+    gradingPolicy: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True, slots=True)
@@ -49,6 +52,7 @@ class ToolExerciseCheckInput:
     checkType: str
     expected: str = ""
     comparator: str = "auto"
+    gradingPolicy: dict[str, Any] = field(default_factory=dict)
 
 
 def exerciseCheckInputFromConfig(
@@ -79,6 +83,7 @@ def exerciseCheckInputFromConfig(
         hints=[str(h) for h in hints],
         currentHintLevel=currentHintLevel,
         comparator=_outputComparator(checkConfig.get("comparator")),
+        gradingPolicy=_outputGradingPolicy(checkConfig.get("gradingPolicy")),
     )
 
 
@@ -92,6 +97,7 @@ async def runExerciseCheck(session: Any, request: ExerciseCheckInput) -> CheckRe
             hints=request.hints,
             currentHintLevel=request.currentHintLevel,
             comparator=comparator,
+            gradingPolicy=request.gradingPolicy,
         )
     if request.checkType == "variable" and request.variableName:
         return await checkByVariable(
@@ -128,6 +134,7 @@ async def runToolExerciseCheck(session: Any, request: ToolExerciseCheckInput) ->
                 request.studentCode,
                 request.expected,
                 comparator=comparator,
+                gradingPolicy=request.gradingPolicy,
             )
         )
     if request.checkType == "outputContains":
@@ -160,3 +167,12 @@ def _outputComparator(value: Any) -> str:
     if comparator not in {"auto", "exact", "text"}:
         raise InvalidExerciseCheck(f"지원하지 않는 출력 비교 방식입니다: {comparator!r}")
     return comparator
+
+
+def _outputGradingPolicy(value: Any) -> dict[str, Any]:
+    policy = value if value is not None else {}
+    try:
+        normalizeOutputGradingPolicy(policy)
+    except ValueError as error:
+        raise InvalidExerciseCheck(str(error)) from error
+    return dict(policy)

@@ -121,6 +121,7 @@ export function CurriculumLearningCell({
             className="astryxWorkCellAction size-8 [&_svg]:size-3.5"
             disabled={!canRun}
             label="셀 실행"
+            preserveEditorFocusOnTouch
             variant="ghost"
             onClick={(event) => {
               event.stopPropagation();
