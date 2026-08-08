@@ -19,9 +19,12 @@
   color: var(--color-text-primary);
 }
 
+/* 레슨 본문도 다른 화면과 같은 칸 위에 선다. 폭과 여백은 토큰이 소유하므로
+   여기서 숫자를 다시 적지 않는다(그러면 헤더와 x 가 어긋난다). */
 .lessonShell {
-  width: min(1200px, calc(100% - 40px));
+  width: var(--frame-width);
   margin-inline: auto;
+  padding-inline: var(--frame-inset);
 }
 
 .lessonMasthead {
@@ -460,10 +463,6 @@
 }
 
 @media (max-width: 767px) {
-  .lessonShell {
-    width: min(100% - 28px, 680px);
-  }
-
   .lessonMasthead {
     padding-block: 92px 40px;
   }
@@ -516,8 +515,10 @@
     top: 0;
     z-index: 4;
     grid-row: 2;
-    width: calc(100% + 28px);
-    margin: 24px -14px 0;
+    /* 셸의 좌우 여백만큼 밖으로 나가 화면 끝까지 스크롤된다. 숫자를 적어 두면
+       프레임 여백이 바뀔 때 어긋나므로 토큰으로 상쇄한다. */
+    width: calc(100% + var(--frame-inset) * 2);
+    margin: 24px calc(-1 * var(--frame-inset)) 0;
     overflow-x: auto;
     flex-direction: row;
     align-items: center;
@@ -560,10 +561,6 @@
 }
 
 @media (max-width: 380px) {
-  .lessonShell {
-    width: calc(100% - 20px);
-  }
-
   .lessonMetaLine {
     align-items: flex-start;
     flex-direction: column;
@@ -574,9 +571,4 @@
     gap: 8px;
   }
 
-  .lessonToc {
-    width: calc(100% + 20px);
-    margin-inline: -10px;
-    padding-inline: 10px;
-  }
 }

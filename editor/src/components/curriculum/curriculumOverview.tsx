@@ -509,10 +509,14 @@ export function SectionNarrative({ contract }: { contract?: CurriculumSectionCon
 
   return (
     <div className="space-y-5 px-4 pt-5 sm:px-6" data-learning-section-part="overview">
+      {/* 카드 계약의 신호 계층(좌측 2px accent rail + 16px 들여쓰기)은 공유 codaroRail과
+          값이 정확히 같다. 같은 규칙을 Tailwind 유틸로 다시 선언하지 않고 공유 어휘를 쓴다.
+          accent는 "지금 해야 할 것"을 뜻하므로 섹션 목표에 data-rail="accent"가 맞다. */}
       {goal || why ? (
         <div
-          className="min-w-0 max-w-[68ch] border-l-2 border-accent-brand pl-4"
+          className="codaroRail min-w-0 max-w-[68ch]"
           data-learning-section-goal="true"
+          data-rail="accent"
         >
           <div className="text-xs font-medium text-accent-brand">이번 섹션의 목표</div>
           {goal ? <p className="mt-1.5 text-md font-normal text-foreground">{goal}</p> : null}

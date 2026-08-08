@@ -56,7 +56,10 @@ export function LocalHomeSurface({
         <header className="border-b border-border px-4 py-5 sm:px-6 lg:px-8">
           <div className="mx-auto flex max-w-[1480px] flex-wrap items-end justify-between gap-4">
             <div className="min-w-0">
-              <div className="text-xs font-semibold text-accent-brand">{t("local.home.eyebrow")}</div>
+              {/* 페이지 최상단 eyebrow. 모노 대문자 + accent + 앞 가로선은 랜딩 섹션 라벨과
+                  같은 의미라 Tailwind 유틸로 다시 만들지 않고 공유 codaroLabel에 소유권을 넘긴다.
+                  문구가 "CODARO LOCAL" 라틴 대문자라 모노 폰트에서도 그대로 읽힌다. */}
+              <div className="codaroLabel">{t("local.home.eyebrow")}</div>
               <h1 className="mt-1 text-2xl font-semibold tracking-normal">{t("local.home.title")}</h1>
               <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
                 {t("local.home.description")}

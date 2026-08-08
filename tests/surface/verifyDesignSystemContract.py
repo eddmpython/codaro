@@ -502,7 +502,7 @@ LANDING_SURFACE_CSS_PX_BUDGET = {
     "landing/src/styles/homeAstryx.css": 106,
     "landing/src/styles/learnExplorer.css": 162,
     "landing/src/styles/publicShell.css": 47,
-    "landing/src/styles/lessonAstryx.css": 123,
+    "landing/src/styles/lessonAstryx.css": 113,
     "landing/src/styles.css": 156,
 }
 

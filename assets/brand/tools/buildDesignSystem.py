@@ -919,7 +919,10 @@ def renderSharedComponentCss() -> str:
     gap: 8px;
     color: var(--color-text-accent);
     font-family: var(--font-family-code);
-    font-size: var(--type-xs, 0.75rem);
+    /* 라벨 크기는 본문 타이포 스케일을 따르지 않는 고정 마이크로 값이다.
+       랜딩 전용 스텝(--type-xs)을 참조하면 에디터에서는 정의가 없어 폴백으로만
+       살아나므로, 공유 프리미티브는 자기 값을 직접 갖는다. */
+    font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0;
     text-transform: uppercase;
@@ -933,7 +936,8 @@ def renderSharedComponentCss() -> str:
   }
 
   /* 신호 rail. 면을 채우지 않고 왼쪽 세로선 하나로 덩어리를 표시한다.
-     accent 는 지금 해야 할 것, 무채는 참고다. */
+     accent 는 지금 해야 할 것, muted 는 조용한 참고다. 학습 표면은 참고 덩어리에
+     연한 선을 쓰기로 계약돼 있어(curriculum-card-contract) 그 톤을 따로 둔다. */
   .codaroRail {
     border-left: 2px solid var(--color-border-emphasized);
     padding-left: 16px;
@@ -943,16 +947,22 @@ def renderSharedComponentCss() -> str:
     border-left-color: var(--color-accent);
   }
 
+  .codaroRail[data-rail="muted"] {
+    border-left-color: var(--color-border);
+  }
+
   /* 숫자 격자. 칸 사이는 세로선으로만 나눈다. 바깥 테두리는 층 프레임이 맡는다. */
   .codaroStatGrid {
     display: grid;
     grid-template-columns: repeat(var(--stat-columns, 4), minmax(0, 1fr));
   }
 
+  /* 칸 안쪽 여백은 표면 밀도에 따라 다르다. 마케팅 표면은 넉넉하게, 작업 화면은
+     조밀하게 쓰므로 값을 변수로 열어 둔다. 이걸 박아 두면 앱 패널에서 못 쓴다. */
   .codaroStatGrid > * {
     display: grid;
     gap: 6px;
-    padding: 26px 24px 28px;
+    padding: var(--stat-cell-padding, 26px 24px 28px);
     border-left: 1px solid var(--color-border);
   }
 

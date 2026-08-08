@@ -18,6 +18,31 @@ import { createServer } from "vite";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const landingRoot = resolve(__dirname, "..");
+
+// 레슨 첫 페인트용 인라인 CSS 는 생성된 테마가 붙기 전에 그려지므로 변수 폴백이
+// 필요하다. 그 폴백을 손으로 적어 두면 토큰이 바뀔 때 조용히 옛 색으로 남는다.
+// (실제로 accent 폴백이 예전 자주색으로 굳어 있었다.) 그래서 SSOT 에서 읽어 쓴다.
+const designTokens = JSON.parse(
+  readFileSync(resolve(landingRoot, "..", "assets", "brand", "designSystem", "tokens.json"), "utf-8"),
+);
+
+function tokenFallback(name) {
+  const value = designTokens.astryxTokens?.[name];
+  if (typeof value === "string") return value;
+  if (!Array.isArray(value)) throw new Error(`unknown design token: ${name}`);
+  const [light, dark] = value;
+  return `light-dark(${light},${dark})`;
+}
+
+function themed(name) {
+  return `var(${name},${tokenFallback(name)})`;
+}
+
+function layoutToken(name) {
+  const value = designTokens.layout?.[name];
+  if (!value) throw new Error(`unknown layout token: ${name}`);
+  return value;
+}
 const buildRoot = resolve(landingRoot, "build");
 const shellPath = resolve(buildRoot, "index.html");
 const shell = readFileSync(shellPath, "utf-8");
@@ -366,24 +391,30 @@ function lessonInitialDocumentHtml(lesson) {
 }
 
 function lessonInitialDocumentCss() {
+  // 색과 기하는 전부 토큰에서 온다. 여기서 값을 손으로 적으면 첫 페인트만 옛
+  // 디자인으로 남아, hydration 이 끝나는 순간 색과 폭이 튀는 화면이 된다.
+  const frameInset = layoutToken("frameInset");
+  const frameMax = layoutToken("frameMax");
+  const frameInsetNarrow = layoutToken("frameInsetNarrow");
+  const framePadding = `max(${frameInset},calc((100vw - ${frameMax})/2 + ${frameInset}))`;
   return `
-    .lessonInitialDocument{min-height:100vh;overflow:auto;padding:56px max(24px,calc((100vw - 960px)/2));background:var(--color-background-body,light-dark(#f5f6f8,#151619));color:var(--color-text-primary,light-dark(#18191d,#f5f6f8));font-family:var(--font-family-body,system-ui,sans-serif)}
+    .lessonInitialDocument{min-height:100vh;overflow:auto;padding-block:56px;padding-inline:${framePadding};background:${themed("--color-background-body")};color:${themed("--color-text-primary")};font-family:var(--font-family-body,system-ui,sans-serif)}
     .lessonInitialHeader{display:grid;max-width:720px;gap:12px}
-    .lessonInitialHeader>span,.lessonInitialIndex{color:var(--color-text-accent,light-dark(#6d2857,#e4a9d2));font:700 12px/18px var(--font-family-code,monospace)}
+    .lessonInitialHeader>span,.lessonInitialIndex{color:${themed("--color-text-accent")};font:700 12px/18px var(--font-family-code,monospace)}
     .lessonInitialHeader h1{margin:0;font:700 32px/40px var(--font-family-heading,system-ui,sans-serif)}
-    .lessonInitialHeader p{margin:0;max-width:64ch;color:var(--color-text-secondary,light-dark(#5d626d,#aeb3bd));font-size:16px;line-height:26px}
-    .lessonInitialRuntime{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:24px;padding:12px 14px;border-left:3px solid var(--color-border-brand,light-dark(#8a356d,#e4a9d2));background:var(--color-background-muted,light-dark(#eceff3,#202226));font-size:13px;line-height:20px}
-    .lessonInitialRuntime span{color:var(--color-text-secondary,light-dark(#5d626d,#aeb3bd))}
-    .lessonInitialOutcomes{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px;padding-block:16px;border-block:1px solid var(--color-border,light-dark(#d9dde3,#34373d))}
-    .lessonInitialOutcomes span{padding:4px 8px;border-radius:6px;background:var(--color-background-muted,light-dark(#eceff3,#202226));font-size:13px;line-height:20px}
+    .lessonInitialHeader p{margin:0;max-width:64ch;color:${themed("--color-text-secondary")};font-size:16px;line-height:26px}
+    .lessonInitialRuntime{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:24px;padding:12px 14px;border-left:2px solid ${themed("--color-border-accent")};background:${themed("--color-background-muted")};font-size:13px;line-height:20px}
+    .lessonInitialRuntime span{color:${themed("--color-text-secondary")}}
+    .lessonInitialOutcomes{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px;padding-block:16px;border-block:1px solid ${themed("--color-border")}}
+    .lessonInitialOutcomes span{padding:4px 8px;background:${themed("--color-background-muted")};font-size:13px;line-height:20px}
     .lessonInitialBody{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,.8fr);gap:48px;margin-top:40px}
     .lessonInitialBody h2{margin:6px 0 10px;font-size:24px;line-height:32px}
     .lessonInitialBody p,.lessonInitialBody li{font-size:16px;line-height:26px}
-    .lessonInitialExercise{display:grid;align-content:start;gap:10px;padding:18px;border:1px solid var(--color-border-emphasized,light-dark(#b7bdc7,#535760));border-radius:8px;background:var(--color-background-card,light-dark(#fff,#1b1c20))}
-    .lessonInitialExercise>span{color:var(--color-text-accent,light-dark(#6d2857,#e4a9d2));font-size:12px;font-weight:700}
-    .lessonInitialExercise pre{overflow:auto;margin:2px 0 0;padding:16px;border-radius:6px;background:var(--color-syntax-background,light-dark(#f8f9fa,#17181b));font-size:14px;line-height:22px}
-    .lessonInitialExercise small{color:var(--color-text-secondary,light-dark(#5d626d,#aeb3bd));font-size:12px;line-height:18px}
-    @media(max-width:700px){.lessonInitialDocument{padding:32px 20px}.lessonInitialHeader h1{font-size:26px;line-height:34px}.lessonInitialBody{grid-template-columns:1fr;gap:24px;margin-top:28px}}
+    .lessonInitialExercise{display:grid;align-content:start;gap:10px;padding:18px;border:1px solid ${themed("--color-border-emphasized")};background:${themed("--color-background-card")}}
+    .lessonInitialExercise>span{color:${themed("--color-text-accent")};font-size:12px;font-weight:700}
+    .lessonInitialExercise pre{overflow:auto;margin:2px 0 0;padding:16px;background:${themed("--color-background-muted")};font-size:14px;line-height:22px}
+    .lessonInitialExercise small{color:${themed("--color-text-secondary")};font-size:12px;line-height:18px}
+    @media(max-width:700px){.lessonInitialDocument{padding-block:32px;padding-inline:${frameInsetNarrow}}.lessonInitialHeader h1{font-size:26px;line-height:34px}.lessonInitialBody{grid-template-columns:1fr;gap:24px;margin-top:28px}}
   `;
 }
 
