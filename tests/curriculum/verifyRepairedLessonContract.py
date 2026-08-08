@@ -216,7 +216,7 @@ def checkLesson(path: Path) -> dict[str, Any]:
         repairedIds.append(sectionId)
         check = sectionCheck(section)
         expected = textOf(check.get("outputExact"))
-        comparator = str(check.get("comparator") or "text")
+        comparator = str(check.get("comparator") or "auto")
         solution = str(exercise.get("solution"))
 
         ok, detail, output = runSolution(solution, namespace, f"{relPath}::{sectionId}.solution")

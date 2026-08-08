@@ -108,7 +108,7 @@ class RuntimeToolHandlers:
         blockId = args["blockId"]
         checkType = args["checkType"]
         expected = args.get("expected", "")
-        comparator = str(args.get("comparator") or "text")
+        comparator = str(args.get("comparator") or "auto")
 
         try:
             block = getDocumentBlock(doc, blockId=blockId)

@@ -144,7 +144,7 @@ def runLocalStrongCheckAttempt(
         actual = normalizeOutput(str(response.get("actual") or "")) if normalized["kind"] == "output" else str(
             response.get("actual") or ""
         )
-        acceptedTextCase = False
+        acceptedOutputFeedback = ""
         if normalized["kind"] == "output":
             verdict = matchLearningOutput(
                 expected,
@@ -153,7 +153,7 @@ def runLocalStrongCheckAttempt(
             )
             if not verdict.passed:
                 return failedResult("mismatch", expected, actual, verdict.feedback), False
-            acceptedTextCase = verdict.tier == "text"
+            acceptedOutputFeedback = verdict.feedback if verdict.tier != "exact" else ""
         elif actual != expected:
             return (
                 failedResult(
@@ -169,8 +169,8 @@ def runLocalStrongCheckAttempt(
                 "actual": actual,
                 "artifacts": normalizeWorkerArtifacts(response.get("artifacts")),
                 "detail": (
-                    "대소문자 차이는 허용했고, 나머지 출력은 맞습니다."
-                    if acceptedTextCase
+                    acceptedOutputFeedback
+                    if acceptedOutputFeedback
                     else
                     "Windows AppContainer에서 fixture와 함께 다시 실행해 정확한 출력을 확인했습니다."
                     if usedAppContainer and normalized["kind"] == "output"
@@ -220,7 +220,7 @@ def validateLocalStrongCheck(spec: dict[str, Any], source: str) -> dict[str, Any
     if not isinstance(payload, dict):
         raise LocalStrongCheckInvalid("check payload가 비어 있습니다.")
     if kind == "output":
-        if payload.get("comparator") not in {"exact", "text"} or payload.get("normalization") != "line-trim":
+        if payload.get("comparator") not in {"auto", "exact", "text"} or payload.get("normalization") != "line-trim":
             raise LocalStrongCheckInvalid("지원하지 않는 output comparator입니다.")
         if not isinstance(payload.get("expected"), str) or not payload["expected"]:
             raise LocalStrongCheckInvalid("output expected가 비어 있습니다.")

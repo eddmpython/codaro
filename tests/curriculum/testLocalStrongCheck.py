@@ -104,6 +104,16 @@ def testLocalStrongTextComparatorAcceptsCaseOnlyDifference() -> None:
     assert result["detail"] == "대소문자 차이는 허용했고, 나머지 출력은 맞습니다."
 
 
+def testLocalStrongAutoComparatorAcceptsEquivalentPythonValue() -> None:
+    result = runLocalStrongCheck(
+        outputSpec("{'name': 'Codaro', 'score': 0.3}", comparator="auto"),
+        "print({'score': 0.1 + 0.2, 'name': 'codaro'})",
+    )
+
+    assert result["passed"] is True
+    assert result["detail"] == "표현 방식의 차이는 허용했고, Python 값과 구조는 맞습니다."
+
+
 def testLocalStrongBehaviorCheckUsesFixtureAndCreatedPath() -> None:
     fixture = {
         **EMPTY_FIXTURE,

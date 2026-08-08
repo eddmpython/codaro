@@ -40,7 +40,7 @@ class ExerciseCheckInput:
     requiredPatterns: list[str] = field(default_factory=list)
     hints: list[str] = field(default_factory=list)
     currentHintLevel: int = 0
-    comparator: str = "text"
+    comparator: str = "auto"
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,7 +48,7 @@ class ToolExerciseCheckInput:
     studentCode: str
     checkType: str
     expected: str = ""
-    comparator: str = "text"
+    comparator: str = "auto"
 
 
 def exerciseCheckInputFromConfig(
@@ -156,7 +156,7 @@ def _toolCheckPayload(
 
 
 def _outputComparator(value: Any) -> str:
-    comparator = str(value or "text")
-    if comparator not in {"exact", "text"}:
+    comparator = str(value or "auto")
+    if comparator not in {"auto", "exact", "text"}:
         raise InvalidExerciseCheck(f"지원하지 않는 출력 비교 방식입니다: {comparator!r}")
     return comparator

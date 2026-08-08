@@ -162,7 +162,7 @@ class WorkbenchToolHandlers:
                 "blockId": args["blockId"],
                 "checkType": args.get("checkType", "noError"),
                 "expected": args.get("expected", ""),
-                "comparator": args.get("comparator", "text"),
+                "comparator": args.get("comparator", "auto"),
             })
         return {"error": f"Unknown cell-call operation: {operation}"}
 

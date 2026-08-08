@@ -18,7 +18,7 @@ DAY06_PATH = ROOT / "curricula" / "python" / "basics" / "30days" / "day06_문자
 
 def loadVectors() -> list[dict]:
     payload = json.loads(VECTORS_PATH.read_text(encoding="utf-8"))
-    assert payload["schemaVersion"] == 1
+    assert payload["schemaVersion"] == 2
     vectors = payload["vectors"]
     assert vectors, "계약 벡터가 비어 있다"
     assert len({vector["id"] for vector in vectors}) == len(vectors)
@@ -53,7 +53,7 @@ def testDifferentTierPointsAtFirstDifferingLine() -> None:
 
 
 def testCaseOnlyFeedbackShowsBothSpellings() -> None:
-    verdict = matchLearningOutput("Hello Codaro", "hello codaro")
+    verdict = matchLearningOutput("Hello Codaro", "hello codaro", comparator="exact")
     assert "대소문자" in verdict.feedback
     assert "Hello Codaro" in verdict.feedback and "hello codaro" in verdict.feedback
 
@@ -63,6 +63,20 @@ def testTextComparatorAcceptsCaseOnlyDifferenceWithTransparentFeedback() -> None
     assert verdict.passed is True
     assert verdict.tier == "text"
     assert "대소문자 차이는 허용" in verdict.feedback
+
+
+def testAutoComparatorIsDefaultAndExplainsAcceptedNumberDifference() -> None:
+    verdict = matchLearningOutput("0.3", "0.30000000000000004")
+    assert verdict.passed is True
+    assert verdict.tier == "number"
+    assert "계산 오차는 허용" in verdict.feedback
+
+
+def testAutoComparatorExplainsStructuredMismatch() -> None:
+    verdict = matchLearningOutput("{'items': [1, 2]}", "{'items': [2, 1]}")
+    assert verdict.passed is False
+    assert verdict.tier == "valueDifferent"
+    assert "값이나 구조가 다릅니다" in verdict.feedback
 
 
 def testUnknownComparatorIsRejected() -> None:
@@ -96,8 +110,13 @@ def testTsMirrorStaysInSync() -> None:
         "normalizeLearningOutput",
         "matchLearningOutput",
         '"caseOnly"',
+        '"auto"',
+        '"number"',
+        '"value"',
+        '"valueDifferent"',
         '"whitespaceOnly"',
         '"different"',
+        "LiteralParser",
         '"text"',
         "번째 줄부터 다릅니다",
         "대소문자만 다릅니다",

@@ -397,7 +397,7 @@ export async function executeBrowserStrongCheck(
     if (payload.exception) {
       return failed("error", expected, actual, concisePythonError(payload.exception));
     }
-    let acceptedTextCase = false;
+    let acceptedOutputFeedback = "";
     if (spec.kind === "output") {
       const verdict = matchLearningOutput(expected, actual, {
         comparator: spec.payload.comparator,
@@ -405,7 +405,7 @@ export async function executeBrowserStrongCheck(
       if (!verdict.passed) {
         return failed("mismatch", expected, actual, verdict.feedback);
       }
-      acceptedTextCase = verdict.tier === "text";
+      acceptedOutputFeedback = verdict.tier === "exact" ? "" : verdict.feedback;
     } else if (actual !== expected) {
       return failed("mismatch", expected, actual, `기대 출력은 ${displayOutput(expected)}이고, 현재 출력은 ${displayOutput(actual)}입니다.`);
     }
@@ -413,8 +413,8 @@ export async function executeBrowserStrongCheck(
       actual,
       ...(spec.kind === "behavior" ? { artifacts: normalizeWorkerArtifacts(payload.artifacts) } : {}),
       detail: spec.kind === "output"
-        ? acceptedTextCase
-          ? "대소문자 차이는 허용했고, 나머지 출력은 맞습니다."
+        ? acceptedOutputFeedback
+          ? acceptedOutputFeedback
           : "새 브라우저 Python Worker에서 fixture와 함께 다시 실행해 정확한 출력을 확인했습니다."
         : spec.kind === "variable"
           ? "새 브라우저 Python Worker에서 학생 namespace의 변수 값을 격리해 확인했습니다."

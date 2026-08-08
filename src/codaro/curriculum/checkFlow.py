@@ -53,7 +53,7 @@ class CurriculumCheckInput:
     requiredPatterns: list[str] = field(default_factory=list)
     hints: list[str] = field(default_factory=list)
     currentHintLevel: int = 0
-    comparator: str = "text"
+    comparator: str = "auto"
     category: str = ""
     contentId: str = ""
     sectionId: str = ""

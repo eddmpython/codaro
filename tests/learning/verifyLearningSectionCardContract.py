@@ -186,7 +186,7 @@ def main() -> int:
         "deterministic practice classifier": "isDeterministicPracticeCheckConfig",
         "Local done status is successful": '["success", "ok", "done"]',
         "shared output matcher": "matchLearningOutput(expected, actual",
-        "text comparison default": 'checkConfig?.comparator === "exact" ? "exact" : "text"',
+        "auto comparison default": 'return "auto";',
         "verified practice state": 'state: "verified"',
         "unsupported completion state": 'state: "unsupported"',
         "practice evidence only": 'evidence: "practice"',

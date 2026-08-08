@@ -133,7 +133,7 @@ checkExercise: (payload: {
     requiredPatterns?: string[];
     hints?: string[];
     currentHintLevel?: number;
-    comparator?: "exact" | "text";
+    comparator?: "auto" | "exact" | "text";
     category?: string;
     contentId?: string;
     sectionId?: string;

@@ -1,6 +1,6 @@
 {
-  "description": "학습 출력 비교 계약 벡터. Python(src/codaro/curriculum/outputMatch.py)과 TS(editor/src/lib/learningOutputMatch.ts)가 같은 결과를 내야 한다.",
-  "schemaVersion": 1,
+  "description": "결정적 학습 출력 비교 계약 벡터. Python(src/codaro/curriculum/outputMatch.py)과 TS(editor/src/lib/learningOutputMatch.ts)가 같은 결과를 내야 한다.",
+  "schemaVersion": 2,
   "vectors": [
     {
       "id": "exact-plain",
@@ -127,6 +127,150 @@
       "expected": "HELLO",
       "actual": "GOODBYE",
       "comparator": "text",
+      "passed": false,
+      "tier": "different"
+    },
+    {
+      "id": "auto-mode-accepts-case-only-difference",
+      "expected": "Hello Codaro",
+      "actual": "hello codaro",
+      "comparator": "auto",
+      "passed": true,
+      "tier": "text"
+    },
+    {
+      "id": "auto-mode-preserves-internal-whitespace",
+      "expected": "합계 : 100",
+      "actual": "합계 :  100",
+      "comparator": "auto",
+      "passed": false,
+      "tier": "whitespaceOnly"
+    },
+    {
+      "id": "numeric-integer-and-float-notation",
+      "expected": "1",
+      "actual": "1.0",
+      "comparator": "auto",
+      "passed": true,
+      "tier": "number"
+    },
+    {
+      "id": "numeric-floating-point-noise",
+      "expected": "0.3",
+      "actual": "0.30000000000000004",
+      "comparator": "auto",
+      "passed": true,
+      "tier": "number"
+    },
+    {
+      "id": "numeric-real-difference",
+      "expected": "0.3",
+      "actual": "0.31",
+      "comparator": "auto",
+      "passed": false,
+      "tier": "valueDifferent"
+    },
+    {
+      "id": "list-formatting-difference",
+      "expected": "[1, 2, 3]",
+      "actual": "[1.0,2,3]",
+      "comparator": "auto",
+      "passed": true,
+      "tier": "value"
+    },
+    {
+      "id": "list-order-remains-significant",
+      "expected": "[1, 2, 3]",
+      "actual": "[3, 2, 1]",
+      "comparator": "auto",
+      "passed": false,
+      "tier": "valueDifferent"
+    },
+    {
+      "id": "tuple-and-list-remain-distinct",
+      "expected": "(1, 2)",
+      "actual": "[1, 2]",
+      "comparator": "auto",
+      "passed": false,
+      "tier": "valueDifferent"
+    },
+    {
+      "id": "dict-order-case-and-number-notation",
+      "expected": "{'Name': 'Codaro', 'score': 1}",
+      "actual": "{'score': 1.0, 'name': 'codaro'}",
+      "comparator": "auto",
+      "passed": true,
+      "tier": "value"
+    },
+    {
+      "id": "nested-structure-comparison",
+      "expected": "{'rows': [1, 0.3], 'ok': True}",
+      "actual": "{'ok': True, 'rows': [1.0, 0.30000000000000004]}",
+      "comparator": "auto",
+      "passed": true,
+      "tier": "value"
+    },
+    {
+      "id": "set-order-is-ignored",
+      "expected": "{'red', 'blue'}",
+      "actual": "{'BLUE', 'RED'}",
+      "comparator": "auto",
+      "passed": true,
+      "tier": "value"
+    },
+    {
+      "id": "empty-set-and-empty-dict-remain-distinct",
+      "expected": "set()",
+      "actual": "{}",
+      "comparator": "auto",
+      "passed": false,
+      "tier": "valueDifferent"
+    },
+    {
+      "id": "quoted-string-style-and-case",
+      "expected": "'Codaro'",
+      "actual": "\"codaro\"",
+      "comparator": "auto",
+      "passed": true,
+      "tier": "value"
+    },
+    {
+      "id": "boolean-and-number-remain-distinct",
+      "expected": "True",
+      "actual": "1",
+      "comparator": "auto",
+      "passed": false,
+      "tier": "valueDifferent"
+    },
+    {
+      "id": "text-mode-does-not-enable-numeric-comparison",
+      "expected": "1",
+      "actual": "1.0",
+      "comparator": "text",
+      "passed": false,
+      "tier": "different"
+    },
+    {
+      "id": "exact-mode-does-not-enable-structural-comparison",
+      "expected": "{'a': 1, 'b': 2}",
+      "actual": "{'b': 2, 'a': 1}",
+      "comparator": "exact",
+      "passed": false,
+      "tier": "different"
+    },
+    {
+      "id": "unsafe-expression-is-plain-text",
+      "expected": "1",
+      "actual": "__import__('os')",
+      "comparator": "auto",
+      "passed": false,
+      "tier": "different"
+    },
+    {
+      "id": "large-integers-do-not-use-lossy-number-comparison",
+      "expected": "9007199254740992",
+      "actual": "9007199254740993",
+      "comparator": "auto",
       "passed": false,
       "tier": "different"
     }

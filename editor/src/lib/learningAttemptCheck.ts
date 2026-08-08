@@ -2,7 +2,11 @@ import type { ExecutionResult } from "@/types";
 import { executeBrowserStrongCheck } from "@/lib/browserLearningCheckExecutor";
 import { stringifyData } from "@/lib/displayFormat";
 import { parseStrongLearningCheckSpec } from "@/lib/learningCheckSpec";
-import { matchLearningOutput, normalizeLearningOutput } from "@/lib/learningOutputMatch";
+import {
+  matchLearningOutput,
+  normalizeLearningOutput,
+  type LearningOutputComparator,
+} from "@/lib/learningOutputMatch";
 import { executeLocalStrongCheck } from "@/lib/localLearningCheckExecutor";
 import type { LearningEvidenceArtifact, LearningEvidencePackageAsset } from "@/lib/webLearningEvidence";
 
@@ -124,7 +128,12 @@ export function isDeterministicPracticeCheckConfig(checkConfig: Record<string, u
   const comparator = checkConfig?.comparator;
   return checkConfig?.type === "outputExact"
     && typeof checkConfig.outputExact === "string"
-    && (comparator === undefined || comparator === "text" || comparator === "exact");
+    && (
+      comparator === undefined
+      || comparator === "auto"
+      || comparator === "text"
+      || comparator === "exact"
+    );
 }
 
 export function practiceActualOutput(result: ExecutionResult): string {
@@ -198,7 +207,7 @@ function learnerFeedback(
   detail: string,
 ): string {
   if (state === "verified") {
-    return detail.startsWith("대소문자 차이는 허용") ? detail : "목표대로 동작했습니다.";
+    return acceptedDifferenceFeedback(detail) ? detail : "목표대로 동작했습니다.";
   }
   if (state === "mismatch") return detail;
   if (state === "unsupported") return detail;
@@ -207,8 +216,17 @@ function learnerFeedback(
 
 function practiceOutputComparator(
   checkConfig: Record<string, unknown> | undefined,
-): "exact" | "text" {
-  return checkConfig?.comparator === "exact" ? "exact" : "text";
+): LearningOutputComparator {
+  if (checkConfig?.comparator === "exact" || checkConfig?.comparator === "text") {
+    return checkConfig.comparator;
+  }
+  return "auto";
+}
+
+function acceptedDifferenceFeedback(detail: string): boolean {
+  return detail.startsWith("대소문자 차이는 허용")
+    || detail.startsWith("숫자 표기나 미세한 계산 오차는 허용")
+    || detail.startsWith("표현 방식의 차이는 허용");
 }
 
 function textValue(value: unknown): string {

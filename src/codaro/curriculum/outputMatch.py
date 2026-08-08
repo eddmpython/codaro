@@ -5,33 +5,233 @@ TS 미러: editor/src/lib/learningOutputMatch.ts (같은 규칙, 같은 피드�
 계약 벡터: contracts/learning-content/outputMatchVectors.json - 두 구현이 같은
 벡터를 통과해야 한다.
 
-규칙:
-1. line-trim 정규화: CRLF/CR → LF, 각 줄 끝 공백 제거, 앞뒤 빈 줄 제거.
-   눈에 보이지 않는 차이(끝 공백, 마지막 줄바꿈, 개행 방식)로는 틀리지 않는다.
-2. 대소문자와 줄 안 공백은 눈에 보이는 차이이므로 기본적으로 틀린 것이 맞다.
-   단, 피드백이 "무엇이 다른지"를 정확히 짚는다:
-   - 대소문자만 다르면 그 사실을 말한다.
-   - 공백 개수/줄바꿈 구조만 다르면 그 사실을 말한다.
-   - 그 외에는 처음 다른 줄 번호와 기대/현재 줄을 함께 보여준다.
-3. comparator="text": 대소문자가 학습 목표와 무관한 일반 텍스트 검사는
-   casefold 비교로 통과시킨다. comparator="exact"는 대소문자 변환처럼
-   표기 자체가 학습 목표인 검사에만 쓴다.
+auto 비교는 코드를 실행하지 않는다. 양쪽 전체가 제한된 Python 표시값 문법으로
+해석될 때만 숫자와 컨테이너 구조를 비교하고, 아니면 일반 text 비교에 머문다.
+exact 비교는 표기 자체가 학습 목표일 때 사용한다.
 """
+
 from __future__ import annotations
 
+import math
 import re
+import unicodedata
 from dataclasses import dataclass
+from typing import Any
+
+
+MAX_LITERAL_LENGTH = 20_000
+MAX_LITERAL_DEPTH = 64
+MAX_LITERAL_ITEMS = 2_000
+MAX_SAFE_NUMBER = 9_007_199_254_740_991
+NUMBER_RELATIVE_TOLERANCE = 1e-9
+NUMBER_ABSOLUTE_TOLERANCE = 1e-12
+NUMBER_PATTERN = re.compile(r"[+-]?(?:(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)")
 
 
 @dataclass(slots=True)
 class OutputMatchVerdict:
     passed: bool
-    tier: str  # "exact" | "text" | "caseOnly" | "whitespaceOnly" | "different"
+    tier: str
     feedback: str
 
 
+@dataclass(slots=True)
+class _LiteralValue:
+    kind: str
+    value: Any = None
+
+
+class _LiteralParseError(ValueError):
+    pass
+
+
+class _LiteralParser:
+    def __init__(self, source: str) -> None:
+        self.source = source
+        self.index = 0
+        self.itemCount = 0
+
+    def parse(self) -> _LiteralValue:
+        if len(self.source) > MAX_LITERAL_LENGTH:
+            raise _LiteralParseError
+        value = self._parseValue(0)
+        self._skipWhitespace()
+        if self.index != len(self.source):
+            raise _LiteralParseError
+        return value
+
+    def _parseValue(self, depth: int) -> _LiteralValue:
+        if depth > MAX_LITERAL_DEPTH:
+            raise _LiteralParseError
+        self._skipWhitespace()
+        if self.index >= len(self.source):
+            raise _LiteralParseError
+        character = self.source[self.index]
+        if character in {"'", '"'}:
+            return _LiteralValue("string", self._parseString(character))
+        if character == "[":
+            return self._parseSequence("list", "]", depth)
+        if character == "(":
+            return self._parseSequence("tuple", ")", depth)
+        if character == "{":
+            return self._parseBrace(depth)
+        if self._consumeKeyword("None"):
+            return _LiteralValue("none")
+        if self._consumeKeyword("True"):
+            return _LiteralValue("boolean", True)
+        if self._consumeKeyword("False"):
+            return _LiteralValue("boolean", False)
+        if self._consumeKeyword("set"):
+            self._skipWhitespace()
+            if self.source[self.index : self.index + 2] != "()":
+                raise _LiteralParseError
+            self.index += 2
+            return _LiteralValue("set", [])
+        match = NUMBER_PATTERN.match(self.source, self.index)
+        if match is None:
+            raise _LiteralParseError
+        token = match.group(0)
+        number = float(token)
+        if not math.isfinite(number) or abs(number) > MAX_SAFE_NUMBER:
+            raise _LiteralParseError
+        self.index = match.end()
+        return _LiteralValue("number", number)
+
+    def _parseSequence(self, kind: str, closer: str, depth: int) -> _LiteralValue:
+        self.index += 1
+        self._skipWhitespace()
+        if self._consume(closer):
+            return _LiteralValue(kind, [])
+        values: list[_LiteralValue] = []
+        hadComma = False
+        while True:
+            values.append(self._parseValue(depth + 1))
+            self._countItem()
+            self._skipWhitespace()
+            if self._consume(closer):
+                if kind == "tuple" and len(values) == 1 and not hadComma:
+                    return values[0]
+                return _LiteralValue(kind, values)
+            if not self._consume(","):
+                raise _LiteralParseError
+            hadComma = True
+            self._skipWhitespace()
+            if self._consume(closer):
+                return _LiteralValue(kind, values)
+
+    def _parseBrace(self, depth: int) -> _LiteralValue:
+        self.index += 1
+        self._skipWhitespace()
+        if self._consume("}"):
+            return _LiteralValue("dict", [])
+        first = self._parseValue(depth + 1)
+        self._countItem()
+        self._skipWhitespace()
+        if self._consume(":"):
+            entries = [(first, self._parseValue(depth + 1))]
+            self._countItem()
+            while True:
+                self._skipWhitespace()
+                if self._consume("}"):
+                    return _LiteralValue("dict", entries)
+                if not self._consume(","):
+                    raise _LiteralParseError
+                self._skipWhitespace()
+                if self._consume("}"):
+                    return _LiteralValue("dict", entries)
+                key = self._parseValue(depth + 1)
+                self._countItem()
+                self._skipWhitespace()
+                if not self._consume(":"):
+                    raise _LiteralParseError
+                entries.append((key, self._parseValue(depth + 1)))
+                self._countItem()
+        values = [first]
+        while True:
+            self._skipWhitespace()
+            if self._consume("}"):
+                return _LiteralValue("set", values)
+            if not self._consume(","):
+                raise _LiteralParseError
+            self._skipWhitespace()
+            if self._consume("}"):
+                return _LiteralValue("set", values)
+            values.append(self._parseValue(depth + 1))
+            self._countItem()
+
+    def _parseString(self, quote: str) -> str:
+        self.index += 1
+        decoded: list[str] = []
+        escapes = {
+            "\\": "\\",
+            "'": "'",
+            '"': '"',
+            "a": "\a",
+            "b": "\b",
+            "f": "\f",
+            "n": "\n",
+            "r": "\r",
+            "t": "\t",
+            "v": "\v",
+        }
+        while self.index < len(self.source):
+            character = self.source[self.index]
+            self.index += 1
+            if character == quote:
+                return "".join(decoded)
+            if character in {"\n", "\r"}:
+                raise _LiteralParseError
+            if character != "\\":
+                decoded.append(character)
+                continue
+            if self.index >= len(self.source):
+                raise _LiteralParseError
+            escaped = self.source[self.index]
+            self.index += 1
+            if escaped in escapes:
+                decoded.append(escapes[escaped])
+                continue
+            width = 2 if escaped == "x" else 4 if escaped == "u" else 8 if escaped == "U" else 0
+            if not width:
+                decoded.append(f"\\{escaped}")
+                continue
+            hexadecimal = self.source[self.index : self.index + width]
+            if len(hexadecimal) != width or re.fullmatch(r"[0-9a-fA-F]+", hexadecimal) is None:
+                raise _LiteralParseError
+            codePoint = int(hexadecimal, 16)
+            if codePoint > 0x10FFFF:
+                raise _LiteralParseError
+            decoded.append(chr(codePoint))
+            self.index += width
+        raise _LiteralParseError
+
+    def _consumeKeyword(self, keyword: str) -> bool:
+        if not self.source.startswith(keyword, self.index):
+            return False
+        end = self.index + len(keyword)
+        if end < len(self.source) and (self.source[end].isalnum() or self.source[end] == "_"):
+            return False
+        self.index = end
+        return True
+
+    def _consume(self, token: str) -> bool:
+        if not self.source.startswith(token, self.index):
+            return False
+        self.index += len(token)
+        return True
+
+    def _skipWhitespace(self) -> None:
+        while self.index < len(self.source) and self.source[self.index].isspace():
+            self.index += 1
+
+    def _countItem(self) -> None:
+        self.itemCount += 1
+        if self.itemCount > MAX_LITERAL_ITEMS:
+            raise _LiteralParseError
+
+
 def normalizeLearningOutput(value: str) -> str:
-    """line-trim 정규화. 비교 양쪽(기대/실제)에 같은 규칙을 적용한다."""
+    """line-trim 정규화. 비교 양쪽에 같은 규칙을 적용한다."""
     unified = value.replace("\r\n", "\n").replace("\r", "\n")
     lines = [line.rstrip() for line in unified.split("\n")]
     while lines and not lines[0]:
@@ -41,22 +241,13 @@ def normalizeLearningOutput(value: str) -> str:
     return "\n".join(lines)
 
 
-def _collapse(value: str) -> str:
-    return re.sub(r"\s+", " ", value).strip()
-
-
-def _preview(value: str, limit: int = 60) -> str:
-    text = value if len(value) <= limit else value[: limit - 1] + "…"
-    return f"`{text}`" if text else "(빈 줄)"
-
-
 def matchLearningOutput(
     expected: str,
     actual: str,
     *,
-    comparator: str = "exact",
+    comparator: str = "auto",
 ) -> OutputMatchVerdict:
-    if comparator not in {"exact", "text"}:
+    if comparator not in {"auto", "exact", "text"}:
         raise ValueError(f"지원하지 않는 출력 비교 방식입니다: {comparator!r}")
 
     expectedNorm = normalizeLearningOutput(expected)
@@ -64,47 +255,148 @@ def matchLearningOutput(
 
     if expectedNorm == actualNorm:
         return OutputMatchVerdict(True, "exact", "목표한 출력과 일치합니다.")
-    if comparator == "text" and expectedNorm.casefold() == actualNorm.casefold():
+
+    if comparator in {"auto", "text"} and _foldText(expectedNorm) == _foldText(actualNorm):
         return OutputMatchVerdict(
             True,
             "text",
             "대소문자 차이는 허용했고, 나머지 출력은 맞습니다.",
         )
 
-    if expectedNorm.casefold() == actualNorm.casefold():
+    expectedValue = _parseLiteral(expectedNorm) if comparator == "auto" else None
+    actualValue = _parseLiteral(actualNorm) if comparator == "auto" else None
+    if expectedValue is not None and actualValue is not None:
+        if _literalValuesEqual(expectedValue, actualValue):
+            if expectedValue.kind == "number" and actualValue.kind == "number":
+                return OutputMatchVerdict(
+                    True,
+                    "number",
+                    "숫자 표기나 미세한 계산 오차는 허용했고, 값은 맞습니다.",
+                )
+            return OutputMatchVerdict(
+                True,
+                "value",
+                "표현 방식의 차이는 허용했고, Python 값과 구조는 맞습니다.",
+            )
+        return OutputMatchVerdict(
+            False,
+            "valueDifferent",
+            "Python 값으로 해석했지만 값이나 구조가 다릅니다. "
+            f"기대 {_preview(expectedNorm)} ↔ 현재 {_preview(actualNorm)}",
+        )
+
+    if _foldText(expectedNorm) == _foldText(actualNorm):
         expectedLine, actualLine = _firstDifferingPair(expectedNorm, actualNorm)
         return OutputMatchVerdict(
             False,
             "caseOnly",
-            "내용은 맞는데 대소문자만 다릅니다. "
-            f"기대 {_preview(expectedLine)} ↔ 현재 {_preview(actualLine)}",
+            f"내용은 맞는데 대소문자만 다릅니다. 기대 {_preview(expectedLine)} ↔ 현재 {_preview(actualLine)}",
         )
     if _collapse(expectedNorm) == _collapse(actualNorm):
         return OutputMatchVerdict(
             False,
             "whitespaceOnly",
-            "내용은 맞는데 공백 개수나 줄바꿈이 다릅니다. "
-            "띄어쓰기와 줄 구조를 기대 출력과 똑같이 맞춰 주세요.",
+            "내용은 맞는데 공백 개수나 줄바꿈이 다릅니다. 띄어쓰기와 줄 구조를 기대 출력과 똑같이 맞춰 주세요.",
         )
-    if _collapse(expectedNorm).casefold() == _collapse(actualNorm).casefold():
+    if _foldText(_collapse(expectedNorm)) == _foldText(_collapse(actualNorm)):
         return OutputMatchVerdict(
             False,
             "whitespaceOnly",
-            "내용은 맞는데 대소문자와 공백이 조금 다릅니다. "
-            "기대 출력과 글자 그대로 비교해 주세요.",
+            "내용은 맞는데 대소문자와 공백이 조금 다릅니다. 기대 출력과 글자 그대로 비교해 주세요.",
         )
 
     expectedLines = expectedNorm.split("\n") if expectedNorm else []
     actualLines = actualNorm.split("\n") if actualNorm else []
     if not actualLines:
         return OutputMatchVerdict(
-            False, "different", "아직 출력이 없습니다. print()로 결과를 출력해 주세요.",
+            False,
+            "different",
+            "아직 출력이 없습니다. print()로 결과를 출력해 주세요.",
         )
     lineNumber, expectedLine, actualLine = _firstDifferingLine(expectedLines, actualLines)
     parts = [f"{lineNumber}번째 줄부터 다릅니다. 기대 {_preview(expectedLine)} ↔ 현재 {_preview(actualLine)}"]
     if len(expectedLines) != len(actualLines):
         parts.append(f"줄 수도 다릅니다(기대 {len(expectedLines)}줄, 현재 {len(actualLines)}줄).")
     return OutputMatchVerdict(False, "different", " ".join(parts))
+
+
+def _parseLiteral(value: str) -> _LiteralValue | None:
+    try:
+        return _LiteralParser(value).parse()
+    except _LiteralParseError:
+        return None
+
+
+def _literalValuesEqual(expected: _LiteralValue, actual: _LiteralValue) -> bool:
+    if expected.kind != actual.kind:
+        return False
+    if expected.kind == "number":
+        difference = abs(float(expected.value) - float(actual.value))
+        scale = max(abs(float(expected.value)), abs(float(actual.value)))
+        return difference <= max(NUMBER_ABSOLUTE_TOLERANCE, NUMBER_RELATIVE_TOLERANCE * scale)
+    if expected.kind == "string":
+        return _foldText(str(expected.value)) == _foldText(str(actual.value))
+    if expected.kind in {"none", "boolean"}:
+        return expected.value == actual.value
+    if expected.kind in {"list", "tuple"}:
+        return len(expected.value) == len(actual.value) and all(
+            _literalValuesEqual(left, right) for left, right in zip(expected.value, actual.value, strict=True)
+        )
+    if expected.kind == "dict":
+        return _unorderedPairsEqual(expected.value, actual.value)
+    if expected.kind == "set":
+        return _unorderedValuesEqual(expected.value, actual.value)
+    return False
+
+
+def _unorderedPairsEqual(
+    expected: list[tuple[_LiteralValue, _LiteralValue]],
+    actual: list[tuple[_LiteralValue, _LiteralValue]],
+) -> bool:
+    if len(expected) != len(actual):
+        return False
+    unmatched = list(actual)
+    for expectedKey, expectedValue in expected:
+        matchIndex = next(
+            (
+                index
+                for index, (actualKey, actualValue) in enumerate(unmatched)
+                if _literalValuesEqual(expectedKey, actualKey) and _literalValuesEqual(expectedValue, actualValue)
+            ),
+            None,
+        )
+        if matchIndex is None:
+            return False
+        unmatched.pop(matchIndex)
+    return True
+
+
+def _unorderedValuesEqual(expected: list[_LiteralValue], actual: list[_LiteralValue]) -> bool:
+    if len(expected) != len(actual):
+        return False
+    unmatched = list(actual)
+    for expectedValue in expected:
+        matchIndex = next(
+            (index for index, actualValue in enumerate(unmatched) if _literalValuesEqual(expectedValue, actualValue)),
+            None,
+        )
+        if matchIndex is None:
+            return False
+        unmatched.pop(matchIndex)
+    return True
+
+
+def _foldText(value: str) -> str:
+    return unicodedata.normalize("NFC", value).lower()
+
+
+def _collapse(value: str) -> str:
+    return re.sub(r"\s+", " ", value).strip()
+
+
+def _preview(value: str, limit: int = 60) -> str:
+    text = value if len(value) <= limit else value[: limit - 1] + "…"
+    return f"`{text}`" if text else "(빈 줄)"
 
 
 def _firstDifferingLine(
@@ -121,6 +413,7 @@ def _firstDifferingLine(
 
 def _firstDifferingPair(expectedNorm: str, actualNorm: str) -> tuple[str, str]:
     _, expectedLine, actualLine = _firstDifferingLine(
-        expectedNorm.split("\n"), actualNorm.split("\n"),
+        expectedNorm.split("\n"),
+        actualNorm.split("\n"),
     )
     return expectedLine, actualLine

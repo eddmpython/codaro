@@ -154,8 +154,8 @@ TOOL_CELL_CALL = ToolDef(
             },
             "comparator": {
                 "type": "string",
-                "enum": ["text", "exact"],
-                "description": "Text ignores letter case; exact preserves it.",
+                "enum": ["auto", "text", "exact"],
+                "description": "Auto compares safe Python values, text ignores letter case, and exact preserves formatting.",
             },
         },
         "required": ["operation", "blockId"],

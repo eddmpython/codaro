@@ -378,7 +378,7 @@ def expectedOutputResult(
     verdict = matchLearningOutput(
         expected,
         actual,
-        comparator=str(check.get("comparator") or "text"),
+        comparator=str(check.get("comparator") or "auto"),
     )
     if verdict.passed:
         return {"path": relPath, "section": sectionId, "kind": "expectedOutput",

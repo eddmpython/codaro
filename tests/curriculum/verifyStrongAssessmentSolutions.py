@@ -146,7 +146,7 @@ def verifyOutput(
     verdict = matchLearningOutput(
         expected,
         actual,
-        comparator=str(payload.get("comparator") or "exact"),
+        comparator=str(payload.get("comparator") or "auto"),
     )
     if not verdict.passed:
         raise AssertionError(

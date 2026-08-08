@@ -72,7 +72,7 @@ async def checkByOutput(
     expectedCode: str,
     hints: list[str] | None = None,
     currentHintLevel: int = 0,
-    comparator: str = "text",
+    comparator: str = "auto",
 ) -> CheckResult:
     studentResult = await session.execute(studentCode, blockId="_check_student")
     expectedResult = await session.execute(expectedCode, blockId="_check_expected")
@@ -96,7 +96,7 @@ async def checkByOutput(
     if verdict.passed:
         return CheckResult(
             passed=True,
-            feedback=verdict.feedback if verdict.tier == "text" else "정답입니다!",
+            feedback=verdict.feedback if verdict.tier != "exact" else "정답입니다!",
             studentOutput=studentOut,
             expectedOutput=expectedOut,
         )
@@ -182,7 +182,7 @@ async def checkExpectedOutput(
     session: KernelSession,
     studentCode: str,
     expectedOutput: str,
-    comparator: str = "text",
+    comparator: str = "auto",
 ) -> CheckResult:
     result = await session.execute(studentCode, blockId="_check_expected_output")
     if result.status == "error":
@@ -200,7 +200,7 @@ async def checkExpectedOutput(
     if verdict.passed:
         return CheckResult(
             passed=True,
-            feedback=verdict.feedback if verdict.tier == "text" else "정답입니다!",
+            feedback=verdict.feedback if verdict.tier != "exact" else "정답입니다!",
             studentOutput=actual,
             expectedOutput=expected,
         )

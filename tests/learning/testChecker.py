@@ -132,6 +132,19 @@ def testCheckExpectedOutputAcceptsCaseByDefaultAndSupportsExactMode() -> None:
     session.dispose()
 
 
+def testCheckExpectedOutputComparesNumbersByValueByDefault() -> None:
+    session = KernelSession()
+    result = _run(checkExpectedOutput(
+        session,
+        "print(0.1 + 0.2)",
+        "0.3",
+    ))
+
+    assert result.passed is True
+    assert "계산 오차는 허용" in result.feedback
+    session.dispose()
+
+
 def testCheckOutputContains() -> None:
     session = KernelSession()
     result = _run(checkOutputContains(session, "print('hello world')", "world"))
