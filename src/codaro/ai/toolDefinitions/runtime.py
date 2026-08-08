@@ -101,6 +101,11 @@ TOOL_CHECK_EXERCISE = ToolDef(
                 "type": "string",
                 "description": "Expected value or pattern to match against.",
             },
+            "comparator": {
+                "type": "string",
+                "enum": ["text", "exact"],
+                "description": "Text ignores letter case; exact preserves it.",
+            },
         },
         "required": ["blockId", "checkType"],
     },

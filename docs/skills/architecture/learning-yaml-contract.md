@@ -77,7 +77,7 @@ sections:
 
 ```yaml
 check:
-  id: python.print.hello-codaro.output.v1
+  id: python.print.hello-codaro.output.v2
   version: 1
   kind: output
   strength: strong
@@ -93,12 +93,14 @@ check:
     files: []
     stdin: []
   payload:
-    comparator: exact
+    comparator: text
     expected: Hello Codaro
     normalization: line-trim
 ```
 
 fixture hash는 key를 정렬한 compact JSON UTF-8 bytes의 SHA-256 SRI다. author gate가 hash를 다시 계산하므로 임의 문자열을 넣어 통과시킬 수 없다. `contracts/checkSandboxFeasibilityDecision.json`이 Web과 Local의 실행 가능 evidence를 함께 결정한다. Web `output`·직렬화 `variable`만 fresh pyproc Worker와 processWorker graph SRI, fixture hash, timeout, teardown을 통과하면 strong 후보가 되며 `behavior`는 Worker boot 전에 `localRequired`로 끝난다. Local `local-sandbox`는 같은 behavior spec을 별도 native Python 자식 프로세스에서 실행한다. Windows launcher 경로는 managed runtime·worker를 tree hash와 active release로 고정하고 AppContainer capability 0, Job Object, handle allowlist, HMAC named pipe, 실행별 ACL receipt v2로 fixture 밖 읽기, network와 child process를 OS 경계에서도 거부한다. 공유 DACL mutex는 동시 grant·revoke를 직렬화하며 회수 실패 receipt/profile은 다음 launcher 시작이 stale run으로 GC한다. Local package asset은 설치본 `CODARO_WEB_BUILD_ROOT`의 pinned wheel만 사용하고 cold 병렬 검사도 캐시를 만들지 않는다. Local 결과는 계약이 지원하는 Windows NT 10.0 build 19045 이상에서 응답의 `isolation=windows-appcontainer`와 실제 build 번호가 함께 확인된 경우에만 strong evidence로 append한다. 일반 개발 서버의 `python-audit-hook` 결과와 더 오래된 Windows 결과는 같은 판정을 통과해도 practice 피드백에만 사용한다. 임의 원격 URL이나 최신 버전 즉석 설치는 strong evidence에 사용할 수 없다.
+
+`comparator: text`는 일반 단답과 출력 문구에 사용하며 영문 대소문자만 다른 답을 통과시킨다. `comparator: exact`는 `upper()`, `lower()`, 대소문자 구분 검색처럼 표기 자체가 학습 목표일 때만 사용한다. 공백과 줄 구조, 숫자와 구두점 같은 실제 내용 차이는 두 모드 모두 그대로 검사한다.
 
 강한 pass는 raw source/output이 아니라 source/result/expected hash, check/fixture ID, canonical lessonRef와 실제 runtime tier를 append-only event로 저장한다. Web은 `runtimeTier: web`과 `web-strong:<fingerprint>`, Local native 검사는 `runtimeTier: local`과 `local-strong:<fingerprint>`를 사용하며 fingerprint에도 tier를 넣어 같은 source의 서로 다른 실행을 충돌로 오해하지 않는다. archive manifest는 event 집합에 따라 `web`, `local`, `mixed`를 기록한다. JSON archive의 canonical event bytes, event-set hash, 개별 payload hash가 모두 맞아야 import할 수 있다. Web은 IndexedDB v3의 metadata header와 evidence store를, Local은 별도 SQLite transaction과 sidecar header를 사용한다. 두 tier 모두 schema/data epoch와 minimum reader floor를 검사한 뒤 `eventId` set union을 수행하고 동일 ID의 다른 payload는 원본을 덮어쓰지 않고 conflicts store에 격리한다. 이전 `web-evidence:` archive ID와 category-scoped legacy lesson alias는 검증 뒤 현재 identity로 이관한다. 이 event archive import는 `progress.json`, lesson completion, outcome credit을 수정하지 않는다. Local behavior artifact descriptor와 pinned package asset descriptor는 봉인됐지만 notebook/document, draft, 전체 virtual FS artifact와 package set archive가 포함되기 전에는 전체 Web-to-Local 학습 archive로 부르지 않는다.
 

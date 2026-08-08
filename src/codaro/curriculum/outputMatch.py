@@ -13,8 +13,9 @@ TS 미러: editor/src/lib/learningOutputMatch.ts (같은 규칙, 같은 피드�
    - 대소문자만 다르면 그 사실을 말한다.
    - 공백 개수/줄바꿈 구조만 다르면 그 사실을 말한다.
    - 그 외에는 처음 다른 줄 번호와 기대/현재 줄을 함께 보여준다.
-3. caseInsensitive=True 옵트인: 대소문자가 학습 목표와 무관한 검사(콘텐츠가
-   명시)는 casefold 비교로 통과시킨다.
+3. comparator="text": 대소문자가 학습 목표와 무관한 일반 텍스트 검사는
+   casefold 비교로 통과시킨다. comparator="exact"는 대소문자 변환처럼
+   표기 자체가 학습 목표인 검사에만 쓴다.
 """
 from __future__ import annotations
 
@@ -25,7 +26,7 @@ from dataclasses import dataclass
 @dataclass(slots=True)
 class OutputMatchVerdict:
     passed: bool
-    tier: str  # "exact" | "caseInsensitive" | "caseOnly" | "whitespaceOnly" | "different"
+    tier: str  # "exact" | "text" | "caseOnly" | "whitespaceOnly" | "different"
     feedback: str
 
 
@@ -53,15 +54,22 @@ def matchLearningOutput(
     expected: str,
     actual: str,
     *,
-    caseInsensitive: bool = False,
+    comparator: str = "exact",
 ) -> OutputMatchVerdict:
+    if comparator not in {"exact", "text"}:
+        raise ValueError(f"지원하지 않는 출력 비교 방식입니다: {comparator!r}")
+
     expectedNorm = normalizeLearningOutput(expected)
     actualNorm = normalizeLearningOutput(actual)
 
     if expectedNorm == actualNorm:
         return OutputMatchVerdict(True, "exact", "목표한 출력과 일치합니다.")
-    if caseInsensitive and expectedNorm.casefold() == actualNorm.casefold():
-        return OutputMatchVerdict(True, "caseInsensitive", "목표한 출력과 일치합니다.")
+    if comparator == "text" and expectedNorm.casefold() == actualNorm.casefold():
+        return OutputMatchVerdict(
+            True,
+            "text",
+            "대소문자 차이는 허용했고, 나머지 출력은 맞습니다.",
+        )
 
     if expectedNorm.casefold() == actualNorm.casefold():
         expectedLine, actualLine = _firstDifferingPair(expectedNorm, actualNorm)

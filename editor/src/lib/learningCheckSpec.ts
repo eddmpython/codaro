@@ -36,7 +36,7 @@ export type StrongOutputCheckSpecV1 = {
   kind: "output";
   packageAssets: LearningCheckPackageAsset[];
   payload: {
-    comparator: "exact";
+    comparator: "exact" | "text";
     expected: string;
     normalization: "line-trim";
   };
@@ -81,12 +81,18 @@ export function parseStrongLearningCheckSpec(
   const payload = mapValue(value.payload);
   if (value.kind === "output") {
     const expected = textValue(payload.expected);
-    if (!expected) return null;
+    const comparator = payload.comparator;
+    const normalization = payload.normalization;
+    if (
+      !expected
+      || (comparator !== "exact" && comparator !== "text")
+      || normalization !== "line-trim"
+    ) return null;
     return {
       ...base,
       kind: "output",
       payload: {
-        comparator: "exact",
+        comparator,
         expected,
         normalization: "line-trim",
       },

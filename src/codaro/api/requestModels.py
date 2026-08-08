@@ -114,6 +114,7 @@ class CheckExerciseRequest(BaseModel):
     requiredPatterns: list[str] = Field(default_factory=list)
     hints: list[str] = Field(default_factory=list)
     currentHintLevel: int = 0
+    comparator: str = "text"
     category: str = ""
     contentId: str = ""
     sectionId: str = ""

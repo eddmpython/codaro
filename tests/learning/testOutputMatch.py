@@ -6,12 +6,14 @@ import re
 from pathlib import Path
 
 import pytest
+import yaml
 
 from codaro.curriculum.outputMatch import matchLearningOutput, normalizeLearningOutput
 
 ROOT = Path(__file__).resolve().parents[2]
 VECTORS_PATH = ROOT / "contracts" / "learning-content" / "outputMatchVectors.json"
 TS_MIRROR_PATH = ROOT / "editor" / "src" / "lib" / "learningOutputMatch.ts"
+DAY06_PATH = ROOT / "curricula" / "python" / "basics" / "30days" / "day06_문자열메서드.yaml"
 
 
 def loadVectors() -> list[dict]:
@@ -28,7 +30,7 @@ def testPythonMatcherSatisfiesContractVectors(vector: dict) -> None:
     verdict = matchLearningOutput(
         vector["expected"],
         vector["actual"],
-        caseInsensitive=vector["caseInsensitive"],
+        comparator=vector["comparator"],
     )
     assert verdict.passed == vector["passed"], verdict.feedback
     assert verdict.tier == vector["tier"], verdict.feedback
@@ -56,6 +58,32 @@ def testCaseOnlyFeedbackShowsBothSpellings() -> None:
     assert "Hello Codaro" in verdict.feedback and "hello codaro" in verdict.feedback
 
 
+def testTextComparatorAcceptsCaseOnlyDifferenceWithTransparentFeedback() -> None:
+    verdict = matchLearningOutput("Hello Codaro", "hello codaro", comparator="text")
+    assert verdict.passed is True
+    assert verdict.tier == "text"
+    assert "대소문자 차이는 허용" in verdict.feedback
+
+
+def testUnknownComparatorIsRejected() -> None:
+    with pytest.raises(ValueError, match="지원하지 않는 출력 비교 방식"):
+        matchLearningOutput("Hello", "hello", comparator="guess")
+
+
+def testCaseTransformationExercisesKeepExactComparison() -> None:
+    lesson = yaml.safe_load(DAY06_PATH.read_text(encoding="utf-8"))
+    sections = {section["id"]: section for section in lesson["sections"]}
+    strictIds = {
+        "method_upper",
+        "method_lower",
+        "method_capitalize",
+        "method_title",
+        "practice",
+    }
+    for sectionId in strictIds:
+        assert sections[sectionId]["check"]["comparator"] == "exact"
+
+
 def testTsMirrorStaysInSync() -> None:
     """TS 미러가 같은 규칙 집합을 선언하는지 구조적으로 확인한다.
 
@@ -70,7 +98,7 @@ def testTsMirrorStaysInSync() -> None:
         '"caseOnly"',
         '"whitespaceOnly"',
         '"different"',
-        '"caseInsensitive"',
+        '"text"',
         "번째 줄부터 다릅니다",
         "대소문자만 다릅니다",
         "공백 개수나 줄바꿈이 다릅니다",

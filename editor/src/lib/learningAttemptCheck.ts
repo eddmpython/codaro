@@ -89,11 +89,8 @@ export async function evaluateLearningAttempt(
       state: "unsupported",
     };
   }
-  // 비교 의미의 SSOT 는 learningOutputMatch 다. 대소문자가 학습 목표와 무관한
-  // 검사는 콘텐츠가 caseInsensitive 로 옵트인한다. 실패 피드백은 무엇이 다른지
-  // (대소문자만/공백만/N번째 줄)를 정확히 짚는다.
   const verdict = matchLearningOutput(expected, actual, {
-    caseInsensitive: checkConfig?.caseInsensitive === true,
+    comparator: practiceOutputComparator(checkConfig),
   });
   if (!verdict.passed) {
     return {
@@ -124,7 +121,10 @@ export async function evaluateLearningAttempt(
 }
 
 export function isDeterministicPracticeCheckConfig(checkConfig: Record<string, unknown> | undefined): boolean {
-  return checkConfig?.type === "outputExact" && typeof checkConfig.outputExact === "string";
+  const comparator = checkConfig?.comparator;
+  return checkConfig?.type === "outputExact"
+    && typeof checkConfig.outputExact === "string"
+    && (comparator === undefined || comparator === "text" || comparator === "exact");
 }
 
 export function practiceActualOutput(result: ExecutionResult): string {
@@ -197,10 +197,18 @@ function learnerFeedback(
   state: "error" | "mismatch" | "unsupported" | "verified",
   detail: string,
 ): string {
-  if (state === "verified") return "목표대로 동작했습니다.";
+  if (state === "verified") {
+    return detail.startsWith("대소문자 차이는 허용") ? detail : "목표대로 동작했습니다.";
+  }
   if (state === "mismatch") return detail;
   if (state === "unsupported") return detail;
   return "자동 확인을 마치지 못했습니다. 잠시 뒤 셀을 다시 실행해 주세요.";
+}
+
+function practiceOutputComparator(
+  checkConfig: Record<string, unknown> | undefined,
+): "exact" | "text" {
+  return checkConfig?.comparator === "exact" ? "exact" : "text";
 }
 
 function textValue(value: unknown): string {

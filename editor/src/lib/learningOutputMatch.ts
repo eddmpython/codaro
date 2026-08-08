@@ -10,13 +10,15 @@
  *    보이지 않는 차이(끝 공백, 마지막 줄바꿈, 개행 방식)로는 틀리지 않는다.
  * 2. 대소문자·줄 안 공백은 보이는 차이라 기본은 불일치가 맞다. 대신 피드백이
  *    무엇이 다른지 정확히 짚는다(대소문자만/공백만/N번째 줄).
- * 3. caseInsensitive 옵트인: 대소문자가 학습 목표와 무관한 검사는 casefold
- *    비교로 통과시킨다.
+ * 3. text 비교: 대소문자가 학습 목표와 무관한 일반 텍스트 검사는 casefold
+ *    비교로 통과시킨다. exact 비교는 표기 자체가 학습 목표일 때만 쓴다.
  */
+
+export type LearningOutputComparator = "exact" | "text";
 
 export type OutputMatchTier =
   | "exact"
-  | "caseInsensitive"
+  | "text"
   | "caseOnly"
   | "whitespaceOnly"
   | "different";
@@ -46,8 +48,9 @@ function preview(value: string, limit = 60): string {
 export function matchLearningOutput(
   expected: string,
   actual: string,
-  options: { caseInsensitive?: boolean } = {},
+  options: { comparator?: LearningOutputComparator } = {},
 ): OutputMatchVerdict {
+  const comparator = options.comparator ?? "exact";
   const expectedNorm = normalizeLearningOutput(expected);
   const actualNorm = normalizeLearningOutput(actual);
 
@@ -55,8 +58,12 @@ export function matchLearningOutput(
     return { feedback: "목표한 출력과 일치합니다.", passed: true, tier: "exact" };
   }
   const caseFoldEqual = expectedNorm.toLowerCase() === actualNorm.toLowerCase();
-  if (options.caseInsensitive && caseFoldEqual) {
-    return { feedback: "목표한 출력과 일치합니다.", passed: true, tier: "caseInsensitive" };
+  if (comparator === "text" && caseFoldEqual) {
+    return {
+      feedback: "대소문자 차이는 허용했고, 나머지 출력은 맞습니다.",
+      passed: true,
+      tier: "text",
+    };
   }
 
   if (caseFoldEqual) {

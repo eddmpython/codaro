@@ -19,6 +19,7 @@ BROWSER_RUNTIME = EDITOR_DIR / "src" / "lib" / "browserPythonRuntime.ts"
 AUTOMATION_CELL_RUNTIME = EDITOR_DIR / "src" / "lib" / "automationCellRuntime.ts"
 AUTOMATION_PRESENTATION = EDITOR_DIR / "src" / "lib" / "automationPresentation.ts"
 LEARNING_ATTEMPT_CHECK = EDITOR_DIR / "src" / "lib" / "learningAttemptCheck.ts"
+LEARNING_OUTPUT_MATCH = EDITOR_DIR / "src" / "lib" / "learningOutputMatch.ts"
 DISPLAY_FORMAT = EDITOR_DIR / "src" / "lib" / "displayFormat.ts"
 TRACEBACK_PARSER = EDITOR_DIR / "src" / "lib" / "tracebackParser.ts"
 LOCAL_RUNTIME = EDITOR_DIR / "src" / "lib" / "localRuntime.ts"
@@ -29,6 +30,7 @@ DEP_GRAPH_LAYOUT = EDITOR_DIR / "src" / "lib" / "dependencyGraphLayout.ts"
 APP_PRIMITIVES = EDITOR_DIR / "src" / "components" / "app" / "appPrimitives.tsx"
 APP_ENTRY = EDITOR_DIR / "src" / "App.tsx"
 DAY01_CURRICULUM = ROOT / "curricula" / "python" / "basics" / "30days" / "day01_헬로월드.yaml"
+DAY06_CURRICULUM = ROOT / "curricula" / "python" / "basics" / "30days" / "day06_문자열메서드.yaml"
 
 
 def main() -> int:
@@ -326,9 +328,11 @@ def nodeProbeScript() -> str:
     automationRuntimePath = json.dumps(str(AUTOMATION_CELL_RUNTIME), ensure_ascii=False)
     automationPresentationPath = json.dumps(str(AUTOMATION_PRESENTATION), ensure_ascii=False)
     learningAttemptPath = json.dumps(str(LEARNING_ATTEMPT_CHECK), ensure_ascii=False)
+    learningOutputMatchPath = json.dumps(str(LEARNING_OUTPUT_MATCH), ensure_ascii=False)
     displayFormatPath = json.dumps(str(DISPLAY_FORMAT), ensure_ascii=False)
     tracebackParserPath = json.dumps(str(TRACEBACK_PARSER), ensure_ascii=False)
     day01CurriculumPath = json.dumps(str(DAY01_CURRICULUM), ensure_ascii=False)
+    day06CurriculumPath = json.dumps(str(DAY06_CURRICULUM), ensure_ascii=False)
     inferencePath = json.dumps(str(PACKAGE_INFERENCE), ensure_ascii=False)
     stdlibPath = json.dumps(str(PYTHON_STDLIB), ensure_ascii=False)
     layoutPath = json.dumps(str(DEP_GRAPH_LAYOUT), ensure_ascii=False)
@@ -511,12 +515,14 @@ const automationPresentation = loadModule({automationPresentationPath}, (specifi
 }});
 const displayFormat = loadModule({displayFormatPath}, (specifier) => require(specifier));
 const tracebackParser = loadModule({tracebackParserPath}, (specifier) => require(specifier));
+const learningOutputMatch = loadModule({learningOutputMatchPath}, (specifier) => require(specifier));
 const learningAttempt = loadModule({learningAttemptPath}, (specifier) => {{
   if (specifier === "@/lib/browserLearningCheckExecutor") {{
     return {{ executeBrowserStrongCheck: async () => {{ throw new Error("unexpected strong check"); }} }};
   }}
   if (specifier === "@/lib/displayFormat") return displayFormat;
   if (specifier === "@/lib/learningCheckSpec") return {{ parseStrongLearningCheckSpec: () => null }};
+  if (specifier === "@/lib/learningOutputMatch") return learningOutputMatch;
   if (specifier === "@/lib/localLearningCheckExecutor") {{
     return {{ executeLocalStrongCheck: async () => {{ throw new Error("unexpected strong check"); }} }};
   }}
@@ -525,6 +531,7 @@ const learningAttempt = loadModule({learningAttemptPath}, (specifier) => {{
 }});
 const yaml = require(require.resolve("yaml", {{ paths: [{editorDir}] }}));
 const day01 = yaml.parse(fs.readFileSync({day01CurriculumPath}, "utf8"));
+const day06 = yaml.parse(fs.readFileSync({day06CurriculumPath}, "utf8"));
 const notebookExpression = day01.sections.find((section) => section.id === "notebook_expression");
 assert.ok(notebookExpression, "day01 notebook_expression lesson exists");
 const notebookExpressionAttempt = await learningAttempt.evaluateLearningAttempt(
@@ -543,6 +550,24 @@ assert.equal(notebookExpressionAttempt.actual, "Hello Notebook");
 assert.equal(notebookExpressionAttempt.expected, "Hello Notebook");
 assert.equal(notebookExpressionAttempt.passed, true);
 assert.equal(notebookExpressionAttempt.state, "verified");
+const printKorean = day01.sections.find((section) => section.id === "print_korean");
+const acceptedCaseAttempt = await learningAttempt.evaluateLearningAttempt(
+  printKorean.check,
+  {{ ...fakeResult, type: "text", data: "", stdout: "안녕하세요, codaro!\\n", status: "done" }},
+  printKorean.exercise.starterCode,
+  "local",
+);
+assert.equal(acceptedCaseAttempt.passed, true);
+assert.match(acceptedCaseAttempt.feedback, /대소문자 차이는 허용/);
+const methodUpper = day06.sections.find((section) => section.id === "method_upper");
+const rejectedCaseAttempt = await learningAttempt.evaluateLearningAttempt(
+  methodUpper.check,
+  {{ ...fakeResult, type: "text", data: "", stdout: "codaro lab\\n", status: "done" }},
+  methodUpper.exercise.starterCode,
+  "local",
+);
+assert.equal(rejectedCaseAttempt.passed, false);
+assert.match(rejectedCaseAttempt.feedback, /대소문자만 다릅니다/);
 assert.equal(
   learningAttempt.practiceActualOutput({{
     ...fakeResult,

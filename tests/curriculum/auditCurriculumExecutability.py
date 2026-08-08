@@ -375,7 +375,11 @@ def expectedOutputResult(
         return {"path": relPath, "section": sectionId, "kind": "expectedOutput",
                 "category": "expected-unverifiable",
                 "detail": "outputExact 기대값이 있으나 exercise.solution 이 없어 실행 대조 불가"}
-    verdict = matchLearningOutput(expected, actual, caseInsensitive=check.get("caseInsensitive") is True)
+    verdict = matchLearningOutput(
+        expected,
+        actual,
+        comparator=str(check.get("comparator") or "text"),
+    )
     if verdict.passed:
         return {"path": relPath, "section": sectionId, "kind": "expectedOutput",
                 "category": "ok", "detail": ""}

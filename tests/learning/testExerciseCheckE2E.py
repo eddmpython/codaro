@@ -67,6 +67,37 @@ def testOutputTypeWithExplicitExpectedCode() -> None:
     session.dispose()
 
 
+def testOutputTypeUsesTextComparisonByDefault() -> None:
+    session = KernelSession()
+    request = exerciseCheckInputFromConfig(
+        studentCode="print('hello codaro')",
+        checkConfig={
+            "type": "output",
+            "expectedCode": "print('Hello Codaro')",
+        },
+    )
+    result = _run(runExerciseCheck(session, request))
+    assert result.passed is True
+    assert "대소문자 차이는 허용" in result.feedback
+    session.dispose()
+
+
+def testOutputTypeCanRequireExactCase() -> None:
+    session = KernelSession()
+    request = exerciseCheckInputFromConfig(
+        studentCode="print('codaro lab')",
+        checkConfig={
+            "type": "output",
+            "expectedCode": "print('CODARO LAB')",
+            "comparator": "exact",
+        },
+    )
+    result = _run(runExerciseCheck(session, request))
+    assert result.passed is False
+    assert "대소문자만 다릅니다" in result.feedback
+    session.dispose()
+
+
 def testVariableTypeMissingVariableFails() -> None:
     """check.type=variable with the variable never defined → fail with clear message."""
     session = KernelSession()
@@ -165,6 +196,7 @@ def testEvalReservedKeysCoverFrontendContract() -> None:
         "expectedCode",
         "variableName",
         "expectedValue",
+        "comparator",
         "requiredPatterns",
         "hints",
     }

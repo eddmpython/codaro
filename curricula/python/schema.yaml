@@ -57,14 +57,14 @@
 #       type: "noError"
 #       noError: "섹션 예제의 입력 데이터, 처리 함수, 출력 확인 단계가 순서대로 실행되어야 한다."
 #       resultCheck: "출력 또는 변수 상태가 이 섹션에서 바꾼 업무 조건을 반영해야 한다."
-#     # outputExact practice check 의 비교 의미는 line-trim 이다(줄 끝 공백,
-#     # 마지막 줄바꿈, CRLF 는 자동 관용 - SSOT: src/codaro/curriculum/outputMatch.py).
-#     # 대소문자가 학습 목표와 무관한 검사(임의 인사말 등)만 caseInsensitive 를 켠다.
-#     # upper()/lower() 처럼 대소문자 자체가 목표인 검사에는 절대 켜지 않는다.
+#     # outputExact practice check 는 일반 텍스트 비교가 기본이다. 줄 끝 공백,
+#     # 마지막 줄바꿈, CRLF, 영문 대소문자 차이를 자동으로 허용한다.
+#     # upper()/lower()처럼 표기 자체가 학습 목표일 때만 comparator: exact를 쓴다.
+#     # 비교 SSOT: src/codaro/curriculum/outputMatch.py
 #     # check:
 #     #   type: "outputExact"
 #     #   outputExact: "Hello Codaro"
-#     #   caseInsensitive: true
+#     #   comparator: "text"
 #     # blocks는 structured card 뒤에 붙는 보조 자료 또는 legacy curriculum 변환용이다.
 #     # 신규 레슨은 위 structured section fields를 우선하고, 표/영상/참고 링크만 blocks로 보조한다.
 #     blocks:
@@ -98,7 +98,7 @@
 #     files: []
 #     stdin: []
 #   payload:
-#     comparator: "exact"
+#     comparator: "text"
 #     expected: "Hello Codaro"
 #     normalization: "line-trim"
 # 현재 Web W0는 output과 callable return+fixture path를 함께 보는 behavior subset을 지원한다.

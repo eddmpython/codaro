@@ -14,7 +14,7 @@ const payload = JSON.parse(readFileSync(vectorsPath, "utf-8"));
 let failures = 0;
 for (const vector of payload.vectors) {
   const verdict = matchLearningOutput(vector.expected, vector.actual, {
-    caseInsensitive: vector.caseInsensitive,
+    comparator: vector.comparator,
   });
   if (verdict.passed !== vector.passed || verdict.tier !== vector.tier) {
     failures += 1;

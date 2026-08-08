@@ -21,6 +21,7 @@ import yaml
 
 from codaro.curriculum._localStrongCheckWorker import imageShape, tableShape
 from codaro.curriculum.localStrongCheck import validatePackageAssets
+from codaro.curriculum.outputMatch import matchLearningOutput
 from learningLedgerAudit import currentGitHead
 
 
@@ -142,8 +143,15 @@ def verifyOutput(
             namespace: dict[str, Any] = {}
             exec(compile(solution, displayPath(ref.path), "exec"), namespace, namespace)
         actual = normalizeOutput(stdout.getvalue())
-    if actual != expected:
-        raise AssertionError(f"output expected {expected!r}, got {actual!r}")
+    verdict = matchLearningOutput(
+        expected,
+        actual,
+        comparator=str(payload.get("comparator") or "exact"),
+    )
+    if not verdict.passed:
+        raise AssertionError(
+            f"output expected {expected!r}, got {actual!r} ({verdict.tier})"
+        )
 
 
 def verifyBehavior(

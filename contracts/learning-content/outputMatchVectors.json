@@ -6,7 +6,7 @@
       "id": "exact-plain",
       "expected": "Hello Codaro",
       "actual": "Hello Codaro",
-      "caseInsensitive": false,
+      "comparator": "exact",
       "passed": true,
       "tier": "exact"
     },
@@ -14,7 +14,7 @@
       "id": "trailing-space-forgiven",
       "expected": "Hello Codaro",
       "actual": "Hello Codaro   ",
-      "caseInsensitive": false,
+      "comparator": "exact",
       "passed": true,
       "tier": "exact"
     },
@@ -22,7 +22,7 @@
       "id": "final-newline-forgiven",
       "expected": "합계 100",
       "actual": "합계 100\n\n",
-      "caseInsensitive": false,
+      "comparator": "exact",
       "passed": true,
       "tier": "exact"
     },
@@ -30,7 +30,7 @@
       "id": "crlf-forgiven",
       "expected": "a\nb",
       "actual": "a\r\nb\r\n",
-      "caseInsensitive": false,
+      "comparator": "exact",
       "passed": true,
       "tier": "exact"
     },
@@ -38,7 +38,7 @@
       "id": "per-line-trailing-space-forgiven",
       "expected": "카멜케이스 : Codaro User\n스네이크케이스 : Codaro Learner",
       "actual": "카멜케이스 : Codaro User \n스네이크케이스 : Codaro Learner  ",
-      "caseInsensitive": false,
+      "comparator": "exact",
       "passed": true,
       "tier": "exact"
     },
@@ -46,7 +46,7 @@
       "id": "leading-blank-lines-forgiven",
       "expected": "결과",
       "actual": "\n\n결과",
-      "caseInsensitive": false,
+      "comparator": "exact",
       "passed": true,
       "tier": "exact"
     },
@@ -54,23 +54,23 @@
       "id": "case-diff-fails-with-note",
       "expected": "Hello Codaro",
       "actual": "hello codaro",
-      "caseInsensitive": false,
+      "comparator": "exact",
       "passed": false,
       "tier": "caseOnly"
     },
     {
-      "id": "case-diff-passes-when-opted-in",
+      "id": "case-diff-passes-in-text-mode",
       "expected": "Hello Codaro",
       "actual": "hello codaro",
-      "caseInsensitive": true,
+      "comparator": "text",
       "passed": true,
-      "tier": "caseInsensitive"
+      "tier": "text"
     },
     {
       "id": "internal-double-space-fails-as-whitespace",
       "expected": "합계 : 100",
       "actual": "합계 :  100",
-      "caseInsensitive": false,
+      "comparator": "exact",
       "passed": false,
       "tier": "whitespaceOnly"
     },
@@ -78,7 +78,7 @@
       "id": "line-structure-fails-as-whitespace",
       "expected": "a b",
       "actual": "a\nb",
-      "caseInsensitive": false,
+      "comparator": "exact",
       "passed": false,
       "tier": "whitespaceOnly"
     },
@@ -86,7 +86,7 @@
       "id": "case-and-space-fails-as-whitespace",
       "expected": "Total : 100",
       "actual": "total :  100",
-      "caseInsensitive": false,
+      "comparator": "exact",
       "passed": false,
       "tier": "whitespaceOnly"
     },
@@ -94,7 +94,7 @@
       "id": "real-difference",
       "expected": "합계 100",
       "actual": "합계 90",
-      "caseInsensitive": false,
+      "comparator": "exact",
       "passed": false,
       "tier": "different"
     },
@@ -102,7 +102,7 @@
       "id": "empty-output",
       "expected": "안녕하세요",
       "actual": "",
-      "caseInsensitive": false,
+      "comparator": "exact",
       "passed": false,
       "tier": "different"
     },
@@ -110,7 +110,7 @@
       "id": "second-line-difference",
       "expected": "1일차\n2일차\n3일차",
       "actual": "1일차\n둘째날\n3일차",
-      "caseInsensitive": false,
+      "comparator": "exact",
       "passed": false,
       "tier": "different"
     },
@@ -118,15 +118,15 @@
       "id": "missing-line",
       "expected": "a\nb\nc",
       "actual": "a\nb",
-      "caseInsensitive": false,
+      "comparator": "exact",
       "passed": false,
       "tier": "different"
     },
     {
-      "id": "case-insensitive-does-not-mask-real-difference",
+      "id": "text-mode-does-not-mask-real-difference",
       "expected": "HELLO",
       "actual": "GOODBYE",
-      "caseInsensitive": true,
+      "comparator": "text",
       "passed": false,
       "tier": "different"
     }

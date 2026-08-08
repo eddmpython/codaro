@@ -115,6 +115,23 @@ def testCheckExpectedOutput() -> None:
     session.dispose()
 
 
+def testCheckExpectedOutputAcceptsCaseByDefaultAndSupportsExactMode() -> None:
+    session = KernelSession()
+    accepted = _run(checkExpectedOutput(session, "print('codaro')", "Codaro"))
+    rejected = _run(checkExpectedOutput(
+        session,
+        "print('codaro')",
+        "Codaro",
+        comparator="exact",
+    ))
+
+    assert accepted.passed is True
+    assert "대소문자 차이는 허용" in accepted.feedback
+    assert rejected.passed is False
+    assert "대소문자만 다릅니다" in rejected.feedback
+    session.dispose()
+
+
 def testCheckOutputContains() -> None:
     session = KernelSession()
     result = _run(checkOutputContains(session, "print('hello world')", "world"))
@@ -187,6 +204,15 @@ def testExerciseCheckRejectsInvalidContract() -> None:
         _run(runExerciseCheck(session, ExerciseCheckInput(studentCode="print(1)", checkType="")))
     with pytest.raises(InvalidExerciseCheck, match="알 수 없는"):
         _run(runExerciseCheck(session, ExerciseCheckInput(studentCode="print(1)", checkType="wibble")))
+    with pytest.raises(InvalidExerciseCheck, match="출력 비교 방식"):
+        _run(runExerciseCheck(
+            session,
+            ExerciseCheckInput(
+                studentCode="print(1)",
+                expectedCode="print(1)",
+                comparator="guess",
+            ),
+        ))
     session.dispose()
 
 

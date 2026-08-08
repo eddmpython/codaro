@@ -22,7 +22,12 @@ EMPTY_FIXTURE = {
 }
 
 
-def outputSpec(expected: str, *, timeoutMs: int = 2_000) -> dict[str, object]:
+def outputSpec(
+    expected: str,
+    *,
+    comparator: str = "exact",
+    timeoutMs: int = 2_000,
+) -> dict[str, object]:
     return {
         "id": "test.local.output.v1",
         "version": 1,
@@ -35,7 +40,7 @@ def outputSpec(expected: str, *, timeoutMs: int = 2_000) -> dict[str, object]:
         "fixture": EMPTY_FIXTURE,
         "packageAssets": [],
         "payload": {
-            "comparator": "exact",
+            "comparator": comparator,
             "expected": expected,
             "normalization": "line-trim",
         },
@@ -87,6 +92,16 @@ def testLocalStrongOutputCheckSeparatesPassAndMismatch() -> None:
     )
     assert failed["passed"] is False
     assert failed["state"] == "mismatch"
+
+
+def testLocalStrongTextComparatorAcceptsCaseOnlyDifference() -> None:
+    result = runLocalStrongCheck(
+        outputSpec("Hello Codaro", comparator="text"),
+        "print('hello codaro')",
+    )
+
+    assert result["passed"] is True
+    assert result["detail"] == "대소문자 차이는 허용했고, 나머지 출력은 맞습니다."
 
 
 def testLocalStrongBehaviorCheckUsesFixtureAndCreatedPath() -> None:

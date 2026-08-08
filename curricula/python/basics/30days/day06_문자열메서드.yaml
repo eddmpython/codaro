@@ -81,6 +81,7 @@ sections:
     type: outputExact
     evidence: practice
     outputExact: 'CODARO LAB'
+    comparator: exact
     resultCheck: "출력이 정확히 일치해야 합니다: 'CODARO LAB'"
 - id: method_lower
   title: 소문자 변환
@@ -112,6 +113,7 @@ sections:
     type: outputExact
     evidence: practice
     outputExact: 'codaro lab'
+    comparator: exact
     resultCheck: "출력이 정확히 일치해야 합니다: 'codaro lab'"
 - id: method_capitalize
   title: 첫 글자 대문자
@@ -143,6 +145,7 @@ sections:
     type: outputExact
     evidence: practice
     outputExact: 'Codaro lab'
+    comparator: exact
     resultCheck: "출력이 정확히 일치해야 합니다: 'Codaro lab'"
 - id: method_title
   title: 제목 형식
@@ -174,6 +177,7 @@ sections:
     type: outputExact
     evidence: practice
     outputExact: 'Codaro Lab Guide'
+    comparator: exact
     resultCheck: "출력이 정확히 일치해야 합니다: 'Codaro Lab Guide'"
 - id: method_strip
   title: 양쪽 공백 제거
@@ -616,6 +620,7 @@ sections:
     type: outputExact
     evidence: practice
     outputExact: 'GOOD JOB'
+    comparator: exact
     resultCheck: "출력이 정확히 일치해야 합니다: 'GOOD JOB'"
 assessment:
   schemaVersion: 1

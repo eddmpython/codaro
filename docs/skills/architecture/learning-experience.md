@@ -53,6 +53,8 @@ provider는 deterministic feedback 뒤 사용자가 요청할 때만 열고, 연
 
 `noError`와 `contains`는 weak evidence다. 설명용 feedback에는 쓸 수 있지만 completion, mastery, transfer, retrieval credit을 단독으로 만들지 않는다. structured strong kind는 `output`, `variable`, `file`, `table`, `image`, `behavior`다.
 
+일반 텍스트 출력은 `text` 비교가 기본이며 영문 대소문자만 다른 답을 허용한다. 대소문자 변환이나 표기 형식 자체를 배우는 검사는 `exact`를 명시한다. 허용한 차이는 성공 feedback에 남기며, 공백 구조나 실제 값이 다른 답까지 정답으로 바꾸지 않는다.
+
 현재 browser release subset은 `output`과 `variable`이다. browser strong check는 main 학습 kernel과 분리된 새 pyproc Worker에서 실행한다. `behavior`와 OS capability가 필요한 검사는 `localRequired`다. Local strong completion은 지원 OS의 launcher broker와 `contracts/checkSandboxFeasibilityDecision.json` 판정을 따라야 한다. 응답의 AppContainer isolation과 지원 Windows build가 확인되지 않은 일반 subprocess 결과는 practice로 유지한다.
 
 artifact evidence는 상대 경로, media type, size, SHA-256 content hash와 type별 의미 필드를 저장한다. table은 format, columns, row count를, image는 실제 header의 media type, width, height를 포함한다. 실제 사용자 파일, 외부 사이트와 nondeterministic retry를 강검증 fixture에 사용하지 않는다.

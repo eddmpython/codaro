@@ -4,7 +4,7 @@ canonicalRows: 30
 lessons:
   - lessonRef: "30days/day01_헬로월드"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "ebbcfb639e9af6cd4cff0b11baa7441f0b87a4f8a60e225c117cc74cdfeba184"
+    lessonContentHash: "be37adcadaf2fe0cc28535488db66b1d27ecd436543258d9ab5ca869d4e5c084"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation"]
@@ -114,7 +114,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day06_문자열메서드"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "7b16a5fd7a0d2196012fa6bbe6970b80ce880a4fd774367844099958c57eeb6f"
+    lessonContentHash: "3edae89c08d354b9b32437c159283dd1c5046b96ff12f4d977cb15ec42b5b320"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation","textProcessing"]

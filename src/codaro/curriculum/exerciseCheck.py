@@ -20,6 +20,7 @@ EVAL_RESERVED_KEYS: frozenset[str] = frozenset({
     "expectedCode",
     "variableName",
     "expectedValue",
+    "comparator",
     "requiredPatterns",
     "hints",
 })
@@ -39,6 +40,7 @@ class ExerciseCheckInput:
     requiredPatterns: list[str] = field(default_factory=list)
     hints: list[str] = field(default_factory=list)
     currentHintLevel: int = 0
+    comparator: str = "text"
 
 
 @dataclass(frozen=True, slots=True)
@@ -46,6 +48,7 @@ class ToolExerciseCheckInput:
     studentCode: str
     checkType: str
     expected: str = ""
+    comparator: str = "text"
 
 
 def exerciseCheckInputFromConfig(
@@ -75,10 +78,12 @@ def exerciseCheckInputFromConfig(
         requiredPatterns=[str(p) for p in requiredPatterns],
         hints=[str(h) for h in hints],
         currentHintLevel=currentHintLevel,
+        comparator=_outputComparator(checkConfig.get("comparator")),
     )
 
 
 async def runExerciseCheck(session: Any, request: ExerciseCheckInput) -> CheckResult:
+    comparator = _outputComparator(request.comparator)
     if request.checkType == "output" and request.expectedCode:
         return await checkByOutput(
             session,
@@ -86,6 +91,7 @@ async def runExerciseCheck(session: Any, request: ExerciseCheckInput) -> CheckRe
             request.expectedCode,
             hints=request.hints,
             currentHintLevel=request.currentHintLevel,
+            comparator=comparator,
         )
     if request.checkType == "variable" and request.variableName:
         return await checkByVariable(
@@ -112,10 +118,18 @@ async def runExerciseCheck(session: Any, request: ExerciseCheckInput) -> CheckRe
 
 
 async def runToolExerciseCheck(session: Any, request: ToolExerciseCheckInput) -> dict[str, Any]:
+    comparator = _outputComparator(request.comparator)
     if request.checkType == "noError":
         return _toolCheckPayload(await checkNoError(session, request.studentCode))
     if request.checkType == "outputMatch":
-        return _toolCheckPayload(await checkExpectedOutput(session, request.studentCode, request.expected))
+        return _toolCheckPayload(
+            await checkExpectedOutput(
+                session,
+                request.studentCode,
+                request.expected,
+                comparator=comparator,
+            )
+        )
     if request.checkType == "outputContains":
         return _toolCheckPayload(
             await checkOutputContains(session, request.studentCode, request.expected),
@@ -139,3 +153,10 @@ def _toolCheckPayload(
     if pattern is not None:
         payload["pattern"] = pattern
     return payload
+
+
+def _outputComparator(value: Any) -> str:
+    comparator = str(value or "text")
+    if comparator not in {"exact", "text"}:
+        raise InvalidExerciseCheck(f"지원하지 않는 출력 비교 방식입니다: {comparator!r}")
+    return comparator

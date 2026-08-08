@@ -144,10 +144,16 @@ def runLocalStrongCheckAttempt(
         actual = normalizeOutput(str(response.get("actual") or "")) if normalized["kind"] == "output" else str(
             response.get("actual") or ""
         )
+        acceptedTextCase = False
         if normalized["kind"] == "output":
-            verdict = matchLearningOutput(expected, actual)
+            verdict = matchLearningOutput(
+                expected,
+                actual,
+                comparator=normalized["payload"]["comparator"],
+            )
             if not verdict.passed:
                 return failedResult("mismatch", expected, actual, verdict.feedback), False
+            acceptedTextCase = verdict.tier == "text"
         elif actual != expected:
             return (
                 failedResult(
@@ -163,6 +169,9 @@ def runLocalStrongCheckAttempt(
                 "actual": actual,
                 "artifacts": normalizeWorkerArtifacts(response.get("artifacts")),
                 "detail": (
+                    "대소문자 차이는 허용했고, 나머지 출력은 맞습니다."
+                    if acceptedTextCase
+                    else
                     "Windows AppContainer에서 fixture와 함께 다시 실행해 정확한 출력을 확인했습니다."
                     if usedAppContainer and normalized["kind"] == "output"
                     else "Windows AppContainer에서 함수 반환값과 생성된 경로를 함께 확인했습니다."
@@ -211,18 +220,12 @@ def validateLocalStrongCheck(spec: dict[str, Any], source: str) -> dict[str, Any
     if not isinstance(payload, dict):
         raise LocalStrongCheckInvalid("check payload가 비어 있습니다.")
     if kind == "output":
-        # canonical 라벨은 line-trim 이다. trim-final-newline 은 기존 YAML 콘텐츠의
-        # 이전 라벨로, 콘텐츠 마이그레이션 사이클(outputExact 전수 패스)에서 YAML 을
-        # 개명하면 함께 제거한다. 두 라벨 모두 실제 의미는 outputMatch(line-trim)다.
-        if payload.get("comparator") != "exact" or payload.get("normalization") not in {
-            "line-trim",
-            "trim-final-newline",
-        }:
+        if payload.get("comparator") not in {"exact", "text"} or payload.get("normalization") != "line-trim":
             raise LocalStrongCheckInvalid("지원하지 않는 output comparator입니다.")
         if not isinstance(payload.get("expected"), str) or not payload["expected"]:
             raise LocalStrongCheckInvalid("output expected가 비어 있습니다.")
         normalizedPayload = {
-            "comparator": "exact",
+            "comparator": payload["comparator"],
             "expected": payload["expected"],
             "normalization": "line-trim",
         }

@@ -269,6 +269,7 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
                     requiredPatterns=request.requiredPatterns,
                     hints=request.hints,
                     currentHintLevel=request.currentHintLevel,
+                    comparator=request.comparator,
                     category=request.category,
                     contentId=request.contentId,
                     sectionId=request.sectionId,

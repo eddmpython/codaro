@@ -152,6 +152,11 @@ TOOL_CELL_CALL = ToolDef(
                 "type": "string",
                 "description": "Expected output, variable payload, or required code pattern.",
             },
+            "comparator": {
+                "type": "string",
+                "enum": ["text", "exact"],
+                "description": "Text ignores letter case; exact preserves it.",
+            },
         },
         "required": ["operation", "blockId"],
     },

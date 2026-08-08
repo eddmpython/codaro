@@ -185,10 +185,8 @@ def main() -> int:
     attempt_tokens = {
         "deterministic practice classifier": "isDeterministicPracticeCheckConfig",
         "Local done status is successful": '["success", "ok", "done"]',
-        # 비교 의미의 SSOT 는 learningOutputMatch 다. 정확 비교 리터럴 대신
-        # 공유 매처 호출과 콘텐츠 옵트인 플래그를 pin 한다.
         "shared output matcher": "matchLearningOutput(expected, actual",
-        "case-insensitive content opt-in": 'checkConfig?.caseInsensitive === true',
+        "text comparison default": 'checkConfig?.comparator === "exact" ? "exact" : "text"',
         "verified practice state": 'state: "verified"',
         "unsupported completion state": 'state: "unsupported"',
         "practice evidence only": 'evidence: "practice"',
@@ -249,6 +247,8 @@ def main() -> int:
                 failures.append(f"Day 1 strong check {section.get('id')} missing {missing}")
             if check.get("version") != 1 or check.get("kind") != "output" or check.get("executor") != "browser-worker":
                 failures.append(f"Day 1 strong check {section.get('id')} has an invalid typed contract")
+            if check.get("payload", {}).get("comparator") != "text":
+                failures.append(f"Day 1 strong check {section.get('id')} must use text comparison")
             fixtureBytes = json.dumps(check.get("fixture"), ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
             expectedHash = "sha256-" + base64.b64encode(hashlib.sha256(fixtureBytes).digest()).decode("ascii")
             if check.get("fixtureHash") != expectedHash:
@@ -283,6 +283,7 @@ def main() -> int:
             or not exercise.get("solution")
             or check.get("strength") != "strong"
             or check.get("executor") != "browser-worker"
+            or check.get("payload", {}).get("comparator") != "text"
         ):
             failures.append(f"Day 1 {mode} variant is not an unseen independent strong task")
         if mode == "retrieval" and variant.get("minimumDelayHours", 0) < minimumDelayHours:
