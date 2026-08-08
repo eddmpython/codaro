@@ -136,9 +136,9 @@ html[data-route-query-pending="true"] [data-route-query-sensitive="true"] {
   /* 셸 폭은 페이지 격자와 한 벌이다. 헤더, 홈, 문서, 푸터가 모두 같은 x 에
      서야 스크롤 내내 좌우 세로선이 한 줄로 이어진다. 기하의 owner 는
      publicShell.css 다(--public-frame-width / --public-frame-inset). */
-  width: var(--public-frame-width);
+  width: var(--frame-width);
   margin: 0 auto;
-  padding-inline: var(--public-frame-inset);
+  padding-inline: var(--frame-inset);
 }
 
 /* ── Multi-column footer ────────────────────────────────────────── */

@@ -7,17 +7,25 @@ import { LiveCodeCell } from "../components/liveCodeCell.jsx";
 import { curriculumLessonCount, curriculumRuntimeCounts, curriculumTree } from "../lib/generated/curriculum.js";
 import { firstLessonHref } from "../lib/learningCatalog.js";
 
-// 홈은 세로로 쌓는 세 층이다. 각 층은 본문 칸 전체를 쓴다.
+// 홈은 세로로 쌓는 네 층이다. 각 층은 본문 칸 전체를 쓴다.
 //   1) 히어로: 격자 폭을 다 쓰는 큰 헤드라인 한 덩어리. 옆에 아무것도 두지 않는다.
-//   2) 실행 띠: 실제로 Python 이 도는 셀. 말이 아니라 물건으로 증명하는 자리다.
-//   3) 학습창: 이어서 하거나 목표를 고르는 자리.
+//   2) 규모 띠: 교육과정 크기를 숫자로 보여 준다.
+//   3) 실행 띠: 실제로 Python 이 도는 셀. 말이 아니라 물건으로 증명하는 자리다.
+//   4) 학습창: 이어서 하거나 목표를 고르는 자리.
 // 히어로를 좌우로 쪼개면 헤드라인이 절반 칸에 갇혀 크기를 못 키운다. 그래서
-// 옆에 세우지 않고 아래로 내렸다. 층마다 좌우 세로선이 같은 x 로 이어진다.
+// 옆에 세우지 않고 아래로 내렸다.
+//
+// 배경 격자와 층 프레임선은 디자인 시스템의 공유 프리미티브다
+// (.codaroBackdropGrid / .codaroFrameRule, assets/brand/tools/buildDesignSystem.py).
+// 가상 요소로 그리면 앱마다 같은 선언을 복사하게 되므로 실제 요소로 둔다.
 export function HomePage() {
   const curriculumUrl = firstLessonHref();
   return (
     <main className="homeAstryx homeContinuous">
+      <div className="codaroBackdropGrid" aria-hidden="true" />
+
       <section className="homeProductHero" aria-labelledby="home-title">
+        <div className="codaroFrameRule" aria-hidden="true" />
         <div className="homeShell homeHeroLayout">
           <span className="homeKicker">Python 학습 스튜디오</span>
           <Heading id="home-title" level={1} className="homeHeroHeadline">
@@ -52,8 +60,9 @@ export function HomePage() {
       </section>
 
       <section className="homeProofBand" aria-label="교육과정 규모">
+        <div className="codaroFrameRule" data-frame-top="true" aria-hidden="true" />
         <div className="homeShell homeProofLayout">
-          <dl className="homeStudioSummary">
+          <dl className="codaroStatGrid homeStudioSummary">
             <div><dt>Web</dt><dd>{curriculumRuntimeCounts.browser}</dd></div>
             <div><dt>Local</dt><dd>{curriculumRuntimeCounts.local}</dd></div>
             <div><dt>전체 레슨</dt><dd>{curriculumLessonCount}</dd></div>
@@ -63,6 +72,7 @@ export function HomePage() {
       </section>
 
       <section className="homeRunBand" aria-labelledby="home-run-title">
+        <div className="codaroFrameRule" data-frame-top="true" aria-hidden="true" />
         <div className="homeShell homeRunLayout">
           <div className="homeRunHead">
             <span className="homeKicker">브라우저에서 실행</span>

@@ -450,7 +450,7 @@
   z-index: 10;
   /* 헤더 바로 아래에 붙는다. 높이는 publicShell.css 가 소유하며 좁은 화면에서
      더 커지므로, 숫자를 베껴 두면 그때 탭이 헤더를 파고든다. */
-  top: var(--public-header-height);
+  top: var(--chrome-height);
   overflow-x: auto;
   border-bottom: 1px solid var(--color-border);
   background: color-mix(in srgb, var(--color-background-surface) 96%, transparent);
@@ -465,7 +465,7 @@
   width: auto;
   min-width: max-content;
   gap: 24px;
-  padding-inline: calc((100% - var(--public-frame-width)) / 2 + var(--public-frame-inset));
+  padding-inline: calc((100% - var(--frame-width)) / 2 + var(--frame-inset));
 }
 
 .learnDomainTab {

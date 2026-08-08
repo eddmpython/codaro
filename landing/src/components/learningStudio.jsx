@@ -23,6 +23,7 @@ const LESSONS_PER_DOMAIN = 4;
 export function LearningStudio() {
   return (
     <section className="homeStudio" id="studio" aria-labelledby="studio-title">
+      <div className="codaroFrameRule" data-frame-top="true" aria-hidden="true" />
       <div className="homeShell homeStudioInner">
         <header className="homeStudioHead">
           <span className="homeKicker">학습창</span>

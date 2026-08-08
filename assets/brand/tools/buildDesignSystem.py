@@ -62,8 +62,37 @@ def calculateHash(value: bytes | str) -> str:
 def parsePixelValue(value: str) -> float:
     match = re.fullmatch(r"([0-9]+(?:\.[0-9]+)?)px", value)
     if match is None:
-        raise DesignSystemError(f"radius must use px: {value}")
+        raise DesignSystemError(f"length token must use px: {value}")
     return float(match.group(1))
+
+
+# 페이지 기하와 배경 격자의 SSOT. 랜딩과 에디터가 같은 칸 위에 서야 하므로
+# 숫자를 한쪽 CSS 에 적어 두지 않고 여기서 토큰으로 내보낸다.
+LAYOUT_KEYS = (
+    "frameMax",
+    "frameGutter",
+    "frameInset",
+    "frameMaxNarrow",
+    "frameGutterNarrow",
+    "frameInsetNarrow",
+    "narrowBreakpoint",
+    "chromeHeight",
+    "chromeHeightNarrow",
+)
+BACKDROP_KEYS = ("gridCell", "gridOpacity")
+
+
+def validateLayoutDocument(layout: Any, backdrop: Any) -> None:
+    if not isinstance(layout, dict) or set(layout) != set(LAYOUT_KEYS):
+        raise DesignSystemError(f"layout must define exactly: {', '.join(LAYOUT_KEYS)}")
+    for key in LAYOUT_KEYS:
+        parsePixelValue(layout[key])
+    if not isinstance(backdrop, dict) or set(backdrop) != set(BACKDROP_KEYS):
+        raise DesignSystemError(f"backdrop must define exactly: {', '.join(BACKDROP_KEYS)}")
+    parsePixelValue(backdrop["gridCell"])
+    opacity = float(backdrop["gridOpacity"])
+    if not 0 < opacity <= 1:
+        raise DesignSystemError("backdrop gridOpacity must be between 0 and 1")
 
 
 def validateTokenDocument(document: dict[str, Any]) -> None:
@@ -78,10 +107,13 @@ def validateTokenDocument(document: dict[str, Any]) -> None:
         "syntax",
         "density",
         "accents",
+        "layout",
+        "backdrop",
     }
     missingKeys = sorted(requiredKeys - document.keys())
     if missingKeys:
         raise DesignSystemError(f"token document is missing: {', '.join(missingKeys)}")
+    validateLayoutDocument(document["layout"], document["backdrop"])
     if document["version"] != 1:
         raise DesignSystemError("token document version must be 1")
 
@@ -359,7 +391,44 @@ def renderRuntimeCss(document: dict[str, Any]) -> str:
             "}",
         ]
     )
+    lines.append(renderLayoutCss(document))
     return "\n".join(lines) + "\n"
+
+
+def renderLayoutCss(document: dict[str, Any]) -> str:
+    """페이지 기하와 배경 격자를 CSS 변수로 내보낸다.
+
+    좁은 화면 전환을 여기서 한 번만 정의한다. 각 앱이 자기 CSS 에서 브레이크포인트를
+    다시 적으면 헤더와 본문이 서로 다른 폭에서 꺾여 격자가 어긋난다.
+    :root 에 두는 이유는 fixed/sticky 요소가 astryx scope 밖에 있을 수 있어서다.
+    """
+    layout = document["layout"]
+    backdrop = document["backdrop"]
+    return "\n".join(
+        [
+            "",
+            "@layer astryx-theme {",
+            "  :root {",
+            f"    --frame-max: {layout['frameMax']};",
+            f"    --frame-gutter: {layout['frameGutter']};",
+            "    --frame-width: min(var(--frame-max), calc(100% - var(--frame-gutter)));",
+            f"    --frame-inset: {layout['frameInset']};",
+            f"    --chrome-height: {layout['chromeHeight']};",
+            f"    --backdrop-grid-cell: {backdrop['gridCell']};",
+            f"    --backdrop-grid-opacity: {backdrop['gridOpacity']};",
+            "  }",
+            "",
+            f"  @media (max-width: {layout['narrowBreakpoint']}) {{",
+            "    :root {",
+            f"      --frame-max: {layout['frameMaxNarrow']};",
+            f"      --frame-gutter: {layout['frameGutterNarrow']};",
+            f"      --frame-inset: {layout['frameInsetNarrow']};",
+            f"      --chrome-height: {layout['chromeHeightNarrow']};",
+            "    }",
+            "  }",
+            "}",
+        ]
+    )
 
 
 def renderAppBridge(appName: str) -> str:
@@ -800,6 +869,98 @@ def renderSharedComponentCss() -> str:
     return '''
 
 @layer components {
+  /* ── 페이지 격자 프리미티브 ────────────────────────────────────────────────
+     두 앱이 같은 칸 위에 서게 하는 최소 어휘다. 여기 있는 것만 공유하고,
+     화면 하나에서만 쓰는 모양은 각 앱 CSS 에 둔다. */
+
+  /* 본문 칸. 헤더, 홈, 문서, 푸터가 모두 이걸 써야 좌우 세로선이 한 줄로 선다. */
+  .codaroFrame {
+    width: var(--frame-width);
+    margin-inline: auto;
+    padding-inline: var(--frame-inset);
+  }
+
+  /* 층의 좌우 세로선. 칸 밖에 그려야 본문 여백까지 감싼다. 가로선이 필요한
+     층은 data-frame-top 을 붙인다(첫 층은 붙이지 않는다). */
+  .codaroFrameRule {
+    position: absolute;
+    z-index: 0;
+    inset-block: 0;
+    left: 50%;
+    width: var(--frame-width);
+    transform: translateX(-50%);
+    border-inline: 1px solid var(--color-border);
+    pointer-events: none;
+  }
+
+  .codaroFrameRule[data-frame-top="true"] {
+    border-top: 1px solid var(--color-border);
+  }
+
+  /* 배경 모눈. 촘촘하고 흐려야 배경이 시끄럽지 않다. 성기게 잡고 진하게 칠하면
+     격자가 아니라 줄무늬가 된다. */
+  .codaroBackdropGrid {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background-image:
+      linear-gradient(var(--color-border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-border) 1px, transparent 1px);
+    background-size: var(--backdrop-grid-cell) var(--backdrop-grid-cell);
+    opacity: var(--backdrop-grid-opacity);
+    pointer-events: none;
+  }
+
+  /* 마이크로 라벨. 앞에 짧은 가로선을 달아 섹션 시작을 알린다. 자간은 주지
+     않는다. 라벨에 한글이 섞이는데 트래킹을 주면 음절이 흩어져 읽기가 나빠진다. */
+  .codaroLabel {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text-accent);
+    font-family: var(--font-family-code);
+    font-size: var(--type-xs, 0.75rem);
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .codaroLabel::before {
+    width: 20px;
+    height: 1px;
+    background: currentColor;
+    content: "";
+  }
+
+  /* 신호 rail. 면을 채우지 않고 왼쪽 세로선 하나로 덩어리를 표시한다.
+     accent 는 지금 해야 할 것, 무채는 참고다. */
+  .codaroRail {
+    border-left: 2px solid var(--color-border-emphasized);
+    padding-left: 16px;
+  }
+
+  .codaroRail[data-rail="accent"] {
+    border-left-color: var(--color-accent);
+  }
+
+  /* 숫자 격자. 칸 사이는 세로선으로만 나눈다. 바깥 테두리는 층 프레임이 맡는다. */
+  .codaroStatGrid {
+    display: grid;
+    grid-template-columns: repeat(var(--stat-columns, 4), minmax(0, 1fr));
+  }
+
+  .codaroStatGrid > * {
+    display: grid;
+    gap: 6px;
+    padding: 26px 24px 28px;
+    border-left: 1px solid var(--color-border);
+  }
+
+  .codaroStatGrid > *:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+
   [data-social-links="codaro"] {
     display: inline-flex;
     flex: 0 0 auto;

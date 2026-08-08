@@ -27,12 +27,15 @@
 
 /* 본문 칸은 페이지 격자 안쪽이다. 칸의 폭과 여백은 publicShell.css 가 소유하고
    (--public-frame-width / --public-frame-inset), 헤더와 홈이 같은 x 를 쓴다. */
+/* 본문 칸 정의는 공유 프리미티브(.codaroFrame)가 소유한다. 여기서는 이름만 잇는다. */
 .homeShell {
-  width: var(--public-frame-width);
+  width: var(--frame-width);
   margin-inline: auto;
-  padding-inline: var(--public-frame-inset);
+  padding-inline: var(--frame-inset);
 }
 
+/* 마이크로 라벨 본체는 공유 프리미티브(.codaroLabel)가 소유한다. 두 화면이
+   같은 라벨을 쓰므로 여기서는 이름만 잇고, 줄 높이만 랜딩 스텝에 맞춘다. */
 .homeKicker,
 .learnKicker {
   display: inline-flex;
@@ -44,17 +47,11 @@
   font-weight: 700;
   line-height: var(--leading-xs);
   letter-spacing: 0;
-}
-
-/* 마이크로 라벨. 짧은 가로선이 라벨을 격자에 매달아 섹션 시작을 알린다.
-   자간은 주지 않는다. 이 라벨은 한글을 포함하는데 한글에 트래킹을 주면 음절이
-   흩어져("학 습  스 튜 디 오") 읽기가 나빠진다. learnExplorer.css 와
-   lessonAstryx.css 가 같은 규칙을 명문화하고 있으므로 여기서도 지킨다. */
-.homeKicker {
   text-transform: uppercase;
 }
 
-.homeKicker::before {
+.homeKicker::before,
+.learnKicker::before {
   width: 20px;
   height: 1px;
   background: currentColor;
@@ -69,27 +66,8 @@
   /* 헤더는 sticky라 flow에서 자기 높이만큼 자리를 차지한다. 홈이 그 높이만큼
      위로 올라와야 배경이 투명 헤더 뒤까지 이어지고, 페이지 맨 위에 민짜 배경
      띠(경계선)가 생기지 않는다. 헤더와 겹치는 만큼은 히어로 상단 패딩이 비운다. */
-  margin-top: calc(-1 * var(--public-header-height));
+  margin-top: calc(-1 * var(--chrome-height));
   background: var(--color-background-body);
-}
-
-/* ── 배경 격자 ──────────────────────────────────────────────────────────────
-   페이지 전체에 가로세로 격자를 깐다. 모눈이 촘촘하고 아주 흐려야 배경이
-   시끄럽지 않으면서도 내용이 격자 위에 조판된 것처럼 읽힌다. 선을 성기게 잡고
-   진하게 칠하면 격자가 아니라 줄무늬가 된다. 색은 테두리 토큰을 그대로 쓰고
-   농도는 opacity 로만 낮춰, 라이트와 다크가 각자의 테두리 색을 따라간다.
-   fixed 라 스크롤해도 선이 제자리에 서 있다. */
-.homeContinuous::before {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  background-image:
-    linear-gradient(var(--color-border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--color-border) 1px, transparent 1px);
-  background-size: 32px 32px;
-  opacity: 0.4;
-  pointer-events: none;
-  content: "";
 }
 
 /* 층을 쌓는 구성에서는 히어로를 고정하지 않는다. 고정하면 다음 층이 덮을 때
@@ -103,29 +81,7 @@
      글자 덩어리가 오히려 작아 보인다. 콘텐츠 높이에 맡기고 위에서부터 쌓는다. */
   align-content: start;
   /* 투명 헤더가 히어로 위에 떠 있다. 그 높이만큼 위쪽을 비워 겹치지 않게 한다. */
-  padding-block: calc(var(--public-header-height) + 96px) 96px;
-}
-
-/* ── 격자 프레임 ──────────────────────────────────────────────────────────────
-   본문 칸의 좌우에 1px 세로선을 세운다. 히어로와 학습창이 같은 x 에 선을 세우므로
-   스크롤 내내 한 줄로 이어져 페이지가 "격자 위의 문서"로 읽힌다. 선 하나에
-   요소 하나를 쓰지 않고 border-inline 으로 두 줄을 한 번에 긋는다. */
-.homeProductHero::after,
-.homeStudio::before {
-  position: absolute;
-  z-index: 0;
-  inset-block: 0;
-  left: 50%;
-  width: var(--public-frame-width);
-  transform: translateX(-50%);
-  border-inline: 1px solid var(--color-border);
-  pointer-events: none;
-  content: "";
-}
-
-/* 학습창은 앞 층과 가로선으로 나뉜다. 히어로는 페이지 첫 층이라 위에 선이 없다. */
-.homeStudio::before {
-  border-top: 1px solid var(--color-border);
+  padding-block: calc(var(--chrome-height) + 96px) 96px;
 }
 
 /* 히어로는 한 칸이다. 헤드라인 옆에 아무것도 세우지 않아야 글자가 격자 폭을
@@ -182,19 +138,6 @@
   z-index: 1;
 }
 
-.homeProofBand::before {
-  position: absolute;
-  z-index: 0;
-  inset-block: 0;
-  left: 50%;
-  width: var(--public-frame-width);
-  transform: translateX(-50%);
-  border-top: 1px solid var(--color-border);
-  border-inline: 1px solid var(--color-border);
-  pointer-events: none;
-  content: "";
-}
-
 .homeProofLayout {
   position: relative;
   z-index: 1;
@@ -206,21 +149,6 @@
 .homeRunBand {
   position: relative;
   z-index: 1;
-}
-
-/* 세로 프레임선과 층을 가르는 가로선을 한 요소로 그린다. 가로선을 본문 칸에
-   두면 좌우 여백만큼 짧아져 프레임선에 닿지 않고 떠 보인다. */
-.homeRunBand::before {
-  position: absolute;
-  z-index: 0;
-  inset-block: 0;
-  left: 50%;
-  width: var(--public-frame-width);
-  transform: translateX(-50%);
-  border-top: 1px solid var(--color-border);
-  border-inline: 1px solid var(--color-border);
-  pointer-events: none;
-  content: "";
 }
 
 .homeRunLayout {
@@ -328,25 +256,6 @@
 
 /* 교육과정 규모는 구석에 몰아넣는 메타데이터가 아니라 읽어야 할 숫자다.
    본문 폭 전체를 쓰고, 칸은 세로 hairline 으로만 나눈다. */
-/* 칸 사이 세로선만 긋는다. 위아래 가로선과 좌우 세로선은 규모 띠(.homeProofBand)의
-   프레임이 이미 그리므로 여기서 또 그으면 이중선이 된다. */
-.homeStudioSummary {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.homeStudioSummary > div {
-  display: grid;
-  gap: 6px;
-  padding: 26px 24px 28px;
-  border-left: 1px solid var(--color-border);
-}
-
-.homeStudioSummary > div:first-child {
-  padding-left: 0;
-  border-left: 0;
-}
-
 /* 라벨에 "전체", "분야" 처럼 한글이 섞이므로 자간은 주지 않는다(음절이 흩어진다).
    모노 + 대문자만으로도 격자 라벨로 읽힌다. */
 .homeStudioSummary dt {
@@ -671,7 +580,7 @@
 
 @media (max-width: 760px) {
   .homeProductHero {
-    padding-block: calc(var(--public-header-height) + 40px) 44px;
+    padding-block: calc(var(--chrome-height) + 40px) 44px;
   }
 
   .homeHeroLayout {
@@ -683,16 +592,18 @@
     padding-block: 40px 64px;
   }
 
-  .homeStudioSummary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* 칸 수는 공유 프리미티브의 --stat-columns 로 바꾼다. 두 줄이 되면 둘째 줄
+     첫 칸의 좌측 선을 지우고 줄 사이에 가로선을 넣는다. */
+  .codaroStatGrid {
+    --stat-columns: 2;
   }
 
-  .homeStudioSummary > div:nth-child(3) {
+  .codaroStatGrid > *:nth-child(3) {
     padding-left: 0;
     border-left: 0;
   }
 
-  .homeStudioSummary > div:nth-child(n + 3) {
+  .codaroStatGrid > *:nth-child(n + 3) {
     border-top: 1px solid var(--color-border);
   }
 

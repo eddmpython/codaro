@@ -1,12 +1,7 @@
-:root {
-  /* 투명 헤더의 높이. 홈은 이 값만큼 위로 올라와 히어로 배경을 헤더 뒤까지 잇는다
-     (homeAstryx.css). 값을 바꾸면 두 파일이 같이 움직인다. */
-  --public-header-height: 52px;
-  /* 페이지 격자의 기하. width 는 세로 hairline 이 서는 칸의 폭이고, inset 은 그
-     선에서 본문까지의 여백이다. 헤더와 홈(homeAstryx.css)이 같은 x 를 쓴다. */
-  --public-frame-width: min(1200px, calc(100% - 64px));
-  --public-frame-inset: 32px;
-}
+/* 페이지 기하는 디자인 토큰이 소유한다(assets/brand/designSystem/tokens.json 의
+   layout). 생성된 codaroTheme.css 가 --frame-width / --frame-inset /
+   --chrome-height 를 :root 에 내보내고 좁은 화면 전환도 거기서 한 번만 한다.
+   여기서 숫자를 다시 적으면 헤더와 본문이 서로 다른 폭에서 꺾인다. */
 
 .publicHeader {
   position: sticky;
@@ -24,10 +19,10 @@
 
 .publicHeaderInner {
   display: grid;
-  width: var(--public-frame-width);
-  min-height: var(--public-header-height);
+  width: var(--frame-width);
+  min-height: var(--chrome-height);
   margin-inline: auto;
-  padding-inline: var(--public-frame-inset);
+  padding-inline: var(--frame-inset);
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 24px;
@@ -222,16 +217,12 @@
 /* 데스크톱 내비가 한 줄로 들어가는 하한이 이 폭이다. 프레임 좌우 여백이 헤더
    콘텐츠 폭을 그만큼 줄이므로, 여백을 도입하기 전 기준을 그대로 두면 이 경계
    바로 위 구간에서 "학/습" 처럼 어절이 꺾여 헤더가 두 줄이 되고, 그 아래
-   sticky 로 붙는 요소들이 헤더 뒤로 숨는다. 실측으로 잡은 경계다. */
+   sticky 로 붙는 요소들이 헤더 뒤로 숨는다. 실측으로 잡은 경계다.
+   경계 값과 그때의 기하는 토큰(layout.narrowBreakpoint)이 소유하므로 여기서는
+   레이아웃 전환만 하고 변수는 다시 정의하지 않는다. */
 @media (max-width: 860px) {
-  :root {
-    --public-header-height: 56px;
-    --public-frame-width: min(100% - 24px, 720px);
-    --public-frame-inset: 14px;
-  }
-
   .publicHeaderInner {
-    min-height: var(--public-header-height);
+    min-height: var(--chrome-height);
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 12px;
   }
@@ -258,13 +249,13 @@
 
   .publicMobileMenu {
     display: grid;
-    width: var(--public-frame-width);
+    width: var(--frame-width);
     max-height: calc(100svh - 68px);
     margin-inline: auto;
     overflow-y: auto;
     border-top: 1px solid var(--color-border);
     padding-block: 10px 16px;
-    padding-inline: var(--public-frame-inset);
+    padding-inline: var(--frame-inset);
   }
 
   .publicMobileMenu a {
