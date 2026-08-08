@@ -74,23 +74,20 @@
 }
 
 /* ── 배경 격자 ──────────────────────────────────────────────────────────────
-   페이지 전체에 가는 세로선을 깐다. 모든 층이 같은 격자 위에 놓여야 문서가
-   조판된 것처럼 읽힌다. fixed 라 스크롤해도 선이 제자리에 서 있고, 층이
-   바뀌어도 같은 자리를 지킨다. 가로선은 넣지 않는다. 층을 가르는 가로선은
-   프레임이 이미 긋고 있어서 겹치면 지저분해진다. */
+   페이지 전체에 가로세로 격자를 깐다. 모눈이 촘촘하고 아주 흐려야 배경이
+   시끄럽지 않으면서도 내용이 격자 위에 조판된 것처럼 읽힌다. 선을 성기게 잡고
+   진하게 칠하면 격자가 아니라 줄무늬가 된다. 색은 테두리 토큰을 그대로 쓰고
+   농도는 opacity 로만 낮춰, 라이트와 다크가 각자의 테두리 색을 따라간다.
+   fixed 라 스크롤해도 선이 제자리에 서 있다. */
 .homeContinuous::before {
   position: fixed;
   inset: 0;
   z-index: 0;
-  background-image: linear-gradient(
-    90deg,
-    light-dark(
-      color-mix(in srgb, var(--color-border) 42%, transparent),
-      color-mix(in srgb, var(--color-border) 62%, transparent)
-    ) 1px,
-    transparent 1px
-  );
-  background-size: 72px 100%;
+  background-image:
+    linear-gradient(var(--color-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-border) 1px, transparent 1px);
+  background-size: 32px 32px;
+  opacity: 0.4;
   pointer-events: none;
   content: "";
 }
