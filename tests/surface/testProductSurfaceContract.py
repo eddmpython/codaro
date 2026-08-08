@@ -404,6 +404,11 @@ def testNotebookKeepsMobileTitleAndCollapsesSecondaryCellActions() -> None:
     assert '".cm-activeLine, .cm-activeLineGutter"' in notebookPanel
     assert '"&.cm-focused .cm-activeLine, &.cm-focused .cm-activeLineGutter"' in notebookPanel
     assert "var(--color-background-muted) 76%" in notebookPanel
+    assert "drawSelection({ cursorBlinkRate: 1000, drawRangeCursor: true })" in notebookPanel
+    assert "highlightActiveLineGutter()" in notebookPanel
+    assert "highlightWhitespace()" in notebookPanel
+    assert 'borderLeftWidth: "2px"' in notebookPanel
+    assert '"&.cm-focused .cm-highlightSpace"' in notebookPanel
     assert "unselected idle notebook cells retain an active-line fill" in productGate
     assert '"lineVisuals": lineVisualSnapshot' in productGate
     assert autosaveGate.count('state="attached"') >= 4

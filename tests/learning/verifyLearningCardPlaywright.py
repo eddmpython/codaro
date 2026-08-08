@@ -64,11 +64,20 @@ def main(argv: list[str] | None = None) -> int:
         clickCustomCurriculum(cli)
         cli.waitEval(jsStructuredCardReady(), "structured learning card")
         cli.waitEval(jsLearningOverviewReady(), "learning overview")
+        cli.run("run-code", "async page => { await page.bringToFront(); }")
         entryEditor = cli.eval(jsAssertLearningEntryEditor())
         domIds = cli.eval(jsAssertLearningDomIdIntegrity())
         desktopOverview = cli.eval(jsAssertLearningOverview("desktop"))
         desktopDependency = cli.eval(jsAssertNoInactiveDependencyPanel("desktop"))
         desktop = cli.eval(jsAssertStructuredCardLayout("desktop"))
+        cli.run(
+            "run-code",
+            (
+                "async page => { const content = page.locator('[data-learning-section-part=\"exercise\"] .cm-content').first(); "
+                "await content.click(); await page.keyboard.press('End'); "
+                "await page.keyboard.press('Shift+ArrowLeft'); }"
+            ),
+        )
         desktopControls = cli.eval(jsAssertStructuredCardControls("desktop"))
         desktopVisual = cli.eval(jsAssertLearningVisualIntegrity("desktop"))
         desktopContractGaps = cli.eval(jsAssertContractGapSignalHidden("desktop"))
@@ -760,6 +769,37 @@ def jsAssertStructuredCardControls(viewport: str) -> str:
   if (!(exerciseEditor.textContent || '').includes('frame = ___')) {{
     throw new Error('starter missing');
   }}
+  content.focus();
+  await new Promise((resolve) => setTimeout(resolve, 40));
+  if (!exerciseEditor.classList.contains('cm-focused')) {{
+    throw new Error('lesson editor did not enter focused state');
+  }}
+  const primaryCursor = exerciseEditor.querySelector('.cm-cursor-primary');
+  if (!(primaryCursor instanceof HTMLElement)) {{
+    throw new Error('focused lesson editor cursor is missing');
+  }}
+  const cursorStyle = getComputedStyle(primaryCursor);
+  if (
+    Number.parseFloat(cursorStyle.borderLeftWidth) < 2
+    || ['transparent', 'rgba(0, 0, 0, 0)'].includes(cursorStyle.borderLeftColor)
+  ) {{
+    throw new Error('focused lesson editor cursor is not visually distinct');
+  }}
+  const selection = exerciseEditor.querySelector('.cm-selectionBackground');
+  if (!(selection instanceof HTMLElement) || selection.getBoundingClientRect().width <= 0) {{
+    throw new Error('keyboard selection highlight is missing');
+  }}
+  const selectionColor = getComputedStyle(selection).backgroundColor;
+  if (['transparent', 'rgba(0, 0, 0, 0)'].includes(selectionColor)) {{
+    throw new Error('keyboard selection highlight is invisible');
+  }}
+  const visibleSpace = exerciseEditor.querySelector('.cm-highlightSpace');
+  if (!(visibleSpace instanceof HTMLElement)) {{
+    throw new Error('lesson editor whitespace markers are missing');
+  }}
+  if (getComputedStyle(visibleSpace).backgroundImage === 'none') {{
+    throw new Error('focused lesson editor whitespace markers are invisible');
+  }}
   if (exercise.querySelector('[data-cell-ai-help-trigger], [data-cell-ai-popover]')) {{
     throw new Error('manual AI controls must stay out of curriculum cells');
   }}
@@ -774,6 +814,9 @@ def jsAssertStructuredCardControls(viewport: str) -> str:
   return JSON.stringify({{
     viewport: {json.dumps(viewport)},
     directEditor: true,
+    cursorVisible: true,
+    keyboardSelectionVisible: true,
+    whitespaceVisible: true,
     snippetCopy: true,
     manualAiControls: 0,
   }});

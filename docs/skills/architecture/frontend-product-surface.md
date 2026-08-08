@@ -124,6 +124,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 - 노트북과 학습의 실행 셀 frame, 선택 상태, output, action은 `editor/src/components/app/workCell.css`의 `astryxWorkCell*` primitive를 함께 사용한다. 각 표면이 border, radius, output 계층을 따로 복제하면 실패다.
 - Web Run과 Local은 모두 `NotebookSurface → NotebookPanel → DocumentBlock` 컴포넌트 트리를 사용한다. `apiOnline`은 실행·저장 capability만 바꾸며 별도 로컬 노트북 디자인을 만들지 않는다.
 - 코드 편집 영역은 별도 엔진 영역으로 보고, 주변 크롬은 shadcn/ui 컴포넌트로 구성한다.
+- 활성 코드 셀은 키보드 이동 위치를 알 수 있는 2px 커서와 선택 영역을 보여 준다. 공백과 탭 표시는 편집기에 포커스가 있을 때만 드러내 들여쓰기를 읽을 수 있게 하고, 비활성 셀에는 시각 잡음을 남기지 않는다.
 - 출력은 셀 바로 아래에 붙이며, 실행 상태는 셀 안에서 먼저 확인할 수 있어야 한다.
 
 ## 커리큘럼 기준

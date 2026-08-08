@@ -22,10 +22,13 @@ import {
 import {
   Decoration,
   type DecorationSet,
+  drawSelection,
   EditorView,
   GutterMarker,
   gutter,
   highlightActiveLine,
+  highlightActiveLineGutter,
+  highlightWhitespace,
   keymap,
   lineNumbers,
   placeholder,
@@ -144,9 +147,21 @@ const codeCellEditorTheme = EditorView.theme({
   },
   ".cm-cursor": {
     borderLeftColor: "var(--color-accent, var(--foreground))",
+    borderLeftWidth: "2px",
   },
   ".cm-selectionBackground": {
-    backgroundColor: "color-mix(in oklab, var(--color-accent) 26%, transparent) !important",
+    backgroundColor: "color-mix(in oklab, var(--color-accent) 34%, transparent) !important",
+  },
+  ".cm-highlightSpace, .cm-highlightTab": {
+    backgroundImage: "none",
+  },
+  "&.cm-focused .cm-highlightSpace": {
+    backgroundImage: "radial-gradient(circle at 50% 56%, color-mix(in oklab, var(--color-text-secondary) 72%, transparent) 1px, transparent 1.2px)",
+    backgroundPosition: "center",
+  },
+  "&.cm-focused .cm-highlightTab": {
+    backgroundColor: "color-mix(in oklab, var(--color-accent) 10%, transparent)",
+    boxShadow: "inset 0 -1px 0 color-mix(in oklab, var(--color-text-secondary) 56%, transparent)",
   },
   ".cm-codaroErrorLine": {
     backgroundColor: "color-mix(in oklch, var(--destructive) 18%, transparent)",
@@ -630,7 +645,10 @@ export function CodeCellEditor({
         closeBrackets(),
         python(),
         syntaxHighlighting(codaroSyntaxHighlightStyle, { fallback: true }),
+        drawSelection({ cursorBlinkRate: 1000, drawRangeCursor: true }),
         highlightActiveLine(),
+        highlightActiveLineGutter(),
+        highlightWhitespace(),
         placeholder(placeholderText),
         accessibilityAttributesRef.current.of(
           EditorView.contentAttributes.of({
