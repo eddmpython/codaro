@@ -80,10 +80,13 @@
 
 ### 앱 모드
 
-1. `codaro run path.py`가 서버를 app 모드로 띄운다
-2. `/app?path=...`가 같은 문서를 읽는다
-3. App 모드는 로컬 서버 커널 실행 경로를 기준으로 코드 블록을 순서 실행한다
-4. `hideCode`를 기준으로 결과 중심 화면을 보여준다
+1. `codaro app path.py` 또는 같은 뜻의 `codaro run path.py`가 서버를 app 모드로 띄운다
+2. bootstrap의 `appMode=true`를 프론트가 소비해 editor chrome 없는 app projection을 연다
+3. App 모드는 별도 실행기를 만들지 않고 노트북의 reactive graph, 로컬 커널 session, widget callback을 그대로 사용한다
+4. AppSpec의 entry 순서, layout, `hideCode`, state policy를 기준으로 결과 중심 화면을 보여준다
+5. 편집기의 `앱 미리보기`는 같은 projection을 열고 AppSpec 변경을 기존 문서 autosave 경로에 저장한다
+6. 실행 오류가 생기면 마지막 정상 결과를 stale로 표시하고 현재 오류를 함께 보여준다
+7. browser session마다 커널과 widget state를 격리하며, 공유 상태는 별도 owner가 생기기 전까지 차단한다
 
 ## 설계상 중요한 점
 

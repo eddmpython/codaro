@@ -6,6 +6,7 @@ import {
   Clipboard,
   ClipboardCheck,
   Moon,
+  PanelsTopLeft,
   Settings,
   Sun,
   XCircle,
@@ -34,6 +35,7 @@ export function TopControls({
   surface,
   onCopyDiagnosticExport,
   onRenameNotebook,
+  onPreviewApp,
   onToggleTheme,
   onToggleNotebookTools,
 }: {
@@ -45,6 +47,7 @@ export function TopControls({
   surface: SurfaceMode;
   onCopyDiagnosticExport?: () => Promise<void>;
   onRenameNotebook?: (title: string) => void;
+  onPreviewApp?: () => void;
   onToggleTheme: () => void;
   onToggleNotebookTools: () => void;
 }) {
@@ -117,6 +120,16 @@ export function TopControls({
         >
           {resolvedTheme === "dark" ? <Sun /> : <Moon />}
         </TopBarIconButton>
+        {showNotebookToolsToggle ? (
+          <TopBarIconButton
+            data-app-preview-open="true"
+            label="앱 미리보기"
+            onClick={onPreviewApp}
+            variant="ghost"
+          >
+            <PanelsTopLeft />
+          </TopBarIconButton>
+        ) : null}
         {showNotebookToolsToggle ? (
           <TopBarIconButton
             className="hidden xl:inline-flex"

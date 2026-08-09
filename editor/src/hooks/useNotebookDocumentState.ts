@@ -18,7 +18,7 @@ import {
   type NotebookPersistenceState,
 } from "@/lib/notebookPersistence";
 import { documentSaveSupportsKeepalive } from "@/lib/documentSavePolicy";
-import type { BlockConfig, CodaroDocument } from "@/types";
+import type { BlockConfig, CodaroDocument, DocumentAppConfig } from "@/types";
 
 type UseNotebookDocumentStateOptions = {
   localDocumentPath: string | null;
@@ -145,6 +145,21 @@ export function useNotebookDocumentState({
     }));
   }, []);
 
+  const updateNotebookApp = useCallback((patch: Partial<DocumentAppConfig>) => {
+    setDocument((current) => ({
+      ...current,
+      app: {
+        schemaVersion: current.app?.schemaVersion ?? 1,
+        title: current.app?.title ?? current.title,
+        layout: current.app?.layout ?? "notebook",
+        hideCode: current.app?.hideCode ?? true,
+        entryBlockIds: current.app?.entryBlockIds ?? [],
+        statePolicy: current.app?.statePolicy ?? "perSession",
+        ...patch,
+      },
+    }));
+  }, []);
+
   const deleteNotebookCell = useCallback((blockId: string) => {
     const blockIndex = document.blocks.findIndex((block) => block.id === blockId);
     if (blockIndex < 0) return;
@@ -224,6 +239,7 @@ export function useNotebookDocumentState({
     selectedBlockId,
     selectBlock: setSelectedBlockId,
     updateDraft,
+    updateNotebookApp,
   };
 }
 

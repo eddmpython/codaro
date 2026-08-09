@@ -16,6 +16,7 @@ type UseAppBootstrapEffectOptions = {
   applyBootstrapCurriculumState: (bootstrap: AppBootstrapState) => void;
   loadDocument: (document: CodaroDocument) => void;
   onDocumentPath: (path: string | null) => void;
+  onAppMode: (appMode: boolean) => void;
   onLoadState: (loadState: LoadState) => void;
   onNotice: (notice: AppNotice) => void;
   onProfile: (profile: AiProfile | null) => void;
@@ -28,6 +29,7 @@ export function useAppBootstrapEffect({
   applyBootstrapCurriculumState,
   loadDocument,
   onDocumentPath,
+  onAppMode,
   onLoadState,
   onNotice,
   onProfile,
@@ -43,6 +45,7 @@ export function useAppBootstrapEffect({
       const bootstrap = await loadAppBootstrapState();
       if (cancelled) return;
       applyBootstrapCurriculumState(bootstrap);
+      onAppMode(bootstrap.appMode);
       onToolCatalog(bootstrap.toolCatalog);
       onProfile(bootstrap.profile);
       onDocumentPath(bootstrap.documentPath);
@@ -57,6 +60,7 @@ export function useAppBootstrapEffect({
 
     void initialize().catch((error) => {
       if (cancelled) return;
+      onAppMode(false);
       onLoadState("error");
       onNotice({
         tone: "error",
@@ -72,6 +76,7 @@ export function useAppBootstrapEffect({
     applyBootstrapCurriculumState,
     loadDocument,
     onDocumentPath,
+    onAppMode,
     onLoadState,
     onNotice,
     onProfile,

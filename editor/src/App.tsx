@@ -4,6 +4,7 @@ import {
   initialBootstrapState,
 } from "@/lib/appBootstrap";
 import { MainSurface } from "@/components/app/mainSurface";
+import { AppProjection } from "@/components/app/appProjection";
 import { useCodaroDesign } from "@/lib/codaroDesign";
 import { ProductSidebar } from "@/components/app/productSidebar";
 import { ProductMobileNav } from "@/components/app/productMobileNav";
@@ -91,6 +92,8 @@ function App() {
     else setDesignSurface("chat");
   }, [setDesignSurface, surface]);
   const [loadState, setLoadState] = useState<LoadState>("loading");
+  const [serverAppMode, setServerAppMode] = useState<boolean | null>(null);
+  const [appPreviewOpen, setAppPreviewOpen] = useState(false);
   const [notebookDocumentPath, setNotebookDocumentPath] = useState<string | null>(null);
   // apiOnline 은 부트스트랩 1회가 아니라 라이브 연결 스토어가 소유한다(세션 중간 끊김 감지).
   const connection = useConnectionStatus();
@@ -120,6 +123,7 @@ function App() {
     selectedBlockId,
     selectBlock,
     updateDraft,
+    updateNotebookApp,
   } = useNotebookDocumentState({
     localDocumentPath: notebookDocumentPath,
     persistenceEnabled: loadState === "ready",
@@ -427,6 +431,7 @@ function App() {
     applyBootstrapCurriculumState,
     loadDocument,
     onDocumentPath: setNotebookDocumentPath,
+    onAppMode: setServerAppMode,
     onLoadState: setLoadState,
     onNotice: applyNotice,
     onProfile: setAiProfile,
@@ -575,6 +580,66 @@ function App() {
     viewportInsets,
   });
 
+  const appProjectionMode = serverAppMode
+    ? "server"
+    : appPreviewOpen
+      ? "preview"
+      : null;
+  const appExecutionSignature = JSON.stringify({
+    documentId: document.id,
+    packages: document.runtime?.packages ?? [],
+    blocks: document.blocks
+      .filter((block) => isExecutableBlock(block) || block.type === "markdown")
+      .map((block) => [block.id, drafts[block.id] ?? block.content]),
+  });
+  const lastAutomaticAppRunRef = useRef<string | null>(null);
+  const runNotebookRef = useRef(runNotebook);
+  const appExecutionBlocked = document.app?.statePolicy === "shared";
+  useEffect(() => {
+    runNotebookRef.current = runNotebook;
+  }, [runNotebook]);
+  useEffect(() => {
+    if (!appProjectionMode || appExecutionBlocked || loadState !== "ready") return;
+    if (lastAutomaticAppRunRef.current === appExecutionSignature) return;
+    lastAutomaticAppRunRef.current = appExecutionSignature;
+    void runNotebookRef.current();
+  }, [appExecutionBlocked, appExecutionSignature, appProjectionMode, loadState]);
+
+  if (serverAppMode === null) {
+    return (
+      <div
+        aria-busy="true"
+        className="grid h-svh place-items-center bg-background text-sm text-muted-foreground"
+        data-app-bootstrap-pending="true"
+        role="status"
+      >
+        Codaro를 여는 중입니다
+      </div>
+    );
+  }
+
+  if (appProjectionMode) {
+    return (
+      <LocaleProvider value={localeState}>
+        <WidgetSessionProvider
+          sessionId={sessionId}
+          onUiValueChange={({ blockId, elementId, value }) => setUiValue(blockId ?? "", elementId, value)}
+        >
+          <AppProjection
+            document={document}
+            drafts={drafts}
+            mode={appProjectionMode}
+            notebookRunning={notebookRunning}
+            onExitPreview={appProjectionMode === "preview" ? () => setAppPreviewOpen(false) : undefined}
+            onUpdateApp={appProjectionMode === "preview" ? updateNotebookApp : undefined}
+            results={results}
+            staleBlockIds={staleBlockIds}
+          />
+        </WidgetSessionProvider>
+      </LocaleProvider>
+    );
+  }
+
   return (
     <LocaleProvider value={localeState}>
     <WidgetSessionProvider
@@ -641,6 +706,7 @@ function App() {
             surface={surface}
             onCopyDiagnosticExport={copyDiagnosticExport}
             onRenameNotebook={renameNotebookDocument}
+            onPreviewApp={() => setAppPreviewOpen(true)}
             onToggleTheme={toggleThemeMode}
             onToggleNotebookTools={() => setNotebookToolsOpen((current) => !current)}
           />

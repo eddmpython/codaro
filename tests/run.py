@@ -254,13 +254,14 @@ GATES: dict[str, Gate] = {
             command(("uv", "run", "python", "-X", "utf8", "tests/runtime/testTracebackParser.py")),
             command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/genWidgetTypes.py", "--check")),
             command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyWidgetBridgeRoundTrip.py")),
-            command(("uv", "run", "python", "-X", "utf8", "tests/runtime/verifyPlaywrightAppRuntime.py")),
         ),
     ),
     "app-runtime": Gate(
         tier="fast",
-        description="App 라이프사이클 hook, 포트 회피, 사용자 정의 컴포넌트, teacher tool registry, OAuth refresh, dogfood.",
+        description="실제 앱 projection, 미리보기 저장, 반응성, 세션 격리, App 라이프사이클, teacher bridge, dogfood.",
         commands=(
+            command(("npm", "run", "build"), cwd="editor"),
+            command(("uv", "run", "python", "-X", "utf8", "tests/runtime/verifyPlaywrightAppRuntime.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/runtime/testAppRuntime.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/teacher/testTeacherToolBridge.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/teacher/testOauthTokenRefresh.py")),

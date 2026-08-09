@@ -32,6 +32,7 @@ export const emptyToolCatalog: AiToolCatalogPayload = {
 
 export type AppBootstrapState = {
   apiOnline: boolean;
+  appMode: boolean;
   categories: CurriculumCategory[];
   categoryGroups: Record<string, string[]>;
   categoryTree: CurriculumCategoryTreeNode[];
@@ -74,6 +75,7 @@ const emptyDiagnosticSummary: DiagnosticSummary = {
 
 export const initialBootstrapState: AppBootstrapState = {
   apiOnline: false,
+  appMode: false,
   categories: preferredCategories(builtInCategories.categories),
   categoryGroups: builtInCategories.groups,
   categoryTree: builtInCategories.tree ?? [],
@@ -119,6 +121,7 @@ export async function loadAppBootstrapState(): Promise<AppBootstrapState> {
   return {
     ...initialBootstrapState,
     apiOnline,
+    appMode: bootstrapResult.data.appMode,
     categories: preferredCategories(categoryResult.data.categories),
     categoryGroups: categoryResult.data.groups,
     categoryTree: categoryResult.data.tree ?? builtInCategories.tree ?? [],
