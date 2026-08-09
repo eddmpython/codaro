@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import time
+from collections.abc import Callable
 from pathlib import Path
+import threading
 
 from .protocol import SessionInfo
 from .session import KernelSession
@@ -17,50 +19,65 @@ class SessionManager:
         workspaceRoot: str | Path | None = None,
         *,
         executionPolicy: ExecutionSecurityPolicy | None = None,
+        sessionFactory: Callable[[str | None], KernelSession] | None = None,
+        onSessionDestroyed: Callable[[KernelSession], None] | None = None,
     ) -> None:
         self._sessions: dict[str, KernelSession] = {}
         self._lastActivity: dict[str, float] = {}
         self._workspaceRoot = Path(workspaceRoot).expanduser().resolve() if workspaceRoot is not None else None
         self._executionPolicy = executionPolicy
+        self._sessionFactory = sessionFactory
+        self._onSessionDestroyed = onSessionDestroyed
+        self._lock = threading.RLock()
 
     def createSession(self, workingDirectory: str | None = None) -> KernelSession:
-        if len(self._sessions) >= MAX_SESSIONS:
-            self.reapExpired()
-        if len(self._sessions) >= MAX_SESSIONS:
-            oldest = min(self._lastActivity, key=self._lastActivity.get, default=None)
-            if oldest is not None:
-                self.destroySession(oldest)
-        sessionWorkingDirectory = workingDirectory or (str(self._workspaceRoot) if self._workspaceRoot is not None else None)
-        session = KernelSession(
-            workingDirectory=sessionWorkingDirectory,
-            workspaceRoot=str(self._workspaceRoot) if self._workspaceRoot is not None else None,
-            executionPolicy=self._executionPolicy,
-        )
-        self._sessions[session.sessionId] = session
-        self._lastActivity[session.sessionId] = time.monotonic()
-        return session
+        with self._lock:
+            if len(self._sessions) >= MAX_SESSIONS:
+                self.reapExpired()
+            if len(self._sessions) >= MAX_SESSIONS:
+                oldest = min(self._lastActivity, key=self._lastActivity.get, default=None)
+                if oldest is not None:
+                    self.destroySession(oldest)
+            sessionWorkingDirectory = workingDirectory or (str(self._workspaceRoot) if self._workspaceRoot is not None else None)
+            session = (
+                self._sessionFactory(workingDirectory)
+                if self._sessionFactory is not None
+                else KernelSession(
+                    workingDirectory=sessionWorkingDirectory,
+                    workspaceRoot=str(self._workspaceRoot) if self._workspaceRoot is not None else None,
+                    executionPolicy=self._executionPolicy,
+                )
+            )
+            self._sessions[session.sessionId] = session
+            self._lastActivity[session.sessionId] = time.monotonic()
+            return session
 
     def touchSession(self, sessionId: str) -> None:
-        if sessionId in self._sessions:
-            self._lastActivity[sessionId] = time.monotonic()
+        with self._lock:
+            if sessionId in self._sessions:
+                self._lastActivity[sessionId] = time.monotonic()
 
     def getSession(self, sessionId: str) -> KernelSession | None:
-        session = self._sessions.get(sessionId)
-        if session is not None:
-            self._lastActivity[sessionId] = time.monotonic()
-        return session
+        with self._lock:
+            session = self._sessions.get(sessionId)
+            if session is not None:
+                self._lastActivity[sessionId] = time.monotonic()
+            return session
 
     def reapExpired(self, maxIdleSeconds: float = SESSION_MAX_IDLE_SECONDS) -> int:
-        now = time.monotonic()
-        expired = [
-            sid for sid, lastActive in self._lastActivity.items()
-            if (now - lastActive) > maxIdleSeconds
-        ]
+        with self._lock:
+            now = time.monotonic()
+            expired = [
+                sid for sid, lastActive in self._lastActivity.items()
+                if (now - lastActive) > maxIdleSeconds
+            ]
         for sid in expired:
             self.destroySession(sid)
         return len(expired)
 
     def listSessions(self) -> list[SessionInfo]:
+        with self._lock:
+            sessions = list(self._sessions.values())
         return [
             SessionInfo(
                 sessionId=session.sessionId,
@@ -68,23 +85,31 @@ class SessionManager:
                 executionCount=session.executionCount,
                 variableCount=len(session._collectVariables()),
             )
-            for session in self._sessions.values()
+            for session in sessions
         ]
 
     def destroySession(self, sessionId: str) -> bool:
-        session = self._sessions.pop(sessionId, None)
-        self._lastActivity.pop(sessionId, None)
+        with self._lock:
+            session = self._sessions.pop(sessionId, None)
+            self._lastActivity.pop(sessionId, None)
         if session is None:
             return False
         session.dispose()
+        if self._onSessionDestroyed is not None:
+            self._onSessionDestroyed(session)
         return True
 
     def destroyAll(self) -> None:
-        for session in self._sessions.values():
+        with self._lock:
+            sessions = list(self._sessions.values())
+            self._sessions.clear()
+            self._lastActivity.clear()
+        for session in sessions:
             session.dispose()
-        self._sessions.clear()
-        self._lastActivity.clear()
+            if self._onSessionDestroyed is not None:
+                self._onSessionDestroyed(session)
 
     @property
     def sessionCount(self) -> int:
-        return len(self._sessions)
+        with self._lock:
+            return len(self._sessions)

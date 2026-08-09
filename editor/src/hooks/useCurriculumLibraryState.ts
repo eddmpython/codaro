@@ -14,6 +14,7 @@ import type { AppNotice, CodaroDocument } from "@/types";
 import { lessonRefFromKey, type RunRouteLessonRef } from "@/lib/runRouteState";
 import { isExecutableBlock } from "@/lib/cellModel";
 import type { LearningArchiveMaterialization } from "@/lib/learningArchive";
+import { isServerPublicationPage } from "@/lib/serverPublication";
 import {
   canonicalLearningArchiveLessonRef,
   readPersistedLearningArchive,
@@ -56,6 +57,7 @@ export function useCurriculumLibraryState({
     let cancelled = false;
 
     async function loadContents() {
+      if (isServerPublicationPage()) return;
       setContentsLoading(true);
       try {
         const result = await loadCurriculumContentsState(selectedCategory, selectedContentId);
@@ -89,6 +91,7 @@ export function useCurriculumLibraryState({
     }
 
     async function loadReferenceLesson() {
+      if (isServerPublicationPage()) return;
       setReferenceLoading(true);
       try {
         let persisted: LearningArchiveMaterialization | null = null;

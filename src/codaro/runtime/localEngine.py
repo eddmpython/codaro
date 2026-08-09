@@ -37,6 +37,9 @@ class LocalEngine(ExecutionEngine):
         engineId: str | None = None,
         resourceLimits: ResourceLimits | None = None,
         executionPolicy: ExecutionSecurityPolicy | None = None,
+        runtimeEnvironment: dict[str, str] | None = None,
+        clearEnvironment: bool = False,
+        pythonPaths: list[str] | None = None,
     ) -> None:
         self.engineId = engineId or f"engine-{uuid.uuid4().hex[:10]}"
         self.executionCount = 0
@@ -49,11 +52,15 @@ class LocalEngine(ExecutionEngine):
         self._connection: Connection | None = None
         self._interruptFlag: mp.Event | None = None
         self._processLock = threading.RLock()
-        self._commandLock = threading.Lock()
+        self._commandLock = threading.RLock()
+        self._disposed = False
         self._workerBusy = threading.Event()
         self._interruptCount = 0
         self._resourceLimits = resourceLimits or _defaultResourceLimits()
         self._executionPolicy = executionPolicy
+        self._runtimeEnvironment = dict(runtimeEnvironment or {})
+        self._clearEnvironment = clearEnvironment
+        self._pythonPaths = list(pythonPaths or [])
         self._supervisor = ProcessSupervisor(self._resourceLimits)
 
         self._registry: dict[str, object] = {}
@@ -298,6 +305,9 @@ class LocalEngine(ExecutionEngine):
         except (BrokenPipeError, EOFError, OSError):
             self._replaceWorker()
 
+    def invokeUiCallback(self, request: dict[str, Any]) -> dict[str, Any]:
+        return self._sendCommand({"action": "uiEvent", "request": request})
+
     def reset(self, *, preserveDefinitions: bool = False) -> None:
         if self._hasLiveWorker():
             action = "resetVariables" if preserveDefinitions else "reset"
@@ -321,13 +331,20 @@ class LocalEngine(ExecutionEngine):
         self.status = "idle"
 
     def dispose(self) -> None:
-        self._supervisor.detach()
-        with self._processLock:
-            self._shutdownWorkerLocked()
-        self._registry.clear()
-        self._cellDefinitions.clear()
-        self._variableStates = []
-        self._ipcExecutor.shutdown(wait=False)
+        with self._commandLock:
+            if self._disposed:
+                return
+            self._disposed = True
+            self._supervisor.detach()
+            with self._processLock:
+                self._shutdownWorkerLocked()
+            self._registry.clear()
+            self._cellDefinitions.clear()
+            self._variableStates = []
+        # A queued execute call must observe `_disposed` and finish before its
+        # session workspace is removed. This is especially important on Windows,
+        # where a live worker working directory keeps the directory locked.
+        self._ipcExecutor.shutdown(wait=True, cancel_futures=True)
 
     def _executeBlocking(
         self,
@@ -388,26 +405,29 @@ class LocalEngine(ExecutionEngine):
                 }
 
     def _sendCommand(self, command: dict[str, Any], *, eventSink=None) -> dict[str, Any]:
-        with self._processLock:
-            self._ensureWorkerLocked()
-            connection = self._connection
+        with self._commandLock:
+            if self._disposed:
+                raise RuntimeError("Engine has been disposed.")
+            with self._processLock:
+                self._ensureWorkerLocked()
+                connection = self._connection
 
-        if connection is None:
-            raise RuntimeError("Engine worker connection is not available.")
+            if connection is None:
+                raise RuntimeError("Engine worker connection is not available.")
 
-        connection.send(command)
-        while True:
-            response = connection.recv()
-            self._supervisor.heartbeat()
-            if isinstance(response, dict) and response.get("kind") == "event":
-                if eventSink is not None:
-                    eventSink(dict(response.get("event", {})))
-                continue
-            if isinstance(response, dict) and response.get("kind") == "response":
-                response = response.get("response", {})
-            if isinstance(response, dict) and response.get("error"):
-                raise RuntimeError(str(response["error"]))
-            return response
+            connection.send(command)
+            while True:
+                response = connection.recv()
+                self._supervisor.heartbeat()
+                if isinstance(response, dict) and response.get("kind") == "event":
+                    if eventSink is not None:
+                        eventSink(dict(response.get("event", {})))
+                    continue
+                if isinstance(response, dict) and response.get("kind") == "response":
+                    response = response.get("response", {})
+                if isinstance(response, dict) and response.get("error"):
+                    raise RuntimeError(str(response["error"]))
+                return response
 
     def _replaceWorker(self) -> None:
         with self._processLock:
@@ -448,6 +468,9 @@ class LocalEngine(ExecutionEngine):
                 "workspaceRoot": str(self._workspaceRoot),
                 "interruptFlag": interruptFlag,
                 "executionPolicy": self._executionPolicy.serialize() if self._executionPolicy is not None else None,
+                "runtimeEnvironment": self._runtimeEnvironment,
+                "clearEnvironment": self._clearEnvironment,
+                "pythonPaths": self._pythonPaths,
             },
             daemon=True,
         )

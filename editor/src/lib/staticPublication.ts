@@ -1,5 +1,5 @@
 import { normalizeDocumentPayload } from "@/lib/documentModel";
-import type { PublicationManifest } from "@/lib/generatedContracts/publicationManifest";
+import type { BrowserPublicationRuntime, PublicationManifest } from "@/lib/generatedContracts/publicationManifest";
 import type { CodaroDocument } from "@/types";
 
 export type LoadedStaticPublication = {
@@ -81,12 +81,14 @@ function parseManifest(raw: unknown): PublicationManifest {
       || !isRecord(raw.runtime)) {
     throw new Error("정적 publication manifest 목록이 잘못됐습니다.");
   }
+  if ("kind" in raw.runtime) throw new Error("server runtime은 정적 publication에서 열 수 없습니다.");
   const manifest = raw as unknown as PublicationManifest;
+  const browserRuntime = manifest.runtime as BrowserPublicationRuntime;
   for (const path of [
     manifest.documentPath,
-    manifest.runtime.pythonIndexPath,
-    manifest.runtime.pythonIntegrityPath,
-    manifest.runtime.pyprocIntegrityPath,
+    browserRuntime.pythonIndexPath,
+    browserRuntime.pythonIntegrityPath,
+    browserRuntime.pyprocIntegrityPath,
     ...manifest.files.map((item) => item.path),
     ...manifest.dataAssets.flatMap((item) => [item.sourcePath, item.bundlePath]),
     ...manifest.packageAssets.map((item) => item.bundlePath),

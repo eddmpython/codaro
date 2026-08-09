@@ -64,4 +64,4 @@ literal relative read는 workspace 안에서 resolve하고 bytes hash를 `assetH
 - `/api/publication/inspect`는 workspace 밖 path를 거부하고 저장 전 draft를 같은 compiler로 판정한다.
 - 편집기는 API 결과만 받아 문서 target banner와 셀 진단 chip으로 투영한다.
 
-정적 browser publication은 [[static-publication]]이 이 manifest를 입력으로 사용한다. source, dependency, package lock, asset, effect 중 하나가 바뀌면 기존 build, permission, deployment receipt를 그대로 재사용하지 않는다.
+정적 browser publication은 [[static-publication]], native package와 secret이 필요한 server publication은 [[server-publication]]이 이 manifest를 입력으로 사용한다. source, dependency, package lock, asset, effect 중 하나가 바뀌면 기존 build, permission, deployment receipt를 그대로 재사용하지 않는다.

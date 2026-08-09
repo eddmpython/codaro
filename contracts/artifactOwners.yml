@@ -36,6 +36,8 @@ artifacts:
       - src/codaro/generatedContracts/publicationManifest.schema.json
       - editor/src/lib/generatedContracts/publicationManifest.ts
       - src/codaro/publication/staticBuilder.py
+      - src/codaro/publication/serverBuilder.py
+      - src/codaro/publication/serverRuntime.py
   - artifactId: learning-artifact-descriptor
     role: source
     owner: learning-runtime

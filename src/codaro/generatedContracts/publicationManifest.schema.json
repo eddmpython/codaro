@@ -28,7 +28,12 @@
       "items": { "type": "string", "minLength": 1, "maxLength": 200 }
     },
     "documentPath": { "$ref": "#/$defs/RelativePath" },
-    "runtime": { "$ref": "#/$defs/PublicationRuntime" },
+    "runtime": {
+      "oneOf": [
+        { "$ref": "#/$defs/BrowserPublicationRuntime" },
+        { "$ref": "#/$defs/ServerPublicationRuntime" }
+      ]
+    },
     "files": {
       "type": "array",
       "items": { "$ref": "#/$defs/PublicationFile" }
@@ -53,7 +58,7 @@
       "minLength": 1,
       "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
     },
-    "PublicationRuntime": {
+    "BrowserPublicationRuntime": {
       "type": "object",
       "additionalProperties": false,
       "required": ["pythonIndexPath", "pythonIntegrityPath", "pyprocIntegrityPath"],
@@ -61,6 +66,49 @@
         "pythonIndexPath": { "$ref": "#/$defs/RelativePath" },
         "pythonIntegrityPath": { "$ref": "#/$defs/RelativePath" },
         "pyprocIntegrityPath": { "$ref": "#/$defs/RelativePath" }
+      }
+    },
+    "ServerPublicationRuntime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "pythonVersion",
+        "requirementsPath",
+        "permissionScopes",
+        "secretRefs",
+        "networkOrigins",
+        "statePolicy",
+        "policyHash",
+        "maxMemoryMb",
+        "maxExecutionSeconds"
+      ],
+      "properties": {
+        "kind": { "const": "server" },
+        "pythonVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+$" },
+        "requirementsPath": { "$ref": "#/$defs/RelativePath" },
+        "permissionScopes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": ["filesystem.read", "filesystem.write", "network"]
+          }
+        },
+        "secretRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}$" }
+        },
+        "networkOrigins": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^https?://[^/]+$" }
+        },
+        "statePolicy": { "type": "string", "enum": ["none", "perSession", "shared"] },
+        "policyHash": { "$ref": "#/$defs/ContentHash" },
+        "maxMemoryMb": { "type": "integer", "minimum": 64, "maximum": 4096 },
+        "maxExecutionSeconds": { "type": "integer", "minimum": 1, "maximum": 3600 }
       }
     },
     "PublicationFile": {

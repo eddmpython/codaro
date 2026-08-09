@@ -57,7 +57,7 @@ def buildParser() -> argparse.ArgumentParser:
 
     buildPublicationParser = subparsers.add_parser("build", help="Build an immutable publication bundle.")
     buildPublicationParser.add_argument("path", help="Document path to build.")
-    buildPublicationParser.add_argument("--target", choices=["browser"], default="browser")
+    buildPublicationParser.add_argument("--target", choices=["browser", "server"], default="browser")
     buildPublicationParser.add_argument("--output", help="Publication output directory.")
     buildPublicationParser.add_argument("--package-lock", help="JSON package compatibility lock path.")
     buildPublicationParser.add_argument("--json", action="store_true", help="Print the build receipt as JSON.")
@@ -67,6 +67,10 @@ def buildParser() -> argparse.ArgumentParser:
     servePublicationParser.add_argument("--host", default="127.0.0.1")
     servePublicationParser.add_argument("--port", type=int, default=8766)
     servePublicationParser.add_argument("--no-browser", action="store_true")
+
+    rollbackPublicationParser = subparsers.add_parser("rollback", help="Move a server publication pointer to a verified bundle.")
+    rollbackPublicationParser.add_argument("path", help="Server publication output directory.")
+    rollbackPublicationParser.add_argument("bundle_hash", help="Exact sha256 bundle hash.")
 
     taskParser = subparsers.add_parser("task", help="Manage automation tasks.")
     taskSubparsers = taskParser.add_subparsers(dest="task_command", required=True)
@@ -167,6 +171,10 @@ def main() -> None:
 
     if command == "serve":
         _handlePublicationServe(args)
+        return
+
+    if command == "rollback":
+        _handlePublicationRollback(args)
         return
 
     host = args.host
@@ -322,17 +330,21 @@ def _handleInspect(args) -> None:
 
 
 def _handlePublicationBuild(args) -> None:
-    from .publication import PublicationBuildError, buildStaticPublication
+    from .publication import PublicationBuildError, buildServerPublication, buildStaticPublication
 
     sourcePath = Path(args.path).expanduser().resolve()
     outputPath = (
         Path(args.output).expanduser().resolve()
         if args.output
-        else sourcePath.with_name(f"{sourcePath.stem}-site")
+        else sourcePath.with_name(f"{sourcePath.stem}-{'server' if args.target == 'server' else 'site'}")
     )
     packageLock = _loadPackageLock(args.package_lock)
     try:
-        result = buildStaticPublication(sourcePath, outputPath, packageLock=packageLock)
+        result = (
+            buildServerPublication(sourcePath, outputPath, packageLock=packageLock)
+            if args.target == "server"
+            else buildStaticPublication(sourcePath, outputPath, packageLock=packageLock)
+        )
     except PublicationBuildError as exc:
         print(f"Publication build failed: {exc}", file=sys.stderr)
         for diagnostic in exc.diagnostics:
@@ -354,23 +366,38 @@ def _handlePublicationBuild(args) -> None:
     if args.json:
         print(json.dumps(payload, ensure_ascii=False, indent=2))
     else:
-        print(f"Built browser publication: {result.bundleRoot}")
+        print(f"Built {args.target} publication: {result.bundleRoot}")
         print(f"Bundle: {result.bundleHash}")
 
 
 def _handlePublicationServe(args) -> None:
     from .publication import PublicationBuildError, servePublication
+    from .server import serveServerPublication
 
     try:
-        servePublication(
-            args.path,
-            host=args.host,
-            port=args.port,
-            openBrowser=not args.no_browser,
-        )
+        activePath = Path(args.path).expanduser().resolve() / "active.json"
+        active = json.loads(activePath.read_text(encoding="utf-8"))
+        if not isinstance(active, dict):
+            raise PublicationBuildError("publication active pointer가 JSON object가 아닙니다.")
+        serve = serveServerPublication if active.get("target") == "server" else servePublication
+        serve(args.path, host=args.host, port=args.port, openBrowser=not args.no_browser)
     except PublicationBuildError as exc:
         print(f"Publication serve failed: {exc}", file=sys.stderr)
         raise SystemExit(1) from exc
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        print(f"Publication serve failed: active pointer를 읽을 수 없습니다: {exc}", file=sys.stderr)
+        raise SystemExit(1) from exc
+
+
+def _handlePublicationRollback(args) -> None:
+    from .publication import PublicationBuildError, rollbackServerPublication
+
+    try:
+        verified = rollbackServerPublication(args.path, args.bundle_hash)
+    except PublicationBuildError as exc:
+        print(f"Publication rollback failed: {exc}", file=sys.stderr)
+        raise SystemExit(1) from exc
+    print(f"Rolled back server publication to {verified.bundleHash}")
 
 
 def _loadPackageLock(pathLike: str | None) -> dict[str, object] | None:
@@ -425,7 +452,7 @@ def normalizeArgs(rawArgs: list[str]) -> list[str]:
         return ["edit"]
 
     command = rawArgs[0].lower()
-    knownCommands = {"edit", "run", "app", "export", "inspect", "build", "serve", "task", "pack", "classroom"}
+    knownCommands = {"edit", "run", "app", "export", "inspect", "build", "serve", "rollback", "task", "pack", "classroom"}
 
     if command == "app":
         return ["run", *rawArgs[1:]]

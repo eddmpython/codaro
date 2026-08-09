@@ -98,14 +98,16 @@ def createKernelRouter(state: ServerState) -> APIRouter:
 
     @router.post("/api/kernel/{sessionId}/ui-event", response_model=UiEventResponse)
     def apiUiEvent(sessionId: str, request: UiEventRequest) -> UiEventResponse:
-        requireSession(state, sessionId)
+        session = requireSession(state, sessionId)
         try:
-            response = handleKernelUiEvent(request)
-        except UiCallbackNotFound:
+            response = handleKernelUiEvent(request, invoke=session.invokeUiCallback)
+        except (UiCallbackNotFound, KeyError):
             logger.warning(
                 "ui-event %s",
                 formatLogFields(action="missing", sessionId=sessionId, callbackId=request.callbackId),
             )
+            fail(404, "ui_callback_not_found", "UI callback not found.")
+        if response.status == "missing":
             fail(404, "ui_callback_not_found", "UI callback not found.")
         if response.status == "error":
             logger.warning(

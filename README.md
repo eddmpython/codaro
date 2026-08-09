@@ -350,6 +350,14 @@ uv run codaro app notebook.py
 uv run codaro build notebook.py --target browser --output notebook-site
 uv run codaro serve notebook-site
 
+# native package와 secret이 필요한 self-host 서버 앱
+uv run codaro build notebook.py --target server --output notebook-server
+$env:APP_TOKEN = "배포 환경에서 주입"
+uv run codaro serve notebook-server
+
+# 검증된 이전 immutable bundle로 pointer 복원
+uv run codaro rollback notebook-server sha256-<bundle hash>
+
 # .py ↔ ipynb 변환
 uv run codaro export notebook.py --format ipynb
 

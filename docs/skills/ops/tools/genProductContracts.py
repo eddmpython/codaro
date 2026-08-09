@@ -370,10 +370,26 @@ PublicationTarget = Literal["browser", "server", "local"]
 PublicationFileRole = Literal["shell", "runtime", "document", "data", "package"]
 
 
-class PublicationRuntime(TypedDict):
+class BrowserPublicationRuntime(TypedDict):
     pythonIndexPath: str
     pythonIntegrityPath: str
     pyprocIntegrityPath: str
+
+
+class ServerPublicationRuntime(TypedDict):
+    kind: Literal["server"]
+    pythonVersion: str
+    requirementsPath: str
+    permissionScopes: list[Literal["filesystem.read", "filesystem.write", "network"]]
+    secretRefs: list[str]
+    networkOrigins: list[str]
+    statePolicy: Literal["none", "perSession", "shared"]
+    policyHash: str
+    maxMemoryMb: int
+    maxExecutionSeconds: int
+
+
+PublicationRuntime = BrowserPublicationRuntime | ServerPublicationRuntime
 
 
 class PublicationFile(TypedDict):
@@ -415,11 +431,26 @@ def publicationManifestTypeScriptSource(schemaHash: str, ownersHash: str) -> str
 export type PublicationTarget = "browser" | "server" | "local";
 export type PublicationFileRole = "shell" | "runtime" | "document" | "data" | "package";
 
-export type PublicationRuntime = {{
+export type BrowserPublicationRuntime = {{
   pythonIndexPath: string;
   pythonIntegrityPath: string;
   pyprocIntegrityPath: string;
 }};
+
+export type ServerPublicationRuntime = {{
+  kind: "server";
+  pythonVersion: string;
+  requirementsPath: string;
+  permissionScopes: Array<"filesystem.read" | "filesystem.write" | "network">;
+  secretRefs: string[];
+  networkOrigins: string[];
+  statePolicy: "none" | "perSession" | "shared";
+  policyHash: string;
+  maxMemoryMb: number;
+  maxExecutionSeconds: number;
+}};
+
+export type PublicationRuntime = BrowserPublicationRuntime | ServerPublicationRuntime;
 
 export type PublicationFile = {{
   path: string;

@@ -5,6 +5,8 @@ export type BootstrapPayload = {
   documentPath: string | null;
   workspaceRoot: string;
   rootPath: string;
+  publicationTarget?: "server";
+  bundleHash?: string;
 };
 
 export type DiagnosticCategory = "provider" | "runtime" | "package" | "frontend";

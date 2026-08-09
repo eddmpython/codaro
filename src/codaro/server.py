@@ -6,6 +6,7 @@ import time
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any, Mapping
 
 from fastapi import HTTPException
 from fastapi import FastAPI, Request, Response
@@ -156,48 +157,57 @@ def createServerApp(
     studyDir: Path | None = None,
     workspaceRoot: Path | None = None,
     browserUrl: str | None = None,
+    publicationRuntime: Any | None = None,
 ) -> FastAPI:
     logger = configureServerLogging()
-    state = createServerState(
-        mode=mode,
-        documentPath=documentPath,
-        workspaceRoot=workspaceRoot or Path.cwd().resolve(),
-        studyRoot=studyDir or CURRICULA_ROOT,
-        packageRoot=PACKAGE_ROOT,
-        editorRoot=EDITOR_ROOT,
-        webBuildRoot=WEB_BUILD_ROOT,
+    state = (
+        publicationRuntime.state
+        if publicationRuntime is not None
+        else createServerState(
+            mode=mode,
+            documentPath=documentPath,
+            workspaceRoot=workspaceRoot or Path.cwd().resolve(),
+            studyRoot=studyDir or CURRICULA_ROOT,
+            packageRoot=PACKAGE_ROOT,
+            editorRoot=EDITOR_ROOT,
+            webBuildRoot=WEB_BUILD_ROOT,
+        )
     )
 
     @asynccontextmanager
     async def lifespan(application: FastAPI):
         del application
-        try:
-            await state.workspaceEngine.initialize()
-        except Exception as startupError:  # noqa: BLE001 — lifespan boundary
-            logger.exception(
-                "lifespan %s",
-                formatLogFields(status="startup-failed", error=str(startupError)),
-            )
-            raise
+        if publicationRuntime is None:
+            try:
+                await state.workspaceEngine.initialize()
+            except Exception as startupError:  # noqa: BLE001 - lifespan boundary
+                logger.exception(
+                    "lifespan %s",
+                    formatLogFields(status="startup-failed", error=str(startupError)),
+                )
+                raise
         logger.info(
             "lifespan %s",
             formatLogFields(
                 status="startup",
                 mode=state.mode,
                 workspaceRoot=state.workspaceRoot,
-                studyRoot=state.studyRoot if state.studyRoot.exists() else None,
+                studyRoot=state.studyRoot if publicationRuntime is None and state.studyRoot.exists() else None,
             ),
         )
 
         async def reapSessionsPeriodically() -> None:
-            from .ai.conversation import getConversationManager
-
             while True:
                 await asyncio.sleep(300)
                 try:
                     sessionReaped = state.sessionManager.reapExpired()
-                    convManager = getConversationManager()
-                    convReaped = convManager.reapExpired()
+                    convManager = None
+                    convReaped = 0
+                    if publicationRuntime is None:
+                        from .ai.conversation import getConversationManager
+
+                        convManager = getConversationManager()
+                        convReaped = convManager.reapExpired()
                     if sessionReaped > 0 or convReaped > 0:
                         logger.info(
                             "reaper %s",
@@ -206,7 +216,7 @@ def createServerApp(
                                 sessions=sessionReaped,
                                 conversations=convReaped,
                                 remainingSessions=state.sessionManager.sessionCount,
-                                remainingConversations=convManager.conversationCount,
+                                remainingConversations=convManager.conversationCount if convManager is not None else 0,
                             ),
                         )
                 except Exception as reapError:  # noqa: BLE001 — reaper must not crash
@@ -223,14 +233,15 @@ def createServerApp(
         reapTask.add_done_callback(_onBackgroundTaskDone)
 
         # 재시작 시 schedule 보유 태스크의 주기 실행을 복원(잡은 휘발, schedule은 영속).
-        try:
-            from .automation.taskFlow import rehydrateAutomationSchedules
+        if publicationRuntime is None:
+            try:
+                from .automation.taskFlow import rehydrateAutomationSchedules
 
-            rehydrated = rehydrateAutomationSchedules(str(state.workspaceRoot))
-            if rehydrated["count"]:
-                logger.info("scheduler %s", formatLogFields(status="rehydrated", count=rehydrated["count"]))
-        except Exception as scheduleError:  # noqa: BLE001 — schedule restore must not block startup
-            logger.warning("scheduler %s", formatLogFields(status="rehydrate-failed", error=str(scheduleError)))
+                rehydrated = rehydrateAutomationSchedules(str(state.workspaceRoot))
+                if rehydrated["count"]:
+                    logger.info("scheduler %s", formatLogFields(status="rehydrated", count=rehydrated["count"]))
+            except Exception as scheduleError:  # noqa: BLE001 - schedule restore must not block startup
+                logger.warning("scheduler %s", formatLogFields(status="rehydrate-failed", error=str(scheduleError)))
 
         if browserUrl:
             import webbrowser
@@ -250,23 +261,25 @@ def createServerApp(
             "lifespan %s",
             formatLogFields(status="shutdown", activeSessions=state.sessionManager.sessionCount),
         )
-        try:
-            state.workspaceEngine.dispose()
-        except Exception as disposeError:  # noqa: BLE001 — shutdown must continue
-            logger.exception("lifespan %s", formatLogFields(status="dispose-failed", error=str(disposeError)))
-        try:
-            await getSessionRegistry().closeAll()
-        except Exception as automationCloseError:  # noqa: BLE001 — shutdown must continue
-            logger.exception(
-                "lifespan %s",
-                formatLogFields(status="automation-session-close-failed", error=str(automationCloseError)),
-            )
+        if publicationRuntime is None:
+            try:
+                state.workspaceEngine.dispose()
+            except Exception as disposeError:  # noqa: BLE001 - shutdown must continue
+                logger.exception("lifespan %s", formatLogFields(status="dispose-failed", error=str(disposeError)))
+            try:
+                await getSessionRegistry().closeAll()
+            except Exception as automationCloseError:  # noqa: BLE001 - shutdown must continue
+                logger.exception(
+                    "lifespan %s",
+                    formatLogFields(status="automation-session-close-failed", error=str(automationCloseError)),
+                )
         try:
             state.sessionManager.destroyAll()
         except Exception as destroyError:  # noqa: BLE001 — shutdown must continue
             logger.exception("lifespan %s", formatLogFields(status="destroy-failed", error=str(destroyError)))
 
     app = FastAPI(title="Codaro", lifespan=lifespan)
+    app.state.codaro = state
     serverPort = os.environ.get("CODARO_PORT", "8765")
     configuredOrigins = [
         origin.strip().rstrip("/")
@@ -300,14 +313,22 @@ def createServerApp(
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Content-Security-Policy"] = (
-            "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://giscus.app https://cdn.jsdelivr.net; "
-            "style-src 'self' 'unsafe-inline'; "
-            "img-src 'self' data: blob:; "
-            "connect-src 'self' ws: wss: https://cdn.jsdelivr.net; "
-            "font-src 'self' data:; "
-            "frame-src https://giscus.app; "
-            "frame-ancestors 'none'"
+            (
+                "default-src 'self'; base-uri 'none'; script-src 'self' 'unsafe-inline'; "
+                "style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; "
+                "font-src 'self' data:; object-src 'none'; frame-src 'none'; frame-ancestors 'none'"
+            )
+            if publicationRuntime is not None
+            else (
+                "default-src 'self'; "
+                "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://giscus.app https://cdn.jsdelivr.net; "
+                "style-src 'self' 'unsafe-inline'; "
+                "img-src 'self' data: blob:; "
+                "connect-src 'self' ws: wss: https://cdn.jsdelivr.net; "
+                "font-src 'self' data:; "
+                "frame-src https://giscus.app; "
+                "frame-ancestors 'none'"
+            )
         )
         if request.url.path == "/" or request.url.path.startswith("/_app"):
             response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
@@ -332,20 +353,25 @@ def createServerApp(
             )
         return response
 
-    app.include_router(createAiRouter(state))
-    app.include_router(createAutomationRouter(state))
-    app.include_router(createBootstrapRouter(state))
-    app.include_router(createDocumentRouter(state))
-    app.include_router(createExtensionRouter(state))
-    from .api.integrationRouter import createIntegrationRouter
-    app.include_router(createIntegrationRouter(state))
-    app.include_router(createKernelRouter(state))
-    app.include_router(createPublicationRouter(state))
-    app.include_router(createShareRouter(state))
-    app.include_router(createSystemRouter(state))
-    app.include_router(createTerminalRouter(state))
-    app.include_router(createWorkspaceRouter(state))
-    app.include_router(createCurriculumRouter(state))
+    if publicationRuntime is not None:
+        from .api.publishedServerRouter import createPublishedServerRouter
+
+        app.include_router(createPublishedServerRouter(publicationRuntime))
+    else:
+        app.include_router(createAiRouter(state))
+        app.include_router(createAutomationRouter(state))
+        app.include_router(createBootstrapRouter(state))
+        app.include_router(createDocumentRouter(state))
+        app.include_router(createExtensionRouter(state))
+        from .api.integrationRouter import createIntegrationRouter
+        app.include_router(createIntegrationRouter(state))
+        app.include_router(createKernelRouter(state))
+        app.include_router(createPublicationRouter(state))
+        app.include_router(createShareRouter(state))
+        app.include_router(createSystemRouter(state))
+        app.include_router(createTerminalRouter(state))
+        app.include_router(createWorkspaceRouter(state))
+        app.include_router(createCurriculumRouter(state))
     app.include_router(createSpaRouter(state))
     return app
 
@@ -442,6 +468,39 @@ def resolveBindablePort(host: str, port: int, *, maxAttempts: int = 10, logger: 
                     )
                 candidate += 1
     return port
+
+
+def createPublishedServerApp(
+    outputRoot: str | Path,
+    *,
+    environment: Mapping[str, str] | None = None,
+) -> FastAPI:
+    from .publication.serverRuntime import PublishedServerRuntime
+
+    runtime = PublishedServerRuntime(outputRoot, environment=environment)
+    app = createServerApp(mode="app", publicationRuntime=runtime)
+    app.state.publicationRuntime = runtime
+    return app
+
+
+def serveServerPublication(
+    outputRoot: str | Path,
+    *,
+    host: str = "127.0.0.1",
+    port: int = 8766,
+    openBrowser: bool = True,
+    environment: Mapping[str, str] | None = None,
+) -> None:
+    import webbrowser
+
+    app = createPublishedServerApp(outputRoot, environment=environment)
+    resolvedPort = resolveBindablePort(host, port)
+    visibleHost = "127.0.0.1" if host in {"0.0.0.0", "::"} else host
+    url = f"http://{visibleHost}:{resolvedPort}/app"
+    print(f"Serving server publication at {url}")
+    if openBrowser:
+        webbrowser.open(url)
+    uvicorn.run(app, host=host, port=resolvedPort, log_level="warning", loop=createServerEventLoop)
 
 
 def shouldLogRequest(request: Request, statusCode: int) -> bool:

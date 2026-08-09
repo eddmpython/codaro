@@ -6,9 +6,10 @@ from collections.abc import Awaitable, Callable
 from ..runtime import ExecutionEvent as RuntimeExecutionEvent
 from ..runtime import LocalEngine, VariableDelta as RuntimeVariableDelta, VariableState
 from ..runtime.executionPolicy import ExecutionSecurityPolicy
+from ..runtime.processSupervisor import ResourceLimits
 from ..system.fileOps import DirectoryListing, FileContent
 from ..system.packageOps import InstallResult, PackageInfo
-from .protocol import ExecutionEvent, ExecutionOutput, VariableDelta, VariableInfo
+from .protocol import ExecutionEvent, ExecutionOutput, UiEventRequest, UiEventResponse, VariableDelta, VariableInfo
 
 
 class KernelSession:
@@ -18,6 +19,10 @@ class KernelSession:
         workingDirectory: str | None = None,
         workspaceRoot: str | None = None,
         executionPolicy: ExecutionSecurityPolicy | None = None,
+        resourceLimits: ResourceLimits | None = None,
+        runtimeEnvironment: dict[str, str] | None = None,
+        clearEnvironment: bool = False,
+        pythonPaths: list[str] | None = None,
     ):
         self.sessionId = sessionId or f"session-{uuid.uuid4().hex[:10]}"
         self._engine = LocalEngine(
@@ -25,6 +30,10 @@ class KernelSession:
             workspaceRoot=workspaceRoot,
             engineId=self.sessionId,
             executionPolicy=executionPolicy,
+            resourceLimits=resourceLimits,
+            runtimeEnvironment=runtimeEnvironment,
+            clearEnvironment=clearEnvironment,
+            pythonPaths=pythonPaths,
         )
         self._registry = self._engine._registry
         self._cellDefinitions = self._engine._cellDefinitions
@@ -78,6 +87,10 @@ class KernelSession:
 
     def interrupt(self):
         return self._engine.interrupt()
+
+    def invokeUiCallback(self, request: UiEventRequest) -> UiEventResponse:
+        payload = self._engine.invokeUiCallback(request.model_dump(mode="json"))
+        return UiEventResponse.model_validate(payload)
 
     async def getFiles(self, path: str = ".") -> DirectoryListing:
         return await self._engine.getFiles(path)

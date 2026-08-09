@@ -18,4 +18,8 @@ def testPublicationManifestContractIsOwnedAndGeneratedOnBothSurfaces() -> None:
     assert schema["additionalProperties"] is False
     assert "contracts/publicationManifest.schema.json" in owners
     assert "class PublicationManifest(TypedDict)" in python
+    assert "class BrowserPublicationRuntime(TypedDict)" in python
+    assert "class ServerPublicationRuntime(TypedDict)" in python
     assert "export type PublicationManifest" in typescript
+    assert 'kind: "server"' in typescript
+    assert "networkOrigins: string[]" in typescript

@@ -47,6 +47,11 @@ def testNormalizeArgsLeavesPublicationCommandsUntouched() -> None:
         "browser",
     ]
     assert normalizeArgs(["serve", "./site", "--no-browser"]) == ["serve", "./site", "--no-browser"]
+    assert normalizeArgs(["rollback", "./server", "sha256-" + "a" * 64]) == [
+        "rollback",
+        "./server",
+        "sha256-" + "a" * 64,
+    ]
 
 
 def testInspectPrintsCompilerReportWithoutStartingEditor(tmp_path, monkeypatch, capsys) -> None:

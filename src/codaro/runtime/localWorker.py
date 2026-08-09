@@ -11,6 +11,7 @@ from pathlib import Path
 import sys
 import traceback
 from typing import Any
+from urllib.parse import urlsplit
 import warnings
 
 from .executionPolicy import ExecutionSecurityPolicy
@@ -45,11 +46,31 @@ def runLocalWorker(
     workspaceRoot: str | None,
     interruptFlag=None,
     executionPolicy: dict[str, object] | None = None,
+    runtimeEnvironment: dict[str, str] | None = None,
+    clearEnvironment: bool = False,
+    pythonPaths: list[str] | None = None,
 ) -> None:
+    if clearEnvironment:
+        os.environ.clear()
+        os.environ.update({
+            "MPLBACKEND": "Agg",
+            "OPENBLAS_NUM_THREADS": "1",
+            "OMP_NUM_THREADS": "1",
+            "MKL_NUM_THREADS": "1",
+            "NUMEXPR_NUM_THREADS": "1",
+            "PYTHONIOENCODING": "utf-8",
+            "PYTHONUTF8": "1",
+        })
+    if runtimeEnvironment:
+        os.environ.update(runtimeEnvironment)
     registry: dict[str, object] = {}
     cellDefinitions: dict[str, set[str]] = {}
     executionCount = 0
     targetCwd = _resolveTargetCwd(workingDirectory, workspaceRoot)
+    for pythonPath in reversed(pythonPaths or []):
+        resolvedPythonPath = str(Path(pythonPath).expanduser().resolve())
+        if resolvedPythonPath not in sys.path:
+            sys.path.insert(0, resolvedPythonPath)
     if targetCwd is not None and str(targetCwd) not in sys.path:
         sys.path.insert(0, str(targetCwd))
 
@@ -134,11 +155,31 @@ def runLocalWorker(
                 continue
 
             if action == "reset":
+                from ..uiCallbacks import resetCallbacks
+
                 registry.clear()
                 cellDefinitions.clear()
                 resetStore()
+                resetCallbacks()
                 executionCount = 0
                 _workerSend(connection, _buildStateResponse(registry, cellDefinitions, executionCount))
+                continue
+
+            if action == "uiEvent":
+                from .uiEventRuntime import UiCallbackNotFound, handleRuntimeUiEvent
+
+                request = command["request"]
+                try:
+                    response = handleRuntimeUiEvent(request)
+                except UiCallbackNotFound as error:
+                    response = {
+                        "status": "missing",
+                        "callbackId": str(request.get("callbackId") or ""),
+                        "eventType": str(request.get("eventType") or "invoke"),
+                        "error": str(error),
+                        "reactiveTrigger": [],
+                    }
+                _workerSend(connection, response)
                 continue
 
             if action == "resetVariables":
@@ -233,11 +274,39 @@ def _installExecutionPolicyAuditHook(policy: ExecutionSecurityPolicy) -> None:
             "socket.gethostbyname",
         }:
             _requireScope(policy, "network", event)
+            _requireNetworkDestination(policy, event, args)
             return
         if event == "subprocess.Popen" or event == "os.system" or event.startswith("os.exec") or event.startswith("os.spawn"):
             _requireScope(policy, "process.execute", event)
 
     sys.addaudithook(audit)
+
+
+def _requireNetworkDestination(
+    policy: ExecutionSecurityPolicy,
+    event: str,
+    args: tuple[object, ...],
+) -> None:
+    if not policy.networkOrigins:
+        return
+    host = _networkHost(event, args)
+    allowedHosts = {urlsplit(origin).hostname for origin in policy.networkOrigins}
+    if host is None or host.lower().rstrip(".") not in {item.lower().rstrip(".") for item in allowedHosts if item}:
+        raise PermissionError(f"Codaro execution policy blocked {event}; destination is not declared")
+
+
+def _networkHost(event: str, args: tuple[object, ...]) -> str | None:
+    if not args:
+        return None
+    candidate: object = args[1] if event in {"socket.bind", "socket.connect"} and len(args) > 1 else args[0]
+    if isinstance(candidate, tuple) and candidate:
+        candidate = candidate[0]
+    if isinstance(candidate, bytes):
+        try:
+            candidate = candidate.decode("ascii")
+        except UnicodeDecodeError:
+            return None
+    return candidate if isinstance(candidate, str) and candidate else None
 
 
 def _auditPath(value: object) -> Path | None:

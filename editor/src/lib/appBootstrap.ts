@@ -110,9 +110,28 @@ export async function loadAppBootstrapState(): Promise<AppBootstrapState> {
     return initialBootstrapState;
   }
 
-  const health = await optional(codaroApi.health, { status: "offline" });
-  const [bootstrapResult, categoryResult, toolsResult, profileResult, diagnosticsResult] = await Promise.all([
+  const [health, bootstrapResult] = await Promise.all([
+    optional(codaroApi.health, { status: "offline" }),
     optional(codaroApi.bootstrap, fallbackBootstrap),
+  ]);
+  const apiOnline = health.online && bootstrapResult.online;
+  if (apiOnline && bootstrapResult.data.publicationTarget === "server") {
+    const sessionId = await createInitialSession();
+    const loadedDocument = bootstrapResult.data.documentPath
+      ? await loadBootstrapDocument(bootstrapResult.data.documentPath)
+      : { document: null, notice: null, path: null };
+    return {
+      ...initialBootstrapState,
+      apiOnline: true,
+      appMode: true,
+      documentPath: loadedDocument.path,
+      documentToApply: loadedDocument.document,
+      notice: loadedDocument.notice,
+      refreshAutomation: false,
+      sessionId,
+    };
+  }
+  const [categoryResult, toolsResult, profileResult, diagnosticsResult] = await Promise.all([
     optional(codaroApi.curriculumCategories, {
       ...builtInCategories,
       categories: preferredCategories(builtInCategories.categories),
@@ -122,7 +141,6 @@ export async function loadAppBootstrapState(): Promise<AppBootstrapState> {
     optional(codaroApi.systemDiagnostics, emptyDiagnosticSummary),
   ]);
 
-  const apiOnline = health.online && bootstrapResult.online;
   const sessionId = apiOnline ? await createInitialSession() : null;
   const loadedDocument = bootstrapResult.online && bootstrapResult.data.documentPath
     ? await loadBootstrapDocument(bootstrapResult.data.documentPath)

@@ -166,6 +166,7 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "pyproc-runtime-fs-browser": ("output/test-runner/pyproc-runtime-fs-browser/pyproc-runtime-fs-report.json",),
     "runtime-recovery-browser": ("output/test-runner/runtime-recovery-browser/runtime-recovery-report.json",),
     "static-publication": ("output/test-runner/static-publication/static-publication-report.json",),
+    "server-publication": ("output/test-runner/server-publication/server-publication-report.json",),
     "quality-cycle": ("output/test-runner/quality-cycle/sequence-summary.json",),
     "product-release": ("output/test-runner/product-release/sequence-summary.json",),
     "preflight": ("output/test-runner/preflight/sequence-summary.json",),
@@ -691,7 +692,8 @@ GATES: dict[str, Gate] = {
         commands=(
             command((
                 "uv", "run", "python", "-X", "utf8", "-m", "pytest",
-                "tests/publication",
+                "tests/publication/testCompiler.py",
+                "tests/publication/testEditorCompilerProjection.py",
                 "tests/contracts/testApplicationContracts.py",
                 "tests/runtime/testCli.py",
                 "tests/runtime/testServerApi.py::testPublicationInspectUsesCanonicalCompilerForUnsavedDraft",
@@ -708,7 +710,7 @@ GATES: dict[str, Gate] = {
         commands=(
             command((
                 "uv", "run", "python", "-X", "utf8", "-m", "pytest",
-                "tests/publication",
+                "tests/publication/testStaticBuilder.py",
                 "tests/contracts/testPublicationManifestContract.py",
                 "tests/runtime/testCli.py",
                 "-q", "--tb=short",
@@ -716,6 +718,23 @@ GATES: dict[str, Gate] = {
             command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/genProductContracts.py", "--check")),
             command(("npm", "run", "build"), cwd="editor"),
             command(("uv", "run", "python", "-X", "utf8", "tests/publication/verifyStaticPublicationPlaywright.py"), timeoutSeconds=600),
+        ),
+        ci_required=False,
+    ),
+    "server-publication": Gate(
+        tier="surface",
+        description="immutable server bundle, session 격리, secret 비노출, worker 복구와 rollback을 검증한다.",
+        commands=(
+            command((
+                "uv", "run", "python", "-X", "utf8", "-m", "pytest",
+                "tests/publication/testServerPublication.py",
+                "tests/contracts/testPublicationManifestContract.py",
+                "tests/runtime/testCli.py",
+                "-q", "--tb=short",
+            ), timeoutSeconds=1200),
+            command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/genProductContracts.py", "--check")),
+            command(("npm", "run", "build"), cwd="editor"),
+            command(("uv", "run", "python", "-X", "utf8", "tests/publication/verifyServerPublicationPlaywright.py"), timeoutSeconds=600),
         ),
         ci_required=False,
     ),
@@ -978,6 +997,7 @@ PRODUCT_QUALITY_GATES = (
     "architecture-boundary",
     "publication-compiler",
     "static-publication",
+    "server-publication",
     "design-system-contract",
     "theme-runtime-browser",
     "visual-accessibility-browser",
@@ -2036,8 +2056,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 66:
-        failures.append(f"expected 66 gates, found {len(GATES)}")
+    if len(GATES) != 67:
+        failures.append(f"expected 67 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:
