@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from itertools import count
 
+import pytest
+
 from codaro.curriculum.capabilityProjection import projectCapability
 from codaro.curriculum.learningEvent import learningEventDigest, sealLearningEvent
 from codaro.curriculum.taxonomy import TaskFamilyDef, TaskFamilyVariantDef, loadTaxonomy
@@ -161,7 +163,7 @@ def testOldClaimVersionIsPreservedButDoesNotRaiseCurrentStage() -> None:
     assert next(item for item in projection.taskFamilies if item.taskFamilyId == family.id).stage == "unproven"
 
 
-def testApplicationProofRequiresLocalArtifactAndCanRecordValidatedRerun() -> None:
+def testApplicationProofRequiresLocalArtifactAndStopsAtIntegrated() -> None:
     taxonomy = loadTaxonomy()
     sequence = count(1)
     events: list[dict[str, object]] = []
@@ -194,17 +196,15 @@ def testApplicationProofRequiresLocalArtifactAndCanRecordValidatedRerun() -> Non
     ))
 
     integrated = projectCapability(taxonomy, "reportAutomationFoundation", events)
-    rerun = projectCapability(
-        taxonomy,
-        "reportAutomationFoundation",
-        events,
-        automationRuns=[{"validated": True, "learnerSelectedInput": True}],
-    )
-
     assert integrated.application.stage == "integrated"
     assert integrated.application.receiptCount == 1
-    assert rerun.application.stage == "rerun"
-    assert rerun.application.userInputRerun is True
+    with pytest.raises(TypeError):
+        projectCapability(
+            taxonomy,
+            "reportAutomationFoundation",
+            events,
+            automationRuns=[{"validated": True, "learnerSelectedInput": True}],
+        )
 
 
 def testTombstonedApplicationReceiptNoLongerRaisesApplicationStage() -> None:

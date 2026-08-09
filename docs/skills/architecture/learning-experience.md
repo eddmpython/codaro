@@ -74,7 +74,7 @@ artifact evidence는 상대 경로, media type, size, SHA-256 content hash와 ty
 
 복습 queue는 TaskFamily와 outcome evidence slice를 함께 추적한다. 최근 variant를 피하고 unseen variant를 우선한다. `occurredAt`만으로 delayed credit을 만들지 않으며 canonical evidence time과 append receipt를 함께 사용한다.
 
-사용자 표면은 보증과 적용을 분리한다. 보증은 `연습 중`, `수업 정답 없이 해냄`, `새 조건에서도 해냄`, `시간 뒤 다시 해냄`이다. 적용은 `검증된 결과물을 만듦`, `여러 능력을 묶어 완성함`, `자동화로 다시 실행됨`이다. 모든 단계는 canonical event, artifact content hash, automation lineage에서만 파생하며 수동 toggle을 두지 않는다.
+사용자 표면은 보증과 적용을 분리한다. 보증은 `연습 중`, `수업 정답 없이 해냄`, `새 조건에서도 해냄`, `시간 뒤 다시 해냄`이다. 현재 적용은 `검증된 결과물을 만듦`, `여러 능력을 묶어 완성함`까지다. 일반 Task의 성공 상태나 사용자가 넣은 task input은 학습 적용 증거가 아니다. `자동화로 다시 실행됨`은 source, input, effect, check, artifact를 같은 versioned operational receipt에 결속하는 계약이 구현된 뒤 그 receipt로만 복원한다. 모든 단계는 canonical event와 artifact content hash에서만 파생하며 수동 toggle을 두지 않는다.
 
 ## Web to Local continuation
 

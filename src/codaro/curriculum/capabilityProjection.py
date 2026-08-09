@@ -11,7 +11,7 @@ from .taxonomy import CurriculumTaxonomy, TaskFamilyDef
 
 
 AssuranceStage = Literal["unproven", "practicing", "independent", "transfer", "mastered"]
-ApplicationStage = Literal["none", "artifact", "integrated", "rerun"]
+ApplicationStage = Literal["none", "artifact", "integrated"]
 
 STAGE_RANK: dict[str, int] = {
     "unproven": 0,
@@ -58,7 +58,6 @@ class ApplicationProof(BaseModel):
     stage: ApplicationStage = "none"
     receiptCount: int = 0
     receipts: list[ProofReceipt] = Field(default_factory=list)
-    userInputRerun: bool = False
 
 
 class CapabilityProjection(BaseModel):
@@ -78,7 +77,6 @@ def projectCapability(
     events: Iterable[Mapping[str, object]],
     *,
     asOf: str | None = None,
-    automationRuns: Iterable[Mapping[str, object]] = (),
 ) -> CapabilityProjection:
     domain = taxonomy.domainById(domainId)
     if domain is None:
@@ -152,7 +150,6 @@ def projectCapability(
         taxonomy=taxonomy,
         domainId=domainId,
         assuranceStage=assuranceStage,
-        automationRuns=automationRuns,
     )
     return CapabilityProjection(
         domainId=domain.id,
@@ -213,7 +210,6 @@ def _projectApplication(
     taxonomy: CurriculumTaxonomy,
     domainId: str,
     assuranceStage: AssuranceStage,
-    automationRuns: Iterable[Mapping[str, object]],
 ) -> ApplicationProof:
     domain = taxonomy.domainById(domainId)
     if domain is None:
@@ -288,21 +284,17 @@ def _projectApplication(
             continue
         receiptIds.add(str(event["eventId"]))
     receipts = _proofReceipts(events, receiptIds)
-    validAutomationRuns = [run for run in automationRuns if run.get("validated") is True]
     if not receipts:
         return ApplicationProof()
-    userInputRerun = any(run.get("learnerSelectedInput") is True for run in validAutomationRuns)
-    if len(validAutomationRuns) >= 1:
-        stage: ApplicationStage = "rerun"
-    elif STAGE_RANK[assuranceStage] >= STAGE_RANK["independent"]:
-        stage = "integrated"
-    else:
-        stage = "artifact"
+    stage: ApplicationStage = (
+        "integrated"
+        if STAGE_RANK[assuranceStage] >= STAGE_RANK["independent"]
+        else "artifact"
+    )
     return ApplicationProof(
         stage=stage,
         receiptCount=len(receipts),
         receipts=receipts,
-        userInputRerun=userInputRerun,
     )
 
 

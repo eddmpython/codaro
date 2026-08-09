@@ -4,8 +4,6 @@ from pathlib import Path
 
 from fastapi import APIRouter, Response
 
-from ..automation.taskModel import TaskStatus
-from ..automation.taskRegistry import getTaskRegistry
 from ..curriculum.analyticsFlow import CurriculumAnalyticsFlow
 from ..curriculum.artifactStore import ArtifactBlobStore, ArtifactStoreError
 from ..curriculum.capabilityProjection import projectCapability
@@ -62,23 +60,6 @@ from .requestModels import (
     OutcomeValidationRequest,
     ReviewResultRequest,
 )
-
-
-def _validatedCapabilityAutomationRuns(domainId: str) -> list[dict[str, object]]:
-    registry = getTaskRegistry()
-    return [
-        {
-            "learnerSelectedInput": False,
-            "runId": run.id,
-            "taskId": task.id,
-            "validated": True,
-        }
-        for task in registry.listTasks()
-        if task.inputs.get("capabilityDomainId") == domainId
-        and task.inputs.get("proofCreditEventIds")
-        for run in registry.getRuns(task.id, limit=50)
-        if run.status == TaskStatus.SUCCESS
-    ]
 
 
 def createCurriculumRouter(state: ServerState) -> APIRouter:
@@ -286,7 +267,6 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
                 state.curriculumOs.taxonomy(),
                 domainId,
                 state.learningEvidenceArchiveStore.eventPayloads(),
-                automationRuns=_validatedCapabilityAutomationRuns(domainId),
             )
         except ValueError as error:
             fail(404, "curriculum-capability-missing", str(error))

@@ -1438,3 +1438,40 @@ def testGeneralCodeHarvestDoesNotClaimLearningProof(tmp_path: Path, monkeypatch)
     assert "capabilityDomainId" not in task["inputs"]
 
     taskRegistryModule._registry = None
+
+
+def testSuccessfulTaskWithSpoofedProofInputsDoesNotRaiseApplicationStage(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("CODARO_HOME", str(tmp_path / "home"))
+    import codaro.automation.taskRegistry as taskRegistryModule
+    from codaro.automation.taskModel import TaskRun, TaskStatus
+
+    taskRegistryModule._registry = None
+    app = createServerApp(workspaceRoot=tmp_path)
+    client = TestClient(app)
+    response = client.post(
+        "/api/tasks/from-code",
+        json={
+            "code": "print('done')",
+            "name": "Spoofed Proof",
+            "inputs": {
+                "capabilityDomainId": "reportAutomationFoundation",
+                "proofCreditEventIds": ["fake-credit"],
+            },
+        },
+    )
+    assert response.status_code == 200
+    task = response.json()["task"]
+    taskRegistryModule.getTaskRegistry().addRun(TaskRun(
+        taskId=task["id"],
+        status=TaskStatus.SUCCESS,
+    ))
+
+    capability = client.get("/api/curriculum/capabilities/reportAutomationFoundation")
+
+    assert capability.status_code == 200
+    assert capability.json()["application"] == {
+        "stage": "none",
+        "receiptCount": 0,
+        "receipts": [],
+    }
+    taskRegistryModule._registry = None
