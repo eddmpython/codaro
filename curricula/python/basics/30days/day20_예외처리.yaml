@@ -502,6 +502,16 @@ assessment:
   masteryVariants:
   - id: day20-positive-int-mastery
     mode: mastery
+    assessmentMode: acquisition
+    instructionRole: practice
+    assessmentRole: assurance
+    capabilityClaimId: report.pipeline
+    capabilityClaimVersion: 1
+    taskFamilyId: python.report.pipeline
+    taskFamilyVersion: 1
+    taskVariantId: python.report.pipeline.acquisition.v1
+    taskVariantVersion: 1
+    outcomeIds: [python.functions, python.modulesAndIo, python.errorHandling]
     unseen: true
     claimScope: portable-concept
     reviewStatus: machine-verified-pending-independent-review
@@ -567,6 +577,15 @@ assessment:
   transferVariants:
   - id: day20-safe-divide-transfer
     mode: transfer
+    instructionRole: practice
+    assessmentRole: assurance
+    capabilityClaimId: report.pipeline
+    capabilityClaimVersion: 1
+    taskFamilyId: python.report.pipeline
+    taskFamilyVersion: 1
+    taskVariantId: python.report.pipeline.transfer.v1
+    taskVariantVersion: 1
+    outcomeIds: [python.functions, python.modulesAndIo, python.errorHandling]
     unseen: true
     claimScope: portable-concept
     reviewStatus: machine-verified-pending-independent-review
@@ -629,6 +648,15 @@ assessment:
   retrievalVariants:
   - id: day20-required-value-retrieval
     mode: retrieval
+    instructionRole: practice
+    assessmentRole: assurance
+    capabilityClaimId: report.pipeline
+    capabilityClaimVersion: 1
+    taskFamilyId: python.report.pipeline
+    taskFamilyVersion: 1
+    taskVariantId: python.report.pipeline.retrieval.v1
+    taskVariantVersion: 1
+    outcomeIds: [python.functions, python.modulesAndIo, python.errorHandling]
     unseen: true
     claimScope: portable-concept
     reviewStatus: machine-verified-pending-independent-review

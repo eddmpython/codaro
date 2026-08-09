@@ -12,7 +12,7 @@ from typing import Any
 
 
 LEARNING_EVENT_SCHEMA_VERSION = 1
-MASTERY_POLICY_VERSION = 1
+MASTERY_POLICY_VERSIONS = frozenset({1, 2})
 LEARNING_EVENT_KINDS = frozenset({
     "RunObserved",
     "CheckEvaluated",
@@ -204,8 +204,18 @@ def _validateRunContext(value: Mapping[str, Any]) -> None:
         "packageSetHash",
     ):
         _requireHash(value, field)
-    if value["masteryPolicyVersion"] != MASTERY_POLICY_VERSION:
+    if value["masteryPolicyVersion"] not in MASTERY_POLICY_VERSIONS:
         raise LearningEventError("RunContext masteryPolicyVersion is unsupported")
+    for field in ("capabilityClaimVersion", "taskFamilyVersion", "taskVariantVersion", "artifactContractVersion"):
+        if field in value and (not _isNonNegativeInt(value[field]) or value[field] < 1):
+            raise LearningEventError(f"RunContext {field} is invalid")
+    for field in ("artifactContractId", "capabilityClaimId", "taskFamilyId"):
+        if field in value:
+            _requireText(value, field)
+    if "exposureReceiptIds" in value:
+        exposureReceiptIds = _requireTextList(value, "exposureReceiptIds")
+        if len(exposureReceiptIds) != len(set(exposureReceiptIds)):
+            raise LearningEventError("RunContext exposureReceiptIds must be unique")
     if value["tierUsed"] not in {"browser", "local"}:
         raise LearningEventError("RunContext tierUsed is invalid")
 

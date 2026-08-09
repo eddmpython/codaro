@@ -7,7 +7,7 @@ taxonomy.lessonOutcomes는 backfill 용도다.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Literal
 
 import yaml
 from pydantic import BaseModel, Field
@@ -19,12 +19,67 @@ class OutcomeDef(BaseModel):
     description: str = ""
 
 
+class ApplicationRequirementDef(BaseModel):
+    artifactContractId: str
+    artifactContractVersion: int = 1
+    automationHandoff: str = "supported"
+
+
+class CapabilityClaimDef(BaseModel):
+    id: str
+    statement: str
+    allowedTools: list[str] = Field(default_factory=list)
+    inferenceBoundary: list[str] = Field(default_factory=list)
+    requiredTaskFamilyIds: list[str] = Field(default_factory=list)
+    applicationRequirement: ApplicationRequirementDef | None = None
+    version: int = 1
+
+
+class EvidenceSliceDef(BaseModel):
+    outcomeId: str
+    caseIds: list[str] = Field(default_factory=list)
+
+
+class TaskFamilyVariantDef(BaseModel):
+    taskVariantId: str
+    taskVariantVersion: int = 1
+    lessonRef: str
+    sectionId: str
+    checkSpecId: str
+    checkSpecVersion: str = "1"
+    fixtureHash: str
+
+
+class CheckerCorpusDef(BaseModel):
+    validAlternatives: list[str] = Field(default_factory=list)
+    requiredMutations: list[str] = Field(default_factory=list)
+    notApplicable: dict[str, str] = Field(default_factory=dict)
+
+
+class TaskFamilyDef(BaseModel):
+    id: str
+    version: int = 1
+    ownerDomainId: str
+    ownerClaimId: str
+    outcomeIds: list[str] = Field(default_factory=list)
+    invariant: str
+    inferenceBoundary: list[str] = Field(default_factory=list)
+    evidenceSlices: list[EvidenceSliceDef] = Field(default_factory=list)
+    variants: dict[str, TaskFamilyVariantDef] = Field(default_factory=dict)
+    applicationVariant: TaskFamilyVariantDef | None = None
+    checkerCorpus: CheckerCorpusDef = Field(default_factory=CheckerCorpusDef)
+    artifactContractId: str | None = None
+    artifactContractVersion: int | None = None
+
+
 class DomainDef(BaseModel):
     id: str
     label: str
     description: str = ""
     targetOutcomes: list[str] = Field(default_factory=list)
     capstoneLessonRef: str | None = None
+    capabilityClaims: list[CapabilityClaimDef] = Field(default_factory=list)
+    prerequisitePolicy: Literal["closure", "targetOnly"] = "closure"
 
 
 class LessonOutcomeRecord(BaseModel):
@@ -39,6 +94,7 @@ class LessonOutcomeRecord(BaseModel):
 class CurriculumTaxonomy(BaseModel):
     outcomes: list[OutcomeDef] = Field(default_factory=list)
     domains: list[DomainDef] = Field(default_factory=list)
+    taskFamilies: list[TaskFamilyDef] = Field(default_factory=list)
     lessonOutcomes: dict[str, LessonOutcomeRecord] = Field(default_factory=dict)
 
     def outcomeById(self, outcomeId: str) -> OutcomeDef | None:
@@ -51,6 +107,12 @@ class CurriculumTaxonomy(BaseModel):
         for domain in self.domains:
             if domain.id == domainId:
                 return domain
+        return None
+
+    def taskFamilyById(self, taskFamilyId: str) -> TaskFamilyDef | None:
+        for taskFamily in self.taskFamilies:
+            if taskFamily.id == taskFamilyId:
+                return taskFamily
         return None
 
     def hasOutcome(self, outcomeId: str) -> bool:
@@ -67,6 +129,11 @@ class CurriculumTaxonomy(BaseModel):
         """그래프 무결성 검증 — 모르는 outcome 참조나 cycle 가능성을 잡는다."""
         errors: list[str] = []
         knownOutcomes = {outcome.id for outcome in self.outcomes}
+        knownDomains = {domain.id for domain in self.domains}
+        familyIds = [family.id for family in self.taskFamilies]
+        duplicateFamilies = {familyId for familyId in familyIds if familyIds.count(familyId) > 1}
+        for familyId in sorted(duplicateFamilies):
+            errors.append(f"duplicate task family '{familyId}'")
         for domain in self.domains:
             for outcomeId in domain.targetOutcomes:
                 if outcomeId not in knownOutcomes:
@@ -77,6 +144,63 @@ class CurriculumTaxonomy(BaseModel):
                 errors.append(
                     f"domain {domain.id}: unknown capstone lesson '{domain.capstoneLessonRef}'"
                 )
+            claimIds = [claim.id for claim in domain.capabilityClaims]
+            for claimId in sorted({claimId for claimId in claimIds if claimIds.count(claimId) > 1}):
+                errors.append(f"domain {domain.id}: duplicate capability claim '{claimId}'")
+            for claim in domain.capabilityClaims:
+                if claim.version < 1:
+                    errors.append(f"claim {claim.id}: version must be positive")
+                if not claim.statement.strip():
+                    errors.append(f"claim {claim.id}: statement is required")
+                for familyId in claim.requiredTaskFamilyIds:
+                    family = self.taskFamilyById(familyId)
+                    if family is None:
+                        errors.append(f"claim {claim.id}: unknown task family '{familyId}'")
+                    elif family.ownerDomainId != domain.id or family.ownerClaimId != claim.id:
+                        errors.append(f"claim {claim.id}: task family '{familyId}' owner mismatch")
+        for family in self.taskFamilies:
+            if family.version < 1:
+                errors.append(f"task family {family.id}: version must be positive")
+            if family.artifactContractId and (family.artifactContractVersion or 0) < 1:
+                errors.append(f"task family {family.id}: artifact contract version is required")
+            if family.artifactContractId and family.applicationVariant is None:
+                errors.append(f"task family {family.id}: artifact contract requires application variant")
+            if family.ownerDomainId not in knownDomains:
+                errors.append(f"task family {family.id}: unknown owner domain '{family.ownerDomainId}'")
+                continue
+            domain = self.domainById(family.ownerDomainId)
+            claim = next((item for item in (domain.capabilityClaims if domain else []) if item.id == family.ownerClaimId), None)
+            if claim is None:
+                errors.append(f"task family {family.id}: unknown owner claim '{family.ownerClaimId}'")
+            elif family.id not in claim.requiredTaskFamilyIds:
+                errors.append(f"task family {family.id}: owner claim does not require it")
+            if set(family.outcomeIds) - set(domain.targetOutcomes if domain else []):
+                errors.append(f"task family {family.id}: outcome outside owner domain")
+            sliceOutcomes = [evidenceSlice.outcomeId for evidenceSlice in family.evidenceSlices]
+            if set(sliceOutcomes) != set(family.outcomeIds):
+                errors.append(f"task family {family.id}: evidence slices must cover every outcome exactly")
+            if len(sliceOutcomes) != len(set(sliceOutcomes)):
+                errors.append(f"task family {family.id}: duplicate evidence slice outcome")
+            for evidenceSlice in family.evidenceSlices:
+                if evidenceSlice.outcomeId not in knownOutcomes:
+                    errors.append(f"task family {family.id}: unknown outcome '{evidenceSlice.outcomeId}'")
+                if not evidenceSlice.caseIds:
+                    errors.append(f"task family {family.id}: evidence slice requires case ids")
+            requiredModes = {"acquisition", "transfer", "retrieval"}
+            if set(family.variants) != requiredModes:
+                errors.append(f"task family {family.id}: acquisition, transfer, retrieval variants are required")
+            variantIds = [variant.taskVariantId for variant in family.variants.values()]
+            if len(variantIds) != len(set(variantIds)):
+                errors.append(f"task family {family.id}: task variant ids must be distinct")
+            for mode, variant in family.variants.items():
+                if variant.taskVariantVersion < 1:
+                    errors.append(f"task family {family.id}: {mode} variant version must be positive")
+                if variant.lessonRef not in self.lessonOutcomes:
+                    errors.append(f"task family {family.id}: unknown variant lesson '{variant.lessonRef}'")
+            if not family.checkerCorpus.validAlternatives:
+                errors.append(f"task family {family.id}: valid alternative corpus is required")
+            if not family.checkerCorpus.requiredMutations:
+                errors.append(f"task family {family.id}: required mutation corpus is required")
         for key, record in self.lessonOutcomes.items():
             for outcomeId in record.outcomes:
                 if outcomeId not in knownOutcomes:

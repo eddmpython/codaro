@@ -1,5 +1,5 @@
-import { ArrowRight, BookOpen, CheckCircle2, GraduationCap, RotateCcw, Target } from "lucide-react";
-import { useMemo } from "react";
+import { ArrowRight, BookOpen, GraduationCap, RotateCcw, Target } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,10 @@ import {
   type LearningVisualDomainId,
 } from "@/lib/learningVisualAssets";
 import type { CurriculumCategory } from "@/types";
+import type { CapabilityProjection } from "@/lib/capabilityProjection";
+import { loadReportAutomationCapability } from "@/lib/capabilityOperations";
+import { PROGRESS_UPDATED_EVENT } from "@/lib/curriculumProgressEvent";
+import { machinePublicationState } from "@/lib/machinePublication";
 import { LearningDomainVisual } from "./learningDomainVisual";
 
 type CurriculumHomeProps = {
@@ -65,13 +69,29 @@ export function CurriculumHome({
   const { summary } = useCurriculumProgress();
   const { reviews } = useCurriculumReviews();
   const groups = useMemo(() => groupByTrack(categories), [categories]);
+  const [capability, setCapability] = useState<CapabilityProjection | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    const refresh = () => {
+      void loadReportAutomationCapability().then((projection) => {
+        if (active) setCapability(projection);
+      }).catch((error: unknown) => {
+        console.error("능력 증거를 읽지 못했습니다.", error);
+      });
+    };
+    refresh();
+    window.addEventListener(PROGRESS_UPDATED_EVENT, refresh);
+    return () => {
+      active = false;
+      window.removeEventListener(PROGRESS_UPDATED_EVENT, refresh);
+    };
+  }, []);
 
   const dueReviews = reviews?.reviews ?? [];
   const totalDue = reviews?.totalDue ?? 0;
 
-  const creditedOutcomes = summary?.creditedOutcomeCount ?? 0;
-  const independentOutcomes = summary?.independentOutcomeCount ?? 0;
-  const masteredOutcomes = summary?.masteredOutcomeCount ?? 0;
+  const showGoldenPath = machinePublicationState("reportAutomationFoundation") === "golden";
   const resume = summary?.resume ?? null;
   const resumeLabel = resume
     ? categories.find((category) => category.key === resume.category)?.name ?? resume.category
@@ -127,29 +147,65 @@ export function CurriculumHome({
             </div>
           </header>
 
-          {creditedOutcomes > 0 ? (
-            <dl
-              className="grid grid-cols-3 divide-x divide-border border-b border-border py-4"
-              data-curriculum-home-mastery="true"
-              data-curriculum-home-credited-outcomes={creditedOutcomes}
-              data-curriculum-home-independent-outcomes={independentOutcomes}
-              data-curriculum-home-mastered-outcomes={masteredOutcomes}
-            >
-              {[
-                ["강한 검증", creditedOutcomes],
-                ["독립 적용", independentOutcomes],
-                ["숙달", masteredOutcomes],
-              ].map(([label, value]) => (
-                <div className="min-w-0 px-3 first:pl-0 sm:px-5" key={label}>
-                  <dt className="truncate text-xs font-normal text-muted-foreground">{label}</dt>
-                  <dd className="mt-1 flex items-center gap-1.5 text-lg font-bold tabular-nums text-foreground">
-                    <CheckCircle2 className="size-3.5 text-success" />
-                    {value}
-                  </dd>
+          {showGoldenPath ? <section
+            className="border-b border-border py-5"
+            data-curriculum-golden-path="reportAutomationFoundation"
+            data-curriculum-golden-stage={capability?.assuranceStage ?? "unproven"}
+          >
+            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant="default">검증된 기본 경로</Badge>
+                  {capability?.reviewDue ? <Badge variant="outline">다시 확인할 때</Badge> : null}
                 </div>
-              ))}
-            </dl>
-          ) : null}
+                <h2 className="mt-3 text-lg font-bold">입력을 검증해 자동화 보고서 만들기</h2>
+                <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
+                  한 행 계산부터 여러 행 판정, 오류 처리, JSON 결과물과 로컬 재실행까지 같은 전체 과업을 점차 적은 도움으로 완성합니다.
+                </p>
+                <div className="mt-4 grid gap-2 sm:grid-cols-2" data-capability-family-list="true">
+                  {(capability?.taskFamilies ?? []).map((family, index) => (
+                    <div className="border border-border px-3 py-2.5" key={family.taskFamilyId}>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-xs font-medium text-muted-foreground">능력 {index + 1}</span>
+                        <span className="text-xs font-bold text-foreground">{assuranceStageLabel(family.stage)}</span>
+                      </div>
+                      <p className="mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground">{family.label}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="min-w-52 border-l border-border pl-4">
+                <div className="text-xs text-muted-foreground">학습 보증</div>
+                <div className="mt-1 text-sm font-bold">{assuranceStageLabel(capability?.assuranceStage ?? "unproven")}</div>
+                <div className="mt-3 text-xs text-muted-foreground">적용 증거</div>
+                <div className="mt-1 text-sm font-bold">{applicationStageLabel(capability?.application.stage ?? "none")}</div>
+                <Button
+                  className="mt-4 w-full gap-2"
+                  data-curriculum-golden-start="true"
+                  onClick={() => onSelectLesson("30days", "day01_헬로월드")}
+                >
+                  <BookOpen className="size-4" />
+                  {capability && capability.assuranceStage !== "unproven" ? "이어서 하기" : "이 경로 시작"}
+                  <ArrowRight className="size-4" />
+                </Button>
+              </div>
+            </div>
+            {capability?.application.receipts.some((receipt) => receipt.artifactContentHashes.length) ? (
+              <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-3" data-capability-artifact-receipts="true">
+                {capability.application.receipts.flatMap((receipt) => receipt.artifactContentHashes).map((contentHash) => (
+                  <a
+                    className="text-xs font-medium text-accent-brand underline-offset-4 hover:underline"
+                    href={`/api/curriculum/artifacts/${encodeURIComponent(contentHash)}`}
+                    key={contentHash}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    검증된 결과물 열기
+                  </a>
+                ))}
+              </div>
+            ) : null}
+          </section> : null}
 
           {totalDue > 0 ? (
             <section
@@ -266,4 +322,23 @@ export function CurriculumHome({
       </div>
     </ScrollArea>
   );
+}
+
+function assuranceStageLabel(stage: CapabilityProjection["assuranceStage"]) {
+  return {
+    unproven: "연습 중",
+    practicing: "연습 중",
+    independent: "수업 정답 없이 해냄",
+    transfer: "새 조건에서도 해냄",
+    mastered: "시간 뒤 다시 해냄",
+  }[stage];
+}
+
+function applicationStageLabel(stage: CapabilityProjection["application"]["stage"]) {
+  return {
+    none: "적용 결과물 없음",
+    artifact: "검증된 결과물을 만듦",
+    integrated: "여러 능력을 묶어 완성함",
+    rerun: "자동화로 다시 실행됨",
+  }[stage];
 }

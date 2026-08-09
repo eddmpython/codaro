@@ -1,10 +1,10 @@
 import type { BlockConfig, ExecutionResult } from "@/types";
-import type { WebStrongCheckEvidenceEvent, WebStrongCheckEvidenceInput } from "@/lib/webLearningEvidence";
+import type { WebLearningAttemptEvidenceEvent, WebStrongCheckEvidenceInput } from "@/lib/webLearningEvidence";
 import { blockLabel, stripBullet, stripMarkdown } from "@/lib/cellModel";
 import { useEffect, useRef, useState } from "react";
 import type { LearningAttemptCheck } from "@/lib/learningAttemptCheck";
 import { evaluateLearningAttempt } from "@/lib/learningAttemptCheck";
-import { learningEvidenceRuntimeTier, storeStrongLearningEvidence } from "@/lib/learningEvidenceOperations";
+import { learningEvidenceRuntimeTier, recordLearningAttemptEvidence } from "@/lib/learningEvidenceOperations";
 import { PROGRESS_UPDATED_EVENT } from "@/lib/curriculumProgressEvent";
 import { dueAssessmentSectionIds, type AssessmentQueueContract } from "@/lib/curriculumAssessmentQueue";
 import { CodePayload, ExecutionOutput, IconButton, LoadingInline } from "@/components/app/appPrimitives";
@@ -181,7 +181,7 @@ export function groupCurriculumSections(blocks: BlockConfig[]): { introBlocks: B
 export async function dueAssessmentBlocks(
   baseBlocks: BlockConfig[],
   candidateBlocks: BlockConfig[],
-  events: WebStrongCheckEvidenceEvent[],
+  events: WebLearningAttemptEvidenceEvent[],
   now = Date.now(),
 ): Promise<BlockConfig[]> {
   if (!candidateBlocks.length || !events.length) return [];
@@ -191,7 +191,7 @@ export async function dueAssessmentBlocks(
     const assessmentMode = readPayloadText(section.contract?.assessmentMode);
     const sectionId = readPayloadText(section.contract?.id);
     if (
-      !["transfer", "retrieval"].includes(assessmentMode)
+      !["capstone", "transfer", "retrieval"].includes(assessmentMode)
       || !sectionId
       || !sectionStrongCheckId(section)
     ) return [];
@@ -352,16 +352,19 @@ export function StructuredSectionLearningBody({
 
   useEffect(() => {
     if (!exercise || !exerciseResult) return;
-    if (!attemptCheck?.passed) return;
+    if (!attemptCheck?.checkId || !attemptCheck.fixtureHash) return;
     const recordKey = `${exercise.id}:${exerciseResult.executionCount}:${attemptCheck.evidence}:${attemptCheck.checkId}`;
     if (recordedAttemptRef.current === recordKey) return;
     recordedAttemptRef.current = recordKey;
-    if (attemptCheck.evidence === "strong") {
+    if (attemptCheck.executor === "browser-worker" || attemptCheck.executor === "local-sandbox") {
       setEvidenceSaveState("saving");
       const evidenceInput = {
           actual: attemptCheck.actual,
           aiHelpUsed: false,
           artifacts: attemptCheck.artifacts,
+          artifactContractId: readPayloadText(section.contract?.artifactContractId) || undefined,
+          artifactContractVersion: payloadPositiveInt(section.contract?.artifactContractVersion),
+          assessmentRole: sectionAssessmentRole(section),
           assessmentMode: sectionAssessmentMode(section),
           blockId: exercise.id,
           category,
@@ -369,15 +372,26 @@ export function StructuredSectionLearningBody({
           contentId,
           executionCount: exerciseResult.executionCount,
           expected: attemptCheck.expected,
+          errorClass: attemptCheck.state,
           fixtureHash: attemptCheck.fixtureHash,
           packages: attemptCheck.packages,
           runtimeTier: learningEvidenceRuntimeTier(),
+          runStatus: learningAttemptRunStatus(exerciseResult.status),
           sectionId: readPayloadText(section.contract?.id) || section.id,
           source: attemptCheck.source,
           outcomeIds: payloadTextList(section.contract?.outcomeIds),
+          passed: attemptCheck.passed,
+          recommendedHintLevel: 0,
+          strength: "strong",
+          capabilityClaimId: readPayloadText(section.contract?.capabilityClaimId) || undefined,
+          capabilityClaimVersion: payloadPositiveInt(section.contract?.capabilityClaimVersion),
+          taskFamilyId: readPayloadText(section.contract?.taskFamilyId) || undefined,
+          taskFamilyVersion: payloadPositiveInt(section.contract?.taskFamilyVersion),
+          taskVariantId: readPayloadText(section.contract?.taskVariantId) || undefined,
+          taskVariantVersion: payloadPositiveInt(section.contract?.taskVariantVersion),
           unseen: section.contract?.unseen === true,
       } satisfies WebStrongCheckEvidenceInput;
-      void storeStrongLearningEvidence(evidenceInput).then(() => {
+      void recordLearningAttemptEvidence(evidenceInput).then(() => {
           setEvidenceSaveState("stored");
           window.dispatchEvent(new CustomEvent(PROGRESS_UPDATED_EVENT));
         }).catch((error: unknown) => {
@@ -580,6 +594,24 @@ export function StructuredSectionLearningBody({
       ) : null}
     </div>
   );
+}
+
+function sectionAssessmentRole(section: CurriculumSectionGroup): WebStrongCheckEvidenceInput["assessmentRole"] {
+  const role = readPayloadText(section.contract?.assessmentRole);
+  return role === "application" || role === "assurance" || role === "formative" || role === "none"
+    ? role
+    : "formative";
+}
+
+function payloadPositiveInt(value: unknown): number | undefined {
+  return Number.isInteger(value) && Number(value) > 0 ? Number(value) : undefined;
+}
+
+function learningAttemptRunStatus(status: string): WebStrongCheckEvidenceInput["runStatus"] {
+  const normalized = status.toLowerCase();
+  if (normalized === "timeout") return "timeout";
+  if (normalized === "stopped" || normalized === "cancelled") return "stopped";
+  return new Set(["success", "ok", "done"]).has(normalized) ? "success" : "error";
 }
 
 function sectionAssessmentMode(

@@ -5,6 +5,7 @@ import re
 from pathlib import Path
 from typing import Any
 
+import pytest
 import yaml
 
 from codaro.curriculum.converter import yamlToDocument
@@ -128,6 +129,38 @@ def testSectionOutcomeIdsPreferSectionThenMetaMappingThenLessonFallback() -> Non
         ["mapped.outcome"],
         ["lesson.outcome"],
     ]
+
+
+def testSectionRolesKeepInstructionAndAssessmentMeaningSeparate() -> None:
+    content = {
+        "sections": [{
+            "id": "application",
+            "instructionRole": "project",
+            "assessmentRole": "application",
+            "assessmentMode": "capstone",
+            "outcomeIds": ["python.projectDelivery"],
+        }],
+    }
+
+    section = lessonContractFromYaml(content).sections[0]
+
+    assert section.instructionRole == "project"
+    assert section.assessmentRole == "application"
+    assert section.assessmentMode == "capstone"
+
+
+def testSectionRolesRejectApplicationDisguisedAsPractice() -> None:
+    content = {
+        "sections": [{
+            "id": "invalid-application",
+            "instructionRole": "practice",
+            "assessmentRole": "application",
+            "assessmentMode": "capstone",
+        }],
+    }
+
+    with pytest.raises(ValueError, match="practice cannot use assessmentRole application"):
+        lessonContractFromYaml(content)
 
 
 def testConverterWiresTaxonomyOutcomeFallbackIntoSectionPayload(tmp_path: Path) -> None:

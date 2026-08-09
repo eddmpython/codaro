@@ -2,7 +2,7 @@ import { nestedCanonicalLearningEvents } from "@/lib/canonicalLearningEvidence";
 import { evidenceAvailabilityTime, parseEvidenceTime } from "@/lib/evidenceTime";
 import type { CreditMode, LearningEvent } from "@/lib/learningEvent";
 import { MasteryPolicy, type MasteryProjection, type OutcomeMasteryState } from "@/lib/masteryPolicy";
-import type { WebStrongCheckEvidenceEvent } from "@/lib/webLearningEvidence";
+import type { WebLearningAttemptEvidenceEvent } from "@/lib/webLearningEvidence";
 import type { ProgressSummary, ReviewItem, ReviewListPayload } from "@/types";
 
 const DAY_MS = 86_400_000;
@@ -29,6 +29,7 @@ export type CanonicalLessonProgress = LessonProgressContract & {
   completedAt: string | null;
   creditedOutcomeIds: string[];
   creditedSectionIds: string[];
+  verifiedSectionIds: string[];
   lastEvidenceAt: string | null;
   reviewDueAt: string | null;
   reviewIntervalDays: number;
@@ -57,7 +58,7 @@ type AcceptedCredit = {
 };
 
 export async function projectCanonicalCurriculumLearning(
-  evidenceEvents: Iterable<WebStrongCheckEvidenceEvent>,
+  evidenceEvents: Iterable<WebLearningAttemptEvidenceEvent>,
   lessonContracts: Iterable<LessonProgressContract>,
   options: { asOf?: string | Date } = {},
 ): Promise<CanonicalCurriculumLearningProjection> {
@@ -152,7 +153,7 @@ export function reviewListFromCanonicalProjection(
 function projectLesson(
   contract: LessonProgressContract,
   credits: AcceptedCredit[],
-  evidenceEvents: WebStrongCheckEvidenceEvent[],
+  evidenceEvents: WebLearningAttemptEvidenceEvent[],
   masteryByOutcome: Map<string, OutcomeMasteryState>,
   projectedAt: string,
 ): CanonicalLessonProgress {
@@ -167,6 +168,7 @@ function projectLesson(
     completedAt,
     creditedOutcomeIds,
     creditedSectionIds: unique(orderedCredits.map((credit) => credit.sectionId)),
+    verifiedSectionIds: verifiedStrongSectionIds(evidenceEvents),
     lastEvidenceAt: latestTimestamp([
       ...evidenceEvents.map((event) => event.occurredAt),
       ...orderedCredits.map((credit) => credit.evidenceAt),
@@ -178,6 +180,29 @@ function projectLesson(
     reviewStreak: review.streak,
     runtimeTiers: unique(orderedCredits.map((credit) => credit.tierUsed)).sort(),
   };
+}
+
+function verifiedStrongSectionIds(evidenceEvents: WebLearningAttemptEvidenceEvent[]): string[] {
+  return unique(evidenceEvents.flatMap((outer) => {
+    const canonical = outer.canonicalEvents ?? [];
+    const runs = new Map(
+      canonical
+        .filter((event) => event.kind === "RunObserved")
+        .map((event) => [event.eventId, event]),
+    );
+    return canonical.flatMap((event) => {
+      if (
+        event.kind !== "CheckEvaluated"
+        || event.strength !== "strong"
+        || event.passed !== true
+      ) return [];
+      const run = runs.get(String(event.runEventId));
+      if (!run || run.kind !== "RunObserved" || run.runStatus !== "success") return [];
+      const context = run.runContext as Record<string, unknown>;
+      const sectionId = String(context.sectionId ?? "");
+      return sectionId ? [sectionId] : [];
+    });
+  }));
 }
 
 function projectLessonReview(

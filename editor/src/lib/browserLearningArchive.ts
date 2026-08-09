@@ -108,14 +108,58 @@ async function buildSerializedBrowserLearningArchive(
       version: item.version,
     })),
     virtualDirectories: input.virtualDirectories ?? persisted?.virtualDirectories,
-    virtualFiles: input.virtualFiles ?? persisted?.virtualFiles.map((item) => ({
+    virtualFiles: await mergedPromotedArtifactFiles(
+      input.virtualFiles ?? persisted?.virtualFiles.map((item) => ({
       executable: item.executable,
       mediaType: item.mediaType,
       path: item.path,
       payload: item.payload,
-    })),
+      })),
+      evidenceArchive,
+    ),
   });
   return serializeLearningArchive(archive);
+}
+
+async function mergedPromotedArtifactFiles(
+  current: LearningArchiveVirtualFileInput[] | undefined,
+  evidenceArchive: unknown,
+): Promise<LearningArchiveVirtualFileInput[]> {
+  const byPath = new Map((current ?? []).map((item) => [item.path, item]));
+  if (!shouldUseApi() || !isRecord(evidenceArchive) || !Array.isArray(evidenceArchive.events)) {
+    return [...byPath.values()];
+  }
+  const promoted = evidenceArchive.events.flatMap((event): Array<{ contentHash: string; path: string }> => {
+    if (!isRecord(event) || event.runtimeTier !== "local" || !Array.isArray(event.artifacts)) return [];
+    const canonical = Array.isArray(event.canonicalEvents) ? event.canonicalEvents.filter(isRecord) : [];
+    const applicationCredit = canonical.some((item) => (
+      item.kind === "CreditGranted"
+      && Array.isArray(item.creditSlices)
+      && item.creditSlices.some((slice) => isRecord(slice) && slice.creditMode === "capstone")
+    ));
+    if (!applicationCredit) return [];
+    return event.artifacts.flatMap((artifact) => {
+      if (!isRecord(artifact) || artifact.origin !== "created") return [];
+      const contentHash = String(artifact.contentHash ?? "");
+      const path = String(artifact.path ?? "");
+      return contentHash && path ? [{ contentHash, path }] : [];
+    });
+  });
+  for (const artifact of promoted) {
+    const archivePath = `proof/${artifact.contentHash.replace(/^sha256-/, "")}/${artifact.path}`;
+    if (byPath.has(archivePath)) continue;
+    const stored = await codaroApi.learningArtifact(artifact.contentHash);
+    byPath.set(archivePath, {
+      mediaType: stored.contentType,
+      path: archivePath,
+      payload: stored.payload,
+    });
+  }
+  return [...byPath.values()].sort((left, right) => left.path.localeCompare(right.path));
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 export async function importBrowserLearningArchive(rawArchive: string): Promise<BrowserLearningArchiveImportReceipt> {

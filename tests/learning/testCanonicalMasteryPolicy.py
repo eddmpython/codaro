@@ -45,6 +45,8 @@ def runEvent(
     fixture: str,
     runStatus: str = "success",
     sectionId: str = "variables-practice",
+    masteryPolicyVersion: int = 1,
+    exposureReceiptIds: list[str] | None = None,
 ) -> dict[str, object]:
     return envelope(
         "RunObserved",
@@ -61,7 +63,7 @@ def runEvent(
             "fixtureHash": learningEventDigest(fixture),
             "lessonContentHash": learningEventDigest("lesson"),
             "lessonRef": "python/variables",
-            "masteryPolicyVersion": 1,
+            "masteryPolicyVersion": masteryPolicyVersion,
             "outcomeIds": [OUTCOME_ID],
             "packageSetHash": learningEventDigest("packages"),
             "runId": f"run-{sequence}",
@@ -71,6 +73,7 @@ def runEvent(
             "sourceCodeHash": learningEventDigest(f"source-{sequence}"),
             "taskVariantId": variant,
             "tierUsed": "browser",
+            **({"exposureReceiptIds": exposureReceiptIds} if exposureReceiptIds is not None else {}),
         },
         runStatus=runStatus,
         startedAt=occurredAt,
@@ -225,6 +228,63 @@ def testMasteryPolicyUsesOnlyCausalCreditGrantedEvents() -> None:
     assert projection.outcomes[0].score == 1.0
     assert len(projection.outcomes[0].creditEventIds) == 4
     assert len(projection.outcomes[0].taskVariantIds) == 4
+
+
+def testMasteryPolicyV2AcceptsOverdueFreshRetrieval() -> None:
+    acquisitionRun = runEvent(1, "2026-07-01T00:00:00Z", variant="v2-acquisition", fixture="a", masteryPolicyVersion=2)
+    acquisitionCheck = checkEvent(2, "2026-07-01T00:00:01Z", acquisitionRun, mode="acquisition")
+    acquisitionCredit = creditEvent(3, "2026-07-01T00:00:02Z", acquisitionRun, [acquisitionCheck], [], mode="acquisition", preAttemptState="unproven")
+    transferRun = runEvent(4, "2026-07-02T00:00:00Z", variant="v2-transfer", fixture="b", masteryPolicyVersion=2)
+    transferCheck = checkEvent(5, "2026-07-02T00:00:01Z", transferRun, mode="transfer")
+    transferCredit = creditEvent(6, "2026-07-02T00:00:02Z", transferRun, [transferCheck], [], mode="transfer", preAttemptState="independent")
+    retrievalRun = runEvent(7, "2026-08-01T00:00:00Z", variant="v2-retrieval", fixture="c", masteryPolicyVersion=2)
+    retrievalCheck = checkEvent(8, "2026-08-01T00:00:01Z", retrievalRun, mode="retrieval")
+    retrievalCredit = creditEvent(9, "2026-08-01T00:00:02Z", retrievalRun, [retrievalCheck], [], mode="retrieval", preAttemptState="transfer")
+
+    projection = MasteryPolicy().reduce([
+        acquisitionRun, acquisitionCheck, acquisitionCredit,
+        transferRun, transferCheck, transferCredit,
+        retrievalRun, retrievalCheck, retrievalCredit,
+    ], asOf="2026-08-01T00:00:02Z")
+
+    assert projection.invalidEventIds == []
+    assert projection.outcomes[0].stage == "mastered"
+
+
+def testMasteryPolicyV2CapstoneDoesNotAdvanceAssurance() -> None:
+    run = runEvent(1, "2026-07-01T00:00:00Z", variant="application", fixture="artifact", masteryPolicyVersion=2)
+    check = checkEvent(2, "2026-07-01T00:00:01Z", run, mode="capstone")
+    credit = creditEvent(3, "2026-07-01T00:00:02Z", run, [check], [], mode="capstone", preAttemptState="unproven")
+
+    projection = MasteryPolicy().reduce([run, check, credit])
+
+    assert projection.invalidEventIds == []
+    assert projection.outcomes == []
+
+
+def testMasteryPolicyV2RejectsSupportedCapstoneProof() -> None:
+    run = runEvent(1, "2026-07-01T00:00:00Z", variant="application", fixture="artifact", masteryPolicyVersion=2)
+    support = supportEvent(2, "2026-07-01T00:00:01Z", run, hintLevel=1)
+    check = checkEvent(3, "2026-07-01T00:00:02Z", run, mode="capstone")
+    credit = creditEvent(4, "2026-07-01T00:00:03Z", run, [check], [support], mode="capstone", preAttemptState="unproven")
+
+    projection = MasteryPolicy().reduce([run, support, check, credit])
+
+    assert projection.outcomes == []
+    assert projection.invalidEventIds == [credit["eventId"]]
+
+
+def testMasteryPolicyV2RejectsOmittedVariantExposureLineage() -> None:
+    supportedRun = runEvent(1, "2026-07-01T00:00:00Z", variant="same-variant", fixture="a", masteryPolicyVersion=2)
+    support = supportEvent(2, "2026-07-01T00:00:01Z", supportedRun, hintLevel=1)
+    retryRun = runEvent(3, "2026-07-01T00:01:00Z", variant="same-variant", fixture="a", masteryPolicyVersion=2)
+    retryCheck = checkEvent(4, "2026-07-01T00:01:01Z", retryRun, mode="acquisition")
+    retryCredit = creditEvent(5, "2026-07-01T00:01:02Z", retryRun, [retryCheck], [], mode="acquisition", preAttemptState="unproven")
+
+    projection = MasteryPolicy().reduce([supportedRun, support, retryRun, retryCheck, retryCredit])
+
+    assert projection.outcomes == []
+    assert projection.invalidEventIds == [retryCredit["eventId"]]
 
 
 def testViewedCompletionLegacyCreditAndWeakCheckDoNotRaiseMastery(tmp_path: Path) -> None:
@@ -601,13 +661,12 @@ const chain=await buildCanonicalStrongCheckEvents(input,outer,[]);
 const attached=await attachCanonicalEventsToStrongEvidence(outer,chain);
 const migrated=await migrateWebEvidenceEventLessonRef(attached);
 await attachCanonicalEventsToStrongEvidence(migrated,migrated.canonicalEvents);
-const cases=["attemptFingerprint","checkId","fixtureHash","lessonRef","runtimeTier","sourceHash"];
+const cases=["checkId","fixtureHash","lessonRef","runtimeTier","sourceHash"];
 const rejected=[];
 for(const field of cases){
   const changed=structuredClone(chain);
   let index=0;
-  if(field==="attemptFingerprint"){index=changed.findIndex((event)=>event.kind==="CreditGranted");changed[index].attemptFingerprint=await learningEventDigest("other-attempt");}
-  else if(field==="checkId"){index=changed.findIndex((event)=>event.kind==="CheckEvaluated");changed[index].checkId="other-check";}
+  if(field==="checkId"){index=changed.findIndex((event)=>event.kind==="CheckEvaluated");changed[index].checkId="other-check";}
   else {
     index=changed.findIndex((event)=>event.kind==="RunObserved");
     const key=field==="runtimeTier"?"tierUsed":field==="sourceHash"?"sourceCodeHash":field;
@@ -618,7 +677,7 @@ for(const field of cases){
   try{await attachCanonicalEventsToStrongEvidence(outer,changed);}catch{rejected.push(field);}
 }
 process.stdout.write(JSON.stringify({
-  migrated:migrated.lessonRef==="python/lesson-canonical"&&migrated.canonicalEvents[0].runContext.lessonRef===migrated.lessonRef&&migrated.canonicalEvents.at(-1).attemptFingerprint===migrated.attemptFingerprint,
+  migrated:migrated.lessonRef==="python/lesson-canonical"&&migrated.canonicalEvents.length===2&&migrated.canonicalEvents[0].runContext.lessonRef===migrated.lessonRef,
   rejected,
 }));
 """ % tuple(json.dumps(bundlePaths[name].as_uri()) for name in ("canonical", "event", "web"))
@@ -632,7 +691,6 @@ process.stdout.write(JSON.stringify({
     assert json.loads(completed.stdout) == {
         "migrated": True,
         "rejected": [
-            "attemptFingerprint",
             "checkId",
             "fixtureHash",
             "lessonRef",
@@ -724,19 +782,21 @@ def testTypeScriptStrongCheckWriterUsesPriorProjectionAndOmitsInvalidCredit(tmp_
 import {buildCanonicalStrongCheckEvents} from %s;
 const hash = (char) => `sha256-${char.repeat(64)}`;
 const input = (overrides = {}) => ({
-  actual: "ok", blockId: "exercise", category: "python", checkId: "check-v1",
+  actual: "ok", assessmentRole: "assurance", blockId: "exercise", category: "python", checkId: "check-v1",
   contentId: "lesson", executionCount: 1, expected: "ok", fixtureHash: hash("a"),
   outcomeIds: ["python.outcome"], runtimeTier: "web", sectionId: "practice",
-  source: "print('ok')", unseen: true, assessmentMode: "acquisition", ...overrides,
+  source: "print('ok')", taskFamilyId: "python.family", unseen: true, assessmentMode: "acquisition", ...overrides,
 });
 const evidence = (char, occurredAt) => {
   const fingerprint = hash(char);
   return {
     attemptFingerprint: fingerprint, blockId: "exercise", checkId: "check-v1",
-    eventId: `web-strong:${fingerprint}`, executionCount: 1, expectedHash: hash("e"),
-    fixtureHash: hash(char), kind: "StrongCheckVerified", lessonRef: "python/lesson",
+    answerReveal: false, artifacts: [], errorClass: "", hintLevel: 0,
+    eventId: `web-attempt:${fingerprint}`, executionCount: 1, expectedHash: hash("e"),
+    fixtureHash: hash(char), kind: "AttemptObserved", lessonRef: "python/lesson", passed: true,
     occurredAt, payloadHash: hash("a"), resultHash: hash("b"), runtimeTier: "web",
-    schemaVersion: 1, sourceHash: hash("f"), strength: "strong",
+    recommendedHintLevel: 0, runStatus: "success", schemaVersion: 1,
+    sourceHash: hash("f"), strength: "strong",
   };
 };
 const acquisition = await buildCanonicalStrongCheckEvents(
@@ -776,7 +836,7 @@ process.stdout.write(JSON.stringify({
         "acquisitionState": "unproven",
         "reinforcementState": "independent",
         "transferKinds": ["RunObserved", "CheckEvaluated"],
-        "supportedKinds": ["RunObserved", "CheckEvaluated", "SupportProvided", "CreditGranted"],
+        "supportedKinds": ["RunObserved", "CheckEvaluated", "SupportProvided"],
     }
 
 

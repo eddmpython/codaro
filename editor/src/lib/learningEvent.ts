@@ -151,7 +151,23 @@ function validateRunObserved(value: Record<string, unknown>): void {
   for (const field of ["lessonContentHash", "sourceCodeHash", "fixtureHash", "packageSetHash"]) {
     requireHash(context, field);
   }
-  if (context.masteryPolicyVersion !== 1) throw new Error("RunContext masteryPolicyVersion is unsupported");
+  if (!new Set([1, 2]).has(Number(context.masteryPolicyVersion))) {
+    throw new Error("RunContext masteryPolicyVersion is unsupported");
+  }
+  for (const field of ["capabilityClaimVersion", "taskFamilyVersion", "taskVariantVersion", "artifactContractVersion"]) {
+    if (field in context && (!Number.isInteger(context[field]) || Number(context[field]) < 1)) {
+      throw new Error(`RunContext ${field} is invalid`);
+    }
+  }
+  for (const field of ["artifactContractId", "capabilityClaimId", "taskFamilyId"]) {
+    if (field in context) requireText(context, field);
+  }
+  if ("exposureReceiptIds" in context) {
+    const exposureReceiptIds = requireTextList(context, "exposureReceiptIds");
+    if (new Set(exposureReceiptIds).size !== exposureReceiptIds.length) {
+      throw new Error("RunContext exposureReceiptIds must be unique");
+    }
+  }
   if (!new Set(["browser", "local"]).has(String(context.tierUsed))) throw new Error("RunContext tierUsed is invalid");
   requireTimestamp(value, "startedAt");
   requireTimestamp(value, "completedAt");

@@ -237,6 +237,7 @@ def _expandWithPrerequisites(
     graph: LessonGraph,
     excludeKeys: set[str],
     masteredOutcomes: set[str] | None = None,
+    allowedPrerequisites: set[str] | None = None,
 ) -> tuple[dict[str, LessonNode], set[str]]:
     """target outcome 집합에서 출발해 prerequisite을 따라가며 필요한 레슨을 모은다.
 
@@ -270,6 +271,8 @@ def _expandWithPrerequisites(
             continue
         selected[lesson.key] = lesson
         for prereq in lesson.prerequisites:
+            if allowedPrerequisites is not None and prereq not in allowedPrerequisites:
+                continue
             if prereq not in visitedOutcomes:
                 open_.append(prereq)
     return selected, unresolved
@@ -411,20 +414,35 @@ def composeMasterPlan(
                     })
         targetOutcomes = [oid for oid in targetOutcomes if oid not in masteredOutcomes]
 
+    domain = taxonomy.domainById(goal.domain) if goal.domain else None
+    allowedPrerequisites = (
+        set(domain.targetOutcomes)
+        if domain and domain.prerequisitePolicy == "targetOnly"
+        else None
+    )
     selected, unresolved = _expandWithPrerequisites(
-        targetOutcomes, graph, excludeKeys, masteredOutcomes,
+        targetOutcomes,
+        graph,
+        excludeKeys,
+        masteredOutcomes,
+        allowedPrerequisites,
     )
 
-    domain = taxonomy.domainById(goal.domain) if goal.domain else None
     capstoneLessonRef = domain.capstoneLessonRef if domain else None
     capstone = graph.byKey(capstoneLessonRef) if capstoneLessonRef else None
     if capstone is not None and capstone.key not in excludeKeys:
         selected[capstone.key] = capstone
+        capstonePrerequisites = [
+            prerequisite
+            for prerequisite in capstone.prerequisites
+            if allowedPrerequisites is None or prerequisite in allowedPrerequisites
+        ]
         extra, extraUnresolved = _expandWithPrerequisites(
-            capstone.prerequisites,
+            capstonePrerequisites,
             graph,
             set(excludeKeys) | {capstone.key},
             masteredOutcomes,
+            allowedPrerequisites,
         )
         selected.update(extra)
         unresolved.update(extraUnresolved)
@@ -438,12 +456,18 @@ def composeMasterPlan(
             selected[project.key] = project
             # project 의 prerequisite 도 expansion
             for prereq in project.prerequisites:
+                if allowedPrerequisites is not None and prereq not in allowedPrerequisites:
+                    continue
                 if prereq in masteredOutcomes:
                     continue
                 covered = any(prereq in lesson.outcomes for lesson in selected.values())
                 if not covered:
                     extra, extraUnresolved = _expandWithPrerequisites(
-                        [prereq], graph, set(excludeKeys) | set(selected.keys()), masteredOutcomes,
+                        [prereq],
+                        graph,
+                        set(excludeKeys) | set(selected.keys()),
+                        masteredOutcomes,
+                        allowedPrerequisites,
                     )
                     selected.update(extra)
                     unresolved.update(extraUnresolved)

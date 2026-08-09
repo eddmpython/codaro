@@ -1,0 +1,15 @@
+{
+  "artifactContractId": "python.report.json.v1",
+  "version": 1,
+  "mediaType": "application/json",
+  "requiredFields": ["count", "total", "average"],
+  "fieldTypes": {
+    "count": "integer",
+    "total": "number",
+    "average": "number"
+  },
+  "encoding": "utf-8",
+  "inferenceBoundary": [
+    "이 계약은 보고서 구조와 값의 검증만 증명하며 실제 업무 사용을 증명하지 않는다."
+  ]
+}

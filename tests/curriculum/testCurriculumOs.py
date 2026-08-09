@@ -259,6 +259,22 @@ def testComposerRealRepoSmokeForDataReporting() -> None:
     assert "pandas.intro" in allOutcomes
 
 
+def testReportAutomationGoldenPathExcludesOptionalObjectOrientedLessons() -> None:
+    taxonomy = loadTaxonomy()
+    graph = buildLessonGraph(StudyLoader(str(CURRICULA_DIR)), taxonomy)
+
+    plan = composeMasterPlan(
+        PlanGoal(domain="reportAutomationFoundation", excludeCompleted=False),
+        graph,
+        taxonomy,
+    )
+    lessonRefs = [step.key for step in plan.steps]
+
+    assert "30days/day30_최종프로젝트" in lessonRefs
+    assert "30days/day22_클래스기초" not in lessonRefs
+    assert "30days/day25_프로퍼티와데코레이터" not in lessonRefs
+
+
 def testComposerSummaryMentionsGoal() -> None:
     plan = composeMasterPlan(
         PlanGoal(domain="goalC"),

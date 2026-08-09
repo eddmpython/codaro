@@ -1420,7 +1420,7 @@ def testHarvestCodeEndpointMaterializesTask(tmp_path: Path, monkeypatch) -> None
     taskRegistryModule._registry = None
 
 
-def testHarvestCodeGatedByUnmasteredOutcome(tmp_path: Path, monkeypatch) -> None:
+def testGeneralCodeHarvestDoesNotClaimLearningProof(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setenv("CODARO_HOME", str(tmp_path / "home"))
     import codaro.automation.taskRegistry as taskRegistryModule
 
@@ -1432,6 +1432,9 @@ def testHarvestCodeGatedByUnmasteredOutcome(tmp_path: Path, monkeypatch) -> None
         "/api/tasks/from-code",
         json={"code": "x = 1", "name": "Gated", "outcomeId": "python.never.mastered.xyz"},
     )
-    assert response.status_code == 403
+    assert response.status_code == 200
+    task = response.json()["task"]
+    assert task["inputs"] == {}
+    assert "capabilityDomainId" not in task["inputs"]
 
     taskRegistryModule._registry = None

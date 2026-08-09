@@ -46,7 +46,7 @@ class OutcomeMasteryState(BaseModel):
 class MasteryProjection(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    policyVersion: int = 1
+    policyVersion: int = 2
     outcomes: list[OutcomeMasteryState] = Field(default_factory=list)
     invalidEventIds: list[str] = Field(default_factory=list)
     deferredCreditEventIds: list[str] = Field(default_factory=list)
@@ -72,8 +72,10 @@ class _OutcomeAccumulator:
 
 
 class MasteryPolicy:
-    def __init__(self) -> None:
-        policyPath = files("codaro.generatedContracts").joinpath("masteryPolicy.v1.json")
+    def __init__(self, version: int = 2) -> None:
+        if version not in {1, 2}:
+            raise ValueError("mastery policy version is unsupported")
+        policyPath = files("codaro.generatedContracts").joinpath(f"masteryPolicy.v{version}.json")
         self._contract = json.loads(policyPath.read_text(encoding="utf-8"))
         self._validateContract()
         self._scores: dict[str, float] = {
@@ -107,6 +109,7 @@ class MasteryPolicy:
         runs = {str(event["eventId"]): event for event in ordered if event["kind"] == "RunObserved"}
         checks = {str(event["eventId"]): event for event in ordered if event["kind"] == "CheckEvaluated"}
         supports = {str(event["eventId"]): event for event in ordered if event["kind"] == "SupportProvided"}
+        exposedVariants = self._exposedVariants(ordered, runs)
         states: dict[str, _OutcomeAccumulator] = {}
         deferredCreditEventIds: set[str] = set()
         clockAnomalies: list[ClockAnomaly] = []
@@ -124,6 +127,7 @@ class MasteryPolicy:
                 runs=runs,
                 checks=checks,
                 supports=supports,
+                exposedVariants=exposedVariants,
                 orderIndex=orderIndex,
                 states=states,
             )
@@ -212,6 +216,7 @@ class MasteryPolicy:
         runs: Mapping[str, Mapping[str, Any]],
         checks: Mapping[str, Mapping[str, Any]],
         supports: Mapping[str, Mapping[str, Any]],
+        exposedVariants: Mapping[str, set[str]],
         orderIndex: Mapping[str, int],
         states: dict[str, _OutcomeAccumulator],
     ) -> tuple[bool, bool, list[ClockAnomaly]]:
@@ -253,6 +258,7 @@ class MasteryPolicy:
         )
         unseen = all(bool(check["unseen"]) for check in checked)
         context = run["runContext"]
+        contextPolicyVersion = int(context["masteryPolicyVersion"])
         taskVariantId = str(context["taskVariantId"])
         fixtureHash = str(context["fixtureHash"])
         evidenceTime = EvidenceTime.parse(
@@ -260,13 +266,37 @@ class MasteryPolicy:
             str(event["appendReceiptAt"]),
         )
         fingerprint = str(event["attemptFingerprint"])
+        priorExposureIds = {
+            exposureId
+            for exposureId in exposedVariants.get(taskVariantId, set())
+            if orderIndex.get(exposureId, eventPosition) < eventPosition
+        }
+        declaredExposureIds = set(context.get("exposureReceiptIds", []))
+        if contextPolicyVersion == 2 and not priorExposureIds.issubset(declaredExposureIds):
+            return False, False, []
+        if contextPolicyVersion == 2 and priorExposureIds:
+            return False, False, []
+        if contextPolicyVersion == 2 and strongestMode == "capstone":
+            if (
+                not unseen
+                or answerReveal
+                or maxHintUsed > int(self._contract["higherStageMaxHintLevel"])
+                or any(
+                    str(creditSlice["creditMode"]) != "capstone"
+                    or str(creditSlice["outcomeId"]) not in context["outcomeIds"]
+                    for creditSlice in event["creditSlices"]
+                )
+            ):
+                return False, False, []
+            return True, False, []
         prepared: list[tuple[Mapping[str, Any], str, str, _OutcomeAccumulator]] = []
 
         for creditSlice in event["creditSlices"]:
             outcomeId = str(creditSlice["outcomeId"])
-            mode = str(creditSlice["creditMode"])
-            if mode != strongestMode or outcomeId not in context["outcomeIds"]:
+            rawMode = str(creditSlice["creditMode"])
+            if rawMode != strongestMode or outcomeId not in context["outcomeIds"]:
                 return False, False, []
+            mode = "acquisition" if contextPolicyVersion == 1 and rawMode == "capstone" else rawMode
             state = states.setdefault(outcomeId, _OutcomeAccumulator(outcomeId=outcomeId))
             if state.dueAt is not None and evidenceTime.availabilityTime >= state.dueAt:
                 state.reviewDue = True
@@ -356,7 +386,7 @@ class MasteryPolicy:
             and not answerReveal
             and maxHintUsed <= int(self._contract["higherStageMaxHintLevel"])
         )
-        if mode in {"acquisition", "reinforcement", "capstone"}:
+        if mode in {"acquisition", "reinforcement"}:
             if independentEligible and self._stageRank(state.baseStage) < self._stageRank("independent"):
                 state.baseStage = "independent"
             elif state.baseStage == "unproven":
@@ -382,7 +412,7 @@ class MasteryPolicy:
                     return False
                 state.reviewDue = False
                 state.dueAt = evidenceTime.availabilityTime + timedelta(
-                    days=int(self._contract["retrievalWindowDays"]["maximum"])
+                    days=self._freshnessTargetDays()
                 )
                 return True
             if self._stageRank(state.baseStage) < self._stageRank("transfer") or not higherStageEligible:
@@ -395,17 +425,14 @@ class MasteryPolicy:
             receiptElapsed = evidenceTime.appendReceiptAt - state.lastAppendReceiptAt
             window = self._contract["retrievalWindowDays"]
             minimum = timedelta(days=int(window["minimum"]))
-            maximum = timedelta(days=int(window["maximum"]))
             if evidenceElapsed < minimum or receiptElapsed < minimum:
-                return False
-            if evidenceElapsed > maximum or receiptElapsed > maximum:
                 return False
             distinctVariants = len(set(state.taskVariantIds) | {taskVariantId})
             if distinctVariants < int(self._contract["minimumDistinctTaskVariantsForMastered"]):
                 return False
             state.baseStage = "mastered"
             state.reviewDue = False
-            state.dueAt = evidenceTime.availabilityTime + maximum
+            state.dueAt = evidenceTime.availabilityTime + timedelta(days=self._freshnessTargetDays())
             return True
         return False
 
@@ -464,7 +491,8 @@ class MasteryPolicy:
         }[base]
 
     def _validateContract(self) -> None:
-        if self._contract.get("policyId") != "mastery-policy-v1" or self._contract.get("version") != 1:
+        version = self._contract.get("version")
+        if version not in {1, 2} or self._contract.get("policyId") != f"mastery-policy-v{version}":
             raise RuntimeError("mastery policy contract identity is invalid")
         expectedStages = {"unproven", "practicing", "independent", "transfer", "mastered"}
         if set(self._contract.get("scores", {})) != expectedStages:
@@ -480,3 +508,25 @@ class MasteryPolicy:
             or clockPolicy["maximumElapsedDivergenceSeconds"] < 0
         ):
             raise RuntimeError("mastery policy clock policy is invalid")
+
+    def _freshnessTargetDays(self) -> int:
+        window = self._contract["retrievalWindowDays"]
+        return int(window.get("freshnessTarget", window.get("maximum")))
+
+    @staticmethod
+    def _exposedVariants(
+        events: list[Mapping[str, Any]],
+        runs: Mapping[str, Mapping[str, Any]],
+    ) -> dict[str, set[str]]:
+        exposed: dict[str, set[str]] = {}
+        for event in events:
+            if event["kind"] != "SupportProvided":
+                continue
+            if int(event["hintLevel"]) <= 0 and not bool(event["answerReveal"]):
+                continue
+            run = runs.get(str(event["runEventId"]))
+            if run is None:
+                continue
+            taskVariantId = str(run["runContext"]["taskVariantId"])
+            exposed.setdefault(taskVariantId, set()).add(str(event["eventId"]))
+        return exposed

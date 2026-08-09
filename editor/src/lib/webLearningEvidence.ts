@@ -8,8 +8,12 @@ import {
 
 export type WebStrongCheckEvidenceInput = {
   actual: string;
+  answerReveal?: boolean;
   aiHelpUsed?: boolean;
   artifacts?: LearningEvidenceArtifact[];
+  artifactContractId?: string;
+  artifactContractVersion?: number;
+  assessmentRole?: "application" | "assurance" | "formative" | "none";
   assessmentMode?: "acquisition" | "capstone" | "mastery" | "reinforcement" | "retrieval" | "transfer";
   blockId: string;
   category: string;
@@ -17,12 +21,23 @@ export type WebStrongCheckEvidenceInput = {
   contentId: string;
   executionCount: number;
   expected: string;
+  errorClass?: string;
   fixtureHash: string;
   packages?: LearningEvidencePackageAsset[];
   runtimeTier: "local" | "web";
+  runStatus?: "error" | "stopped" | "success" | "timeout";
   sectionId?: string;
   source: string;
   outcomeIds?: string[];
+  passed?: boolean;
+  recommendedHintLevel?: number;
+  strength?: "strong" | "weak";
+  capabilityClaimId?: string;
+  capabilityClaimVersion?: number;
+  taskFamilyId?: string;
+  taskFamilyVersion?: number;
+  taskVariantId?: string;
+  taskVariantVersion?: number;
   unseen?: boolean;
 };
 
@@ -73,6 +88,19 @@ export type WebStrongCheckEvidenceEvent = {
   strength: "strong";
 };
 
+export type WebAttemptObservedEvidenceEvent = Omit<WebStrongCheckEvidenceEvent, "kind" | "strength"> & {
+  answerReveal: boolean;
+  errorClass: string;
+  hintLevel: number;
+  kind: "AttemptObserved";
+  passed: boolean;
+  recommendedHintLevel: number;
+  runStatus: "error" | "stopped" | "success" | "timeout";
+  strength: "strong" | "weak";
+};
+
+export type WebLearningAttemptEvidenceEvent = WebAttemptObservedEvidenceEvent | WebStrongCheckEvidenceEvent;
+
 export type WebMigrationImportedEvent = {
   creditEligibility: "none";
   eventId: string;
@@ -88,7 +116,7 @@ export type WebMigrationImportedEvent = {
   sourceRecordHash: string;
 };
 
-export type WebLearningEvidenceEvent = WebMigrationImportedEvent | WebStrongCheckEvidenceEvent;
+export type WebLearningEvidenceEvent = WebAttemptObservedEvidenceEvent | WebMigrationImportedEvent | WebStrongCheckEvidenceEvent;
 
 export type LearningEvidencePackageAsset = {
   integrity: string;
@@ -160,8 +188,11 @@ export type WebLearningEvidenceStoreHeader = {
   schemaVersion: 1;
 };
 
+export type LearningAttemptEvidenceCore =
+  | Omit<WebAttemptObservedEvidenceEvent, "payloadHash">
+  | Omit<WebStrongCheckEvidenceEvent, "payloadHash">;
 type StrongEvidenceCore = Omit<WebStrongCheckEvidenceEvent, "payloadHash">;
-type EvidenceEventCore = Omit<WebMigrationImportedEvent, "payloadHash"> | StrongEvidenceCore;
+type EvidenceEventCore = Omit<WebMigrationImportedEvent, "payloadHash"> | LearningAttemptEvidenceCore;
 
 const DATABASE_NAME = "codaro-learning-evidence-v1";
 const DATABASE_VERSION = 3;
@@ -181,7 +212,7 @@ const MAX_CANONICAL_EVENTS = 4;
 const EMPTY_ARCHIVE_CREATED_AT = "1970-01-01T00:00:00.000Z";
 
 const strongEvidenceAttemptFingerprint = async (
-  event: Pick<StrongEvidenceCore,
+  event: Pick<LearningAttemptEvidenceCore,
     "blockId" | "checkId" | "executionCount" | "fixtureHash" | "lessonRef" | "occurredAt" | "runtimeTier" | "sourceHash">,
   includeAttemptMetadata: boolean,
 ): Promise<string> => digestText(stableJson({
@@ -207,6 +238,25 @@ export async function appendWebStrongCheckEvidenceEventTransaction(
 ): Promise<WebStrongCheckEvidenceReceipt> {
   const event = await normalizeStoredEvidenceEvent(value);
   if (event.kind !== "StrongCheckVerified") throw new Error("strong learning evidence event가 아닙니다.");
+  const database = await openEvidenceDatabase();
+  try {
+    await addEvent(database, event);
+    return { attemptFingerprint: event.attemptFingerprint, eventId: event.eventId, inserted: true };
+  } catch (error) {
+    if (isConstraintError(error)) {
+      return { attemptFingerprint: event.attemptFingerprint, eventId: event.eventId, inserted: false };
+    }
+    throw error;
+  } finally {
+    database.close();
+  }
+}
+
+export async function appendWebLearningAttemptEvidenceEventTransaction(
+  value: WebLearningAttemptEvidenceEvent,
+): Promise<WebStrongCheckEvidenceReceipt> {
+  const event = await normalizeStoredEvidenceEvent(value);
+  if (!isLearningAttemptEvidenceEvent(event)) throw new Error("learning attempt evidence event가 아닙니다.");
   const database = await openEvidenceDatabase();
   try {
     await addEvent(database, event);
@@ -269,6 +319,36 @@ export async function createWebStrongCheckEvidenceEvent(
   };
 }
 
+export async function createWebLearningAttemptEvidenceEvent(
+  input: WebStrongCheckEvidenceInput,
+  canonicalEvents: LearningEvent[] = [],
+): Promise<WebAttemptObservedEvidenceEvent> {
+  const legacy = await createWebStrongCheckEvidenceEvent(input);
+  const { payloadHash: _payloadHash, kind: _kind, strength: _strength, ...common } = legacy;
+  let eventCore: LearningAttemptEvidenceCore = {
+    ...common,
+    answerReveal: input.answerReveal === true,
+    errorClass: input.errorClass ?? "",
+    hintLevel: input.aiHelpUsed ? 1 : 0,
+    kind: "AttemptObserved",
+    passed: input.passed === true,
+    recommendedHintLevel: Math.max(0, Math.trunc(input.recommendedHintLevel ?? 0)),
+    runStatus: input.runStatus ?? "success",
+    strength: input.strength ?? "strong",
+  };
+  eventCore = {
+    ...eventCore,
+    eventId: `${input.runtimeTier}-attempt:${legacy.attemptFingerprint}`,
+  };
+  if (canonicalEvents.length) {
+    eventCore = { ...eventCore, canonicalEvents: await normalizeCanonicalEvents(canonicalEvents, eventCore) };
+  }
+  return {
+    ...eventCore,
+    payloadHash: await digestText(stableJson(eventCore)),
+  } as WebAttemptObservedEvidenceEvent;
+}
+
 export async function attachCanonicalEventsToStrongEvidence(
   value: WebStrongCheckEvidenceEvent,
   canonicalEvents: LearningEvent[],
@@ -280,6 +360,19 @@ export async function attachCanonicalEventsToStrongEvidence(
     ...eventCore,
     payloadHash: await digestText(stableJson(eventCore)),
   };
+}
+
+export async function attachCanonicalEventsToAttemptEvidence(
+  value: WebLearningAttemptEvidenceEvent,
+  canonicalEvents: LearningEvent[],
+): Promise<WebLearningAttemptEvidenceEvent> {
+  const { payloadHash: _payloadHash, ...core } = value;
+  const normalizedCanonicalEvents = await normalizeCanonicalEvents(canonicalEvents, core);
+  const eventCore = { ...core, canonicalEvents: normalizedCanonicalEvents };
+  return {
+    ...eventCore,
+    payloadHash: await digestText(stableJson(eventCore)),
+  } as WebLearningAttemptEvidenceEvent;
 }
 
 export async function countWebStrongCheckEvidence(): Promise<number> {
@@ -310,6 +403,23 @@ export async function listWebStrongCheckEvidence(
   const events = await Promise.all(storedEvents.map(normalizeStoredEvidenceEvent));
   return events
     .filter((event): event is WebStrongCheckEvidenceEvent => event.kind === "StrongCheckVerified")
+    .filter((event) => !lessonRef || event.lessonRef === lessonRef)
+    .sort((left, right) => unicodeCodePointCompare(left.occurredAt, right.occurredAt));
+}
+
+export async function listWebLearningAttemptEvidence(
+  lessonRef?: string,
+): Promise<WebLearningAttemptEvidenceEvent[]> {
+  const database = await openEvidenceDatabase();
+  let storedEvents: unknown[];
+  try {
+    storedEvents = await getAllStoreValues(database, EVENT_STORE);
+  } finally {
+    database.close();
+  }
+  const events = await Promise.all(storedEvents.map(normalizeStoredEvidenceEvent));
+  return events
+    .filter(isLearningAttemptEvidenceEvent)
     .filter((event) => !lessonRef || event.lessonRef === lessonRef)
     .sort((left, right) => unicodeCodePointCompare(left.occurredAt, right.occurredAt));
 }
@@ -383,8 +493,8 @@ export async function importWebLearningEvidenceArchive(
   const events = await Promise.all(archive.events.map(migrateWebEvidenceEventLessonRef));
   const migrated = events.filter((event, index) => {
     const original = archive.events[index];
-    return event.kind === "StrongCheckVerified"
-      && original.kind === "StrongCheckVerified"
+    return isLearningAttemptEvidenceEvent(event)
+      && isLearningAttemptEvidenceEvent(original)
       && event.lessonRef !== original.lessonRef;
   }).length;
   const database = await openEvidenceDatabase();
@@ -401,7 +511,7 @@ export async function replaceWebLearningEvidenceArchive(value: string | unknown)
   const events = await Promise.all(archive.events.map(migrateWebEvidenceEventLessonRef));
   const eventIds = events.map((event) => event.eventId);
   const fingerprints = events
-    .filter((event): event is WebStrongCheckEvidenceEvent => event.kind === "StrongCheckVerified")
+    .filter(isLearningAttemptEvidenceEvent)
     .map((event) => event.attemptFingerprint);
   if (new Set(eventIds).size !== eventIds.length || new Set(fingerprints).size !== fingerprints.length) {
     throw new Error("복원할 학습 증거 archive의 identity가 중복되었습니다.");
@@ -619,7 +729,7 @@ function validateWebLegacyImportHeader(value: unknown): void {
   }
 }
 
-function addEvent(database: IDBDatabase, event: WebStrongCheckEvidenceEvent): Promise<void> {
+function addEvent(database: IDBDatabase, event: WebLearningAttemptEvidenceEvent): Promise<void> {
   return new Promise((resolve, reject) => {
     const transaction = database.transaction(EVENT_STORE, "readwrite", { durability: "strict" });
     transaction.objectStore(EVENT_STORE).add(event);
@@ -680,14 +790,14 @@ function mergeArchiveEvents(
         if (!existing) {
           eventStore.add(event);
           receipt.inserted += 1;
-          if (event.kind === "StrongCheckVerified") {
+          if (isLearningAttemptEvidenceEvent(event)) {
             receipt.accepted.push({ checkId: event.checkId, lessonRef: event.lessonRef });
           }
           return;
         }
         if (sameEvidencePayload(existing, event)) {
           receipt.skipped += 1;
-          if (event.kind === "StrongCheckVerified") {
+          if (isLearningAttemptEvidenceEvent(event)) {
             receipt.accepted.push({ checkId: event.checkId, lessonRef: event.lessonRef });
           }
           return;
@@ -768,7 +878,7 @@ async function validateWebLearningEvidenceArchive(value: unknown): Promise<WebLe
 export async function migrateWebEvidenceEventLessonRef(
   event: WebLearningEvidenceEvent,
 ): Promise<WebLearningEvidenceEvent> {
-  if (event.kind !== "StrongCheckVerified") return event;
+  if (!isLearningAttemptEvidenceEvent(event)) return event;
   const separator = event.lessonRef.indexOf("/");
   if (separator < 1 || separator !== event.lessonRef.lastIndexOf("/")) {
     throw new Error(`학습 증거 lessonRef가 유효하지 않습니다: ${event.lessonRef}`);
@@ -780,7 +890,7 @@ export async function migrateWebEvidenceEventLessonRef(
   if (lessonRef === event.lessonRef) return event;
   const includeAttemptMetadata = event.attemptFingerprint === await strongEvidenceAttemptFingerprint(event, true);
   const { payloadHash: _payloadHash, canonicalEvents, ...eventWithoutSeal } = event;
-  let core: StrongEvidenceCore = {
+  let core: LearningAttemptEvidenceCore = {
     ...eventWithoutSeal,
     lessonRef,
   };
@@ -788,7 +898,7 @@ export async function migrateWebEvidenceEventLessonRef(
   core = {
     ...core,
     attemptFingerprint,
-    eventId: `${event.runtimeTier}-strong:${attemptFingerprint}`,
+    eventId: `${event.runtimeTier}-${event.kind === "AttemptObserved" ? "attempt" : "strong"}:${attemptFingerprint}`,
   };
   if (canonicalEvents?.length) {
     core = { ...core, canonicalEvents: await migrateCanonicalEventsLessonRef(canonicalEvents, core) };
@@ -796,13 +906,13 @@ export async function migrateWebEvidenceEventLessonRef(
   return {
     ...core,
     payloadHash: await digestText(stableJson(core)),
-  };
+  } as WebLearningAttemptEvidenceEvent;
 }
 
 async function normalizeStoredEvidenceEvent(value: unknown): Promise<WebLearningEvidenceEvent> {
   if (!isRecord(value)) throw new Error("학습 증거 event 형식이 유효하지 않습니다.");
   let core = evidenceEventCore(value);
-  if (core.kind === "StrongCheckVerified" && "canonicalEvents" in core) {
+  if (isLearningAttemptEvidenceCore(core) && "canonicalEvents" in core) {
     core = { ...core, canonicalEvents: await normalizeCanonicalEvents(core.canonicalEvents, core) };
   }
   if (core.kind === "MigrationImported") {
@@ -815,7 +925,7 @@ async function normalizeStoredEvidenceEvent(value: unknown): Promise<WebLearning
   if (typeof value.payloadHash === "string" && value.payloadHash !== payloadHash) {
     throw new Error(`학습 증거 payload hash가 일치하지 않습니다: ${core.eventId}`);
   }
-  return { ...core, payloadHash };
+  return { ...core, payloadHash } as WebLearningEvidenceEvent;
 }
 
 function evidenceEventCore(value: Record<string, unknown>): EvidenceEventCore {
@@ -838,10 +948,10 @@ function evidenceEventCore(value: Record<string, unknown>): EvidenceEventCore {
     }
   }
   if (
-    value.kind !== "StrongCheckVerified"
+    !new Set(["AttemptObserved", "StrongCheckVerified"]).has(String(value.kind))
     || !new Set(["local", "web"]).has(String(value.runtimeTier))
     || value.schemaVersion !== 1
-    || value.strength !== "strong"
+    || !new Set(["strong", "weak"]).has(String(value.strength))
     || !Number.isSafeInteger(value.executionCount)
     || Number(value.executionCount) < 0
   ) {
@@ -852,10 +962,11 @@ function evidenceEventCore(value: Record<string, unknown>): EvidenceEventCore {
       throw new Error(`학습 증거 event의 ${field} 해시가 유효하지 않습니다.`);
     }
   }
-  if (value.eventId !== `${value.runtimeTier}-strong:${value.attemptFingerprint}` || !String(value.lessonRef).includes("/")) {
+  const identityKind = value.kind === "AttemptObserved" ? "attempt" : "strong";
+  if (value.eventId !== `${value.runtimeTier}-${identityKind}:${value.attemptFingerprint}` || !String(value.lessonRef).includes("/")) {
     throw new Error("학습 증거 event identity가 유효하지 않습니다.");
   }
-  return {
+  const common = {
     attemptFingerprint: String(value.attemptFingerprint),
     ...("artifacts" in value ? { artifacts: normalizeEvidenceArtifacts(value.artifacts) } : {}),
     blockId: String(value.blockId),
@@ -865,7 +976,7 @@ function evidenceEventCore(value: Record<string, unknown>): EvidenceEventCore {
     executionCount: Number(value.executionCount),
     expectedHash: String(value.expectedHash),
     fixtureHash: String(value.fixtureHash),
-    kind: "StrongCheckVerified",
+    kind: value.kind as "AttemptObserved" | "StrongCheckVerified",
     lessonRef: String(value.lessonRef),
     occurredAt: String(value.occurredAt),
     ...("packages" in value ? { packages: normalizeEvidencePackages(value.packages) } : {}),
@@ -873,13 +984,35 @@ function evidenceEventCore(value: Record<string, unknown>): EvidenceEventCore {
     runtimeTier: value.runtimeTier as "local" | "web",
     schemaVersion: 1,
     sourceHash: String(value.sourceHash),
-    strength: "strong",
+    strength: value.strength as "strong" | "weak",
   };
+  if (value.kind === "StrongCheckVerified") return common as StrongEvidenceCore;
+  if (
+    typeof value.answerReveal !== "boolean"
+    || typeof value.passed !== "boolean"
+    || typeof value.errorClass !== "string"
+    || !Number.isSafeInteger(value.hintLevel)
+    || Number(value.hintLevel) < 0
+    || !Number.isSafeInteger(value.recommendedHintLevel)
+    || Number(value.recommendedHintLevel) < 0
+    || !new Set(["error", "stopped", "success", "timeout"]).has(String(value.runStatus))
+  ) {
+    throw new Error("학습 attempt 관찰 계약이 유효하지 않습니다.");
+  }
+  return {
+    ...common,
+    answerReveal: value.answerReveal,
+    errorClass: value.errorClass,
+    hintLevel: Number(value.hintLevel),
+    passed: value.passed,
+    recommendedHintLevel: Number(value.recommendedHintLevel),
+    runStatus: value.runStatus as WebAttemptObservedEvidenceEvent["runStatus"],
+  } as LearningAttemptEvidenceCore;
 }
 
 async function migrateCanonicalEventsLessonRef(
   events: LearningEvent[],
-  outerEvent: StrongEvidenceCore,
+  outerEvent: LearningAttemptEvidenceCore,
 ): Promise<LearningEvent[]> {
   const eventIds = {
     RunObserved: `${outerEvent.eventId}:run`,
@@ -906,7 +1039,9 @@ async function migrateCanonicalEventsLessonRef(
       context.lessonRef = outerEvent.lessonRef;
       context.runId = outerEvent.eventId;
       context.sourceCodeHash = outerEvent.sourceHash;
-      context.taskVariantId = `${outerEvent.lessonRef}#${String(context.sectionId)}`;
+      if (!context.taskFamilyId) {
+        context.taskVariantId = `${outerEvent.lessonRef}#${String(context.sectionId)}`;
+      }
       context.lessonContentHash = await learningEventDigest({
         checkId: outerEvent.checkId,
         lessonRef: outerEvent.lessonRef,
@@ -934,7 +1069,7 @@ async function migrateCanonicalEventsLessonRef(
 
 async function normalizeCanonicalEvents(
   value: unknown,
-  outerEvent?: StrongEvidenceCore,
+  outerEvent?: LearningAttemptEvidenceCore,
 ): Promise<LearningEvent[]> {
   if (!Array.isArray(value) || value.length < 2 || value.length > MAX_CANONICAL_EVENTS) {
     throw new Error("학습 증거 canonical event chain 길이가 유효하지 않습니다.");
@@ -971,7 +1106,7 @@ async function normalizeCanonicalEvents(
 
 async function validateCanonicalEventBinding(
   events: LearningEvent[],
-  outerEvent: StrongEvidenceCore,
+  outerEvent: LearningAttemptEvidenceCore,
 ): Promise<void> {
   const byKind = new Map(events.map((event) => [event.kind, event]));
   const run = byKind.get("RunObserved");
@@ -1007,6 +1142,9 @@ async function validateCanonicalEventBinding(
     sectionId: context.sectionId,
   });
   const packageSetHash = await learningEventDigest(outerEvent.packages ?? []);
+  const expectedRunStatus = outerEvent.kind === "AttemptObserved" ? outerEvent.runStatus : "success";
+  const expectedPassed = outerEvent.kind === "AttemptObserved" ? outerEvent.passed : true;
+  const expectedStrength = outerEvent.kind === "AttemptObserved" ? outerEvent.strength : "strong";
   if (
     context.attemptId !== outerEvent.eventId
     || context.runId !== outerEvent.eventId
@@ -1014,7 +1152,7 @@ async function validateCanonicalEventBinding(
     || context.checkSpecId !== outerEvent.checkId
     || context.fixtureHash !== outerEvent.fixtureHash
     || context.sourceCodeHash !== outerEvent.sourceHash
-    || context.taskVariantId !== `${outerEvent.lessonRef}#${String(context.sectionId)}`
+    || (!context.taskFamilyId && context.taskVariantId !== `${outerEvent.lessonRef}#${String(context.sectionId)}`)
     || context.lessonContentHash !== lessonContentHash
     || context.packageSetHash !== packageSetHash
     || context.tierUsed !== runtimeBinding.tierUsed
@@ -1023,11 +1161,12 @@ async function validateCanonicalEventBinding(
     || context.runtimeVersion !== "1"
     || run.startedAt !== outerEvent.occurredAt
     || run.completedAt !== outerEvent.occurredAt
-    || run.runStatus !== "success"
+    || run.runStatus !== expectedRunStatus
+    || stableJson(run.artifactDescriptors ?? []) !== stableJson(outerEvent.artifacts ?? [])
   ) {
     throw new Error("학습 증거 canonical run이 outer evidence와 일치하지 않습니다.");
   }
-  if (check.checkId !== outerEvent.checkId || check.strength !== "strong" || check.passed !== true) {
+  if (check.checkId !== outerEvent.checkId || check.strength !== expectedStrength || check.passed !== expectedPassed) {
     throw new Error("학습 증거 canonical check가 outer evidence와 일치하지 않습니다.");
   }
   if (support && support.runEventId !== run.eventId) {
@@ -1281,4 +1420,12 @@ function isConstraintError(error: unknown): boolean {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function isLearningAttemptEvidenceCore(value: EvidenceEventCore): value is LearningAttemptEvidenceCore {
+  return value.kind === "AttemptObserved" || value.kind === "StrongCheckVerified";
+}
+
+function isLearningAttemptEvidenceEvent(value: WebLearningEvidenceEvent): value is WebLearningAttemptEvidenceEvent {
+  return value.kind === "AttemptObserved" || value.kind === "StrongCheckVerified";
 }

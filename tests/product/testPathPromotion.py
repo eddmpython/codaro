@@ -83,12 +83,28 @@ def testMachineReadyPathStaysProvisionalWithoutHumanEvidence() -> None:
     assert state.allowedClaim == "machineVerified"
     assert state.visibility == "provisional"
     assert state.promotionEligible is False
+    assert state.publicationState == "candidate"
+    assert state.machinePublicationEligible is False
     assert state.blockers == (
         "content-review-required",
         "formative-evidence-required",
         "learning-signal-evidence-required",
         "confirmatory-evidence-required",
     )
+
+
+def testCompleteCapabilityContractPublishesMachineGoldenWithoutEffectClaim() -> None:
+    state = resolvePathPromotionState(
+        pathId="reportAutomationFoundation",
+        contentHash=CONTENT_HASH,
+        machineChecks=machineChecks(),
+        capabilityContractComplete=True,
+    )
+
+    assert state.publicationState == "golden"
+    assert state.machinePublicationEligible is True
+    assert state.allowedClaim == "machineVerified"
+    assert state.promotionEligible is False
 
 
 def testOneMachineFailureIsVisiblePerPath() -> None:

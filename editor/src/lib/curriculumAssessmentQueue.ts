@@ -2,12 +2,13 @@ import { nestedCanonicalLearningEvents } from "@/lib/canonicalLearningEvidence";
 import { evidenceAvailabilityTime, parseEvidenceTime } from "@/lib/evidenceTime";
 import type { LearningEvent } from "@/lib/learningEvent";
 import { MasteryPolicy } from "@/lib/masteryPolicy";
-import type { WebStrongCheckEvidenceEvent } from "@/lib/webLearningEvidence";
+import type { WebLearningAttemptEvidenceEvent } from "@/lib/webLearningEvidence";
+import policyContract from "@/lib/generatedContracts/masteryPolicy.v2.json";
 
-const RETRIEVAL_MINIMUM_HOURS = 7 * 24;
+const RETRIEVAL_MINIMUM_HOURS = policyContract.retrievalWindowDays.minimum * 24;
 
 export type AssessmentQueueContract = {
-  assessmentMode: "retrieval" | "transfer";
+  assessmentMode: "capstone" | "retrieval" | "transfer";
   minimumDelayHours: number;
   outcomeIds: string[];
   sectionId: string;
@@ -22,7 +23,7 @@ type AcceptedCredit = {
 
 export async function dueAssessmentSectionIds(
   contracts: Iterable<AssessmentQueueContract>,
-  evidenceEvents: Iterable<WebStrongCheckEvidenceEvent>,
+  evidenceEvents: Iterable<WebLearningAttemptEvidenceEvent>,
   now = Date.now(),
 ): Promise<Set<string>> {
   if (!Number.isFinite(now)) throw new Error("assessment queue time must be finite");
@@ -34,10 +35,17 @@ export async function dueAssessmentSectionIds(
   ], projection.outcomes.flatMap(
     (outcome) => outcome.creditEventIds,
   ));
+  const acceptedApplications = acceptedApplicationCredits(canonicalEvents, projection.invalidEventIds);
   const masteryByOutcome = new Map(projection.outcomes.map((outcome) => [outcome.outcomeId, outcome]));
   const due = new Set<string>();
 
   for (const contract of contracts) {
+    if (contract.assessmentMode === "capstone") {
+      const completed = acceptedApplications.some((credit) => credit.sectionId === contract.sectionId);
+      const sourceCompleted = accepted.some((credit) => contract.sourceSectionIds.includes(credit.sectionId));
+      if (!completed && sourceCompleted) due.add(contract.sectionId);
+      continue;
+    }
     const completed = accepted.filter((credit) => credit.sectionId === contract.sectionId);
     if (contract.assessmentMode === "transfer") {
       if (!completed.length && accepted.some((credit) => contract.sourceSectionIds.includes(credit.sectionId))) {
@@ -65,6 +73,29 @@ export async function dueAssessmentSectionIds(
     }
   }
   return due;
+}
+
+function acceptedApplicationCredits(
+  events: LearningEvent[],
+  invalidEventIds: string[],
+): AcceptedCredit[] {
+  const invalid = new Set(invalidEventIds);
+  const byId = new Map(events.map((event) => [event.eventId, event]));
+  const accepted: AcceptedCredit[] = [];
+  for (const credit of events) {
+    if (credit.kind !== "CreditGranted" || invalid.has(credit.eventId)) continue;
+    const slices = Array.isArray(credit.creditSlices) ? credit.creditSlices.filter(isRecord) : [];
+    if (!slices.length || slices.some((slice) => slice.creditMode !== "capstone")) continue;
+    const run = byId.get(String(credit.runEventId));
+    if (!run || run.kind !== "RunObserved") continue;
+    const context = run.runContext as Record<string, unknown>;
+    accepted.push({
+      evidenceTime: evidenceAvailabilityTime(parseEvidenceTime(credit.evidenceTime, credit.appendReceiptAt)),
+      outcomeIds: slices.map((slice) => String(slice.outcomeId ?? "")).filter(Boolean),
+      sectionId: String(context.sectionId),
+    });
+  }
+  return accepted;
 }
 
 function acceptedCredits(

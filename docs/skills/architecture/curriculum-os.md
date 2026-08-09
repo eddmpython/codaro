@@ -16,7 +16,7 @@ whenToUse: 새 학습 도메인을 정의하거나, 자동 학습 경로 합성/
 ## 5계층 구조 (Phase 1~3 완성형)
 
 ```
-taxonomy (SSOT YAML - outcomes/domains/lessonOutcomes/sectionOutcomes/lessonRole)
+taxonomy (SSOT YAML - outcomes/domains/capabilityClaims/taskFamilies/lessonOutcomes)
   ↓
 lessonGraph (outcome 매핑 + prerequisite DAG + section/role 메타)
   ↓
@@ -32,7 +32,8 @@ UI surfaces (MasterPlanPanel + MasteryPanel + TodayReviewsCard + AnalyticsPanel)
 세 가지 vocabulary를 한 파일에 둔다.
 
 - **outcomes**: 학생이 한 레슨을 마치고 얻는 단위 능력. ID는 `<도메인 prefix>.<능력명>` lowerCamelCase. 예: `python.variables`, `pandas.aggregate`, `automation.browser.session`.
-- **domains**: 학습자가 실제로 달성하려는 실무 목표. `targetOutcomes` 배열이 도메인을 충족하기 위해 필요한 outcome 집합.
+- **domains**: 학습자가 실제로 달성하려는 실무 목표. 승격 경로는 versioned `capabilityClaims`와 required TaskFamily를 함께 가진다.
+- **taskFamilies**: 같은 underlying rule을 acquisition, transfer, retrieval, application의 다른 표면 조건으로 관찰하는 평가 가족. outcome evidence slice, fixture, CheckSpec version, checker corpus와 artifact contract를 소유한다.
 - **lessonOutcomes**: `<category>/<contentId>` 키별 backfill. 레슨 YAML 메타에 `outcomes`/`prerequisites`가 있으면 그 쪽이 우선, 없으면 여기 값으로 채운다.
 - **sectionOutcomes** (Phase 2b): 같은 항목 안의 dict - `{sectionId: [outcome, ...]}`. 다중 outcome lesson 에서 어느 섹션이 어느 outcome 을 검증하는지 매핑한다. 미지정 시 lesson outcomes 전체로 fallback.
 - **lessonRole** (Phase 2d): `concept | practice | project`. project 는 deliverable-driven plan 합성 시 우측 칼럼에 배치되는 마지막 lesson.
@@ -60,23 +61,11 @@ UI surfaces (MasterPlanPanel + MasteryPanel + TodayReviewsCard + AnalyticsPanel)
 
 `PRIMARY_CATEGORY_ORDER`에 카테고리 우선순위가 명시되어 있다 (기초가 앞).
 
-## Phase 2b - Outcome Credit & Review
+## Legacy 진도 진단과 현재 권위
 
-체크 통과를 outcome 숙련도 신호로 변환:
+`outcomeCredit.py`, `outcomeMastery.py`, `reviewScheduler.py`, 수동 validation과 unified blend는 기존 화면과 진단 호환을 위해 남아 있다. 이 경로는 현재 capability assurance, application, golden publication을 바꾸지 못한다. 현재 단계 변경 권위는 `AttemptObserved -> canonical LearningEvent -> MasteryPolicy@2 -> CapabilityProjection` 한 경로다.
 
-- `outcomeCredit.py`: weight 매핑 (hintLevel 0 → 1.0, 1 → 0.7, 2 → 0.5, 3 → 0.3, 그 외 0.2).
-- `progress.py`: `outcomeCredits`, `autoValidatedOutcomes`, `sectionResults` 필드. `creditCheckPass(category, contentId, sectionId, outcomes, hintLevel)` 가 누적.
-- 3 회 이상 credit + 평균 weight ≥ 0.7 → outcome 자동 검증 (`autoValidatedOutcomes`).
-- `outcomeMastery.computeMastery`: lesson contribution + credit contribution 을 같은 확률 합성에 넣음. 시간 감쇠 half-life 30 일 (Phase 2c).
-
-## Phase 2c - Review Scheduling
-
-SM-2 lite - binary success/lapse 로 다음 review interval 결정:
-
-- `reviewScheduler.py`: `ReviewState (interval, ease 1.3~2.5, streak, nextReviewAt, lastResult)`, init/updateOnSuccess/updateOnLapse/isDue.
-- `progress.completeMission()` 가 lesson 완료 첫 순간 자동으로 `ReviewState` 생성.
-- `/api/curriculum/reviews` / `/api/curriculum/reviews/{cat}/{id}` 엔드포인트.
-- mastery decay: `_decayedContribution(base, lastTouched)` - half-life 30일, floor 0.25.
+새 credit은 explicit `assessmentRole: assurance | application`과 promoted TaskFamily identity가 모두 있는 strong check만 쓴다. unmarked legacy assessment는 formative 실행과 feedback에는 쓰지만 새 assurance credit을 만들지 않는다.
 
 ## Phase 3 - Analytics & Bridge
 
@@ -94,6 +83,8 @@ SM-2 lite - binary success/lapse 로 다음 review interval 결정:
 | `/api/curriculum/master-plan` | POST | `{domain?, outcomes?, excludeCompleted?, excludeKeys?, skipMasteredOutcomes?, maxMinutes?, projectIntent?, deliverableOnly?}` | `MasterPlan` (steps, gaps, droppedSteps, conceptSteps/practiceSteps/projectSteps, projectMatches, totalMinutes, summary) |
 | `/api/curriculum/gaps` | GET | `?domain=` (옵션) | `{gaps: [{domainId, domainLabel, missing}]}` |
 | `/api/curriculum/mastery` | GET | - | `MasteryReport` (outcomes, domains, masteredOutcomeCount, totalOutcomeCount) |
+| `/api/curriculum/capabilities/{domainId}` | GET | - | current-version 보증, 적용과 evidence receipt |
+| `/api/curriculum/artifacts/{contentHash}` | GET | - | 검증 후 보존한 Local artifact bytes |
 | `/api/curriculum/mastery/unified` | GET | - | `UnifiedMasteryReport` (progress + learnerState blend) |
 | `/api/curriculum/outcomes/validate` | POST | `{outcomeId, validated}` | toggle 결과 |
 | `/api/curriculum/check` | POST | `{... category?, contentId?, sectionId?}` | `CheckResult` + `creditedOutcomes` + `autoValidatedOutcomes` |
@@ -124,7 +115,8 @@ unknown domain/outcome ID는 400 + `curriculum_unknown_domain` / `curriculum_unk
 
 세 가지 surface 가 등록되어 있다.
 
-- `SurfaceMode = "plan"` - [`masterPlanPanel.tsx`](../../../editor/src/components/curriculum/masterPlanPanel.tsx):
+- `SurfaceMode = "plan"`은 legacy 진도 진단과 경로 합성을 제공한다. capability 성취는 curriculum home의 검증된 기본 경로 카드가 canonical projection으로 표시한다.
+- [`masterPlanPanel.tsx`](../../../editor/src/components/curriculum/masterPlanPanel.tsx):
   - 도메인 칩 선택 → 자동 plan 합성
   - 시간 예산 / 이미 익힌 능력 건너뛰기 토글
   - projectIntent 텍스트 입력 → deliverableOnly 자동 활성 + 매칭 키워드 chip + 단일↔3단 뷰 토글

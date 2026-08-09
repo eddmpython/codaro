@@ -57,6 +57,15 @@ export async function requestJson<T>(path: string, init?: RequestInit): Promise<
   return (await response.json()) as T;
 }
 
+export async function requestBytes(path: string): Promise<{ contentType: string; payload: Uint8Array }> {
+  const response = await fetch(`${configuredApiBase}${path}`);
+  if (!response.ok) throw new CodaroApiError(response.status, `${response.status} ${response.statusText}`);
+  return {
+    contentType: response.headers.get("Content-Type") ?? "application/octet-stream",
+    payload: new Uint8Array(await response.arrayBuffer()),
+  };
+}
+
 export function postJson<T>(
   path: string,
   body: unknown,

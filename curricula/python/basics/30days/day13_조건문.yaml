@@ -632,6 +632,16 @@ assessment:
   masteryVariants:
   - id: day13-shipping-fee-mastery
     mode: mastery
+    assessmentMode: acquisition
+    instructionRole: practice
+    assessmentRole: assurance
+    capabilityClaimId: report.pipeline
+    capabilityClaimVersion: 1
+    taskFamilyId: python.report.collection
+    taskFamilyVersion: 1
+    taskVariantId: python.report.collection.acquisition.v1
+    taskVariantVersion: 1
+    outcomeIds: [python.lists, python.dictsAndSets, python.controlFlow]
     unseen: true
     claimScope: portable-concept
     reviewStatus: machine-verified-pending-independent-review
@@ -701,6 +711,15 @@ assessment:
   transferVariants:
   - id: day13-risk-level-transfer
     mode: transfer
+    instructionRole: practice
+    assessmentRole: assurance
+    capabilityClaimId: report.pipeline
+    capabilityClaimVersion: 1
+    taskFamilyId: python.report.collection
+    taskFamilyVersion: 1
+    taskVariantId: python.report.collection.transfer.v1
+    taskVariantVersion: 1
+    outcomeIds: [python.lists, python.dictsAndSets, python.controlFlow]
     unseen: true
     claimScope: portable-concept
     reviewStatus: machine-verified-pending-independent-review
@@ -766,6 +785,15 @@ assessment:
   retrievalVariants:
   - id: day13-leap-year-retrieval
     mode: retrieval
+    instructionRole: practice
+    assessmentRole: assurance
+    capabilityClaimId: report.pipeline
+    capabilityClaimVersion: 1
+    taskFamilyId: python.report.collection
+    taskFamilyVersion: 1
+    taskVariantId: python.report.collection.retrieval.v1
+    taskVariantVersion: 1
+    outcomeIds: [python.lists, python.dictsAndSets, python.controlFlow]
     unseen: true
     claimScope: portable-concept
     reviewStatus: machine-verified-pending-independent-review

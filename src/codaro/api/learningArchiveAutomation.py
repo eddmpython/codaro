@@ -6,6 +6,8 @@ import re
 from typing import Any
 
 from ..automation.taskRegistry import TaskRegistry, getTaskRegistry
+from ..curriculum.capabilityProjection import projectCapability
+from ..curriculum.evidenceArchive import digestBytes
 from ..curriculum.learningArchive import (
     LearningArchiveError,
     confirmAutomationDraft,
@@ -13,6 +15,7 @@ from ..curriculum.learningArchive import (
     readCurrentLearningArchive,
 )
 from ..curriculum.learningArchiveFlow import learningArchiveMutationLock
+from ..curriculum.taxonomy import loadTaxonomy
 from ..document.models import BlockConfig, CodaroDocument, DocumentMetadata
 from ..document.service import saveDocument
 
@@ -34,6 +37,7 @@ def adoptLearningArchiveAutomationDraft(
         archiveDraft = next((item for item in archive["automationDrafts"] if item["draftId"] == draftId), None)
         if draft is None or archiveDraft is None:
             raise LearningArchiveError("현재 학습 archive에서 자동화 초안을 찾을 수 없습니다.")
+        capabilityProof = _goldenCapabilityProof(archive, materialized, draft.lineageId)
 
         existing = next(
             (task for task in registry.listTasks() if task.inputs.get("sourceDraftId") == draftId),
@@ -79,6 +83,7 @@ def adoptLearningArchiveAutomationDraft(
                 "learningArchiveId": archive["manifest"]["archiveId"],
                 "lineageId": confirmation["lineageId"],
                 "sourceDraftId": confirmation["sourceDraftId"],
+                **capabilityProof,
             },
             enabled=False,
         )
@@ -94,3 +99,65 @@ def _automationDraftDocumentPath(name: str, draftId: str) -> str:
     slug = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-") or "learning-automation"
     digest = draftId.split(":", 1)[-1][:12]
     return f"automations/learning/{slug}-{digest}.py"
+
+
+def _goldenCapabilityProof(
+    archive: dict[str, Any],
+    materialized: object,
+    lineageId: str,
+) -> dict[str, object]:
+    lineage = next(
+        (item for item in archive["lineage"] if item["lineageId"] == lineageId),
+        None,
+    )
+    if not isinstance(lineage, dict):
+        raise LearningArchiveError("자동화 초안의 학습 계보를 찾을 수 없습니다.")
+    if lineage.get("lessonRef") != "30days/day30_최종프로젝트":
+        return {}
+    evidenceIds = set(str(value) for value in lineage.get("evidenceEventIds", []))
+    evidenceArchive = getattr(materialized, "evidenceArchive", {})
+    outerEvents = evidenceArchive.get("events", []) if isinstance(evidenceArchive, dict) else []
+    canonicalEvents = [
+        canonical
+        for outer in outerEvents
+        if isinstance(outer, dict) and str(outer.get("eventId")) in evidenceIds
+        for canonical in outer.get("canonicalEvents", [])
+        if isinstance(canonical, dict)
+    ]
+    projection = projectCapability(
+        loadTaxonomy(),
+        "reportAutomationFoundation",
+        canonicalEvents,
+    )
+    if projection.application.stage == "none" or not projection.application.receipts:
+        raise LearningArchiveError("검증된 보고서 산출물 증거가 있어야 이 초안을 적용할 수 있습니다.")
+    artifactHashes = sorted({
+        contentHash
+        for receipt in projection.application.receipts
+        for contentHash in receipt.artifactContentHashes
+    })
+    virtualFiles = getattr(materialized, "virtualFiles", ())
+    retainedHashes = {
+        digestBytes(item.payload)
+        for item in virtualFiles
+        if any(
+            item.path.startswith(f"proof/{contentHash.removeprefix('sha256-')}/")
+            for contentHash in artifactHashes
+        )
+    }
+    if not artifactHashes or not set(artifactHashes).issubset(retainedHashes):
+        raise LearningArchiveError("적용 증거의 산출물 바이트가 학습 archive에 보존되지 않았습니다.")
+    taxonomy = loadTaxonomy()
+    claimIds = sorted({
+        taxonomy.taskFamilyById(receipt.taskFamilyId).ownerClaimId
+        for receipt in projection.application.receipts
+        if taxonomy.taskFamilyById(receipt.taskFamilyId) is not None
+    })
+    return {
+        "capabilityDomainId": projection.domainId,
+        "capabilityClaimIds": claimIds,
+        "proofArtifactContentHashes": artifactHashes,
+        "proofCreditEventIds": sorted(
+            receipt.creditEventId for receipt in projection.application.receipts
+        ),
+    }

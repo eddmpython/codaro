@@ -576,6 +576,16 @@ assessment:
   masteryVariants:
   - id: day04-introduce-mastery
     mode: mastery
+    assessmentMode: acquisition
+    instructionRole: practice
+    assessmentRole: assurance
+    capabilityClaimId: report.record
+    capabilityClaimVersion: 1
+    taskFamilyId: python.report.record
+    taskFamilyVersion: 1
+    taskVariantId: python.report.record.acquisition.v1
+    taskVariantVersion: 1
+    outcomeIds: [python.intro, python.variables, python.operators, python.strings]
     unseen: true
     claimScope: portable-concept
     reviewStatus: machine-verified-pending-independent-review
@@ -636,6 +646,15 @@ assessment:
   transferVariants:
   - id: day04-initials-transfer
     mode: transfer
+    instructionRole: practice
+    assessmentRole: assurance
+    capabilityClaimId: report.record
+    capabilityClaimVersion: 1
+    taskFamilyId: python.report.record
+    taskFamilyVersion: 1
+    taskVariantId: python.report.record.transfer.v1
+    taskVariantVersion: 1
+    outcomeIds: [python.intro, python.variables, python.operators, python.strings]
     unseen: true
     claimScope: portable-concept
     reviewStatus: machine-verified-pending-independent-review
@@ -693,6 +712,15 @@ assessment:
   retrievalVariants:
   - id: day04-quote-text-retrieval
     mode: retrieval
+    instructionRole: practice
+    assessmentRole: assurance
+    capabilityClaimId: report.record
+    capabilityClaimVersion: 1
+    taskFamilyId: python.report.record
+    taskFamilyVersion: 1
+    taskVariantId: python.report.record.retrieval.v1
+    taskVariantVersion: 1
+    outcomeIds: [python.intro, python.variables, python.operators, python.strings]
     unseen: true
     claimScope: portable-concept
     reviewStatus: machine-verified-pending-independent-review

@@ -7,7 +7,7 @@ lessons:
     lessonContentHash: "ba55069c877220979222831d64ce9d717de571b8048a02c84562d7384d425bf8"
     disposition: migrate
     ownerPacket: "01-python-foundation"
-    eligiblePathIds: ["pythonFoundation"]
+    eligiblePathIds: ["pythonFoundation","reportAutomationFoundation"]
     outcomes: ["python.intro"]
     prerequisites: []
     reinforcesOutcomeIds: []
@@ -29,7 +29,7 @@ lessons:
     lessonContentHash: "7815f6d1ad32ac775889079afc16700d91d468794f4264aa1b9dfefbffae7765"
     disposition: migrate
     ownerPacket: "01-python-foundation"
-    eligiblePathIds: ["computerVision","dataReporting","dataVisualization","geoVisualization","imageProcessing","officeAutomation","pythonFoundation","scriptingAutomation","sqlAnalysis","webMonitoring"]
+    eligiblePathIds: ["computerVision","dataReporting","dataVisualization","geoVisualization","imageProcessing","officeAutomation","pythonFoundation","reportAutomationFoundation","scriptingAutomation","sqlAnalysis","webMonitoring"]
     outcomes: ["python.variables"]
     prerequisites: ["python.intro"]
     reinforcesOutcomeIds: []
@@ -51,7 +51,7 @@ lessons:
     lessonContentHash: "673ad55ca2c6e02fb02a37a1550bc549ffd894feffd5c82f9a600bd6de25e242"
     disposition: migrate
     ownerPacket: "01-python-foundation"
-    eligiblePathIds: ["pythonFoundation"]
+    eligiblePathIds: ["pythonFoundation","reportAutomationFoundation"]
     outcomes: ["python.operators"]
     prerequisites: ["python.variables"]
     reinforcesOutcomeIds: []
@@ -70,10 +70,10 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day04_문자열기초"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "8ae024ea6b02522ac7040f414416fb28c25ef1a4cf3c614eff5073b3b1d94459"
+    lessonContentHash: "a6c29169b50d6eaf1815b811cdb950b37d24980a8ca45ed7d5d048cc53a31929"
     disposition: migrate
     ownerPacket: "01-python-foundation"
-    eligiblePathIds: ["pythonFoundation","textProcessing"]
+    eligiblePathIds: ["pythonFoundation","reportAutomationFoundation","textProcessing"]
     outcomes: ["python.strings"]
     prerequisites: ["python.variables"]
     reinforcesOutcomeIds: []
@@ -139,7 +139,7 @@ lessons:
     lessonContentHash: "ff790a78c49cfd4e6f31f24053e59812f94d7fdabc0ac189969c71d53e33f049"
     disposition: migrate
     ownerPacket: "01-python-foundation"
-    eligiblePathIds: ["pythonFoundation"]
+    eligiblePathIds: ["pythonFoundation","reportAutomationFoundation"]
     outcomes: ["python.lists"]
     prerequisites: ["python.variables"]
     reinforcesOutcomeIds: []
@@ -205,7 +205,7 @@ lessons:
     lessonContentHash: "3b0ce6ba3e5ad529091129f962adf6b02e5d61cfe30f4cbe0107574fa80e6259"
     disposition: migrate
     ownerPacket: "01-python-foundation"
-    eligiblePathIds: ["pythonFoundation"]
+    eligiblePathIds: ["pythonFoundation","reportAutomationFoundation"]
     outcomes: ["python.dictsAndSets"]
     prerequisites: ["python.lists"]
     reinforcesOutcomeIds: []
@@ -268,10 +268,10 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day13_조건문"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "4efe2a900158a4874a123467f8c8296ee3c33bc69dc939bde1f6c96c3ef49095"
+    lessonContentHash: "2a0b73726e696dc518286a3179aa84fc59ae4ed6cffa12c632c4aaec52f39636"
     disposition: migrate
     ownerPacket: "01-python-foundation"
-    eligiblePathIds: ["dataReporting","dataVisualization","officeAutomation","pythonFoundation","scriptingAutomation","webMonitoring"]
+    eligiblePathIds: ["dataReporting","dataVisualization","officeAutomation","pythonFoundation","reportAutomationFoundation","scriptingAutomation","webMonitoring"]
     outcomes: ["python.controlFlow"]
     prerequisites: ["python.operators"]
     reinforcesOutcomeIds: []
@@ -315,7 +315,7 @@ lessons:
     lessonContentHash: "0a41cf2564da4345b422b174d2184da953f35cdca88cdb55333235c5c8f99a05"
     disposition: migrate
     ownerPacket: "01-python-foundation"
-    eligiblePathIds: ["aiIntegration","dataReporting","desktopAutomation","documentAutomation","emailAutomation","graphAnalysis","machineLearning","officeAutomation","pdfAutomation","pythonFoundation","scriptingAutomation","standardLibraryMastery","webMonitoring"]
+    eligiblePathIds: ["aiIntegration","dataReporting","desktopAutomation","documentAutomation","emailAutomation","graphAnalysis","machineLearning","officeAutomation","pdfAutomation","pythonFoundation","reportAutomationFoundation","scriptingAutomation","standardLibraryMastery","webMonitoring"]
     outcomes: ["python.functions"]
     prerequisites: ["python.controlFlow"]
     reinforcesOutcomeIds: []
@@ -381,7 +381,7 @@ lessons:
     lessonContentHash: "674118b5558a209d516f4ec404e6ffc19710b39a8235afe6773eceaf3a60fd7c"
     disposition: migrate
     ownerPacket: "01-python-foundation"
-    eligiblePathIds: ["aiIntegration","documentAutomation","emailAutomation","fileAutomation","imageProcessing","officeAutomation","pdfAutomation","pythonFoundation","scriptingAutomation","standardLibraryMastery"]
+    eligiblePathIds: ["aiIntegration","documentAutomation","emailAutomation","fileAutomation","imageProcessing","officeAutomation","pdfAutomation","pythonFoundation","reportAutomationFoundation","scriptingAutomation","standardLibraryMastery"]
     outcomes: ["python.modulesAndIo"]
     prerequisites: ["python.functions"]
     reinforcesOutcomeIds: []
@@ -422,10 +422,10 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day20_예외처리"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "a67c3b8a5d46f8a44595b5a73409a5d9e7988f9003f4c616696eecc4fd6fc9ab"
+    lessonContentHash: "d04bc67678cf41832e0f183ed9022aae383e7ef477e27c9ec40f187f34167627"
     disposition: migrate
     ownerPacket: "01-python-foundation"
-    eligiblePathIds: ["aiIntegration","desktopAutomation","emailAutomation","pdfAutomation","pythonFoundation","scriptingAutomation","systemMonitoring"]
+    eligiblePathIds: ["aiIntegration","desktopAutomation","emailAutomation","pdfAutomation","pythonFoundation","reportAutomationFoundation","scriptingAutomation","systemMonitoring"]
     outcomes: ["python.errorHandling"]
     prerequisites: ["python.functions"]
     reinforcesOutcomeIds: []
@@ -642,10 +642,10 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day30_최종프로젝트"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "ae99b294741b62e6689c96df911434e2fa217f0012e05e0c499faeb45c704ec9"
+    lessonContentHash: "948c0c87ef1b06cc93ee5bf597b5b2d5d51d8b61cc53b30432315ab356580c5b"
     disposition: migrate
     ownerPacket: "01-python-foundation"
-    eligiblePathIds: ["pythonFoundation"]
+    eligiblePathIds: ["pythonFoundation","reportAutomationFoundation"]
     outcomes: ["python.projectDelivery"]
     prerequisites: ["python.advancedSyntax","python.oop","python.errorHandling"]
     reinforcesOutcomeIds: []

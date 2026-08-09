@@ -54,6 +54,8 @@ class PathPromotionState:
     allowedClaim: str
     visibility: str
     promotionEligible: bool
+    machinePublicationEligible: bool
+    publicationState: str
     contentHash: str
     blockers: tuple[str, ...]
 
@@ -64,6 +66,7 @@ def resolvePathPromotionState(
     contentHash: str,
     machineChecks: dict[str, bool],
     efficacyCandidate: dict[str, Any] | None = None,
+    capabilityContractComplete: bool = False,
 ) -> PathPromotionState:
     normalizedPathId = pathId.strip() if isinstance(pathId, str) else ""
     if not normalizedPathId:
@@ -102,6 +105,13 @@ def resolvePathPromotionState(
     blockers.extend(HUMAN_STAGE_BLOCKERS[humanStage])
 
     promotionEligible = machineReady and humanStage == "E3"
+    publicationState = (
+        "golden"
+        if machineReady and capabilityContractComplete
+        else "candidate"
+        if machineReady
+        else "unavailable"
+    )
     if promotionEligible:
         allowedClaim = humanClaim
         visibility = humanVisibility
@@ -124,6 +134,8 @@ def resolvePathPromotionState(
         allowedClaim=allowedClaim,
         visibility=visibility,
         promotionEligible=promotionEligible,
+        machinePublicationEligible=publicationState == "golden",
+        publicationState=publicationState,
         contentHash=contentHash,
         blockers=tuple(blockers),
     )
@@ -141,6 +153,7 @@ def resolvePathPromotionPortfolio(
                 contentHash=candidate.get("contentHash"),
                 machineChecks=candidate.get("machineChecks"),
                 efficacyCandidate=candidate.get("efficacyCandidate"),
+                capabilityContractComplete=candidate.get("capabilityContractComplete") is True,
             )
             results[pathId] = {"passed": True, **asdict(state)}
         except PathPromotionInvalid as error:

@@ -19,6 +19,16 @@ STRUCTURED_SECTION_FIELDS = {
     "check",
 }
 
+INSTRUCTION_ROLES = {"reference", "workedExample", "practice", "project"}
+ASSESSMENT_ROLES = {"none", "formative", "assurance", "application"}
+ASSESSMENT_MODES = {"mastery", "acquisition", "transfer", "retrieval", "capstone"}
+ROLE_COMBINATIONS = {
+    "reference": {"none", "formative"},
+    "workedExample": {"none", "formative"},
+    "practice": {"formative", "assurance"},
+    "project": {"formative", "assurance", "application"},
+}
+
 REQUIRED_STRUCTURED_SECTION_FIELDS = (
     "subtitle",
     "goal",
@@ -113,6 +123,17 @@ class LearningSectionContract(BaseModel):
     rawBlocks: list[dict[str, Any]] = Field(default_factory=list)
     contractGaps: list[str] = Field(default_factory=list)
     assessmentMode: str = ""
+    instructionRole: str = ""
+    assessmentRole: str = ""
+    capabilityClaimId: str = ""
+    capabilityClaimVersion: int = 0
+    taskFamilyId: str = ""
+    taskFamilyVersion: int = 0
+    taskVariantId: str = ""
+    taskVariantVersion: int = 0
+    artifactContractId: str = ""
+    artifactContractVersion: int = 0
+    evidenceSlices: list[dict[str, Any]] = Field(default_factory=list)
     sourceSectionIds: list[str] = Field(default_factory=list)
     unseen: bool = False
     minimumDelayHours: int = 0
@@ -213,6 +234,15 @@ def _sectionContract(
     sectionId = _textValue(section.get("id")) or f"section-{index}"
     directOutcomeIds = _uniqueTextList(section.get("outcomeIds") or section.get("outcomes"))
     mappedOutcomeIds = (sectionOutcomeIds or {}).get(sectionId, [])
+    instructionRole = _textValue(section.get("instructionRole"))
+    assessmentRole = _textValue(section.get("assessmentRole"))
+    assessmentMode = _textValue(section.get("assessmentMode") or section.get("mode"))
+    _validateAssessmentRoles(
+        sectionId=sectionId,
+        instructionRole=instructionRole,
+        assessmentRole=assessmentRole,
+        assessmentMode=assessmentMode,
+    )
     contract = LearningSectionContract(
         id=sectionId,
         title=_textValue(section.get("title")) or f"{index}단계",
@@ -227,7 +257,18 @@ def _sectionContract(
         check=check,
         reflection=reflection,
         rawBlocks=blocks,
-        assessmentMode=_textValue(section.get("assessmentMode") or section.get("mode")),
+        assessmentMode=assessmentMode,
+        instructionRole=instructionRole,
+        assessmentRole=assessmentRole,
+        capabilityClaimId=_textValue(section.get("capabilityClaimId")),
+        capabilityClaimVersion=_nonNegativeInteger(section.get("capabilityClaimVersion")),
+        taskFamilyId=_textValue(section.get("taskFamilyId")),
+        taskFamilyVersion=_nonNegativeInteger(section.get("taskFamilyVersion")),
+        taskVariantId=_textValue(section.get("taskVariantId")),
+        taskVariantVersion=_nonNegativeInteger(section.get("taskVariantVersion")),
+        artifactContractId=_textValue(section.get("artifactContractId")),
+        artifactContractVersion=_nonNegativeInteger(section.get("artifactContractVersion")),
+        evidenceSlices=_arrayOfMaps(section.get("evidenceSlices")),
         sourceSectionIds=_uniqueTextList(section.get("sourceSectionIds")),
         unseen=section.get("unseen") is True,
         minimumDelayHours=_nonNegativeInteger(section.get("minimumDelayHours")),
@@ -236,6 +277,29 @@ def _sectionContract(
     if not sectionHasStructuredFields(section):
         return contract
     return contract.model_copy(update={"contractGaps": sectionContractGaps(contract)})
+
+
+def _validateAssessmentRoles(
+    *,
+    sectionId: str,
+    instructionRole: str,
+    assessmentRole: str,
+    assessmentMode: str,
+) -> None:
+    if not instructionRole and not assessmentRole:
+        return
+    if instructionRole not in INSTRUCTION_ROLES:
+        raise ValueError(f"section {sectionId}: invalid instructionRole '{instructionRole}'")
+    if assessmentRole not in ASSESSMENT_ROLES:
+        raise ValueError(f"section {sectionId}: invalid assessmentRole '{assessmentRole}'")
+    if assessmentRole not in ROLE_COMBINATIONS[instructionRole]:
+        raise ValueError(
+            f"section {sectionId}: {instructionRole} cannot use assessmentRole {assessmentRole}"
+        )
+    if assessmentRole in {"assurance", "application"} and assessmentMode not in ASSESSMENT_MODES:
+        raise ValueError(f"section {sectionId}: promoted assessment requires assessmentMode")
+    if assessmentRole == "application" and assessmentMode != "capstone":
+        raise ValueError(f"section {sectionId}: application requires capstone mode")
 
 
 def _exerciseContract(value: Any) -> LearningExerciseContract:

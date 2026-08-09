@@ -1772,7 +1772,6 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "verifyBrowserLocalRequiredHandoff": True,
             "verifyLegacyProgressMigration": True,
             "verifyDayOneCommentPrompt": True,
-            "expectTransferSection": True,
             "initialCheckState": "mismatch",
             "requireInlineHint": True,
             "solutionCode": "print('Hello Codaro')",
@@ -1840,7 +1839,6 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "waitFor": "[data-learning-section-card]",
             "runLearningCell": True,
             "targetAssessmentMode": "mastery",
-            "expectTransferSection": True,
             "initialCheckState": "mismatch",
             "solutionCode": "print('Hello Codaro')",
             "captureCheckStates": True,
@@ -1856,7 +1854,6 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "waitFor": "[data-learning-section-card]",
             "runLearningCell": True,
             "targetAssessmentMode": "mastery",
-            "expectTransferSection": True,
             "initialCheckState": "mismatch",
             "solutionCode": "print('Hello Codaro')",
             "captureCheckStates": True,
@@ -1873,7 +1870,6 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "runLearningCell": True,
             "targetAssessmentMode": "mastery",
             "expectCanonicalLesson": "day02_변수와데이터타입",
-            "expectTransferSection": True,
             "initialCheckState": "mismatch",
             "expectedLearningVisualAssetId": "pythonFundamentals",
             "solutionCode": (
@@ -1892,7 +1888,6 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "waitFor": '[data-learning-section-mode="mastery"]',
             "runLearningCell": True,
             "targetAssessmentMode": "mastery",
-            "expectTransferSection": True,
             "initialCheckState": "mismatch",
             "solutionCode": (
                 "def select_fields(record, fields):\n"
@@ -1910,7 +1905,6 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "waitFor": '[data-learning-section-mode="mastery"]',
             "runLearningCell": True,
             "targetAssessmentMode": "mastery",
-            "expectTransferSection": True,
             "initialCheckState": "mismatch",
             "solutionCode": (
                 "def clamp(value, low, high):\n"
@@ -1949,7 +1943,6 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "waitFor": '[data-learning-section-mode="mastery"]',
             "runLearningCell": True,
             "targetAssessmentMode": "mastery",
-            "expectTransferSection": True,
             "initialCheckState": "mismatch",
             "solutionCode": (
                 "class Counter:\n"
@@ -1975,7 +1968,6 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "waitFor": '[data-learning-section-mode="mastery"]',
             "runLearningCell": True,
             "targetAssessmentMode": "mastery",
-            "expectTransferSection": True,
             "initialCheckState": "mismatch",
             "solutionCode": (
                 "def even_values(limit):\n"
@@ -2028,7 +2020,6 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "waitFor": '[data-learning-section-mode="mastery"]',
             "runLearningCell": True,
             "targetAssessmentMode": "mastery",
-            "expectTransferSection": True,
             "initialCheckState": "mismatch",
             "expectedLearningVisualAssetId": "dataVisualizationOutcome",
             "verifySemanticArtifactEvidence": True,
@@ -2049,7 +2040,6 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "waitFor": '[data-learning-section-mode="mastery"]',
             "runLearningCell": True,
             "targetAssessmentMode": "mastery",
-            "expectTransferSection": True,
             "initialCheckState": "mismatch",
             "solutionCode": (
                 "def read_nonempty_lines(path):\n"
@@ -2067,7 +2057,6 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "surface": "web-lesson",
             "waitFor": "[data-learning-section-card]",
             "runLearningCell": True,
-            "runDelayedRetrieval": True,
             "initialCheckState": "mismatch",
             "solutionCode": "print('Hello Codaro')",
             "transferSolutionCode": "files = 3\nprint(\"Report ready:\", files, \"files\")",
@@ -2085,7 +2074,6 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "runLearningCell": True,
             "runDelayedRetrieval": True,
             "targetAssessmentMode": "mastery",
-            "expectTransferSection": True,
             "initialCheckState": "mismatch",
             "solutionCode": (
                 "from pathlib import Path\n\n"
@@ -2135,7 +2123,6 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "waitFor": '[data-learning-section-mode="mastery"]',
             "runLearningCell": True,
             "targetAssessmentMode": "mastery",
-            "expectTransferSection": True,
             "initialCheckState": "mismatch",
             "solutionCode": (
                 "import zipfile\n"
@@ -2169,7 +2156,6 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "expectedLearningVisualAssetId": "learningAutomation",
             "runLearningCell": True,
             "targetAssessmentMode": "mastery",
-            "expectTransferSection": True,
             "initialCheckState": "mismatch",
             "solutionCode": (
                 "import schedule\n\n"
@@ -3211,7 +3197,9 @@ async ({ surface, expectedTier }) => {
       (event) => event?.kind === "MigrationImported"
     ).length;
     webStrongEvidenceEventCount = evidenceStore.events.filter(
-      (event) => event?.kind === "StrongCheckVerified"
+      (event) => event?.kind === "AttemptObserved"
+        && event?.passed === true
+        && event?.strength === "strong"
     ).length;
     webEvidenceConflictCount = evidenceStore.conflicts.length;
     webEvidenceStoreHeader = evidenceStore.header;
@@ -6032,9 +6020,22 @@ def runBrowserMatrix(
                             manifest = archive.get("manifest", {})
                             files = manifest.get("files", [])
                             strong_event = next(
-                                (event for event in events if event.get("kind") == "StrongCheckVerified"),
+                                (
+                                    event for event in events
+                                    if event.get("kind") == "AttemptObserved"
+                                    and event.get("passed") is True
+                                    and event.get("strength") == "strong"
+                                ),
                                 None,
                             )
+                            attempt_events = [
+                                event for event in events
+                                if event.get("kind") == "AttemptObserved"
+                            ]
+                            migration_events = [
+                                event for event in events
+                                if event.get("kind") == "MigrationImported"
+                            ]
                             if (
                                 learning_archive.get("kind") != "codaro.learning-archive"
                                 or learning_archive.get("schemaVersion") != 2
@@ -6049,14 +6050,33 @@ def runBrowserMatrix(
                                 or archive.get("kind") != "codaro.learning-evidence-archive"
                                 or archive.get("schemaVersion") != 1
                                 or manifest.get("eventCount") != len(events)
-                                or len(events) != 2
+                                or len(attempt_events) < 2
+                                or not any(event.get("passed") is False for event in attempt_events)
+                                or len(migration_events) != 1
                                 or strong_event is None
                                 or manifest.get("eventSetHash") != event_set_hash
                                 or len(files) != 1
                                 or files[0].get("contentHash") != event_set_hash
                                 or files[0].get("byteLength") != len(canonical)
                             ):
-                                raise AssertionError("learning archive manifest, document, or evidence is invalid")
+                                raise AssertionError(
+                                    "learning archive manifest, document, or evidence is invalid: "
+                                    + json.dumps({
+                                        "archiveKind": learning_archive.get("kind"),
+                                        "archiveSchema": learning_archive.get("schemaVersion"),
+                                        "draftCount": learning_manifest.get("draftCount"),
+                                        "draftRows": len(learning_drafts),
+                                        "draftSourceRestored": webLearningArchiveDraftSource in draft_sources,
+                                        "eventCount": learning_manifest.get("evidenceEventCount"),
+                                        "eventKinds": [event.get("kind") for event in events],
+                                        "eventPassed": [event.get("passed") for event in events],
+                                        "lineageLessonRef": learning_lineage[0].get("lessonRef") if learning_lineage else None,
+                                        "manifestEventCount": manifest.get("eventCount"),
+                                        "strongEventFound": strong_event is not None,
+                                        "fileCount": len(files),
+                                        "eventSetHashMatches": manifest.get("eventSetHash") == event_set_hash,
+                                    }, ensure_ascii=False, sort_keys=True)
+                                )
                             openLearningDataSettings(page)
                             import_input = page.locator('[data-learning-evidence-import-input="true"]')
                             import_input.set_input_files({
@@ -6181,7 +6201,8 @@ def runBrowserMatrix(
 
                             legacy_index = next(
                                 index for index, event in enumerate(legacy_archive["events"])
-                                if event.get("kind") == "StrongCheckVerified"
+                                if event.get("kind") == "AttemptObserved"
+                                and event.get("passed") is True
                             )
                             legacy_archive["events"][legacy_index] = migrateEvidenceEventLessonRef(
                                 legacy_archive["events"][legacy_index],
@@ -6216,7 +6237,8 @@ def runBrowserMatrix(
                             )
                             strong_event = next(
                                 event for event in archive["events"]
-                                if event.get("kind") == "StrongCheckVerified"
+                                if event.get("kind") == "AttemptObserved"
+                                and event.get("passed") is True
                             )
                             original_result_hash = strong_event["resultHash"]
                             strong_event["resultHash"] = strong_event["sourceHash"]
@@ -6285,10 +6307,10 @@ def runBrowserMatrix(
                                     eventRequest.onsuccess = () => {
                                       const values = eventRequest.result;
                                       database.close();
-                                      const strong = values.find((event) => event?.kind === 'StrongCheckVerified');
+                                      const strong = values.find((event) => event?.kind === 'AttemptObserved'
+                                        && event?.passed === true);
                                       const migration = values.find((event) => event?.kind === 'MigrationImported');
-                                      resolve(values.length === 2
-                                        && strong?.resultHash === expectedResultHash
+                                      resolve(strong?.resultHash === expectedResultHash
                                         && migration?.creditEligibility === 'none');
                                     };
                                   };
@@ -6325,17 +6347,49 @@ def runBrowserMatrix(
                             masteryCheck = mastery.locator(
                                 '[data-learning-check-result="unsupported"]'
                             )
+                            waitForWebLearningEvidenceEventCount(
+                                page,
+                                beforeBehaviorEvidenceCount + 1,
+                                timeout=20_000,
+                            )
+                            behaviorAttempt = page.evaluate(
+                                """
+                                async () => new Promise((resolve, reject) => {
+                                  const request = indexedDB.open('codaro-learning-evidence-v1', 3);
+                                  request.onerror = () => reject(request.error);
+                                  request.onsuccess = () => {
+                                    const database = request.result;
+                                    const eventRequest = database.transaction('events', 'readonly')
+                                      .objectStore('events').getAll();
+                                    eventRequest.onerror = () => reject(eventRequest.error);
+                                    eventRequest.onsuccess = () => {
+                                      const values = eventRequest.result;
+                                      const attempt = values.find((item) => item?.kind === 'AttemptObserved'
+                                        && item?.lessonRef?.startsWith('30days/day19_'));
+                                      database.close();
+                                      resolve({
+                                        count: values.length,
+                                        found: Boolean(attempt),
+                                        hasCredit: (attempt?.canonicalEvents || [])
+                                          .some((item) => item?.kind === 'CreditGranted'),
+                                      });
+                                    };
+                                  };
+                                })
+                                """
+                            )
                             if (
                                 masteryCheck.get_attribute(
                                     "data-learning-check-evidence"
                                 ) != "none"
                                 or "Local" not in masteryCheck.inner_text()
-                                or readWebLearningEvidenceEventCount(page)
-                                != beforeBehaviorEvidenceCount
+                                or behaviorAttempt.get("count") != beforeBehaviorEvidenceCount + 1
+                                or behaviorAttempt.get("found") is not True
+                                or behaviorAttempt.get("hasCredit") is not False
                             ):
                                 raise AssertionError(
-                                    "Web behavior Local handoff created strong evidence: "
-                                    f"{masteryCheck.inner_text()[:800]}"
+                                    "Web behavior Local handoff created assurance credit: "
+                                    f"{masteryCheck.inner_text()[:800]} {behaviorAttempt}"
                                 )
                             releaseLocalKernelSessions(page, case, localPort)
                             page.goto(case["url"], wait_until="domcontentloaded", timeout=30_000)
@@ -6386,7 +6440,8 @@ def runBrowserMatrix(
                                     eventRequest.onerror = () => reject(eventRequest.error);
                                     eventRequest.onsuccess = () => {
                                       const event = eventRequest.result.find(
-                                        (item) => item?.kind === 'StrongCheckVerified'
+                                        (item) => item?.kind === 'AttemptObserved'
+                                          && item?.passed === true
                                           && item?.lessonRef?.startsWith('30days/day19_')
                                       );
                                       database.close();

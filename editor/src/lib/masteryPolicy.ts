@@ -1,4 +1,4 @@
-import policyContract from "@/lib/generatedContracts/masteryPolicy.v1.json";
+import policyContract from "@/lib/generatedContracts/masteryPolicy.v2.json";
 import {
   clockAnomalies,
   evidenceAvailabilityTime,
@@ -28,7 +28,7 @@ export type OutcomeMasteryState = {
 };
 
 export type MasteryProjection = {
-  policyVersion: 1;
+  policyVersion: 2;
   outcomes: OutcomeMasteryState[];
   invalidEventIds: string[];
   deferredCreditEventIds: string[];
@@ -49,8 +49,8 @@ type OutcomeAccumulator = {
 };
 
 const contract = policyContract as {
-  policyId: "mastery-policy-v1";
-  version: 1;
+  policyId: "mastery-policy-v2";
+  version: 2;
   creditEventKind: "CreditGranted";
   nonCreditEventKinds: string[];
   modePriority: CreditMode[];
@@ -62,14 +62,14 @@ const contract = policyContract as {
     maximumFutureSkewSeconds: number;
     maximumElapsedDivergenceSeconds: number;
   };
-  retrievalWindowDays: { minimum: number; maximum: number };
+  retrievalWindowDays: { minimum: number; freshnessTarget: number };
 };
 
 export class MasteryPolicy {
   private readonly modeRank = new Map(contract.modePriority.map((mode, index) => [mode, index]));
 
   constructor() {
-    if (contract.policyId !== "mastery-policy-v1" || contract.version !== 1 || contract.creditEventKind !== "CreditGranted") {
+    if (contract.policyId !== "mastery-policy-v2" || contract.version !== 2 || contract.creditEventKind !== "CreditGranted") {
       throw new Error("mastery policy contract identity is invalid");
     }
     if (
@@ -94,6 +94,7 @@ export class MasteryPolicy {
     const runs = eventMap(ordered, "RunObserved");
     const checks = eventMap(ordered, "CheckEvaluated");
     const supports = eventMap(ordered, "SupportProvided");
+    const exposedVariants = buildExposedVariants(ordered, runs);
     let states = new Map<string, OutcomeAccumulator>();
     const deferredCreditEventIds = new Set<string>();
     const anomalies: ClockAnomaly[] = [];
@@ -105,7 +106,7 @@ export class MasteryPolicy {
       }
       if (event.kind !== contract.creditEventKind || revoked.has(event.eventId)) continue;
       const before = cloneStates(states);
-      const result = this.applyCredit(event, { runs, checks, supports, orderIndex, states });
+      const result = this.applyCredit(event, { runs, checks, supports, exposedVariants, orderIndex, states });
       if (!result.accepted) {
         states = before;
         invalidEventIds.add(event.eventId);
@@ -122,7 +123,7 @@ export class MasteryPolicy {
       }
     }
     return {
-      policyVersion: 1,
+      policyVersion: 2,
       outcomes: [...states.values()]
         .map((state) => this.buildOutcomeState(state))
         .sort((left, right) => left.outcomeId.localeCompare(right.outcomeId)),
@@ -186,6 +187,7 @@ export class MasteryPolicy {
       runs: Map<string, LearningEvent>;
       checks: Map<string, LearningEvent>;
       supports: Map<string, LearningEvent>;
+      exposedVariants: Map<string, Set<string>>;
       orderIndex: Map<string, number>;
       states: Map<string, OutcomeAccumulator>;
     },
@@ -218,11 +220,35 @@ export class MasteryPolicy {
       .reduce((left, right) => ((this.modeRank.get(left) ?? -1) >= (this.modeRank.get(right) ?? -1) ? left : right));
     const unseen = checks.every((check) => check.unseen === true);
     const context = run.runContext as Record<string, unknown>;
+    const contextPolicyVersion = Number(context.masteryPolicyVersion);
     const taskVariantId = String(context.taskVariantId);
     const fixtureHash = String(context.fixtureHash);
     const outcomeIds = context.outcomeIds as string[];
     const evidenceTime = parseEvidenceTime(event.evidenceTime, event.appendReceiptAt);
     const fingerprint = String(event.attemptFingerprint);
+    const priorExposureIds = new Set(
+      [...(input.exposedVariants.get(taskVariantId) ?? new Set<string>())].filter(
+        (eventId) => (input.orderIndex.get(eventId) ?? eventPosition) < eventPosition,
+      ),
+    );
+    const declaredExposureIds = new Set(
+      Array.isArray(context.exposureReceiptIds) ? context.exposureReceiptIds.map(String) : [],
+    );
+    if (contextPolicyVersion === 2 && [...priorExposureIds].some((eventId) => !declaredExposureIds.has(eventId))) {
+      return rejected;
+    }
+    if (contextPolicyVersion === 2 && priorExposureIds.size) return rejected;
+    if (contextPolicyVersion === 2 && strongestMode === "capstone") {
+      const validApplicationSlices = (event.creditSlices as Record<string, unknown>[]).every((rawSlice) => (
+        rawSlice.creditMode === "capstone" && outcomeIds.includes(String(rawSlice.outcomeId))
+      ));
+      return unseen
+        && !answerReveal
+        && maxHintUsed <= contract.higherStageMaxHintLevel
+        && validApplicationSlices
+        ? { accepted: true, deferred: false, anomalies: [] }
+        : rejected;
+    }
     const prepared: Array<{
       outcomeId: string;
       mode: CreditMode;
@@ -231,8 +257,9 @@ export class MasteryPolicy {
 
     for (const rawSlice of event.creditSlices as Record<string, unknown>[]) {
       const outcomeId = String(rawSlice.outcomeId);
-      const mode = rawSlice.creditMode as CreditMode;
-      if (mode !== strongestMode || !outcomeIds.includes(outcomeId)) return rejected;
+      const rawMode = rawSlice.creditMode as CreditMode;
+      if (rawMode !== strongestMode || !outcomeIds.includes(outcomeId)) return rejected;
+      const mode = contextPolicyVersion === 1 && rawMode === "capstone" ? "acquisition" : rawMode;
       const state = input.states.get(outcomeId) ?? emptyState(outcomeId);
       input.states.set(outcomeId, state);
       if (state.dueAt !== null && evidenceAvailabilityTime(evidenceTime) >= state.dueAt) state.reviewDue = true;
@@ -296,7 +323,7 @@ export class MasteryPolicy {
     const higherStageEligible = input.unseen
       && !input.answerReveal
       && input.maxHintUsed <= contract.higherStageMaxHintLevel;
-    if (new Set<CreditMode>(["acquisition", "reinforcement", "capstone"]).has(input.mode)) {
+    if (new Set<CreditMode>(["acquisition", "reinforcement"]).has(input.mode)) {
       if (independentEligible && stageRank(state.baseStage) < stageRank("independent")) state.baseStage = "independent";
       else if (state.baseStage === "unproven") state.baseStage = "practicing";
       state.reviewDue = false;
@@ -317,7 +344,7 @@ export class MasteryPolicy {
         if (!higherStageEligible) return false;
         state.reviewDue = false;
         state.dueAt = evidenceAvailabilityTime(input.evidenceTime)
-          + contract.retrievalWindowDays.maximum * 86_400_000;
+          + contract.retrievalWindowDays.freshnessTarget * 86_400_000;
         return true;
       }
       if (
@@ -331,16 +358,14 @@ export class MasteryPolicy {
       const receiptElapsedDays = (input.evidenceTime.appendReceiptAt - state.lastAppendReceiptAt) / 86_400_000;
       if (
         evidenceElapsedDays < contract.retrievalWindowDays.minimum
-        || evidenceElapsedDays > contract.retrievalWindowDays.maximum
         || receiptElapsedDays < contract.retrievalWindowDays.minimum
-        || receiptElapsedDays > contract.retrievalWindowDays.maximum
       ) return false;
       const variants = new Set([...state.taskVariantIds, input.taskVariantId]);
       if (variants.size < contract.minimumDistinctTaskVariantsForMastered) return false;
       state.baseStage = "mastered";
       state.reviewDue = false;
       state.dueAt = evidenceAvailabilityTime(input.evidenceTime)
-        + contract.retrievalWindowDays.maximum * 86_400_000;
+        + contract.retrievalWindowDays.freshnessTarget * 86_400_000;
       return true;
     }
     return false;
@@ -377,6 +402,25 @@ export class MasteryPolicy {
 
 function eventMap(events: LearningEvent[], kind: LearningEvent["kind"]): Map<string, LearningEvent> {
   return new Map(events.filter((event) => event.kind === kind).map((event) => [event.eventId, event]));
+}
+
+function buildExposedVariants(
+  events: LearningEvent[],
+  runs: Map<string, LearningEvent>,
+): Map<string, Set<string>> {
+  const exposed = new Map<string, Set<string>>();
+  for (const event of events) {
+    if (event.kind !== "SupportProvided") continue;
+    if (Number(event.hintLevel) <= 0 && event.answerReveal !== true) continue;
+    const run = runs.get(String(event.runEventId));
+    if (!run) continue;
+    const context = run.runContext as Record<string, unknown>;
+    const taskVariantId = String(context.taskVariantId);
+    const receipts = exposed.get(taskVariantId) ?? new Set<string>();
+    receipts.add(event.eventId);
+    exposed.set(taskVariantId, receipts);
+  }
+  return exposed;
 }
 
 function emptyState(outcomeId: string): OutcomeAccumulator {

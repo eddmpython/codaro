@@ -44,6 +44,14 @@ STRONG_EVENT_FIELDS = (
     "sourceHash",
     "strength",
 )
+ATTEMPT_EVENT_FIELDS = STRONG_EVENT_FIELDS + (
+    "answerReveal",
+    "errorClass",
+    "hintLevel",
+    "passed",
+    "recommendedHintLevel",
+    "runStatus",
+)
 MIGRATION_SOURCE_KINDS = {
     "learner-state-sqlite-v1",
     "progress-json-v1",
@@ -62,6 +70,14 @@ LEARNING_EVIDENCE_READER_VERSION = 1
 
 class EvidenceArchiveError(ValueError):
     pass
+
+
+def isLearningAttemptEvidence(value: object) -> bool:
+    return isinstance(value, dict) and value.get("kind") in {"AttemptObserved", "StrongCheckVerified"}
+
+
+def _isNonNegativeInt(value: object) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool) and value >= 0
 
 
 class LearningEvidenceArchiveStore:
@@ -135,8 +151,8 @@ class LearningEvidenceArchiveStore:
             "conflicted": 0,
             "inserted": 0,
             "migrated": sum(
-                event["kind"] == "StrongCheckVerified"
-                and original["kind"] == "StrongCheckVerified"
+                isLearningAttemptEvidence(event)
+                and isLearningAttemptEvidence(original)
                 and event["lessonRef"] != original["lessonRef"]
                 for event, original in zip(events, archive["events"], strict=True)
             ),
@@ -158,12 +174,12 @@ class LearningEvidenceArchiveStore:
                         (eventId, event["payloadHash"], payloadJson, event["occurredAt"]),
                     )
                     receipt["inserted"] += 1
-                    if event["kind"] == "StrongCheckVerified":
+                    if isLearningAttemptEvidence(event):
                         receipt["accepted"].append({"checkId": event["checkId"], "lessonRef": event["lessonRef"]})
                     continue
                 if str(existing[1]) == payloadJson:
                     receipt["skipped"] += 1
-                    if event["kind"] == "StrongCheckVerified":
+                    if isLearningAttemptEvidence(event):
                         receipt["accepted"].append({"checkId": event["checkId"], "lessonRef": event["lessonRef"]})
                     continue
                 receipt["conflicted"] += 1
@@ -201,12 +217,12 @@ class LearningEvidenceArchiveStore:
         for row in rows:
             event = json.loads(str(row[0]))
             payloads.append(event)
-            if event.get("kind") == "StrongCheckVerified":
+            if isLearningAttemptEvidence(event):
                 payloads.extend(event.get("canonicalEvents", []))
         return payloads
 
     def _canonicalEvent(self, event: dict[str, Any]) -> dict[str, Any]:
-        if event["kind"] != "StrongCheckVerified" or self._lessonRefResolver is None:
+        if not isLearningAttemptEvidence(event) or self._lessonRefResolver is None:
             return normalizeEvidenceEvent(event)
         try:
             lessonRef = self._lessonRefResolver(str(event["lessonRef"]))
@@ -672,10 +688,10 @@ def evidenceEventCore(value: dict[str, Any]) -> dict[str, Any]:
         raise EvidenceArchiveError("학습 증거 event의 문자열 필드가 유효하지 않습니다.")
     executionCount = value.get("executionCount")
     if (
-        value.get("kind") != "StrongCheckVerified"
+        value.get("kind") not in {"AttemptObserved", "StrongCheckVerified"}
         or value.get("runtimeTier") not in {"local", "web"}
         or value.get("schemaVersion") != 1
-        or value.get("strength") != "strong"
+        or value.get("strength") not in {"strong", "weak"}
         or isinstance(executionCount, bool)
         or not isinstance(executionCount, int)
         or executionCount < 0
@@ -684,9 +700,20 @@ def evidenceEventCore(value: dict[str, Any]) -> dict[str, Any]:
     for field in ("attemptFingerprint", "expectedHash", "fixtureHash", "resultHash", "sourceHash"):
         if not SHA256_PATTERN.fullmatch(str(value[field])):
             raise EvidenceArchiveError(f"학습 증거 event의 {field} 해시가 유효하지 않습니다.")
-    if value["eventId"] != f"{value['runtimeTier']}-strong:{value['attemptFingerprint']}" or "/" not in value["lessonRef"]:
+    identityKind = "attempt" if value["kind"] == "AttemptObserved" else "strong"
+    if value["eventId"] != f"{value['runtimeTier']}-{identityKind}:{value['attemptFingerprint']}" or "/" not in value["lessonRef"]:
         raise EvidenceArchiveError("학습 증거 event identity가 유효하지 않습니다.")
-    core = {field: value[field] for field in STRONG_EVENT_FIELDS}
+    fields = ATTEMPT_EVENT_FIELDS if value["kind"] == "AttemptObserved" else STRONG_EVENT_FIELDS
+    core = {field: value[field] for field in fields}
+    if value["kind"] == "AttemptObserved" and (
+        not isinstance(value.get("answerReveal"), bool)
+        or not isinstance(value.get("passed"), bool)
+        or not isinstance(value.get("errorClass"), str)
+        or not _isNonNegativeInt(value.get("hintLevel"))
+        or not _isNonNegativeInt(value.get("recommendedHintLevel"))
+        or value.get("runStatus") not in {"error", "stopped", "success", "timeout"}
+    ):
+        raise EvidenceArchiveError("학습 attempt 관찰 계약이 유효하지 않습니다.")
     if "artifacts" in value:
         core["artifacts"] = normalizeEvidenceArtifacts(value["artifacts"])
     if "packages" in value:
@@ -778,7 +805,7 @@ def migrationImportedEventCore(value: dict[str, Any]) -> dict[str, Any]:
 
 def migrateEvidenceEventLessonRef(event: dict[str, Any], lessonRef: str) -> dict[str, Any]:
     normalized = normalizeEvidenceEvent(event)
-    if normalized["kind"] != "StrongCheckVerified":
+    if not isLearningAttemptEvidence(normalized):
         return normalized
     if normalized["lessonRef"] == lessonRef:
         return normalized
@@ -788,7 +815,7 @@ def migrateEvidenceEventLessonRef(event: dict[str, Any], lessonRef: str) -> dict
     )
     core = {
         field: normalized[field]
-        for field in STRONG_EVENT_FIELDS
+        for field in (ATTEMPT_EVENT_FIELDS if normalized["kind"] == "AttemptObserved" else STRONG_EVENT_FIELDS)
     }
     if "artifacts" in normalized:
         core["artifacts"] = normalized["artifacts"]
@@ -800,7 +827,8 @@ def migrateEvidenceEventLessonRef(event: dict[str, Any], lessonRef: str) -> dict
         includeAttemptMetadata=includeAttemptMetadata,
     )
     core["attemptFingerprint"] = attemptFingerprint
-    core["eventId"] = f"{normalized['runtimeTier']}-strong:{attemptFingerprint}"
+    identityKind = "attempt" if normalized["kind"] == "AttemptObserved" else "strong"
+    core["eventId"] = f"{normalized['runtimeTier']}-{identityKind}:{attemptFingerprint}"
     if "canonicalEvents" in normalized:
         core["canonicalEvents"] = migrateCanonicalEventsLessonRef(normalized["canonicalEvents"], core)
     return sealEvidenceEvent(core)
@@ -856,8 +884,9 @@ def migrateCanonicalEventsLessonRef(
                 "lessonRef": outerEvent["lessonRef"],
                 "runId": outerEvent["eventId"],
                 "sourceCodeHash": outerEvent["sourceHash"],
-                "taskVariantId": f"{outerEvent['lessonRef']}#{context['sectionId']}",
             })
+            if not context.get("taskFamilyId"):
+                context["taskVariantId"] = f"{outerEvent['lessonRef']}#{context['sectionId']}"
             context["lessonContentHash"] = learningEventDigest({
                 "checkId": outerEvent["checkId"],
                 "lessonRef": outerEvent["lessonRef"],
@@ -958,6 +987,9 @@ def validateCanonicalEventBinding(
         "outcomeIds": context["outcomeIds"],
         "sectionId": context["sectionId"],
     })
+    expectedRunStatus = outerEvent["runStatus"] if outerEvent["kind"] == "AttemptObserved" else "success"
+    expectedPassed = outerEvent["passed"] if outerEvent["kind"] == "AttemptObserved" else True
+    expectedStrength = outerEvent["strength"]
     if (
         context["attemptId"] != outerEvent["eventId"]
         or context["runId"] != outerEvent["eventId"]
@@ -965,20 +997,24 @@ def validateCanonicalEventBinding(
         or context["checkSpecId"] != outerEvent["checkId"]
         or context["fixtureHash"] != outerEvent["fixtureHash"]
         or context["sourceCodeHash"] != outerEvent["sourceHash"]
-        or context["taskVariantId"] != f"{outerEvent['lessonRef']}#{context['sectionId']}"
+        or (
+            not context.get("taskFamilyId")
+            and context["taskVariantId"] != f"{outerEvent['lessonRef']}#{context['sectionId']}"
+        )
         or context["lessonContentHash"] != expectedLessonContentHash
         or context["packageSetHash"] != learningEventDigest(outerEvent.get("packages", []))
         or (context["tierUsed"], context["runtimeId"], context["checkEngineVersion"]) != runtimeBinding
         or context["runtimeVersion"] != "1"
         or run["startedAt"] != outerEvent["occurredAt"]
         or run["completedAt"] != outerEvent["occurredAt"]
-        or run["runStatus"] != "success"
+        or run["runStatus"] != expectedRunStatus
+        or stableJson(run.get("artifactDescriptors", [])) != stableJson(outerEvent.get("artifacts", []))
     ):
         raise EvidenceArchiveError("학습 증거 canonical run이 outer evidence와 일치하지 않습니다.")
     if (
         check["checkId"] != outerEvent["checkId"]
-        or check["strength"] != "strong"
-        or check["passed"] is not True
+        or check["strength"] != expectedStrength
+        or check["passed"] is not expectedPassed
     ):
         raise EvidenceArchiveError("학습 증거 canonical check가 outer evidence와 일치하지 않습니다.")
     if support is not None and support["runEventId"] != run["eventId"]:

@@ -56,6 +56,22 @@ def evidenceEvent(
     return sealEvidenceEvent(core)
 
 
+def attemptEvidenceEvent(*, passed: bool) -> dict[str, object]:
+    legacy = evidenceEvent(result="result-pass" if passed else "result-fail")
+    core = {key: value for key, value in legacy.items() if key != "payloadHash"}
+    core.update({
+        "answerReveal": False,
+        "errorClass": "" if passed else "mismatch",
+        "hintLevel": 0,
+        "kind": "AttemptObserved",
+        "passed": passed,
+        "recommendedHintLevel": 0 if passed else 1,
+        "runStatus": "success",
+    })
+    core["eventId"] = f"web-attempt:{core['attemptFingerprint']}"
+    return sealEvidenceEvent(core)
+
+
 def canonicalLessonRef(lessonRef: str) -> str:
     if lessonRef == "30days/day01":
         return "30days/day01_헬로월드"
@@ -173,6 +189,30 @@ def testEvidenceArchivePreservesAndFlattensCanonicalLearningEvents(tmp_path: Pat
     tampered["canonicalEvents"][1]["passed"] = False
     with pytest.raises(EvidenceArchiveError, match="canonical event"):
         store.appendEvent(tampered)
+
+
+@pytest.mark.parametrize("passed", [False, True])
+def testAttemptObservedRoundTripsFailedAndSuccessfulChecks(tmp_path: Path, passed: bool) -> None:
+    outer = attemptEvidenceEvent(passed=passed)
+    chain = canonicalChain(outer)
+    runCore = {key: value for key, value in chain[0].items() if key != "payloadHash"}
+    checkCore = {key: value for key, value in chain[1].items() if key != "payloadHash"}
+    checkCore["passed"] = passed
+    checkCore["errorClass"] = "" if passed else "mismatch"
+    canonical = [sealLearningEvent(runCore), sealLearningEvent(checkCore)]
+    if passed:
+        canonical.append(chain[2])
+    outerCore = {key: value for key, value in outer.items() if key != "payloadHash"}
+    event = sealEvidenceEvent({**outerCore, "canonicalEvents": canonical})
+    store = LearningEvidenceArchiveStore(tmp_path / "attempts.sqlite3")
+
+    receipt = store.appendEvent(event)
+
+    assert receipt["inserted"] == 1
+    assert store.buildArchive()["events"][0]["kind"] == "AttemptObserved"
+    assert store.eventPayloads() == [event, *canonical]
+    projection = MasteryPolicy().reduce(store.eventPayloads())
+    assert projection.outcomes[0].stage == "independent" if passed else not projection.outcomes
 
 
 @pytest.mark.parametrize(

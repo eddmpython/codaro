@@ -4,14 +4,19 @@ import {
   nestedCanonicalLearningEvents,
 } from "@/lib/canonicalLearningEvidence";
 import {
+  appendWebLearningAttemptEvidenceEventTransaction,
   appendWebStrongCheckEvidenceEventTransaction,
+  attachCanonicalEventsToAttemptEvidence,
   attachCanonicalEventsToStrongEvidence,
+  createWebLearningAttemptEvidenceEvent,
   createWebStrongCheckEvidenceEvent,
   importWebLearningEvidenceArchive,
+  listWebLearningAttemptEvidence,
   listWebStrongCheckEvidence,
   replaceWebLearningEvidenceArchive,
   serializeWebLearningEvidenceArchive,
   summarizeWebLearningEvidence,
+  type WebLearningAttemptEvidenceEvent,
   type WebLearningEvidenceImportReceipt,
   type WebLearningEvidenceSummary,
   type WebStrongCheckEvidenceEvent,
@@ -53,13 +58,13 @@ export async function replaceLearningEvidenceArchive(rawArchive: string): Promis
 export async function readLearningEvidenceEvents(
   category?: string,
   contentId?: string,
-): Promise<WebStrongCheckEvidenceEvent[]> {
+): Promise<WebLearningAttemptEvidenceEvent[]> {
   const lessonRef = category && contentId ? `${category}/${contentId}` : undefined;
-  if (!usesLocalLearningEvidence()) return listWebStrongCheckEvidence(lessonRef);
+  if (!usesLocalLearningEvidence()) return listWebLearningAttemptEvidence(lessonRef);
   const archive = await codaroApi.learningEvidenceArchive();
   if (!Array.isArray(archive.events)) return [];
   return archive.events
-    .filter(isStrongCheckEvidenceEvent)
+    .filter(isLearningAttemptEvidenceEvent)
     .filter((event) => !lessonRef || event.lessonRef === lessonRef);
 }
 
@@ -79,9 +84,33 @@ export async function storeStrongLearningEvidence(input: WebStrongCheckEvidenceI
   await appendWebStrongCheckEvidenceEventTransaction(event);
 }
 
+export async function recordLearningAttemptEvidence(input: WebStrongCheckEvidenceInput): Promise<void> {
+  const baseEvent = await createWebLearningAttemptEvidenceEvent(input);
+  const priorAttemptEvents = await readLearningEvidenceEvents();
+  const canonicalEvents = await buildCanonicalStrongCheckEvents(
+    input,
+    baseEvent,
+    nestedCanonicalLearningEvents(priorAttemptEvents),
+  );
+  const event = await attachCanonicalEventsToAttemptEvidence(baseEvent, canonicalEvents);
+  if (usesLocalLearningEvidence()) {
+    await codaroApi.appendLearningEvidence(event as unknown as Record<string, unknown>);
+    return;
+  }
+  await appendWebLearningAttemptEvidenceEventTransaction(event);
+}
+
 function isStrongCheckEvidenceEvent(value: unknown): value is WebStrongCheckEvidenceEvent {
   if (!isRecord(value)) return false;
   return value.kind === "StrongCheckVerified"
+    && typeof value.checkId === "string"
+    && typeof value.lessonRef === "string"
+    && typeof value.occurredAt === "string";
+}
+
+function isLearningAttemptEvidenceEvent(value: unknown): value is WebLearningAttemptEvidenceEvent {
+  if (!isRecord(value)) return false;
+  return (value.kind === "AttemptObserved" || value.kind === "StrongCheckVerified")
     && typeof value.checkId === "string"
     && typeof value.lessonRef === "string"
     && typeof value.occurredAt === "string";

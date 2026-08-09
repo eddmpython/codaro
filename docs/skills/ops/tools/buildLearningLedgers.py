@@ -441,10 +441,12 @@ def validateAppliedTransition(
         for row in pathDiffs
         if isinstance(row, dict)
     }
-    if set(byPath) != set(plans):
-        failures.append("applied taxonomy transition pathDiffs do not cover every path")
+    unknownPaths = set(byPath) - set(plans)
+    if unknownPaths:
+        failures.append("applied taxonomy transition contains unknown paths: " + ", ".join(sorted(unknownPaths)))
         return failures
-    for pathId, plan in plans.items():
+    for pathId in sorted(byPath):
+        plan = plans[pathId]
         targetRefs = list(plan["lessonRefs"])
         row = byPath[pathId]
         if row.get("toCount") != len(targetRefs) or row.get("toOrderHash") != orderHash(targetRefs):
@@ -671,6 +673,16 @@ def evaluate(write: bool, applyTransition: bool = False) -> list[str]:
                     expectedAggregate,
                     f"path ledger {payload.get('pathId')}",
                 )
+            currentTaxonomyHash = fileSha256(TAXONOMY_PATH)
+            recordedTaxonomyHash = str(payload.get("taxonomySnapshotHash", ""))
+            if recordedTaxonomyHash != currentTaxonomyHash:
+                text = replaceScalar(
+                    text,
+                    "taxonomySnapshotHash",
+                    recordedTaxonomyHash,
+                    currentTaxonomyHash,
+                    f"path ledger {payload.get('pathId')}",
+                )
             if text != path.read_text(encoding="utf-8"):
                 path.write_text(text, encoding="utf-8")
         for ledgerPath, changes in identityUpdates.items():
@@ -699,14 +711,15 @@ def evaluate(write: bool, applyTransition: bool = False) -> list[str]:
         SUMMARY_PATH.write_text(summaryText, encoding="utf-8")
         writeGeneratedYaml(IDENTITY_SUMMARY_PATH, expectedIdentity)
         writeGeneratedYaml(ALIAS_MIGRATION_PATH, expectedAlias)
-        writeGeneratedYaml(TAXONOMY_TRANSITION_PATH, expectedTransition)
+        if not transitionApplied:
+            writeGeneratedYaml(TAXONOMY_TRANSITION_PATH, expectedTransition)
     else:
         if summary.get("canonicalRows") != len(rows):
             failures.append(f"canonicalRows mismatch: {summary.get('canonicalRows')} != {len(rows)}")
         if recordedAggregate != expectedAggregate:
             failures.append("content-ledger sourceSetHash is stale")
         if transitionApplied:
-            targetHash = str(expectedTransition.get("toHash", ""))
+            targetHash = fileSha256(TAXONOMY_PATH)
             for pathId, (_, payload) in sorted(paths.items()):
                 if payload.get("sourceSetHash") != expectedAggregate:
                     failures.append(f"path sourceSetHash is stale: {pathId}")
@@ -718,7 +731,7 @@ def evaluate(write: bool, applyTransition: bool = False) -> list[str]:
             failures.append("identity-ledger summary is stale")
         if not sameYaml(ALIAS_MIGRATION_PATH, expectedAlias):
             failures.append("legacy alias migration ledger is missing or stale")
-        if not sameYaml(TAXONOMY_TRANSITION_PATH, expectedTransition):
+        if not transitionApplied and not sameYaml(TAXONOMY_TRANSITION_PATH, expectedTransition):
             failures.append("taxonomy transition proposal is missing or stale")
     return failures
 

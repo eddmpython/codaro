@@ -6,19 +6,20 @@ import {
 } from "@/lib/learningEvent";
 import { MasteryPolicy } from "@/lib/masteryPolicy";
 import type {
+  WebLearningAttemptEvidenceEvent,
   WebStrongCheckEvidenceEvent,
   WebStrongCheckEvidenceInput,
 } from "@/lib/webLearningEvidence";
 
 export function nestedCanonicalLearningEvents(
-  events: Iterable<WebStrongCheckEvidenceEvent>,
+  events: Iterable<WebLearningAttemptEvidenceEvent>,
 ): LearningEvent[] {
   return [...events].flatMap((event) => event.canonicalEvents ?? []);
 }
 
 export async function buildCanonicalStrongCheckEvents(
   input: WebStrongCheckEvidenceInput,
-  evidence: WebStrongCheckEvidenceEvent,
+  evidence: WebLearningAttemptEvidenceEvent,
   priorEvents: Iterable<LearningEvent>,
 ): Promise<LearningEvent[]> {
   const prior = [...priorEvents];
@@ -26,6 +27,9 @@ export async function buildCanonicalStrongCheckEvents(
   const sectionId = input.sectionId?.trim() || input.blockId;
   const outcomeIds = uniqueText(input.outcomeIds ?? []);
   const mode = creditMode(input.assessmentMode);
+  const policyVersion = evidence.kind === "AttemptObserved" ? 2 : 1;
+  const taskVariantId = input.taskVariantId?.trim() || `${lessonRef}#${sectionId}`;
+  const exposureReceiptIds = priorExposureReceiptIds(prior, taskVariantId);
   const deviceId = `codaro-${input.runtimeTier}-learning-evidence`;
   const epoch = "learning-epoch-v1";
   let lamport = nextLamport(prior);
@@ -61,7 +65,7 @@ export async function buildCanonicalStrongCheckEvents(
         sectionId,
       }),
       lessonRef,
-      masteryPolicyVersion: 1,
+      masteryPolicyVersion: policyVersion,
       outcomeIds,
       packageSetHash: await learningEventDigest(evidence.packages ?? []),
       runId: identity,
@@ -69,34 +73,64 @@ export async function buildCanonicalStrongCheckEvents(
       runtimeVersion: "1",
       sectionId,
       sourceCodeHash: evidence.sourceHash,
-      taskVariantId: `${lessonRef}#${sectionId}`,
+      taskVariantId,
       tierUsed: input.runtimeTier === "web" ? "browser" : "local",
+      ...(input.capabilityClaimId ? { capabilityClaimId: input.capabilityClaimId } : {}),
+      ...(input.capabilityClaimVersion ? { capabilityClaimVersion: input.capabilityClaimVersion } : {}),
+      ...(input.taskFamilyId ? { taskFamilyId: input.taskFamilyId } : {}),
+      ...(input.taskFamilyVersion ? { taskFamilyVersion: input.taskFamilyVersion } : {}),
+      ...(input.taskVariantVersion ? { taskVariantVersion: input.taskVariantVersion } : {}),
+      ...(input.artifactContractId ? { artifactContractId: input.artifactContractId } : {}),
+      ...(input.artifactContractVersion ? { artifactContractVersion: input.artifactContractVersion } : {}),
+      ...(exposureReceiptIds.length ? { exposureReceiptIds } : {}),
     },
-    runStatus: "success",
+    artifactDescriptors: evidence.artifacts ?? [],
+    runStatus: evidence.kind === "AttemptObserved" ? evidence.runStatus : "success",
     startedAt: evidence.occurredAt,
   });
   const check = await sealLearningEvent({
     ...envelope("CheckEvaluated", `${identity}:check`),
     assessmentMode: mode,
     checkId: input.checkId,
-    errorClass: "",
-    passed: true,
-    recommendedHintLevel: 0,
+    errorClass: evidence.kind === "AttemptObserved" ? evidence.errorClass : "",
+    passed: evidence.kind === "AttemptObserved" ? evidence.passed : true,
+    recommendedHintLevel: evidence.kind === "AttemptObserved" ? evidence.recommendedHintLevel : 0,
     runEventId: run.eventId,
-    strength: "strong",
+    strength: evidence.strength,
     unseen: input.unseen === true,
   });
   const events = [run, check];
-  if (input.aiHelpUsed) {
+  if (input.aiHelpUsed || input.answerReveal) {
     events.push(await sealLearningEvent({
       ...envelope("SupportProvided", `${identity}:support`),
-      answerReveal: false,
-      hintLevel: 1,
+      answerReveal: input.answerReveal === true,
+      hintLevel: input.aiHelpUsed ? 1 : 0,
       runEventId: run.eventId,
       supportId: "cell-assistant",
     }));
   }
-  if (!outcomeIds.length) return events;
+  const explicitCreditRole = input.assessmentRole === "assurance" || input.assessmentRole === "application";
+  const roleAllowsMode = input.assessmentRole === "application"
+    ? mode === "capstone"
+    : input.assessmentRole === "assurance" && mode !== "capstone";
+  const applicationProofReady = input.assessmentRole !== "application" || (
+    input.runtimeTier === "local"
+    && Boolean(input.artifactContractId)
+    && Boolean(input.artifactContractVersion)
+    && (evidence.artifacts ?? []).some((artifact) => (
+      artifact.origin === "created" && artifact.kind !== "directory"
+    ))
+  );
+  const attemptEligible = evidence.kind === "AttemptObserved" && (
+    evidence.passed
+    && evidence.runStatus === "success"
+    && evidence.strength === "strong"
+    && Boolean(input.taskFamilyId)
+    && explicitCreditRole
+    && roleAllowsMode
+    && applicationProofReady
+  );
+  if (!outcomeIds.length || !attemptEligible) return events;
 
   const appendReceiptAt = new Date().toISOString();
   const projection = await new MasteryPolicy().reduce(prior, { asOf: appendReceiptAt });
@@ -127,9 +161,23 @@ export async function buildCanonicalStrongCheckEvents(
 }
 
 function creditMode(value: WebStrongCheckEvidenceInput["assessmentMode"]): CreditMode {
-  if (value === "mastery") return "capstone";
+  if (value === "mastery") return "acquisition";
   if (value) return value;
   return "acquisition";
+}
+
+function priorExposureReceiptIds(events: LearningEvent[], taskVariantId: string): string[] {
+  const runVariantById = new Map(
+    events
+      .filter((event) => event.kind === "RunObserved")
+      .map((event) => [event.eventId, String((event.runContext as Record<string, unknown>).taskVariantId)]),
+  );
+  return events
+    .filter((event) => event.kind === "SupportProvided")
+    .filter((event) => Number(event.hintLevel) > 0 || event.answerReveal === true)
+    .filter((event) => runVariantById.get(String(event.runEventId)) === taskVariantId)
+    .map((event) => event.eventId)
+    .sort();
 }
 
 function nextLamport(events: LearningEvent[]): bigint {

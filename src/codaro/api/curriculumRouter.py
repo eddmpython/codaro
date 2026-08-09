@@ -1,8 +1,14 @@
 from __future__ import annotations
 
-from fastapi import APIRouter
+from pathlib import Path
 
+from fastapi import APIRouter, Response
+
+from ..automation.taskModel import TaskStatus
+from ..automation.taskRegistry import getTaskRegistry
 from ..curriculum.analyticsFlow import CurriculumAnalyticsFlow
+from ..curriculum.artifactStore import ArtifactBlobStore, ArtifactStoreError
+from ..curriculum.capabilityProjection import projectCapability
 from ..curriculum.catalogFlow import buildCurriculumTaxonomyPayload, buildLearningSpecPayload
 from ..curriculum.checkFlow import (
     CurriculumCheckInput,
@@ -56,6 +62,23 @@ from .requestModels import (
     OutcomeValidationRequest,
     ReviewResultRequest,
 )
+
+
+def _validatedCapabilityAutomationRuns(domainId: str) -> list[dict[str, object]]:
+    registry = getTaskRegistry()
+    return [
+        {
+            "learnerSelectedInput": False,
+            "runId": run.id,
+            "taskId": task.id,
+            "validated": True,
+        }
+        for task in registry.listTasks()
+        if task.inputs.get("capabilityDomainId") == domainId
+        and task.inputs.get("proofCreditEventIds")
+        for run in registry.getRuns(task.id, limit=50)
+        if run.status == TaskStatus.SUCCESS
+    ]
 
 
 def createCurriculumRouter(state: ServerState) -> APIRouter:
@@ -238,7 +261,11 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
     @router.post("/api/curriculum/check/strong/local")
     def apiLocalStrongCheck(request: LocalStrongCheckRequest) -> dict[str, object]:
         try:
-            payload = runLocalStrongCheck(request.checkSpec, request.source)
+            payload = runLocalStrongCheck(
+                request.checkSpec,
+                request.source,
+                artifactStoreRoot=state.learningArchiveRoot.parent / "artifacts",
+            )
         except LocalStrongCheckInvalid as error:
             fail(400, "curriculum-local-strong-check-invalid", str(error))
         logger.info(
@@ -251,6 +278,36 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
             ),
         )
         return payload
+
+    @router.get("/api/curriculum/capabilities/{domainId}")
+    def apiCurriculumCapability(domainId: str) -> dict[str, object]:
+        try:
+            projection = projectCapability(
+                state.curriculumOs.taxonomy(),
+                domainId,
+                state.learningEvidenceArchiveStore.eventPayloads(),
+                automationRuns=_validatedCapabilityAutomationRuns(domainId),
+            )
+        except ValueError as error:
+            fail(404, "curriculum-capability-missing", str(error))
+        return projection.model_dump(mode="json")
+
+    @router.get("/api/curriculum/artifacts/{contentHash}")
+    def apiCurriculumArtifact(contentHash: str) -> Response:
+        try:
+            payload, metadata = ArtifactBlobStore(
+                state.learningArchiveRoot.parent / "artifacts"
+            ).read(contentHash)
+        except ArtifactStoreError as error:
+            fail(404, "curriculum-artifact-missing", str(error))
+        return Response(
+            content=payload,
+            media_type=str(metadata["mediaType"]),
+            headers={
+                "Content-Disposition": f'inline; filename="{Path(str(metadata["originalPath"])).name}"',
+                "ETag": f'"{contentHash}"',
+            },
+        )
 
     @router.post("/api/curriculum/check")
     async def apiCheckExercise(request: CheckExerciseRequest) -> dict[str, object]:

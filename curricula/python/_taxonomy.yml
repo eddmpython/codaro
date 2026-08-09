@@ -691,6 +691,46 @@ domains:
       - automation.fileOps
       - automation.procCtl
 
+  - id: reportAutomationFoundation
+    label: 입력을 검증해 자동화 보고서 만들기
+    description: 표 형태 입력을 검증하고 변환해 재실행 가능한 JSON 보고서로 만든다.
+    capstoneLessonRef: 30days/day30_최종프로젝트
+    prerequisitePolicy: targetOnly
+    targetOutcomes:
+      - python.intro
+      - python.variables
+      - python.operators
+      - python.strings
+      - python.lists
+      - python.dictsAndSets
+      - python.controlFlow
+      - python.functions
+      - python.modulesAndIo
+      - python.errorHandling
+      - python.projectDelivery
+    capabilityClaims:
+      - id: report.record
+        statement: 한 레코드를 읽어 계산된 상태 문장으로 표현한다.
+        allowedTools: [languageReference, localEditor]
+        inferenceBoundary:
+          - 대규모 데이터 처리 성능을 증명하지 않는다.
+        requiredTaskFamilyIds: [python.report.record]
+        version: 1
+      - id: report.pipeline
+        statement: 여러 레코드의 잘못된 입력을 분리하고 검증된 보고서 파일을 만든다.
+        allowedTools: [languageReference, localEditor]
+        inferenceBoundary:
+          - 코드 유지보수성과 임의 업무 도메인 적용을 자동으로 증명하지 않는다.
+        requiredTaskFamilyIds:
+          - python.report.collection
+          - python.report.pipeline
+          - python.report.delivery
+        applicationRequirement:
+          artifactContractId: python.report.json.v1
+          artifactContractVersion: 1
+          automationHandoff: supported
+        version: 1
+
   - id: pythonFoundation
     label: Python 기초 완주
     description: 30일 커리큘럼으로 Python 기본기를 끝까지 다진다.
@@ -966,6 +1006,178 @@ domains:
       - llm.toolUse
 
 # 기존 레슨 backfill. 레슨 YAML meta.outcomes/prerequisites가 있으면 그쪽이 우선.
+taskFamilies:
+  - id: python.report.record
+    version: 1
+    ownerDomainId: reportAutomationFoundation
+    ownerClaimId: report.record
+    outcomeIds: [python.intro, python.variables, python.operators, python.strings]
+    invariant: 한 입력 레코드의 값을 계산하고 요구한 문자열 계약으로 표현한다.
+    inferenceBoundary:
+      - 파일 입출력과 여러 행 처리는 증명하지 않는다.
+    evidenceSlices:
+      - outcomeId: python.intro
+        caseIds: [python, rust, two-words, three-words, word, sentence]
+      - outcomeId: python.variables
+        caseIds: [python, rust, two-words, three-words, word, sentence]
+      - outcomeId: python.operators
+        caseIds: [python, rust, two-words, three-words, word, sentence]
+      - outcomeId: python.strings
+        caseIds: [python, rust, two-words, three-words, word, sentence]
+    variants:
+      acquisition:
+        taskVariantId: python.report.record.acquisition.v1
+        taskVariantVersion: 1
+        lessonRef: 30days/day04_문자열기초
+        sectionId: day04-introduce-mastery
+        checkSpecId: python.30days.day04.introduce.mastery.behavior.v1
+        fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      transfer:
+        taskVariantId: python.report.record.transfer.v1
+        taskVariantVersion: 1
+        lessonRef: 30days/day04_문자열기초
+        sectionId: day04-initials-transfer
+        checkSpecId: python.30days.day04.initials.transfer.behavior.v1
+        fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      retrieval:
+        taskVariantId: python.report.record.retrieval.v1
+        taskVariantVersion: 1
+        lessonRef: 30days/day04_문자열기초
+        sectionId: day04-quote-text-retrieval
+        checkSpecId: python.30days.day04.quote-text.retrieval.behavior.v1
+        fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+    checkerCorpus:
+      validAlternatives: [commentPreserving]
+      requiredMutations: [zeroEdit, constantReturn]
+
+  - id: python.report.collection
+    version: 1
+    ownerDomainId: reportAutomationFoundation
+    ownerClaimId: report.pipeline
+    outcomeIds: [python.lists, python.dictsAndSets, python.controlFlow]
+    invariant: 여러 레코드를 순회해 유효한 값과 잘못된 값을 분리하고 요약한다.
+    inferenceBoundary:
+      - 파일 저장과 재실행 자동화는 증명하지 않는다.
+    evidenceSlices:
+      - outcomeId: python.lists
+        caseIds: [member, ordinary, mid, low, high, edge, four-hundred, century]
+      - outcomeId: python.dictsAndSets
+        caseIds: [member, ordinary, mid, low, high, edge, four-hundred, century]
+      - outcomeId: python.controlFlow
+        caseIds: [member, ordinary, mid, low, high, edge, four-hundred, century]
+    variants:
+      acquisition:
+        taskVariantId: python.report.collection.acquisition.v1
+        taskVariantVersion: 1
+        lessonRef: 30days/day13_조건문
+        sectionId: day13-shipping-fee-mastery
+        checkSpecId: python.30days.day13.shipping-fee.mastery.behavior.v1
+        fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      transfer:
+        taskVariantId: python.report.collection.transfer.v1
+        taskVariantVersion: 1
+        lessonRef: 30days/day13_조건문
+        sectionId: day13-risk-level-transfer
+        checkSpecId: python.30days.day13.risk-level.transfer.behavior.v1
+        fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      retrieval:
+        taskVariantId: python.report.collection.retrieval.v1
+        taskVariantVersion: 1
+        lessonRef: 30days/day13_조건문
+        sectionId: day13-leap-year-retrieval
+        checkSpecId: python.30days.day13.leap-year.retrieval.behavior.v1
+        fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+    checkerCorpus:
+      validAlternatives: [commentPreserving]
+      requiredMutations: [zeroEdit, constantReturn]
+
+  - id: python.report.pipeline
+    version: 1
+    ownerDomainId: reportAutomationFoundation
+    ownerClaimId: report.pipeline
+    outcomeIds: [python.functions, python.modulesAndIo, python.errorHandling]
+    invariant: 입력을 함수 경계에서 검증하고 오류를 분리해 재사용 가능한 처리 결과를 만든다.
+    inferenceBoundary:
+      - 병렬 처리와 외부 서비스 장애 복구는 증명하지 않는다.
+    evidenceSlices:
+      - outcomeId: python.functions
+        caseIds: [valid, zero, invalid, normal, present, missing]
+      - outcomeId: python.modulesAndIo
+        caseIds: [valid, zero, invalid, normal, present, missing]
+      - outcomeId: python.errorHandling
+        caseIds: [valid, zero, invalid, normal, present, missing]
+    variants:
+      acquisition:
+        taskVariantId: python.report.pipeline.acquisition.v1
+        taskVariantVersion: 1
+        lessonRef: 30days/day20_예외처리
+        sectionId: day20-positive-int-mastery
+        checkSpecId: python.30days.day20.positive-int.mastery.behavior.v1
+        fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      transfer:
+        taskVariantId: python.report.pipeline.transfer.v1
+        taskVariantVersion: 1
+        lessonRef: 30days/day20_예외처리
+        sectionId: day20-safe-divide-transfer
+        checkSpecId: python.30days.day20.safe-divide.transfer.behavior.v1
+        fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      retrieval:
+        taskVariantId: python.report.pipeline.retrieval.v1
+        taskVariantVersion: 1
+        lessonRef: 30days/day20_예외처리
+        sectionId: day20-required-value-retrieval
+        checkSpecId: python.30days.day20.required-value.retrieval.behavior.v1
+        fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+    checkerCorpus:
+      validAlternatives: [commentPreserving]
+      requiredMutations: [zeroEdit, constantReturn]
+
+  - id: python.report.delivery
+    version: 1
+    ownerDomainId: reportAutomationFoundation
+    ownerClaimId: report.pipeline
+    outcomeIds: [python.projectDelivery]
+    invariant: CSV 입력을 검증해 계약에 맞는 JSON 보고서를 만들고 다시 실행한다.
+    inferenceBoundary:
+      - 한 번의 검증 실행을 실제 업무의 지속 사용으로 표현하지 않는다.
+    evidenceSlices:
+      - outcomeId: python.projectDelivery
+        caseIds: [first, second, mixed, empty, nonpositive, retail]
+    variants:
+      acquisition:
+        taskVariantId: python.report.delivery.acquisition.v1
+        taskVariantVersion: 1
+        lessonRef: 30days/day30_최종프로젝트
+        sectionId: day30-sales-report-mastery
+        checkSpecId: python.30days.day30.sales-report.mastery.behavior.v1
+        fixtureHash: sha256-ryx2Y6JbI/ENxR5KudfXYARxzgQEfGuS2W7sfTs1P0M=
+      transfer:
+        taskVariantId: python.report.delivery.transfer.v1
+        taskVariantVersion: 1
+        lessonRef: 30days/day30_최종프로젝트
+        sectionId: day30-status-summary-transfer
+        checkSpecId: python.30days.day30.status-summary.transfer.behavior.v1
+        fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      retrieval:
+        taskVariantId: python.report.delivery.retrieval.v1
+        taskVariantVersion: 1
+        lessonRef: 30days/day30_최종프로젝트
+        sectionId: day30-validate-pipeline-retrieval
+        checkSpecId: python.30days.day30.validate-pipeline.retrieval.behavior.v1
+        fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+    checkerCorpus:
+      validAlternatives: [commentPreserving]
+      requiredMutations: [zeroEdit, constantReturn]
+    applicationVariant:
+      taskVariantId: python.report.delivery.application.v1
+      taskVariantVersion: 1
+      lessonRef: 30days/day30_최종프로젝트
+      sectionId: day30-report-artifact-application
+      checkSpecId: python.30days.day30.report-artifact.application.behavior.v1
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+    artifactContractId: python.report.json.v1
+    artifactContractVersion: 1
+
 lessonOutcomes:
   # 30days 기본기 트랙
   "30days/day01_헬로월드":

@@ -8,7 +8,7 @@ export type UseLessonSectionProgressResult = {
   loading: boolean;
 };
 
-// 현재 레슨에서 강한 검증 credit을 받은 섹션 목록. 헤더 진행 배지와 목차 체크가 함께 쓴다.
+// 현재 레슨에서 strong check를 통과한 섹션 목록. assurance credit과 수업 내 진행은 분리한다.
 export function useLessonSectionProgress(lessonRef: string): UseLessonSectionProgressResult {
   const [creditedSectionIds, setCreditedSectionIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -17,7 +17,7 @@ export function useLessonSectionProgress(lessonRef: string): UseLessonSectionPro
     try {
       const projection = await loadCanonicalCurriculumLearningState();
       const lesson = projection.lessons.find((candidate) => candidate.lessonRef === lessonRef);
-      setCreditedSectionIds(lesson?.creditedSectionIds ?? []);
+      setCreditedSectionIds(lesson?.verifiedSectionIds ?? []);
     } catch (error) {
       console.warn("lesson section progress reload failed", error);
     } finally {

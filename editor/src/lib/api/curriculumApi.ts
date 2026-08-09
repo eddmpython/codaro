@@ -1,4 +1,4 @@
-import { postJson, requestJson } from "./transport";
+import { postJson, requestBytes, requestJson } from "./transport";
 import type { AnalyticsListPayload, AnalyticsSummaryPayload, CheckProposalsPayload, CheckResult, CurriculumCategoriesPayload, CurriculumContentsPayload, CurriculumGapsPayload, CurriculumLessonPayload, CurriculumQualityReportPayload, CurriculumTaxonomyPayload, LearnerOutcomePayload, LearnerSnapshotPayload, LessonStatsPayload, MasterPlanPayload, MasterPlanRequestBody, MasteryReportPayload, ProgressSummary, ReviewListPayload, ReviewStatePayload } from "@/types";
 import type { LearningEvidenceArtifact } from "@/lib/webLearningEvidence";
 
@@ -50,6 +50,10 @@ learningEvidenceSummary: () =>
     requestJson<{ conflicts: number; events: number }>("/api/curriculum/evidence/summary"),
 learningEvidenceArchive: () =>
     requestJson<Record<string, unknown>>("/api/curriculum/evidence/archive"),
+curriculumCapability: (domainId: string) =>
+    requestJson<Record<string, unknown>>(`/api/curriculum/capabilities/${encodeURIComponent(domainId)}`),
+learningArtifact: (contentHash: string) =>
+    requestBytes(`/api/curriculum/artifacts/${encodeURIComponent(contentHash)}`),
 importLearningEvidence: (archive: Record<string, unknown>) =>
     postJson<{
       accepted: Array<{ checkId: string; lessonRef: string }>;

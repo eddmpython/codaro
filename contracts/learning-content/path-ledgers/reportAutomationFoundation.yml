@@ -1,0 +1,55 @@
+schemaVersion: 1
+pathId: reportAutomationFoundation
+composerSnapshotDate: '2026-08-09'
+composerGraphCount: 472
+composerVersionHash: 291b330a7d7701c8866c8486b688fa40ee516b195a397bec49240c2ae4574926
+taxonomySnapshotHash: f5edcbdc2041f32303102ae11b0f79ddaf7f13fd58314181fc71c2e7ba8b9813
+sourceSetHash: 0733599fcd7f32d40418be3982506362b10e7b665f0467da35f466b0880bc490
+ledgerTool: uv run python -X utf8 docs/skills/ops/tools/buildLearningLedgers.py --check
+targetOutcomes:
+- python.intro
+- python.variables
+- python.operators
+- python.strings
+- python.lists
+- python.dictsAndSets
+- python.controlFlow
+- python.functions
+- python.modulesAndIo
+- python.errorHandling
+- python.projectDelivery
+gaps: []
+lessons:
+- order: 1
+  lessonRef: 30days/day01_헬로월드
+  canonicalContentRef: 30days/day01_헬로월드
+- order: 2
+  lessonRef: 30days/day02_변수와데이터타입
+  canonicalContentRef: 30days/day02_변수와데이터타입
+- order: 3
+  lessonRef: 30days/day03_연산자
+  canonicalContentRef: 30days/day03_연산자
+- order: 4
+  lessonRef: 30days/day04_문자열기초
+  canonicalContentRef: 30days/day04_문자열기초
+- order: 5
+  lessonRef: 30days/day07_리스트기초
+  canonicalContentRef: 30days/day07_리스트기초
+- order: 6
+  lessonRef: 30days/day10_집합
+  canonicalContentRef: 30days/day10_집합
+- order: 7
+  lessonRef: 30days/day13_조건문
+  canonicalContentRef: 30days/day13_조건문
+- order: 8
+  lessonRef: 30days/day15_함수기초
+  canonicalContentRef: 30days/day15_함수기초
+- order: 9
+  lessonRef: 30days/day18_모듈과import
+  canonicalContentRef: 30days/day18_모듈과import
+- order: 10
+  lessonRef: 30days/day20_예외처리
+  canonicalContentRef: 30days/day20_예외처리
+- order: 11
+  lessonRef: 30days/day30_최종프로젝트
+  canonicalContentRef: 30days/day30_최종프로젝트

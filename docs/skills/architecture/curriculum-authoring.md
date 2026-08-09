@@ -40,9 +40,11 @@ Codaro 커리큘럼은 "설명 문서"가 아니라 학습자가 실행하고 �
 
 ## 레슨 작성 순서
 
-1. **능력 문장 작성**
+1. **능력 claim과 TaskFamily 작성**
    - "이 레슨을 끝내면 무엇을 할 수 있는가"를 한 문장으로 쓴다.
    - 함수명이나 문법명보다 결과 행동을 앞세운다.
+   - 승격 경로라면 수행 조건, 허용 도구, inference boundary, required TaskFamily와 semantic version을 `_taxonomy.yml`에 둔다.
+   - family마다 acquisition, transfer, retrieval을 서로 다른 fixture와 variant로 둔다. application은 검증할 산출물이 있을 때만 추가한다.
 
 2. **의존성 분리**
    - 표준 라이브러리만 쓰면 `meta.packages`를 비운다.
@@ -60,11 +62,15 @@ Codaro 커리큘럼은 "설명 문서"가 아니라 학습자가 실행하고 �
    - 섹션 하나는 하나의 학습 카드다.
    - 필수 필드: `title`, `subtitle`, `goal`, `why`, `explanation`, `tips`, `snippet`, `exercise.prompt`, `exercise.starterCode`, `exercise.solution`, `exercise.hints`, `check`.
    - `snippet`은 읽는 예제이고, `exercise.starterCode`는 학습자가 직접 고치는 입력 코드다.
+   - `instructionRole: reference | workedExample | practice | project`와 `assessmentRole: none | formative | assurance | application`을 분리한다.
+   - assurance와 application에는 `assessmentMode`, claim, family, variant, CheckSpec version과 evidence slice를 모두 명시한다.
 
 5. **검증 셀 고정**
    - 실행만 성공하는 코드로 끝내지 않는다.
    - `assert`, 변수 확인, 출력 비교, 오류 메시지 확인 중 하나를 반드시 둔다.
    - 실패 케이스를 한 번 넣어 "오류를 읽고 고치는 방법"을 가르친다.
+   - checker corpus는 reference solution 통과, 서로 다른 올바른 구현 통과, zero-edit와 constant-return mutation 거부를 모두 만족해야 한다.
+   - 대소문자와 공백이 outcome이 아니면 semantic 비교를 사용한다. 표기 자체가 목표일 때만 exact를 명시한다.
 
 6. **실무 변주 추가**
    - 값 하나를 바꾸는 실험을 둔다.
@@ -87,6 +93,8 @@ Codaro 커리큘럼은 "설명 문서"가 아니라 학습자가 실행하고 �
 - 브라우저 전용 Python, Pyodide, micropip, marimo 우회 흐름을 기본 커리큘럼 목표로 삼지 않는다.
 - 소개 레슨을 "이 라이브러리는 무엇인가" 설명으로만 끝내지 않는다.
 - 예제 코드를 실행만 하고 검증 없이 다음 섹션으로 넘기지 않는다.
+- `reference`, `practice`, weak check, answer reveal을 assurance credit으로 승격하지 않는다.
+- capstone이라는 이유만으로 기초 outcome을 일괄 승격하지 않는다.
 
 ## 관련
 

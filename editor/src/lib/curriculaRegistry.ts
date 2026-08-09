@@ -61,6 +61,17 @@ type LearningSectionContract = {
   rawBlocks: YamlMap[];
   contractGaps: string[];
   assessmentMode: string;
+  instructionRole: string;
+  assessmentRole: string;
+  capabilityClaimId: string;
+  capabilityClaimVersion: number;
+  taskFamilyId: string;
+  taskFamilyVersion: number;
+  taskVariantId: string;
+  taskVariantVersion: number;
+  artifactContractId: string;
+  artifactContractVersion: number;
+  evidenceSlices: YamlMap[];
   sourceSectionIds: string[];
   unseen: boolean;
   minimumDelayHours: number;
@@ -70,6 +81,43 @@ type LearningSectionContract = {
 type LessonOutcomeBinding = {
   lessonOutcomeIds: string[];
   sectionOutcomeIds: Record<string, string[]>;
+};
+
+export type RegistryCapabilityClaim = {
+  id: string;
+  requiredTaskFamilyIds: string[];
+  statement: string;
+  version: number;
+};
+
+export type RegistryTaskVariant = {
+  checkSpecId: string;
+  checkSpecVersion: string;
+  fixtureHash: string;
+  lessonRef: string;
+  sectionId: string;
+  taskVariantId: string;
+  taskVariantVersion: number;
+};
+
+export type RegistryTaskFamily = {
+  applicationVariant: RegistryTaskVariant | null;
+  artifactContractId: string;
+  artifactContractVersion: number;
+  id: string;
+  invariant: string;
+  outcomeIds: string[];
+  ownerClaimId: string;
+  ownerDomainId: string;
+  variants: Record<"acquisition" | "retrieval" | "transfer", RegistryTaskVariant>;
+  version: number;
+};
+
+export type RegistryCapabilityDomain = {
+  capabilityClaims: RegistryCapabilityClaim[];
+  id: string;
+  label: string;
+  taskFamilies: RegistryTaskFamily[];
 };
 
 type LearningLessonContract = {
@@ -495,6 +543,10 @@ export async function registryAssessmentBlocks(category: string, contentId: stri
       ...variant,
       assessmentMode: "retrieval",
     })),
+    ...arrayOfMaps(assessment.applicationVariants).map((variant) => ({
+      ...variant,
+      assessmentMode: "capstone",
+    })),
   ];
   if (!candidateSections.length) return [];
   const contract = learningContractFromYaml(
@@ -554,7 +606,7 @@ function documentFromCurriculumYaml(
   const assessment = mapValue(yaml.assessment);
   const masterySections: YamlMap[] = arrayOfMaps(assessment.masteryVariants).map((variant) => ({
     ...variant,
-    assessmentMode: "mastery",
+    assessmentMode: textValue(variant.assessmentMode) || "mastery",
   }));
   const sections = [...arrayOfMaps(yaml.sections), ...masterySections];
   const materializedYaml = { ...yaml, sections };
@@ -600,6 +652,63 @@ function documentFromCurriculumYaml(
       hideCode: false,
       entryBlockIds: [],
     },
+  };
+}
+
+export async function registryCapabilityDomain(domainId: string): Promise<RegistryCapabilityDomain | null> {
+  if (!loadRawTaxonomy) return null;
+  const taxonomy = parseYaml(await loadRawTaxonomy());
+  const domain = arrayOfMaps(taxonomy.domains).find((item) => textValue(item.id) === domainId);
+  if (!domain) return null;
+  const claims = arrayOfMaps(domain.capabilityClaims).map((claim): RegistryCapabilityClaim => ({
+    id: textValue(claim.id),
+    requiredTaskFamilyIds: uniqueTextList(claim.requiredTaskFamilyIds),
+    statement: textValue(claim.statement),
+    version: positiveInteger(claim.version),
+  }));
+  const claimFamilyIds = new Set(claims.flatMap((claim) => claim.requiredTaskFamilyIds));
+  const taskFamilies = arrayOfMaps(taxonomy.taskFamilies)
+    .filter((family) => claimFamilyIds.has(textValue(family.id)))
+    .map(taskFamilyContract);
+  return {
+    capabilityClaims: claims,
+    id: domainId,
+    label: textValue(domain.label),
+    taskFamilies,
+  };
+}
+
+function taskFamilyContract(value: YamlMap): RegistryTaskFamily {
+  const variants = mapValue(value.variants);
+  return {
+    applicationVariant: Object.keys(mapValue(value.applicationVariant)).length
+      ? taskVariantContract(mapValue(value.applicationVariant))
+      : null,
+    artifactContractId: textValue(value.artifactContractId),
+    artifactContractVersion: positiveInteger(value.artifactContractVersion),
+    id: textValue(value.id),
+    invariant: textValue(value.invariant),
+    outcomeIds: uniqueTextList(value.outcomeIds),
+    ownerClaimId: textValue(value.ownerClaimId),
+    ownerDomainId: textValue(value.ownerDomainId),
+    variants: {
+      acquisition: taskVariantContract(mapValue(variants.acquisition)),
+      retrieval: taskVariantContract(mapValue(variants.retrieval)),
+      transfer: taskVariantContract(mapValue(variants.transfer)),
+    },
+    version: positiveInteger(value.version),
+  };
+}
+
+function taskVariantContract(value: YamlMap): RegistryTaskVariant {
+  return {
+    checkSpecId: textValue(value.checkSpecId),
+    checkSpecVersion: textValue(value.checkSpecVersion) || "1",
+    fixtureHash: textValue(value.fixtureHash),
+    lessonRef: textValue(value.lessonRef),
+    sectionId: textValue(value.sectionId),
+    taskVariantId: textValue(value.taskVariantId),
+    taskVariantVersion: positiveInteger(value.taskVariantVersion),
   };
 }
 
@@ -1130,6 +1239,17 @@ function sectionContractFromYaml(
     rawBlocks,
     contractGaps: [],
     assessmentMode: textValue(section.assessmentMode ?? section.mode),
+    instructionRole: textValue(section.instructionRole),
+    assessmentRole: textValue(section.assessmentRole),
+    capabilityClaimId: textValue(section.capabilityClaimId),
+    capabilityClaimVersion: nonNegativeInteger(section.capabilityClaimVersion),
+    taskFamilyId: textValue(section.taskFamilyId),
+    taskFamilyVersion: nonNegativeInteger(section.taskFamilyVersion),
+    taskVariantId: textValue(section.taskVariantId),
+    taskVariantVersion: nonNegativeInteger(section.taskVariantVersion),
+    artifactContractId: textValue(section.artifactContractId),
+    artifactContractVersion: nonNegativeInteger(section.artifactContractVersion),
+    evidenceSlices: arrayOfMaps(section.evidenceSlices),
     sourceSectionIds: uniqueTextList(section.sourceSectionIds),
     unseen: section.unseen === true,
     minimumDelayHours: nonNegativeInteger(section.minimumDelayHours),
@@ -1702,6 +1822,10 @@ function uniqueValues(values: string[]) {
 function nonNegativeInteger(value: unknown) {
   const number = typeof value === "number" ? value : Number(textValue(value));
   return Number.isFinite(number) ? Math.max(0, Math.trunc(number)) : 0;
+}
+
+function positiveInteger(value: unknown) {
+  return Math.max(1, nonNegativeInteger(value));
 }
 
 function textValue(value: unknown): string {

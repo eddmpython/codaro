@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from .checkSandboxBrokerClient import checkSandboxBrokerAvailable, runCheckSandboxBroker
+from .artifactStore import ArtifactBlobStore
 from .outputMatch import matchLearningOutput, normalizeLearningOutput, normalizeOutputGradingPolicy
 
 
@@ -53,13 +54,29 @@ class LocalStrongCheckInvalid(ValueError):
     pass
 
 
-def runLocalStrongCheck(spec: dict[str, Any], source: str) -> dict[str, object]:
+def runLocalStrongCheck(
+    spec: dict[str, Any],
+    source: str,
+    *,
+    artifactStoreRoot: Path | None = None,
+) -> dict[str, object]:
     normalized = validateLocalStrongCheck(spec, source)
     expected = expectedDisplay(normalized)
     timeoutMs = int(normalized["timeoutMs"])
 
     for attempt in range(2):
-        result, retryable = runLocalStrongCheckAttempt(normalized, source, expected, timeoutMs)
+        storeOption = (
+            {"artifactStoreRoot": artifactStoreRoot}
+            if artifactStoreRoot is not None
+            else {}
+        )
+        result, retryable = runLocalStrongCheckAttempt(
+            normalized,
+            source,
+            expected,
+            timeoutMs,
+            **storeOption,
+        )
         if not retryable or attempt == 1:
             return result
     raise AssertionError("local strong-check retry loop did not return")
@@ -70,6 +87,8 @@ def runLocalStrongCheckAttempt(
     source: str,
     expected: str,
     timeoutMs: int,
+    *,
+    artifactStoreRoot: Path | None = None,
 ) -> tuple[dict[str, object], bool]:
 
     with tempfile.TemporaryDirectory(prefix="codaro-strong-check-") as rootText:
@@ -165,10 +184,13 @@ def runLocalStrongCheckAttempt(
                 ),
                 False,
             )
+        artifacts = normalizeWorkerArtifacts(response.get("artifacts"))
+        if artifactStoreRoot is not None and normalized.get("artifactContractId") and artifacts:
+            ArtifactBlobStore(artifactStoreRoot).promote(root, artifacts)
         return (
             {
                 "actual": actual,
-                "artifacts": normalizeWorkerArtifacts(response.get("artifacts")),
+                "artifacts": artifacts,
                 "detail": (
                     acceptedOutputFeedback
                     if acceptedOutputFeedback
@@ -212,6 +234,14 @@ def validateLocalStrongCheck(spec: dict[str, Any], source: str) -> dict[str, Any
     for key in ("id", "fixtureId", "fixtureHash"):
         if not isinstance(spec.get(key), str) or not str(spec[key]).strip():
             raise LocalStrongCheckInvalid(f"{key}가 비어 있습니다.")
+    if "artifactContractId" in spec and (
+        not isinstance(spec.get("artifactContractId"), str)
+        or not str(spec["artifactContractId"]).strip()
+        or isinstance(spec.get("artifactContractVersion"), bool)
+        or not isinstance(spec.get("artifactContractVersion"), int)
+        or int(spec["artifactContractVersion"]) < 1
+    ):
+        raise LocalStrongCheckInvalid("artifact contract identity가 유효하지 않습니다.")
 
     fixture = normalizeFixture(spec.get("fixture"))
     if fixtureHash(fixture) != spec["fixtureHash"]:

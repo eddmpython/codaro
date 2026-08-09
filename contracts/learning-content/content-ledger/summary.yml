@@ -1,5 +1,5 @@
 schemaVersion: 1
-snapshotDate: '2026-08-08'
+snapshotDate: '2026-08-09'
 canonicalRows: 472
 uniqueLessonRefs: 472
 unownedRows: 0
@@ -9,7 +9,7 @@ dispositionCounts:
   migrate: 472
   merge: 0
   archive: 0
-sourceSetHash: fb6f4d500adab27559930852643653d0ffd850f6eafc54f1d816bf3399c916d2
+sourceSetHash: 0733599fcd7f32d40418be3982506362b10e7b665f0467da35f466b0880bc490
 baselineTaxonomyHash: b5e9b0b9db4f6ecd89c7be10a5c795f9b991b3ce700d5b5cf044607fc835def2
 composerVersionHash: 82c325cd14b0d6fc2767a2780e69f500d4496e444c3c2271b830179e70be6446
 plannedTaxonomyOutcomeIds:

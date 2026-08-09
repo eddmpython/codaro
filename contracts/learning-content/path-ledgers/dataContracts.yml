@@ -2,9 +2,9 @@ schemaVersion: 1
 pathId: dataContracts
 composerSnapshotDate: '2026-08-03'
 composerGraphCount: 472
-composerVersionHash: e4d4d563381b658826a477e2541ce7cbb70db111eafdf9217f15e8f7eadc6ef3
-taxonomySnapshotHash: 1a8f5ed385803f0bbe3594393b3bd1983e2506ab1e77d65b0b53da24645446ac
-sourceSetHash: fb6f4d500adab27559930852643653d0ffd850f6eafc54f1d816bf3399c916d2
+composerVersionHash: 291b330a7d7701c8866c8486b688fa40ee516b195a397bec49240c2ae4574926
+taxonomySnapshotHash: f5edcbdc2041f32303102ae11b0f79ddaf7f13fd58314181fc71c2e7ba8b9813
+sourceSetHash: 0733599fcd7f32d40418be3982506362b10e7b665f0467da35f466b0880bc490
 ledgerTool: uv run python -X utf8 docs/skills/ops/tools/buildLearningLedgers.py --check
 targetOutcomes:
 - python.oop

@@ -1,0 +1,16 @@
+{
+  "kind": "codaro.machine-publication",
+  "schemaVersion": 1,
+  "sourceIdentity": {
+    "capstoneContentHash": "sha256-948c0c87ef1b06cc93ee5bf597b5b2d5d51d8b61cc53b30432315ab356580c5b",
+    "composerHash": "sha256-a4825b21ea2e02cdc3e2ba6c788bd52f70ac998fc2c8b66ffc074caa42830bd1",
+    "taxonomyHash": "sha256-f5edcbdc2041f32303102ae11b0f79ddaf7f13fd58314181fc71c2e7ba8b9813"
+  },
+  "paths": [
+    {
+      "allowedClaim": "machineVerified",
+      "pathId": "reportAutomationFoundation",
+      "publicationState": "golden"
+    }
+  ]
+}

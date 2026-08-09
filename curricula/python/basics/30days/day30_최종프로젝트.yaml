@@ -888,6 +888,17 @@ assessment:
   masteryVariants:
   - id: day30-sales-report-mastery
     mode: mastery
+    assessmentMode: acquisition
+    instructionRole: project
+    assessmentRole: assurance
+    capabilityClaimId: report.pipeline
+    capabilityClaimVersion: 1
+    taskFamilyId: python.report.delivery
+    taskFamilyVersion: 1
+    taskVariantId: python.report.delivery.acquisition.v1
+    taskVariantVersion: 1
+    artifactContractId: python.report.json.v1
+    artifactContractVersion: 1
     unseen: true
     claimScope: portable-concept
     reviewStatus: machine-verified-pending-independent-review
@@ -990,6 +1001,14 @@ assessment:
   transferVariants:
   - id: day30-status-summary-transfer
     mode: transfer
+    instructionRole: project
+    assessmentRole: assurance
+    capabilityClaimId: report.pipeline
+    capabilityClaimVersion: 1
+    taskFamilyId: python.report.delivery
+    taskFamilyVersion: 1
+    taskVariantId: python.report.delivery.transfer.v1
+    taskVariantVersion: 1
     unseen: true
     claimScope: portable-concept
     reviewStatus: machine-verified-pending-independent-review
@@ -1060,6 +1079,14 @@ assessment:
   retrievalVariants:
   - id: day30-validate-pipeline-retrieval
     mode: retrieval
+    instructionRole: project
+    assessmentRole: assurance
+    capabilityClaimId: report.pipeline
+    capabilityClaimVersion: 1
+    taskFamilyId: python.report.delivery
+    taskFamilyVersion: 1
+    taskVariantId: python.report.delivery.retrieval.v1
+    taskVariantVersion: 1
     unseen: true
     claimScope: portable-concept
     reviewStatus: machine-verified-pending-independent-review
@@ -1137,3 +1164,96 @@ assessment:
         expectedPaths: []
         normalizeReturnPaths: []
     minimumDelayHours: 168
+  applicationVariants:
+  - id: day30-report-artifact-application
+    mode: capstone
+    assessmentMode: capstone
+    instructionRole: project
+    assessmentRole: application
+    capabilityClaimId: report.pipeline
+    capabilityClaimVersion: 1
+    taskFamilyId: python.report.delivery
+    taskFamilyVersion: 1
+    taskVariantId: python.report.delivery.application.v1
+    taskVariantVersion: 1
+    artifactContractId: python.report.json.v1
+    artifactContractVersion: 1
+    outcomeIds: [python.projectDelivery]
+    unseen: true
+    sourceSectionIds:
+    - day30-validate-pipeline-retrieval
+    title: 검증된 JSON 보고서를 자동화로 넘기기
+    subtitle: 로컬에서 결과물과 내용을 함께 확인
+    goal: 새 입력을 집계해 JSON 파일을 만들고 저장된 내용을 다시 읽어 검증한다.
+    why: 반환값만 맞는 코드와 다시 열 수 있는 결과물을 만든 코드를 구분해야 자동화로 이어갈 수 있습니다.
+    explanation: 이 과제는 로컬 격리 실행에서 두 입력을 처리하고 생성된 JSON 파일의 내용과 해시를 증거로 남깁니다.
+    tips:
+    - 함수 이름과 매개변수는 그대로 두고 함수 본문을 완성하세요.
+    - 보고서를 저장한 뒤 같은 파일을 다시 읽어 반환값의 persisted에 넣으세요.
+    exercise:
+      prompt: build_validated_report(rows, output_name)가 count, total, average 보고서를 JSON으로 저장하고 report와 다시 읽은 persisted를 함께 반환하도록 완성하세요.
+      starterCode: |-
+        def build_validated_report(rows, output_name):
+            raise NotImplementedError
+      solution: |-
+        def build_validated_report(rows, output_name):
+            import json
+            from pathlib import Path
+            amounts = [float(row['amount']) for row in rows]
+            report = {
+                'count': len(amounts),
+                'total': sum(amounts),
+                'average': sum(amounts) / len(amounts) if amounts else 0,
+            }
+            target = Path(output_name)
+            target.write_text(json.dumps(report, ensure_ascii=False, sort_keys=True), encoding='utf-8')
+            return {'report': report, 'persisted': json.loads(target.read_text(encoding='utf-8'))}
+      hints:
+      - amounts를 먼저 만든 뒤 count, total, average를 계산하세요.
+      - Path.write_text로 저장하고 json.loads로 같은 파일을 다시 읽으세요.
+    check:
+      id: python.30days.day30.report-artifact.application.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: local-sandbox
+      timeoutMs: 8000
+      fixtureId: python.30days.day30.report-artifact.application.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      artifactContractId: python.report.json.v1
+      artifactContractVersion: 1
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_validated_report
+        cases:
+        - id: retail
+          arguments:
+          - value:
+            - {item: pen, amount: '1000'}
+            - {item: book, amount: '2500'}
+          - value: report-retail.json
+          expectedReturn:
+            report: {count: 2, total: 3500.0, average: 1750.0}
+            persisted: {count: 2, total: 3500.0, average: 1750.0}
+        - id: empty
+          arguments:
+          - value: []
+          - value: report-empty.json
+          expectedReturn:
+            report: {count: 0, total: 0, average: 0}
+            persisted: {count: 0, total: 0, average: 0}
+        expectedPaths:
+        - path: report-retail.json
+          kind: file
+          origin: created
+        - path: report-empty.json
+          kind: file
+          origin: created
+        normalizeReturnPaths: []
