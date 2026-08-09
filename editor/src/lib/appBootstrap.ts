@@ -4,6 +4,7 @@ import { registryCategories } from "@/lib/curriculaRegistry";
 import { defaultCurriculumState } from "@/lib/curriculumSelection";
 import { shortPath } from "@/lib/displayFormat";
 import { translate } from "@/lib/localeCopy";
+import { loadStaticPublication } from "@/lib/staticPublication";
 import type {
   AiProfile,
   AiToolCatalogPayload,
@@ -95,6 +96,16 @@ export const initialBootstrapState: AppBootstrapState = {
 };
 
 export async function loadAppBootstrapState(): Promise<AppBootstrapState> {
+  const publication = await loadStaticPublication();
+  if (publication) {
+    return {
+      ...initialBootstrapState,
+      appMode: true,
+      curriculumDocument: null,
+      documentToApply: publication.document,
+      notice: null,
+    };
+  }
   if (!shouldUseApi()) {
     return initialBootstrapState;
   }

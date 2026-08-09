@@ -9,7 +9,16 @@
 import analysisSource from "../../../src/codaro/document/analysis.py?raw";
 import figureCaptureSource from "../../../src/codaro/runtime/figureCapture.py?raw";
 import reactivePlanSource from "../../../src/codaro/kernel/reactivePlan.py?raw";
+import outputDescriptorSource from "../../../src/codaro/outputDescriptor.py?raw";
+import uiCallbacksSource from "../../../src/codaro/uiCallbacks.py?raw";
+import uiValueSource from "../../../src/codaro/uiValue.py?raw";
 import { shouldUseApi } from "@/lib/api";
+import {
+  fetchVerifiedPublicationFile,
+  loadStaticPublication,
+  publicationAssetUrl,
+  staticPublicationManifestUrl,
+} from "@/lib/staticPublication";
 import type { ExecutionResult, ReactiveDiagnostics, VariableInfo } from "@/types";
 
 type PyRuntime = {
@@ -51,16 +60,25 @@ type PyProcAssetIntegrity = {
   files?: { path: string; url: string; integrity: string; roles?: string[] }[];
 };
 
+type PyodideAssetIntegrity = {
+  packageRoot?: string;
+  files?: { path: string; url: string; integrity: string; roles?: string[] }[];
+};
+
 type PyProcModule = {
   bootRuntime(opts: {
     stdout?: (line: string) => void;
     stderr?: (line: string) => void;
     assetIntegrity?: PyProcAssetIntegrity;
+    coreIntegrity?: { files: Record<string, string>; required: boolean };
+    engineScriptIntegrity?: string;
+    indexURL?: string;
   }): Promise<PyRuntime>;
 };
 
 let runtimePromise: Promise<PyRuntime> | null = null;
 let assetIntegrityPromise: Promise<PyProcAssetIntegrity | null> | null = null;
+let pyodideIntegrityPromise: Promise<PyodideAssetIntegrity> | null = null;
 const stdoutLines: string[] = [];
 const stderrLines: string[] = [];
 let previousVariables = new Map<string, VariableInfo>();
@@ -74,6 +92,7 @@ export type BrowserReactivePlan = ReactiveDiagnostics & {
 };
 
 function assetIntegrityUrl(): string {
+  if (staticPublicationManifestUrl()) return publicationAssetUrl("pyproc-assets.json").href;
   const envUrl = import.meta.env.VITE_PYPROC_ASSET_INTEGRITY_URL;
   if (typeof envUrl === "string" && envUrl.trim()) return envUrl;
   const appBase = import.meta.env.BASE_URL || "/";
@@ -85,7 +104,14 @@ function assetIntegrityUrl(): string {
 async function loadAssetIntegrity(): Promise<PyProcAssetIntegrity | null> {
   if (!assetIntegrityPromise) {
     assetIntegrityPromise = fetch(assetIntegrityUrl(), { cache: "no-store", credentials: "same-origin" })
-      .then((response) => (response.ok ? response.json() as Promise<PyProcAssetIntegrity> : null))
+      .then(async (response) => {
+        if (!response.ok) return null;
+        const manifest = await response.json() as PyProcAssetIntegrity;
+        return {
+          ...manifest,
+          files: manifest.files?.map((file) => ({ ...file, url: resolvedAssetUrl(file.url) })),
+        };
+      })
       .catch((error: unknown) => {
         console.warn("pyproc asset manifest unavailable", error);
         return null;
@@ -94,20 +120,59 @@ async function loadAssetIntegrity(): Promise<PyProcAssetIntegrity | null> {
   return assetIntegrityPromise;
 }
 
+async function loadPyodideIntegrity(): Promise<PyodideAssetIntegrity> {
+  if (!pyodideIntegrityPromise) {
+    const url = staticPublicationManifestUrl()
+      ? publicationAssetUrl("pyodide-assets.json").href
+      : new URL("pyodide-assets.json", new URL(import.meta.env.BASE_URL || "/", window.location.origin)).href;
+    pyodideIntegrityPromise = fetch(url, { cache: "no-store", credentials: "same-origin" })
+      .then(async (response) => {
+        if (!response.ok) throw new Error(`pyodide asset manifest unavailable: ${response.status}`);
+        return response.json() as Promise<PyodideAssetIntegrity>;
+      });
+  }
+  return pyodideIntegrityPromise;
+}
+
+function resolvedAssetUrl(value: string): string {
+  if (staticPublicationManifestUrl()) return publicationAssetUrl(value.replace(/^\/+/, "")).href;
+  return new URL(value, window.location.href).href;
+}
+
 async function ensureRuntime(): Promise<PyRuntime> {
   if (!runtimePromise) {
     runtimePromise = import("pyproc/runtime")
       .then(async (module) => {
         const { bootRuntime } = module as unknown as PyProcModule;
-        const assetIntegrity = await loadAssetIntegrity();
+        const [assetIntegrity, pyodideIntegrity] = await Promise.all([
+          loadAssetIntegrity(),
+          loadPyodideIntegrity(),
+        ]);
+        const pyodideFiles = pyodideIntegrity.files ?? [];
+        const pythonIndexUrl = resolvedAssetUrl(pyodideIntegrity.packageRoot ?? "vendor/pyodide/");
+        const engineScript = pyodideFiles.find((file) => file.roles?.includes("engineScript"));
+        const coreFiles: Record<string, string> = {};
+        for (const file of pyodideFiles) {
+          const url = resolvedAssetUrl(file.url);
+          coreFiles[file.path] = file.integrity;
+          coreFiles[url] = file.integrity;
+          coreFiles[new URL(url).pathname] = file.integrity;
+        }
         const runtime = await bootRuntime({
           stdout: (line: string) => stdoutLines.push(line),
           stderr: (line: string) => stderrLines.push(line),
           ...(assetIntegrity ? { assetIntegrity } : {}),
+          coreIntegrity: { files: coreFiles, required: true },
+          ...(engineScript ? { engineScriptIntegrity: engineScript.integrity } : {}),
+          indexURL: pythonIndexUrl.endsWith("/") ? pythonIndexUrl : `${pythonIndexUrl}/`,
         });
         // matplotlib을 headless로 고정한다. import보다 먼저 정해져야 하므로 부팅 직후에 둔다.
         // 로컬 워커도 같은 값을 쓴다(localWorker.py 상단).
         runtime.run("import os as _codaroOs\n_codaroOs.environ.setdefault('MPLBACKEND', 'Agg')");
+        installBrowserCodaroModules(runtime);
+        ensureBrowserFileWorld(runtime);
+        runtime.run(`import os as _codaroOs\n_codaroOs.chdir(${JSON.stringify(browserFsRoot)})`);
+        await mountStaticPublicationAssets(runtime);
         return runtime;
       })
       .catch((error: unknown) => {
@@ -286,18 +351,33 @@ function computeDelta(current: VariableInfo[]) {
 // 진짜 import 오류가 셀 stderr로 정직하게 드러난다.
 async function ensurePackages(runtime: PyRuntime, packages: string[]): Promise<void> {
   for (const name of packages) {
-    const key = name.trim().toLowerCase();
+    const requested = name.trim();
+    const key = requested.toLowerCase();
     if (!key || attemptedPackages.has(key)) continue;
     attemptedPackages.add(key);
     try {
-      await runtime.loadPackages([key]);
+      await runtime.loadPackages([requested]);
     } catch {
       try {
-        await runtime.install(key);
+        await runtime.install(requested);
       } catch (error) {
         console.warn(`browser kernel package unavailable: ${key}`, error);
       }
     }
+  }
+}
+
+async function mountStaticPublicationAssets(runtime: PyRuntime): Promise<void> {
+  const publication = await loadStaticPublication();
+  if (!publication) return;
+  for (const asset of publication.manifest.dataAssets) {
+    const bytes = await fetchVerifiedPublicationFile(publication, asset.bundlePath);
+    const relativeParts = asset.sourcePath.split("/").filter(Boolean);
+    const fileName = relativeParts.pop();
+    if (!fileName) throw new Error(`publication asset path is invalid: ${asset.sourcePath}`);
+    const directory = [browserFsRoot, ...relativeParts].join("/");
+    runtime.fs.mkdirTree(directory);
+    runtime.fs.writeFile(`${directory}/${fileName}`, bytes, { encoding: "binary" });
   }
 }
 
@@ -317,6 +397,31 @@ function browserSafeBlockName(blockId: string): string {
 function ensureBrowserFileWorld(runtime: PyRuntime): void {
   runtime.fs.mkdirTree(browserFsCellsDir);
   runtime.fs.mkdirTree(browserFsRunsDir);
+}
+
+function installBrowserCodaroModules(runtime: PyRuntime): void {
+  const modules = [
+    ["codaro.uiCallbacks", uiCallbacksSource],
+    ["codaro.uiValue", uiValueSource],
+    ["codaro.outputDescriptor", outputDescriptorSource],
+  ];
+  const code = [
+    "import sys as _codaroSys",
+    "import types as _codaroTypes",
+    "_codaroPackage = _codaroSys.modules.get('codaro')",
+    "if _codaroPackage is None:",
+    "    _codaroPackage = _codaroTypes.ModuleType('codaro')",
+    "    _codaroPackage.__path__ = []",
+    "    _codaroSys.modules['codaro'] = _codaroPackage",
+    `_codaroModuleSources = ${JSON.stringify(modules)}`,
+    "for _codaroModuleName, _codaroModuleSource in _codaroModuleSources:",
+    "    _codaroModule = _codaroTypes.ModuleType(_codaroModuleName)",
+    "    _codaroModule.__package__ = 'codaro'",
+    "    _codaroSys.modules[_codaroModuleName] = _codaroModule",
+    "    exec(_codaroModuleSource, _codaroModule.__dict__)",
+    "    setattr(_codaroPackage, _codaroModuleName.rsplit('.', 1)[-1], _codaroModule)",
+  ].join("\n");
+  runtime.run(code);
 }
 
 function pythonBool(value: unknown): boolean {
@@ -494,15 +599,23 @@ export async function executeBrowserBlock(
   drainBuffers();
 
   let resultRepr = "";
+  let resultData: unknown = null;
+  let resultType: ExecutionResult["type"] = "text";
   let errorText = "";
   let sourcePath = "";
   let artifacts: ReturnType<typeof browserFileArtifacts> = [];
   try {
     const sourceEvidence = writeBrowserCellSource(runtime, blockId, code);
     sourcePath = sourceEvidence.sourcePath;
+    runtime.run(
+      `from codaro.uiValue import beginBlock as _codaroBeginBlock\n_codaroBeginBlock(${JSON.stringify(blockId)})`,
+    );
     const value = await runtime.runAsync(code);
     if (value !== undefined && value !== null) {
-      resultRepr = String(value);
+      const normalized = normalizeBrowserPythonResult(value);
+      resultData = normalized.data;
+      resultRepr = normalized.repr;
+      resultType = normalized.type;
       const proxy = value as { destroy?: () => void };
       if (typeof proxy.destroy === "function") proxy.destroy();
     }
@@ -537,10 +650,10 @@ export async function executeBrowserBlock(
 
   const showFigures = !errorText && figures.length > 0;
   return {
-    type: showFigures ? "image" : "text",
+    type: showFigures ? "image" : resultType,
     blockId,
-    data: showFigures ? (figures.length > 1 ? figures : figures[0]) : null,
-    stdout: combinedStdout,
+    data: showFigures ? (figures.length > 1 ? figures : figures[0]) : resultData,
+    stdout: resultType === "layout" ? stdout : combinedStdout,
     stderr: errorText ? (stderr ? `${stderr}\n${errorText}` : errorText) : stderr,
     variables,
     stateDelta,
@@ -548,6 +661,48 @@ export async function executeBrowserBlock(
     status: errorText ? "error" : "success",
     artifacts,
   };
+}
+
+function normalizeBrowserPythonResult(value: unknown): {
+  data: unknown;
+  repr: string;
+  type: ExecutionResult["type"];
+} {
+  const proxy = value as {
+    codaroDescriptor?: () => unknown;
+    destroy?: () => void;
+    toJs?: (options?: Record<string, unknown>) => unknown;
+  };
+  let candidate: unknown = value;
+  let descriptorProxy: unknown = null;
+  if (typeof proxy.codaroDescriptor === "function") {
+    descriptorProxy = proxy.codaroDescriptor();
+    candidate = descriptorProxy;
+  }
+  const converted = pythonProxyToJs(candidate);
+  const descriptor = isBrowserWidgetDescriptor(converted) ? converted : null;
+  const disposable = descriptorProxy as { destroy?: () => void } | null;
+  disposable?.destroy?.();
+  if (descriptor) return { data: descriptor, repr: "", type: "layout" };
+  return { data: null, repr: String(value), type: "text" };
+}
+
+function pythonProxyToJs(value: unknown): unknown {
+  const proxy = value as { toJs?: (options?: Record<string, unknown>) => unknown };
+  if (typeof proxy?.toJs !== "function") return value;
+  return proxy.toJs({
+    create_pyproxies: false,
+    dict_converter: (entries: Iterable<readonly [PropertyKey, unknown]>) => Object.fromEntries(entries),
+  });
+}
+
+function isBrowserWidgetDescriptor(value: unknown): value is Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const type = (value as Record<string, unknown>).type;
+  return typeof type === "string" && [
+    "accordion", "callout", "custom", "hstack", "html", "markdown", "plain",
+    "sidebar", "stat", "tabs", "text", "ui", "vstack",
+  ].includes(type);
 }
 
 /** 노트북 전체를 공용 AST 그래프의 문서 순서로 실행한다. */
@@ -587,6 +742,36 @@ export async function runBrowserReactiveNotebook(
     content: block.code,
   }));
   const diagnostics = await planBrowserReactiveNotebook(planBlocks, changedBlockId, notebookName);
+  const outcome = await runBrowserExecutionPlan(blocks, diagnostics, packages);
+  return { ...outcome, diagnostics };
+}
+
+export async function setBrowserNotebookUiValue(
+  blocks: Array<{ id: string; type?: "code" | "markdown"; code: string }>,
+  changedBlockId: string,
+  elementId: string,
+  value: unknown,
+  packages: string[] = [],
+  notebookName?: string | null,
+): Promise<{
+  results: Record<string, ExecutionResult>;
+  variables: VariableInfo[];
+  diagnostics: BrowserReactivePlan;
+}> {
+  const runtime = await ensureRuntime();
+  const encoded = JSON.stringify(value);
+  runtime.run([
+    "import json as _codaroJson",
+    "from codaro.uiValue import setStoredValue as _codaroSetStoredValue",
+    `_codaroSetStoredValue(${JSON.stringify(elementId)}, _codaroJson.loads(${JSON.stringify(encoded)}))`,
+  ].join("\n"));
+  const planBlocks = blocks.map((block) => ({
+    id: block.id,
+    type: block.type ?? "code",
+    content: block.code,
+  }));
+  const diagnostics = await planBrowserReactiveNotebook(planBlocks, changedBlockId, notebookName);
+  diagnostics.executionOrder = diagnostics.executionOrder.filter((blockId) => blockId !== changedBlockId);
   const outcome = await runBrowserExecutionPlan(blocks, diagnostics, packages);
   return { ...outcome, diagnostics };
 }

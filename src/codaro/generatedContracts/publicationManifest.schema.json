@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codaro.dev/contracts/publicationManifest.schema.json",
+  "title": "Codaro PublicationManifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "target",
+    "compilerManifestHash",
+    "sourceRevisionHash",
+    "entryBlockIds",
+    "documentPath",
+    "runtime",
+    "files",
+    "dataAssets",
+    "packageAssets",
+    "manifestHash"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "target": { "type": "string", "enum": ["browser", "server", "local"] },
+    "compilerManifestHash": { "$ref": "#/$defs/ContentHash" },
+    "sourceRevisionHash": { "$ref": "#/$defs/ContentHash" },
+    "entryBlockIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1, "maxLength": 200 }
+    },
+    "documentPath": { "$ref": "#/$defs/RelativePath" },
+    "runtime": { "$ref": "#/$defs/PublicationRuntime" },
+    "files": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/PublicationFile" }
+    },
+    "dataAssets": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/PublicationAsset" }
+    },
+    "packageAssets": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/PublicationPackage" }
+    },
+    "manifestHash": { "$ref": "#/$defs/ContentHash" }
+  },
+  "$defs": {
+    "ContentHash": {
+      "type": "string",
+      "pattern": "^sha256-[0-9a-f]{64}$"
+    },
+    "RelativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+    },
+    "PublicationRuntime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pythonIndexPath", "pythonIntegrityPath", "pyprocIntegrityPath"],
+      "properties": {
+        "pythonIndexPath": { "$ref": "#/$defs/RelativePath" },
+        "pythonIntegrityPath": { "$ref": "#/$defs/RelativePath" },
+        "pyprocIntegrityPath": { "$ref": "#/$defs/RelativePath" }
+      }
+    },
+    "PublicationFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "contentHash", "bytes", "role"],
+      "properties": {
+        "path": { "$ref": "#/$defs/RelativePath" },
+        "contentHash": { "$ref": "#/$defs/ContentHash" },
+        "bytes": { "type": "integer", "minimum": 0 },
+        "role": {
+          "type": "string",
+          "enum": ["shell", "runtime", "document", "data", "package"]
+        }
+      }
+    },
+    "PublicationAsset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourcePath", "bundlePath", "contentHash"],
+      "properties": {
+        "sourcePath": { "$ref": "#/$defs/RelativePath" },
+        "bundlePath": { "$ref": "#/$defs/RelativePath" },
+        "contentHash": { "$ref": "#/$defs/ContentHash" }
+      }
+    },
+    "PublicationPackage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "bundlePath", "contentHash"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "bundlePath": { "$ref": "#/$defs/RelativePath" },
+        "contentHash": { "$ref": "#/$defs/ContentHash" }
+      }
+    }
+  }
+}

@@ -346,6 +346,10 @@ uv run codaro notebook.py
 # 앱 모드
 uv run codaro app notebook.py
 
+# 외부 CDN 없는 정적 앱 build와 로컬 검증
+uv run codaro build notebook.py --target browser --output notebook-site
+uv run codaro serve notebook-site
+
 # .py ↔ ipynb 변환
 uv run codaro export notebook.py --format ipynb
 

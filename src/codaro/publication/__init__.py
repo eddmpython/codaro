@@ -6,6 +6,15 @@ from .compiler import (
     compileDocument,
     compileExecutableUnit,
 )
+from .staticBuilder import (
+    PublicationBuildError,
+    PublicationBuildResult,
+    PublicationVerification,
+    buildStaticPublication,
+    servePublication,
+    startPublicationServer,
+    verifyPublication,
+)
 
 __all__ = [
     "CompilationReport",
@@ -14,4 +23,11 @@ __all__ = [
     "TargetDecision",
     "compileDocument",
     "compileExecutableUnit",
+    "PublicationBuildError",
+    "PublicationBuildResult",
+    "PublicationVerification",
+    "buildStaticPublication",
+    "servePublication",
+    "startPublicationServer",
+    "verifyPublication",
 ]

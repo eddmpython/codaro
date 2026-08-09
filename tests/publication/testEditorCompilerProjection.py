@@ -21,3 +21,14 @@ def testEditorProjectsBackendCompilerWithoutDuplicatingTargetRules() -> None:
     for forbidden in ("eval(", "subprocess.", "os.system", "browserSmoke"):
         assert forbidden not in hook
         assert forbidden not in diagnostics
+
+
+def testStaticPublicationUsesOnlyItsHashedRuntimePackages() -> None:
+    runtime = (ROOT / "editor/src/lib/notebookRuntime.ts").read_text(encoding="utf-8")
+    inference = (ROOT / "editor/src/lib/packageInference.ts").read_text(encoding="utf-8")
+
+    assert "if (staticPublicationManifestUrl())" in runtime
+    assert "return Array.from(packages);" in runtime
+    assert '"codaro"' in inference
+    assert '"pyodide"' in inference
+    assert '"js"' in inference

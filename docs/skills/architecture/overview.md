@@ -96,4 +96,4 @@ src/codaro/
 
 ## 관련
 
-- [[ssot-map]] [[document-model]] [[execution-engine]] [[dataflow]] [[widget-bridge]]
+- [[ssot-map]] [[document-model]] [[execution-engine]] [[dataflow]] [[widget-bridge]] [[publication-compiler]] [[static-publication]]

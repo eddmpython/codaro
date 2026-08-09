@@ -21,6 +21,8 @@ def buildParser() -> argparse.ArgumentParser:
             "  codaro app notebook.py\n"
             "  codaro export notebook.py --format ipynb\n"
             "  codaro inspect notebook.py\n"
+            "  codaro build notebook.py --target browser\n"
+            "  codaro serve ./notebook-site\n"
             "  codaro pack inspect ./my-pack\n"
             "  codaro classroom audit"
         ),
@@ -52,6 +54,19 @@ def buildParser() -> argparse.ArgumentParser:
     inspectParser.add_argument("--entry", action="append", default=[], help="Entry block id. Repeat for multiple entries.")
     inspectParser.add_argument("--package-lock", help="JSON package compatibility lock path.")
     inspectParser.add_argument("--json", action="store_true", help="Print the complete compiler report as JSON.")
+
+    buildPublicationParser = subparsers.add_parser("build", help="Build an immutable publication bundle.")
+    buildPublicationParser.add_argument("path", help="Document path to build.")
+    buildPublicationParser.add_argument("--target", choices=["browser"], default="browser")
+    buildPublicationParser.add_argument("--output", help="Publication output directory.")
+    buildPublicationParser.add_argument("--package-lock", help="JSON package compatibility lock path.")
+    buildPublicationParser.add_argument("--json", action="store_true", help="Print the build receipt as JSON.")
+
+    servePublicationParser = subparsers.add_parser("serve", help="Serve a verified publication bundle.")
+    servePublicationParser.add_argument("path", help="Publication output directory.")
+    servePublicationParser.add_argument("--host", default="127.0.0.1")
+    servePublicationParser.add_argument("--port", type=int, default=8766)
+    servePublicationParser.add_argument("--no-browser", action="store_true")
 
     taskParser = subparsers.add_parser("task", help="Manage automation tasks.")
     taskSubparsers = taskParser.add_subparsers(dest="task_command", required=True)
@@ -144,6 +159,14 @@ def main() -> None:
 
     if command == "inspect":
         _handleInspect(args)
+        return
+
+    if command == "build":
+        _handlePublicationBuild(args)
+        return
+
+    if command == "serve":
+        _handlePublicationServe(args)
         return
 
     host = args.host
@@ -272,17 +295,7 @@ def _handleInspect(args) -> None:
         document = document.model_copy(
             update={"app": document.app.model_copy(update={"entryBlockIds": list(dict.fromkeys(args.entry))})}
         )
-    packageLock = None
-    if args.package_lock:
-        lockPath = Path(args.package_lock).expanduser().resolve()
-        try:
-            packageLock = json.loads(lockPath.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError) as exc:
-            print(f"Package lock is invalid: {exc}", file=sys.stderr)
-            raise SystemExit(1) from exc
-        if not isinstance(packageLock, dict):
-            print("Package lock must be a JSON object.", file=sys.stderr)
-            raise SystemExit(1)
+    packageLock = _loadPackageLock(args.package_lock)
     try:
         report = compileDocument(
             document,
@@ -306,6 +319,73 @@ def _handleInspect(args) -> None:
             print(f"  {diagnostic['code']} {span['path']}:{span['startLine']} {diagnostic['message']}")
     if report.runtimeTarget == "blocked":
         raise SystemExit(1)
+
+
+def _handlePublicationBuild(args) -> None:
+    from .publication import PublicationBuildError, buildStaticPublication
+
+    sourcePath = Path(args.path).expanduser().resolve()
+    outputPath = (
+        Path(args.output).expanduser().resolve()
+        if args.output
+        else sourcePath.with_name(f"{sourcePath.stem}-site")
+    )
+    packageLock = _loadPackageLock(args.package_lock)
+    try:
+        result = buildStaticPublication(sourcePath, outputPath, packageLock=packageLock)
+    except PublicationBuildError as exc:
+        print(f"Publication build failed: {exc}", file=sys.stderr)
+        for diagnostic in exc.diagnostics:
+            span = diagnostic.get("sourceSpan", {})
+            print(
+                f"  {diagnostic.get('code', 'BUILD_BLOCKED')} "
+                f"{span.get('path', sourcePath.name)}:{span.get('startLine', 1)} "
+                f"{diagnostic.get('message', '')}",
+                file=sys.stderr,
+            )
+        raise SystemExit(1) from exc
+    payload = {
+        "target": args.target,
+        "bundleHash": result.bundleHash,
+        "bundleRoot": result.bundleRoot.as_posix(),
+        "activePointer": result.activePointer.as_posix(),
+        "reused": result.reused,
+    }
+    if args.json:
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+    else:
+        print(f"Built browser publication: {result.bundleRoot}")
+        print(f"Bundle: {result.bundleHash}")
+
+
+def _handlePublicationServe(args) -> None:
+    from .publication import PublicationBuildError, servePublication
+
+    try:
+        servePublication(
+            args.path,
+            host=args.host,
+            port=args.port,
+            openBrowser=not args.no_browser,
+        )
+    except PublicationBuildError as exc:
+        print(f"Publication serve failed: {exc}", file=sys.stderr)
+        raise SystemExit(1) from exc
+
+
+def _loadPackageLock(pathLike: str | None) -> dict[str, object] | None:
+    if not pathLike:
+        return None
+    lockPath = Path(pathLike).expanduser().resolve()
+    try:
+        payload = json.loads(lockPath.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"Package lock is invalid: {exc}", file=sys.stderr)
+        raise SystemExit(1) from exc
+    if not isinstance(payload, dict):
+        print("Package lock must be a JSON object.", file=sys.stderr)
+        raise SystemExit(1)
+    return payload
 
 
 def _handleClassroom(args) -> None:
@@ -345,7 +425,7 @@ def normalizeArgs(rawArgs: list[str]) -> list[str]:
         return ["edit"]
 
     command = rawArgs[0].lower()
-    knownCommands = {"edit", "run", "app", "export", "inspect", "task", "pack", "classroom"}
+    knownCommands = {"edit", "run", "app", "export", "inspect", "build", "serve", "task", "pack", "classroom"}
 
     if command == "app":
         return ["run", *rawArgs[1:]]

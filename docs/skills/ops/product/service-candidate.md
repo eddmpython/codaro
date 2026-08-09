@@ -190,6 +190,7 @@ uv run python -X utf8 tests/run.py gate root-clean
 uv run python -X utf8 tests/run.py gate docs
 uv run python -X utf8 tests/run.py gate backend
 uv run python -X utf8 tests/run.py gate architecture-boundary
+uv run python -X utf8 tests/run.py gate static-publication
 uv run python -X utf8 tests/run.py gate design-system-contract
 uv run python -X utf8 tests/run.py gate theme-runtime-browser
 uv run python -X utf8 tests/run.py gate visual-accessibility-browser

@@ -39,6 +39,16 @@ def testNormalizeArgsLeavesInspectUntouched() -> None:
     assert normalizeArgs(["inspect", "notebook.py", "--json"]) == ["inspect", "notebook.py", "--json"]
 
 
+def testNormalizeArgsLeavesPublicationCommandsUntouched() -> None:
+    assert normalizeArgs(["build", "notebook.py", "--target", "browser"]) == [
+        "build",
+        "notebook.py",
+        "--target",
+        "browser",
+    ]
+    assert normalizeArgs(["serve", "./site", "--no-browser"]) == ["serve", "./site", "--no-browser"]
+
+
 def testInspectPrintsCompilerReportWithoutStartingEditor(tmp_path, monkeypatch, capsys) -> None:
     document = createEmptyDocument("Inspectable")
     document.blocks[0].content = "value = 42"

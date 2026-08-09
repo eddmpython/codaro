@@ -21,13 +21,21 @@ RUST_PATH = ROOT / "launcher" / "codaro-launcher" / "src" / "generated_contracts
 RUST_MOD_PATH = ROOT / "launcher" / "codaro-launcher" / "src" / "generated_contracts" / "mod.rs"
 APP_SPEC_PATH = ROOT / "contracts" / "appSpec.schema.json"
 EXECUTABLE_UNIT_PATH = ROOT / "contracts" / "executableUnit.schema.json"
+PUBLICATION_MANIFEST_PATH = ROOT / "contracts" / "publicationManifest.schema.json"
 PYTHON_APP_SPEC_PATH = ROOT / "src" / "codaro" / "generatedContracts" / "appSpec.py"
 PYTHON_EXECUTABLE_UNIT_PATH = ROOT / "src" / "codaro" / "generatedContracts" / "executableUnit.py"
+PYTHON_PUBLICATION_MANIFEST_PATH = ROOT / "src" / "codaro" / "generatedContracts" / "publicationManifest.py"
 PACKAGED_APP_SPEC_PATH = ROOT / "src" / "codaro" / "generatedContracts" / "appSpec.schema.json"
 PACKAGED_EXECUTABLE_UNIT_PATH = ROOT / "src" / "codaro" / "generatedContracts" / "executableUnit.schema.json"
+PACKAGED_PUBLICATION_MANIFEST_PATH = (
+    ROOT / "src" / "codaro" / "generatedContracts" / "publicationManifest.schema.json"
+)
 TYPESCRIPT_APP_SPEC_PATH = ROOT / "editor" / "src" / "lib" / "generatedContracts" / "appSpec.ts"
 TYPESCRIPT_EXECUTABLE_UNIT_PATH = (
     ROOT / "editor" / "src" / "lib" / "generatedContracts" / "executableUnit.ts"
+)
+TYPESCRIPT_PUBLICATION_MANIFEST_PATH = (
+    ROOT / "editor" / "src" / "lib" / "generatedContracts" / "publicationManifest.ts"
 )
 CHECK_SANDBOX_DECISION_PATH = ROOT / "contracts" / "checkSandboxFeasibilityDecision.json"
 TYPESCRIPT_CHECK_SANDBOX_DECISION_PATH = (
@@ -172,6 +180,16 @@ from .executableUnit import (
     RuntimeTarget,
     SourceSpan,
 )
+from .publicationManifest import (
+    PUBLICATION_MANIFEST_CONTRACT_SHA256,
+    PublicationAsset,
+    PublicationFile,
+    PublicationFileRole,
+    PublicationManifest,
+    PublicationPackage,
+    PublicationRuntime,
+    PublicationTarget,
+)
 
 __all__ = [
     "ARTIFACT_OWNERSHIP_CONTRACT_SHA256",
@@ -191,6 +209,14 @@ __all__ = [
     "ExecutableUnitSpec",
     "RuntimeTarget",
     "SourceSpan",
+    "PUBLICATION_MANIFEST_CONTRACT_SHA256",
+    "PublicationAsset",
+    "PublicationFile",
+    "PublicationFileRole",
+    "PublicationManifest",
+    "PublicationPackage",
+    "PublicationRuntime",
+    "PublicationTarget",
 ]
 '''
 
@@ -335,6 +361,101 @@ export type ExecutableUnitSpec = {{
 '''
 
 
+def publicationManifestPythonSource(schemaHash: str, ownersHash: str) -> str:
+    return generatedHeader(schemaHash, ownersHash, "#") + f'''from typing import Literal, TypedDict
+
+
+PUBLICATION_MANIFEST_CONTRACT_SHA256 = "{schemaHash}"
+PublicationTarget = Literal["browser", "server", "local"]
+PublicationFileRole = Literal["shell", "runtime", "document", "data", "package"]
+
+
+class PublicationRuntime(TypedDict):
+    pythonIndexPath: str
+    pythonIntegrityPath: str
+    pyprocIntegrityPath: str
+
+
+class PublicationFile(TypedDict):
+    path: str
+    contentHash: str
+    bytes: int
+    role: PublicationFileRole
+
+
+class PublicationAsset(TypedDict):
+    sourcePath: str
+    bundlePath: str
+    contentHash: str
+
+
+class PublicationPackage(TypedDict):
+    name: str
+    bundlePath: str
+    contentHash: str
+
+
+class PublicationManifest(TypedDict):
+    schemaVersion: Literal[1]
+    target: PublicationTarget
+    compilerManifestHash: str
+    sourceRevisionHash: str
+    entryBlockIds: list[str]
+    documentPath: str
+    runtime: PublicationRuntime
+    files: list[PublicationFile]
+    dataAssets: list[PublicationAsset]
+    packageAssets: list[PublicationPackage]
+    manifestHash: str
+'''
+
+
+def publicationManifestTypeScriptSource(schemaHash: str, ownersHash: str) -> str:
+    return generatedHeader(schemaHash, ownersHash, "//") + f'''export const PUBLICATION_MANIFEST_CONTRACT_SHA256 = "{schemaHash}" as const;
+export type PublicationTarget = "browser" | "server" | "local";
+export type PublicationFileRole = "shell" | "runtime" | "document" | "data" | "package";
+
+export type PublicationRuntime = {{
+  pythonIndexPath: string;
+  pythonIntegrityPath: string;
+  pyprocIntegrityPath: string;
+}};
+
+export type PublicationFile = {{
+  path: string;
+  contentHash: string;
+  bytes: number;
+  role: PublicationFileRole;
+}};
+
+export type PublicationAsset = {{
+  sourcePath: string;
+  bundlePath: string;
+  contentHash: string;
+}};
+
+export type PublicationPackage = {{
+  name: string;
+  bundlePath: string;
+  contentHash: string;
+}};
+
+export type PublicationManifest = {{
+  schemaVersion: 1;
+  target: PublicationTarget;
+  compilerManifestHash: string;
+  sourceRevisionHash: string;
+  entryBlockIds: string[];
+  documentPath: string;
+  runtime: PublicationRuntime;
+  files: PublicationFile[];
+  dataAssets: PublicationAsset[];
+  packageAssets: PublicationPackage[];
+  manifestHash: string;
+}};
+'''
+
+
 def typeScriptSource(schemaHash: str, ownersHash: str) -> str:
     return generatedHeader(schemaHash, ownersHash, "//") + f'''export const ARTIFACT_OWNERSHIP_CONTRACT_SHA256 = "{schemaHash}" as const;
 export const ARTIFACT_OWNERSHIP_OWNERS_SHA256 = "{ownersHash}" as const;
@@ -386,6 +507,7 @@ def expectedOutputs() -> dict[Path, str]:
     _schema, _owners, schemaHash, ownersHash = loadSources()
     _appSpec, appSpecHash = loadJsonSchema(APP_SPEC_PATH)
     _executableUnit, executableUnitHash = loadJsonSchema(EXECUTABLE_UNIT_PATH)
+    _publicationManifest, publicationManifestHash = loadJsonSchema(PUBLICATION_MANIFEST_PATH)
     return {
         PYTHON_PATH: pythonSource(schemaHash, ownersHash),
         PYTHON_INIT_PATH: pythonInitSource(schemaHash, ownersHash),
@@ -397,6 +519,11 @@ def expectedOutputs() -> dict[Path, str]:
         PACKAGED_EXECUTABLE_UNIT_PATH: EXECUTABLE_UNIT_PATH.read_text(encoding="utf-8"),
         TYPESCRIPT_APP_SPEC_PATH: appSpecTypeScriptSource(appSpecHash, ownersHash),
         TYPESCRIPT_EXECUTABLE_UNIT_PATH: executableUnitTypeScriptSource(executableUnitHash, ownersHash),
+        PYTHON_PUBLICATION_MANIFEST_PATH: publicationManifestPythonSource(publicationManifestHash, ownersHash),
+        PACKAGED_PUBLICATION_MANIFEST_PATH: PUBLICATION_MANIFEST_PATH.read_text(encoding="utf-8"),
+        TYPESCRIPT_PUBLICATION_MANIFEST_PATH: publicationManifestTypeScriptSource(
+            publicationManifestHash, ownersHash
+        ),
         TYPESCRIPT_CHECK_SANDBOX_DECISION_PATH: CHECK_SANDBOX_DECISION_PATH.read_text(encoding="utf-8"),
         RUST_PATH: rustSource(schemaHash, ownersHash),
         RUST_MOD_PATH: rustModSource(schemaHash, ownersHash),

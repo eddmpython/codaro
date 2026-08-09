@@ -27,6 +27,15 @@ artifacts:
       - src/codaro/generatedContracts/executableUnit.py
       - src/codaro/generatedContracts/executableUnit.schema.json
       - editor/src/lib/generatedContracts/executableUnit.ts
+  - artifactId: publication-manifest
+    role: source
+    owner: product-architecture
+    sourcePath: contracts/publicationManifest.schema.json
+    surfacePaths:
+      - src/codaro/generatedContracts/publicationManifest.py
+      - src/codaro/generatedContracts/publicationManifest.schema.json
+      - editor/src/lib/generatedContracts/publicationManifest.ts
+      - src/codaro/publication/staticBuilder.py
   - artifactId: learning-artifact-descriptor
     role: source
     owner: learning-runtime

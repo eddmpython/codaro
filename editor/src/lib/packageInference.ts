@@ -43,6 +43,8 @@ const PACKAGE_PROVIDER_EQUIVALENTS: Record<string, string[]> = {
   "opencv-contrib-python": ["opencv-python"],
 };
 
+const RUNTIME_PROVIDED_MODULES = new Set(["codaro", "js", "pyodide"]);
+
 const KEYWORD_PACKAGES: Record<string, string> = {
   pandas: "pandas",
   dataframe: "pandas",
@@ -92,7 +94,7 @@ export function inferCodePackages(code: string) {
 
 export function importPackageName(moduleName: string) {
   const normalized = moduleName.trim();
-  if (!normalized || isPythonStdlibModule(normalized)) return "";
+  if (!normalized || RUNTIME_PROVIDED_MODULES.has(normalized) || isPythonStdlibModule(normalized)) return "";
   return PACKAGE_ALIASES[normalized] ?? normalized;
 }
 

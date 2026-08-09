@@ -15,6 +15,9 @@
 | 계약 | 역할 | 생성물 |
 | --- | --- | --- |
 | `artifactOwnership.schema.json` | schema와 생성물의 owner·role·surface path 계약 | Python `artifactOwnership.py`, TypeScript `artifactOwnership.ts`, Rust `artifact_ownership.rs` |
+| `appSpec.schema.json` | Python source에 보존되는 app title, layout, code visibility, entry, state 계약 | Python document model과 TypeScript app projection |
+| `executableUnit.schema.json` | 기능 블록의 closure, effect, runtime target, source 및 asset hash 계약 | Python publication compiler와 TypeScript 진단 projection |
+| `publicationManifest.schema.json` | immutable publication의 source revision, runtime, document, data, wheel, file hash 계약 | Python static builder와 TypeScript static bootstrap |
 | `learningArtifactDescriptor.schema.json` | 학습 실행 산출물의 file·directory·table·image 공용 합집합 | Local/Web executor와 evidence archive |
 | `tableArtifactDescriptor.schema.json` | CSV·JSON의 열·행·hash 계약 | Local/Web strong check |
 | `imageArtifactDescriptor.schema.json` | PNG·JPEG·GIF의 media type·크기·hash 계약 | Local/Web strong check |

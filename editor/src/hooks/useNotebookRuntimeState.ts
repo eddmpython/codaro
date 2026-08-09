@@ -279,7 +279,7 @@ export function useNotebookRuntimeState({
   }, [apiOnline, automationSessions, codeBlocks, document, drafts, onNotice, selectedBlock, sessionId, variables]);
 
   const setUiValue = useCallback(async (blockId: string, elementId: string, value: unknown) => {
-    if (!sessionId) return;
+    if (!sessionId && apiOnline) return;
     // 위젯 값 변경 → 그 변수를 쓰는 다운스트림 셀 출력만 갱신(위젯 정의 셀은 재실행 안 함).
     const outcome = await setNotebookUiValue({
       sessionId,
@@ -293,7 +293,7 @@ export function useNotebookRuntimeState({
     if (outcome.results) setResults((current) => ({ ...current, ...outcome.results }));
     if (outcome.variables) setVariables(outcome.variables);
     if (outcome.diagnostics) setDiagnostics(outcome.diagnostics);
-  }, [sessionId, document, drafts, variables]);
+  }, [apiOnline, sessionId, document, drafts, variables]);
 
   // 코드 편집(draft≠마지막 실행 내용)으로 stale해진 셀 + 다운스트림 전이 + 백엔드 early-stop stale.
   const staleBlockIds = useMemo(() => {

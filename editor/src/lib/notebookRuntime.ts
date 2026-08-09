@@ -5,10 +5,12 @@ import {
   executeBrowserBlock,
   runBrowserNotebook,
   runBrowserReactiveNotebook,
+  setBrowserNotebookUiValue,
 } from "@/lib/browserPythonRuntime";
 import { isKernelExecutableBlock, isPersistentAutomationBlock } from "@/lib/cellModel";
 import { firstOutputLine } from "@/lib/localRuntime";
 import { translate } from "@/lib/localeCopy";
+import { staticPublicationManifestUrl } from "@/lib/staticPublication";
 import { inferCodePackages, normalizePackageName } from "@/lib/packageInference";
 import { emptyReactiveDiagnostics } from "@/lib/reactiveDiagnostics";
 import type {
@@ -535,7 +537,28 @@ export async function setNotebookUiValue({
   value: unknown;
   previousVariables: VariableInfo[];
 }): Promise<{ sessionId: string | null; results?: ResultMap; variables?: VariableInfo[]; diagnostics?: ReactiveDiagnostics }> {
-  if (!sessionId) return { sessionId };
+  if (!sessionId) {
+    try {
+      const runtimeBlocks = documentRuntimeBlocks(document, drafts);
+      const outcome = await setBrowserNotebookUiValue(
+        runtimeBlocks.map((block) => ({ id: block.id, type: block.type, code: block.content })),
+        blockId,
+        elementId,
+        value,
+        inferDocumentRuntimePackages(document, drafts),
+        document.title,
+      );
+      return {
+        sessionId,
+        results: outcome.results as ResultMap,
+        variables: outcome.variables.length ? outcome.variables : previousVariables,
+        diagnostics: outcome.diagnostics,
+      };
+    } catch (error) {
+      console.warn("browser set-ui-value failed", error);
+      return { sessionId };
+    }
+  }
   try {
     const payload = await codaroApi.setUiValue(sessionId, {
       blockId,
@@ -589,6 +612,7 @@ export async function preflightRuntimePackages(
 
 function inferDocumentRuntimePackages(document: CodaroDocument, drafts: Record<string, string>) {
   const packages = new Set<string>((document.runtime?.packages ?? []).map(String).filter(Boolean));
+  if (staticPublicationManifestUrl()) return Array.from(packages);
   for (const block of document.blocks) {
     if (!isKernelExecutableBlock(block)) continue;
     for (const packageName of inferCodePackages(drafts[block.id] ?? block.content)) {
