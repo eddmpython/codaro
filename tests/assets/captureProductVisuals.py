@@ -36,6 +36,11 @@ MAX_RASTER_CHANNEL_DELTA = 12
 # 픽셀 수가 이 완화 범위도 넘으므로 여전히 잡힌다.
 AA_RASTER_CHANNEL_DELTA = 4
 AA_RASTER_PIXEL_MULTIPLIER = 8
+# Chromium on Windows owns this overlay strip. Its rounded scrollbar thumb can
+# move by a few pixels between otherwise identical captures, so report those
+# pixels separately instead of treating browser chrome as product drift.
+NATIVE_SCROLLBAR_GUTTER_PIXELS = 8
+MIN_NATIVE_SCROLLBAR_VIEWPORT_WIDTH = 320
 
 
 class ProductVisualCaptureError(RuntimeError):
@@ -211,19 +216,35 @@ def pngPixelComparison(expectedPath: Path, actualPath: Path) -> dict[str, Any]:
                 "equivalent": False,
                 "byteExact": False,
                 "differingPixelCount": None,
+                "rawDifferingPixelCount": None,
+                "ignoredNativeScrollbarPixelCount": None,
                 "allowedDifferingPixelCount": None,
                 "maxChannelDelta": None,
+                "rawMaxChannelDelta": None,
                 "expectedSize": list(expected.size),
                 "actualSize": list(actual.size),
             }
         difference = ImageChops.difference(expected, actual)
         allowedDifferingPixelCount = allowedRasterNoisePixels(expected.size)
         differingPixelCount = 0
+        rawDifferingPixelCount = 0
+        ignoredNativeScrollbarPixelCount = 0
         maxChannelDelta = 0
+        rawMaxChannelDelta = 0
         differenceBytes = difference.tobytes()
         for offset in range(0, len(differenceBytes), 4):
             pixelDelta = max(differenceBytes[offset:offset + 4])
             if pixelDelta:
+                rawDifferingPixelCount += 1
+                rawMaxChannelDelta = max(rawMaxChannelDelta, pixelDelta)
+                pixelIndex = offset // 4
+                x = pixelIndex % expected.width
+                if (
+                    expected.width >= MIN_NATIVE_SCROLLBAR_VIEWPORT_WIDTH
+                    and x >= expected.width - NATIVE_SCROLLBAR_GUTTER_PIXELS
+                ):
+                    ignoredNativeScrollbarPixelCount += 1
+                    continue
                 differingPixelCount += 1
                 maxChannelDelta = max(maxChannelDelta, pixelDelta)
         withinPixelBudget = (
@@ -239,10 +260,13 @@ def pngPixelComparison(expectedPath: Path, actualPath: Path) -> dict[str, Any]:
                 withinPixelBudget
                 and maxChannelDelta <= MAX_RASTER_CHANNEL_DELTA
             ),
-            "byteExact": differingPixelCount == 0,
+            "byteExact": rawDifferingPixelCount == 0,
             "differingPixelCount": differingPixelCount,
+            "rawDifferingPixelCount": rawDifferingPixelCount,
+            "ignoredNativeScrollbarPixelCount": ignoredNativeScrollbarPixelCount,
             "allowedDifferingPixelCount": allowedDifferingPixelCount,
             "maxChannelDelta": maxChannelDelta,
+            "rawMaxChannelDelta": rawMaxChannelDelta,
             "expectedSize": list(expected.size),
             "actualSize": list(actual.size),
         }

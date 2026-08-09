@@ -226,6 +226,38 @@ class CaptureProductVisualsTest(unittest.TestCase):
             oversizedShimmer = comparisonWith(aaBudget + 1, CAPTURE_TOOL.AA_RASTER_CHANNEL_DELTA)
             self.assertFalse(oversizedShimmer["equivalent"])
 
+    def testPixelComparisonSeparatesNativeScrollbarGutterFromProductPixels(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="codaro-scrollbar-gutter-") as directory:
+            root = Path(directory)
+            expectedPath = root / "expected.png"
+            gutterOnlyPath = root / "gutter-only.png"
+            productChangePath = root / "product-change.png"
+            expected = Image.new("RGBA", (390, 20), (20, 21, 24, 255))
+            expected.save(expectedPath)
+
+            gutterOnly = expected.copy()
+            gutterStart = expected.width - CAPTURE_TOOL.NATIVE_SCROLLBAR_GUTTER_PIXELS
+            for x in range(gutterStart, expected.width):
+                for y in range(5):
+                    gutterOnly.putpixel((x, y), (80, 81, 84, 255))
+            gutterOnly.save(gutterOnlyPath)
+            comparison = CAPTURE_TOOL.pngPixelComparison(expectedPath, gutterOnlyPath)
+            self.assertTrue(comparison["equivalent"])
+            self.assertFalse(comparison["byteExact"])
+            self.assertEqual(comparison["differingPixelCount"], 0)
+            self.assertEqual(comparison["rawDifferingPixelCount"], 40)
+            self.assertEqual(comparison["ignoredNativeScrollbarPixelCount"], 40)
+            self.assertEqual(comparison["maxChannelDelta"], 0)
+            self.assertEqual(comparison["rawMaxChannelDelta"], 60)
+
+            productChange = gutterOnly.copy()
+            productChange.putpixel((gutterStart - 1, 0), (80, 81, 84, 255))
+            productChange.save(productChangePath)
+            comparison = CAPTURE_TOOL.pngPixelComparison(expectedPath, productChangePath)
+            self.assertFalse(comparison["equivalent"])
+            self.assertEqual(comparison["differingPixelCount"], 1)
+            self.assertEqual(comparison["ignoredNativeScrollbarPixelCount"], 40)
+
     def testRasterNoiseBudgetScalesWithViewportAreaAndStaysCapped(self) -> None:
         self.assertEqual(CAPTURE_TOOL.allowedRasterNoisePixels((10, 10)), 8)
         self.assertEqual(CAPTURE_TOOL.allowedRasterNoisePixels((390, 844)), 11)
