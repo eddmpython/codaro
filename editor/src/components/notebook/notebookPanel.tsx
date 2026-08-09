@@ -972,6 +972,7 @@ function DocumentBlock({
         aria-setsize={total}
         className="astryxWorkCell notebookCell group"
         data-notebook-cell="markdown"
+        data-notebook-cell-id={block.id}
         data-notebook-cell-selected={isSelected ? "true" : "false"}
         data-notebook-cell-status={resultStatus}
         data-work-cell-selected={isSelected ? "true" : "false"}
@@ -1070,6 +1071,7 @@ function DocumentBlock({
       className="astryxWorkCell notebookCell group"
       data-automation-session-cell={persistentAutomation ? "true" : undefined}
       data-notebook-cell="code"
+      data-notebook-cell-id={block.id}
       data-notebook-cell-selected={isSelected ? "true" : "false"}
       data-notebook-cell-status={resultStatus}
       data-work-cell-running={isRunning ? "true" : "false"}

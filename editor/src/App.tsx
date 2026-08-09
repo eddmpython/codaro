@@ -27,6 +27,7 @@ import { useProviderConnection } from "@/hooks/useProviderConnection";
 import { useSurfaceRoute } from "@/hooks/useSurfaceRoute";
 import { useAccentColor } from "@/hooks/useAccentColor";
 import { useThemeMode } from "@/hooks/useThemeMode";
+import { useProductGuiControl } from "@/hooks/useProductGuiControl";
 import { useLocaleState } from "@/hooks/useLocaleState";
 import { useViewportInsets } from "@/hooks/useViewportInsets";
 import { LocaleProvider } from "@/lib/localeContext";
@@ -253,7 +254,7 @@ function App() {
     onNotice: applyNotice,
   });
   const [toolCatalog, setToolCatalog] = useState(initialBootstrapState.toolCatalog);
-  const { resolvedTheme, themeMode, toggleThemeMode } = useThemeMode();
+  const { resolvedTheme, setThemeMode, themeMode, toggleThemeMode } = useThemeMode();
   const { accentColor, selectAccentColor } = useAccentColor();
   const [sidebarOpen, setSidebarOpen] = useState(() => surface !== "editor");
   const [notebookToolsOpen, setNotebookToolsOpen] = useState(false);
@@ -511,6 +512,69 @@ function App() {
   useEffect(() => {
     if (surface === "curriculum") setTerminalOpen(false);
   }, [surface]);
+
+  useProductGuiControl({
+    accentColor,
+    addNotebookCell,
+    apiOnline,
+    askAssistant,
+    assistantLoading,
+    auditCount,
+    automationSection,
+    cleanupCellDefinitions,
+    curriculumDocument,
+    deleteNotebookCell,
+    document,
+    drafts,
+    duplicateNotebookCell,
+    eStop,
+    loadState,
+    messages,
+    moveNotebookCell,
+    notebookPersistence,
+    notebookRunning,
+    notebookToolsOpen,
+    notice,
+    prompt,
+    reactiveEnabled,
+    referenceLoading,
+    refreshAutomation,
+    renameNotebookDocument,
+    resolvedTheme,
+    results,
+    runBlock,
+    runNotebook,
+    runRouteState,
+    runTask,
+    runningBlockId,
+    scheduler,
+    selectAccentColor,
+    selectAutomationSection,
+    selectBlock,
+    selectCurriculumLesson,
+    selectCurriculumRouteBlock,
+    selectedBlockId,
+    selectedCategory,
+    selectedContentId,
+    selectedCurriculumBlockId,
+    selectSurface,
+    setNotebookToolsOpen,
+    setPrompt,
+    setSidebarOpen,
+    setTerminalOpen,
+    setThemeMode,
+    sidebarOpen,
+    staleBlockIds,
+    surface,
+    tasks,
+    terminalOpen,
+    themeMode,
+    toggleEStop,
+    toggleReactive,
+    toggleTask,
+    updateDraft,
+    viewportInsets,
+  });
 
   return (
     <LocaleProvider value={localeState}>

@@ -17,6 +17,7 @@ whenToUse: 외부 프레임워크(FastAPI/Django/Flask) 통합, root_path 처리
 - Flask: WSGIMiddleware 래핑
 - 프론트엔드는 `<meta name="codaro-base">` 태그에서 root_path를 자동 감지한다.
 - GUI에서 되는 모든 것은 API로도 된다 (시스템적 수정 가능).
+- 제품 브라우저의 구체 계약은 `window.codaroGui`다. product command는 실제 React callback을 호출하고, `controls()`는 아직 개별 command가 없는 보이는 control을 반사한다. 의미와 검증 기준은 `docs/skills/architecture/gui-control-contract.md`가 소유한다.
 
 ## 관련
 

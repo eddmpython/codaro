@@ -145,6 +145,8 @@ def main() -> int:
                     } else None,
                 )
 
+                cases.append(verify_gui_control_contract(page))
+
                 case_specs = (
                     ("local-home-900x640", "home", 900, 640, "[data-local-home-surface='true']"),
                     ("local-notebook-1024x768", "editor", 1024, 768, "[data-notebook-studio='true']"),
@@ -284,6 +286,7 @@ def main() -> int:
                 "current Windows session",
                 "installed current-commit wheel",
                 "native launcher window",
+                "window.codaroGui version 1 state, action catalog, control reflection, and command receipt",
                 (
                     f"WebView2 Fixed Version {runtime_lock['version']} runtime"
                     if runtime_lock is not None
@@ -884,6 +887,10 @@ def reset_work_paths() -> None:
         DIST_ROOT,
         SCREENSHOT_ROOT,
         ZOOM_CONTROL_PATH,
+        REPORT_PATH,
+        WEB_ARCHIVE_PATH,
+        DEPLOYED_WEB_ARCHIVE_PATH,
+        DEPLOYED_LOCAL_REEXPORT_PATH,
     ):
         resolved = path.resolve()
         if work_root != resolved and work_root not in resolved.parents:
@@ -940,6 +947,78 @@ def launch_native_product(
         creationflags=CREATE_NO_WINDOW,
     )
     return process, log_handle
+
+
+def verify_gui_control_contract(page: Page) -> dict[str, Any]:
+    page.wait_for_function("() => window.codaroGui?.ready === true", timeout=45_000)
+    snapshot = page.evaluate(
+        """async () => {
+          const requiredActions = [
+            "surface.open",
+            "notebook.setCellSource",
+            "notebook.runCell",
+            "learning.openLesson",
+            "automation.openSection",
+            "automation.setEmergencyStop",
+            "control.activate",
+          ];
+          const catalog = window.codaroGui.catalog();
+          const before = window.codaroGui.getState();
+          const controls = window.codaroGui.controls();
+          const receipt = await window.codaroGui.invoke("surface.open", {surface: "editor"});
+          return {
+            version: window.codaroGui.version,
+            ready: window.codaroGui.ready,
+            before,
+            receipt,
+            actionIds: catalog.map((action) => action.id),
+            missingActions: requiredActions.filter(
+              (actionId) => !catalog.some((action) => action.id === actionId),
+            ),
+            controlCount: controls.length,
+            namedControlCount: controls.filter((control) => control.name).length,
+            geometryValid: controls.every(
+              (control) => control.rect.width > 0 && control.rect.height > 0,
+            ),
+          };
+        }"""
+    )
+    page.wait_for_selector("[data-notebook-studio='true']", state="visible", timeout=45_000)
+    page.wait_for_selector(".cm-editor", state="visible", timeout=45_000)
+    page.wait_for_load_state("networkidle", timeout=45_000)
+    snapshot["restoreReceipt"] = page.evaluate(
+        """async () => await window.codaroGui.invoke("surface.open", {surface: "home"})"""
+    )
+    page.wait_for_selector("[data-local-home-surface='true']", state="visible", timeout=45_000)
+    action_ids = snapshot["actionIds"]
+    checks = {
+        "version": snapshot["version"] == 1,
+        "ready": snapshot["ready"] is True,
+        "runtimeTier": snapshot["before"].get("runtimeTier") == "local",
+        "catalogUnique": len(action_ids) == len(set(action_ids)),
+        "requiredActions": not snapshot["missingActions"],
+        "controlsReflected": snapshot["controlCount"] > 0,
+        "controlsNamed": snapshot["namedControlCount"] > 0,
+        "geometryValid": snapshot["geometryValid"] is True,
+        "commandReceipt": (
+            snapshot["receipt"].get("ok") is True
+            and snapshot["receipt"].get("actionId") == "surface.open"
+            and snapshot["receipt"].get("state", {}).get("surface") == "editor"
+        ),
+        "restoredAfterEditorLoad": (
+            snapshot["restoreReceipt"].get("ok") is True
+            and snapshot["restoreReceipt"].get("state", {}).get("surface") == "home"
+        ),
+    }
+    failures = [f"{name} check failed" for name, passed in checks.items() if not passed]
+    return {
+        "id": "native-gui-control-contract",
+        "surface": "cross-surface",
+        "snapshot": snapshot,
+        "checks": checks,
+        "passed": not failures,
+        "failures": failures,
+    }
 
 
 def verify_surface_case(

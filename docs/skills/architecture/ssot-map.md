@@ -33,6 +33,7 @@ Codaro에서 기준 파일은 아래 순서로 본다. 같은 의미의 규칙�
 | 표면 조립 | `editor/src/components/app/mainSurface.tsx` | surface별 화면 조립 |
 | 제품 사이드바 shell | `editor/src/components/app/productSidebar.tsx` | provider/theme/locale/search/utility와 표면별 sidebar tree를 조립하는 shell |
 | 제품 flow nav | `editor/src/components/app/productFlowNav.tsx` | `PRODUCT_SIDEBAR_FLOW_ITEMS`를 렌더링하는 `학습 → 노트북 → 자동화 → 대화` flow nav |
+| GUI 제어와 상태 reflection | `docs/skills/architecture/gui-control-contract.md`, `editor/src/lib/guiControl.ts`, `editor/src/hooks/useGuiControl.ts` | 실제 제품 callback command, 보이는 control reflection, 상태 snapshot, action receipt와 browser 폐쇄 루프 기준 |
 | Astryx 제품 토큰과 cascade | `assets/brand/designSystem/tokens.json`, `assets/brand/tools/buildDesignSystem.py`, `assets/brand/tools/viteLayerOrder.mjs` | landing과 editor가 공유하는 색상, 반지름, typography, density, accent, production CSS layer 순서와 생성 mirror 기준 |
 | 제품·학습 시각 증명 | `assets/brand/visuals/manifest.json`, `tests/assets/captureProductVisuals.py`, `assets/brand/visuals/outcomes/fixtures.json`, `assets/brand/tools/captureOutcomeProofs.py` | 제품 screenshot과 실제 결과 fixture, source provenance, responsive variant, Landing·Editor mirror의 SSOT |
 | 공용 SNS rail | `assets/brand/designSystem/socialLinks.json`, `assets/brand/tools/buildDesignSystem.py`, 양쪽 `src/styles/generated/socialLinks.tsx` | 링크 순서·라벨·URL·SVG path와 동일 byte Astryx `IconButton` component의 SSOT |

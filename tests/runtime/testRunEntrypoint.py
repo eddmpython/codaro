@@ -43,6 +43,7 @@ def testGateNamesAreStable() -> None:
         "design-system-contract",
         "theme-runtime-browser",
         "visual-accessibility-browser",
+        "gui-control-browser",
         "visual-assets",
         "learning-method",
         "learning-evidence-contract",
@@ -115,6 +116,9 @@ def testGateNamesAreStable() -> None:
     assert runner.GATE_ARTIFACTS["visual-accessibility-browser"] == (
         "output/test-runner/visual-accessibility-browser/visual-accessibility-report.json",
     )
+    assert runner.GATE_ARTIFACTS["gui-control-browser"] == (
+        "output/test-runner/gui-control-browser/gui-control-report.json",
+    )
     assert runner.GATE_ARTIFACTS["run-local-state-browser"] == (
         "output/test-runner/run-local-state-browser/run-local-state-report.json",
     )
@@ -147,6 +151,8 @@ def testGateNamesAreStable() -> None:
             timeoutSeconds=600,
         ),
     )
+    assert runner.GATES["product-browser-webview2-evergreen"].commands[-1].timeoutSeconds == 1800
+    assert runner.GATES["product-browser-webview2-fixed"].commands[-1].timeoutSeconds == 1800
     assert runner.changedCycleGates((
         "editor/src/App.tsx",
         "launcher/codaro-launcher/src/main.rs",
@@ -156,6 +162,7 @@ def testGateNamesAreStable() -> None:
         "root-clean",
         "docs",
         "editor-build",
+        "gui-control-browser",
         "launcher-check",
         "launcher-test",
         "backend",
@@ -169,6 +176,7 @@ def testGateNamesAreStable() -> None:
         "design-system-contract",
         "theme-runtime-browser",
         "visual-accessibility-browser",
+        "gui-control-browser",
         "visual-assets",
         "learning-method",
         "learning-evidence-contract",
@@ -216,6 +224,7 @@ def testGateNamesAreStable() -> None:
         "design-system-contract",
         "theme-runtime-browser",
         "visual-accessibility-browser",
+        "gui-control-browser",
         "learning-method",
         "curriculum-quality-matrix",
         "path-promotion-readiness",

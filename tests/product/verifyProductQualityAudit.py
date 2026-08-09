@@ -21,6 +21,7 @@ PRODUCT_QUALITY_GATES = (
     "design-system-contract",
     "theme-runtime-browser",
     "visual-accessibility-browser",
+    "gui-control-browser",
     "visual-assets",
     "learning-method",
     "learning-evidence-contract",

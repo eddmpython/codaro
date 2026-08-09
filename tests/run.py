@@ -80,6 +80,9 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "visual-accessibility-browser": (
         "output/test-runner/visual-accessibility-browser/visual-accessibility-report.json",
     ),
+    "gui-control-browser": (
+        "output/test-runner/gui-control-browser/gui-control-report.json",
+    ),
     "visual-assets": ("output/test-runner/visual-assets/visual-assets-report.json",),
     "learning-method": ("output/test-runner/learning-method/learning-flow-report.json",),
     "learning-evidence-contract": (
@@ -408,7 +411,7 @@ GATES: dict[str, Gate] = {
             command((
                 "uv", "run", "python", "-X", "utf8",
                 "tests/product/verifyWebView2ProductSmoke.py",
-            ), timeoutSeconds=600),
+            ), timeoutSeconds=1800),
         ),
     ),
     "product-browser-webview2-fixed": Gate(
@@ -428,7 +431,7 @@ GATES: dict[str, Gate] = {
             command((
                 "uv", "run", "python", "-X", "utf8",
                 "tests/product/verifyWebView2FixedProduct.py",
-            ), timeoutSeconds=900),
+            ), timeoutSeconds=1800),
         ),
         ci_required=False,
     ),
@@ -680,6 +683,21 @@ GATES: dict[str, Gate] = {
             ), timeoutSeconds=1200),
         ),
     ),
+    "gui-control-browser": Gate(
+        tier="surface",
+        description="버전된 GUI 제어 API와 실제 Chromium의 명령, 클릭, 키 입력, 모바일 포커스, AX tree, geometry 폐쇄 루프를 확인한다.",
+        commands=(
+            command(("npm", "run", "build"), cwd="editor"),
+            command((
+                "uv",
+                "run",
+                "python",
+                "-X",
+                "utf8",
+                "tests/surface/verifyGuiControlPlaywright.py",
+            ), timeoutSeconds=600),
+        ),
+    ),
     "visual-assets": Gate(
         tier="surface",
         description="공용 visual manifest, instructional 앵커, Run 5상태·3 viewport, fresh 제품 fixture, redaction, source provenance, 파생물과 용량 예산을 확인한다.",
@@ -925,6 +943,7 @@ PRODUCT_QUALITY_GATES = (
     "design-system-contract",
     "theme-runtime-browser",
     "visual-accessibility-browser",
+    "gui-control-browser",
     "visual-assets",
     "learning-method",
     "learning-evidence-contract",
@@ -972,6 +991,7 @@ PRODUCT_RELEASE_GATES = (
     "design-system-contract",
     "theme-runtime-browser",
     "visual-accessibility-browser",
+    "gui-control-browser",
     "learning-method",
     "curriculum-quality-matrix",
     "path-promotion-readiness",
@@ -1027,6 +1047,9 @@ def changedCycleGates(paths: tuple[str, ...] | None = None) -> tuple[str, ...]:
             addGate("backend")
         if normalized.startswith("editor/"):
             addGate("editor-build")
+            addGate("gui-control-browser")
+        if normalized == "tests/surface/verifyGuiControlPlaywright.py":
+            addGate("gui-control-browser")
         if normalized.startswith("landing/"):
             addGate("landing-build")
         if normalized.startswith("launcher/"):
@@ -1974,8 +1997,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 63:
-        failures.append(f"expected 63 gates, found {len(GATES)}")
+    if len(GATES) != 64:
+        failures.append(f"expected 64 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

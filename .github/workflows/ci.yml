@@ -221,6 +221,10 @@ jobs:
         timeout-minutes: 25
         run: uv run python -X utf8 tests/run.py gate visual-accessibility-browser
 
+      - name: Verify machine-controlled GUI loop
+        timeout-minutes: 15
+        run: uv run python -X utf8 tests/run.py gate gui-control-browser
+
       - name: Verify direct learning method
         timeout-minutes: 15
         run: uv run python -X utf8 tests/run.py gate learning-method
