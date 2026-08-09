@@ -27,7 +27,6 @@ type UseNotebookRuntimeStateOptions = {
   document: CodaroDocument;
   drafts: Record<string, string>;
   onNotice: (notice: AppNotice) => void;
-  selectCurriculumBlock: (blockId: string) => void;
   selectNotebookBlock: (blockId: string) => void;
   selectedBlock: BlockConfig | undefined;
   surface: SurfaceMode;
@@ -61,7 +60,6 @@ export function useNotebookRuntimeState({
   document,
   drafts,
   onNotice,
-  selectCurriculumBlock,
   selectNotebookBlock,
   selectedBlock,
   surface,
@@ -104,9 +102,7 @@ export function useNotebookRuntimeState({
   const executeBlock = useCallback(async (block: BlockConfig, sourceOverride?: string) => {
     if (!isExecutableBlock(block)) return;
     const code = sourceOverride ?? resolveBlockRunCode(block, drafts, { emptySnippetFallback: surface === "curriculum" });
-    if (surface === "curriculum") {
-      selectCurriculumBlock(block.id);
-    } else {
+    if (surface !== "curriculum") {
       selectNotebookBlock(block.id);
     }
     setRunningBlockId(block.id);
@@ -183,7 +179,6 @@ export function useNotebookRuntimeState({
     onNotice,
     reactiveEnabled,
     results,
-    selectCurriculumBlock,
     selectNotebookBlock,
     sessionId,
     surface,

@@ -371,7 +371,6 @@ function App() {
     document: activeDocument,
     drafts: activeDrafts,
     onNotice: applyNotice,
-    selectCurriculumBlock: activateCurriculumBlock,
     selectNotebookBlock: selectBlock,
     selectedBlock,
     surface,

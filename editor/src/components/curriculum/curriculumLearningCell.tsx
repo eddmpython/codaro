@@ -50,6 +50,7 @@ export function CurriculumLearningCell({
   };
 
   const runCurrentDraft = (sourceOverride?: string) => {
+    onSelect();
     onRun(sourceOverride ?? draftRef.current);
   };
 
@@ -65,7 +66,7 @@ export function CurriculumLearningCell({
       );
     }
 
-    // 마크다운 셀 래퍼 — 아이콘칩+라벨 이중 헤더 폐지. 제목은 CurriculumMarkdownBody가
+    // 마크다운 셀 래퍼. 아이콘칩과 라벨 이중 헤더를 폐지했다. 제목은 CurriculumMarkdownBody가
     // 유일하게 소유한다. 선택 상태는 좌측 accent rail 하나로만 표시한다.
     if (embedded || block.displayKind === "callout") {
       return (

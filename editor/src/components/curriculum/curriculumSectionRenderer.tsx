@@ -299,7 +299,7 @@ export function StructuredSectionLearningBody({
   const exerciseSource = typeof exerciseResult?.sourceCode === "string" ? exerciseResult.sourceCode : exerciseDraft;
   const exerciseRunning = exercise ? runningBlockId === exercise.id : false;
   const exerciseSelected = exercise ? selectedBlockId === exercise.id : false;
-  // 실습 prompt는 사람이 쓴 학습 지시문 — 필터·자르기 없이 그대로 렌더한다(스펙 §5 ⑤).
+  // 실습 prompt는 사람이 쓴 학습 지시문이다. 필터나 자르기 없이 그대로 렌더한다(스펙 §5 ⑤).
   const exerciseDescription = stripMarkdown(exercise?.guide?.description || exercise?.description || "");
   const sectionTips = payloadTextList(section.contract?.tips).map(stripMarkdown).filter(Boolean).slice(0, 4);
   const [attemptCheck, setAttemptCheck] = useState<LearningAttemptCheck | null>(null);
@@ -320,6 +320,7 @@ export function StructuredSectionLearningBody({
 
   const runExercise = (sourceOverride?: string) => {
     if (!exercise) return;
+    onSelectBlock(exercise.id);
     onRunBlock(exercise, sourceOverride ?? exerciseDraftRef.current);
   };
 
@@ -632,7 +633,7 @@ export function hasStructuredSectionBlocks(section: CurriculumSectionGroup) {
 export function structuredSectionParts(section: CurriculumSectionGroup) {
   const snippet = section.blocks.find((block) => block.sourceType === "sectionContract:snippet");
   const exercise = section.blocks.find((block) => block.sourceType === "sectionContract:exercise");
-  // 검증 기준(sectionContract:check)은 학습자에게 표시하지 않는다 — 내부 채점 메타이지 학습
+  // 검증 기준(sectionContract:check)은 학습자에게 표시하지 않는다. 내부 채점 메타이지 학습
   // 콘텐츠가 아니다. 남아 있어도 학습자 카드로 렌더하지 않도록 extraBlocks에서도 제외한다.
   const extraBlocks = section.blocks.filter((block) => (
     block.sourceType !== "sectionContract:explanation"
