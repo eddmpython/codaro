@@ -1,5 +1,5 @@
 import type { BlockConfig, CodaroDocument, CurriculumContentSummary } from "@/types";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSnippetAutoRun } from "@/hooks/useSnippetAutoRun";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { readLearningEvidenceEvents } from "@/lib/learningEvidenceOperations";
@@ -70,7 +70,7 @@ export function CurriculumView({
   // 완성 예제 자동 실행은 hook 이 소유한다. 이 파일은 조립만 한다.
   // 별도 패키지를 요구하는 레슨은 브라우저 커널에서 예제가 반드시 실패하므로 자동 실행하지
   // 않는다. Local 은 패키지를 설치하므로 그대로 돈다.
-  useSnippetAutoRun({
+  const cancelSnippetAutoRun = useSnippetAutoRun({
     blocks: document.blocks,
     canRun,
     lessonKey: `${selectedCategory}/${selectedContentId}`,
@@ -79,6 +79,10 @@ export function CurriculumView({
     results,
     runningBlockId,
   });
+  const runLearnerBlock = useCallback((block: BlockConfig, sourceOverride?: string) => {
+    cancelSnippetAutoRun();
+    onRunBlock(block, sourceOverride);
+  }, [cancelSnippetAutoRun, onRunBlock]);
 
   const introBlock = curriculumSections.introBlocks[0] ?? document.blocks.find((block) => block.displayKind === "hero" || block.sourceType === "intro");
   const selectedContentIndex = contents.findIndex((content) => content.contentId === selectedContentId);
@@ -155,7 +159,7 @@ export function CurriculumView({
                 section={section}
                 selectedBlockId={selectedBlockId}
                 onDraftChange={onDraftChange}
-                onRunBlock={onRunBlock}
+                onRunBlock={runLearnerBlock}
                 onSelectBlock={onSelectBlock}
               />
             ))}

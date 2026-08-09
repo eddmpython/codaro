@@ -917,6 +917,14 @@ def releaseLocalKernelSessions(page: Any, case: dict[str, Any], localPort: int) 
 
 def captureStableViewport(page: Any, screenshotPath: Path) -> None:
     page.mouse.move(0, 0)
+    page.add_style_tag(
+        content="""
+        .cm-cursor,
+        .cm-dropCursor {
+          visibility: hidden !important;
+        }
+        """
+    )
     page.screenshot(
         path=str(screenshotPath),
         animations="disabled",
@@ -1842,6 +1850,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "initialCheckState": "mismatch",
             "solutionCode": "print('Hello Codaro')",
             "captureCheckStates": True,
+            "expectedSnippetOutput": "Hello World",
         },
         {
             "name": "web-day1-transfer-tablet",
@@ -1857,6 +1866,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "initialCheckState": "mismatch",
             "solutionCode": "print('Hello Codaro')",
             "captureCheckStates": True,
+            "expectedSnippetOutput": "Hello World",
         },
         {
             "name": "web-day2-progression-desktop",
@@ -5433,6 +5443,20 @@ def runBrowserMatrix(
                                 f'[data-learning-section-mode="{assessmentMode}"] '
                                 '[data-learning-section-part="exercise"]'
                             )
+                        expectedSnippetOutput = str(case.get("expectedSnippetOutput", ""))
+                        snippetOutput = None
+                        if expectedSnippetOutput:
+                            snippetOutput = page.locator(
+                                f'[data-learning-section-mode="{assessmentMode}"] '
+                                '[data-learning-snippet-output="true"] '
+                                '[data-execution-output="true"] pre'
+                            ).first
+                            snippetOutput.wait_for(state="visible", timeout=120_000)
+                            if snippetOutput.inner_text().strip() != expectedSnippetOutput:
+                                raise AssertionError(
+                                    "worked example output was not isolated before learner run: "
+                                    f"{snippetOutput.inner_text()!r}"
+                                )
                         exerciseIndex = 0 if assessmentMode else int(case.get("exerciseIndex", 0))
                         runButton = exerciseParts.locator('button[aria-label="셀 실행"]').nth(exerciseIndex)
                         codeEditor = exerciseParts.locator('.cm-content').nth(exerciseIndex)
@@ -5733,6 +5757,14 @@ def runBrowserMatrix(
                                 timeout=20_000,
                             )
                             if case.get("captureCheckStates"):
+                                if (
+                                    snippetOutput is not None
+                                    and snippetOutput.inner_text().strip() != expectedSnippetOutput
+                                ):
+                                    raise AssertionError(
+                                        "learner run contaminated the worked example output: "
+                                        f"{snippetOutput.inner_text()!r}"
+                                    )
                                 verifiedCheck = page.locator(
                                     '[data-learning-check-result="verified"]'
                                 ).last

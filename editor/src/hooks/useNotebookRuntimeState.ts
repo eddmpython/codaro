@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { blockLabel, isExecutableBlock, isKernelExecutableBlock } from "@/lib/cellModel";
 import type { ResultMap } from "@/lib/assistantContext";
 import { translate } from "@/lib/localeCopy";
@@ -70,13 +70,14 @@ export function useNotebookRuntimeState({
   const [variables, setVariables] = useState<VariableInfo[]>([]);
   const [results, setResults] = useState<ResultMap>({});
   const [runningBlockId, setRunningBlockId] = useState<string | null>(null);
+  const executionQueueRef = useRef<Promise<void>>(Promise.resolve());
   const [notebookRunning, setNotebookRunning] = useState(false);
   const [reactiveEnabled, setReactiveEnabled] = useState(
     () => document.runtime?.reactiveMode !== "sequential",
   );
   const [diagnostics, setDiagnostics] = useState<ReactiveDiagnostics>(emptyReactiveDiagnostics);
   const [automationSessions, setAutomationSessions] = useState<Record<string, string>>({});
-  // 마지막 실행 시점에 보낸 셀 내용 스냅샷 — 이후 draft가 달라지면 그 셀(+다운스트림)이 stale.
+  // 마지막 실행 시점에 보낸 셀 내용 스냅샷. 이후 draft가 달라지면 그 셀과 다운스트림이 stale.
   const [lastRunContent, setLastRunContent] = useState<Record<string, string>>({});
 
   const codeBlocks = useMemo(() => document.blocks.filter(isExecutableBlock), [document.blocks]);
@@ -100,7 +101,7 @@ export function useNotebookRuntimeState({
     setReactiveEnabled(document.runtime?.reactiveMode !== "sequential");
   }, [document.id, document.runtime?.reactiveMode]);
 
-  const runBlock = useCallback(async (block: BlockConfig, sourceOverride?: string) => {
+  const executeBlock = useCallback(async (block: BlockConfig, sourceOverride?: string) => {
     if (!isExecutableBlock(block)) return;
     const code = sourceOverride ?? resolveBlockRunCode(block, drafts, { emptySnippetFallback: surface === "curriculum" });
     if (surface === "curriculum") {
@@ -188,6 +189,21 @@ export function useNotebookRuntimeState({
     surface,
     variables,
   ]);
+
+  const runBlock = useCallback((block: BlockConfig, sourceOverride?: string) => {
+    // React state alone cannot lock two calls made in the same render turn. Keep the
+    // shared Python stdout and filesystem transaction strictly serial while preserving
+    // the later learner action instead of dropping it.
+    const scheduled = executionQueueRef.current.then(
+      () => executeBlock(block, sourceOverride),
+      () => executeBlock(block, sourceOverride),
+    );
+    executionQueueRef.current = scheduled.then(
+      () => undefined,
+      () => undefined,
+    );
+    return scheduled;
+  }, [executeBlock]);
 
   const runNotebook = useCallback(async () => {
     const defaultBlock = codeBlocks.find(isKernelExecutableBlock) ?? codeBlocks[0];

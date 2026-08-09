@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type { BlockConfig, ExecutionResult } from "@/types";
 
 /**
@@ -36,10 +36,14 @@ export function useSnippetAutoRun({
   requiresPackages: boolean;
   results: Record<string, ExecutionResult>;
   runningBlockId: string | null;
-}): void {
+}): () => void {
   const queueRef = useRef<string[]>([]);
   const lessonRef = useRef("");
   const pendingRef = useRef<string | null>(null);
+  const cancelSnippetAutoRun = useCallback(() => {
+    queueRef.current = [];
+    pendingRef.current = null;
+  }, []);
 
   useEffect(() => {
     if (lessonRef.current === lessonKey) return;
@@ -71,4 +75,6 @@ export function useSnippetAutoRun({
       return;
     }
   }, [blocks, canRun, onRunBlock, results, runningBlockId]);
+
+  return cancelSnippetAutoRun;
 }
