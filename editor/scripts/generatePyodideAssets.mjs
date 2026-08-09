@@ -11,6 +11,7 @@ const FILE_NAMES = [
   "pyodide.asm.mjs",
   "pyodide.asm.wasm",
   "pyodide.js",
+  "pyodide.mjs",
   "pyodide-lock.json",
   "python_stdlib.zip",
 ];

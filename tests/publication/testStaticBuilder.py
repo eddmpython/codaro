@@ -30,6 +30,7 @@ def _shell(root: Path) -> Path:
     (shell / "vendor/pyproc/src/worker.js").write_text("self.onmessage = () => {};", encoding="utf-8")
     for name, payload in {
         "pyodide.js": b"globalThis.loadPyodide = async () => ({});",
+        "pyodide.mjs": b"export const loadPyodide = async () => ({});",
         "pyodide.asm.mjs": b"export default {};",
         "pyodide.asm.wasm": b"\x00asm",
         "pyodide-lock.json": b"{}",
@@ -49,7 +50,14 @@ const isLocalPreview = ["localhost", "127.0.0.1", "::1"].includes(location.hostn
     _runtimeManifest(
         shell / "pyodide-assets.json",
         "vendor/pyodide/",
-        ["pyodide.js", "pyodide.asm.mjs", "pyodide.asm.wasm", "pyodide-lock.json", "python_stdlib.zip"],
+        [
+            "pyodide.js",
+            "pyodide.mjs",
+            "pyodide.asm.mjs",
+            "pyodide.asm.wasm",
+            "pyodide-lock.json",
+            "python_stdlib.zip",
+        ],
     )
     return shell
 
@@ -115,6 +123,7 @@ def testTwoCleanBuildsReuseSameImmutableBundleAndPreserveSource(tmp_path: Path) 
     runtimeManifest = json.loads(first.bundleRoot.joinpath("pyodide-assets.json").read_text(encoding="utf-8"))
     assert runtimeManifest["packageRoot"] == "./vendor/pyodide/"
     assert all(item["url"].startswith("./vendor/pyodide/") for item in runtimeManifest["files"])
+    assert {item["path"] for item in runtimeManifest["files"]} >= {"pyodide.js", "pyodide.mjs"}
 
 
 def testChangedSnapshotCreatesNewBundleWithoutMutatingPrevious(tmp_path: Path) -> None:
