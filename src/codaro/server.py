@@ -23,6 +23,7 @@ from .api import (
     createDocumentRouter,
     createExtensionRouter,
     createKernelRouter,
+    createPublicationRouter,
     createShareRouter,
     createSpaRouter,
     createSystemRouter,
@@ -339,6 +340,7 @@ def createServerApp(
     from .api.integrationRouter import createIntegrationRouter
     app.include_router(createIntegrationRouter(state))
     app.include_router(createKernelRouter(state))
+    app.include_router(createPublicationRouter(state))
     app.include_router(createShareRouter(state))
     app.include_router(createSystemRouter(state))
     app.include_router(createTerminalRouter(state))

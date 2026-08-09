@@ -377,6 +377,7 @@ function App() {
     onNotice: applyNotice,
     selectNotebookBlock: selectBlock,
     selectedBlock,
+    sourcePath: surface === "editor" ? notebookDocumentPath : null,
     surface,
   });
   const {

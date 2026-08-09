@@ -287,6 +287,13 @@ export function NotebookPanel({
   const [width, setWidth] = useState<NotebookWidth>("medium");
   const staleSet = new Set(staleBlockIds);
   const cyclePaths = formatCyclePaths(diagnostics.cycles);
+  const publicationTarget = diagnostics.capability?.runtimeTarget ?? null;
+  const publicationTargetLabel = publicationTarget ? ({
+    browser: "브라우저",
+    server: "서버",
+    local: "로컬",
+    blocked: "차단",
+  } as const)[publicationTarget] : null;
   const selectedBlockIndex = document.blocks.findIndex((block) => block.id === selectedBlockId);
   const activeCellLabel = selectedBlockIndex >= 0
     ? `셀 ${selectedBlockIndex + 1} / ${document.blocks.length}`
@@ -318,6 +325,19 @@ export function NotebookPanel({
         {cyclePaths.length ? (
           <div className="rounded-md border border-destructive/40 bg-destructive/10 px-2.5 py-1.5 text-[11px] text-destructive">
             <span className="font-medium">순환 의존</span> — 실행 순서가 정해지지 않습니다: {cyclePaths.join(" · ")}
+          </div>
+        ) : null}
+        {publicationTarget ? (
+          <div
+            className={publicationTarget === "blocked"
+              ? "rounded-md border border-destructive/40 bg-destructive/10 px-2.5 py-1.5 text-[11px] text-destructive"
+              : "rounded-md border border-border/70 bg-muted/40 px-2.5 py-1.5 text-[11px] text-muted-foreground"}
+            data-publication-target={publicationTarget}
+          >
+            <span className="font-medium">배포 대상: {publicationTargetLabel}</span>
+            {diagnostics.capability?.diagnostics.length
+              ? ` · ${diagnostics.capability.diagnostics[0].message}`
+              : " · 이 문서의 기능 블록 계약으로 판정했습니다."}
           </div>
         ) : null}
       </div>
@@ -1197,9 +1217,17 @@ function CellMetaBar({
       <div className="notebookCellActions">
         {diagnosticChips.map((chip) => (
           <span
-            key={chip.kind}
-            className="notebookCellDiagnostic"
-            title="정합성 경고 — 실행은 진행되며, 마지막 정의가 적용됩니다."
+            key={`${chip.kind}:${chip.label}`}
+            className={cn(
+              "notebookCellDiagnostic",
+              chip.kind === "capability-blocked" && "notebookCellDiagnosticBlocked",
+            )}
+            data-cell-diagnostic-kind={chip.kind}
+            title={chip.kind === "capability-blocked"
+              ? "이 셀이 재현 가능한 publication build를 차단합니다."
+              : chip.kind === "capability-warning"
+                ? "이 셀 때문에 더 강한 실행 환경이 필요합니다."
+                : "셀 정합성 경고입니다."}
           >
             {chip.label}
           </span>

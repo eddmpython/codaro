@@ -4,6 +4,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
+from ..document.models import CodaroDocument
+
 
 class InsertBlockRequest(BaseModel):
     path: str
@@ -71,6 +73,12 @@ class PackageInstallCommandRequest(BaseModel):
 
 class PathRequest(BaseModel):
     path: str
+
+
+class PublicationInspectRequest(BaseModel):
+    document: CodaroDocument
+    sourcePath: str | None = None
+    packageLock: dict[str, Any] = Field(default_factory=dict)
 
 
 class EnvironmentInfo(BaseModel):

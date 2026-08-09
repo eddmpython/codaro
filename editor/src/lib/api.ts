@@ -4,6 +4,7 @@ import { curriculumApi } from "./api/curriculumApi";
 import { automationApi } from "./api/automationApi";
 import { shareApi } from "./api/shareApi";
 import { providerApi } from "./api/providerApi";
+import { publicationApi } from "./api/publicationApi";
 import { putJson, requestJson } from "./api/transport";
 
 export { CodaroApiError, optional, shouldUseApi } from "./api/transport";
@@ -16,6 +17,7 @@ export const codaroApi = {
   ...automationApi,
   ...shareApi,
   ...providerApi,
+  ...publicationApi,
   putJson,
   requestJson,
 };

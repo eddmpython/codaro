@@ -6,6 +6,7 @@ from .curriculumRouter import createCurriculumRouter
 from .documentRouter import createDocumentRouter
 from .errors import ApiError, apiErrorHandler, fail, httpExceptionHandler, unhandledExceptionHandler, validationExceptionHandler
 from .kernelRouter import createKernelRouter
+from .publicationRouter import createPublicationRouter
 from .shareRouter import createShareRouter
 from .requestModels import (
     CheckExerciseRequest,
@@ -16,6 +17,7 @@ from .requestModels import (
     NotebookExecuteRequest,
     PackageRequest,
     PathRequest,
+    PublicationInspectRequest,
     ReactiveExecuteRequest,
     RemoveBlockRequest,
     RunBlockRequest,
@@ -36,6 +38,7 @@ __all__ = [
     "NotebookExecuteRequest",
     "PackageRequest",
     "PathRequest",
+    "PublicationInspectRequest",
     "ReactiveExecuteRequest",
     "RemoveBlockRequest",
     "RunBlockRequest",
@@ -50,6 +53,7 @@ __all__ = [
     "createDocumentRouter",
     "createExtensionRouter",
     "createKernelRouter",
+    "createPublicationRouter",
     "createServerState",
     "createShareRouter",
     "createSpaRouter",

@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import pytest
 
+from codaro.document import createEmptyDocument
+from codaro.document.service import saveDocument
+
 import codaro.cli as cliModule
 from codaro.cli import normalizeArgs
 from codaro.server import EditorBuildError
@@ -30,6 +33,49 @@ def testNormalizeArgsLeavesExportUntouched() -> None:
         "--format",
         "ipynb",
     ]
+
+
+def testNormalizeArgsLeavesInspectUntouched() -> None:
+    assert normalizeArgs(["inspect", "notebook.py", "--json"]) == ["inspect", "notebook.py", "--json"]
+
+
+def testInspectPrintsCompilerReportWithoutStartingEditor(tmp_path, monkeypatch, capsys) -> None:
+    document = createEmptyDocument("Inspectable")
+    document.blocks[0].content = "value = 42"
+    document.app.entryBlockIds = [document.blocks[0].id]
+    path = saveDocument(str(tmp_path / "inspectable.py"), document)
+    editorChecked = False
+
+    def failIfEditorChecked(*args, **kwargs) -> None:
+        del args, kwargs
+        nonlocal editorChecked
+        editorChecked = True
+
+    monkeypatch.setattr(cliModule.sys, "argv", ["codaro", "inspect", str(path), "--json"])
+    monkeypatch.setattr(cliModule, "requireEditorBuildReady", failIfEditorChecked)
+
+    cliModule.main()
+
+    payload = __import__("json").loads(capsys.readouterr().out)
+    assert payload["runtimeTarget"] == "browser"
+    assert payload["manifestHash"].startswith("sha256-")
+    assert editorChecked is False
+
+
+def testInspectReturnsNonzeroWhenCompilerBlocksDocument(tmp_path, monkeypatch, capsys) -> None:
+    document = createEmptyDocument("Blocked")
+    document.blocks[0].content = "value = eval('1 + 1')"
+    document.app.entryBlockIds = [document.blocks[0].id]
+    path = saveDocument(str(tmp_path / "blocked.py"), document)
+    monkeypatch.setattr(cliModule.sys, "argv", ["codaro", "inspect", str(path)])
+
+    with pytest.raises(SystemExit) as excInfo:
+        cliModule.main()
+
+    captured = capsys.readouterr()
+    assert excInfo.value.code == 1
+    assert "Target: blocked" in captured.out
+    assert "DYNAMIC_CODE_BLOCKED" in captured.out
 
 
 def testMainFailsBeforeOpeningBrowserWhenFrontendBuildMissing(monkeypatch, capsys) -> None:

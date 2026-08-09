@@ -104,6 +104,47 @@ def testSaveDocumentResolvesRelativePathInsideWorkspace(tmp_path: Path) -> None:
     assert "value = 42" in expectedPath.read_text(encoding="utf-8")
 
 
+def testPublicationInspectUsesCanonicalCompilerForUnsavedDraft(tmp_path: Path) -> None:
+    client = TestClient(createServerApp(workspaceRoot=tmp_path))
+    document = createEmptyDocument("Deployable")
+    document.blocks[0].content = "import os\nvalue = os.getenv('SERVICE_TOKEN')"
+    document.app.entryBlockIds = [document.blocks[0].id]
+
+    response = client.post(
+        "/api/publication/inspect",
+        json={
+            "document": document.model_dump(),
+            "sourcePath": "deployable.py",
+            "packageLock": {},
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["runtimeTarget"] == "server"
+    assert payload["entryBlockIds"] == [document.blocks[0].id]
+    assert payload["sourceRevision"]["path"] == "deployable.py"
+    assert payload["manifestHash"].startswith("sha256-")
+    assert {item["code"] for item in payload["diagnostics"]} >= {"SECRET_REQUIRES_SERVER"}
+
+
+def testPublicationInspectRejectsSourcePathOutsideWorkspace(tmp_path: Path) -> None:
+    client = TestClient(createServerApp(workspaceRoot=tmp_path))
+    document = createEmptyDocument("Outside")
+
+    response = client.post(
+        "/api/publication/inspect",
+        json={
+            "document": document.model_dump(),
+            "sourcePath": str(tmp_path.parent / "outside.py"),
+            "packageLock": {},
+        },
+    )
+
+    assert response.status_code == 403
+    assert response.json()["error"]["code"] == "publication_path_outside_workspace"
+
+
 def testSaveDocumentApiPreservesLoadedJupyterNotebook(tmp_path: Path) -> None:
     client = TestClient(createServerApp(workspaceRoot=tmp_path))
     path = tmp_path / "analysis.ipynb"

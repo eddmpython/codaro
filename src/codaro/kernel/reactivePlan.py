@@ -105,6 +105,24 @@ def getAllExecutionOrder(graph: ReactiveGraph) -> list[str]:
     return list(graph.blockOrder)
 
 
+def dependencyClosure(graph: ReactiveGraph, entryBlockId: str) -> list[str]:
+    """Return the entry block and every provider it needs in document order."""
+    if entryBlockId not in graph.nodes:
+        raise KeyError(entryBlockId)
+    closure = {entryBlockId}
+    queue = [entryBlockId]
+    while queue:
+        current = queue.pop(0)
+        node = graph.nodes[current]
+        for variable in node.uses:
+            for provider in graph.definedBy.get(variable, []):
+                if provider in closure:
+                    continue
+                closure.add(provider)
+                queue.append(provider)
+    return [blockId for blockId in graph.blockOrder if blockId in closure]
+
+
 def detectCycles(graph: ReactiveGraph) -> list[list[str]]:
     white, gray, black = 0, 1, 2
     color = {blockId: white for blockId in graph.nodes}

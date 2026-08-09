@@ -6,7 +6,7 @@ from pathlib import Path
 import sys
 import webbrowser
 
-from .document.service import exportDocument
+from .document.service import exportDocument, loadDocument
 from .serverLog import formatLogFields, setVerboseLogging
 from .server import EditorBuildError, requireEditorBuildReady, runServer
 
@@ -20,6 +20,7 @@ def buildParser() -> argparse.ArgumentParser:
             "  codaro notebook.py\n"
             "  codaro app notebook.py\n"
             "  codaro export notebook.py --format ipynb\n"
+            "  codaro inspect notebook.py\n"
             "  codaro pack inspect ./my-pack\n"
             "  codaro classroom audit"
         ),
@@ -45,6 +46,12 @@ def buildParser() -> argparse.ArgumentParser:
     exportParser.add_argument("path", help="Source document path.")
     exportParser.add_argument("--format", required=True, choices=["codaro", "percent", "ipynb"])
     exportParser.add_argument("--output", help="Output file path.")
+
+    inspectParser = subparsers.add_parser("inspect", help="Inspect publication capability and target.")
+    inspectParser.add_argument("path", help="Document path to inspect.")
+    inspectParser.add_argument("--entry", action="append", default=[], help="Entry block id. Repeat for multiple entries.")
+    inspectParser.add_argument("--package-lock", help="JSON package compatibility lock path.")
+    inspectParser.add_argument("--json", action="store_true", help="Print the complete compiler report as JSON.")
 
     taskParser = subparsers.add_parser("task", help="Manage automation tasks.")
     taskSubparsers = taskParser.add_subparsers(dest="task_command", required=True)
@@ -133,6 +140,10 @@ def main() -> None:
             ),
         )
         print(f"Exported to {outputPath}")
+        return
+
+    if command == "inspect":
+        _handleInspect(args)
         return
 
     host = args.host
@@ -249,6 +260,54 @@ def _handlePack(args) -> None:
     raise ValueError(f"Unsupported pack command: {args.pack_command}")
 
 
+def _handleInspect(args) -> None:
+    from .publication import compileDocument
+
+    sourcePath = Path(args.path).expanduser().resolve()
+    if not sourcePath.is_file():
+        print(f"Document not found: {sourcePath}", file=sys.stderr)
+        raise SystemExit(1)
+    document = loadDocument(str(sourcePath))
+    if args.entry:
+        document = document.model_copy(
+            update={"app": document.app.model_copy(update={"entryBlockIds": list(dict.fromkeys(args.entry))})}
+        )
+    packageLock = None
+    if args.package_lock:
+        lockPath = Path(args.package_lock).expanduser().resolve()
+        try:
+            packageLock = json.loads(lockPath.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            print(f"Package lock is invalid: {exc}", file=sys.stderr)
+            raise SystemExit(1) from exc
+        if not isinstance(packageLock, dict):
+            print("Package lock must be a JSON object.", file=sys.stderr)
+            raise SystemExit(1)
+    try:
+        report = compileDocument(
+            document,
+            sourcePath=sourcePath,
+            sourceText=sourcePath.read_text(encoding="utf-8"),
+            workspaceRoot=sourcePath.parent,
+            packageLock=packageLock,
+        )
+    except ValueError as exc:
+        print(f"Compilation failed: {exc}", file=sys.stderr)
+        raise SystemExit(1) from exc
+    payload = report.payload()
+    if args.json:
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+    else:
+        print(f"Target: {report.runtimeTarget}")
+        print(f"Manifest: {report.manifestHash}")
+        print(f"Entries: {', '.join(report.entryBlockIds) or '(none)'}")
+        for diagnostic in report.diagnostics:
+            span = diagnostic["sourceSpan"]
+            print(f"  {diagnostic['code']} {span['path']}:{span['startLine']} {diagnostic['message']}")
+    if report.runtimeTarget == "blocked":
+        raise SystemExit(1)
+
+
 def _handleClassroom(args) -> None:
     from .migrations import (
         ClassroomMigrationError,
@@ -286,7 +345,7 @@ def normalizeArgs(rawArgs: list[str]) -> list[str]:
         return ["edit"]
 
     command = rawArgs[0].lower()
-    knownCommands = {"edit", "run", "app", "export", "task", "pack", "classroom"}
+    knownCommands = {"edit", "run", "app", "export", "inspect", "task", "pack", "classroom"}
 
     if command == "app":
         return ["run", *rawArgs[1:]]

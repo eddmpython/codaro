@@ -104,6 +104,12 @@ export type ReactiveDiagnostics = {
   definitionOrder: Array<[string, string, string]>; // (변수, 쓰는 셀, 뒤에서 정의하는 셀)
   emptyCells: string[];
   unsafeCalls: Array<[string, string]>; // (셀, 위험 호출)
+  capability: {
+    runtimeTarget: import("@/lib/generatedContracts/executableUnit").RuntimeTarget;
+    manifestHash: string;
+    entryBlockIds: string[];
+    diagnostics: import("@/lib/generatedContracts/executableUnit").CapabilityDiagnostic[];
+  } | null;
 };
 
 export type GuideConfig = {

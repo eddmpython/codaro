@@ -31,6 +31,26 @@ class PercentFormatError(ValueError):
     pass
 
 
+def percentBlockSourceSpans(source: str, path: str) -> dict[str, dict[str, int | str]]:
+    """Map stable Percent block ids to one-based source spans without parsing the document twice."""
+    lines = source.splitlines()
+    markers: list[tuple[int, str]] = []
+    for lineIndex, line in enumerate(lines):
+        match = _CELL_MARKER.match(line)
+        if not match:
+            continue
+        blockId = _parseKeyValues(match.group(2)).get("id")
+        if blockId:
+            markers.append((lineIndex, blockId))
+    spans: dict[str, dict[str, int | str]] = {}
+    for markerIndex, (lineIndex, blockId) in enumerate(markers):
+        nextLine = markers[markerIndex + 1][0] if markerIndex + 1 < len(markers) else len(lines)
+        startLine = min(lineIndex + 2, max(1, len(lines)))
+        endLine = max(startLine, nextLine)
+        spans[blockId] = {"path": path, "startLine": startLine, "endLine": endLine}
+    return spans
+
+
 def parseInlineScriptMetadata(source: str) -> dict | None:
     """PEP 723 `# /// script` 블록을 TOML로 파싱해 반환한다(없으면 None)."""
     match = _INLINE_SCRIPT.search(source)

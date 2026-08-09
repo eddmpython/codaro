@@ -52,6 +52,7 @@ Codaro에서 기준 파일은 아래 순서로 본다. 같은 의미의 규칙�
 | app and executable unit contracts | `contracts/appSpec.schema.json`, `contracts/executableUnit.schema.json`, `docs/skills/ops/tools/genProductContracts.py` | app projection과 기능 블록의 versioned Python, TypeScript wire type 기준 |
 | Percent app metadata | `src/codaro/document/percentFormat.py` | `codaro-app` TOML parse, canonical write, legacy header migration과 entry fail-closed 기준 |
 | app projection과 미리보기 | `editor/src/components/app/appProjection.tsx`, `editor/src/App.tsx` | AppSpec entry, layout, code visibility, session state, reactive result와 last-good 오류 투영 기준 |
+| 기능 블록 compiler | `docs/skills/architecture/publication-compiler.md`, `src/codaro/publication/compiler.py`, `src/codaro/kernel/reactivePlan.py`, `contracts/executableUnit.schema.json` | entry dependency closure, effect, package, asset hash와 browser/server/local/blocked 판정의 단일 기준 |
 | 문서 블록 조작 | `src/codaro/document/blockOperations.py` | 블록 삽입/삭제/이동/수정과 실행 대상 코드 블록 검증 기준 |
 | 노트북 생성 | `src/codaro/document/notebookGeneration.py` | tool이 생성하거나 분리한 노트북 document와 저장 payload를 조립하는 document 경계 |
 | 프론트 문서 조작 | `editor/src/lib/documentModel.ts` | draft 생성, block 병합, payload 정규화 |

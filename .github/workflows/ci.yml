@@ -66,6 +66,9 @@ jobs:
       - name: Run architecture boundary gate
         run: uv run python -X utf8 tests/run.py gate architecture-boundary
 
+      - name: Run publication compiler gate
+        run: uv run python -X utf8 tests/run.py gate publication-compiler
+
       - name: Verify PRD evaluation contract
         if: matrix.python-version == '3.12'
         run: uv run python -X utf8 tests/run.py gate evaluation-contract

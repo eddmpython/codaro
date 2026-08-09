@@ -38,6 +38,7 @@ function extractDiagnostics(payload: ReactiveResponse): ReactiveDiagnostics {
     definitionOrder: payload.definitionOrder ?? [],
     emptyCells: payload.emptyCells ?? [],
     unsafeCalls: payload.unsafeCalls ?? [],
+    capability: null,
   };
 }
 

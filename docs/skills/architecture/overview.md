@@ -28,7 +28,7 @@ src/codaro/
 ├── core/         # primitives - errorGuard, outputDescriptor, serverLog, appRuntime, customTool
 ├── engine/       # document model + execution runtime + reactive dataflow
 │   ├── document/ kernel/ runtime/ system/
-├── domain/       # business - curriculum, ai, automation
+├── domain/       # business - curriculum, ai, automation, publication
 ├── transport/    # ui/widget bridge + app shell - api, webBuild
 ├── extensions/   # plugin hooks
 ├── server.py     # entry
@@ -86,7 +86,7 @@ src/codaro/
 | --- | --- | --- |
 | core | `serverLog.py`, `proof/`, 공용 primitive | 위 계층 구현을 import하지 않는다 |
 | engine | `document/`, `runtime/`, `kernel/` | `api/`, `ai/`, `curriculum/`, `automation/`, `share/`, `extensions/`를 import하지 않는다 |
-| domain | `curriculum/`, `automation/`, `share/`, `extensions/`, `ai/` | `api/`를 import하지 않는다. tool handler는 engine/domain flow 경계만 호출한다 |
+| domain | `curriculum/`, `automation/`, `publication/`, `share/`, `extensions/`, `ai/` | `api/`를 import하지 않는다. tool handler는 engine/domain flow 경계만 호출한다 |
 | transport | `api/`, `webBuild/` | HTTP/SSE/WebSocket/payload 변환만 맡고 provider/runtime/domain 내부 판단을 직접 소유하지 않는다 |
 | entry | `server.py`, `cli.py` | 앱 조립과 실행 진입점이다 |
 

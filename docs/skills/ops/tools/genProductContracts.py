@@ -261,6 +261,7 @@ class EffectSpec(TypedDict):
 
 
 class CapabilityDiagnostic(TypedDict):
+    blockId: str
     code: str
     message: str
     severity: Literal["info", "warning", "blocked"]
@@ -306,6 +307,7 @@ export type EffectSpec = {{
 }};
 
 export type CapabilityDiagnostic = {{
+  blockId: string;
   code: string;
   message: string;
   severity: "info" | "warning" | "blocked";

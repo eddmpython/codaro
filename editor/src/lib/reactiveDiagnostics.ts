@@ -12,6 +12,7 @@ export const emptyReactiveDiagnostics: ReactiveDiagnostics = {
   definitionOrder: [],
   emptyCells: [],
   unsafeCalls: [],
+  capability: null,
 };
 
 // dirty 셀 + 의존성 전이 다운스트림 = stale 집합(순수 BFS, 백엔드 dependents 인접 재사용).
@@ -40,7 +41,9 @@ export type CellDiagnosticChip = {
     | "self-import"
     | "definition-order"
     | "empty-cell"
-    | "unsafe-call";
+    | "unsafe-call"
+    | "capability-warning"
+    | "capability-blocked";
   label: string;
 };
 
@@ -73,6 +76,13 @@ export function cellDiagnosticChips(diagnostics: ReactiveDiagnostics, blockId: s
   const unsafe = diagnostics.unsafeCalls.filter(([cell]) => cell === blockId).map(([, call]) => call);
   if (unsafe.length) {
     chips.push({ kind: "unsafe-call", label: `주의 호출: ${unsafe.join(", ")}` });
+  }
+  for (const diagnostic of diagnostics.capability?.diagnostics ?? []) {
+    if (diagnostic.blockId !== blockId) continue;
+    chips.push({
+      kind: diagnostic.severity === "blocked" ? "capability-blocked" : "capability-warning",
+      label: diagnostic.message,
+    });
   }
   return chips;
 }

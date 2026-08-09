@@ -13,6 +13,11 @@ import {
   setNotebookUiValue,
 } from "@/lib/notebookRuntime";
 import { computeStaleBlockIds, emptyReactiveDiagnostics } from "@/lib/reactiveDiagnostics";
+import {
+  inspectPublicationDraft,
+  type PublicationCompilationReport,
+  type PublicationInspector,
+} from "@/lib/publicationCompiler";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import type {
   AppNotice,
@@ -29,7 +34,9 @@ type UseNotebookRuntimeStateOptions = {
   onNotice: (notice: AppNotice) => void;
   selectNotebookBlock: (blockId: string) => void;
   selectedBlock: BlockConfig | undefined;
+  sourcePath: string | null;
   surface: SurfaceMode;
+  inspectPublication?: PublicationInspector;
 };
 
 function applyAutomationSessionOutcome(
@@ -62,7 +69,9 @@ export function useNotebookRuntimeState({
   onNotice,
   selectNotebookBlock,
   selectedBlock,
+  sourcePath,
   surface,
+  inspectPublication = inspectPublicationDraft,
 }: UseNotebookRuntimeStateOptions) {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [variables, setVariables] = useState<VariableInfo[]>([]);
@@ -74,6 +83,7 @@ export function useNotebookRuntimeState({
     () => document.runtime?.reactiveMode !== "sequential",
   );
   const [diagnostics, setDiagnostics] = useState<ReactiveDiagnostics>(emptyReactiveDiagnostics);
+  const [capability, setCapability] = useState<PublicationCompilationReport | null>(null);
   const [automationSessions, setAutomationSessions] = useState<Record<string, string>>({});
   // 마지막 실행 시점에 보낸 셀 내용 스냅샷. 이후 draft가 달라지면 그 셀과 다운스트림이 stale.
   const [lastRunContent, setLastRunContent] = useState<Record<string, string>>({});
@@ -87,6 +97,7 @@ export function useNotebookRuntimeState({
     setResults({});
     setVariables([]);
     setDiagnostics(emptyReactiveDiagnostics);
+    setCapability(null);
     setLastRunContent({});
     setAutomationSessions({});
   }, []);
@@ -98,6 +109,27 @@ export function useNotebookRuntimeState({
   useEffect(() => {
     setReactiveEnabled(document.runtime?.reactiveMode !== "sequential");
   }, [document.id, document.runtime?.reactiveMode]);
+
+  useEffect(() => {
+    if (!apiOnline || surface !== "editor") {
+      setCapability(null);
+      return;
+    }
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      void inspectPublication(document, drafts, sourcePath)
+        .then((report) => {
+          if (!cancelled) setCapability(report);
+        })
+        .catch(() => {
+          if (!cancelled) setCapability(null);
+        });
+    }, 300);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [apiOnline, document, drafts, inspectPublication, sourcePath, surface]);
 
   const executeBlock = useCallback(async (block: BlockConfig, sourceOverride?: string) => {
     if (!isExecutableBlock(block)) return;
@@ -348,11 +380,21 @@ export function useNotebookRuntimeState({
     };
   }, [sessionId]);
 
+  const projectedDiagnostics = useMemo<ReactiveDiagnostics>(() => ({
+    ...diagnostics,
+    capability: capability ? {
+      runtimeTarget: capability.runtimeTarget,
+      manifestHash: capability.manifestHash,
+      entryBlockIds: capability.entryBlockIds,
+      diagnostics: capability.diagnostics,
+    } : null,
+  }), [capability, diagnostics]);
+
   return {
     canRun,
     cleanupCellDefinitions,
     currentResult,
-    diagnostics,
+    diagnostics: projectedDiagnostics,
     hasRunnableNotebook,
     notebookRunning,
     reactiveEnabled,

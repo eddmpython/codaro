@@ -74,6 +74,13 @@ def testExecutableUnitSchemaAndGeneratedPythonTypeHaveExactFields() -> None:
     assert set(schema["properties"]) == expected
     assert ExecutableUnitSpec.__required_keys__ == frozenset(expected)
     assert tuple(schema["$defs"]["RuntimeTarget"]["enum"]) == RUNTIME_TARGETS
+    assert set(schema["$defs"]["CapabilityDiagnostic"]["required"]) == {
+        "blockId",
+        "code",
+        "message",
+        "severity",
+        "sourceSpan",
+    }
 
 
 def testGeneratedTypeScriptContractsExposeEveryCanonicalField() -> None:

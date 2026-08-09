@@ -120,8 +120,9 @@
     "CapabilityDiagnostic": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["code", "message", "severity", "sourceSpan"],
+      "required": ["blockId", "code", "message", "severity", "sourceSpan"],
       "properties": {
+        "blockId": { "type": "string", "minLength": 1, "maxLength": 200 },
         "code": { "type": "string", "minLength": 1 },
         "message": { "type": "string", "minLength": 1 },
         "severity": { "type": "string", "enum": ["info", "warning", "blocked"] },
