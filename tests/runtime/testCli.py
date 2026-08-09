@@ -6,7 +6,7 @@ from codaro.document import createEmptyDocument
 from codaro.document.service import saveDocument
 
 import codaro.cli as cliModule
-from codaro.cli import normalizeArgs
+from codaro.cli import buildParser, normalizeArgs
 from codaro.server import EditorBuildError
 
 
@@ -52,6 +52,16 @@ def testNormalizeArgsLeavesPublicationCommandsUntouched() -> None:
         "./server",
         "sha256-" + "a" * 64,
     ]
+
+
+def testBuildParserAcceptsExplicitBlockEmbedContract() -> None:
+    args = buildParser().parse_args(
+        ["build", "notebook.py", "--target", "embed", "--entry", "result", "--mode", "editable"]
+    )
+
+    assert args.target == "embed"
+    assert args.entry == "result"
+    assert args.mode == "editable"
 
 
 def testInspectPrintsCompilerReportWithoutStartingEditor(tmp_path, monkeypatch, capsys) -> None:

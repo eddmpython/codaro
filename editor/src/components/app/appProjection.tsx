@@ -5,6 +5,7 @@ import { ExecutionOutput } from "@/components/app/appPrimitives";
 import { Button } from "@/components/ui/button";
 import { blockLabel, isExecutableBlock } from "@/lib/cellModel";
 import { cn } from "@/lib/utils";
+import type { BlockEmbedMode } from "@/embed/embedMessage";
 import type {
   BlockConfig,
   CodaroDocument,
@@ -17,18 +18,24 @@ type ResultMap = Record<string, ExecutionResult>;
 export function AppProjection({
   document,
   drafts,
+  embedMode,
   mode,
   notebookRunning,
+  onDraftChange,
   onExitPreview,
+  onRunEntry,
   onUpdateApp,
   results,
   staleBlockIds,
 }: {
   document: CodaroDocument;
   drafts: Record<string, string>;
+  embedMode?: BlockEmbedMode;
   mode: "preview" | "server";
   notebookRunning: boolean;
+  onDraftChange?: (blockId: string, code: string) => void;
   onExitPreview?: () => void;
+  onRunEntry?: (blockId: string, code: string) => Promise<void>;
   onUpdateApp?: (patch: Partial<DocumentAppConfig>) => void;
   results: ResultMap;
   staleBlockIds: string[];
@@ -71,6 +78,7 @@ export function AppProjection({
     <main
       className="h-svh min-h-0 overflow-y-auto overflow-x-hidden bg-background text-foreground"
       data-app-layout={app.layout}
+      data-app-embed-mode={embedMode}
       data-app-mode={mode}
       data-app-projection="true"
       data-app-state-policy={app.statePolicy}
@@ -100,18 +108,27 @@ export function AppProjection({
             title="표시할 출력이 없습니다"
           />
         ) : (
-          <div className={layoutClass(app.layout)} data-app-entry-layout={app.layout}>
+          <div
+            className={cn(
+              layoutClass(app.layout),
+              embedMode === "output" && "[&_[data-widget-ui]]:pointer-events-none",
+            )}
+            data-app-entry-layout={app.layout}
+          >
             {entries.map((block, index) => (
               <AppEntry
                 block={block}
                 code={drafts[block.id] ?? block.content}
                 displayTitle={block.title?.trim() || `출력 ${index + 1}`}
-                hideCode={app.hideCode}
+                editable={embedMode === "editable"}
+                hideCode={embedMode === "editable" ? false : app.hideCode}
                 key={block.id}
                 lastGoodResult={lastGoodResults[block.id]}
                 notebookRunning={notebookRunning}
                 result={results[block.id]}
                 stale={staleBlockIds.includes(block.id)}
+                onDraftChange={onDraftChange}
+                onRun={onRunEntry}
               />
             ))}
           </div>
@@ -228,20 +245,26 @@ function AppEntry({
   block,
   code,
   displayTitle,
+  editable,
   hideCode,
   lastGoodResult,
   notebookRunning,
   result,
   stale,
+  onDraftChange,
+  onRun,
 }: {
   block: BlockConfig;
   code: string;
   displayTitle: string;
+  editable: boolean;
   hideCode: boolean;
   lastGoodResult?: ExecutionResult;
   notebookRunning: boolean;
   result?: ExecutionResult;
   stale: boolean;
+  onDraftChange?: (blockId: string, code: string) => void;
+  onRun?: (blockId: string, code: string) => Promise<void>;
 }) {
   const failed = result ? isExecutionError(result) : false;
   const visibleResult = failed && lastGoodResult ? lastGoodResult : result;
@@ -255,7 +278,30 @@ function AppEntry({
       data-app-output-stale={outputStale ? "true" : "false"}
     >
       <h2 className="mb-3 break-words text-sm font-medium text-muted-foreground">{displayTitle}</h2>
-      {!hideCode ? (
+      {editable ? (
+        <div className="mb-4 grid gap-2" data-app-editable-source={block.id}>
+          <label className="text-xs font-medium text-muted-foreground" htmlFor={`embed-source-${block.id}`}>
+            Python 코드
+          </label>
+          <textarea
+            aria-label={`${displayTitle} Python 코드`}
+            className="min-h-32 w-full resize-y rounded-md border bg-code p-3 font-mono text-xs leading-5 text-code-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            id={`embed-source-${block.id}`}
+            spellCheck={false}
+            value={code}
+            onChange={(event) => onDraftChange?.(block.id, event.target.value)}
+          />
+          <Button
+            className="justify-self-start"
+            disabled={notebookRunning || !onRun}
+            size="sm"
+            type="button"
+            onClick={() => void onRun?.(block.id, code)}
+          >
+            코드 실행
+          </Button>
+        </div>
+      ) : !hideCode ? (
         <pre
           className="mb-4 max-h-72 overflow-auto rounded-md bg-code p-3 font-mono text-xs leading-5 text-code-foreground"
           data-app-source={block.id}

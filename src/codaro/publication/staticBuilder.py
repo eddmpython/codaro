@@ -12,7 +12,7 @@ from pathlib import Path, PurePosixPath
 import re
 import shutil
 import tempfile
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 import uuid
 import webbrowser
 
@@ -67,12 +67,25 @@ def buildStaticPublication(
     *,
     packageLock: Mapping[str, Any] | None = None,
     webBuildRoot: str | Path | None = None,
+    entryBlockIds: Sequence[str] | None = None,
+    closureOnly: bool = False,
 ) -> PublicationBuildResult:
     source = Path(sourcePath).expanduser().resolve()
     output = Path(outputRoot).expanduser().resolve()
     if not source.is_file():
         raise PublicationBuildError(f"문서가 없습니다: {source}")
     document = loadDocument(str(source))
+    requestedEntries = tuple(dict.fromkeys(entryBlockIds or ()))
+    if requestedEntries:
+        knownBlockIds = {block.id for block in document.blocks}
+        missingEntries = [blockId for blockId in requestedEntries if blockId not in knownBlockIds]
+        if missingEntries:
+            raise PublicationBuildError("entry block이 문서에 없습니다: " + ", ".join(missingEntries))
+        document = document.model_copy(
+            update={
+                "app": document.app.model_copy(update={"entryBlockIds": list(requestedEntries)})
+            }
+        )
     sourceText = source.read_text(encoding="utf-8")
     report = compileDocument(
         document,
@@ -101,9 +114,18 @@ def buildStaticPublication(
         packageAssets, runtimePackages = _collectPackageAssets(
             report, source.parent, staging, packageLock or {}
         )
+        publicationBlocks = document.blocks
+        if closureOnly:
+            includedBlockIds = {
+                blockId
+                for result in report.units
+                for blockId in (result.unit["entryBlockId"], *result.unit["dependencyBlockIds"])
+            }
+            publicationBlocks = [block for block in document.blocks if block.id in includedBlockIds]
         publicationDocument = document.model_copy(
             update={
                 "id": f"publication-{report.sourceRevision.revisionHash.removeprefix(_HASH_PREFIX)[:24]}",
+                "blocks": publicationBlocks,
                 "metadata": document.metadata.model_copy(
                     update={
                         "createdAt": "1970-01-01T00:00:00+00:00",

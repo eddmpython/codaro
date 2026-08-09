@@ -38,6 +38,16 @@ artifacts:
       - src/codaro/publication/staticBuilder.py
       - src/codaro/publication/serverBuilder.py
       - src/codaro/publication/serverRuntime.py
+  - artifactId: block-embed-message
+    role: source
+    owner: product-architecture
+    sourcePath: contracts/embedMessage.schema.json
+    surfacePaths:
+      - src/codaro/generatedContracts/embedMessage.schema.json
+      - editor/src/lib/generatedContracts/embedMessage.schema.json
+      - editor/src/embed/embedMessage.ts
+      - editor/src/embed/codaroBlock.js
+      - src/codaro/publication/embedBuilder.py
   - artifactId: learning-artifact-descriptor
     role: source
     owner: learning-runtime

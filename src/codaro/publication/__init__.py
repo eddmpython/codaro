@@ -26,6 +26,15 @@ from .serverBuilder import (
 from .serverRuntime import (
     PublishedServerRuntime,
 )
+from .embedBuilder import (
+    BlockEmbedBuildResult,
+    BlockEmbedManifest,
+    BlockEmbedVerification,
+    buildBlockEmbed,
+    serveBlockEmbed,
+    startBlockEmbedServer,
+    verifyBlockEmbed,
+)
 
 __all__ = [
     "CompilationReport",
@@ -48,4 +57,11 @@ __all__ = [
     "rollbackServerPublication",
     "verifyServerPublication",
     "PublishedServerRuntime",
+    "BlockEmbedBuildResult",
+    "BlockEmbedManifest",
+    "BlockEmbedVerification",
+    "buildBlockEmbed",
+    "serveBlockEmbed",
+    "startBlockEmbedServer",
+    "verifyBlockEmbed",
 ]

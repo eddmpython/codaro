@@ -57,7 +57,14 @@ def buildParser() -> argparse.ArgumentParser:
 
     buildPublicationParser = subparsers.add_parser("build", help="Build an immutable publication bundle.")
     buildPublicationParser.add_argument("path", help="Document path to build.")
-    buildPublicationParser.add_argument("--target", choices=["browser", "server"], default="browser")
+    buildPublicationParser.add_argument("--target", choices=["browser", "server", "embed"], default="browser")
+    buildPublicationParser.add_argument("--entry", help="Single entry block id for an embed build.")
+    buildPublicationParser.add_argument(
+        "--mode",
+        choices=["output", "interactive", "editable"],
+        default="interactive",
+        help="Default block embed mode.",
+    )
     buildPublicationParser.add_argument("--output", help="Publication output directory.")
     buildPublicationParser.add_argument("--package-lock", help="JSON package compatibility lock path.")
     buildPublicationParser.add_argument("--json", action="store_true", help="Print the build receipt as JSON.")
@@ -330,21 +337,33 @@ def _handleInspect(args) -> None:
 
 
 def _handlePublicationBuild(args) -> None:
-    from .publication import PublicationBuildError, buildServerPublication, buildStaticPublication
+    from .publication import PublicationBuildError, buildBlockEmbed, buildServerPublication, buildStaticPublication
 
     sourcePath = Path(args.path).expanduser().resolve()
     outputPath = (
         Path(args.output).expanduser().resolve()
         if args.output
-        else sourcePath.with_name(f"{sourcePath.stem}-{'server' if args.target == 'server' else 'site'}")
+        else sourcePath.with_name(
+            f"{sourcePath.stem}-"
+            f"{'server' if args.target == 'server' else 'embed' if args.target == 'embed' else 'site'}"
+        )
     )
     packageLock = _loadPackageLock(args.package_lock)
     try:
-        result = (
-            buildServerPublication(sourcePath, outputPath, packageLock=packageLock)
-            if args.target == "server"
-            else buildStaticPublication(sourcePath, outputPath, packageLock=packageLock)
-        )
+        if args.target == "embed":
+            if not args.entry:
+                raise PublicationBuildError("embed build에는 --entry block id가 필요합니다.")
+            result = buildBlockEmbed(
+                sourcePath,
+                outputPath,
+                entryBlockId=args.entry,
+                defaultMode=args.mode,
+                packageLock=packageLock,
+            )
+        elif args.target == "server":
+            result = buildServerPublication(sourcePath, outputPath, packageLock=packageLock)
+        else:
+            result = buildStaticPublication(sourcePath, outputPath, packageLock=packageLock)
     except PublicationBuildError as exc:
         print(f"Publication build failed: {exc}", file=sys.stderr)
         for diagnostic in exc.diagnostics:
@@ -356,22 +375,24 @@ def _handlePublicationBuild(args) -> None:
                 file=sys.stderr,
             )
         raise SystemExit(1) from exc
+    resultHash = result.embedHash if args.target == "embed" else result.bundleHash
+    resultRoot = result.embedRoot if args.target == "embed" else result.bundleRoot
     payload = {
         "target": args.target,
-        "bundleHash": result.bundleHash,
-        "bundleRoot": result.bundleRoot.as_posix(),
+        "bundleHash": resultHash,
+        "bundleRoot": resultRoot.as_posix(),
         "activePointer": result.activePointer.as_posix(),
         "reused": result.reused,
     }
     if args.json:
         print(json.dumps(payload, ensure_ascii=False, indent=2))
     else:
-        print(f"Built {args.target} publication: {result.bundleRoot}")
-        print(f"Bundle: {result.bundleHash}")
+        print(f"Built {args.target} publication: {resultRoot}")
+        print(f"Bundle: {resultHash}")
 
 
 def _handlePublicationServe(args) -> None:
-    from .publication import PublicationBuildError, servePublication
+    from .publication import PublicationBuildError, serveBlockEmbed, servePublication
     from .server import serveServerPublication
 
     try:
@@ -379,7 +400,13 @@ def _handlePublicationServe(args) -> None:
         active = json.loads(activePath.read_text(encoding="utf-8"))
         if not isinstance(active, dict):
             raise PublicationBuildError("publication active pointer가 JSON object가 아닙니다.")
-        serve = serveServerPublication if active.get("target") == "server" else servePublication
+        serve = (
+            serveServerPublication
+            if active.get("target") == "server"
+            else serveBlockEmbed
+            if active.get("target") == "embed"
+            else servePublication
+        )
         serve(args.path, host=args.host, port=args.port, openBrowser=not args.no_browser)
     except PublicationBuildError as exc:
         print(f"Publication serve failed: {exc}", file=sys.stderr)

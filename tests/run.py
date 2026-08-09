@@ -167,6 +167,7 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "runtime-recovery-browser": ("output/test-runner/runtime-recovery-browser/runtime-recovery-report.json",),
     "static-publication": ("output/test-runner/static-publication/static-publication-report.json",),
     "server-publication": ("output/test-runner/server-publication/server-publication-report.json",),
+    "block-embedding": ("output/test-runner/block-embedding/block-embedding-report.json",),
     "quality-cycle": ("output/test-runner/quality-cycle/sequence-summary.json",),
     "product-release": ("output/test-runner/product-release/sequence-summary.json",),
     "preflight": ("output/test-runner/preflight/sequence-summary.json",),
@@ -738,6 +739,23 @@ GATES: dict[str, Gate] = {
         ),
         ci_required=False,
     ),
+    "block-embedding": Gate(
+        tier="surface",
+        description="기능 블록 closure, Web Component, 메시지 보안, 상태 및 CSS 격리를 실제 Chromium에서 검증한다.",
+        commands=(
+            command((
+                "uv", "run", "python", "-X", "utf8", "-m", "pytest",
+                "tests/publication/testEmbedBuilder.py",
+                "tests/contracts/testApplicationContracts.py",
+                "tests/runtime/testCli.py",
+                "-q", "--tb=short",
+            )),
+            command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/genProductContracts.py", "--check")),
+            command(("npm", "run", "build"), cwd="editor"),
+            command(("uv", "run", "python", "-X", "utf8", "tests/publication/verifyBlockEmbedPlaywright.py"), timeoutSeconds=600),
+        ),
+        ci_required=False,
+    ),
     "gui-control-browser": Gate(
         tier="surface",
         description="버전된 GUI 제어 API와 실제 Chromium의 명령, 클릭, 키 입력, 모바일 포커스, AX tree, geometry 폐쇄 루프를 확인한다.",
@@ -998,6 +1016,7 @@ PRODUCT_QUALITY_GATES = (
     "publication-compiler",
     "static-publication",
     "server-publication",
+    "block-embedding",
     "design-system-contract",
     "theme-runtime-browser",
     "visual-accessibility-browser",
@@ -2056,8 +2075,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 67:
-        failures.append(f"expected 67 gates, found {len(GATES)}")
+    if len(GATES) != 68:
+        failures.append(f"expected 68 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

@@ -104,14 +104,9 @@ GitHub Pages, Cloudflare, Docker registry 같은 외부 대상은 이미 검증�
 
 ## 구현 순서
 
-1. [앱 모드와 저작](04-app-mode-authoring/README.md)
-2. [기능 블록 compiler](05-capability-compiler/README.md)
-3. [정적 publication](06-static-publication/README.md)
-4. [서버 publication](07-server-publication/README.md)
-5. [블록 임베딩](08-block-embedding/README.md)
-6. [학습과 제품 승격](09-learning-product-bridge/README.md)
-7. [배포 adapter](10-deployment-adapters/README.md)
-8. [참조 제품과 최종 claim](11-reference-products/README.md)
+1. [학습과 제품 승격](09-learning-product-bridge/README.md)
+2. [배포 adapter](10-deployment-adapters/README.md)
+3. [참조 제품과 최종 claim](11-reference-products/README.md)
 
 각 workstream은 구현, 지정 gate, 문서 정합, 부정 경로 검증을 모두 끝낸 같은 변경에서 삭제한다. parent에는 남은 일만 유지한다.
 

@@ -355,6 +355,10 @@ uv run codaro build notebook.py --target server --output notebook-server
 $env:APP_TOKEN = "배포 환경에서 주입"
 uv run codaro serve notebook-server
 
+# 한 기능 블록을 다른 페이지에 넣는 Web Component bundle
+uv run codaro build notebook.py --target embed --entry result-block --mode interactive --output result-embed
+uv run codaro serve result-embed
+
 # 검증된 이전 immutable bundle로 pointer 복원
 uv run codaro rollback notebook-server sha256-<bundle hash>
 

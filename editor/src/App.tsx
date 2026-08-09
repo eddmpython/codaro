@@ -46,6 +46,10 @@ import {
 import { WidgetSessionProvider } from "@/lib/widgetSession";
 import { isServerPublicationPage } from "@/lib/serverPublication";
 import {
+  installBlockEmbedFrameBridge,
+  resolveBlockEmbedFrameConfig,
+} from "@/embed/embedFrameBridge";
+import {
   installBrowserPythonRuntimeDiagnostics,
   scheduleBrowserPythonRuntimeWarm,
 } from "@/lib/browserPythonRuntime";
@@ -63,6 +67,7 @@ const CURRICULUM_HOME_ROUTE = "__curriculum-home__";
 
 function App() {
   const serverPublicationPage = isServerPublicationPage();
+  const blockEmbedFrame = useRef(resolveBlockEmbedFrameConfig()).current;
   const [surface, setSurface, runRouteState, navigateRunRoute, routeRestoreRevision] = useSurfaceRoute();
   const initialRouteLesson = lessonRefFromKey(runRouteState.lessonKey);
   const initialCurriculumSelection = useRef(
@@ -84,6 +89,10 @@ function App() {
     if (!params.has("codaroBrowserRuntimeDiagnostics")) return undefined;
     return installBrowserPythonRuntimeDiagnostics();
   }, []);
+
+  useEffect(() => (
+    blockEmbedFrame ? installBlockEmbedFrameBridge(blockEmbedFrame) : undefined
+  ), [blockEmbedFrame]);
 
   const { setDesignSurface } = useCodaroDesign();
   useEffect(() => {
@@ -588,6 +597,13 @@ function App() {
     : appPreviewOpen
       ? "preview"
       : null;
+  const runEmbedEntry = useCallback(async (blockId: string, code: string) => {
+    if (blockEmbedFrame?.mode !== "editable") return;
+    const block = document.blocks.find((candidate) => candidate.id === blockId);
+    if (!block || !isExecutableBlock(block)) return;
+    updateDraft(blockId, code);
+    await runBlock(block, code);
+  }, [blockEmbedFrame, document.blocks, runBlock, updateDraft]);
   const appExecutionSignature = JSON.stringify({
     documentId: document.id,
     packages: document.runtime?.packages ?? [],
@@ -631,9 +647,12 @@ function App() {
           <AppProjection
             document={document}
             drafts={drafts}
+            embedMode={blockEmbedFrame?.mode}
             mode={appProjectionMode}
             notebookRunning={notebookRunning}
+            onDraftChange={blockEmbedFrame?.mode === "editable" ? updateDraft : undefined}
             onExitPreview={appProjectionMode === "preview" ? () => setAppPreviewOpen(false) : undefined}
+            onRunEntry={blockEmbedFrame?.mode === "editable" ? runEmbedEntry : undefined}
             onUpdateApp={appProjectionMode === "preview" ? updateNotebookApp : undefined}
             results={results}
             staleBlockIds={staleBlockIds}

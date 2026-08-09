@@ -131,6 +131,7 @@ uv run python -X utf8 tests/run.py gate attempts
 | `publication-compiler` | fast | 기능 블록 dependency closure, effect, package lock, asset hash, target 판정과 CLI/API/editor 단일 projection을 확인한다. |
 | `static-publication` | surface | immutable browser bundle의 재현성, 무결성, 상대 자산과 실제 Chromium offline Python 및 위젯 반응성을 확인한다. |
 | `server-publication` | surface | immutable server bundle, offline wheel, session 격리, secret 비노출, worker 복구와 rollback을 실제 Chromium까지 확인한다. |
+| `block-embedding` | surface | entry dependency closure, Web Component manifest 공유, iframe state와 CSS 격리, 메시지 origin/version 거부와 editable 재실행을 실제 Chromium에서 확인한다. |
 | `teacher-eval` | fast | teacher tool policy, trace, golden eval 계약을 빠르게 확인한다. |
 | `teacher-e2e` | fast | scripted provider loop, provider error workloop, tool policy, 실제 curriculum YAML handler를 통과하는 golden e2e harness와 9점 기준 score를 실행한다. |
 | `assistant-workloop-contract` | fast | assistant workloop/trace UI state가 작업 전 확인 질문, provider 오류, tool detail을 보존하는지 확인한다. |

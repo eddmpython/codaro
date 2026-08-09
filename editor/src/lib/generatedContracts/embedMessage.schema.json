@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codaro.dev/contracts/embedMessage.schema.json",
+  "title": "Codaro Block Embed Message",
+  "oneOf": [
+    { "$ref": "#/$defs/InitMessage" },
+    { "$ref": "#/$defs/ReadyMessage" },
+    { "$ref": "#/$defs/ResizeMessage" },
+    { "$ref": "#/$defs/ErrorMessage" }
+  ],
+  "$defs": {
+    "Protocol": { "const": "codaro.embed" },
+    "Version": { "const": 1 },
+    "EmbedId": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "FrameId": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "Mode": { "type": "string", "enum": ["output", "interactive", "editable"] },
+    "InitMessage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol", "version", "type", "embedId", "mode", "parentOrigin"],
+      "properties": {
+        "protocol": { "$ref": "#/$defs/Protocol" },
+        "version": { "$ref": "#/$defs/Version" },
+        "type": { "const": "init" },
+        "embedId": { "$ref": "#/$defs/EmbedId" },
+        "mode": { "$ref": "#/$defs/Mode" },
+        "parentOrigin": { "type": "string", "pattern": "^https?://[^/]+$" }
+      }
+    },
+    "ReadyMessage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol", "version", "type", "embedId", "frameId", "height"],
+      "properties": {
+        "protocol": { "$ref": "#/$defs/Protocol" },
+        "version": { "$ref": "#/$defs/Version" },
+        "type": { "const": "ready" },
+        "embedId": { "$ref": "#/$defs/EmbedId" },
+        "frameId": { "$ref": "#/$defs/FrameId" },
+        "height": { "type": "integer", "minimum": 120, "maximum": 4096 }
+      }
+    },
+    "ResizeMessage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol", "version", "type", "embedId", "frameId", "height"],
+      "properties": {
+        "protocol": { "$ref": "#/$defs/Protocol" },
+        "version": { "$ref": "#/$defs/Version" },
+        "type": { "const": "resize" },
+        "embedId": { "$ref": "#/$defs/EmbedId" },
+        "frameId": { "$ref": "#/$defs/FrameId" },
+        "height": { "type": "integer", "minimum": 120, "maximum": 4096 }
+      }
+    },
+    "ErrorMessage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol", "version", "type", "embedId", "frameId", "code", "message"],
+      "properties": {
+        "protocol": { "$ref": "#/$defs/Protocol" },
+        "version": { "$ref": "#/$defs/Version" },
+        "type": { "const": "error" },
+        "embedId": { "$ref": "#/$defs/EmbedId" },
+        "frameId": { "$ref": "#/$defs/FrameId" },
+        "code": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "message": { "type": "string", "minLength": 1, "maxLength": 1000 }
+      }
+    }
+  }
+}

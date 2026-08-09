@@ -22,6 +22,7 @@ RUST_MOD_PATH = ROOT / "launcher" / "codaro-launcher" / "src" / "generated_contr
 APP_SPEC_PATH = ROOT / "contracts" / "appSpec.schema.json"
 EXECUTABLE_UNIT_PATH = ROOT / "contracts" / "executableUnit.schema.json"
 PUBLICATION_MANIFEST_PATH = ROOT / "contracts" / "publicationManifest.schema.json"
+EMBED_MESSAGE_PATH = ROOT / "contracts" / "embedMessage.schema.json"
 PYTHON_APP_SPEC_PATH = ROOT / "src" / "codaro" / "generatedContracts" / "appSpec.py"
 PYTHON_EXECUTABLE_UNIT_PATH = ROOT / "src" / "codaro" / "generatedContracts" / "executableUnit.py"
 PYTHON_PUBLICATION_MANIFEST_PATH = ROOT / "src" / "codaro" / "generatedContracts" / "publicationManifest.py"
@@ -36,6 +37,10 @@ TYPESCRIPT_EXECUTABLE_UNIT_PATH = (
 )
 TYPESCRIPT_PUBLICATION_MANIFEST_PATH = (
     ROOT / "editor" / "src" / "lib" / "generatedContracts" / "publicationManifest.ts"
+)
+PACKAGED_EMBED_MESSAGE_PATH = ROOT / "src" / "codaro" / "generatedContracts" / "embedMessage.schema.json"
+TYPESCRIPT_EMBED_MESSAGE_PATH = (
+    ROOT / "editor" / "src" / "lib" / "generatedContracts" / "embedMessage.schema.json"
 )
 CHECK_SANDBOX_DECISION_PATH = ROOT / "contracts" / "checkSandboxFeasibilityDecision.json"
 TYPESCRIPT_CHECK_SANDBOX_DECISION_PATH = (
@@ -539,6 +544,9 @@ def expectedOutputs() -> dict[Path, str]:
     _appSpec, appSpecHash = loadJsonSchema(APP_SPEC_PATH)
     _executableUnit, executableUnitHash = loadJsonSchema(EXECUTABLE_UNIT_PATH)
     _publicationManifest, publicationManifestHash = loadJsonSchema(PUBLICATION_MANIFEST_PATH)
+    embedMessage = json.loads(EMBED_MESSAGE_PATH.read_text(encoding="utf-8"))
+    if not isinstance(embedMessage, dict) or not isinstance(embedMessage.get("oneOf"), list):
+        raise ContractGenerationError("embedMessage.schema.json must declare a oneOf message union")
     return {
         PYTHON_PATH: pythonSource(schemaHash, ownersHash),
         PYTHON_INIT_PATH: pythonInitSource(schemaHash, ownersHash),
@@ -555,6 +563,8 @@ def expectedOutputs() -> dict[Path, str]:
         TYPESCRIPT_PUBLICATION_MANIFEST_PATH: publicationManifestTypeScriptSource(
             publicationManifestHash, ownersHash
         ),
+        PACKAGED_EMBED_MESSAGE_PATH: EMBED_MESSAGE_PATH.read_text(encoding="utf-8"),
+        TYPESCRIPT_EMBED_MESSAGE_PATH: EMBED_MESSAGE_PATH.read_text(encoding="utf-8"),
         TYPESCRIPT_CHECK_SANDBOX_DECISION_PATH: CHECK_SANDBOX_DECISION_PATH.read_text(encoding="utf-8"),
         RUST_PATH: rustSource(schemaHash, ownersHash),
         RUST_MOD_PATH: rustModSource(schemaHash, ownersHash),
