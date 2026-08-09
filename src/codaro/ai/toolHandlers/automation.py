@@ -457,6 +457,9 @@ class AutomationToolHandlers:
                 description=str(args.get("description", "")),
                 schedule=str(args["schedule"]) if args.get("schedule") else None,
                 inputs=args.get("inputs"),
+                outputContract=args.get("outputContract"),
+                secretRefs=args.get("secretRefs"),
+                permissionScopes=args.get("permissionScopes"),
             )
         except AutomationTaskFlowError as exc:
             return {"error": str(exc)}

@@ -24,6 +24,12 @@ whenToUse: 새 엔진 구현, capability 추가 (execute/interrupt/variables/fil
 - `runtime-recovery-browser` gate는 실제 제품 화면에서 package failure와 cell execution failure가 각각 셀 근처 복구 UX로 보이는지 확인한다.
 - kernel 실행 결과를 HTTP, websocket, tool payload로 바꾸는 기준은 `src/codaro/kernel/executionPayload.py`에 둔다.
 
+## Task 실행 정책
+
+일반 notebook session은 사용자가 소유한 Local runtime 의미를 유지한다. 예약, webhook, workflow, 수동 task는 같은 LocalEngine을 사용하되 `ExecutionSecurityPolicy`가 주입된 별도 worker에서 실행한다. 정책은 workspace root, 정확한 permission scope, safety approval과 같은 policy hash를 가진다.
+
+Task worker의 파일, network, process audit event는 `src/codaro/runtime/localWorker.py`가 집행한다. Task 결과 의미 판정은 `src/codaro/automation/taskExecution.py`, 승인 fingerprint와 policy hash는 `src/codaro/automation/taskSafety.py`가 소유한다. 표시된 권한과 실행 권한이 다르면 검증된 run이 될 수 없다.
+
 ## 관련
 
 - [[local-first-runtime]] - 로컬 기본 실행 정책

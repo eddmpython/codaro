@@ -65,11 +65,13 @@ def testAutoreloadReloadsChangedUserModule(tmp_path) -> None:
     module.write_text("VALUE = 1\n", encoding="utf-8")
     session = KernelSession(workingDirectory=str(tmp_path))
     first = _run(session.execute("import mymod\nmymod.VALUE", blockId="a"))
+    assert first.status == "done"
     assert "1" in str(first.data)
 
     module.write_text("VALUE = 2\n", encoding="utf-8")
     future = time.time() + 10
     os.utime(module, (future, future))  # mtime을 확실히 앞당겨 reload 트리거
     second = _run(session.execute("import mymod\nmymod.VALUE", blockId="b"))
+    assert second.status == "done"
     assert "2" in str(second.data)
     session.dispose()

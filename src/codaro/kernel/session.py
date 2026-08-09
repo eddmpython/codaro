@@ -5,6 +5,7 @@ from collections.abc import Awaitable, Callable
 
 from ..runtime import ExecutionEvent as RuntimeExecutionEvent
 from ..runtime import LocalEngine, VariableDelta as RuntimeVariableDelta, VariableState
+from ..runtime.executionPolicy import ExecutionSecurityPolicy
 from ..system.fileOps import DirectoryListing, FileContent
 from ..system.packageOps import InstallResult, PackageInfo
 from .protocol import ExecutionEvent, ExecutionOutput, VariableDelta, VariableInfo
@@ -16,12 +17,14 @@ class KernelSession:
         sessionId: str | None = None,
         workingDirectory: str | None = None,
         workspaceRoot: str | None = None,
+        executionPolicy: ExecutionSecurityPolicy | None = None,
     ):
         self.sessionId = sessionId or f"session-{uuid.uuid4().hex[:10]}"
         self._engine = LocalEngine(
             workingDirectory=workingDirectory,
             workspaceRoot=workspaceRoot,
             engineId=self.sessionId,
+            executionPolicy=executionPolicy,
         )
         self._registry = self._engine._registry
         self._cellDefinitions = self._engine._cellDefinitions

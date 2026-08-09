@@ -98,6 +98,9 @@ class CreateTaskRequest(BaseModel):
     description: str = ""
     schedule: str | None = None
     inputs: dict[str, Any] | None = None
+    outputContract: dict[str, Any] | None = None
+    secretRefs: list[str] | None = None
+    permissionScopes: list[str] | None = None
 
 
 class HarvestCodeRequest(BaseModel):
@@ -106,6 +109,9 @@ class HarvestCodeRequest(BaseModel):
     description: str = ""
     schedule: str | None = None
     inputs: dict[str, Any] | None = None
+    outputContract: dict[str, Any] | None = None
+    secretRefs: list[str] | None = None
+    permissionScopes: list[str] | None = None
 
 
 class UpdateTaskRequest(BaseModel):
@@ -202,6 +208,9 @@ def createAutomationRouter(state: Any) -> APIRouter:
             description=req.description,
             schedule=req.schedule,
             inputs=req.inputs,
+            outputContract=req.outputContract,
+            secretRefs=req.secretRefs,
+            permissionScopes=req.permissionScopes,
             workspaceRoot=str(getattr(state, "workspaceRoot", ".")),
         )
 
@@ -214,6 +223,9 @@ def createAutomationRouter(state: Any) -> APIRouter:
                 description=req.description,
                 schedule=req.schedule,
                 inputs=req.inputs,
+                outputContract=req.outputContract,
+                secretRefs=req.secretRefs,
+                permissionScopes=req.permissionScopes,
                 workspaceRoot=str(getattr(state, "workspaceRoot", ".")),
             )
         except AutomationTaskFlowError as error:

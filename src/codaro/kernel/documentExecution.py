@@ -32,6 +32,7 @@ async def captureDocument(
     *,
     manager: SessionManager,
     onBlock: Callable[[BlockConfig], None] | None = None,
+    executableBlockTypes: frozenset[str] = frozenset({"code"}),
 ) -> CaptureResult:
     """문서의 코드 블록을 순서대로 실행해 stdout/stderr/variables/상태를 포착한다.
 
@@ -47,7 +48,7 @@ async def captureDocument(
     failedBlockId = ""
     try:
         for block in document.blocks:
-            if block.type != "code" or not block.content.strip():
+            if block.type not in executableBlockTypes or not block.content.strip():
                 continue
             if onBlock is not None:
                 onBlock(block)

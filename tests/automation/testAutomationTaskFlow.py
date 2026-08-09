@@ -352,6 +352,48 @@ def testNewTaskIsDisabledUntilExactSafetyConfirmation(tmp_path) -> None:
     assert confirmed["safety"]["approvedAt"]
 
 
+def testTaskCreationPreservesExplicitEmptyPermissionScope(tmp_path) -> None:
+    (tmp_path / "pure.py").write_text("# %% [code]\nprint(42)\n", encoding="utf-8")
+    task = createAutomationTaskPayload(
+        name="Pure",
+        documentPath="pure.py",
+        permissionScopes=[],
+        outputContract={"schemaVersion": 1, "stdoutEquals": "42"},
+        workspaceRoot=str(tmp_path),
+    )
+
+    assert task["permissionScopes"] == []
+    confirmed = confirmAutomationTaskSafetyPayload(
+        task["id"],
+        confirmation=task["id"],
+        workspaceRoot=str(tmp_path),
+    )
+    assert confirmed["safety"]["status"] == "approved"
+    assert confirmed["safety"]["permissionScopes"] == []
+
+
+def testTaskDocumentOutsideWorkspaceIsBlocked(tmp_path) -> None:
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    outside = tmp_path / "outside.py"
+    outside.write_text("# %% [code]\nprint('outside')\n", encoding="utf-8")
+    task = createAutomationTaskPayload(
+        name="Outside",
+        documentPath=str(outside),
+        workspaceRoot=str(workspace),
+    )
+
+    assert task["safety"]["status"] == "blocked"
+    assert task["safety"]["reason"] == "document-outside-workspace"
+    with pytest.raises(AutomationTaskFlowError) as blocked:
+        confirmAutomationTaskSafetyPayload(
+            task["id"],
+            confirmation=task["id"],
+            workspaceRoot=str(workspace),
+        )
+    assert blocked.value.statusCode == 409
+
+
 def testManualRunRequiresEnabledCurrentSafetyReceipt(tmp_path) -> None:
     (tmp_path / "report.py").write_text("# %% [code]\nprint('first')\n", encoding="utf-8")
     task = createAutomationTaskPayload(

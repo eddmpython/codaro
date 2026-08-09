@@ -131,6 +131,9 @@ def createAutomationTaskPayload(
     schedule: str | None = None,
     inputs: dict[str, Any] | None = None,
     workspaceRoot: str = ".",
+    outputContract: dict[str, Any] | None = None,
+    secretRefs: list[str] | None = None,
+    permissionScopes: list[str] | None = None,
 ) -> dict[str, Any]:
     task = getTaskRegistry().create(
         name=name,
@@ -138,6 +141,9 @@ def createAutomationTaskPayload(
         description=description,
         schedule=schedule,
         inputs=inputs,
+        outputContract=outputContract,
+        secretRefs=secretRefs,
+        permissionScopes=permissionScopes,
     )
     return _serializeAutomationTask(task, workspaceRoot=workspaceRoot)
 
@@ -157,6 +163,9 @@ def createAutomationTaskFromCodePayload(
     schedule: str | None = None,
     inputs: dict[str, Any] | None = None,
     workspaceRoot: str,
+    outputContract: dict[str, Any] | None = None,
+    secretRefs: list[str] | None = None,
+    permissionScopes: list[str] | None = None,
 ) -> dict[str, Any]:
     """학습/편집기에서 쓴 코드를 자동화 태스크로 Harvest한다(졸업 메커닉).
 
@@ -188,6 +197,9 @@ def createAutomationTaskFromCodePayload(
         description=description,
         inputs=inputs,
         workspaceRoot=workspaceRoot,
+        outputContract=outputContract,
+        secretRefs=secretRefs,
+        permissionScopes=permissionScopes,
     )
     if schedule is not None:
         setAutomationTaskSchedulePayload(payload["id"], schedule=schedule, workspaceRoot=workspaceRoot)
@@ -203,6 +215,9 @@ def createAutomationTaskFromRecipePayload(
     description: str = "",
     schedule: str | None = None,
     inputs: dict[str, Any] | None = None,
+    outputContract: dict[str, Any] | None = None,
+    secretRefs: list[str] | None = None,
+    permissionScopes: list[str] | None = None,
 ) -> dict[str, Any]:
     try:
         draft = buildAutomationTaskDraft(
@@ -230,6 +245,9 @@ def createAutomationTaskFromRecipePayload(
         description=draft.description,
         schedule=draft.schedule,
         inputs=draft.inputs,
+        outputContract=outputContract,
+        secretRefs=secretRefs,
+        permissionScopes=permissionScopes,
     )
     return {
         "created": True,

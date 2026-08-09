@@ -88,6 +88,8 @@ class TaskRegistry:
         enabled: bool = False,
         permissionScopes: list[str] | None = None,
         riskLevel: str = "destructive",
+        outputContract: dict[str, Any] | None = None,
+        secretRefs: list[str] | None = None,
     ) -> TaskDefinition:
         task = TaskDefinition(
             name=name,
@@ -96,8 +98,14 @@ class TaskRegistry:
             schedule=schedule,
             inputs=inputs or {},
             enabled=enabled,
-            permissionScopes=list(permissionScopes or DEFAULT_TASK_PERMISSION_SCOPES),
+            permissionScopes=list(
+                DEFAULT_TASK_PERMISSION_SCOPES
+                if permissionScopes is None
+                else permissionScopes
+            ),
             riskLevel=riskLevel,
+            outputContract=dict(outputContract) if outputContract is not None else None,
+            secretRefs=sorted(set(secretRefs or [])),
         )
         self._tasks[task.id] = task
         self._save()

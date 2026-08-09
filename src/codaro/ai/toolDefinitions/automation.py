@@ -310,6 +310,23 @@ TOOL_CREATE_AUTOMATION_TASK = ToolDef(
                 "type": "object",
                 "description": "Optional task input defaults.",
             },
+            "outputContract": {
+                "type": "object",
+                "description": "Required semantic stdout, variable, and artifact checks for validated runs.",
+            },
+            "secretRefs": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Environment variable names whose values must be redacted from task results.",
+            },
+            "permissionScopes": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "enum": ["filesystem.read", "filesystem.write", "network", "process.execute"],
+                },
+                "description": "Exact capabilities enforced by the task execution worker.",
+            },
         },
         "required": ["name", "documentPath"],
     },

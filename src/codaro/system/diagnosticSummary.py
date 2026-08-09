@@ -242,6 +242,9 @@ def safeDiagnosticText(value: str, *, limit: int = 500) -> str:
         secret = os.environ.get(envName)
         if secret:
             text = text.replace(secret, "[redacted]")
+    for envName, secret in os.environ.items():
+        if _isSecretKey(envName) and len(secret) >= 6:
+            text = text.replace(secret, "[redacted]")
     text = re.sub(r"Bearer\s+[A-Za-z0-9._~+/=-]+", "Bearer [redacted]", text)
     text = re.sub(r"sk-[A-Za-z0-9_-]{12,}", "sk-[redacted]", text)
     text = re.sub(r'"access_token"\s*:\s*"[^"]+"', '"access_token":"[redacted]"', text)

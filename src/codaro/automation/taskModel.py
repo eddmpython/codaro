@@ -32,6 +32,8 @@ class TaskDefinition:
     schedule: str | None = None
     inputs: dict[str, Any] = field(default_factory=dict)
     outputs: list[str] = field(default_factory=list)
+    outputContract: dict[str, Any] | None = None
+    secretRefs: list[str] = field(default_factory=list)
     permissionScopes: list[str] = field(default_factory=lambda: list(DEFAULT_TASK_PERMISSION_SCOPES))
     riskLevel: str = "destructive"
     safetyApproval: dict[str, Any] | None = None
@@ -48,6 +50,8 @@ class TaskDefinition:
             "schedule": self.schedule,
             "inputs": self.inputs,
             "outputs": self.outputs,
+            "outputContract": self.outputContract,
+            "secretRefs": self.secretRefs,
             "permissionScopes": self.permissionScopes,
             "riskLevel": self.riskLevel,
             "safetyApproval": self.safetyApproval,
@@ -68,6 +72,14 @@ class TaskRun:
     output: str = ""
     error: str | None = None
     variables: dict[str, Any] = field(default_factory=dict)
+    validated: bool = False
+    validationErrors: list[str] = field(default_factory=list)
+    artifactDescriptors: list[dict[str, Any]] = field(default_factory=list)
+    enforcementPolicyHash: str | None = None
+    sourceHash: str | None = None
+    inputHash: str | None = None
+    checkSpecHash: str | None = None
+    operationalCandidate: bool = False
 
     def serialize(self) -> dict[str, Any]:
         return {
@@ -80,6 +92,14 @@ class TaskRun:
             "output": self.output,
             "error": self.error,
             "variables": self.variables,
+            "validated": self.validated,
+            "validationErrors": self.validationErrors,
+            "artifactDescriptors": self.artifactDescriptors,
+            "enforcementPolicyHash": self.enforcementPolicyHash,
+            "sourceHash": self.sourceHash,
+            "inputHash": self.inputHash,
+            "checkSpecHash": self.checkSpecHash,
+            "operationalCandidate": self.operationalCandidate,
         }
 
     @classmethod
@@ -94,4 +114,16 @@ class TaskRun:
             output=str(data.get("output") or ""),
             error=data.get("error"),
             variables=dict(data.get("variables") or {}),
+            validated=data.get("validated") is True,
+            validationErrors=[str(value) for value in data.get("validationErrors", [])],
+            artifactDescriptors=[
+                dict(value)
+                for value in data.get("artifactDescriptors", [])
+                if isinstance(value, dict)
+            ],
+            enforcementPolicyHash=data.get("enforcementPolicyHash"),
+            sourceHash=data.get("sourceHash"),
+            inputHash=data.get("inputHash"),
+            checkSpecHash=data.get("checkSpecHash"),
+            operationalCandidate=data.get("operationalCandidate") is True,
         )

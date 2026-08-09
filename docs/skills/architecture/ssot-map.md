@@ -110,6 +110,8 @@ Codaro에서 기준 파일은 아래 순서로 본다. 같은 의미의 규칙�
 |---|---|---|
 | automation task flow | `src/codaro/automation/taskFlow.py` | task 조회/실행/스케줄/webhook/E-Stop payload와 scheduler 접점의 domain 경계 |
 | automation task safety | `src/codaro/automation/taskSafety.py` | 태스크 권한·위험 확인 receipt와 문서·schedule fingerprint 무효화 기준 |
+| automation task result contract | `src/codaro/automation/taskExecution.py` | stdout, 변수, artifact 의미 검증과 task output redaction 기준 |
+| automation task run log | `src/codaro/automation/taskModel.py`, `src/codaro/automation/taskRegistry.py` | legacy 호환 run persistence와 validated, operational candidate 필드 기준. Proof receipt 권위는 아님 |
 | automation plan flow | `src/codaro/automation/planFlow.py` | plan 실행/status/pause/resume payload와 `AutomationLoop` 보관의 domain 경계 |
 | automation workflow flow | `src/codaro/automation/workflowFlow.py` | workflow 조회/생성/삭제/실행/run 조회 payload와 `WorkflowEngine` 접점의 domain 경계 |
 | automation input policy flow | `src/codaro/automation/inputPolicyFlow.py` | input guard 정책 조회/수정 payload와 screen region 변환의 domain 경계 |
@@ -161,6 +163,7 @@ Codaro에서 기준 파일은 아래 순서로 본다. 같은 의미의 규칙�
 | reactive 실행 | `src/codaro/kernel/reactive.py` | 공용 계획을 KernelSession 실행과 에러 가지 전파 중단으로 연결 |
 | runtime engine | `src/codaro/runtime/executionEngine.py` | 교체 가능한 실행 capability 인터페이스 |
 | local engine | `src/codaro/runtime/localEngine.py` | 로컬 기본 실행 engine 구현 |
+| task execution policy | `src/codaro/runtime/executionPolicy.py`, `src/codaro/runtime/localWorker.py` | Task 전용 workspace, filesystem, network, process 권한의 worker 집행 기준 |
 
 ## Extension System
 

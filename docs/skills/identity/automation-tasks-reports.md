@@ -30,6 +30,17 @@ whenToUse: 스케줄러 설계, 워크플로우 DAG 구현, audit trail 포맷 �
 - 수동 실행, webhook, workflow, scheduler callback과 서버 시작 시 schedule 복원은 모두 현재 receipt를 다시 검사한다.
 - E-Stop은 승인된 태스크에도 계속 적용되며, 승인 실패와 무효화는 audit trail에 남긴다.
 
+확인 화면과 실제 실행은 같은 `policyHash`를 사용한다. Task 전용 Local worker는 Python audit event를 통해 workspace 밖 파일 접근을 막고, 선언되지 않은 `filesystem.read`, `filesystem.write`, `network`, `process.execute` 동작을 거부한다. 빈 권한 목록도 유효하며 순수 계산 task에 사용할 수 있다. E-Stop은 worker 생성 전과 실행 block 사이에서 모두 다시 검사한다.
+
+## 의미 검증과 운영 증거
+
+- 예외 없이 끝난 `TaskRun.status=success`는 실행 로그일 뿐 검증된 운영 증거가 아니다.
+- 새 task는 stdout, 변수, 산출물의 `outputContract@1`을 선언할 수 있다. 이 계약을 통과한 run만 `validated=true`가 된다.
+- 파일 산출물은 workspace 상대 경로, byte 크기, content hash로 확인한다. 문서 밖 경로와 workspace를 벗어나는 symlink는 허용하지 않는다.
+- `operationalCandidate=true`는 의미 검사, 산출물 검사, 현재 safety policy hash가 일치했다는 뜻이다. 이것만으로 `OperationalRunReceipt`를 만들지는 않는다. 학습 proof와 source lineage를 검증하는 신뢰된 writer가 별도로 receipt를 발급한다.
+- `secretRefs`에는 환경 변수 이름만 저장한다. 값은 task 결과, 변수, audit, 알림, API 응답과 진단 요약에 저장하지 않는다.
+- 과거 `TaskRun`과 output contract가 없는 성공 run은 계속 조회할 수 있지만 `validated` 또는 proof로 승격하지 않는다.
+
 ## 셀 기반 자동화
 
 자동화도 결국 셀 조합이다. Python 실행 셀에서 시작하되, `executionKind`로 브라우저, OS, 마우스, 이미지, 태스크, 스킬 실행을 구분한다. 이렇게 해야 학습 셀, 실습 셀, 자동화 셀이 같은 notebook/cell 모델 위에서 이어진다.

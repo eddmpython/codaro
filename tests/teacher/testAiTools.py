@@ -153,8 +153,17 @@ class TestToolRegistry:
     def test_automation_task_tool_requires_dry_run_percent_format_recipe(self):
         schema = next(schema for schema in toolSchemas() if schema["function"]["name"] == "create-automation-task")
         description = schema["function"]["description"]
+        properties = schema["function"]["parameters"]["properties"]
 
         assert "dry-run percent-format automation recipe" in description
+        assert properties["outputContract"]["type"] == "object"
+        assert properties["secretRefs"]["items"] == {"type": "string"}
+        assert properties["permissionScopes"]["items"]["enum"] == [
+            "filesystem.read",
+            "filesystem.write",
+            "network",
+            "process.execute",
+        ]
 
     def test_every_tool_has_required_fields(self):
         for tool in allTools():

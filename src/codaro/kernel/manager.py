@@ -5,16 +5,23 @@ from pathlib import Path
 
 from .protocol import SessionInfo
 from .session import KernelSession
+from ..runtime.executionPolicy import ExecutionSecurityPolicy
 
 SESSION_MAX_IDLE_SECONDS = 3600
 MAX_SESSIONS = 10
 
 
 class SessionManager:
-    def __init__(self, workspaceRoot: str | Path | None = None) -> None:
+    def __init__(
+        self,
+        workspaceRoot: str | Path | None = None,
+        *,
+        executionPolicy: ExecutionSecurityPolicy | None = None,
+    ) -> None:
         self._sessions: dict[str, KernelSession] = {}
         self._lastActivity: dict[str, float] = {}
         self._workspaceRoot = Path(workspaceRoot).expanduser().resolve() if workspaceRoot is not None else None
+        self._executionPolicy = executionPolicy
 
     def createSession(self, workingDirectory: str | None = None) -> KernelSession:
         if len(self._sessions) >= MAX_SESSIONS:
@@ -27,6 +34,7 @@ class SessionManager:
         session = KernelSession(
             workingDirectory=sessionWorkingDirectory,
             workspaceRoot=str(self._workspaceRoot) if self._workspaceRoot is not None else None,
+            executionPolicy=self._executionPolicy,
         )
         self._sessions[session.sessionId] = session
         self._lastActivity[session.sessionId] = time.monotonic()

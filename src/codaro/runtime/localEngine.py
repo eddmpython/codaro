@@ -21,6 +21,7 @@ from .executionEngine import (
     VariableDelta,
     VariableState,
 )
+from .executionPolicy import ExecutionSecurityPolicy
 from .localWorker import runLocalWorker
 from .processSupervisor import ProcessSupervisor, ResourceLimits
 
@@ -35,6 +36,7 @@ class LocalEngine(ExecutionEngine):
         workspaceRoot: str | Path | None = None,
         engineId: str | None = None,
         resourceLimits: ResourceLimits | None = None,
+        executionPolicy: ExecutionSecurityPolicy | None = None,
     ) -> None:
         self.engineId = engineId or f"engine-{uuid.uuid4().hex[:10]}"
         self.executionCount = 0
@@ -51,6 +53,7 @@ class LocalEngine(ExecutionEngine):
         self._workerBusy = threading.Event()
         self._interruptCount = 0
         self._resourceLimits = resourceLimits or _defaultResourceLimits()
+        self._executionPolicy = executionPolicy
         self._supervisor = ProcessSupervisor(self._resourceLimits)
 
         self._registry: dict[str, object] = {}
@@ -444,6 +447,7 @@ class LocalEngine(ExecutionEngine):
                 "workingDirectory": str(self._workingDirectory) if self._workingDirectory is not None else None,
                 "workspaceRoot": str(self._workspaceRoot),
                 "interruptFlag": interruptFlag,
+                "executionPolicy": self._executionPolicy.serialize() if self._executionPolicy is not None else None,
             },
             daemon=True,
         )

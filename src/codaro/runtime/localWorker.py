@@ -13,6 +13,8 @@ import traceback
 from typing import Any
 import warnings
 
+from .executionPolicy import ExecutionSecurityPolicy
+
 # numpy/scipy/scikit-learn이 쓰는 OpenBLAS는 기본적으로 CPU 코어 수만큼 스레드 버퍼를 미리
 # 잡는다. spawn으로 만든 worker(특히 여러 세션이 동시에 떠 있을 때)에서는 이 할당이 실패해
 # "OpenBLAS error: Memory allocation still failed"로 프로세스가 죽고, 셀이 EOFError로 끝난다.
@@ -42,11 +44,17 @@ def runLocalWorker(
     workingDirectory: str | None,
     workspaceRoot: str | None,
     interruptFlag=None,
+    executionPolicy: dict[str, object] | None = None,
 ) -> None:
     registry: dict[str, object] = {}
     cellDefinitions: dict[str, set[str]] = {}
     executionCount = 0
     targetCwd = _resolveTargetCwd(workingDirectory, workspaceRoot)
+    if targetCwd is not None and str(targetCwd) not in sys.path:
+        sys.path.insert(0, str(targetCwd))
+
+    if executionPolicy is not None:
+        _installExecutionPolicyAuditHook(ExecutionSecurityPolicy.deserialize(executionPolicy))
 
     if interruptFlag is not None:
         _installInterruptTrace(interruptFlag)
@@ -171,6 +179,122 @@ def _workerSend(connection, data: Any) -> None:
         raise
 
 
+def _installExecutionPolicyAuditHook(policy: ExecutionSecurityPolicy) -> None:
+    workspaceRoot = policy.workspaceRoot
+    runtimeReadRoots = tuple({
+        Path(sys.base_prefix).resolve(),
+        Path(sys.prefix).resolve(),
+        Path(__file__).resolve().parents[2],
+    })
+
+    def audit(event: str, args: tuple[object, ...]) -> None:
+        if event == "open" and args:
+            pathValue = args[0]
+            if isinstance(pathValue, int):
+                return
+            path = _auditPath(pathValue)
+            if path is None:
+                return
+            write = _openRequestsWrite(args)
+            if not write and any(path.is_relative_to(root) for root in runtimeReadRoots):
+                return
+            _requireWorkspacePath(policy, path, write=write, event=event)
+            return
+        if event == "os.chdir" and args:
+            path = _auditPath(args[0])
+            if path is not None:
+                _requireInsideWorkspace(policy, path, event=event)
+            return
+        if event in {"os.listdir", "os.scandir"} and args:
+            path = _auditPath(args[0])
+            if path is not None:
+                _requireWorkspacePath(policy, path, write=False, event=event)
+            return
+        if event in {
+            "os.remove",
+            "os.rename",
+            "os.rmdir",
+            "os.mkdir",
+            "os.link",
+            "os.symlink",
+            "os.truncate",
+            "shutil.copyfile",
+        }:
+            for pathValue in args[:2]:
+                path = _auditPath(pathValue)
+                if path is not None:
+                    _requireWorkspacePath(policy, path, write=True, event=event)
+            return
+        if event.startswith("socket.") and event in {
+            "socket.bind",
+            "socket.connect",
+            "socket.getaddrinfo",
+            "socket.gethostbyaddr",
+            "socket.gethostbyname",
+        }:
+            _requireScope(policy, "network", event)
+            return
+        if event == "subprocess.Popen" or event == "os.system" or event.startswith("os.exec") or event.startswith("os.spawn"):
+            _requireScope(policy, "process.execute", event)
+
+    sys.addaudithook(audit)
+
+
+def _auditPath(value: object) -> Path | None:
+    if isinstance(value, bytes):
+        try:
+            value = os.fsdecode(value)
+        except UnicodeDecodeError:
+            return None
+    if not isinstance(value, (str, os.PathLike)):
+        return None
+    text = os.fspath(value)
+    if not text or (isinstance(text, str) and text.startswith("<")):
+        return None
+    path = Path(text).expanduser()
+    if not path.is_absolute():
+        path = Path.cwd() / path
+    return path.resolve(strict=False)
+
+
+def _openRequestsWrite(args: tuple[object, ...]) -> bool:
+    mode = args[1] if len(args) > 1 else None
+    flags = args[2] if len(args) > 2 else 0
+    if isinstance(mode, str) and any(marker in mode for marker in ("w", "a", "x", "+")):
+        return True
+    if isinstance(flags, int):
+        writeFlags = os.O_WRONLY | os.O_RDWR | os.O_CREAT | os.O_TRUNC | os.O_APPEND
+        return bool(flags & writeFlags)
+    return False
+
+
+def _requireWorkspacePath(
+    policy: ExecutionSecurityPolicy,
+    path: Path,
+    *,
+    write: bool,
+    event: str,
+) -> None:
+    scope = "filesystem.write" if write else "filesystem.read"
+    _requireInsideWorkspace(policy, path, event=event)
+    _requireScope(policy, scope, event)
+
+
+def _requireInsideWorkspace(
+    policy: ExecutionSecurityPolicy,
+    path: Path,
+    *,
+    event: str,
+) -> None:
+    if not path.is_relative_to(policy.workspaceRoot):
+        raise PermissionError(f"Codaro execution policy blocked {event} outside the workspace")
+
+
+def _requireScope(policy: ExecutionSecurityPolicy, scope: str, event: str) -> None:
+    if scope not in policy.permissionScopes:
+        raise PermissionError(f"Codaro execution policy blocked {event}; missing scope {scope}")
+
+
 # autoreload(lazy on-run) — 워킹 디렉터리 아래 사용자 모듈의 mtime을 기억해, 바뀌었으면 실행 직전 reload.
 _moduleStamps: dict[str, float] = {}
 
@@ -178,19 +302,7 @@ _moduleStamps: dict[str, float] = {}
 def _reloadChangedUserModules(targetCwd: Path | None) -> None:
     if targetCwd is None:
         return
-    rootStr = str(targetCwd)
-    for name, module in list(sys.modules.items()):
-        if module is None or name == "__main__":
-            continue
-        # 프레임워크(codaro) 자체나 설치 패키지는 절대 reload하지 않는다 — 클래스 정체성·상태가 깨진다.
-        if name == "codaro" or name.startswith("codaro."):
-            continue
-        file = getattr(module, "__file__", None)
-        if not file:
-            continue
-        fileStr = str(file)
-        if not fileStr.startswith(rootStr) or "site-packages" in fileStr:
-            continue
+    for name, module, file in _userModules(targetCwd):
         try:
             mtime = os.path.getmtime(file)
         except OSError:
@@ -200,6 +312,31 @@ def _reloadChangedUserModules(targetCwd: Path | None) -> None:
         if previous is not None and previous != mtime:
             # 사용자가 import한 로컬 모듈이 바뀜 → reload. 실패는 셀 실행 에러로 자연히 표면된다.
             importlib.reload(module)
+
+
+def _recordUserModuleStamps(targetCwd: Path | None) -> None:
+    if targetCwd is None:
+        return
+    for name, _module, file in _userModules(targetCwd):
+        try:
+            _moduleStamps[name] = os.path.getmtime(file)
+        except OSError:
+            continue
+
+
+def _userModules(targetCwd: Path):
+    for name, module in list(sys.modules.items()):
+        if module is None or name == "__main__":
+            continue
+        if name == "codaro" or name.startswith("codaro."):
+            continue
+        file = getattr(module, "__file__", None)
+        if not file:
+            continue
+        path = Path(file).resolve(strict=False)
+        if "site-packages" in path.parts or not path.is_relative_to(targetCwd):
+            continue
+        yield name, module, path
 
 
 def _executeCommand(
@@ -319,6 +456,7 @@ def _executeCommand(
             registry=registry,
             cellDefinitions=cellDefinitions,
         )
+        _recordUserModuleStamps(targetCwd)
 
     response = _buildStateResponse(registry, cellDefinitions, executionCount)
     stateDelta = _buildVariableDelta(beforeVariables, response["variables"])
