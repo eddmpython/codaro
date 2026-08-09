@@ -7,7 +7,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-detail-dark.png",
       "sourceHash": "sha256-abdec19a2cf07043ec106305c79adb4966791f2063d3891651dbd54e6950a542",
-      "sourceGitHead": "7d6c86a1910cd7db398916243858dbd8bfe853ae",
+      "sourceGitHead": "132b5c9357a9532904ff73f8dea0b4041e6852b0",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -91,7 +91,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-9bd40ed0ad382c8666c6b1e56033b3d08c27f9ebb2d4fcc2eb8b5d3d1b3b38ae",
+        "sourceSetHash": "sha256-ba8f4d6495069b770888f23d09f1787b3ae573a26513dac76348a8c4d5d7d6aa",
         "platform": "win32"
       },
       "themePairId": "runLearningDetailLight"
@@ -102,7 +102,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-detail-light.png",
       "sourceHash": "sha256-96ff05cfcc101899f9c300916a0d75163ec04638f406380c7af4f735ecd7a464",
-      "sourceGitHead": "7d6c86a1910cd7db398916243858dbd8bfe853ae",
+      "sourceGitHead": "132b5c9357a9532904ff73f8dea0b4041e6852b0",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -186,7 +186,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-9bd40ed0ad382c8666c6b1e56033b3d08c27f9ebb2d4fcc2eb8b5d3d1b3b38ae",
+        "sourceSetHash": "sha256-ba8f4d6495069b770888f23d09f1787b3ae573a26513dac76348a8c4d5d7d6aa",
         "platform": "win32"
       },
       "themePairId": "runLearningDetail"
@@ -197,7 +197,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-mobile-dark.png",
       "sourceHash": "sha256-ec1aacb523a546df745fe959048b203739d6bbfe37585992801d4be9eef9638f",
-      "sourceGitHead": "7d6c86a1910cd7db398916243858dbd8bfe853ae",
+      "sourceGitHead": "132b5c9357a9532904ff73f8dea0b4041e6852b0",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -278,7 +278,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-9bd40ed0ad382c8666c6b1e56033b3d08c27f9ebb2d4fcc2eb8b5d3d1b3b38ae",
+        "sourceSetHash": "sha256-ba8f4d6495069b770888f23d09f1787b3ae573a26513dac76348a8c4d5d7d6aa",
         "platform": "win32"
       },
       "themePairId": "runLearningMobileLight"
@@ -289,7 +289,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-mobile-light.png",
       "sourceHash": "sha256-44a072c7ed79e2fc04ac7f1d83a5ee383beaaec5ddd29a2332d22cdca355352a",
-      "sourceGitHead": "7d6c86a1910cd7db398916243858dbd8bfe853ae",
+      "sourceGitHead": "132b5c9357a9532904ff73f8dea0b4041e6852b0",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -370,7 +370,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-9bd40ed0ad382c8666c6b1e56033b3d08c27f9ebb2d4fcc2eb8b5d3d1b3b38ae",
+        "sourceSetHash": "sha256-ba8f4d6495069b770888f23d09f1787b3ae573a26513dac76348a8c4d5d7d6aa",
         "platform": "win32"
       },
       "themePairId": "runLearningMobile"
@@ -381,7 +381,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-hero-dark.png",
       "sourceHash": "sha256-43764938af0afc40d36261448860882f77fb456263c1e871e9ae00344c60a352",
-      "sourceGitHead": "7d6c86a1910cd7db398916243858dbd8bfe853ae",
+      "sourceGitHead": "132b5c9357a9532904ff73f8dea0b4041e6852b0",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -462,7 +462,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-fd807cfd42be87b7d554f1c2da4b4ad826e871053c014c76348ba1512460765b",
+        "sourceSetHash": "sha256-30c64e079ff0fbfb57af314299605de2f637f1890fe6af8f1b03076a0c1d472c",
         "platform": "win32"
       },
       "themePairId": "runLearningHeroLight"
@@ -473,7 +473,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-hero-light.png",
       "sourceHash": "sha256-14f7509dd6f59fe8d0a63e65c258349c260aee6dc9eece9875ca13fbf099e776",
-      "sourceGitHead": "7d6c86a1910cd7db398916243858dbd8bfe853ae",
+      "sourceGitHead": "132b5c9357a9532904ff73f8dea0b4041e6852b0",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -554,7 +554,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-fd807cfd42be87b7d554f1c2da4b4ad826e871053c014c76348ba1512460765b",
+        "sourceSetHash": "sha256-30c64e079ff0fbfb57af314299605de2f637f1890fe6af8f1b03076a0c1d472c",
         "platform": "win32"
       },
       "themePairId": "runLearningHero"
@@ -565,7 +565,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/local-notebook-desktop-dark.png",
       "sourceHash": "sha256-f51381298c9912ddeb0880d0a1f15cc7ac779b1283cb83aa19a2ea69813bfb32",
-      "sourceGitHead": "7d6c86a1910cd7db398916243858dbd8bfe853ae",
+      "sourceGitHead": "132b5c9357a9532904ff73f8dea0b4041e6852b0",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -640,7 +640,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-fd807cfd42be87b7d554f1c2da4b4ad826e871053c014c76348ba1512460765b",
+        "sourceSetHash": "sha256-30c64e079ff0fbfb57af314299605de2f637f1890fe6af8f1b03076a0c1d472c",
         "platform": "win32"
       },
       "themePairId": "localNotebookDesktopLight"
@@ -651,7 +651,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/local-notebook-desktop-light.png",
       "sourceHash": "sha256-2ac8b5e58660b37adfcf93f5b7d9656326d61097941b90ff95ef444f7a1ee2d2",
-      "sourceGitHead": "7d6c86a1910cd7db398916243858dbd8bfe853ae",
+      "sourceGitHead": "132b5c9357a9532904ff73f8dea0b4041e6852b0",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -726,7 +726,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-fd807cfd42be87b7d554f1c2da4b4ad826e871053c014c76348ba1512460765b",
+        "sourceSetHash": "sha256-30c64e079ff0fbfb57af314299605de2f637f1890fe6af8f1b03076a0c1d472c",
         "platform": "win32"
       },
       "themePairId": "localNotebookDesktop"
@@ -737,7 +737,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/local-automation-desktop-dark.png",
       "sourceHash": "sha256-fb1ef8b5ee9954b1fa4635a0217b6e7937632b5becb295c3daa6c96ce2cea94b",
-      "sourceGitHead": "7d6c86a1910cd7db398916243858dbd8bfe853ae",
+      "sourceGitHead": "132b5c9357a9532904ff73f8dea0b4041e6852b0",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -814,7 +814,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-16d490f1d233225371b2bd7f8bc6019f5ac16b24c85ffc32cb0fb38764758cfd",
+        "sourceSetHash": "sha256-47f12e49b44b2369d3a08aaf4f56eaa420310cfdd22375956aed54bfaa12f4f6",
         "platform": "win32"
       },
       "themePairId": "localAutomationDesktopLight"
@@ -825,7 +825,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/local-automation-desktop-light.png",
       "sourceHash": "sha256-c6c57ccdbf06b71d1c4d999e3565d005c9fabfab18334b099b47b2a02560956e",
-      "sourceGitHead": "7d6c86a1910cd7db398916243858dbd8bfe853ae",
+      "sourceGitHead": "132b5c9357a9532904ff73f8dea0b4041e6852b0",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -902,7 +902,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-16d490f1d233225371b2bd7f8bc6019f5ac16b24c85ffc32cb0fb38764758cfd",
+        "sourceSetHash": "sha256-47f12e49b44b2369d3a08aaf4f56eaa420310cfdd22375956aed54bfaa12f4f6",
         "platform": "win32"
       },
       "themePairId": "localAutomationDesktop"
@@ -913,7 +913,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run/ready-dark.png",
       "sourceHash": "sha256-43764938af0afc40d36261448860882f77fb456263c1e871e9ae00344c60a352",
-      "sourceGitHead": "7d6c86a1910cd7db398916243858dbd8bfe853ae",
+      "sourceGitHead": "132b5c9357a9532904ff73f8dea0b4041e6852b0",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -995,7 +995,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-fd807cfd42be87b7d554f1c2da4b4ad826e871053c014c76348ba1512460765b",
+        "sourceSetHash": "sha256-30c64e079ff0fbfb57af314299605de2f637f1890fe6af8f1b03076a0c1d472c",
         "platform": "win32"
       },
       "themePairId": "runStateReadyLight"
@@ -1006,7 +1006,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run/ready-light.png",
       "sourceHash": "sha256-14f7509dd6f59fe8d0a63e65c258349c260aee6dc9eece9875ca13fbf099e776",
-      "sourceGitHead": "7d6c86a1910cd7db398916243858dbd8bfe853ae",
+      "sourceGitHead": "132b5c9357a9532904ff73f8dea0b4041e6852b0",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1088,7 +1088,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-fd807cfd42be87b7d554f1c2da4b4ad826e871053c014c76348ba1512460765b",
+        "sourceSetHash": "sha256-30c64e079ff0fbfb57af314299605de2f637f1890fe6af8f1b03076a0c1d472c",
         "platform": "win32"
       },
       "themePairId": "runStateReady"
@@ -1099,7 +1099,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run/running-dark.png",
       "sourceHash": "sha256-ea8910484bea3a451db9ae34b0135fbf6bf8830e91c23a13b743acff55dc2745",
-      "sourceGitHead": "7d6c86a1910cd7db398916243858dbd8bfe853ae",
+      "sourceGitHead": "132b5c9357a9532904ff73f8dea0b4041e6852b0",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1181,7 +1181,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-fd807cfd42be87b7d554f1c2da4b4ad826e871053c014c76348ba1512460765b",
+        "sourceSetHash": "sha256-30c64e079ff0fbfb57af314299605de2f637f1890fe6af8f1b03076a0c1d472c",
         "evidencePath": "notebookStateEvidence.screenshots.running",
         "platform": "win32"
       },
@@ -1193,7 +1193,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run/running-light.png",
       "sourceHash": "sha256-164603659e51de1b83c03d77b918f8f2324209defa384e2f2886ad92736ef135",
-      "sourceGitHead": "7d6c86a1910cd7db398916243858dbd8bfe853ae",
+      "sourceGitHead": "132b5c9357a9532904ff73f8dea0b4041e6852b0",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1275,7 +1275,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-fd807cfd42be87b7d554f1c2da4b4ad826e871053c014c76348ba1512460765b",
+        "sourceSetHash": "sha256-30c64e079ff0fbfb57af314299605de2f637f1890fe6af8f1b03076a0c1d472c",
         "evidencePath": "notebookStateEvidence.screenshots.running",
         "platform": "win32"
       },
@@ -1287,7 +1287,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run/check-fail-dark.png",
       "sourceHash": "sha256-b6bcb312768145614f58799637f1bc6ca6b4377503370e213d92d5edb72c6db4",
-      "sourceGitHead": "7d6c86a1910cd7db398916243858dbd8bfe853ae",
+      "sourceGitHead": "132b5c9357a9532904ff73f8dea0b4041e6852b0",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1368,7 +1368,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-9bd40ed0ad382c8666c6b1e56033b3d08c27f9ebb2d4fcc2eb8b5d3d1b3b38ae",
+        "sourceSetHash": "sha256-ba8f4d6495069b770888f23d09f1787b3ae573a26513dac76348a8c4d5d7d6aa",
         "evidencePath": "checkStateEvidence.screenshots.mismatch",
         "platform": "win32"
       },
@@ -1380,7 +1380,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run/check-fail-light.png",
       "sourceHash": "sha256-5e1c630e8fc31362195a1441f3ca02695948a1752bdcc6ce7f424c35865929aa",
-      "sourceGitHead": "7d6c86a1910cd7db398916243858dbd8bfe853ae",
+      "sourceGitHead": "132b5c9357a9532904ff73f8dea0b4041e6852b0",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1461,7 +1461,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-9bd40ed0ad382c8666c6b1e56033b3d08c27f9ebb2d4fcc2eb8b5d3d1b3b38ae",
+        "sourceSetHash": "sha256-ba8f4d6495069b770888f23d09f1787b3ae573a26513dac76348a8c4d5d7d6aa",
         "evidencePath": "checkStateEvidence.screenshots.mismatch",
         "platform": "win32"
       },
@@ -1473,7 +1473,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run/check-pass-dark.png",
       "sourceHash": "sha256-8aa105b159449f2820dad5d622e5969b2005f86ef6290139496df990b36694e8",
-      "sourceGitHead": "7d6c86a1910cd7db398916243858dbd8bfe853ae",
+      "sourceGitHead": "132b5c9357a9532904ff73f8dea0b4041e6852b0",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1554,7 +1554,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-9bd40ed0ad382c8666c6b1e56033b3d08c27f9ebb2d4fcc2eb8b5d3d1b3b38ae",
+        "sourceSetHash": "sha256-ba8f4d6495069b770888f23d09f1787b3ae573a26513dac76348a8c4d5d7d6aa",
         "evidencePath": "checkStateEvidence.screenshots.verified",
         "platform": "win32"
       },
@@ -1565,8 +1565,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run/check-pass-light.png",
-      "sourceHash": "sha256-da9999c397a282eafc6ebfa5fcd2ee629a22c0fcd685ff3d402748758ca018e6",
-      "sourceGitHead": "7d6c86a1910cd7db398916243858dbd8bfe853ae",
+      "sourceHash": "sha256-dc05a7119dd8fa90f19f91d74a5c3942e0c4fcf2e5317d0a7b6935b528259fab",
+      "sourceGitHead": "132b5c9357a9532904ff73f8dea0b4041e6852b0",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1647,7 +1647,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-9bd40ed0ad382c8666c6b1e56033b3d08c27f9ebb2d4fcc2eb8b5d3d1b3b38ae",
+        "sourceSetHash": "sha256-ba8f4d6495069b770888f23d09f1787b3ae573a26513dac76348a8c4d5d7d6aa",
         "evidencePath": "checkStateEvidence.screenshots.verified",
         "platform": "win32"
       },
@@ -1659,7 +1659,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run/local-required-dark.png",
       "sourceHash": "sha256-d4be5d7a4c177b6296718313934bd8ff011a51745b8174887672084831c0f493",
-      "sourceGitHead": "7d6c86a1910cd7db398916243858dbd8bfe853ae",
+      "sourceGitHead": "132b5c9357a9532904ff73f8dea0b4041e6852b0",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1740,7 +1740,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-9bd40ed0ad382c8666c6b1e56033b3d08c27f9ebb2d4fcc2eb8b5d3d1b3b38ae",
+        "sourceSetHash": "sha256-ba8f4d6495069b770888f23d09f1787b3ae573a26513dac76348a8c4d5d7d6aa",
         "evidencePath": "checkCapabilityEvidence.screenshot",
         "platform": "win32"
       },
@@ -1752,7 +1752,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run/local-required-light.png",
       "sourceHash": "sha256-1be359110ff4d9cd9bc3be76473cd40d82aa15acecbc1cd88a1b43c7e63ff147",
-      "sourceGitHead": "7d6c86a1910cd7db398916243858dbd8bfe853ae",
+      "sourceGitHead": "132b5c9357a9532904ff73f8dea0b4041e6852b0",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1833,7 +1833,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-9bd40ed0ad382c8666c6b1e56033b3d08c27f9ebb2d4fcc2eb8b5d3d1b3b38ae",
+        "sourceSetHash": "sha256-ba8f4d6495069b770888f23d09f1787b3ae573a26513dac76348a8c4d5d7d6aa",
         "evidencePath": "checkCapabilityEvidence.screenshot",
         "platform": "win32"
       },
