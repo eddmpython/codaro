@@ -102,9 +102,6 @@ export function useNotebookRuntimeState({
   const executeBlock = useCallback(async (block: BlockConfig, sourceOverride?: string) => {
     if (!isExecutableBlock(block)) return;
     const code = sourceOverride ?? resolveBlockRunCode(block, drafts, { emptySnippetFallback: surface === "curriculum" });
-    if (surface !== "curriculum") {
-      selectNotebookBlock(block.id);
-    }
     setRunningBlockId(block.id);
     onNotice({ tone: "default", title: translate("runtime.cellRunning"), detail: blockLabel(block) });
 
@@ -179,7 +176,6 @@ export function useNotebookRuntimeState({
     onNotice,
     reactiveEnabled,
     results,
-    selectNotebookBlock,
     sessionId,
     surface,
     variables,
@@ -189,6 +185,7 @@ export function useNotebookRuntimeState({
     // React state alone cannot lock two calls made in the same render turn. Keep the
     // shared Python stdout and filesystem transaction strictly serial while preserving
     // the later learner action instead of dropping it.
+    if (surface !== "curriculum") selectNotebookBlock(block.id);
     const scheduled = executionQueueRef.current.then(
       () => executeBlock(block, sourceOverride),
       () => executeBlock(block, sourceOverride),
@@ -198,7 +195,7 @@ export function useNotebookRuntimeState({
       () => undefined,
     );
     return scheduled;
-  }, [executeBlock]);
+  }, [executeBlock, selectNotebookBlock, surface]);
 
   const runNotebook = useCallback(async () => {
     const defaultBlock = codeBlocks.find(isKernelExecutableBlock) ?? codeBlocks[0];

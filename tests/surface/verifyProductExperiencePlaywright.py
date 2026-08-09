@@ -7223,20 +7223,47 @@ def runBrowserMatrix(
                             raise AssertionError("free notebook did not start with a blank code cell")
                         firstNotebookEditor.fill("print('shift advance verified')", timeout=20_000)
                         firstNotebookEditor.press("Shift+Enter", timeout=20_000)
-                        page.wait_for_function(
-                            """
-                            () => {
-                              const cells = [...document.querySelectorAll('[data-notebook-cell]')];
-                              if (cells.length !== 2) return false;
-                              const selected = document.querySelector(
-                                '[data-notebook-cell-selected="true"]'
-                              );
-                              const nextEditor = cells[1].querySelector('.cm-content');
-                              return selected === cells[1] && document.activeElement === nextEditor;
-                            }
-                            """,
-                            timeout=20_000,
-                        )
+                        try:
+                            page.wait_for_function(
+                                """
+                                () => {
+                                  const cells = [...document.querySelectorAll('[data-notebook-cell]')];
+                                  if (cells.length !== 2) return false;
+                                  const selected = document.querySelector(
+                                    '[data-notebook-cell-selected="true"]'
+                                  );
+                                  const nextEditor = cells[1].querySelector('.cm-content');
+                                  return selected === cells[1] && document.activeElement === nextEditor;
+                                }
+                                """,
+                                timeout=20_000,
+                            )
+                        except Exception as advanceError:
+                            advanceEvidence = page.evaluate(
+                                """
+                                () => {
+                                  const cells = [...document.querySelectorAll('[data-notebook-cell]')];
+                                  const selected = document.querySelector(
+                                    '[data-notebook-cell-selected="true"]'
+                                  );
+                                  return {
+                                    activeCellId: document.activeElement?.closest(
+                                      '[data-notebook-cell]'
+                                    )?.getAttribute('data-notebook-cell-id') || '',
+                                    activeClass: String(document.activeElement?.className || ''),
+                                    cellIds: cells.map(
+                                      (cell) => cell.getAttribute('data-notebook-cell-id') || ''
+                                    ),
+                                    selectedCellId: selected?.getAttribute(
+                                      'data-notebook-cell-id'
+                                    ) || '',
+                                  };
+                                }
+                                """
+                            )
+                            raise AssertionError(
+                                f"Shift+Enter did not advance to a fresh cell: {advanceEvidence}"
+                            ) from advanceError
                         page.wait_for_function(
                             """
                             () => document.body.innerText.includes('shift advance verified')
