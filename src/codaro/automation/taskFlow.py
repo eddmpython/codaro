@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from .eStop import getEmergencyStop
+from .operationalProof import recordPromotedTaskOperationalRun
 from .recipeAuthoring import buildAutomationTaskDraft, validateAutomationTaskRecipeText
 from .reportDiff import RunDiff
 from .scheduler import TaskScheduler, parseScheduleSeconds
@@ -392,8 +393,6 @@ def _recordOperationalProof(
 ) -> str | None:
     if proofArchive is None:
         return None
-    from ..api.learningArchiveAutomation import recordPromotedTaskOperationalRun
-
     receipt = recordPromotedTaskOperationalRun(task, run, proofArchive=proofArchive)
     return receipt.receiptId if receipt is not None else None
 

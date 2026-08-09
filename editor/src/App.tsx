@@ -645,6 +645,7 @@ function App() {
           onUiValueChange={({ blockId, elementId, value }) => setUiValue(blockId ?? "", elementId, value)}
         >
           <AppProjection
+            deploymentTarget={appProjectionMode === "preview" ? diagnostics.capability?.runtimeTarget ?? null : null}
             document={document}
             drafts={drafts}
             embedMode={blockEmbedFrame?.mode}
@@ -656,6 +657,7 @@ function App() {
             onUpdateApp={appProjectionMode === "preview" ? updateNotebookApp : undefined}
             results={results}
             staleBlockIds={staleBlockIds}
+            sourcePath={appProjectionMode === "preview" ? notebookDocumentPath : null}
           />
         </WidgetSessionProvider>
       </LocaleProvider>

@@ -35,6 +35,22 @@ from .embedBuilder import (
     startBlockEmbedServer,
     verifyBlockEmbed,
 )
+from .adapters import (
+    DeploymentAdapter,
+    DeploymentAdapterDefinition,
+    DeploymentError,
+    DeploymentOutcome,
+    DeploymentProbe,
+    FolderDeploymentAdapter,
+    PreparedDeployment,
+    ProviderFilesystemAdapter,
+    SelfHostDeploymentAdapter,
+    UploadedDeployment,
+    ZipDeploymentAdapter,
+    deployPublication,
+    redactDeploymentDiagnostic,
+    verifyDeploymentSource,
+)
 
 __all__ = [
     "CompilationReport",
@@ -64,4 +80,18 @@ __all__ = [
     "serveBlockEmbed",
     "startBlockEmbedServer",
     "verifyBlockEmbed",
+    "DeploymentAdapter",
+    "DeploymentAdapterDefinition",
+    "DeploymentError",
+    "DeploymentOutcome",
+    "DeploymentProbe",
+    "FolderDeploymentAdapter",
+    "PreparedDeployment",
+    "ProviderFilesystemAdapter",
+    "SelfHostDeploymentAdapter",
+    "UploadedDeployment",
+    "ZipDeploymentAdapter",
+    "deployPublication",
+    "redactDeploymentDiagnostic",
+    "verifyDeploymentSource",
 ]

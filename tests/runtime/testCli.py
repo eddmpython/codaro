@@ -47,6 +47,14 @@ def testNormalizeArgsLeavesPublicationCommandsUntouched() -> None:
         "browser",
     ]
     assert normalizeArgs(["serve", "./site", "--no-browser"]) == ["serve", "./site", "--no-browser"]
+    assert normalizeArgs(["deploy", "./site", "--target", "zip", "--output", "./site.zip"]) == [
+        "deploy",
+        "./site",
+        "--target",
+        "zip",
+        "--output",
+        "./site.zip",
+    ]
     assert normalizeArgs(["rollback", "./server", "sha256-" + "a" * 64]) == [
         "rollback",
         "./server",
@@ -62,6 +70,24 @@ def testBuildParserAcceptsExplicitBlockEmbedContract() -> None:
     assert args.target == "embed"
     assert args.entry == "result"
     assert args.mode == "editable"
+
+
+def testBuildParserAcceptsProviderNeutralDeploymentContract() -> None:
+    args = buildParser().parse_args([
+        "deploy",
+        "./site",
+        "--target",
+        "provider",
+        "--output",
+        "./remote",
+        "--credential-ref",
+        "CODARO_DEPLOY_TOKEN",
+        "--json",
+    ])
+
+    assert args.target == "provider"
+    assert args.credential_ref == ["CODARO_DEPLOY_TOKEN"]
+    assert args.json is True
 
 
 def testInspectPrintsCompilerReportWithoutStartingEditor(tmp_path, monkeypatch, capsys) -> None:

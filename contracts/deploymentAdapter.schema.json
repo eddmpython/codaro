@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codaro.dev/contracts/deploymentAdapter.schema.json",
+  "title": "Codaro Deployment Adapter",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "adapterId", "target", "credentialRefs"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "kind": { "const": "codaro.deployment-adapter" },
+    "adapterId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9.-]{1,63}$"
+    },
+    "target": { "enum": ["folder", "zip", "self-host", "provider"] },
+    "credentialRefs": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{1,63}$" },
+      "uniqueItems": true
+    }
+  }
+}

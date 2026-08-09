@@ -100,6 +100,7 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [server-publication](architecture/server-publication.md)
 - [block-embedding](architecture/block-embedding.md)
 - [learning-product-bridge](architecture/learning-product-bridge.md)
+- [deployment-adapters](architecture/deployment-adapters.md)
 - [frontend-product-surface](architecture/frontend-product-surface.md)
 - [gui-control-contract](architecture/gui-control-contract.md)
 - [curriculum-authoring](architecture/curriculum-authoring.md)

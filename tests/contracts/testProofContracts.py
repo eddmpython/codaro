@@ -37,12 +37,15 @@ def testProofSchemasAreVersionedClosedContracts() -> None:
     source = json.loads((CONTRACT_ROOT / "sourceRevision.schema.json").read_text(encoding="utf-8"))
     operational = json.loads((CONTRACT_ROOT / "operationalReceipt.schema.json").read_text(encoding="utf-8"))
     deployment = json.loads((CONTRACT_ROOT / "deploymentReceipt.schema.json").read_text(encoding="utf-8"))
+    adapter = json.loads((CONTRACT_ROOT / "deploymentAdapter.schema.json").read_text(encoding="utf-8"))
 
     assert source["$schema"] == "https://json-schema.org/draft/2020-12/schema"
     assert source["additionalProperties"] is False
     assert source["properties"]["schemaVersion"] == {"const": 1}
     assert deployment["additionalProperties"] is False
     assert deployment["properties"]["schemaVersion"] == {"const": 1}
+    assert adapter["additionalProperties"] is False
+    assert adapter["properties"]["credentialRefs"]["uniqueItems"] is True
     assert all(
         operational["$defs"][name]["additionalProperties"] is False
         for name in ("BuildArtifact", "PermissionReceipt", "FunctionalCheckReceipt", "OperationalRunReceipt")

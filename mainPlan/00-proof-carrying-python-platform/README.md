@@ -104,8 +104,7 @@ GitHub Pages, Cloudflare, Docker registry 같은 외부 대상은 이미 검증�
 
 ## 구현 순서
 
-1. [배포 adapter](10-deployment-adapters/README.md)
-2. [참조 제품과 최종 claim](11-reference-products/README.md)
+1. [참조 제품과 최종 claim](11-reference-products/README.md)
 
 각 workstream은 구현, 지정 gate, 문서 정합, 부정 경로 검증을 모두 끝낸 같은 변경에서 삭제한다. parent에는 남은 일만 유지한다.
 

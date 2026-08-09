@@ -23,6 +23,7 @@ def buildParser() -> argparse.ArgumentParser:
             "  codaro inspect notebook.py\n"
             "  codaro build notebook.py --target browser\n"
             "  codaro serve ./notebook-site\n"
+            "  codaro deploy ./notebook-site --target zip --output notebook-site.zip\n"
             "  codaro pack inspect ./my-pack\n"
             "  codaro classroom audit"
         ),
@@ -78,6 +79,24 @@ def buildParser() -> argparse.ArgumentParser:
     rollbackPublicationParser = subparsers.add_parser("rollback", help="Move a server publication pointer to a verified bundle.")
     rollbackPublicationParser.add_argument("path", help="Server publication output directory.")
     rollbackPublicationParser.add_argument("bundle_hash", help="Exact sha256 bundle hash.")
+    rollbackPublicationParser.add_argument(
+        "--target",
+        choices=["server", "folder", "zip", "self-host", "provider"],
+        default="server",
+        help="Rollback target. Existing server publication behavior is the default.",
+    )
+
+    deployParser = subparsers.add_parser("deploy", help="Deploy a verified immutable publication bundle.")
+    deployParser.add_argument("path", help="Verified publication output directory.")
+    deployParser.add_argument("--target", choices=["folder", "zip", "self-host", "provider"], required=True)
+    deployParser.add_argument("--output", required=True, help="Deployment folder, zip path, or provider storage root.")
+    deployParser.add_argument(
+        "--credential-ref",
+        action="append",
+        default=[],
+        help="Provider credential environment variable name. Values are never persisted.",
+    )
+    deployParser.add_argument("--json", action="store_true", help="Print the deployment receipt as JSON.")
 
     taskParser = subparsers.add_parser("task", help="Manage automation tasks.")
     taskSubparsers = taskParser.add_subparsers(dest="task_command", required=True)
@@ -178,6 +197,10 @@ def main() -> None:
 
     if command == "serve":
         _handlePublicationServe(args)
+        return
+
+    if command == "deploy":
+        _handlePublicationDeploy(args)
         return
 
     if command == "rollback":
@@ -417,14 +440,81 @@ def _handlePublicationServe(args) -> None:
 
 
 def _handlePublicationRollback(args) -> None:
-    from .publication import PublicationBuildError, rollbackServerPublication
+    from .publication import (
+        DeploymentError,
+        FolderDeploymentAdapter,
+        PublicationBuildError,
+        ProviderFilesystemAdapter,
+        SelfHostDeploymentAdapter,
+        ZipDeploymentAdapter,
+        rollbackServerPublication,
+    )
 
     try:
-        verified = rollbackServerPublication(args.path, args.bundle_hash)
-    except PublicationBuildError as exc:
+        if args.target == "server":
+            verified = rollbackServerPublication(args.path, args.bundle_hash)
+            print(f"Rolled back server publication to {verified.bundleHash}")
+            return
+        adapter = (
+            ZipDeploymentAdapter(args.path)
+            if args.target == "zip"
+            else SelfHostDeploymentAdapter(args.path)
+            if args.target == "self-host"
+            else ProviderFilesystemAdapter(args.path, credentialRefs=())
+            if args.target == "provider"
+            else FolderDeploymentAdapter(args.path)
+        )
+        probe = adapter.rollback(args.bundle_hash)
+    except (PublicationBuildError, DeploymentError) as exc:
         print(f"Publication rollback failed: {exc}", file=sys.stderr)
         raise SystemExit(1) from exc
-    print(f"Rolled back server publication to {verified.bundleHash}")
+    print(f"Rolled back {args.target} deployment to {probe.versionId}")
+
+
+def _handlePublicationDeploy(args) -> None:
+    from .proof import ProofArchive
+    from .publication import (
+        DeploymentError,
+        FolderDeploymentAdapter,
+        ProviderFilesystemAdapter,
+        SelfHostDeploymentAdapter,
+        ZipDeploymentAdapter,
+        deployPublication,
+    )
+
+    try:
+        adapter = (
+            ZipDeploymentAdapter(args.output)
+            if args.target == "zip"
+            else SelfHostDeploymentAdapter(args.output)
+            if args.target == "self-host"
+            else ProviderFilesystemAdapter(args.output, credentialRefs=args.credential_ref)
+            if args.target == "provider"
+            else FolderDeploymentAdapter(args.output)
+        )
+        outcome = deployPublication(args.path, adapter, proofArchive=ProofArchive())
+    except DeploymentError as exc:
+        print(f"Publication deploy failed: {exc}", file=sys.stderr)
+        for diagnostic in exc.diagnostics:
+            print(f"  {diagnostic}", file=sys.stderr)
+        raise SystemExit(1) from exc
+    payload = {
+        "adapterId": outcome.adapterId,
+        "target": outcome.target,
+        "versionId": outcome.versionId,
+        "previousVersionId": outcome.previousVersionId,
+        "artifactPath": outcome.artifactPath.as_posix(),
+        "artifactHash": outcome.artifactHash,
+        "manifestHash": outcome.manifestHash,
+        "deploymentReceipt": outcome.deploymentReceipt.model_dump(mode="json"),
+    }
+    if args.json:
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+    else:
+        print(f"Deployed {outcome.target} publication: {outcome.artifactPath}")
+        print(f"Version: {outcome.versionId}")
+        if outcome.target == "self-host":
+            print(f"Serve with: codaro serve {outcome.artifactPath}")
 
 
 def _loadPackageLock(pathLike: str | None) -> dict[str, object] | None:
@@ -479,7 +569,7 @@ def normalizeArgs(rawArgs: list[str]) -> list[str]:
         return ["edit"]
 
     command = rawArgs[0].lower()
-    knownCommands = {"edit", "run", "app", "export", "inspect", "build", "serve", "rollback", "task", "pack", "classroom"}
+    knownCommands = {"edit", "run", "app", "export", "inspect", "build", "serve", "deploy", "rollback", "task", "pack", "classroom"}
 
     if command == "app":
         return ["run", *rawArgs[1:]]
@@ -496,7 +586,7 @@ def normalizeArgs(rawArgs: list[str]) -> list[str]:
 def openBrowser(url: str, logger) -> None:
     try:
         opened = webbrowser.open(url)
-    except Exception as error:  # noqa: BLE001 — browser open is best-effort
+    except Exception as error:  # noqa: BLE001, browser open is best-effort
         logger.exception("browser %s", formatLogFields(action="error", url=url, message=str(error)))
         return
     status = "opened" if opened else "not-confirmed"

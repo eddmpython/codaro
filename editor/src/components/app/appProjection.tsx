@@ -2,10 +2,12 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { ExecutionOutput } from "@/components/app/appPrimitives";
+import { DeploymentGuide } from "@/components/app/deploymentGuide";
 import { Button } from "@/components/ui/button";
 import { blockLabel, isExecutableBlock } from "@/lib/cellModel";
 import { cn } from "@/lib/utils";
 import type { BlockEmbedMode } from "@/embed/embedMessage";
+import type { RuntimeTarget } from "@/lib/generatedContracts/executableUnit";
 import type {
   BlockConfig,
   CodaroDocument,
@@ -17,6 +19,7 @@ type ResultMap = Record<string, ExecutionResult>;
 
 export function AppProjection({
   document,
+  deploymentTarget,
   drafts,
   embedMode,
   mode,
@@ -27,8 +30,10 @@ export function AppProjection({
   onUpdateApp,
   results,
   staleBlockIds,
+  sourcePath,
 }: {
   document: CodaroDocument;
+  deploymentTarget?: RuntimeTarget | null;
   drafts: Record<string, string>;
   embedMode?: BlockEmbedMode;
   mode: "preview" | "server";
@@ -39,6 +44,7 @@ export function AppProjection({
   onUpdateApp?: (patch: Partial<DocumentAppConfig>) => void;
   results: ResultMap;
   staleBlockIds: string[];
+  sourcePath?: string | null;
 }) {
   const app = resolvedAppConfig(document);
   const candidates = useMemo(
@@ -87,8 +93,10 @@ export function AppProjection({
         <AppPreviewToolbar
           app={app}
           candidates={candidates}
+          deploymentTarget={deploymentTarget ?? null}
           onExit={onExitPreview}
           onUpdateApp={updateApp}
+          sourcePath={sourcePath ?? null}
         />
       ) : null}
 
@@ -141,13 +149,17 @@ export function AppProjection({
 function AppPreviewToolbar({
   app,
   candidates,
+  deploymentTarget,
   onExit,
   onUpdateApp,
+  sourcePath,
 }: {
   app: Required<DocumentAppConfig>;
   candidates: BlockConfig[];
+  deploymentTarget: RuntimeTarget | null;
   onExit: () => void;
   onUpdateApp: (patch: Partial<DocumentAppConfig>) => void;
+  sourcePath: string | null;
 }) {
   const selectedIds = app.entryBlockIds.length
     ? new Set(app.entryBlockIds)
@@ -236,6 +248,10 @@ function AppPreviewToolbar({
             ))}
           </div>
         </details>
+
+        <div className="ml-auto">
+          <DeploymentGuide runtimeTarget={deploymentTarget} sourcePath={sourcePath} />
+        </div>
       </div>
     </div>
   );

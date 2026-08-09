@@ -778,6 +778,22 @@ GATES: dict[str, Gate] = {
         ),
         ci_required=False,
     ),
+    "deployment-adapters": Gate(
+        tier="fast",
+        description="검증된 publication의 folder, zip, self-host, provider 전달과 probe, rollback, proof를 검증한다.",
+        commands=(
+            command((
+                "uv", "run", "python", "-X", "utf8", "-m", "pytest",
+                "tests/publication/testDeploymentAdapters.py",
+                "tests/contracts/testProofContracts.py",
+                "tests/proof/testProofArchive.py",
+                "tests/runtime/testCli.py",
+                "-q", "--tb=short",
+            )),
+            command(("npm", "run", "check"), cwd="editor"),
+        ),
+        ci_required=False,
+    ),
     "gui-control-browser": Gate(
         tier="surface",
         description="버전된 GUI 제어 API와 실제 Chromium의 명령, 클릭, 키 입력, 모바일 포커스, AX tree, geometry 폐쇄 루프를 확인한다.",
@@ -1040,6 +1056,7 @@ PRODUCT_QUALITY_GATES = (
     "server-publication",
     "block-embedding",
     "learning-product-bridge",
+    "deployment-adapters",
     "design-system-contract",
     "theme-runtime-browser",
     "visual-accessibility-browser",
@@ -2098,8 +2115,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 69:
-        failures.append(f"expected 69 gates, found {len(GATES)}")
+    if len(GATES) != 70:
+        failures.append(f"expected 70 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:
