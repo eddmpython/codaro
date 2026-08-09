@@ -3696,9 +3696,13 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
                     f"{name}: draft autosave created learning evidence before a verified check"
                 )
         elif case.get("expectLocalRequiredCheck"):
-            if audit["webEvidenceEventCount"] or audit["webStrongEvidenceEventCount"]:
+            if (
+                audit["webEvidenceEventCount"] != 2
+                or audit["webStrongEvidenceEventCount"] != 0
+            ):
                 failures.append(
-                    f"{name}: Local-required browser behavior created learning evidence"
+                    f"{name}: Local-required browser behavior did not retain exactly two "
+                    "non-credit attempt receipts"
                 )
         elif case.get("runLearningCell") and audit["webStrongEvidenceEventCount"] < 1:
             failures.append(f"{name}: append-only strong-check event did not survive reload")
@@ -5676,7 +5680,41 @@ def runBrowserMatrix(
                                 '[data-learning-check-result="unsupported"]',
                                 timeout=120_000,
                             )
-                            waitForWebLearningEvidenceEventCount(page, 0, timeout=20_000)
+                            waitForWebLearningEvidenceEventCount(page, 2, timeout=20_000)
+                            localRequiredEvidence = page.evaluate(
+                                """
+                                async () => new Promise((resolve, reject) => {
+                                  const request = indexedDB.open('codaro-learning-evidence-v1', 3);
+                                  request.onerror = () => reject(request.error);
+                                  request.onsuccess = () => {
+                                    const database = request.result;
+                                    const eventRequest = database.transaction('events', 'readonly')
+                                      .objectStore('events').getAll();
+                                    eventRequest.onerror = () => reject(eventRequest.error);
+                                    eventRequest.onsuccess = () => {
+                                      const values = eventRequest.result;
+                                      database.close();
+                                      resolve({
+                                        attemptCount: values.filter(
+                                          (item) => item?.kind === 'AttemptObserved'
+                                        ).length,
+                                        creditCount: values.flatMap(
+                                          (item) => item?.canonicalEvents || []
+                                        ).filter((item) => item?.kind === 'CreditGranted').length,
+                                      });
+                                    };
+                                  };
+                                })
+                                """
+                            )
+                            if (
+                                localRequiredEvidence.get("attemptCount") != 2
+                                or localRequiredEvidence.get("creditCount") != 0
+                            ):
+                                raise AssertionError(
+                                    "Local-required attempts were not stored without credit: "
+                                    f"{localRequiredEvidence}"
+                                )
                         else:
                             try:
                                 page.wait_for_selector(
