@@ -86,7 +86,10 @@ def testRecipeGeneratorBasic() -> None:
     gen = RecipeGenerator()
     recipe = gen.generate(actions, title="Test Recipe")
 
-    assert "# codaro:app title='Test Recipe'" in recipe
+    assert "# /// codaro-app" in recipe
+    assert '# title = "Test Recipe"' in recipe
+    assert '# statePolicy = "none"' in recipe
+    assert "# codaro:app" not in recipe
     assert "guard.click(100, 200)" in recipe
     assert "guard.typeText('hello')" in recipe
     assert "guard.hotkey('ctrl', 's')" in recipe

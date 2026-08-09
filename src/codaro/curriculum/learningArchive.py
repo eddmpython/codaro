@@ -11,6 +11,7 @@ from pathlib import Path
 import re
 import shutil
 import tempfile
+import time
 from typing import Any, TypeVar
 
 from .evidenceArchive import (
@@ -630,7 +631,7 @@ def commitLearningArchiveImport(
                 _writeDurableFile(blobRoot / blobHash.removeprefix("sha256-"), payload)
             if fault is not None:
                 fault("beforeObjectPublish")
-            os.replace(_ioPath(stageRoot), _ioPath(objectRoot))
+            _publishObjectDirectory(stageRoot, objectRoot)
         finally:
             if _ioPath(stageRoot).exists():
                 shutil.rmtree(_ioPath(stageRoot))
@@ -1309,6 +1310,21 @@ def _writeDurableFile(path: Path, payload: bytes) -> None:
         handle.write(payload)
         handle.flush()
         os.fsync(handle.fileno())
+
+
+def _publishObjectDirectory(stageRoot: Path, objectRoot: Path) -> None:
+    source = _ioPath(stageRoot)
+    target = _ioPath(objectRoot)
+    for attempt in range(6):
+        try:
+            os.replace(source, target)
+            return
+        except PermissionError:
+            if target.exists():
+                return
+            if attempt == 5:
+                raise
+            time.sleep(0.05 * (2 ** attempt))
 
 
 def _atomicReplaceFile(path: Path, payload: bytes) -> None:

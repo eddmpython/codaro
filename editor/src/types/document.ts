@@ -4,6 +4,7 @@ import type {
   cellRoles,
   executionKinds,
 } from "@/lib/cellSchema";
+import type { AppSpec } from "@/lib/generatedContracts/appSpec";
 
 export type LoadState = "idle" | "loading" | "ready" | "error";
 
@@ -131,6 +132,9 @@ export type BlockConfig = {
   guide?: GuideConfig | null;
 };
 
+export type DocumentAppConfig = Omit<AppSpec, "schemaVersion" | "statePolicy"> &
+  Partial<Pick<AppSpec, "schemaVersion" | "statePolicy">>;
+
 export type CodaroDocument = {
   id: string;
   title: string;
@@ -146,10 +150,5 @@ export type CodaroDocument = {
     reactiveMode: string;
     packages: string[];
   };
-  app?: {
-    title: string;
-    layout: string;
-    hideCode: boolean;
-    entryBlockIds: string[];
-  };
+  app?: DocumentAppConfig;
 };

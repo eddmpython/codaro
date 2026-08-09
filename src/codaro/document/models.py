@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+from ..generatedContracts import AppLayout, AppStatePolicy
 
 
 def utcNow() -> str:
@@ -57,10 +59,23 @@ class RuntimeConfig(BaseModel):
 
 
 class AppConfig(BaseModel):
-    title: str = "Untitled"
-    layout: str = "notebook"
+    model_config = ConfigDict(extra="forbid", validate_assignment=True)
+
+    schemaVersion: Literal[1] = 1
+    title: str = Field(default="Untitled", min_length=1, max_length=200)
+    layout: AppLayout = "notebook"
     hideCode: bool = True
     entryBlockIds: list[str] = Field(default_factory=list)
+    statePolicy: AppStatePolicy = "perSession"
+
+    @field_validator("entryBlockIds")
+    @classmethod
+    def validateUniqueEntryBlockIds(cls, value: list[str]) -> list[str]:
+        if len(value) != len(set(value)):
+            raise ValueError("app entry block ids must be unique")
+        if any(not blockId or len(blockId) > 200 for blockId in value):
+            raise ValueError("app entry block ids must contain 1 to 200 characters")
+        return value
 
 
 class CodaroDocument(BaseModel):
@@ -70,6 +85,14 @@ class CodaroDocument(BaseModel):
     metadata: DocumentMetadata = Field(default_factory=DocumentMetadata)
     runtime: RuntimeConfig = Field(default_factory=RuntimeConfig)
     app: AppConfig = Field(default_factory=AppConfig)
+
+    @model_validator(mode="after")
+    def validateAppEntryBlocks(self) -> "CodaroDocument":
+        blockIds = {block.id for block in self.blocks}
+        missing = [blockId for blockId in self.app.entryBlockIds if blockId not in blockIds]
+        if missing:
+            raise ValueError(f"app entry blocks are missing from the document: {missing}")
+        return self
 
 
 class LoadRequest(BaseModel):

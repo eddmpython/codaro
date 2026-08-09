@@ -1,5 +1,10 @@
 import type { BlockConfig, CodaroDocument } from "@/types";
 import { isExecutableBlock } from "@/lib/cellModel";
+import {
+  APP_LAYOUTS,
+  APP_STATE_POLICIES,
+  type AppSpec,
+} from "@/lib/generatedContracts/appSpec";
 
 export const starterDocument: CodaroDocument = {
   id: "new-notebook",
@@ -142,6 +147,9 @@ export function normalizeDocumentPayload(
 
   const fallbackTitle = options.fallbackTitle ?? "Codaro 노트북";
   const title = String(raw.title ?? fallbackTitle);
+  const rawApp = isRecord(raw.app) ? raw.app : options.fallbackApp;
+  const app = normalizeAppSpec(rawApp, title, blocks);
+  if (app === null) return null;
 
   return {
     ...starterDocument,
@@ -152,14 +160,39 @@ export function normalizeDocumentPayload(
       ? (raw.metadata as CodaroDocument["metadata"])
       : options.fallbackMetadata ?? starterDocument.metadata,
     runtime: isRecord(raw.runtime) ? (raw.runtime as CodaroDocument["runtime"]) : starterDocument.runtime,
-    app: isRecord(raw.app)
-      ? (raw.app as CodaroDocument["app"])
-      : options.fallbackApp ?? {
-        title,
-        layout: "notebook",
-        hideCode: false,
-        entryBlockIds: [],
-      },
+    app,
+  };
+}
+
+function normalizeAppSpec(
+  raw: unknown,
+  title: string,
+  blocks: BlockConfig[],
+): AppSpec | null {
+  const value = isRecord(raw) ? raw : {};
+  const schemaVersion = value.schemaVersion ?? 1;
+  const layout = value.layout ?? "notebook";
+  const statePolicy = value.statePolicy ?? "perSession";
+  const entryBlockIds = value.entryBlockIds ?? [];
+  if (schemaVersion !== 1) return null;
+  if (typeof layout !== "string" || !APP_LAYOUTS.includes(layout as AppSpec["layout"])) return null;
+  if (
+    typeof statePolicy !== "string"
+    || !APP_STATE_POLICIES.includes(statePolicy as AppSpec["statePolicy"])
+  ) return null;
+  if (!Array.isArray(entryBlockIds) || !entryBlockIds.every((blockId) => typeof blockId === "string")) {
+    return null;
+  }
+  if (new Set(entryBlockIds).size !== entryBlockIds.length) return null;
+  const blockIds = new Set(blocks.map((block) => block.id));
+  if (entryBlockIds.some((blockId) => !blockIds.has(blockId))) return null;
+  return {
+    schemaVersion: 1,
+    title: String(value.title ?? title),
+    layout: layout as AppSpec["layout"],
+    hideCode: value.hideCode === undefined ? false : value.hideCode === true,
+    entryBlockIds: [...entryBlockIds],
+    statePolicy: statePolicy as AppSpec["statePolicy"],
   };
 }
 

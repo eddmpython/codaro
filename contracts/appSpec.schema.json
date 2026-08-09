@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codaro.dev/contracts/appSpec.schema.json",
+  "title": "Codaro AppSpec",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "title",
+    "layout",
+    "hideCode",
+    "entryBlockIds",
+    "statePolicy"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "layout": {
+      "type": "string",
+      "enum": ["notebook", "learning", "stack", "grid"]
+    },
+    "hideCode": { "type": "boolean" },
+    "entryBlockIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1, "maxLength": 200 }
+    },
+    "statePolicy": {
+      "type": "string",
+      "enum": ["none", "perSession", "shared"]
+    }
+  }
+}

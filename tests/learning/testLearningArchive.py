@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 from copy import deepcopy
+import os
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -394,3 +395,28 @@ def testLearningArchiveApiUsesConfiguredWorkspaceInsteadOfProcessRoot(
     assert current.json()["manifest"]["rootHash"] == archive["manifest"]["rootHash"]
     assert evidenceSummary.json() == {"events": 1, "conflicts": 0}
     assert tasks.json()["total"] == 1
+
+
+def testLearningArchiveRetriesTransientObjectDirectoryPublishLock(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    realReplace = os.replace
+    directoryAttempts = 0
+
+    def replaceAfterTransientFailure(source: object, target: object) -> None:
+        nonlocal directoryAttempts
+        if Path(source).name.startswith(".learning-import-"):
+            directoryAttempts += 1
+            if directoryAttempts == 1:
+                raise PermissionError("temporary directory scanner lock")
+        realReplace(source, target)
+
+    monkeypatch.setattr(os, "replace", replaceAfterTransientFailure)
+
+    receipt = commitLearningArchiveImport(learningArchive(), tmp_path / "learning-archives")
+
+    assert directoryAttempts == 2
+    assert receipt["changed"] is True
+    current = readCurrentLearningArchive(tmp_path / "learning-archives")
+    assert current["manifest"]["archiveId"] == receipt["archiveId"]

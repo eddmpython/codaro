@@ -253,10 +253,12 @@ export const fallbackDocument: CodaroDocument = {
     packages: [],
   },
   app: {
+    schemaVersion: 1,
     title: "값을 보이게 만들기",
     layout: "notebook",
     hideCode: false,
     entryBlockIds: [],
+    statePolicy: "perSession",
   },
   blocks: [
     {

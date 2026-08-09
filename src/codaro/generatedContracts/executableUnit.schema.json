@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codaro.dev/contracts/executableUnit.schema.json",
+  "title": "Codaro ExecutableUnitSpec",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "unitId",
+    "entryBlockId",
+    "dependencyBlockIds",
+    "inputSchema",
+    "outputSchema",
+    "effects",
+    "statePolicy",
+    "runtimeTarget",
+    "sourceSpan",
+    "sourceHash",
+    "dependencyHash",
+    "assetHashes",
+    "checkScenarioIds",
+    "evidenceReceiptIds",
+    "diagnostics"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "unitId": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "entryBlockId": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "dependencyBlockIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1, "maxLength": 200 }
+    },
+    "inputSchema": { "type": "object" },
+    "outputSchema": { "type": "object" },
+    "effects": { "$ref": "#/$defs/EffectSpec" },
+    "statePolicy": { "$ref": "#/$defs/StatePolicy" },
+    "runtimeTarget": { "$ref": "#/$defs/RuntimeTarget" },
+    "sourceSpan": { "$ref": "#/$defs/SourceSpan" },
+    "sourceHash": { "$ref": "#/$defs/ContentHash" },
+    "dependencyHash": { "$ref": "#/$defs/ContentHash" },
+    "assetHashes": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/ContentHash" }
+    },
+    "checkScenarioIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "evidenceReceiptIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/CapabilityDiagnostic" }
+    }
+  },
+  "$defs": {
+    "ContentHash": {
+      "type": "string",
+      "pattern": "^sha256-[0-9a-f]{64}$"
+    },
+    "StatePolicy": {
+      "type": "string",
+      "enum": ["none", "perSession", "shared"]
+    },
+    "RuntimeTarget": {
+      "type": "string",
+      "enum": ["browser", "server", "local", "blocked"]
+    },
+    "SourceSpan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "startLine", "endLine"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "startLine": { "type": "integer", "minimum": 1 },
+        "endLine": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "EffectSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "filesystemRead",
+        "filesystemWrite",
+        "networkOrigins",
+        "process",
+        "gui",
+        "secretRefs"
+      ],
+      "properties": {
+        "filesystemRead": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "filesystemWrite": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "networkOrigins": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "process": { "type": "boolean" },
+        "gui": { "type": "boolean" },
+        "secretRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "CapabilityDiagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "severity", "sourceSpan"],
+      "properties": {
+        "code": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 },
+        "severity": { "type": "string", "enum": ["info", "warning", "blocked"] },
+        "sourceSpan": { "$ref": "#/$defs/SourceSpan" }
+      }
+    }
+  }
+}

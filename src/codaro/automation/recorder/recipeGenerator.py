@@ -3,6 +3,8 @@ from __future__ import annotations
 import logging
 from typing import Any
 
+from codaro.document import AppConfig, writeAppMetadata
+
 from .actionRecorder import RecordedAction
 
 logger = logging.getLogger(__name__)
@@ -12,7 +14,11 @@ class RecipeGenerator:
 
     def generate(self, actions: list[RecordedAction], title: str = "Recorded Automation") -> str:
         lines: list[str] = []
-        lines.append(f"# codaro:app title={title!r}")
+        lines.append(writeAppMetadata(AppConfig(
+            title=title,
+            hideCode=False,
+            statePolicy="none",
+        )))
         lines.append("")
         lines.append("# %% [markdown]")
         lines.append(f"# # {title}")

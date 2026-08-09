@@ -9,6 +9,24 @@ artifacts:
       - src/codaro/generatedContracts/artifactOwnership.schema.json
       - editor/src/lib/generatedContracts/artifactOwnership.ts
       - launcher/codaro-launcher/src/generated_contracts/artifact_ownership.rs
+  - artifactId: app-spec
+    role: source
+    owner: product-architecture
+    sourcePath: contracts/appSpec.schema.json
+    surfacePaths:
+      - src/codaro/generatedContracts/appSpec.py
+      - src/codaro/generatedContracts/appSpec.schema.json
+      - editor/src/lib/generatedContracts/appSpec.ts
+      - src/codaro/document/models.py
+      - src/codaro/document/percentFormat.py
+  - artifactId: executable-unit
+    role: source
+    owner: product-architecture
+    sourcePath: contracts/executableUnit.schema.json
+    surfacePaths:
+      - src/codaro/generatedContracts/executableUnit.py
+      - src/codaro/generatedContracts/executableUnit.schema.json
+      - editor/src/lib/generatedContracts/executableUnit.ts
   - artifactId: learning-artifact-descriptor
     role: source
     owner: learning-runtime

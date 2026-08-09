@@ -83,7 +83,7 @@ def testSaveDocument(tmp_path: Path) -> None:
     assert response.status_code == 200
     assert path.exists()
     content = path.read_text(encoding="utf-8")
-    assert "codaro:app" in content
+    assert "# /// codaro-app" in content
     assert "value = 42" in content
 
 
@@ -257,7 +257,7 @@ def testAutosaveKeepsRichJupyterOriginalAndUsesUniqueCodaroCopy(tmp_path: Path) 
     assert preserved["cells"][1]["attachments"] == originalPayload["cells"][1]["attachments"]
 
     assert occupiedCopy.read_text(encoding="utf-8") == "existing_copy = True\n"
-    assert "# codaro:app" in copyPath.read_text(encoding="utf-8")
+    assert "# /// codaro-app" in copyPath.read_text(encoding="utf-8")
     copyDocument = loadDocument(str(copyPath))
     assert copyDocument.metadata.sourceFormat == "percent"
     assert "value = 99" in copyDocument.blocks[0].content
