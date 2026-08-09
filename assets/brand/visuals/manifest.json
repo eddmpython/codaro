@@ -196,8 +196,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-mobile-dark.png",
-      "sourceHash": "sha256-260a2e09566745b2b52256fec1422860f6180bbd500e522efd709112d3904ae4",
-      "sourceGitHead": "c69fa0698382fb78972ccdd45d986ebd2f7018ba",
+      "sourceHash": "sha256-a6c285fdd9bc720f52cdbfc7d9f52f5674195351da28d54147898af242e56363",
+      "sourceGitHead": "23404b81fe3bd744fe478ce4d3ee650c1de3d4f2",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -278,7 +278,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-d3622876bd1fa45799700b14f1332b5302cb1117ed44f7bf49c475779020d499",
+        "sourceSetHash": "sha256-0a7ecc4462e855a3af76af003e74e5d409f98d67e9598a7d2d636aca02ff9866",
         "platform": "win32"
       },
       "themePairId": "runLearningMobileLight"
@@ -288,8 +288,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-mobile-light.png",
-      "sourceHash": "sha256-9819f6593242b9d4a52899006f987339d804b86e1e80d53a6f5a93a54486b9c7",
-      "sourceGitHead": "c69fa0698382fb78972ccdd45d986ebd2f7018ba",
+      "sourceHash": "sha256-44a072c7ed79e2fc04ac7f1d83a5ee383beaaec5ddd29a2332d22cdca355352a",
+      "sourceGitHead": "23404b81fe3bd744fe478ce4d3ee650c1de3d4f2",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -370,7 +370,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-d3622876bd1fa45799700b14f1332b5302cb1117ed44f7bf49c475779020d499",
+        "sourceSetHash": "sha256-0a7ecc4462e855a3af76af003e74e5d409f98d67e9598a7d2d636aca02ff9866",
         "platform": "win32"
       },
       "themePairId": "runLearningMobile"
@@ -381,7 +381,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-hero-dark.png",
       "sourceHash": "sha256-43764938af0afc40d36261448860882f77fb456263c1e871e9ae00344c60a352",
-      "sourceGitHead": "c69fa0698382fb78972ccdd45d986ebd2f7018ba",
+      "sourceGitHead": "23404b81fe3bd744fe478ce4d3ee650c1de3d4f2",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -462,7 +462,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-c98363a861ac6304428005c9d5307781c60746d9e9f4eb87d58d359a72e4c871",
+        "sourceSetHash": "sha256-efd3b027cd3a27d7502aa5ad5f5df2d192f8d9de481da41fa96c172cfe34196d",
         "platform": "win32"
       },
       "themePairId": "runLearningHeroLight"
@@ -473,7 +473,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-hero-light.png",
       "sourceHash": "sha256-14f7509dd6f59fe8d0a63e65c258349c260aee6dc9eece9875ca13fbf099e776",
-      "sourceGitHead": "c69fa0698382fb78972ccdd45d986ebd2f7018ba",
+      "sourceGitHead": "23404b81fe3bd744fe478ce4d3ee650c1de3d4f2",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -554,7 +554,7 @@
           "tests/assets/captureProductVisuals.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-c98363a861ac6304428005c9d5307781c60746d9e9f4eb87d58d359a72e4c871",
+        "sourceSetHash": "sha256-efd3b027cd3a27d7502aa5ad5f5df2d192f8d9de481da41fa96c172cfe34196d",
         "platform": "win32"
       },
       "themePairId": "runLearningHero"
