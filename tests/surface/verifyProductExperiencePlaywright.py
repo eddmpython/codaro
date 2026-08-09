@@ -1850,6 +1850,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "initialCheckState": "mismatch",
             "solutionCode": "print('Hello Codaro')",
             "captureCheckStates": True,
+            "captureAtTop": True,
             "expectedSnippetOutput": "Hello World",
         },
         {
@@ -7073,6 +7074,33 @@ def runBrowserMatrix(
                         }
                         """
                     )
+                    if case.get("captureAtTop"):
+                        topScrollPosition = page.evaluate(
+                            """
+                            () => {
+                              const pane = document.querySelector(
+                                '[data-learning-content-pane="true"]'
+                              );
+                              const viewport = pane?.querySelector(
+                                '[data-radix-scroll-area-viewport]'
+                              ) || pane;
+                              if (!(viewport instanceof HTMLElement)) return null;
+                              viewport.scrollTop = 0;
+                              return viewport.scrollTop;
+                            }
+                            """
+                        )
+                        if topScrollPosition != 0:
+                            raise AssertionError(
+                                "product overview capture did not reset its content viewport"
+                            )
+                        page.evaluate(
+                            """
+                            () => new Promise((resolve) => requestAnimationFrame(
+                              () => requestAnimationFrame(resolve)
+                            ))
+                            """
+                        )
                     audit = page.evaluate(
                         AUDIT_SCRIPT,
                         {"surface": case["surface"], "expectedTier": case.get("expectedTier")},
