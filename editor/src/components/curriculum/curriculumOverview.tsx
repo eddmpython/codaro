@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { WebLearningEvidenceSummary } from "@/lib/webLearningEvidence";
 import { importLearningEvidenceArchive, readLearningEvidenceSummary } from "@/lib/learningEvidenceOperations";
 import {
-  adoptLearningArchiveAutomationDraft,
+  promoteLearningArtifact,
+  learningArtifactPromotionStatus,
   exportBrowserLearningArchive,
   importBrowserLearningArchive,
   readAdoptedLearningArchiveAutomationDraftIds,
@@ -46,6 +47,7 @@ export function LearningArchiveMenu({
   localRuntime: boolean;
   onImportArchive: (archive: LearningArchiveMaterialization) => Promise<void> | void;
 }) {
+  type PromotionStatus = Awaited<ReturnType<typeof learningArtifactPromotionStatus>>;
   const { t } = useLocale();
   const inputRef = useRef<HTMLInputElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -55,6 +57,8 @@ export function LearningArchiveMenu({
   const [workspaceArchive, setWorkspaceArchive] = useState<LearningArchiveMaterialization | null>(null);
   const [automationDrafts, setAutomationDrafts] = useState<LearningArchiveMaterialization["automationDrafts"]>([]);
   const [adoptedAutomationDraftIds, setAdoptedAutomationDraftIds] = useState<Set<string>>(new Set());
+  const [promotionStatuses, setPromotionStatuses] = useState<Map<string, PromotionStatus>>(new Map());
+  const [promotionInputs, setPromotionInputs] = useState<Map<string, Record<string, string>>>(new Map());
   const showStatus = (message: string) => {
     setNoticeTone("status");
     setNotice(message);
@@ -69,6 +73,7 @@ export function LearningArchiveMenu({
       setWorkspaceArchive(null);
       setAutomationDrafts([]);
       setAdoptedAutomationDraftIds(new Set());
+      setPromotionStatuses(new Map());
       return;
     }
     const materialized = archive === undefined
@@ -78,15 +83,25 @@ export function LearningArchiveMenu({
     if (!localRuntime) {
       setAutomationDrafts([]);
       setAdoptedAutomationDraftIds(new Set());
+      setPromotionStatuses(new Map());
       return;
     }
     const nextDrafts = materialized?.automationDrafts ?? [];
     setAutomationDrafts(nextDrafts);
     if (!nextDrafts.length) {
       setAdoptedAutomationDraftIds(new Set());
+      setPromotionStatuses(new Map());
       return;
     }
-    setAdoptedAutomationDraftIds(new Set(await readAdoptedLearningArchiveAutomationDraftIds()));
+    const [adoptedIds, eligibility] = await Promise.all([
+      readAdoptedLearningArchiveAutomationDraftIds(),
+      Promise.all(nextDrafts.map(async (draft) => [
+        draft.draftId,
+        await learningArtifactPromotionStatus(draft.draftId),
+      ] as const)),
+    ]);
+    setAdoptedAutomationDraftIds(new Set(adoptedIds));
+    setPromotionStatuses(new Map(eligibility));
   }, [lessonRef, localRuntime]);
 
   useEffect(() => {
@@ -184,19 +199,30 @@ export function LearningArchiveMenu({
     }
   };
 
-  const adoptAutomationDraft = async (draftId: string) => {
+  const promoteAutomationDraft = async (draftId: string) => {
     try {
-      const receipt = await adoptLearningArchiveAutomationDraft(draftId);
+      const status = promotionStatuses.get(draftId);
+      const rawInputs = promotionInputs.get(draftId) ?? {};
+      const inputs = Object.fromEntries((status?.requiredInputNames ?? []).map((name) => {
+        const raw = rawInputs[name]?.trim();
+        if (!raw) throw new Error(`기능 블록 입력이 비어 있습니다: ${name}`);
+        try {
+          return [name, JSON.parse(raw) as unknown];
+        } catch {
+          throw new Error(`기능 블록 입력은 JSON 값이어야 합니다: ${name}`);
+        }
+      }));
+      const receipt = await promoteLearningArtifact(draftId, inputs);
       setAdoptedAutomationDraftIds((current) => new Set(current).add(draftId));
       showStatus(
-        receipt.adopted
-          ? `"${receipt.task.name}" 자동화 초안을 작업 메뉴에 추가했습니다. 직접 켜기 전에는 실행되지 않습니다.`
-          : `"${receipt.task.name}" 자동화 초안은 이미 작업 메뉴에 있습니다.`,
+        receipt.promoted
+          ? `"${receipt.task.name}" 기능 블록을 같은 코드와 검증 계보로 만들었습니다. 직접 켜기 전에는 실행되지 않습니다.`
+          : `"${receipt.task.name}" 기능 블록은 이미 작업 메뉴에 있습니다.`,
       );
       window.dispatchEvent(new CustomEvent(AUTOMATION_UPDATED_EVENT));
     } catch (error) {
-      console.error("학습 데이터의 자동화 초안을 옮기지 못했습니다.", error);
-      showError("자동화 초안을 옮기지 못했습니다. Local 연결 상태를 확인해 주세요.");
+      console.error("학습 결과를 기능 블록으로 만들지 못했습니다.", error);
+      showError("강한 산출물 검증을 통과한 현재 코드만 내 기능으로 사용할 수 있습니다.");
     }
   };
 
@@ -308,23 +334,49 @@ export function LearningArchiveMenu({
             <section className="mt-3 border-t border-border pt-3" data-learning-automation-drafts="true">
               <div className="mb-2 flex items-center gap-2 text-xs font-medium text-muted-foreground">
                 <Workflow className="size-4" />
-                자동화 초안
+                내 기능 후보
               </div>
               <div className="divide-y divide-border">
                 {automationDrafts.map((draft) => {
                   const adopted = adoptedAutomationDraftIds.has(draft.draftId);
+                  const promotionStatus = promotionStatuses.get(draft.draftId);
+                  const eligible = promotionStatus?.eligible === true;
                   return (
                     <div className="flex flex-wrap items-center gap-3 py-2" key={draft.draftId}>
                       <div className="min-w-0 flex-1">
                         <div className="text-sm font-medium text-foreground">{draft.name}</div>
                         {draft.description ? <div className="mt-1 text-xs text-muted-foreground">{draft.description}</div> : null}
+                        {eligible && promotionStatus.requiredInputNames.length ? (
+                          <div className="mt-2 grid gap-2 sm:grid-cols-2" data-learning-promotion-inputs="true">
+                            {promotionStatus.requiredInputNames.map((name) => (
+                              <label className="grid gap-1 text-xs text-muted-foreground" key={name}>
+                                {name}
+                                <input
+                                  className="min-h-9 rounded-md border border-border bg-background px-2 font-mono text-foreground"
+                                  value={promotionInputs.get(draft.draftId)?.[name] ?? ""}
+                                  placeholder='JSON 값, 예: "report.json"'
+                                  onChange={(event) => setPromotionInputs((current) => {
+                                    const next = new Map(current);
+                                    next.set(draft.draftId, {
+                                      ...(next.get(draft.draftId) ?? {}),
+                                      [name]: event.currentTarget.value,
+                                    });
+                                    return next;
+                                  })}
+                                />
+                              </label>
+                            ))}
+                          </div>
+                        ) : null}
                       </div>
                       {adopted ? (
-                        <span className="text-xs font-medium text-muted-foreground">작업 메뉴에 추가됨</span>
+                        <span className="text-xs font-medium text-muted-foreground">내 기능으로 사용 중</span>
+                      ) : !eligible ? (
+                        <span className="text-xs font-medium text-muted-foreground">강한 결과물 검증 필요</span>
                       ) : (
-                        <Button size="sm" variant="outline" onClick={() => void adoptAutomationDraft(draft.draftId)}>
+                        <Button size="sm" variant="outline" onClick={() => void promoteAutomationDraft(draft.draftId)}>
                           <Workflow />
-                          자동화로 옮기기
+                          내 기능으로 사용
                         </Button>
                       )}
                     </div>

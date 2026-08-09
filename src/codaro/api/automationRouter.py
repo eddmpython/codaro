@@ -268,6 +268,7 @@ def createAutomationRouter(state: Any) -> APIRouter:
             return await runAutomationTaskPayload(
                 taskId,
                 workspaceRoot=str(getattr(state, "workspaceRoot", ".")),
+                proofArchive=getattr(state, "proofArchive", None),
             )
         except AutomationTaskFlowError as error:
             failAutomationTaskFlow(error)

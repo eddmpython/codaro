@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from .eStop import getEmergencyStop
 from .recipeAuthoring import buildAutomationTaskDraft, validateAutomationTaskRecipeText
@@ -12,6 +12,9 @@ from .taskModel import TaskDefinition, TaskRun, TaskStatus
 from .taskRegistry import getTaskRegistry
 from .taskRunner import TaskRunner
 from .taskSafety import TaskSafetyError, confirmTaskSafety, requireTaskSafety, taskSafetyStatus
+
+if TYPE_CHECKING:
+    from ..proof import ProofArchive
 
 
 def _shouldNotifyRun(run: TaskRun, diff: RunDiff) -> bool:
@@ -361,7 +364,12 @@ def deleteAutomationTaskPayload(taskId: str) -> dict[str, bool]:
     return {"ok": True}
 
 
-async def runAutomationTaskPayload(taskId: str, *, workspaceRoot: str) -> dict[str, Any]:
+async def runAutomationTaskPayload(
+    taskId: str,
+    *,
+    workspaceRoot: str,
+    proofArchive: "ProofArchive | None" = None,
+) -> dict[str, Any]:
     registry = getTaskRegistry()
     task = registry.get(taskId)
     if task is None:
@@ -369,7 +377,25 @@ async def runAutomationTaskPayload(taskId: str, *, workspaceRoot: str) -> dict[s
     _requireTaskReady(task, workspaceRoot=workspaceRoot, source="task-manual-run")
     run = await TaskRunner(workspaceRoot=workspaceRoot).run(task)
     registry.addRun(run)
-    return run.serialize()
+    operationalReceiptId = _recordOperationalProof(task, run, proofArchive=proofArchive)
+    return {
+        **run.serialize(),
+        **({"operationalReceiptId": operationalReceiptId} if operationalReceiptId else {}),
+    }
+
+
+def _recordOperationalProof(
+    task: TaskDefinition,
+    run: TaskRun,
+    *,
+    proofArchive: "ProofArchive | None",
+) -> str | None:
+    if proofArchive is None:
+        return None
+    from ..api.learningArchiveAutomation import recordPromotedTaskOperationalRun
+
+    receipt = recordPromotedTaskOperationalRun(task, run, proofArchive=proofArchive)
+    return receipt.receiptId if receipt is not None else None
 
 
 def listAutomationTaskRunsPayload(taskId: str, *, limit: int) -> dict[str, Any]:

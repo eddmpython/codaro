@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 import os
+import json
 from pathlib import Path, PurePosixPath
 import re
 from typing import Any, Mapping
@@ -70,7 +71,35 @@ def documentSourceHash(document: CodaroDocument) -> str:
         for block in document.blocks
         if block.type in {"code", "automation"} and block.content.strip()
     ]
+    if len(executable) == 1:
+        return contentDigest(str(executable[0]["content"]))
     return contentDigest(canonicalJson(executable))
+
+
+def taskInputPrelude(inputs: Mapping[str, object]) -> str:
+    """Return a JSON-only prelude that exposes declared Task inputs to Python.
+
+    The prelude is runtime state, not generated source, so the promoted block keeps
+    the same content hash as its learning evidence.  Names that could mutate Python
+    internals are rejected before any learner code executes.
+    """
+
+    if not inputs:
+        return ""
+    if any(not isinstance(name, str) or not name.isidentifier() or name.startswith("_") for name in inputs):
+        raise TaskExecutionError("task-input-name-invalid")
+    try:
+        encodedValues = {
+            name: json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+            for name, value in sorted(inputs.items())
+        }
+    except (TypeError, ValueError) as error:
+        raise TaskExecutionError("task-input-json-invalid") from error
+    assignments = "".join(
+        f"{name} = __codaro_json.loads({encoded!r})\n"
+        for name, encoded in encodedValues.items()
+    )
+    return "import json as __codaro_json\n" + assignments + "del __codaro_json\n"
 
 
 def evaluateTaskOutput(
@@ -121,6 +150,9 @@ def evaluateTaskOutput(
         expectedHash = artifact.get("contentHash")
         if expectedHash is not None and contentHash != expectedHash:
             errors.append(f"artifact-hash-mismatch:{artifact['path']}")
+        jsonSchema = artifact.get("jsonSchema")
+        if jsonSchema is not None:
+            errors.extend(_validateJsonArtifact(payload, str(artifact["path"]), jsonSchema))
         artifactDescriptors.append({
             "schemaVersion": 1,
             "kind": "file",
@@ -178,11 +210,14 @@ def _validateOutputContract(value: object) -> dict[str, Any]:
             raise TaskExecutionError("output-contract-artifacts-invalid")
         normalizedArtifacts: list[dict[str, Any]] = []
         for artifact in artifacts:
-            if not isinstance(artifact, dict) or set(artifact) not in ({"path", "minBytes"}, {"path", "minBytes", "contentHash"}):
+            if not isinstance(artifact, dict) or not {"path", "minBytes"}.issubset(artifact) or set(artifact) - {
+                "path", "minBytes", "contentHash", "jsonSchema"
+            }:
                 raise TaskExecutionError("output-contract-artifacts-invalid")
             path = artifact.get("path")
             minBytes = artifact.get("minBytes")
             contentHash = artifact.get("contentHash")
+            jsonSchema = artifact.get("jsonSchema")
             if (
                 not isinstance(path, str)
                 or not _safeRelativePath(path)
@@ -192,15 +227,74 @@ def _validateOutputContract(value: object) -> dict[str, Any]:
                 or (contentHash is not None and not isinstance(contentHash, str))
             ):
                 raise TaskExecutionError("output-contract-artifacts-invalid")
+            normalizedJsonSchema = _normalizeJsonArtifactSchema(jsonSchema) if jsonSchema is not None else None
             normalizedArtifacts.append({
                 "path": path,
                 "minBytes": minBytes,
                 **({"contentHash": contentHash} if contentHash is not None else {}),
+                **({"jsonSchema": normalizedJsonSchema} if normalizedJsonSchema is not None else {}),
             })
         if len({item["path"] for item in normalizedArtifacts}) != len(normalizedArtifacts):
             raise TaskExecutionError("output-contract-artifacts-duplicate")
         normalized["artifacts"] = sorted(normalizedArtifacts, key=lambda item: item["path"])
     return normalized
+
+
+def _normalizeJsonArtifactSchema(value: object) -> dict[str, object]:
+    if not isinstance(value, dict) or set(value) != {"requiredFields", "fieldTypes"}:
+        raise TaskExecutionError("output-contract-json-schema-invalid")
+    requiredFields = value.get("requiredFields")
+    fieldTypes = value.get("fieldTypes")
+    supportedTypes = {"integer", "number", "string", "boolean", "object", "array", "null"}
+    if (
+        not isinstance(requiredFields, list)
+        or not requiredFields
+        or not all(isinstance(field, str) and field for field in requiredFields)
+        or len(requiredFields) != len(set(requiredFields))
+        or not isinstance(fieldTypes, dict)
+        or set(fieldTypes) != set(requiredFields)
+        or not all(isinstance(kind, str) and kind in supportedTypes for kind in fieldTypes.values())
+    ):
+        raise TaskExecutionError("output-contract-json-schema-invalid")
+    return {
+        "requiredFields": sorted(requiredFields),
+        "fieldTypes": {field: fieldTypes[field] for field in sorted(fieldTypes)},
+    }
+
+
+def _validateJsonArtifact(payload: bytes, path: str, schema: Mapping[str, object]) -> list[str]:
+    try:
+        value = json.loads(payload.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return [f"artifact-json-invalid:{path}"]
+    if not isinstance(value, dict):
+        return [f"artifact-json-object-required:{path}"]
+    errors: list[str] = []
+    fieldTypes = schema["fieldTypes"]
+    assert isinstance(fieldTypes, dict)
+    for field in schema["requiredFields"]:
+        if field not in value:
+            errors.append(f"artifact-json-field-missing:{path}:{field}")
+            continue
+        if not _jsonValueMatchesType(value[field], str(fieldTypes[field])):
+            errors.append(f"artifact-json-field-type:{path}:{field}")
+    return errors
+
+
+def _jsonValueMatchesType(value: object, kind: str) -> bool:
+    if kind == "integer":
+        return isinstance(value, int) and not isinstance(value, bool)
+    if kind == "number":
+        return isinstance(value, (int, float)) and not isinstance(value, bool)
+    if kind == "string":
+        return isinstance(value, str)
+    if kind == "boolean":
+        return isinstance(value, bool)
+    if kind == "object":
+        return isinstance(value, dict)
+    if kind == "array":
+        return isinstance(value, list)
+    return value is None
 
 
 def _workspaceArtifactPath(relativePath: str, workspaceRoot: str | Path) -> Path:

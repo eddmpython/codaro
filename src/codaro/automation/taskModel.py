@@ -31,6 +31,7 @@ class TaskDefinition:
     documentPath: str = ""
     schedule: str | None = None
     inputs: dict[str, Any] = field(default_factory=dict)
+    provenance: dict[str, Any] | None = None
     outputs: list[str] = field(default_factory=list)
     outputContract: dict[str, Any] | None = None
     secretRefs: list[str] = field(default_factory=list)
@@ -49,6 +50,7 @@ class TaskDefinition:
             "documentPath": self.documentPath,
             "schedule": self.schedule,
             "inputs": self.inputs,
+            "provenance": self.provenance,
             "outputs": self.outputs,
             "outputContract": self.outputContract,
             "secretRefs": self.secretRefs,

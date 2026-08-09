@@ -61,6 +61,14 @@ export type TaskDefinition = {
   description: string;
   documentPath: string;
   inputs?: Record<string, unknown>;
+  provenance?: {
+    kind: "codaro.learning-artifact-promotion" | "codaro.learning-draft-adoption";
+    schemaVersion: 1;
+    archiveId: string;
+    capabilityDomainId?: string;
+    draftId: string;
+    sourceBlockHash?: string;
+  } | null;
   schedule?: string | null;
   enabled: boolean;
   outputs: string[];

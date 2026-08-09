@@ -33,6 +33,7 @@ async def captureDocument(
     manager: SessionManager,
     onBlock: Callable[[BlockConfig], None] | None = None,
     executableBlockTypes: frozenset[str] = frozenset({"code"}),
+    inputPrelude: str = "",
 ) -> CaptureResult:
     """문서의 코드 블록을 순서대로 실행해 stdout/stderr/variables/상태를 포착한다.
 
@@ -47,7 +48,15 @@ async def captureDocument(
     error = ""
     failedBlockId = ""
     try:
+        if inputPrelude:
+            preludeResult = await session.execute(inputPrelude, blockId="codaro-task-inputs")
+            if preludeResult.status == "error":
+                status = "error"
+                failedBlockId = "codaro-task-inputs"
+                error = preludeResult.stderr or str(preludeResult.data or "")
         for block in document.blocks:
+            if status == "error":
+                break
             if block.type not in executableBlockTypes or not block.content.strip():
                 continue
             if onBlock is not None:

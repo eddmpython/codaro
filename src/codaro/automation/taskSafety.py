@@ -119,7 +119,9 @@ def taskSafetyFingerprint(task: TaskDefinition, *, workspaceRoot: str | Path) ->
         "schedule": task.schedule,
         "riskLevel": task.riskLevel,
         "permissionScopes": list(task.permissionScopes),
+        "inputs": task.inputs,
         "outputContract": task.outputContract,
+        "provenance": task.provenance,
         "secretRefs": sorted(task.secretRefs),
     }
     encoded = json.dumps(

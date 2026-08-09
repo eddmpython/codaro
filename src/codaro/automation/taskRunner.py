@@ -15,6 +15,7 @@ from .taskExecution import (
     redactTaskText,
     redactTaskVariables,
     resolveTaskSecretValues,
+    taskInputPrelude,
 )
 from .taskSafety import resolveTaskDocumentPath, taskPermissionPolicyHash
 
@@ -126,4 +127,5 @@ class TaskRunner:
             manager=manager,
             onBlock=lambda block: getEmergencyStop().check(),
             executableBlockTypes=frozenset({"code", "automation"}),
+            inputPrelude=taskInputPrelude(task.inputs),
         )

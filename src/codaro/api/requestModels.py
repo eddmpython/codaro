@@ -107,6 +107,10 @@ class CurriculumLearningArchiveRequest(BaseModel):
     archive: dict[str, Any]
 
 
+class LearningArtifactPromotionRequest(BaseModel):
+    inputs: dict[str, Any] = Field(default_factory=dict)
+
+
 class LocalStrongCheckRequest(BaseModel):
     checkSpec: dict[str, Any]
     source: str

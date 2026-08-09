@@ -108,6 +108,27 @@ adoptLearningArchiveAutomationDraft: (draftId: string) =>
       `/api/curriculum/learning-archive/automation-drafts/${encodeURIComponent(draftId)}/adopt`,
       {},
     ),
+promoteLearningArtifact: (draftId: string, inputs: Record<string, unknown> = {}) =>
+    postJson<{
+      promoted: boolean;
+      documentPath: string;
+      executableUnit: Record<string, unknown>;
+      promotion: Record<string, unknown>;
+      task: import("@/types").TaskDefinition;
+    }>(
+      `/api/curriculum/learning-archive/automation-drafts/${encodeURIComponent(draftId)}/promote`,
+      { inputs },
+    ),
+learningArtifactPromotionStatus: (draftId: string) =>
+    requestJson<{
+      eligible: boolean;
+      reason: string;
+      capabilityDomainId: string | null;
+      sourceBlockHash: string | null;
+      requiredInputNames: string[];
+    }>(
+      `/api/curriculum/learning-archive/automation-drafts/${encodeURIComponent(draftId)}/promotion-status`,
+    ),
 localStrongCheck: (checkSpec: Record<string, unknown>, source: string, signal?: AbortSignal) =>
     postJson<{
       actual: string;

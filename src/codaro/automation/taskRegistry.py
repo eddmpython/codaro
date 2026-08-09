@@ -90,6 +90,7 @@ class TaskRegistry:
         riskLevel: str = "destructive",
         outputContract: dict[str, Any] | None = None,
         secretRefs: list[str] | None = None,
+        provenance: dict[str, Any] | None = None,
     ) -> TaskDefinition:
         task = TaskDefinition(
             name=name,
@@ -97,6 +98,7 @@ class TaskRegistry:
             description=description,
             schedule=schedule,
             inputs=inputs or {},
+            provenance=dict(provenance) if provenance is not None else None,
             enabled=enabled,
             permissionScopes=list(
                 DEFAULT_TASK_PERMISSION_SCOPES
@@ -110,6 +112,38 @@ class TaskRegistry:
         self._tasks[task.id] = task
         self._save()
         return task
+
+    def createPromoted(
+        self,
+        *,
+        name: str,
+        documentPath: str,
+        description: str,
+        inputs: dict[str, Any],
+        outputContract: dict[str, Any],
+        permissionScopes: list[str],
+        provenance: dict[str, Any],
+    ) -> TaskDefinition:
+        """Create a disabled Task from an internally verified learning promotion.
+
+        Public Task APIs never accept provenance.  Keeping this as a distinct registry
+        entry point prevents caller supplied ``inputs`` from impersonating learning
+        evidence lineage.
+        """
+
+        if provenance.get("kind") != "codaro.learning-artifact-promotion" or provenance.get("schemaVersion") != 1:
+            raise ValueError("learning promotion provenance is invalid")
+        return self.create(
+            name=name,
+            documentPath=documentPath,
+            description=description,
+            schedule=None,
+            inputs=inputs,
+            outputContract=outputContract,
+            permissionScopes=permissionScopes,
+            provenance=provenance,
+            enabled=False,
+        )
 
     def get(self, taskId: str) -> TaskDefinition | None:
         return self._tasks.get(taskId)

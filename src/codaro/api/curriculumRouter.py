@@ -48,7 +48,11 @@ from ..curriculum.reviewFlow import buildCurriculumReviewsPayload, recordCurricu
 from ..serverLog import formatLogFields, getServerLogger
 from ..system.serverState import ServerState
 from .errors import fail
-from .learningArchiveAutomation import adoptLearningArchiveAutomationDraft
+from .learningArchiveAutomation import (
+    adoptLearningArchiveAutomationDraft,
+    learningArtifactPromotionStatus,
+    promoteLearningArtifactToExecutableUnit,
+)
 from .requestModels import (
     CheckExerciseRequest,
     CurriculumEvidenceArchiveRequest,
@@ -56,6 +60,7 @@ from .requestModels import (
     CurriculumLearningArchiveRequest,
     CurriculumProgressRequest,
     LocalStrongCheckRequest,
+    LearningArtifactPromotionRequest,
     MasterPlanRequest,
     OutcomeValidationRequest,
     ReviewResultRequest,
@@ -238,6 +243,30 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
             )
         except LearningArchiveError as error:
             fail(400, "curriculum-learning-archive-automation-invalid", str(error))
+
+    @router.post("/api/curriculum/learning-archive/automation-drafts/{draftId}/promote")
+    def apiPromoteCurriculumLearningArtifact(
+        draftId: str,
+        request: LearningArtifactPromotionRequest,
+    ) -> dict[str, object]:
+        try:
+            return promoteLearningArtifactToExecutableUnit(
+                draftId,
+                storeRoot=state.learningArchiveRoot,
+                workspaceRoot=state.workspaceRoot,
+                proofArchive=state.proofArchive,
+                inputs=request.inputs,
+            )
+        except (LearningArchiveError, ValueError) as error:
+            fail(400, "curriculum-learning-artifact-promotion-invalid", str(error))
+
+    @router.get("/api/curriculum/learning-archive/automation-drafts/{draftId}/promotion-status")
+    def apiCurriculumLearningArtifactPromotionStatus(draftId: str) -> dict[str, object]:
+        return learningArtifactPromotionStatus(
+            draftId,
+            storeRoot=state.learningArchiveRoot,
+            workspaceRoot=state.workspaceRoot,
+        )
 
     @router.post("/api/curriculum/check/strong/local")
     def apiLocalStrongCheck(request: LocalStrongCheckRequest) -> dict[str, object]:

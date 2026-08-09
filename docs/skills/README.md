@@ -86,7 +86,7 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [ai-sensory-system](identity/ai-sensory-system.md)
 - [external-channels-mobile](identity/external-channels-mobile.md)
 
-## Architecture (20) - 5층 구조
+## Architecture (22) - 5층 구조
 
 - [repository-structure](architecture/repository-structure.md)
 - [ssot-map](architecture/ssot-map.md)
@@ -98,6 +98,8 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [publication-compiler](architecture/publication-compiler.md)
 - [static-publication](architecture/static-publication.md)
 - [server-publication](architecture/server-publication.md)
+- [block-embedding](architecture/block-embedding.md)
+- [learning-product-bridge](architecture/learning-product-bridge.md)
 - [frontend-product-surface](architecture/frontend-product-surface.md)
 - [gui-control-contract](architecture/gui-control-contract.md)
 - [curriculum-authoring](architecture/curriculum-authoring.md)

@@ -385,7 +385,9 @@ def testLearningArchiveApiUsesConfiguredWorkspaceInsteadOfProcessRoot(
     assert adopted.json()["adopted"] is True
     assert adopted.json()["task"]["enabled"] is False
     assert adopted.json()["task"]["schedule"] is None
-    assert adopted.json()["task"]["inputs"]["sourceDraftId"] == draftId
+    assert adopted.json()["task"]["inputs"] == {}
+    assert adopted.json()["task"]["provenance"]["kind"] == "codaro.learning-draft-adoption"
+    assert adopted.json()["task"]["provenance"]["draftId"] == draftId
     assert adoptedAgain.status_code == 200
     assert adoptedAgain.json()["adopted"] is False
     assert adoptedAgain.json()["task"]["id"] == adopted.json()["task"]["id"]

@@ -55,7 +55,7 @@ export type BrowserLearningArchiveImportReceipt = {
 export async function readAdoptedLearningArchiveAutomationDraftIds(): Promise<string[]> {
   const tasks = await codaroApi.tasks();
   return tasks.tasks
-    .map((task) => task.inputs?.sourceDraftId)
+    .map((task) => task.provenance?.draftId)
     .filter((draftId): draftId is string => typeof draftId === "string");
 }
 
@@ -68,8 +68,12 @@ export function captureBrowserLearningWorkspaceAutosave(
   };
 }
 
-export function adoptLearningArchiveAutomationDraft(draftId: string) {
-  return codaroApi.adoptLearningArchiveAutomationDraft(draftId);
+export function promoteLearningArtifact(draftId: string, inputs: Record<string, unknown> = {}) {
+  return codaroApi.promoteLearningArtifact(draftId, inputs);
+}
+
+export function learningArtifactPromotionStatus(draftId: string) {
+  return codaroApi.learningArtifactPromotionStatus(draftId);
 }
 
 export async function exportBrowserLearningArchive(input: BrowserLearningArchiveExportInput): Promise<string> {
@@ -90,13 +94,21 @@ async function buildSerializedBrowserLearningArchive(
   if (!Object.keys(drafts).length) {
     throw new Error("내보낼 학습 문서 수정본이 없습니다.");
   }
+  const derivedAutomationDrafts = await applicationAutomationDrafts(
+    input.document,
+    drafts,
+    evidenceArchive,
+  );
   const archive = await buildLearningArchive({
-    automationDrafts: input.automationDrafts ?? persisted?.automationDrafts.map((draft) => ({
-      description: draft.description,
-      name: draft.name,
-      recipe: draft.recipe,
-      sourceBlockIds: draft.sourceBlockIds,
-    })),
+    automationDrafts: input.automationDrafts
+      ?? (derivedAutomationDrafts.length
+        ? derivedAutomationDrafts
+        : persisted?.automationDrafts.map((draft) => ({
+          description: draft.description,
+          name: draft.name,
+          recipe: draft.recipe,
+          sourceBlockIds: draft.sourceBlockIds,
+        }))),
     document: input.document,
     drafts,
     evidenceArchive,
@@ -119,6 +131,48 @@ async function buildSerializedBrowserLearningArchive(
     ),
   });
   return serializeLearningArchive(archive);
+}
+
+async function applicationAutomationDrafts(
+  document: CodaroDocument,
+  drafts: Record<string, string>,
+  evidenceArchive: unknown,
+): Promise<LearningArchiveAutomationDraftInput[]> {
+  if (!isRecord(evidenceArchive) || !Array.isArray(evidenceArchive.events)) return [];
+  const candidates = new Map<string, LearningArchiveAutomationDraftInput>();
+  for (const event of evidenceArchive.events) {
+    if (!isRecord(event) || event.runtimeTier !== "local" || typeof event.blockId !== "string") continue;
+    const source = drafts[event.blockId];
+    if (!source || event.sourceHash !== await sourceDigest(source)) continue;
+    const canonical = Array.isArray(event.canonicalEvents) ? event.canonicalEvents.filter(isRecord) : [];
+    const hasApplicationCredit = canonical.some((item) => (
+      item.kind === "CreditGranted"
+      && Array.isArray(item.creditSlices)
+      && item.creditSlices.length > 0
+      && item.creditSlices.every((slice) => isRecord(slice) && slice.creditMode === "capstone")
+    ));
+    const hasStrongArtifactRun = canonical.some((item) => (
+      item.kind === "RunObserved"
+      && item.runStatus === "success"
+      && Array.isArray(item.artifactDescriptors)
+      && item.artifactDescriptors.some((artifact) => isRecord(artifact) && artifact.origin === "created")
+    ));
+    if (!hasApplicationCredit || !hasStrongArtifactRun) continue;
+    candidates.set(event.blockId, {
+      name: `${document.title} 기능`,
+      description: "강한 산출물 검증을 통과한 현재 학습 블록입니다.",
+      recipe: source,
+      sourceBlockIds: [event.blockId],
+    });
+  }
+  return [...candidates.values()];
+}
+
+async function sourceDigest(value: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  let binary = "";
+  for (const byte of new Uint8Array(digest)) binary += String.fromCharCode(byte);
+  return `sha256-${btoa(binary).replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "")}`;
 }
 
 async function mergedPromotedArtifactFiles(
