@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codaro.dev/contracts/operationalReceipt.schema.json",
+  "title": "Codaro Operational Proof Receipts",
+  "oneOf": [
+    { "$ref": "#/$defs/BuildArtifact" },
+    { "$ref": "#/$defs/PermissionReceipt" },
+    { "$ref": "#/$defs/FunctionalCheckReceipt" },
+    { "$ref": "#/$defs/OperationalRunReceipt" }
+  ],
+  "$defs": {
+    "Hash": { "type": "string", "pattern": "^sha256-(?:[0-9a-f]{64}|[A-Za-z0-9_-]{43})$" },
+    "ReceiptId": {
+      "type": "string",
+      "pattern": "^(?:sourceRevision|buildArtifact|permission|functionalCheck|operationalRun):sha256-[A-Za-z0-9_-]{43}$"
+    },
+    "HashList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/Hash" }
+    },
+    "TextList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "BuildArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion", "kind", "receiptId", "sourceRevisionId", "sourceHash",
+        "buildArtifactHash", "manifestHash", "target", "createdAt"
+      ],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "kind": { "const": "buildArtifact" },
+        "receiptId": { "$ref": "#/$defs/ReceiptId" },
+        "sourceRevisionId": { "$ref": "#/$defs/ReceiptId" },
+        "sourceHash": { "$ref": "#/$defs/Hash" },
+        "buildArtifactHash": { "$ref": "#/$defs/Hash" },
+        "manifestHash": { "$ref": "#/$defs/Hash" },
+        "target": { "enum": ["browser", "server", "local"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "PermissionReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion", "kind", "receiptId", "sourceRevisionId", "sourceHash",
+        "effectSetHash", "permissionSetHash", "approvedAt"
+      ],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "kind": { "const": "permission" },
+        "receiptId": { "$ref": "#/$defs/ReceiptId" },
+        "sourceRevisionId": { "$ref": "#/$defs/ReceiptId" },
+        "sourceHash": { "$ref": "#/$defs/Hash" },
+        "effectSetHash": { "$ref": "#/$defs/Hash" },
+        "permissionSetHash": { "$ref": "#/$defs/Hash" },
+        "approvedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "FunctionalCheckReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion", "kind", "receiptId", "sourceRevisionId", "sourceHash",
+        "buildArtifactReceiptId", "buildArtifactHash", "inputHash", "checkSpecHash",
+        "artifactHashes", "passed", "checkedAt"
+      ],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "kind": { "const": "functionalCheck" },
+        "receiptId": { "$ref": "#/$defs/ReceiptId" },
+        "sourceRevisionId": { "$ref": "#/$defs/ReceiptId" },
+        "sourceHash": { "$ref": "#/$defs/Hash" },
+        "buildArtifactReceiptId": { "$ref": "#/$defs/ReceiptId" },
+        "buildArtifactHash": { "$ref": "#/$defs/Hash" },
+        "inputHash": { "$ref": "#/$defs/Hash" },
+        "checkSpecHash": { "$ref": "#/$defs/Hash" },
+        "artifactHashes": { "$ref": "#/$defs/HashList" },
+        "passed": { "const": true },
+        "checkedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "OperationalRunReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion", "kind", "receiptId", "sourceRevisionId", "sourceHash",
+        "buildArtifactReceiptId", "buildArtifactHash", "inputHash", "permissionReceiptId",
+        "permissionSetHash", "functionalCheckReceiptId", "artifactHashes",
+        "learningEvidenceCreditIds", "learningEvidenceArtifactHashes", "capabilityDomainId",
+        "taskId", "runId", "runtimeTier", "learnerSelectedInput", "startedAt", "finishedAt"
+      ],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "kind": { "const": "operationalRun" },
+        "receiptId": { "$ref": "#/$defs/ReceiptId" },
+        "sourceRevisionId": { "$ref": "#/$defs/ReceiptId" },
+        "sourceHash": { "$ref": "#/$defs/Hash" },
+        "buildArtifactReceiptId": { "$ref": "#/$defs/ReceiptId" },
+        "buildArtifactHash": { "$ref": "#/$defs/Hash" },
+        "inputHash": { "$ref": "#/$defs/Hash" },
+        "permissionReceiptId": { "$ref": "#/$defs/ReceiptId" },
+        "permissionSetHash": { "$ref": "#/$defs/Hash" },
+        "functionalCheckReceiptId": { "$ref": "#/$defs/ReceiptId" },
+        "artifactHashes": { "$ref": "#/$defs/HashList" },
+        "learningEvidenceCreditIds": { "$ref": "#/$defs/TextList" },
+        "learningEvidenceArtifactHashes": { "$ref": "#/$defs/HashList" },
+        "capabilityDomainId": { "type": "string", "minLength": 1 },
+        "taskId": { "type": "string", "minLength": 1 },
+        "runId": { "type": "string", "minLength": 1 },
+        "runtimeTier": { "enum": ["server", "local"] },
+        "learnerSelectedInput": { "type": "boolean" },
+        "startedAt": { "type": "string", "format": "date-time" },
+        "finishedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

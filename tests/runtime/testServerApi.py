@@ -1473,5 +1473,7 @@ def testSuccessfulTaskWithSpoofedProofInputsDoesNotRaiseApplicationStage(tmp_pat
         "stage": "none",
         "receiptCount": 0,
         "receipts": [],
+        "operationalReceiptIds": [],
+        "userInputRerun": False,
     }
     taskRegistryModule._registry = None

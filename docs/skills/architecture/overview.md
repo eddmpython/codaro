@@ -84,7 +84,7 @@ src/codaro/
 
 | 목표 계층 | 현재 폴더 | 규칙 |
 | --- | --- | --- |
-| core | `serverLog.py`, 공용 primitive | 위 계층 구현을 import하지 않는다 |
+| core | `serverLog.py`, `proof/`, 공용 primitive | 위 계층 구현을 import하지 않는다 |
 | engine | `document/`, `runtime/`, `kernel/` | `api/`, `ai/`, `curriculum/`, `automation/`, `share/`, `extensions/`를 import하지 않는다 |
 | domain | `curriculum/`, `automation/`, `share/`, `extensions/`, `ai/` | `api/`를 import하지 않는다. tool handler는 engine/domain flow 경계만 호출한다 |
 | transport | `api/`, `webBuild/` | HTTP/SSE/WebSocket/payload 변환만 맡고 provider/runtime/domain 내부 판단을 직접 소유하지 않는다 |

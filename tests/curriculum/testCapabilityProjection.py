@@ -7,6 +7,7 @@ import pytest
 from codaro.curriculum.capabilityProjection import projectCapability
 from codaro.curriculum.learningEvent import learningEventDigest, sealLearningEvent
 from codaro.curriculum.taxonomy import TaskFamilyDef, TaskFamilyVariantDef, loadTaxonomy
+from codaro.proof import contentDigest, sealProofReceipt, validateOperationalLink
 
 
 def _transaction(
@@ -163,7 +164,7 @@ def testOldClaimVersionIsPreservedButDoesNotRaiseCurrentStage() -> None:
     assert next(item for item in projection.taskFamilies if item.taskFamilyId == family.id).stage == "unproven"
 
 
-def testApplicationProofRequiresLocalArtifactAndStopsAtIntegrated() -> None:
+def testApplicationProofRequiresLocalArtifactAndOnlyTrustsLinkedOperationalReceipt() -> None:
     taxonomy = loadTaxonomy()
     sequence = count(1)
     events: list[dict[str, object]] = []
@@ -205,6 +206,80 @@ def testApplicationProofRequiresLocalArtifactAndStopsAtIntegrated() -> None:
             events,
             automationRuns=[{"validated": True, "learnerSelectedInput": True}],
         )
+
+    applicationReceipt = integrated.application.receipts[0]
+    source = sealProofReceipt({
+        "kind": "sourceRevision",
+        "sourceHash": applicationReceipt.sourceCodeHash,
+        "dependencyHash": contentDigest("dependencies"),
+        "packageSetHash": contentDigest("packages"),
+        "effectSetHash": contentDigest("effects"),
+        "documentPath": "automations/report.py",
+        "blockIds": ["report"],
+        "createdAt": "2026-01-03T00:00:00+00:00",
+    })
+    build = sealProofReceipt({
+        "kind": "buildArtifact",
+        "sourceRevisionId": source.receiptId,
+        "sourceHash": source.sourceHash,
+        "buildArtifactHash": contentDigest("build"),
+        "manifestHash": contentDigest("manifest"),
+        "target": "local",
+        "createdAt": "2026-01-03T00:00:00+00:00",
+    })
+    permission = sealProofReceipt({
+        "kind": "permission",
+        "sourceRevisionId": source.receiptId,
+        "sourceHash": source.sourceHash,
+        "effectSetHash": source.effectSetHash,
+        "permissionSetHash": contentDigest("permission"),
+        "approvedAt": "2026-01-03T00:00:00+00:00",
+    })
+    check = sealProofReceipt({
+        "kind": "functionalCheck",
+        "sourceRevisionId": source.receiptId,
+        "sourceHash": source.sourceHash,
+        "buildArtifactReceiptId": build.receiptId,
+        "buildArtifactHash": build.buildArtifactHash,
+        "inputHash": contentDigest("learner-input"),
+        "checkSpecHash": contentDigest("operational-check"),
+        "artifactHashes": [contentDigest("rerun-report")],
+        "passed": True,
+        "checkedAt": "2026-01-03T00:01:00+00:00",
+    })
+    operational = sealProofReceipt({
+        "kind": "operationalRun",
+        "sourceRevisionId": source.receiptId,
+        "sourceHash": source.sourceHash,
+        "buildArtifactReceiptId": build.receiptId,
+        "buildArtifactHash": build.buildArtifactHash,
+        "inputHash": check.inputHash,
+        "permissionReceiptId": permission.receiptId,
+        "permissionSetHash": permission.permissionSetHash,
+        "functionalCheckReceiptId": check.receiptId,
+        "artifactHashes": check.artifactHashes,
+        "learningEvidenceCreditIds": [applicationReceipt.creditEventId],
+        "learningEvidenceArtifactHashes": applicationReceipt.artifactContentHashes,
+        "capabilityDomainId": "reportAutomationFoundation",
+        "taskId": "task-report",
+        "runId": "run-report",
+        "runtimeTier": "local",
+        "learnerSelectedInput": True,
+        "startedAt": "2026-01-03T00:00:00+00:00",
+        "finishedAt": "2026-01-03T00:01:00+00:00",
+    })
+    validateOperationalLink(operational, source, build, permission, check)
+
+    rerun = projectCapability(
+        taxonomy,
+        "reportAutomationFoundation",
+        events,
+        operationalReceipts=[operational],
+    )
+
+    assert rerun.application.stage == "rerun"
+    assert rerun.application.operationalReceiptIds == [operational.receiptId]
+    assert rerun.application.userInputRerun is True
 
 
 def testTombstonedApplicationReceiptNoLongerRaisesApplicationStage() -> None:

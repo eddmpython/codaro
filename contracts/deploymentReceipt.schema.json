@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codaro.dev/contracts/deploymentReceipt.schema.json",
+  "title": "Codaro Deployment Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion", "kind", "receiptId", "sourceRevisionId", "sourceHash",
+    "buildArtifactReceiptId", "buildArtifactHash", "manifestHash",
+    "deploymentArtifactHash", "target", "verifiedAt"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "kind": { "const": "deployment" },
+    "receiptId": {
+      "type": "string",
+      "pattern": "^deployment:sha256-[A-Za-z0-9_-]{43}$"
+    },
+    "sourceRevisionId": {
+      "type": "string",
+      "pattern": "^sourceRevision:sha256-[A-Za-z0-9_-]{43}$"
+    },
+    "sourceHash": { "$ref": "#/$defs/Hash" },
+    "buildArtifactReceiptId": {
+      "type": "string",
+      "pattern": "^buildArtifact:sha256-[A-Za-z0-9_-]{43}$"
+    },
+    "buildArtifactHash": { "$ref": "#/$defs/Hash" },
+    "manifestHash": { "$ref": "#/$defs/Hash" },
+    "deploymentArtifactHash": { "$ref": "#/$defs/Hash" },
+    "target": { "enum": ["folder", "zip", "self-host", "provider"] },
+    "verifiedAt": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "Hash": { "type": "string", "pattern": "^sha256-(?:[0-9a-f]{64}|[A-Za-z0-9_-]{43})$" }
+  }
+}

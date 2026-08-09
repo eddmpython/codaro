@@ -267,6 +267,7 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
                 state.curriculumOs.taxonomy(),
                 domainId,
                 state.learningEvidenceArchiveStore.eventPayloads(),
+                operationalReceipts=state.proofArchive.receipts("operationalRun"),
             )
         except ValueError as error:
             fail(404, "curriculum-capability-missing", str(error))

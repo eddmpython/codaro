@@ -84,6 +84,7 @@ Codaro에서 기준 파일은 아래 순서로 본다. 같은 의미의 규칙�
 | check feasibility | `contracts/checkSandboxFeasibilityDecision.json` | runtime tier별 strong eligibility와 `localRequired` 판정 |
 | canonical learning evidence | `contracts/learningEvent.schema.json`, `editor/src/lib/canonicalLearningEvidence.ts` | 실행, check와 credit의 append-only transaction |
 | mastery policy | `src/codaro/curriculum/masteryPolicy.py`, `editor/src/lib/masteryPolicy.ts` | generated policy 기반 단일 mastery projection |
+| proof graph | `contracts/sourceRevision.schema.json`, `contracts/operationalReceipt.schema.json`, `contracts/deploymentReceipt.schema.json`, `src/codaro/proof/` | source, build, permission, check, operational run, deployment의 content identity와 append-only archive |
 
 ## Share Pack System
 

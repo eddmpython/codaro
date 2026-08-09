@@ -8,10 +8,11 @@ from pydantic import BaseModel, Field
 from .learningEvent import learningEventOrderKey, validateLearningEvent
 from .masteryPolicy import MasteryPolicy
 from .taxonomy import CurriculumTaxonomy, TaskFamilyDef
+from ..proof.contracts import OperationalRunReceipt
 
 
 AssuranceStage = Literal["unproven", "practicing", "independent", "transfer", "mastered"]
-ApplicationStage = Literal["none", "artifact", "integrated"]
+ApplicationStage = Literal["none", "artifact", "integrated", "rerun"]
 
 STAGE_RANK: dict[str, int] = {
     "unproven": 0,
@@ -31,6 +32,7 @@ class ProofReceipt(BaseModel):
     sectionId: str
     evidenceTime: str
     runtimeTier: str
+    sourceCodeHash: str
     artifactContentHashes: list[str] = Field(default_factory=list)
 
 
@@ -58,6 +60,8 @@ class ApplicationProof(BaseModel):
     stage: ApplicationStage = "none"
     receiptCount: int = 0
     receipts: list[ProofReceipt] = Field(default_factory=list)
+    operationalReceiptIds: list[str] = Field(default_factory=list)
+    userInputRerun: bool = False
 
 
 class CapabilityProjection(BaseModel):
@@ -77,11 +81,15 @@ def projectCapability(
     events: Iterable[Mapping[str, object]],
     *,
     asOf: str | None = None,
+    operationalReceipts: Iterable[OperationalRunReceipt] = (),
 ) -> CapabilityProjection:
     domain = taxonomy.domainById(domainId)
     if domain is None:
         raise ValueError(f"unknown domain '{domainId}'")
     normalized, invalidEventIds = _normalizedEvents(events)
+    trustedOperationalReceipts = tuple(operationalReceipts)
+    if any(not isinstance(receipt, OperationalRunReceipt) for receipt in trustedOperationalReceipts):
+        raise TypeError("operationalReceipts must come from the validated ProofArchive")
     familyProofs: list[TaskFamilyProof] = []
     for claim in domain.capabilityClaims:
         for familyId in claim.requiredTaskFamilyIds:
@@ -150,6 +158,7 @@ def projectCapability(
         taxonomy=taxonomy,
         domainId=domainId,
         assuranceStage=assuranceStage,
+        operationalReceipts=trustedOperationalReceipts,
     )
     return CapabilityProjection(
         domainId=domain.id,
@@ -210,6 +219,7 @@ def _projectApplication(
     taxonomy: CurriculumTaxonomy,
     domainId: str,
     assuranceStage: AssuranceStage,
+    operationalReceipts: tuple[OperationalRunReceipt, ...],
 ) -> ApplicationProof:
     domain = taxonomy.domainById(domainId)
     if domain is None:
@@ -286,16 +296,57 @@ def _projectApplication(
     receipts = _proofReceipts(events, receiptIds)
     if not receipts:
         return ApplicationProof()
-    stage: ApplicationStage = (
-        "integrated"
-        if STAGE_RANK[assuranceStage] >= STAGE_RANK["independent"]
-        else "artifact"
+    validOperationalReceipts = _operationalReceiptsForApplication(
+        operationalReceipts,
+        domainId=domainId,
+        applicationReceipts=receipts,
     )
+    if validOperationalReceipts:
+        stage: ApplicationStage = "rerun"
+    elif STAGE_RANK[assuranceStage] >= STAGE_RANK["independent"]:
+        stage = "integrated"
+    else:
+        stage = "artifact"
     return ApplicationProof(
         stage=stage,
         receiptCount=len(receipts),
         receipts=receipts,
+        operationalReceiptIds=sorted(receipt.receiptId for receipt in validOperationalReceipts),
+        userInputRerun=any(receipt.learnerSelectedInput for receipt in validOperationalReceipts),
     )
+
+
+def _operationalReceiptsForApplication(
+    operationalReceipts: tuple[OperationalRunReceipt, ...],
+    *,
+    domainId: str,
+    applicationReceipts: list[ProofReceipt],
+) -> list[OperationalRunReceipt]:
+    applicationByCredit = {receipt.creditEventId: receipt for receipt in applicationReceipts}
+    valid: list[OperationalRunReceipt] = []
+    for operational in operationalReceipts:
+        if operational.capabilityDomainId != domainId:
+            continue
+        referenced = [
+            applicationByCredit[creditId]
+            for creditId in operational.learningEvidenceCreditIds
+            if creditId in applicationByCredit
+        ]
+        if len(referenced) != len(operational.learningEvidenceCreditIds):
+            continue
+        expectedArtifacts = sorted({
+            contentHash
+            for receipt in referenced
+            for contentHash in receipt.artifactContentHashes
+        })
+        if (
+            not referenced
+            or expectedArtifacts != operational.learningEvidenceArtifactHashes
+            or any(receipt.sourceCodeHash != operational.sourceHash for receipt in referenced)
+        ):
+            continue
+        valid.append(operational)
+    return valid
 
 
 def _proofReceipts(events: list[dict[str, Any]], creditIds: set[str]) -> list[ProofReceipt]:
@@ -319,6 +370,7 @@ def _proofReceipts(events: list[dict[str, Any]], creditIds: set[str]) -> list[Pr
             sectionId=str(context.get("sectionId") or ""),
             evidenceTime=str(credit.get("evidenceTime") or ""),
             runtimeTier=str(context.get("tierUsed") or ""),
+            sourceCodeHash=str(context.get("sourceCodeHash") or ""),
             artifactContentHashes=[
                 str(artifact.get("contentHash"))
                 for artifact in artifacts

@@ -11,6 +11,7 @@ from ..curriculum.osCache import CurriculumOsCache
 from ..curriculum.progress import ProgressTracker
 from ..curriculum.studyLoader import StudyLoader
 from ..kernel.manager import SessionManager
+from ..proof.archive import ProofArchive
 from ..runtime import ExecutionEngine, LocalEngine
 
 
@@ -32,6 +33,7 @@ class ServerState:
     analyticsTimeline: AnalyticsTimeline
     learningEvidenceArchiveStore: LearningEvidenceArchiveStore
     learningArchiveRoot: Path
+    proofArchive: ProofArchive
 
 
 def createServerState(
@@ -54,6 +56,8 @@ def createServerState(
         lessonRefResolver=studyLoader.resolveLessonRef if studyLoader is not None else None,
     )
     learningEvidenceArchiveStore.initialize()
+    proofArchive = ProofArchive(codaroHome / "proofArchive.sqlite3")
+    proofArchive.initialize()
     return ServerState(
         mode=mode,
         documentPath=documentPath,
@@ -74,4 +78,5 @@ def createServerState(
         analyticsTimeline=AnalyticsTimeline(),
         learningEvidenceArchiveStore=learningEvidenceArchiveStore,
         learningArchiveRoot=codaroHome / "learningArchives",
+        proofArchive=proofArchive,
     )

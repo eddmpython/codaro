@@ -104,17 +104,16 @@ GitHub Pages, Cloudflare, Docker registry 같은 외부 대상은 이미 검증�
 
 ## 구현 순서
 
-1. [ProofGraph receipt](01-proof-graph-receipts/README.md)
-2. [Task 실행 보안](02-task-runtime-enforcement/README.md)
-3. [앱 문서 계약](03-app-document-contract/README.md)
-4. [앱 모드와 저작](04-app-mode-authoring/README.md)
-5. [기능 블록 compiler](05-capability-compiler/README.md)
-6. [정적 publication](06-static-publication/README.md)
-7. [서버 publication](07-server-publication/README.md)
-8. [블록 임베딩](08-block-embedding/README.md)
-9. [학습과 제품 승격](09-learning-product-bridge/README.md)
-10. [배포 adapter](10-deployment-adapters/README.md)
-11. [참조 제품과 최종 claim](11-reference-products/README.md)
+1. [Task 실행 보안](02-task-runtime-enforcement/README.md)
+2. [앱 문서 계약](03-app-document-contract/README.md)
+3. [앱 모드와 저작](04-app-mode-authoring/README.md)
+4. [기능 블록 compiler](05-capability-compiler/README.md)
+5. [정적 publication](06-static-publication/README.md)
+6. [서버 publication](07-server-publication/README.md)
+7. [블록 임베딩](08-block-embedding/README.md)
+8. [학습과 제품 승격](09-learning-product-bridge/README.md)
+9. [배포 adapter](10-deployment-adapters/README.md)
+10. [참조 제품과 최종 claim](11-reference-products/README.md)
 
 각 workstream은 구현, 지정 gate, 문서 정합, 부정 경로 검증을 모두 끝낸 같은 변경에서 삭제한다. parent에는 남은 일만 유지한다.
 

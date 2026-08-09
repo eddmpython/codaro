@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codaro.dev/contracts/sourceRevision.schema.json",
+  "title": "Codaro Source Revision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "receiptId",
+    "sourceHash",
+    "dependencyHash",
+    "packageSetHash",
+    "effectSetHash",
+    "documentPath",
+    "blockIds",
+    "createdAt"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "kind": { "const": "sourceRevision" },
+    "receiptId": { "$ref": "#/$defs/SourceRevisionId" },
+    "sourceHash": { "$ref": "#/$defs/Hash" },
+    "dependencyHash": { "$ref": "#/$defs/Hash" },
+    "packageSetHash": { "$ref": "#/$defs/Hash" },
+    "effectSetHash": { "$ref": "#/$defs/Hash" },
+    "documentPath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*:)(?!.*\\\\).+$"
+    },
+    "blockIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "createdAt": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "Hash": { "type": "string", "pattern": "^sha256-(?:[0-9a-f]{64}|[A-Za-z0-9_-]{43})$" },
+    "SourceRevisionId": {
+      "type": "string",
+      "pattern": "^sourceRevision:sha256-[A-Za-z0-9_-]{43}$"
+    }
+  }
+}
