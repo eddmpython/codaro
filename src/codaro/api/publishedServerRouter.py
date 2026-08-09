@@ -74,6 +74,7 @@ def createPublishedServerRouter(runtime: PublishedServerRuntime) -> APIRouter:
 
     @router.delete("/api/kernel/{sessionId}")
     def destroySession(sessionId: str) -> dict[str, bool]:
+        requireSession(sessionId)
         return {"destroyed": runtime.sessionManager.destroySession(sessionId)}
 
     @router.post("/api/kernel/{sessionId}/execute")
