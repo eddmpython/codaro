@@ -18,6 +18,20 @@ whenToUse: 문서 파서/writer, ipynb 변환, 외부 에디터 호환성 다룰
 - VS Code, Spyder, Jupytext가 동일한 `# %%` 포맷을 인식한다.
 - ipynb 호환 import/export는 유지한다.
 
+## 문서 의미 metadata
+
+`src/codaro/document/formatMetadata.py`가 포맷 사이에서 보존할 Codaro 의미의 단일 계약이다. 현재 schemaVersion은 1이다.
+
+- Percent는 `codaro-document`, `codaro-app`, 각 셀의 `codaro-block` 주석 metadata를 쓴다.
+- ipynb는 notebook과 cell의 `metadata.codaro` namespace를 쓴다.
+- native codaro export는 `codaro-native` envelope와 생성된 Python body의 hash를 함께 저장한다. metadata와 body 중 한쪽만 바뀌면 읽기를 거부한다.
+- document id, block id와 type, role, executionKind, displayKind, sourceType, payload, title, description, collapsed, guide, 문서 tag와 timestamp, RuntimeConfig, AppConfig를 보존한다.
+- `BlockExecution`의 실행 횟수, 상태, 최근 출력처럼 session에만 속한 결과는 파일에 저장하지 않는다. ipynb의 `execution_count`와 `outputs`도 새 파일에서는 비운다.
+
+기존 metadata가 없는 Percent, ipynb, native codaro 문서는 계속 읽는다. 다음 저장은 schemaVersion 1의 canonical metadata를 한 번 기록하며, 다시 읽고 저장해도 같은 bytes가 나온다. Codaro namespace가 있는데 버전이 알려지지 않았거나 필드가 일부만 있는 파일은 의미를 추측하지 않고 load를 실패시킨다. 따라서 save API의 atomic replace 전에 중단되어 원본을 덮어쓰지 않는다.
+
+Percent의 PEP 723 `dependencies`와 `RuntimeConfig.packages`는 canonical 문서에서 정확히 같아야 한다. 셀 marker의 id/type과 `codaro-block` metadata도 같아야 한다. 둘 중 한쪽만 고친 stale metadata는 조용히 채택하지 않는다.
+
 ## AppSpec 메타데이터
 
 앱 projection은 실행 코드가 아니라 주석 TOML인 `codaro-app` 블록에 저장한다. 이 블록은 title, layout, code visibility, entry block, state policy를 모두 보존하면서 `python file.py` 실행을 방해하지 않는다.

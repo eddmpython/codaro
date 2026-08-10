@@ -99,6 +99,15 @@ async function buildSerializedBrowserLearningArchive(
     drafts,
     evidenceArchive,
   );
+  const virtualFiles = await mergedPromotedArtifactFiles(
+    input.virtualFiles ?? persisted?.virtualFiles.map((item) => ({
+      executable: item.executable,
+      mediaType: item.mediaType,
+      path: item.path,
+      payload: item.payload,
+    })),
+    evidenceArchive,
+  );
   const archive = await buildLearningArchive({
     automationDrafts: input.automationDrafts
       ?? (derivedAutomationDrafts.length
@@ -119,18 +128,27 @@ async function buildSerializedBrowserLearningArchive(
       payload: item.payload,
       version: item.version,
     })),
-    virtualDirectories: input.virtualDirectories ?? persisted?.virtualDirectories,
-    virtualFiles: await mergedPromotedArtifactFiles(
-      input.virtualFiles ?? persisted?.virtualFiles.map((item) => ({
-      executable: item.executable,
-      mediaType: item.mediaType,
-      path: item.path,
-      payload: item.payload,
-      })),
-      evidenceArchive,
+    virtualDirectories: mergedVirtualDirectories(
+      input.virtualDirectories ?? persisted?.virtualDirectories,
+      virtualFiles,
     ),
+    virtualFiles,
   });
   return serializeLearningArchive(archive);
+}
+
+function mergedVirtualDirectories(
+  current: string[] | undefined,
+  files: LearningArchiveVirtualFileInput[],
+): string[] {
+  const directories = new Set(current ?? []);
+  for (const file of files) {
+    const parts = file.path.split("/");
+    for (let index = 1; index < parts.length; index += 1) {
+      directories.add(parts.slice(0, index).join("/"));
+    }
+  }
+  return [...directories].sort();
 }
 
 async function applicationAutomationDrafts(
@@ -281,8 +299,29 @@ export async function readPersistedLearningArchive(
 }
 
 export async function persistBrowserLearningWorkspace(input: BrowserLearningWorkspaceAutosaveInput): Promise<void> {
-  if (shouldUseApi()) return;
   const importGeneration = input.importGeneration;
+  if (shouldUseApi()) {
+    await enqueueWorkspaceWrite(input.lessonRef, async () => {
+      if (workspaceImportGeneration(input.lessonRef) !== importGeneration) return;
+      const persisted = await readPersistedLearningArchive(input.lessonRef);
+      const evidenceArchive = await learningArchiveAutosaveStage(
+        "현재 Local 학습 증거 내보내기",
+        async () => JSON.parse(await exportLearningEvidenceArchive()) as unknown,
+      );
+      const serialized = await learningArchiveAutosaveStage(
+        "새 Local 학습 작업 구성",
+        () => buildSerializedBrowserLearningArchive(input, evidenceArchive, persisted),
+      );
+      const materialized = await learningArchiveAutosaveStage(
+        "새 Local 학습 작업 검증",
+        () => materializeLearningArchive(serialized),
+      );
+      const lessonRef = await canonicalLearningArchiveLessonRef(materialized);
+      if (lessonRef !== input.lessonRef) throw new Error("저장할 학습 작업의 레슨 주소가 현재 레슨과 다릅니다.");
+      await codaroApi.syncLearningArchive(materialized.archive as unknown as Record<string, unknown>);
+    });
+    return;
+  }
   await enqueueWorkspaceWrite(input.lessonRef, async () => {
     if (workspaceImportGeneration(input.lessonRef) !== importGeneration) return;
     await recoverPendingBrowserLearningArchive(input.lessonRef);

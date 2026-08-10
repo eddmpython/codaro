@@ -178,6 +178,7 @@ impl AppContainerSandbox {
         let python_executable = python_executable
             .canonicalize()
             .context("failed to resolve sandbox Python executable")?;
+        let launch_python = appcontainer_python_executable(&python_executable)?;
         let worker_path = worker_path
             .canonicalize()
             .context("failed to resolve sandbox worker")?;
@@ -213,7 +214,7 @@ impl AppContainerSandbox {
 
         let output_result = launch_appcontainer_process(
             self.sid,
-            &python_executable,
+            &launch_python,
             &worker_path,
             &fixture_root,
             &request.environment,
@@ -546,6 +547,32 @@ fn python_runtime_roots(python_executable: &Path) -> Result<Vec<PathBuf>> {
         );
     }
     Ok(roots)
+}
+
+#[cfg(windows)]
+fn appcontainer_python_executable(python_executable: &Path) -> Result<PathBuf> {
+    let runtime_roots = python_runtime_roots(python_executable)?;
+    if runtime_roots.len() == 1 {
+        return python_executable
+            .canonicalize()
+            .context("failed to resolve sandbox Python executable");
+    }
+    let base_home = runtime_roots
+        .last()
+        .context("sandbox Python base runtime is unavailable")?;
+    let executable_name = python_executable
+        .file_name()
+        .context("sandbox Python executable has no file name")?;
+    let base_executable = base_home.join(executable_name);
+    if !base_executable.is_file() {
+        bail!(
+            "sandbox managed Python base executable does not exist: {}",
+            base_executable.display()
+        );
+    }
+    base_executable
+        .canonicalize()
+        .context("failed to resolve sandbox managed Python base executable")
 }
 
 fn validate_request(
@@ -1397,7 +1424,7 @@ mod tests {
                 "python".into()
             }
         });
-        let base_python = Command::new(configured_python)
+        let base_python = Command::new(&configured_python)
             .args(["-I", "-c", "import sys; print(sys._base_executable)"])
             .output()
             .expect("test Python should start");
@@ -1405,10 +1432,14 @@ mod tests {
             base_python.status.success(),
             "test Python did not report its base executable"
         );
-        let python_executable =
+        let configured_path = PathBuf::from(&configured_python);
+        let python_executable = if configured_path.is_file() {
+            configured_path.canonicalize().unwrap()
+        } else {
             PathBuf::from(String::from_utf8(base_python.stdout).unwrap().trim())
                 .canonicalize()
-                .unwrap();
+                .unwrap()
+        };
 
         let fixture = tempdir().unwrap();
         let outside = tempdir().unwrap();

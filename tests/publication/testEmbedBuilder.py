@@ -107,6 +107,8 @@ def testEmbedBuildIsImmutableAndCarriesOnlyEntryDependencyClosure(tmp_path: Path
         verified.publication.bundleRoot.joinpath("document.json").read_text(encoding="utf-8")
     )
     assert [block["id"] for block in publicationDocument["blocks"]] == ["provider", "entry"]
+    assert verified.publication.manifest["executionBlockIds"] == ["provider", "entry"]
+    assert verified.publication.manifest["executionProjectionHash"].startswith("sha256-")
     assert "secret_unrelated" not in json.dumps(publicationDocument)
 
 

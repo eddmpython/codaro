@@ -58,9 +58,13 @@
           "type": "array",
           "minItems": 3,
           "uniqueItems": true,
-          "items": { "enum": ["author", "preview", "build", "serve", "embed", "task", "deploy"] }
+          "items": { "enum": ["build", "serve", "embed", "deploy", "rollback"] }
         },
-        "expectedProofKinds": { "$ref": "#/$defs/StringList" },
+        "expectedProofKinds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
         "claim": { "type": "string", "minLength": 1 }
       }
     }

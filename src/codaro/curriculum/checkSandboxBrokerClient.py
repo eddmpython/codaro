@@ -98,10 +98,19 @@ def runCheckSandboxBroker(
     except subprocess.TimeoutExpired:
         terminateBroker(process)
         raise
-    except Exception:
-        terminateBroker(process)
+    except (CheckSandboxBrokerError, OSError, TypeError, ValueError) as error:
+        try:
+            _stdout, stderr = process.communicate(timeout=1)
+        except subprocess.TimeoutExpired:
+            stderr = b""
+        if stderr:
+            detail = (stderr or b"").decode("utf-8", errors="replace").strip()[:2000]
+            if detail:
+                raise CheckSandboxBrokerError(f"{error}: {detail}") from error
         raise
     finally:
+        if process.poll() is None:
+            terminateBroker(process)
         secret[:] = b"\0" * len(secret)
 
 

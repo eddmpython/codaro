@@ -182,6 +182,7 @@ from .executableUnit import (
     CapabilityDiagnostic,
     EffectSpec,
     ExecutableUnitSpec,
+    ProofLineage,
     RuntimeTarget,
     SourceSpan,
 )
@@ -192,6 +193,8 @@ from .publicationManifest import (
     PublicationFileRole,
     PublicationManifest,
     PublicationPackage,
+    PublicationProof,
+    PublicationProofLineage,
     PublicationRuntime,
     PublicationTarget,
 )
@@ -212,6 +215,7 @@ __all__ = [
     "CapabilityDiagnostic",
     "EffectSpec",
     "ExecutableUnitSpec",
+    "ProofLineage",
     "RuntimeTarget",
     "SourceSpan",
     "PUBLICATION_MANIFEST_CONTRACT_SHA256",
@@ -220,6 +224,8 @@ __all__ = [
     "PublicationFileRole",
     "PublicationManifest",
     "PublicationPackage",
+    "PublicationProof",
+    "PublicationProofLineage",
     "PublicationRuntime",
     "PublicationTarget",
 ]
@@ -299,6 +305,17 @@ class CapabilityDiagnostic(TypedDict):
     sourceSpan: SourceSpan
 
 
+class ProofLineage(TypedDict):
+    schemaVersion: Literal[1]
+    kind: Literal["codaro.proof-lineage"]
+    sourceRevisionReceiptId: str
+    sourceBlockHash: str
+    dependencyHash: str
+    learningCreditIds: list[str]
+    learningCheckIds: list[str]
+    lineageHash: str
+
+
 class ExecutableUnitSpec(TypedDict):
     schemaVersion: Literal[1]
     unitId: str
@@ -310,11 +327,14 @@ class ExecutableUnitSpec(TypedDict):
     statePolicy: AppStatePolicy
     runtimeTarget: RuntimeTarget
     sourceSpan: SourceSpan
-    sourceHash: str
+    entryBlockHash: str
+    sourceFileHash: str
+    sourceRevisionHash: str
     dependencyHash: str
     assetHashes: dict[str, str]
     checkScenarioIds: list[str]
     evidenceReceiptIds: list[str]
+    proofLineage: ProofLineage | None
     diagnostics: list[CapabilityDiagnostic]
 '''
 
@@ -345,6 +365,17 @@ export type CapabilityDiagnostic = {{
   sourceSpan: SourceSpan;
 }};
 
+export type ProofLineage = {{
+  schemaVersion: 1;
+  kind: "codaro.proof-lineage";
+  sourceRevisionReceiptId: string;
+  sourceBlockHash: string;
+  dependencyHash: string;
+  learningCreditIds: string[];
+  learningCheckIds: string[];
+  lineageHash: string;
+}};
+
 export type ExecutableUnitSpec = {{
   schemaVersion: 1;
   unitId: string;
@@ -356,11 +387,14 @@ export type ExecutableUnitSpec = {{
   statePolicy: AppStatePolicy;
   runtimeTarget: RuntimeTarget;
   sourceSpan: SourceSpan;
-  sourceHash: string;
+  entryBlockHash: string;
+  sourceFileHash: string;
+  sourceRevisionHash: string;
   dependencyHash: string;
   assetHashes: Record<string, string>;
   checkScenarioIds: string[];
   evidenceReceiptIds: string[];
+  proofLineage: ProofLineage | null;
   diagnostics: CapabilityDiagnostic[];
 }};
 '''
@@ -394,7 +428,23 @@ class ServerPublicationRuntime(TypedDict):
     maxExecutionSeconds: int
 
 
-PublicationRuntime = BrowserPublicationRuntime | ServerPublicationRuntime
+class LocalPublicationRuntime(TypedDict):
+    kind: Literal["local"]
+    pythonVersion: str
+    requirementsPath: str
+    permissionScopes: list[Literal["filesystem.read", "filesystem.write", "network", "process.execute", "gui.display", "secret.read"]]
+    effects: dict[str, object]
+    secretRefs: list[str]
+    networkOrigins: list[str]
+    statePolicy: Literal["none", "perSession", "shared"]
+    policyHash: str
+    maxMemoryMb: int
+    maxExecutionSeconds: int
+    maxChildProcesses: int
+    apiAllowlist: list[str]
+
+
+PublicationRuntime = BrowserPublicationRuntime | ServerPublicationRuntime | LocalPublicationRuntime
 
 
 class PublicationFile(TypedDict):
@@ -416,12 +466,40 @@ class PublicationPackage(TypedDict):
     contentHash: str
 
 
+class PublicationProofLineage(TypedDict):
+    schemaVersion: Literal[1]
+    kind: Literal["codaro.proof-lineage"]
+    sourceRevisionReceiptId: str
+    promotionBuildArtifactReceiptId: str
+    sourceBlockHash: str
+    dependencyHash: str
+    learningCreditIds: list[str]
+    learningCheckIds: list[str]
+    lineageHash: str
+    coveredBlockIds: list[str]
+    verificationStatus: Literal["verified", "unverified"]
+    permissionReceiptId: str | None
+    functionalCheckReceiptId: str | None
+    operationalRunReceiptId: str | None
+    artifactHashes: list[str]
+
+
+class PublicationProof(TypedDict):
+    schemaVersion: Literal[1]
+    verificationStatus: Literal["verified", "unverified"]
+    lineages: list[PublicationProofLineage]
+    proofHash: str
+
+
 class PublicationManifest(TypedDict):
     schemaVersion: Literal[1]
     target: PublicationTarget
     compilerManifestHash: str
     sourceRevisionHash: str
     entryBlockIds: list[str]
+    executionBlockIds: list[str]
+    executionProjectionHash: str
+    proof: PublicationProof
     documentPath: str
     runtime: PublicationRuntime
     files: list[PublicationFile]
@@ -455,7 +533,23 @@ export type ServerPublicationRuntime = {{
   maxExecutionSeconds: number;
 }};
 
-export type PublicationRuntime = BrowserPublicationRuntime | ServerPublicationRuntime;
+export type LocalPublicationRuntime = {{
+  kind: "local";
+  pythonVersion: string;
+  requirementsPath: string;
+  permissionScopes: Array<"filesystem.read" | "filesystem.write" | "network" | "process.execute" | "gui.display" | "secret.read">;
+  effects: Record<string, unknown>;
+  secretRefs: string[];
+  networkOrigins: string[];
+  statePolicy: "none" | "perSession" | "shared";
+  policyHash: string;
+  maxMemoryMb: number;
+  maxExecutionSeconds: number;
+  maxChildProcesses: number;
+  apiAllowlist: string[];
+}};
+
+export type PublicationRuntime = BrowserPublicationRuntime | ServerPublicationRuntime | LocalPublicationRuntime;
 
 export type PublicationFile = {{
   path: string;
@@ -476,12 +570,40 @@ export type PublicationPackage = {{
   contentHash: string;
 }};
 
+export type PublicationProofLineage = {{
+  schemaVersion: 1;
+  kind: "codaro.proof-lineage";
+  sourceRevisionReceiptId: string;
+  promotionBuildArtifactReceiptId: string;
+  sourceBlockHash: string;
+  dependencyHash: string;
+  learningCreditIds: string[];
+  learningCheckIds: string[];
+  lineageHash: string;
+  coveredBlockIds: string[];
+  verificationStatus: "verified" | "unverified";
+  permissionReceiptId: string | null;
+  functionalCheckReceiptId: string | null;
+  operationalRunReceiptId: string | null;
+  artifactHashes: string[];
+}};
+
+export type PublicationProof = {{
+  schemaVersion: 1;
+  verificationStatus: "verified" | "unverified";
+  lineages: PublicationProofLineage[];
+  proofHash: string;
+}};
+
 export type PublicationManifest = {{
   schemaVersion: 1;
   target: PublicationTarget;
   compilerManifestHash: string;
   sourceRevisionHash: string;
   entryBlockIds: string[];
+  executionBlockIds: string[];
+  executionProjectionHash: string;
+  proof: PublicationProof;
   documentPath: string;
   runtime: PublicationRuntime;
   files: PublicationFile[];
@@ -511,8 +633,10 @@ export type ArtifactOwner = {{
 def rustSource(schemaHash: str, ownersHash: str) -> str:
     return generatedHeader(schemaHash, ownersHash, "//") + f'''use serde::{{Deserialize, Serialize}};
 
-pub const ARTIFACT_OWNERSHIP_CONTRACT_SHA256: &str = "{schemaHash}";
-pub const ARTIFACT_OWNERSHIP_OWNERS_SHA256: &str = "{ownersHash}";
+pub const ARTIFACT_OWNERSHIP_CONTRACT_SHA256: &str =
+    "{schemaHash}";
+pub const ARTIFACT_OWNERSHIP_OWNERS_SHA256: &str =
+    "{ownersHash}";
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]

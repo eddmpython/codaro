@@ -555,13 +555,41 @@ def testTypeScriptAssessmentQueueUsesAcceptedCreditAndKeepsRetriesVisible(tmp_pa
         sectionId="retrieval",
     )
     failedCheck = checkEvent(15, "2026-07-10T00:00:04Z", failedRun, mode="retrieval")
+    capstoneRun = runEvent(
+        16,
+        "2026-07-02T01:00:00Z",
+        variant="capstone-application",
+        fixture="fixture-capstone",
+        sectionId="capstone",
+    )
+    capstoneCheck = checkEvent(17, "2026-07-02T01:00:01Z", capstoneRun, mode="capstone")
+    capstoneCredit = creditEvent(
+        18,
+        "2026-07-02T01:00:02Z",
+        capstoneRun,
+        [capstoneCheck],
+        [],
+        mode="capstone",
+        preAttemptState="independent",
+    )
     fixturePath = tmp_path / "assessment-queue.json"
     bundlePath = tmp_path / "assessment-queue.mjs"
     fixturePath.write_text(json.dumps({
         "beforeTransfer": [{"canonicalEvents": events[:7]}],
         "beforeRetrieval": [{"canonicalEvents": events[:10]}],
         "failedRetrieval": [{"canonicalEvents": [*events[:10], failedRun, failedCheck]}],
+        "beforeCapstone": [{"canonicalEvents": events[:7]}],
+        "completedCapstone": [{"canonicalEvents": [*events[:7], capstoneRun, capstoneCheck, capstoneCredit]}],
         "mastered": [{"canonicalEvents": events}],
+        "capstoneContracts": [
+            {
+                "assessmentMode": "capstone",
+                "minimumDelayHours": 0,
+                "outcomeIds": [OUTCOME_ID],
+                "sectionId": "capstone",
+                "sourceSectionIds": ["mastery"],
+            },
+        ],
         "contracts": [
             {
                 "assessmentMode": "transfer",
@@ -599,7 +627,10 @@ def testTypeScriptAssessmentQueueUsesAcceptedCreditAndKeepsRetriesVisible(tmp_pa
         f"import {{dueAssessmentSectionIds}} from {json.dumps(bundlePath.as_uri())};"
         f"const value=JSON.parse(fs.readFileSync({json.dumps(str(fixturePath))},'utf8'));"
         "const due=async(events,at)=>[...await dueAssessmentSectionIds(value.contracts,events,Date.parse(at))].sort();"
+        "const capstone=async(events,at)=>[...await dueAssessmentSectionIds(value.capstoneContracts,events,Date.parse(at))].sort();"
         "const result={"
+        "capstoneReady:await capstone(value.beforeCapstone,'2026-07-02T00:00:03Z'),"
+        "capstoneCompleted:await capstone(value.completedCapstone,'2026-07-02T01:00:03Z'),"
         "transfer:await due(value.beforeTransfer,'2026-07-02T00:00:03Z'),"
         "early:await due(value.beforeRetrieval,'2026-07-09T00:00:02Z'),"
         "retrieval:await due(value.beforeRetrieval,'2026-07-10T00:00:02Z'),"
@@ -615,6 +646,8 @@ def testTypeScriptAssessmentQueueUsesAcceptedCreditAndKeepsRetriesVisible(tmp_pa
         text=True,
     )
     assert json.loads(completed.stdout) == {
+        "capstoneCompleted": ["capstone"],
+        "capstoneReady": ["capstone"],
         "early": [],
         "renewal": ["retrieval"],
         "retrieval": ["retrieval"],

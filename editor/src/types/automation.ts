@@ -104,6 +104,14 @@ export type TaskRun = {
   output: string;
   error?: string | null;
   variables: Record<string, unknown>;
+  executionStatus?: "not-started" | "success" | "failed" | "cancelled";
+  semanticStatus?: "not-checked" | "contract-passed" | "contract-failed";
+  proofStatus?: "semantic-not-checked" | "contract-passed" | "contract-failed" | "operational-proof";
+  validated?: boolean;
+  validationErrors?: string[];
+  artifactDescriptors?: Array<Record<string, unknown>>;
+  buildArtifactHash?: string | null;
+  operationalReceiptId?: string | null;
 };
 
 export type TaskListPayload = {

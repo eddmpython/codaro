@@ -147,7 +147,7 @@ function isManifest(value) {
   const keys = [
     "schemaVersion", "kind", "protocol", "embedId", "title", "entryBlockId",
     "dependencyBlockIds", "runtimeTarget", "defaultMode", "allowedModes", "framePath",
-    "publicationBundleHash", "publicationManifestHash", "sandbox", "loaderHash", "manifestHash",
+    "publicationBundleHash", "publicationManifestHash", "sandbox", "loaderHash", "proof", "manifestHash",
   ];
   return exactObject(value, keys)
     && value.schemaVersion === 1
@@ -169,7 +169,58 @@ function isManifest(value) {
     && Array.isArray(value.sandbox)
     && value.sandbox.join(" ") === "allow-scripts allow-same-origin"
     && contentHash(value.loaderHash)
+    && isPublicationProof(value.proof, [value.entryBlockId, ...value.dependencyBlockIds])
     && contentHash(value.manifestHash);
+}
+
+function isPublicationProof(value, executionBlockIds) {
+  if (!exactObject(value, ["schemaVersion", "verificationStatus", "lineages", "proofHash"])
+      || value.schemaVersion !== 1
+      || !["verified", "unverified"].includes(value.verificationStatus)
+      || !Array.isArray(value.lineages)
+      || !proofHash(value.proofHash)
+      || !value.lineages.every(isPublicationProofLineage)) return false;
+  const sourceIds = value.lineages.map((lineage) => lineage.sourceRevisionReceiptId);
+  if (sourceIds.join("\n") !== [...new Set(sourceIds)].sort().join("\n")) return false;
+  const verifiedCoverage = new Set(value.lineages
+    .filter((lineage) => lineage.verificationStatus === "verified")
+    .flatMap((lineage) => lineage.coveredBlockIds));
+  const fullyVerified = value.lineages.length > 0
+    && executionBlockIds.every((blockId) => verifiedCoverage.has(blockId));
+  return value.verificationStatus === (fullyVerified ? "verified" : "unverified");
+}
+
+function isPublicationProofLineage(value) {
+  const keys = [
+    "schemaVersion", "kind", "sourceRevisionReceiptId", "promotionBuildArtifactReceiptId",
+    "sourceBlockHash", "dependencyHash", "learningCreditIds", "learningCheckIds", "lineageHash",
+    "coveredBlockIds", "verificationStatus", "permissionReceiptId", "functionalCheckReceiptId",
+    "operationalRunReceiptId", "artifactHashes",
+  ];
+  if (!exactObject(value, keys)
+      || value.schemaVersion !== 1
+      || value.kind !== "codaro.proof-lineage"
+      || !receiptId(value.sourceRevisionReceiptId, "sourceRevision")
+      || !receiptId(value.promotionBuildArtifactReceiptId, "buildArtifact")
+      || !proofHash(value.sourceBlockHash)
+      || !proofHash(value.dependencyHash)
+      || !proofHash(value.lineageHash)
+      || !stringList(value.learningCreditIds)
+      || !stringList(value.learningCheckIds)
+      || !stringList(value.coveredBlockIds)
+      || !Array.isArray(value.artifactHashes)
+      || !value.artifactHashes.every(proofHash)) return false;
+  if (value.verificationStatus === "verified") {
+    return value.artifactHashes.length > 0
+      && receiptId(value.permissionReceiptId, "permission")
+      && receiptId(value.functionalCheckReceiptId, "functionalCheck")
+      && receiptId(value.operationalRunReceiptId, "operationalRun");
+  }
+  return value.verificationStatus === "unverified"
+    && value.permissionReceiptId === null
+    && value.functionalCheckReceiptId === null
+    && value.operationalRunReceiptId === null
+    && value.artifactHashes.length === 0;
 }
 
 function isFrameMessage(value) {
@@ -215,6 +266,15 @@ function boundedText(value, maximum) {
 
 function contentHash(value) {
   return typeof value === "string" && /^sha256-[0-9a-f]{64}$/.test(value);
+}
+
+function proofHash(value) {
+  return typeof value === "string" && /^sha256-(?:[0-9a-f]{64}|[A-Za-z0-9_-]{43})$/.test(value);
+}
+
+function receiptId(value, kind) {
+  return typeof value === "string"
+    && new RegExp(`^${kind}:sha256-[A-Za-z0-9_-]{43}$`).test(value);
 }
 
 function safeRelativePath(value) {

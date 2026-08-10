@@ -98,15 +98,66 @@ def getReactiveOrder(
     includeSource: bool = True,
 ) -> list[str]:
     affected = calculateStaleSet(graph, changedBlockId, includeSource=includeSource)
-    return [blockId for blockId in graph.blockOrder if blockId in affected]
+    return stableTopologicalOrder(graph, affected)
 
 
 def getAllExecutionOrder(graph: ReactiveGraph) -> list[str]:
-    return list(graph.blockOrder)
+    return stableTopologicalOrder(graph)
+
+
+def stableTopologicalOrder(
+    graph: ReactiveGraph,
+    includedBlockIds: set[str] | None = None,
+) -> list[str]:
+    """Return a deterministic provider-before-consumer order.
+
+    Document order is the stable tie breaker for independent nodes. Cyclic
+    residual nodes are appended in document order so diagnostics can still
+    describe the complete graph; execution owners must fail closed before
+    running a graph with cycles or ambiguous definitions.
+    """
+    included = (
+        set(graph.blockOrder)
+        if includedBlockIds is None
+        else set(includedBlockIds).intersection(graph.nodes)
+    )
+    orderIndex = {blockId: index for index, blockId in enumerate(graph.blockOrder)}
+    indegree = {blockId: 0 for blockId in included}
+    for provider in included:
+        for dependent in graph.dependents.get(provider, set()):
+            if dependent in included:
+                indegree[dependent] += 1
+
+    ready = sorted(
+        (blockId for blockId, degree in indegree.items() if degree == 0),
+        key=orderIndex.__getitem__,
+    )
+    result: list[str] = []
+    while ready:
+        current = ready.pop(0)
+        result.append(current)
+        for dependent in sorted(
+            graph.dependents.get(current, set()),
+            key=orderIndex.__getitem__,
+        ):
+            if dependent not in indegree:
+                continue
+            indegree[dependent] -= 1
+            if indegree[dependent] == 0:
+                ready.append(dependent)
+                ready.sort(key=orderIndex.__getitem__)
+
+    if len(result) != len(included):
+        result.extend(
+            blockId
+            for blockId in graph.blockOrder
+            if blockId in included and blockId not in result
+        )
+    return result
 
 
 def dependencyClosure(graph: ReactiveGraph, entryBlockId: str) -> list[str]:
-    """Return the entry block and every provider it needs in document order."""
+    """Return the entry block and every provider it needs in execution order."""
     if entryBlockId not in graph.nodes:
         raise KeyError(entryBlockId)
     closure = {entryBlockId}
@@ -120,7 +171,7 @@ def dependencyClosure(graph: ReactiveGraph, entryBlockId: str) -> list[str]:
                     continue
                 closure.add(provider)
                 queue.append(provider)
-    return [blockId for blockId in graph.blockOrder if blockId in closure]
+    return stableTopologicalOrder(graph, closure)
 
 
 def detectCycles(graph: ReactiveGraph) -> list[list[str]]:
@@ -255,7 +306,8 @@ def reactivePlanPayload(
 ) -> dict[str, Any]:
     graph = buildReactiveGraph(blocks, analyzeCellBindings, analyzeMarkdownRefs)
     diagnostics = diagnosticsFromGraph(graph, notebookName)
-    executionOrder = (
+    executionBlocked = bool(diagnostics.cycles or diagnostics.multipleDefinitions)
+    executionOrder = [] if executionBlocked else (
         getReactiveOrder(graph, changedBlockId, includeSource=includeSource)
         if changedBlockId is not None
         else getAllExecutionOrder(graph)

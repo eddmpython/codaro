@@ -45,6 +45,8 @@ result-embed/
 
 `embed.json`은 entry block, dependency block, 허용 mode, iframe sandbox, loader hash, publication bundle과 manifest hash를 고정한다. embed는 publication runtime을 복사하지 않고 같은 immutable bundle을 참조한다. source, dependency, package, asset 또는 loader가 바뀌면 hash가 달라진다.
 
+embed proof는 내부 browser publication의 proof와 byte-level canonical payload가 같아야 한다. promoted 블록이면 embed 자체의 `BuildArtifact`도 기존 source root에 연결한다. verifier는 entry와 dependency closure 전체가 verified coverage에 포함됐는지 확인하며, 일반 블록을 verified로 올리지 않는다.
+
 ## Web Component와 메시지
 
 `editor/src/embed/codaroBlock.js`는 open Shadow DOM 안에 iframe 하나를 만들고 같은 manifest URL의 fetch promise를 페이지 전체에서 공유한다. 각 iframe은 별도 browser runtime과 widget state를 가진다. host CSS는 Shadow DOM과 iframe 내부에 들어가지 않는다.

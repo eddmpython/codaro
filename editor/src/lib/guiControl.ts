@@ -125,6 +125,10 @@ export type GuiStateInput = {
     selectedCellId: string | null;
     title: string;
   };
+  publication: {
+    runtimeTarget: "blocked" | "browser" | "local" | "server" | null;
+    sourcePath: string | null;
+  };
   notice: {
     detail: string;
     title: string;

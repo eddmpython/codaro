@@ -223,7 +223,7 @@ def testCycleAndMultipleDefinitionBlockBuild(tmp_path: Path) -> None:
     assert "MULTIPLE_DEFINITION_BLOCKED" in {item["code"] for item in duplicateResult.unit["diagnostics"]}
 
 
-def testDefinitionAfterUseBlocksPublicationEvenWithoutCycle(tmp_path: Path) -> None:
+def testDefinitionAfterUseUsesStableProviderFirstProjection(tmp_path: Path) -> None:
     document = _document(
         [
             ("entry", "result = source + 1"),
@@ -234,10 +234,61 @@ def testDefinitionAfterUseBlocksPublicationEvenWithoutCycle(tmp_path: Path) -> N
 
     result = _compile(document, tmp_path)
 
-    assert result.targetDecision.selected == "blocked"
-    assert "DEFINITION_ORDER_BLOCKED" in {
+    assert result.targetDecision.selected == "browser"
+    assert result.unit["dependencyBlockIds"] == ["source"]
+    assert "DEFINITION_ORDER_BLOCKED" not in {
         item["code"] for item in result.unit["diagnostics"]
     }
+
+
+def testAppReportJudgesEveryActuallyExecutedBlockNotOnlyVisibleEntries(tmp_path: Path) -> None:
+    document = _document(
+        [
+            ("visible", "value = 1"),
+            ("hidden-local-effect", "import subprocess\nsubprocess.run(['python', '-V'])"),
+        ],
+        entries=["visible"],
+    )
+    source = writePercentDocument(document)
+
+    report = compileDocument(
+        document,
+        sourcePath=tmp_path / "app.py",
+        sourceText=source,
+        workspaceRoot=tmp_path,
+    )
+
+    assert report.entryBlockIds == ("visible",)
+    assert report.executionBlockIds == ("visible", "hidden-local-effect")
+    assert report.runtimeTarget == "local"
+    assert {unit.unit["entryBlockId"] for unit in report.units} == {
+        "visible",
+        "hidden-local-effect",
+    }
+    assert report.executionProjectionHash.startswith("sha256-")
+
+
+def testEntryClosureScopeKeepsEmbedIndependentFromHiddenBlocks(tmp_path: Path) -> None:
+    document = _document(
+        [
+            ("provider", "source = 41"),
+            ("entry", "result = source + 1"),
+            ("hidden-local-effect", "import subprocess\nsubprocess.run(['python', '-V'])"),
+        ],
+        entries=["entry"],
+    )
+    source = writePercentDocument(document)
+
+    report = compileDocument(
+        document,
+        sourcePath=tmp_path / "app.py",
+        sourceText=source,
+        workspaceRoot=tmp_path,
+        executionScope="entryClosure",
+    )
+
+    assert report.executionBlockIds == ("provider", "entry")
+    assert report.runtimeTarget == "browser"
 
 
 def testDocumentReportUsesMostRestrictiveEntryAndDoesNotMutateSource(tmp_path: Path) -> None:
@@ -262,3 +313,15 @@ def testDocumentReportUsesMostRestrictiveEntryAndDoesNotMutateSource(tmp_path: P
     assert report.entryBlockIds == ("browser", "local")
     assert len(report.units) == 2
     assert document.model_dump_json() == before
+
+
+def testExecutableUnitInputsExcludePythonBuiltinsAndKeepCallerValues(tmp_path: Path) -> None:
+    document = _document([(
+        "entry",
+        "if all(name in globals() for name in ('count', 'outputPath')):\n"
+        "    result = (count, outputPath)\n",
+    )])
+
+    result = _compile(document, tmp_path)
+
+    assert result.unit["inputSchema"]["required"] == ["count", "outputPath"]

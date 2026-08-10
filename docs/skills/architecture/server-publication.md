@@ -59,6 +59,10 @@ manifest에는 secret 이름만 들어간다. 시작할 때 필요한 이름의 
 
 filesystem read와 write는 session workspace 안에서 선언된 scope가 있을 때만 허용한다. network는 compiler가 고정한 origin과 `network` scope가 함께 있어야 한다. process 실행과 child process는 published server에서 허용하지 않는다.
 
+network origin은 scheme, 정규화된 hostname과 port를 보존한다. worker는 audit hook을 설치하기 전에 선언 hostname의 DNS 결과를 고정하고, 실행 중에는 선언 hostname의 `getaddrinfo` 뒤 같은 port로 이어지는 pinned address 연결만 허용한다. 직접 IP 우회, 다른 port, 다른 hostname과 redirect의 새 origin은 차단한다.
+
+공개 session은 server가 발급한 HttpOnly, SameSite owner cookie에 묶는다. 다른 browser owner는 session ID를 알아도 조회, 실행, 삭제할 수 없다. 전체 또는 owner별 capacity가 차면 기존 session을 LRU로 축출하지 않고 429를 반환한다. 만료된 session에서 실행 요청이 404로 거부되면 client는 멱등 실행만 새 session에서 한 번 재시도하며, 비멱등 callback은 자동 재실행하지 않는다.
+
 `hideCode`는 화면 표시 옵션이며 source 보안 경계가 아니다. 현재 app bootstrap은 reactive graph를 만들기 위해 source를 client document payload로 전달한다. secret 값은 전달하지 않지만 Python 지식재산 은닉이 필요한 앱은 source-free protocol이 별도로 구현되기 전에는 공개하면 안 된다.
 
 ## rollback

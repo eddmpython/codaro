@@ -17,6 +17,7 @@ PRODUCT_QUALITY_GATES = (
     "root-clean",
     "docs",
     "backend",
+    "runtime-security",
     "architecture-boundary",
     "design-system-contract",
     "theme-runtime-browser",

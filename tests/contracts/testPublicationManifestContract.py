@@ -16,6 +16,9 @@ def testPublicationManifestContractIsOwnedAndGeneratedOnBothSurfaces() -> None:
 
     assert schema["properties"]["schemaVersion"]["const"] == 1
     assert schema["additionalProperties"] is False
+    assert "executionBlockIds" in schema["required"]
+    assert schema["properties"]["executionBlockIds"]["uniqueItems"] is True
+    assert "executionProjectionHash" in schema["required"]
     assert "contracts/publicationManifest.schema.json" in owners
     assert "class PublicationManifest(TypedDict)" in python
     assert "class BrowserPublicationRuntime(TypedDict)" in python
@@ -23,3 +26,5 @@ def testPublicationManifestContractIsOwnedAndGeneratedOnBothSurfaces() -> None:
     assert "export type PublicationManifest" in typescript
     assert 'kind: "server"' in typescript
     assert "networkOrigins: string[]" in typescript
+    assert "executionBlockIds: string[]" in typescript
+    assert "executionProjectionHash: str" in python

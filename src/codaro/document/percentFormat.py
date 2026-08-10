@@ -8,6 +8,15 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
+from .formatMetadata import (
+    FORMAT_METADATA_SCHEMA_VERSION,
+    FormatMetadataError,
+    blockMetadataPayload,
+    canonicalJson,
+    documentMetadataPayload,
+    parseBlockMetadata,
+    parseDocumentMetadata as parseDocumentMetadataPayload,
+)
 from .models import AppConfig, BlockConfig, CodaroDocument, DocumentMetadata, GuideConfig, RuntimeConfig
 
 
@@ -17,6 +26,11 @@ _KV_PAIR = re.compile(r'(\w+)=["\']([^"\']*)["\']|(\w+)=(\S+)')
 # PEP 723 인라인 스크립트 메타데이터 — `# /// script` ~ `# ///` 사이의 주석 줄이 TOML이다.
 _INLINE_SCRIPT = re.compile(r"(?m)^# /// script[ \t]*$\n(?P<content>(?:^#.*\n)*?)^# ///[ \t]*$\n?")
 _INLINE_APP = re.compile(r"(?m)^# /// codaro-app[ \t]*$\n(?P<content>(?:^#.*\n)*?)^# ///[ \t]*$\n?")
+_INLINE_DOCUMENT = re.compile(
+    r"(?m)^# /// codaro-document[ \t]*$\n(?P<content>(?:^#.*\n)*?)^# ///[ \t]*$\n?"
+)
+_BLOCK_METADATA_START = "# /// codaro-block"
+_BLOCK_METADATA_END = "# ///"
 _APP_SPEC_FIELDS = {
     "schemaVersion",
     "title",
@@ -29,6 +43,28 @@ _APP_SPEC_FIELDS = {
 
 class PercentFormatError(ValueError):
     pass
+
+
+def parseDocumentMetadata(source: str) -> tuple[tuple[str, str, DocumentMetadata, RuntimeConfig] | None, str]:
+    matches = list(_INLINE_DOCUMENT.finditer(source))
+    if not matches:
+        return None, source
+    if len(matches) != 1:
+        raise PercentFormatError("percent document must contain at most one codaro-document metadata block")
+    match = matches[0]
+    payload = _parseJsonCommentMetadata(match.group("content"), "codaro-document")
+    try:
+        parsed = parseDocumentMetadataPayload(payload, sourceFormat="percent")
+    except FormatMetadataError as exc:
+        raise PercentFormatError(f"codaro-document metadata is invalid: {exc}") from exc
+    return parsed, source[:match.start()] + source[match.end():]
+
+
+def writeDocumentMetadata(document: CodaroDocument) -> str:
+    return _writeJsonCommentMetadata(
+        "codaro-document",
+        documentMetadataPayload(document, "percent"),
+    )
 
 
 def percentBlockSourceSpans(source: str, path: str) -> dict[str, dict[str, int | str]]:
@@ -45,7 +81,19 @@ def percentBlockSourceSpans(source: str, path: str) -> dict[str, dict[str, int |
     spans: dict[str, dict[str, int | str]] = {}
     for markerIndex, (lineIndex, blockId) in enumerate(markers):
         nextLine = markers[markerIndex + 1][0] if markerIndex + 1 < len(markers) else len(lines)
-        startLine = min(lineIndex + 2, max(1, len(lines)))
+        contentLineIndex = lineIndex + 1
+        if contentLineIndex < len(lines) and lines[contentLineIndex].strip() == _BLOCK_METADATA_START:
+            closingIndex = next(
+                (
+                    index
+                    for index in range(contentLineIndex + 1, nextLine)
+                    if lines[index].strip() == _BLOCK_METADATA_END
+                ),
+                None,
+            )
+            if closingIndex is not None:
+                contentLineIndex = closingIndex + 1
+        startLine = min(contentLineIndex + 1, max(1, len(lines)))
         endLine = max(startLine, nextLine)
         spans[blockId] = {"path": path, "startLine": startLine, "endLine": endLine}
     return spans
@@ -125,12 +173,62 @@ def writeAppMetadata(app: AppConfig) -> str:
     ])
 
 
+def writeBlockMetadata(block: BlockConfig) -> str:
+    return _writeJsonCommentMetadata(
+        "codaro-block",
+        blockMetadataPayload(block),
+    )
+
+
+def _parseJsonCommentMetadata(content: str, namespace: str) -> dict[str, object]:
+    tomlLines: list[str] = []
+    for line in content.splitlines():
+        if line.startswith("# "):
+            tomlLines.append(line[2:])
+        elif line == "#":
+            tomlLines.append("")
+        else:
+            raise PercentFormatError(f"{namespace} metadata must contain comment-prefixed TOML")
+    try:
+        wrapper = tomllib.loads("\n".join(tomlLines))
+    except tomllib.TOMLDecodeError as exc:
+        raise PercentFormatError(f"{namespace} metadata is invalid TOML: {exc}") from exc
+    if set(wrapper) != {"schemaVersion", "payload"}:
+        raise PercentFormatError(f"{namespace} metadata fields are invalid")
+    if wrapper.get("schemaVersion") != FORMAT_METADATA_SCHEMA_VERSION:
+        raise PercentFormatError(
+            f"{namespace} metadata schemaVersion is not supported: {wrapper.get('schemaVersion')!r}"
+        )
+    encoded = wrapper.get("payload")
+    if not isinstance(encoded, str):
+        raise PercentFormatError(f"{namespace} metadata payload must be a JSON string")
+    try:
+        payload = json.loads(encoded)
+    except json.JSONDecodeError as exc:
+        raise PercentFormatError(f"{namespace} metadata payload is invalid JSON: {exc}") from exc
+    if not isinstance(payload, dict):
+        raise PercentFormatError(f"{namespace} metadata payload must be an object")
+    if payload.get("schemaVersion") != wrapper["schemaVersion"]:
+        raise PercentFormatError(f"{namespace} metadata versions do not match")
+    return payload
+
+
+def _writeJsonCommentMetadata(namespace: str, payload: dict[str, object]) -> str:
+    return "\n".join([
+        f"# /// {namespace}",
+        f"# schemaVersion = {payload['schemaVersion']}",
+        f"# payload = {_tomlString(canonicalJson(payload))}",
+        "# ///",
+    ])
+
+
 def parsePercentDocument(source: str, sourcePath: Path | None = None) -> CodaroDocument:
     # PEP 723 인라인 의존성을 먼저 떼어내 packages로 쓰고, 셀 파싱에서는 제외한다.
     inlineMeta = parseInlineScriptMetadata(source)
     if inlineMeta is not None:
         source = _INLINE_SCRIPT.sub("", source, count=1)
     inlinePackages = _packagesFromInlineMeta(inlineMeta)
+    documentMetadata, source = parseDocumentMetadata(source)
     appConfig = parseAppMetadata(source)
     if appConfig is not None:
         source = _INLINE_APP.sub("", source, count=1)
@@ -160,7 +258,7 @@ def parsePercentDocument(source: str, sourcePath: Path | None = None) -> CodaroD
 
         if match:
             if currentType is not None:
-                blocks.append(_buildBlock(currentType, currentId, currentLines))
+                blocks.append(_buildBlock(currentType, currentId, currentLines, followedByMarker=True))
             elif preambleLines:
                 trimmed = "\n".join(preambleLines).strip()
                 if trimmed:
@@ -168,7 +266,7 @@ def parsePercentDocument(source: str, sourcePath: Path | None = None) -> CodaroD
 
             currentType = match.group(1).lower()
             markerMeta = _parseKeyValues(match.group(2))
-            currentId = markerMeta.get("id", _blockId())
+            currentId = markerMeta.get("id")
             currentLines = []
         elif currentType is not None:
             currentLines.append(line)
@@ -176,22 +274,34 @@ def parsePercentDocument(source: str, sourcePath: Path | None = None) -> CodaroD
             preambleLines.append(line)
 
     if currentType is not None:
-        blocks.append(_buildBlock(currentType, currentId, currentLines))
+        blocks.append(_buildBlock(currentType, currentId, currentLines, followedByMarker=False))
     elif preambleLines:
         trimmed = "\n".join(preambleLines).strip()
         if trimmed:
             blocks.append(BlockConfig(id=_blockId(), type="code", content=trimmed))
 
-    if not blocks:
+    if not blocks and documentMetadata is None:
         blocks.append(BlockConfig(id=_blockId(), type="code", content=""))
+
+    if documentMetadata is not None:
+        documentId, documentTitle, metadata, runtime = documentMetadata
+        title = documentTitle
+        if inlinePackages != runtime.packages:
+            raise PercentFormatError("codaro-document runtime packages do not match PEP 723 dependencies")
+        if appConfig is None:
+            raise PercentFormatError("codaro-document metadata requires codaro-app metadata")
+    else:
+        documentId = f"doc-{uuid.uuid4().hex[:10]}"
+        metadata = DocumentMetadata(sourceFormat="percent")
+        runtime = RuntimeConfig(packages=inlinePackages) if inlinePackages else RuntimeConfig()
 
     try:
         return CodaroDocument(
-            id=f"doc-{uuid.uuid4().hex[:10]}",
+            id=documentId,
             title=title,
             blocks=blocks,
-            metadata=DocumentMetadata(sourceFormat="percent"),
-            runtime=RuntimeConfig(packages=inlinePackages) if inlinePackages else RuntimeConfig(),
+            metadata=metadata,
+            runtime=runtime,
             app=appConfig or AppConfig(title=title),
         )
     except ValidationError as exc:
@@ -205,32 +315,23 @@ def writePercentDocument(document: CodaroDocument) -> str:
         # 선언 의존성을 PEP 723 블록으로 직렬화 → `uv run`/다른 도구도 읽을 수 있다(라운드트립).
         parts.append(writeInlineScriptMetadata(list(document.runtime.packages)))
         parts.append("")
-    parts.extend([writeAppMetadata(document.app), ""])
+    parts.extend([writeDocumentMetadata(document), "", writeAppMetadata(document.app), ""])
 
     for block in document.blocks:
+        parts.append(f'# %% [{block.type}] id={_tomlString(block.id)}')
+        parts.extend(writeBlockMetadata(block).splitlines())
         if block.type == "markdown":
-            parts.append(f'# %% [markdown] id={block.id}')
-            for line in (block.content or "").splitlines():
+            for line in (block.content or "").split("\n"):
                 parts.append(f"# {line}" if line else "#")
-            parts.append("")
-        elif block.type == "guide":
-            parts.append(f'# %% [guide] id={block.id}')
-            parts.append(block.content or "")
-            parts.append("")
-        elif block.type == "automation":
-            parts.append(f'# %% [automation] id={block.id}')
-            parts.append(block.content or "")
-            parts.append("")
         else:
-            parts.append(f'# %% [code] id={block.id}')
-            parts.append(block.content or "")
-            parts.append("")
+            parts.extend((block.content or "").split("\n"))
+        parts.append("")
 
     return "\n".join(parts)
 
 
 def isPercentFormat(source: str) -> bool:
-    if _INLINE_APP.search(source):
+    if _INLINE_DOCUMENT.search(source) or _INLINE_APP.search(source):
         return True
     for line in source.splitlines()[:20]:
         stripped = line.strip()
@@ -242,11 +343,36 @@ def isPercentFormat(source: str) -> bool:
     return False
 
 
-def _buildBlock(blockType: str, blockId: str | None, lines: list[str]) -> BlockConfig:
+def _buildBlock(
+    blockType: str,
+    blockId: str | None,
+    lines: list[str],
+    *,
+    followedByMarker: bool,
+) -> BlockConfig:
+    metadataPayload, contentLines = _extractBlockMetadata(lines)
+    if metadataPayload is not None:
+        if followedByMarker and contentLines and contentLines[-1] == "":
+            contentLines = contentLines[:-1]
+        content = (
+            _decodeMarkdownComments(contentLines)
+            if blockType == "markdown"
+            else "\n".join(contentLines)
+        )
+        try:
+            block = parseBlockMetadata(metadataPayload, content=content)
+        except FormatMetadataError as exc:
+            raise PercentFormatError(f"codaro-block metadata is invalid: {exc}") from exc
+        if blockId is not None and block.id != blockId:
+            raise PercentFormatError("codaro-block id does not match its Percent marker")
+        if block.type != blockType:
+            raise PercentFormatError("codaro-block type does not match its Percent marker")
+        return block
+
     if blockType == "markdown":
-        content = _stripMarkdownComments(lines)
+        content = _stripMarkdownComments(contentLines)
     elif blockType == "guide":
-        content = _stripTrailingBlanks("\n".join(lines))
+        content = _stripTrailingBlanks("\n".join(contentLines))
         guide = _parseGuideContent(content)
         return BlockConfig(
             id=blockId or _blockId(),
@@ -255,19 +381,45 @@ def _buildBlock(blockType: str, blockId: str | None, lines: list[str]) -> BlockC
             guide=guide,
         )
     elif blockType == "automation":
-        content = _stripTrailingBlanks("\n".join(lines))
+        content = _stripTrailingBlanks("\n".join(contentLines))
         return BlockConfig(
             id=blockId or _blockId(),
             type="automation",
             content=content,
         )
     else:
-        content = _stripTrailingBlanks("\n".join(lines))
+        content = _stripTrailingBlanks("\n".join(contentLines))
     return BlockConfig(
         id=blockId or _blockId(),
         type=blockType,
         content=content,
     )
+
+
+def _extractBlockMetadata(lines: list[str]) -> tuple[dict[str, object] | None, list[str]]:
+    if not lines or lines[0].strip() != _BLOCK_METADATA_START:
+        return None, lines
+    endIndex = next(
+        (index for index, line in enumerate(lines[1:], start=1) if line.strip() == _BLOCK_METADATA_END),
+        None,
+    )
+    if endIndex is None:
+        raise PercentFormatError("codaro-block metadata is missing its closing marker")
+    content = "\n".join(lines[1:endIndex])
+    payload = _parseJsonCommentMetadata(content, "codaro-block")
+    return payload, lines[endIndex + 1:]
+
+
+def _decodeMarkdownComments(lines: list[str]) -> str:
+    result: list[str] = []
+    for line in lines:
+        if line.startswith("# "):
+            result.append(line[2:])
+        elif line == "#":
+            result.append("")
+        else:
+            result.append(line)
+    return "\n".join(result)
 
 
 def _stripMarkdownComments(lines: list[str]) -> str:

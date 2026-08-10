@@ -16,12 +16,21 @@ import uuid
 import webbrowser
 
 from ..document.service import loadDocument
+from ..generatedContracts import PublicationProof
+from ..proof import ProofArchive
 from .compiler import compileExecutableUnit
+from .proofLineage import (
+    PublicationProofError,
+    recordPublicationBuildArtifacts,
+    validatePublicationProof,
+)
+from .immutablePointer import activateImmutablePointer, rollbackImmutablePointer
 from .staticBuilder import (
     PublicationBuildError,
     PublicationBuildResult,
     PublicationVerification,
     buildStaticPublication,
+    verifyPublicationBundle,
     verifyPublication,
 )
 
@@ -58,6 +67,7 @@ class BlockEmbedManifest(TypedDict):
     framePath: str
     publicationBundleHash: str
     publicationManifestHash: str
+    proof: PublicationProof
     sandbox: list[str]
     loaderHash: str
     manifestHash: str
@@ -95,6 +105,7 @@ def buildBlockEmbed(
     packageLock: Mapping[str, Any] | None = None,
     webBuildRoot: str | Path | None = None,
     embedLoaderPath: str | Path | None = None,
+    proofArchive: ProofArchive | None = None,
 ) -> BlockEmbedBuildResult:
     source = Path(sourcePath).expanduser().resolve()
     output = Path(outputRoot).expanduser().resolve()
@@ -134,6 +145,7 @@ def buildBlockEmbed(
         webBuildRoot=webBuildRoot,
         entryBlockIds=(entryBlockId,),
         closureOnly=True,
+        proofArchive=proofArchive,
     )
     loader = _resolveEmbedLoader(webBuildRoot, embedLoaderPath)
     loaderBytes = loader.read_bytes()
@@ -157,6 +169,7 @@ def buildBlockEmbed(
         "framePath": framePath,
         "publicationBundleHash": publication.bundleHash,
         "publicationManifestHash": publication.manifest["manifestHash"],
+        "proof": publication.manifest["proof"],
         "sandbox": list(_SANDBOX),
         "loaderHash": loaderHash,
     }
@@ -189,6 +202,16 @@ def buildBlockEmbed(
             _removeStaging(staging, embedsRoot)
         else:
             os.replace(staging, finalRoot)
+        try:
+            recordPublicationBuildArtifacts(
+                manifest["proof"],
+                proofArchive,
+                buildArtifactHash=embedHash,
+                manifestHash=manifestHash,
+                target="browser",
+            )
+        except PublicationProofError as exc:
+            raise PublicationBuildError(f"embed build proof를 기록할 수 없습니다: {exc}") from exc
         active = {
             "schemaVersion": 1,
             "target": "embed",
@@ -198,7 +221,7 @@ def buildBlockEmbed(
             "loaderHash": loaderHash,
             "hostHash": _fileHash(finalRoot / "index.html"),
         }
-        _writeJsonAtomically(output / "active.json", active)
+        activateImmutablePointer(output, active)
         verified = verifyBlockEmbed(output)
         return BlockEmbedBuildResult(
             outputRoot=output,
@@ -218,6 +241,26 @@ def buildBlockEmbed(
 def verifyBlockEmbed(outputRoot: str | Path) -> BlockEmbedVerification:
     output = Path(outputRoot).expanduser().resolve()
     active = _readJson(output / "active.json", "embed active pointer")
+    return _verifyBlockEmbedActive(output, active)
+
+
+def rollbackBlockEmbed(outputRoot: str | Path, embedHash: str) -> BlockEmbedVerification:
+    output = Path(outputRoot).expanduser().resolve()
+
+    def candidate(embedRoot: Path, contentHash: str):
+        active = _embedActivePayload(output, embedRoot, contentHash)
+        return active, _verifyBlockEmbedActive(output, active)
+
+    return rollbackImmutablePointer(
+        output,
+        target="embed",
+        contentHash=embedHash,
+        collection="embeds",
+        candidate=candidate,
+    )
+
+
+def _verifyBlockEmbedActive(output: Path, active: dict[str, Any]) -> BlockEmbedVerification:
     if set(active) != {
         "schemaVersion", "target", "embedHash", "embedPath", "manifestFileHash", "loaderHash", "hostHash"
     } or active.get("schemaVersion") != 1 or active.get("target") != "embed":
@@ -245,11 +288,23 @@ def verifyBlockEmbed(outputRoot: str | Path) -> BlockEmbedVerification:
     if actualFiles != {"codaro-block.js", "embed.json", "index.html"}:
         raise PublicationBuildError("embed bundle 파일 목록이 다릅니다.")
 
-    publication = verifyPublication(output / "publication")
+    publicationBundleHash = manifest.get("publicationBundleHash")
+    if not isinstance(publicationBundleHash, str):
+        raise PublicationBuildError("embed publication bundle hash가 없습니다.")
+    publication = verifyPublicationBundle(output / "publication", publicationBundleHash)
     if publication.bundleHash != manifest.get("publicationBundleHash"):
         raise PublicationBuildError("embed와 publication bundle hash가 다릅니다.")
     if publication.manifest["manifestHash"] != manifest.get("publicationManifestHash"):
         raise PublicationBuildError("embed와 publication manifest hash가 다릅니다.")
+    try:
+        proof = validatePublicationProof(
+            manifest.get("proof"),
+            executionBlockIds=[*manifest.get("dependencyBlockIds", []), manifest.get("entryBlockId")],
+        )
+    except PublicationProofError as exc:
+        raise PublicationBuildError(f"embed proof가 손상됐습니다: {exc}") from exc
+    if proof != publication.manifest.get("proof"):
+        raise PublicationBuildError("embed와 publication proof가 다릅니다.")
     framePath = manifest.get("framePath")
     if not isinstance(framePath, str) or "\\" in framePath or ":" in framePath:
         raise PublicationBuildError("embed framePath가 안전한 상대 경로가 아닙니다.")
@@ -279,6 +334,19 @@ def verifyBlockEmbed(outputRoot: str | Path) -> BlockEmbedVerification:
         fileCount=3 + publication.fileCount,
         totalBytes=totalBytes + publication.totalBytes,
     )
+
+
+def _embedActivePayload(output: Path, embedRoot: Path, embedHash: str) -> dict[str, object]:
+    manifest = _readJson(embedRoot / "embed.json", "embed manifest")
+    return {
+        "schemaVersion": 1,
+        "target": "embed",
+        "embedHash": embedHash,
+        "embedPath": embedRoot.relative_to(output).as_posix(),
+        "manifestFileHash": _fileHash(embedRoot / "embed.json"),
+        "loaderHash": str(manifest.get("loaderHash") or ""),
+        "hostHash": _fileHash(embedRoot / "index.html"),
+    }
 
 
 def startBlockEmbedServer(
@@ -374,7 +442,7 @@ def _validateManifest(manifest: dict[str, Any]) -> None:
     required = {
         "schemaVersion", "kind", "protocol", "embedId", "title", "entryBlockId",
         "dependencyBlockIds", "runtimeTarget", "defaultMode", "allowedModes", "framePath",
-        "publicationBundleHash", "publicationManifestHash", "sandbox", "loaderHash", "manifestHash",
+        "publicationBundleHash", "publicationManifestHash", "proof", "sandbox", "loaderHash", "manifestHash",
     }
     if set(manifest) != required or manifest.get("schemaVersion") != 1 or manifest.get("kind") != "codaro.block-embed":
         raise PublicationBuildError("지원하지 않는 embed manifest입니다.")

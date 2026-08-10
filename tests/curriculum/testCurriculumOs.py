@@ -40,6 +40,25 @@ def testTaxonomyLoadsAndValidates() -> None:
             )
 
 
+def testTaxonomyUsesConfiguredStudyDirectory(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    studyRoot = tmp_path / "managed-study"
+    studyRoot.mkdir()
+    (studyRoot / "_taxonomy.yml").write_text(
+        "outcomes:\n"
+        "  - id: configured.outcome\n"
+        "    label: Configured\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("CODARO_STUDY_DIR", str(studyRoot))
+
+    taxonomy = loadTaxonomy()
+
+    assert [outcome.id for outcome in taxonomy.outcomes] == ["configured.outcome"]
+
+
 def testTaxonomyLessonOutcomesValid() -> None:
     taxonomy = loadTaxonomy()
     knownOutcomes = {outcome.id for outcome in taxonomy.outcomes}

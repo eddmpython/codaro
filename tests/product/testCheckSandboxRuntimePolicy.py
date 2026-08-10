@@ -13,6 +13,7 @@ POLICY = EDITOR / "src/lib/checkSandboxPolicy.ts"
 BROWSER_EXECUTOR = EDITOR / "src/lib/browserLearningCheckExecutor.ts"
 LOCAL_EXECUTOR = EDITOR / "src/lib/localLearningCheckExecutor.ts"
 LEARNING_ATTEMPT = EDITOR / "src/lib/learningAttemptCheck.ts"
+LEARNING_CHECK_SPEC = EDITOR / "src/lib/learningCheckSpec.ts"
 
 
 def test_generated_sandbox_decision_matches_source() -> None:
@@ -49,6 +50,40 @@ def test_runtime_policy_requires_native_isolation_before_local_strong_evidence()
   }}
 
   const decision = JSON.parse(fs.readFileSync({json.dumps(str(CONTRACT))}, "utf8"));
+  const learningCheckSpec = load({json.dumps(str(LEARNING_CHECK_SPEC))}, (specifier) => {{
+    if (specifier === "./learningOutputMatch") return {{
+      parseLearningOutputGradingPolicy: (value) => value ?? {{}},
+    }};
+    return require(specifier);
+  }});
+  const localOutputConfig = {{
+    artifactContractId: "python.report.json.v1",
+    artifactContractVersion: 1,
+    executor: "local-sandbox",
+    fixture: {{ directories: [], env: {{}}, files: [], stdin: [] }},
+    fixtureHash: "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+    fixtureId: "policy-fixture",
+    id: "policy-local-output",
+    kind: "output",
+    packageAssets: [],
+    payload: {{
+      comparator: "text",
+      expected: "ok",
+      gradingPolicy: {{}},
+      normalization: "line-trim",
+    }},
+    strength: "strong",
+    timeoutMs: 1000,
+    version: 1,
+  }};
+  const parsedLocalOutput = learningCheckSpec.parseStrongLearningCheckSpec(localOutputConfig);
+  assert.equal(parsedLocalOutput.executor, "local-sandbox");
+  assert.equal(parsedLocalOutput.artifactContractId, "python.report.json.v1");
+  assert.equal(parsedLocalOutput.artifactContractVersion, 1);
+  assert.equal(learningCheckSpec.parseStrongLearningCheckSpec({{
+    ...localOutputConfig,
+    artifactContractVersion: undefined,
+  }}), null);
   const policy = load({json.dumps(str(POLICY))}, (specifier) => {{
     if (specifier === "@/lib/generatedContracts/checkSandboxFeasibilityDecision.json") return decision;
     if (specifier === "@/lib/learningOutputMatch") return {{
@@ -115,6 +150,12 @@ def test_runtime_policy_requires_native_isolation_before_local_strong_evidence()
   assert.equal(blocked.state, "unsupported");
   assert.equal(blocked.passed, false);
   assert.match(blocked.detail, /Local/);
+  assert.equal(browserBootCalls, 0);
+
+  const localOnly = await browserExecutor.executeBrowserStrongCheck(localOutputConfig, "print('ok')");
+  assert.equal(localOnly.state, "unsupported");
+  assert.equal(localOnly.passed, false);
+  assert.match(localOnly.detail, /로컬 실행 환경/);
   assert.equal(browserBootCalls, 0);
 
   let localCalls = 0;

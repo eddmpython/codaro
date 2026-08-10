@@ -10,6 +10,8 @@ from typing import Any, Literal, Mapping, TypeAlias
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
+from ..executionIsolation import proofExecutionIsolationPolicyHash
+
 
 HASH_PATTERN = re.compile(r"^sha256-(?:[0-9a-f]{64}|[A-Za-z0-9_-]{43})$")
 RECEIPT_ID_PATTERN = re.compile(
@@ -141,6 +143,9 @@ class OperationalRunReceipt(_ProofReceipt):
     taskId: str = Field(min_length=1)
     runId: str = Field(min_length=1)
     runtimeTier: Literal["server", "local"]
+    isolationProfile: Literal["codaro-local-restricted-v1"]
+    isolationPolicyHash: str
+    isolationTerminationStatus: Literal["destroyed"]
     learnerSelectedInput: bool
     startedAt: str
     finishedAt: str
@@ -151,6 +156,8 @@ class OperationalRunReceipt(_ProofReceipt):
         _requireReceiptKind(self.buildArtifactReceiptId, "buildArtifact", "buildArtifactReceiptId")
         _requireReceiptKind(self.permissionReceiptId, "permission", "permissionReceiptId")
         _requireReceiptKind(self.functionalCheckReceiptId, "functionalCheck", "functionalCheckReceiptId")
+        if self.isolationPolicyHash != proofExecutionIsolationPolicyHash():
+            raise ValueError("isolationPolicyHash must identify the current proof execution policy")
         if _parseTimestamp(self.finishedAt, "finishedAt") < _parseTimestamp(self.startedAt, "startedAt"):
             raise ValueError("finishedAt must not precede startedAt")
         return self

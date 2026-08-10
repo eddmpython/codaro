@@ -1,16 +1,83 @@
 from __future__ import annotations
 
 import ast
+import hashlib
+import json
 from pathlib import Path
+import re
 import textwrap
+import tomllib
 import uuid
 
 from .analysis import analyzeCode
+from .formatMetadata import (
+    FORMAT_METADATA_SCHEMA_VERSION,
+    FormatMetadataError,
+    canonicalJson,
+    parsePersistentDocumentPayload,
+    persistentDocumentPayload,
+)
 from .models import AppConfig, BlockConfig, CodaroDocument, DocumentMetadata, RuntimeConfig
 
 
+_INLINE_NATIVE = re.compile(
+    r"(?m)^# /// codaro-native[ \t]*$\n(?P<content>(?:^#.*\n)*?)^# ///[ \t]*$\n?"
+)
+_NATIVE_FIELDS = {"schemaVersion", "document", "app", "blocks", "bodyHash"}
+
+
+class CodaroFormatError(ValueError):
+    pass
+
+
+def isCodaroFormat(source: str) -> bool:
+    return _INLINE_NATIVE.search(source) is not None
+
+
 def parseCodaroDocument(source: str, sourcePath: Path | None = None) -> CodaroDocument:
-    tree = ast.parse(source)
+    try:
+        tree = ast.parse(source)
+    except SyntaxError as exc:
+        raise CodaroFormatError(f"codaro document is invalid Python: {exc}") from exc
+
+    nativeMatches = list(_INLINE_NATIVE.finditer(source))
+    if nativeMatches:
+        if len(nativeMatches) != 1:
+            raise CodaroFormatError("codaro document must contain exactly one codaro-native metadata block")
+        match = nativeMatches[0]
+        payload = _parseNativeMetadata(match.group("content"))
+        if set(payload) != _NATIVE_FIELDS:
+            raise CodaroFormatError("codaro-native metadata fields are invalid")
+        body = (source[:match.start()] + source[match.end():]).lstrip("\r\n")
+        expectedBodyHash = payload.pop("bodyHash")
+        actualBodyHash = _contentHash(body)
+        if expectedBodyHash != actualBodyHash:
+            raise CodaroFormatError("codaro-native body does not match its lossless metadata")
+        try:
+            document = parsePersistentDocumentPayload(payload, sourceFormat="codaro")
+        except FormatMetadataError as exc:
+            raise CodaroFormatError(f"codaro-native metadata is invalid: {exc}") from exc
+        if _writeCodaroBody(document) != body:
+            raise CodaroFormatError("codaro-native body does not match its lossless metadata")
+        return document
+
+    return _parseLegacyCodaroDocument(source, tree, sourcePath)
+
+
+def writeCodaroDocument(document: CodaroDocument) -> str:
+    body = _writeCodaroBody(document)
+    payload = {
+        **persistentDocumentPayload(document, "codaro"),
+        "bodyHash": _contentHash(body),
+    }
+    return f"{_writeNativeMetadata(payload)}\n\n{body}"
+
+
+def _parseLegacyCodaroDocument(
+    source: str,
+    tree: ast.Module,
+    sourcePath: Path | None,
+) -> CodaroDocument:
     title = sourcePath.stem if sourcePath else "Untitled"
     blocks: list[BlockConfig] = []
 
@@ -33,18 +100,12 @@ def parseCodaroDocument(source: str, sourcePath: Path | None = None) -> CodaroDo
         else:
             content = _parseCodeContent(source, node)
 
-        blocks.append(
-            BlockConfig(
-                id=blockId,
-                type=blockKind,
-                content=content,
-            )
-        )
+        blocks.append(BlockConfig(id=blockId, type=blockKind, content=content))
 
     if not blocks:
         blocks.append(BlockConfig(id=_blockId(), type="code", content=""))
 
-    document = CodaroDocument(
+    return CodaroDocument(
         id=_documentId(),
         title=title,
         blocks=blocks,
@@ -52,37 +113,30 @@ def parseCodaroDocument(source: str, sourcePath: Path | None = None) -> CodaroDo
         runtime=RuntimeConfig(),
         app=AppConfig(title=title, entryBlockIds=[block.id for block in blocks if block.type == "code"]),
     )
-    return document
 
 
-def writeCodaroDocument(document: CodaroDocument) -> str:
+def _writeCodaroBody(document: CodaroDocument) -> str:
     parts = [
         "import codaro",
         "",
-        f'app = codaro.App(title={document.title!r})',
+        f"app = codaro.App(title={document.title!r})",
         "",
     ]
 
     for index, block in enumerate(document.blocks, start=1):
         functionName = f"block{index}"
         if block.type == "markdown":
-            parts.append(f'@app.block(id="{block.id}", kind="markdown")')
+            parts.append(f"@app.block(id={block.id!r}, kind='markdown')")
             parts.append(f"def {functionName}():")
-            parts.append("    codaro.md(")
-            parts.append('        """')
-            if block.content:
-                for line in block.content.splitlines():
-                    parts.append(f"        {line}")
-            parts.append('        """')
-            parts.append("    )")
+            parts.append(f"    codaro.md({block.content!r})")
             parts.append("")
             continue
 
         defines, _ = analyzeCode(block.content)
-        parts.append(f'@app.block(id="{block.id}", kind="code")')
+        parts.append(f"@app.block(id={block.id!r}, kind={block.type!r})")
         parts.append(f"def {functionName}():")
         if block.content.strip():
-            for line in block.content.splitlines():
+            for line in block.content.split("\n"):
                 parts.append(f"    {line}" if line else "")
         else:
             parts.append("    pass")
@@ -101,6 +155,47 @@ def writeCodaroDocument(document: CodaroDocument) -> str:
         ]
     )
     return "\n".join(parts)
+
+
+def _parseNativeMetadata(content: str) -> dict[str, object]:
+    tomlLines: list[str] = []
+    for line in content.splitlines():
+        if line.startswith("# "):
+            tomlLines.append(line[2:])
+        elif line == "#":
+            tomlLines.append("")
+        else:
+            raise CodaroFormatError("codaro-native metadata must contain comment-prefixed TOML")
+    try:
+        wrapper = tomllib.loads("\n".join(tomlLines))
+    except tomllib.TOMLDecodeError as exc:
+        raise CodaroFormatError(f"codaro-native metadata is invalid TOML: {exc}") from exc
+    if (
+        set(wrapper) != {"schemaVersion", "payload"}
+        or wrapper.get("schemaVersion") != FORMAT_METADATA_SCHEMA_VERSION
+    ):
+        raise CodaroFormatError(
+            f"codaro-native metadata schemaVersion is not supported: {wrapper.get('schemaVersion')!r}"
+        )
+    encoded = wrapper.get("payload")
+    if not isinstance(encoded, str):
+        raise CodaroFormatError("codaro-native metadata payload must be a JSON string")
+    try:
+        payload = json.loads(encoded)
+    except json.JSONDecodeError as exc:
+        raise CodaroFormatError(f"codaro-native metadata payload is invalid JSON: {exc}") from exc
+    if not isinstance(payload, dict) or payload.get("schemaVersion") != wrapper["schemaVersion"]:
+        raise CodaroFormatError("codaro-native metadata payload is invalid")
+    return payload
+
+
+def _writeNativeMetadata(payload: dict[str, object]) -> str:
+    return "\n".join([
+        "# /// codaro-native",
+        f"# schemaVersion = {payload['schemaVersion']}",
+        f"# payload = {json.dumps(canonicalJson(payload), ensure_ascii=False)}",
+        "# ///",
+    ])
 
 
 def _parseDecorator(node: ast.FunctionDef) -> tuple[str | None, str | None]:
@@ -151,6 +246,10 @@ def _literalString(node: ast.AST) -> str | None:
     if isinstance(node, ast.Constant) and isinstance(node.value, str):
         return node.value
     return None
+
+
+def _contentHash(value: str) -> str:
+    return "sha256-" + hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
 def _documentId() -> str:

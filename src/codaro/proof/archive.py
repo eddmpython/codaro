@@ -103,6 +103,33 @@ class ProofArchive:
         except (json.JSONDecodeError, ProofContractError) as error:
             raise ProofArchiveError("stored proof receipt is corrupt") from error
 
+    def resolveLineage(self, receiptId: str) -> list[ProofReceipt]:
+        rootReceipt = self.receiptById(receiptId)
+        if rootReceipt is None:
+            raise ProofArchiveError(f"proof receipt does not resolve: {receiptId}")
+        sourceRevisionId = (
+            rootReceipt.receiptId
+            if isinstance(rootReceipt, SourceRevision)
+            else rootReceipt.sourceRevisionId
+        )
+        receipts = [
+            receipt
+            for receipt in self.receipts()
+            if receipt.receiptId == sourceRevisionId
+            or getattr(receipt, "sourceRevisionId", None) == sourceRevisionId
+        ]
+        if not any(receipt.receiptId == rootReceipt.receiptId for receipt in receipts):
+            raise ProofArchiveError(f"proof receipt is detached from its source revision: {receiptId}")
+        connection = self._connect()
+        try:
+            for receipt in receipts:
+                self._validateLinks(connection, receipt)
+        except ProofContractError as error:
+            raise ProofArchiveError(str(error)) from error
+        finally:
+            connection.close()
+        return sorted(receipts, key=lambda receipt: (KIND_ORDER[receipt.kind], receipt.receiptId))
+
     def appendReceipt(self, value: Mapping[str, object] | ProofReceipt) -> dict[str, object]:
         payload = value.model_dump(mode="json") if hasattr(value, "model_dump") else dict(value)
         return self.mergeArchive({

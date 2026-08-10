@@ -58,7 +58,7 @@ def buildParser() -> argparse.ArgumentParser:
 
     buildPublicationParser = subparsers.add_parser("build", help="Build an immutable publication bundle.")
     buildPublicationParser.add_argument("path", help="Document path to build.")
-    buildPublicationParser.add_argument("--target", choices=["browser", "server", "embed"], default="browser")
+    buildPublicationParser.add_argument("--target", choices=["browser", "server", "local", "embed"], default="browser")
     buildPublicationParser.add_argument("--entry", help="Single entry block id for an embed build.")
     buildPublicationParser.add_argument(
         "--mode",
@@ -70,18 +70,28 @@ def buildParser() -> argparse.ArgumentParser:
     buildPublicationParser.add_argument("--package-lock", help="JSON package compatibility lock path.")
     buildPublicationParser.add_argument("--json", action="store_true", help="Print the build receipt as JSON.")
 
+    verifyPublicationParser = subparsers.add_parser("verify", help="Verify an immutable publication bundle.")
+    verifyPublicationParser.add_argument("path", help="Publication output directory.")
+    verifyPublicationParser.add_argument(
+        "--target",
+        choices=["browser", "server", "local", "embed"],
+        required=True,
+    )
+    verifyPublicationParser.add_argument("--json", action="store_true")
+
     servePublicationParser = subparsers.add_parser("serve", help="Serve a verified publication bundle.")
     servePublicationParser.add_argument("path", help="Publication output directory.")
     servePublicationParser.add_argument("--host", default="127.0.0.1")
     servePublicationParser.add_argument("--port", type=int, default=8766)
     servePublicationParser.add_argument("--no-browser", action="store_true")
+    servePublicationParser.add_argument("--approve-policy", help="Exact local policy hash approved for this launch.")
 
     rollbackPublicationParser = subparsers.add_parser("rollback", help="Move a server publication pointer to a verified bundle.")
     rollbackPublicationParser.add_argument("path", help="Server publication output directory.")
     rollbackPublicationParser.add_argument("bundle_hash", help="Exact sha256 bundle hash.")
     rollbackPublicationParser.add_argument(
         "--target",
-        choices=["server", "folder", "zip", "self-host", "provider"],
+        choices=["browser", "server", "local", "embed", "folder", "zip", "self-host", "provider"],
         default="server",
         help="Rollback target. Existing server publication behavior is the default.",
     )
@@ -193,6 +203,10 @@ def main() -> None:
 
     if command == "build":
         _handlePublicationBuild(args)
+        return
+
+    if command == "verify":
+        _handlePublicationVerify(args)
         return
 
     if command == "serve":
@@ -360,7 +374,14 @@ def _handleInspect(args) -> None:
 
 
 def _handlePublicationBuild(args) -> None:
-    from .publication import PublicationBuildError, buildBlockEmbed, buildServerPublication, buildStaticPublication
+    from .proof import ProofArchive
+    from .publication import (
+        PublicationBuildError,
+        buildBlockEmbed,
+        buildLocalPublication,
+        buildServerPublication,
+        buildStaticPublication,
+    )
 
     sourcePath = Path(args.path).expanduser().resolve()
     outputPath = (
@@ -368,10 +389,11 @@ def _handlePublicationBuild(args) -> None:
         if args.output
         else sourcePath.with_name(
             f"{sourcePath.stem}-"
-            f"{'server' if args.target == 'server' else 'embed' if args.target == 'embed' else 'site'}"
+            f"{'server' if args.target == 'server' else 'local' if args.target == 'local' else 'embed' if args.target == 'embed' else 'site'}"
         )
     )
     packageLock = _loadPackageLock(args.package_lock)
+    proofArchive = ProofArchive()
     try:
         if args.target == "embed":
             if not args.entry:
@@ -382,11 +404,29 @@ def _handlePublicationBuild(args) -> None:
                 entryBlockId=args.entry,
                 defaultMode=args.mode,
                 packageLock=packageLock,
+                proofArchive=proofArchive,
             )
         elif args.target == "server":
-            result = buildServerPublication(sourcePath, outputPath, packageLock=packageLock)
+            result = buildServerPublication(
+                sourcePath,
+                outputPath,
+                packageLock=packageLock,
+                proofArchive=proofArchive,
+            )
+        elif args.target == "local":
+            result = buildLocalPublication(
+                sourcePath,
+                outputPath,
+                packageLock=packageLock,
+                proofArchive=proofArchive,
+            )
         else:
-            result = buildStaticPublication(sourcePath, outputPath, packageLock=packageLock)
+            result = buildStaticPublication(
+                sourcePath,
+                outputPath,
+                packageLock=packageLock,
+                proofArchive=proofArchive,
+            )
     except PublicationBuildError as exc:
         print(f"Publication build failed: {exc}", file=sys.stderr)
         for diagnostic in exc.diagnostics:
@@ -406,17 +446,50 @@ def _handlePublicationBuild(args) -> None:
         "bundleRoot": resultRoot.as_posix(),
         "activePointer": result.activePointer.as_posix(),
         "reused": result.reused,
+        "verificationStatus": result.manifest["proof"]["verificationStatus"],
     }
     if args.json:
         print(json.dumps(payload, ensure_ascii=False, indent=2))
     else:
         print(f"Built {args.target} publication: {resultRoot}")
         print(f"Bundle: {resultHash}")
+        if args.target == "local":
+            print(f"Approve policy to serve: {result.manifest['runtime']['policyHash']}")
+
+
+def _handlePublicationVerify(args) -> None:
+    from .publication import (
+        PublicationBuildError,
+        verifyBlockEmbed,
+        verifyLocalPublication,
+        verifyPublication,
+        verifyServerPublication,
+    )
+
+    try:
+        verified = (
+            verifyBlockEmbed(args.path)
+            if args.target == "embed"
+            else verifyServerPublication(args.path)
+            if args.target == "server"
+            else verifyLocalPublication(args.path)
+            if args.target == "local"
+            else verifyPublication(args.path)
+        )
+    except PublicationBuildError as exc:
+        print(f"Publication verify failed: {exc}", file=sys.stderr)
+        raise SystemExit(1) from exc
+    identity = verified.embedHash if args.target == "embed" else verified.bundleHash
+    payload = {"target": args.target, "bundleHash": identity}
+    if args.json:
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+    else:
+        print(f"Verified {args.target} publication: {identity}")
 
 
 def _handlePublicationServe(args) -> None:
     from .publication import PublicationBuildError, serveBlockEmbed, servePublication
-    from .server import serveServerPublication
+    from .server import serveLocalPublication, serveServerPublication
 
     try:
         activePath = Path(args.path).expanduser().resolve() / "active.json"
@@ -426,11 +499,22 @@ def _handlePublicationServe(args) -> None:
         serve = (
             serveServerPublication
             if active.get("target") == "server"
+            else serveLocalPublication
+            if active.get("target") == "local"
             else serveBlockEmbed
             if active.get("target") == "embed"
             else servePublication
         )
-        serve(args.path, host=args.host, port=args.port, openBrowser=not args.no_browser)
+        kwargs = {
+            "host": args.host,
+            "port": args.port,
+            "openBrowser": not args.no_browser,
+        }
+        if active.get("target") == "local":
+            if not args.approve_policy:
+                raise PublicationBuildError("local publication serve에는 --approve-policy가 필요합니다.")
+            kwargs["approvedPolicyHash"] = args.approve_policy
+        serve(args.path, **kwargs)
     except PublicationBuildError as exc:
         print(f"Publication serve failed: {exc}", file=sys.stderr)
         raise SystemExit(1) from exc
@@ -447,6 +531,9 @@ def _handlePublicationRollback(args) -> None:
         ProviderFilesystemAdapter,
         SelfHostDeploymentAdapter,
         ZipDeploymentAdapter,
+        rollbackBlockEmbed,
+        rollbackLocalPublication,
+        rollbackPublication,
         rollbackServerPublication,
     )
 
@@ -454,6 +541,18 @@ def _handlePublicationRollback(args) -> None:
         if args.target == "server":
             verified = rollbackServerPublication(args.path, args.bundle_hash)
             print(f"Rolled back server publication to {verified.bundleHash}")
+            return
+        if args.target == "local":
+            verified = rollbackLocalPublication(args.path, args.bundle_hash)
+            print(f"Rolled back local publication to {verified.bundleHash}")
+            return
+        if args.target == "browser":
+            verified = rollbackPublication(args.path, args.bundle_hash)
+            print(f"Rolled back browser publication to {verified.bundleHash}")
+            return
+        if args.target == "embed":
+            verified = rollbackBlockEmbed(args.path, args.bundle_hash)
+            print(f"Rolled back embed publication to {verified.embedHash}")
             return
         adapter = (
             ZipDeploymentAdapter(args.path)
@@ -506,6 +605,7 @@ def _handlePublicationDeploy(args) -> None:
         "artifactPath": outcome.artifactPath.as_posix(),
         "artifactHash": outcome.artifactHash,
         "manifestHash": outcome.manifestHash,
+        "verificationStatus": outcome.verificationStatus,
         "deploymentReceipt": outcome.deploymentReceipt.model_dump(mode="json"),
     }
     if args.json:
@@ -569,7 +669,21 @@ def normalizeArgs(rawArgs: list[str]) -> list[str]:
         return ["edit"]
 
     command = rawArgs[0].lower()
-    knownCommands = {"edit", "run", "app", "export", "inspect", "build", "serve", "deploy", "rollback", "task", "pack", "classroom"}
+    knownCommands = {
+        "edit",
+        "run",
+        "app",
+        "export",
+        "inspect",
+        "build",
+        "verify",
+        "serve",
+        "deploy",
+        "rollback",
+        "task",
+        "pack",
+        "classroom",
+    }
 
     if command == "app":
         return ["run", *rawArgs[1:]]

@@ -97,6 +97,8 @@ def main() -> int:
     externalRequests: list[str] = []
     failedRequests: list[str] = []
     consoleErrors: list[str] = []
+    expectedRecoveryResponses: list[str] = []
+    expectedRecoveryPaths: set[str] = set()
     pageErrors: list[str] = []
     try:
         scratch = repoLocalPlaywrightWorkspace(ROOT, "server-publication")
@@ -127,6 +129,12 @@ def main() -> int:
                 for page in (pageOne, pageTwo):
                     page.on("request", lambda request: externalRequests.append(request.url) if not request.url.startswith(origin) else None)
                     page.on("requestfailed", lambda request: failedRequests.append(request.url))
+                    page.on(
+                        "response",
+                        lambda response: expectedRecoveryResponses.append(response.url)
+                        if response.status == 404 and response.url in expectedRecoveryPaths
+                        else None,
+                    )
                     page.on("console", lambda message: consoleErrors.append(message.text) if message.type == "error" else None)
                     page.on("pageerror", lambda error: pageErrors.append(str(error)))
                     page.goto(url, wait_until="domcontentloaded", timeout=120_000)
@@ -139,6 +147,45 @@ def main() -> int:
                 pageOne.wait_for_function("() => document.body.textContent?.includes('서버 결과:40:[redacted]')", timeout=30_000)
                 if "서버 결과:20:[redacted]" not in pageTwo.locator("body").inner_text():
                     raise AssertionError("두 번째 browser session 상태가 첫 번째 session에서 바뀌었습니다.")
+                ownerCookie = next(
+                    (
+                        cookie["value"]
+                        for cookie in contextOne.cookies()
+                        if cookie["name"] == "codaro_published_owner"
+                    ),
+                    None,
+                )
+                if not ownerCookie:
+                    raise AssertionError("published session owner cookie가 없습니다.")
+                firstSessionId = next(
+                    (
+                        sessionId
+                        for sessionId, owner in app.state.publicationRuntime._sessionOwners.items()
+                        if owner == ownerCookie
+                    ),
+                    None,
+                )
+                if not firstSessionId:
+                    raise AssertionError("첫 browser의 owned session을 찾지 못했습니다.")
+                expectedRecoveryPaths.add(f"{origin}/api/kernel/{firstSessionId}/set-ui-value")
+                app.state.publicationRuntime.sessionManager.destroySession(firstSessionId)
+                numberInput.fill("6")
+                pageOne.wait_for_function(
+                    "() => document.body.textContent?.includes('서버 결과:60:[redacted]')",
+                    timeout=30_000,
+                )
+                recoveredSessionIds = [
+                    sessionId
+                    for sessionId, owner in app.state.publicationRuntime._sessionOwners.items()
+                    if owner == ownerCookie
+                ]
+                if len(recoveredSessionIds) != 1 or recoveredSessionIds[0] == firstSessionId:
+                    raise AssertionError("만료된 published session이 새 owner session으로 한 번만 복구되지 않았습니다.")
+                if expectedRecoveryResponses != [f"{origin}/api/kernel/{firstSessionId}/set-ui-value"]:
+                    raise AssertionError("만료 session 복구의 예상 404 응답이 정확히 한 번 관찰되지 않았습니다.")
+                expectedConsole = "Failed to load resource: the server responded with a status of 404 (Not Found)"
+                if expectedConsole in consoleErrors:
+                    consoleErrors.remove(expectedConsole)
                 combinedText = pageOne.locator("body").inner_text() + pageTwo.locator("body").inner_text()
                 if SECRET_VALUE in combinedText:
                     raise AssertionError("secret 값이 browser text에 노출됐습니다.")
@@ -156,9 +203,11 @@ def main() -> int:
                     "status": "passed",
                     "bundleHash": built.bundleHash,
                     "fileCount": verification.fileCount,
-                    "desktopOutput": "서버 결과:40:[redacted]",
+                    "desktopOutput": "서버 결과:60:[redacted]",
                     "mobileOutput": "서버 결과:20:[redacted]",
                     "sessionIsolation": True,
+                    "sessionRecovery": True,
+                    "expectedRecoveryResponses": expectedRecoveryResponses,
                     "secretRedacted": True,
                     "editorChromeCount": pageOne.locator("[data-product-sidebar], [data-app-preview-toolbar]").count(),
                     "healthBundleHash": health.get("bundleHash"),

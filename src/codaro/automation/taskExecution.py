@@ -22,6 +22,22 @@ OUTPUT_CONTRACT_FIELDS = {
 }
 MAX_PERSISTED_TASK_TEXT = 200_000
 SECRET_REF_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]{1,127}$")
+TASK_RUNTIME_ENV_RESERVED = frozenset({
+    "COMSPEC",
+    "PATH",
+    "PATHEXT",
+    "PYTHONBREAKPOINT",
+    "PYTHONHOME",
+    "PYTHONINSPECT",
+    "PYTHONPATH",
+    "PYTHONSTARTUP",
+    "PYTHONWARNINGS",
+    "SYSTEMROOT",
+    "TEMP",
+    "TMP",
+    "TMPDIR",
+    "WINDIR",
+})
 
 
 class TaskExecutionError(ValueError):
@@ -37,16 +53,25 @@ class TaskOutputEvaluation:
     checkSpecHash: str | None = None
 
 
-def resolveTaskSecretValues(task: TaskDefinition) -> tuple[str, ...]:
-    values: list[str] = []
+@dataclass(frozen=True, slots=True)
+class TaskArtifactState:
+    contentHash: str
+    byteLength: int
+    modifiedAtNs: int
+
+
+def resolveTaskSecretValues(task: TaskDefinition) -> dict[str, str]:
+    values: dict[str, str] = {}
     for reference in task.secretRefs:
         if not SECRET_REF_PATTERN.fullmatch(reference):
             raise TaskExecutionError("task secret reference name is invalid")
+        if reference in TASK_RUNTIME_ENV_RESERVED:
+            raise TaskExecutionError(f"task secret reference is reserved by the runtime: {reference}")
         value = os.environ.get(reference)
         if value is None or not value:
             raise TaskExecutionError(f"task secret reference is unavailable: {reference}")
-        values.append(value)
-    return tuple(sorted(set(values), key=len, reverse=True))
+        values[reference] = value
+    return values
 
 
 def redactTaskText(value: object, secrets: tuple[str, ...]) -> str:
@@ -102,11 +127,35 @@ def taskInputPrelude(inputs: Mapping[str, object]) -> str:
     return "import json as __codaro_json\n" + assignments + "del __codaro_json\n"
 
 
+def captureTaskArtifactSnapshot(
+    task: TaskDefinition,
+    *,
+    workspaceRoot: str | Path,
+) -> dict[str, TaskArtifactState | None]:
+    if task.outputContract is None:
+        return {}
+    try:
+        normalized = _validateOutputContract(task.outputContract)
+    except TaskExecutionError:
+        return {}
+    snapshot: dict[str, TaskArtifactState | None] = {}
+    for artifact in normalized.get("artifacts", []):
+        artifactPath = str(artifact["path"])
+        try:
+            path = _workspaceArtifactPath(artifactPath, workspaceRoot)
+        except TaskExecutionError:
+            continue
+        snapshot[artifactPath] = _artifactState(path)
+    return snapshot
+
+
 def evaluateTaskOutput(
     task: TaskDefinition,
     capture: CaptureResult,
     *,
     workspaceRoot: str | Path,
+    artifactSnapshot: Mapping[str, TaskArtifactState | None] | None = None,
+    secrets: tuple[str, ...] = (),
 ) -> TaskOutputEvaluation:
     contract = task.outputContract
     if contract is None:
@@ -144,6 +193,18 @@ def evaluateTaskOutput(
         except OSError:
             errors.append(f"artifact-unreadable:{artifact['path']}")
             continue
+        currentState = _artifactState(path, payload=payload)
+        artifactPath = str(artifact["path"])
+        if artifactSnapshot is None or artifactPath not in artifactSnapshot:
+            errors.append(f"artifact-freshness-unavailable:{artifactPath}")
+            continue
+        beforeState = artifactSnapshot[artifactPath]
+        if currentState is None or beforeState == currentState:
+            errors.append(f"artifact-not-fresh:{artifact['path']}")
+            continue
+        if any(secret.encode("utf-8") in payload for secret in secrets):
+            errors.append(f"artifact-secret-detected:{artifact['path']}")
+            continue
         contentHash = contentDigest(payload)
         if len(payload) < artifact["minBytes"]:
             errors.append(f"artifact-too-small:{artifact['path']}")
@@ -153,9 +214,20 @@ def evaluateTaskOutput(
         jsonSchema = artifact.get("jsonSchema")
         if jsonSchema is not None:
             errors.extend(_validateJsonArtifact(payload, str(artifact["path"]), jsonSchema))
+        inputBindings = artifact.get("inputBindings")
+        if inputBindings is not None:
+            errors.extend(
+                _validateJsonArtifactInputBindings(
+                    payload,
+                    str(artifact["path"]),
+                    inputBindings,
+                    task.inputs,
+                )
+            )
         artifactDescriptors.append({
             "schemaVersion": 1,
             "kind": "file",
+            "origin": "created",
             "path": str(artifact["path"]),
             "byteLength": len(payload),
             "contentHash": contentHash,
@@ -211,13 +283,14 @@ def _validateOutputContract(value: object) -> dict[str, Any]:
         normalizedArtifacts: list[dict[str, Any]] = []
         for artifact in artifacts:
             if not isinstance(artifact, dict) or not {"path", "minBytes"}.issubset(artifact) or set(artifact) - {
-                "path", "minBytes", "contentHash", "jsonSchema"
+                "path", "minBytes", "contentHash", "jsonSchema", "inputBindings"
             }:
                 raise TaskExecutionError("output-contract-artifacts-invalid")
             path = artifact.get("path")
             minBytes = artifact.get("minBytes")
             contentHash = artifact.get("contentHash")
             jsonSchema = artifact.get("jsonSchema")
+            inputBindings = artifact.get("inputBindings")
             if (
                 not isinstance(path, str)
                 or not _safeRelativePath(path)
@@ -228,11 +301,16 @@ def _validateOutputContract(value: object) -> dict[str, Any]:
             ):
                 raise TaskExecutionError("output-contract-artifacts-invalid")
             normalizedJsonSchema = _normalizeJsonArtifactSchema(jsonSchema) if jsonSchema is not None else None
+            normalizedInputBindings = _normalizeArtifactInputBindings(
+                inputBindings,
+                normalizedJsonSchema,
+            ) if inputBindings is not None else None
             normalizedArtifacts.append({
                 "path": path,
                 "minBytes": minBytes,
                 **({"contentHash": contentHash} if contentHash is not None else {}),
                 **({"jsonSchema": normalizedJsonSchema} if normalizedJsonSchema is not None else {}),
+                **({"inputBindings": normalizedInputBindings} if normalizedInputBindings is not None else {}),
             })
         if len({item["path"] for item in normalizedArtifacts}) != len(normalizedArtifacts):
             raise TaskExecutionError("output-contract-artifacts-duplicate")
@@ -281,6 +359,51 @@ def _validateJsonArtifact(payload: bytes, path: str, schema: Mapping[str, object
     return errors
 
 
+def _normalizeArtifactInputBindings(
+    value: object,
+    jsonSchema: Mapping[str, object] | None,
+) -> dict[str, str]:
+    requiredFields = jsonSchema.get("requiredFields") if jsonSchema is not None else None
+    if (
+        not isinstance(value, dict)
+        or not value
+        or not isinstance(requiredFields, list)
+        or not all(
+            isinstance(field, str)
+            and field in requiredFields
+            and isinstance(inputName, str)
+            and inputName.isidentifier()
+            and not inputName.startswith("_")
+            for field, inputName in value.items()
+        )
+    ):
+        raise TaskExecutionError("output-contract-input-bindings-invalid")
+    return {field: str(value[field]) for field in sorted(value)}
+
+
+def _validateJsonArtifactInputBindings(
+    payload: bytes,
+    path: str,
+    bindings: Mapping[str, object],
+    inputs: Mapping[str, object],
+) -> list[str]:
+    try:
+        value = json.loads(payload.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return []
+    if not isinstance(value, dict):
+        return []
+    errors: list[str] = []
+    for field, rawInputName in bindings.items():
+        inputName = str(rawInputName)
+        if inputName not in inputs:
+            errors.append(f"input-binding-missing:{path}:{inputName}")
+            continue
+        if field not in value or canonicalJson(value[field]) != canonicalJson(inputs[inputName]):
+            errors.append(f"input-binding-mismatch:{path}:{field}")
+    return errors
+
+
 def _jsonValueMatchesType(value: object, kind: str) -> bool:
     if kind == "integer":
         return isinstance(value, int) and not isinstance(value, bool)
@@ -305,6 +428,21 @@ def _workspaceArtifactPath(relativePath: str, workspaceRoot: str | Path) -> Path
     if not path.is_relative_to(workspace):
         raise TaskExecutionError("artifact path must stay inside the workspace")
     return path
+
+
+def _artifactState(path: Path, *, payload: bytes | None = None) -> TaskArtifactState | None:
+    if not path.is_file():
+        return None
+    try:
+        resolvedPayload = payload if payload is not None else path.read_bytes()
+        stat = path.stat()
+    except OSError:
+        return None
+    return TaskArtifactState(
+        contentHash=contentDigest(resolvedPayload),
+        byteLength=len(resolvedPayload),
+        modifiedAtNs=stat.st_mtime_ns,
+    )
 
 
 def _safeRelativePath(value: str) -> bool:

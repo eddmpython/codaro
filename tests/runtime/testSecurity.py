@@ -7,7 +7,7 @@ import pytest
 
 from codaro.system.fileOps import WorkspacePathError, resolvePath
 from codaro.system.packageOps import PackageEnvironmentError, validatePackageName
-from codaro.kernel.manager import SessionManager
+from codaro.kernel.manager import SessionCapacityError, SessionManager
 from codaro.ai.conversation import ConversationManager, MAX_CONVERSATIONS
 
 
@@ -119,6 +119,19 @@ class TestSessionExpiry:
         newest = manager.createSession()
         assert manager.sessionCount == 10
         assert manager.getSession(newest.sessionId) is not None
+
+    def testRejectWhenFullDoesNotEvictExistingSession(self) -> None:
+        manager = SessionManager(maxSessions=2, rejectWhenFull=True)
+        first = manager.createSession()
+        second = manager.createSession()
+
+        with pytest.raises(SessionCapacityError, match="capacity reached"):
+            manager.createSession()
+
+        assert manager.sessionCount == 2
+        assert manager.getSession(first.sessionId) is first
+        assert manager.getSession(second.sessionId) is second
+        manager.destroyAll()
 
 
 class TestConversationExpiry:

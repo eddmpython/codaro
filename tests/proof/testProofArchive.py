@@ -16,6 +16,7 @@ from codaro.proof import (
     validateDeploymentLink,
     validateOperationalLink,
 )
+from codaro.executionIsolation import proofExecutionIsolationPolicyHash
 
 
 NOW = "2026-08-09T00:00:00+00:00"
@@ -79,6 +80,9 @@ def _chain() -> dict[str, object]:
         "taskId": "task-1",
         "runId": "run-1",
         "runtimeTier": "local",
+        "isolationProfile": "codaro-local-restricted-v1",
+        "isolationPolicyHash": proofExecutionIsolationPolicyHash(),
+        "isolationTerminationStatus": "destroyed",
         "learnerSelectedInput": True,
         "startedAt": NOW,
         "finishedAt": LATER,
@@ -178,6 +182,14 @@ def testArchiveRejectsUnlinkedOperationalReceipt(tmp_path: Path) -> None:
     archive = ProofArchive(tmp_path / "proof.sqlite3")
     with pytest.raises(ProofArchiveError, match="dependency is missing"):
         archive.appendReceipt(_chain()["operational"])
+
+
+def testOperationalReceiptRejectsSpoofedIsolationPolicy() -> None:
+    payload = _chain()["operational"].model_dump(mode="json")
+    payload["isolationPolicyHash"] = contentDigest("weaker-isolation-policy")
+
+    with pytest.raises(ProofContractError, match="current proof execution policy"):
+        sealProofReceipt(payload)
 
 
 def testLegacyTaskRunsAreNeverMigratedIntoProofArchive(tmp_path: Path) -> None:

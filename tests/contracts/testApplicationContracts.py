@@ -61,11 +61,14 @@ def testExecutableUnitSchemaAndGeneratedPythonTypeHaveExactFields() -> None:
         "statePolicy",
         "runtimeTarget",
         "sourceSpan",
-        "sourceHash",
+        "entryBlockHash",
+        "sourceFileHash",
+        "sourceRevisionHash",
         "dependencyHash",
         "assetHashes",
         "checkScenarioIds",
         "evidenceReceiptIds",
+        "proofLineage",
         "diagnostics",
     }
 

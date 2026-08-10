@@ -36,7 +36,7 @@ export function HomePage() {
             설치도 가입도 없이, 이 페이지에서 Python이 그대로 실행됩니다.
           </p>
           <p className="homeProductStatement">
-            같은 Python 셀을 앱, 자동화, 검증된 배포 산출물로 이어갑니다.
+            Python 셀을 target별 앱, 자동화 또는 검증된 배포 산출물로 이어갑니다.
           </p>
 
           <div className="homeHeroActions">

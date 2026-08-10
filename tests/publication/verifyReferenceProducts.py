@@ -17,7 +17,7 @@ REPORT_DIR = ROOT / "output/test-runner/reference-products"
 REPORT_PATH = REPORT_DIR / "reference-products-machine.json"
 MANIFEST_PATH = ROOT / "examples/apps/referenceProducts.json"
 REQUIRED_PUBLIC_CLAIMS = (
-    "같은 Python 셀을 앱, 자동화, 검증된 배포 산출물로 이어갑니다.",
+    "Python 셀을 target별 앱, 자동화 또는 검증된 배포 산출물로 이어갑니다.",
     "provider 없이 folder, ZIP, self-host 산출물까지 만들고 검증할 수 있습니다.",
 )
 
@@ -117,6 +117,13 @@ def main() -> int:
         local = next(row for row in productReports if row["id"] == "local-file-automation")
         if local["artifactCreated"] is not True:
             raise AssertionError("Local reference product가 artifact를 만들지 못했습니다.")
+        snapshotSource = ROOT / "examples/apps/snapshot-report/app.py"
+        snapshot = json.loads(
+            (ROOT / "examples/apps/snapshot-report/data/status.json").read_text(encoding="utf-8")
+        )
+        expectedSnapshotHash = "sha256-" + hashlib.sha256(snapshotSource.read_bytes()).hexdigest()
+        if snapshot.get("sourceHash") != expectedSnapshotHash:
+            raise AssertionError("snapshot sourceHash가 실제 app.py bytes와 다릅니다.")
         report["products"] = productReports
         report["claimBoundary"] = manifest["claimBoundary"]
         report["publicClaims"] = list(REQUIRED_PUBLIC_CLAIMS)

@@ -94,7 +94,8 @@
         "buildArtifactReceiptId", "buildArtifactHash", "inputHash", "permissionReceiptId",
         "permissionSetHash", "functionalCheckReceiptId", "artifactHashes",
         "learningEvidenceCreditIds", "learningEvidenceArtifactHashes", "capabilityDomainId",
-        "taskId", "runId", "runtimeTier", "learnerSelectedInput", "startedAt", "finishedAt"
+        "taskId", "runId", "runtimeTier", "isolationProfile", "isolationPolicyHash",
+        "isolationTerminationStatus", "learnerSelectedInput", "startedAt", "finishedAt"
       ],
       "properties": {
         "schemaVersion": { "const": 1 },
@@ -115,6 +116,9 @@
         "taskId": { "type": "string", "minLength": 1 },
         "runId": { "type": "string", "minLength": 1 },
         "runtimeTier": { "enum": ["server", "local"] },
+        "isolationProfile": { "const": "codaro-local-restricted-v1" },
+        "isolationPolicyHash": { "$ref": "#/$defs/Hash" },
+        "isolationTerminationStatus": { "const": "destroyed" },
         "learnerSelectedInput": { "type": "boolean" },
         "startedAt": { "type": "string", "format": "date-time" },
         "finishedAt": { "type": "string", "format": "date-time" }

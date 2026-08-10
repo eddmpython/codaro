@@ -9,6 +9,7 @@ from fastapi.testclient import TestClient
 import pytest
 import yaml
 
+from codaro.curriculum import _localStrongCheckWorker as localStrongCheckWorker
 from codaro.curriculum import localStrongCheck as localStrongCheckModule
 from codaro.curriculum.localStrongCheck import LocalStrongCheckInvalid, fixtureHash, runLocalStrongCheck
 from codaro.server import createServerApp
@@ -159,6 +160,17 @@ def writeUpper(sourcePath, outputName):
     assert created["kind"] == "file"
 
 
+@pytest.mark.skipif(os.name != "nt", reason="Windows extended path contract")
+def testLocalStrongWorkerTreatsExtendedFixturePathAsTheSameRoot(tmp_path: Path) -> None:
+    root = tmp_path.resolve()
+    extendedRoot = Path("\\\\?\\" + str(root))
+    canonicalRoot = localStrongCheckWorker.canonicalPath(extendedRoot)
+
+    assert canonicalRoot == localStrongCheckWorker.canonicalPath(root)
+    assert localStrongCheckWorker.inside(root / "report.json", (canonicalRoot,)) is True
+    assert localStrongCheckWorker.inside(root.parent / "outside.json", (canonicalRoot,)) is False
+
+
 def testLocalStrongBehaviorCheckMaterializesBinaryFixture() -> None:
     payload = bytes([0, 255, 67, 68, 82, 79])
     fixture = {
@@ -217,6 +229,47 @@ async def collectStatuses(names):
     result = runLocalStrongCheck(spec, source)
 
     assert result["passed"] is True
+
+
+def testLocalStrongBehaviorAcceptsJsonNumericRepresentationDifferences() -> None:
+    spec = behaviorSpec()
+    spec["payload"] = {
+        "entry": "summarize",
+        "cases": [{
+            "id": "numeric-json",
+            "arguments": [{"value": None}],
+            "expectedReturn": {"average": 1750, "nested": [200.0, {"count": 3}]},
+        }],
+        "expectedPaths": [],
+        "normalizeReturnPaths": [],
+    }
+    source = """\
+def summarize(_unused):
+    return {"average": 1750.0, "nested": [200, {"count": 3.0}]}
+"""
+
+    result = runLocalStrongCheck(spec, source)
+
+    assert result["passed"] is True
+
+
+def testLocalStrongBehaviorDoesNotTreatBooleanAsNumber() -> None:
+    spec = behaviorSpec()
+    spec["payload"] = {
+        "entry": "status",
+        "cases": [{
+            "id": "boolean-is-not-one",
+            "arguments": [{"value": None}],
+            "expectedReturn": True,
+        }],
+        "expectedPaths": [],
+        "normalizeReturnPaths": [],
+    }
+
+    result = runLocalStrongCheck(spec, "def status(_unused):\n    return 1\n")
+
+    assert result["passed"] is False
+    assert result["state"] == "mismatch"
 
 
 def testLocalStrongCheckDoesNotExposeExpectedValuesToStudentFrames() -> None:

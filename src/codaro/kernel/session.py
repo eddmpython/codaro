@@ -85,8 +85,21 @@ class KernelSession:
     def removeCellDefinitions(self, blockId: str) -> None:
         self._engine.removeBlockDefinitions(blockId)
 
-    def interrupt(self):
-        return self._engine.interrupt()
+    def interrupt(
+        self,
+        *,
+        mode: str = "auto",
+        graceMs: int = 250,
+        restartWorker: bool = True,
+    ):
+        return self._engine.interrupt(
+            mode=mode,
+            graceMs=graceMs,
+            restartWorker=restartWorker,
+        )
+
+    def destroyExecutionContext(self):
+        return self._engine.destroyExecutionContext()
 
     def invokeUiCallback(self, request: UiEventRequest) -> UiEventResponse:
         payload = self._engine.invokeUiCallback(request.model_dump(mode="json"))

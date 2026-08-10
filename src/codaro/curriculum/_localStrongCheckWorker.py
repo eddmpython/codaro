@@ -16,11 +16,22 @@ import traceback
 from typing import Any
 
 
-ROOT = Path.cwd().resolve()
+def canonicalPath(path: Path) -> Path:
+    resolved = str(path.resolve(strict=False))
+    if os.name == "nt":
+        if resolved.startswith("\\\\?\\UNC\\"):
+            resolved = "\\\\" + resolved[8:]
+        elif resolved.startswith("\\\\?\\"):
+            resolved = resolved[4:]
+        resolved = os.path.normcase(resolved)
+    return Path(resolved)
+
+
+ROOT = canonicalPath(Path.cwd())
 for packagePath in reversed([item for item in os.environ.get("CODARO_CHECK_PACKAGE_PATHS", "").split(os.pathsep) if item]):
     sys.path.insert(0, packagePath)
 READ_ROOTS = tuple(
-    path.resolve()
+    canonicalPath(path)
     for value in {*sys.path, sys.base_prefix, sys.prefix}
     if value and (path := Path(value)).exists()
 )
@@ -58,7 +69,7 @@ ASYNCIO_SOCKET_IDS: set[int] = set()
 
 
 def inside(path: Path, roots: tuple[Path, ...]) -> bool:
-    resolved = path.resolve(strict=False)
+    resolved = canonicalPath(path)
     return any(resolved == root or root in resolved.parents for root in roots)
 
 

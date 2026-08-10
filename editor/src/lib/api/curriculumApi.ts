@@ -2,6 +2,32 @@ import { postJson, requestBytes, requestJson } from "./transport";
 import type { AnalyticsListPayload, AnalyticsSummaryPayload, CheckProposalsPayload, CheckResult, CurriculumCategoriesPayload, CurriculumContentsPayload, CurriculumGapsPayload, CurriculumLessonPayload, CurriculumQualityReportPayload, CurriculumTaxonomyPayload, LearnerOutcomePayload, LearnerSnapshotPayload, LessonStatsPayload, MasterPlanPayload, MasterPlanRequestBody, MasteryReportPayload, ProgressSummary, ReviewListPayload, ReviewStatePayload } from "@/types";
 import type { LearningEvidenceArtifact } from "@/lib/webLearningEvidence";
 
+export type LearningArchiveWriteReceipt = {
+  archiveId: string;
+  automationDrafts: Array<{
+    draftId: string;
+    enabled: false;
+    lineageId: string;
+    name: string;
+    schedule: null;
+    state: "draft";
+  }>;
+  changed: boolean;
+  documentId: string;
+  draftCount: number;
+  evidence: {
+    accepted: Array<{ checkId: string; lessonRef: string }>;
+    conflicted: number;
+    inserted: number;
+    migrated: number;
+    skipped: number;
+  };
+  packageCount: number;
+  previousArchiveId: string | null;
+  rootHash: string;
+  virtualFsEntryCount: number;
+};
+
 export const curriculumApi = {
 curriculumCategories: () => requestJson<CurriculumCategoriesPayload>("/api/curriculum/categories"),
 curriculumContents: (category: string) => requestJson<CurriculumContentsPayload>(
@@ -73,31 +99,9 @@ appendLearningEvidence: (event: Record<string, unknown>) =>
 currentLearningArchive: () =>
     requestJson<Record<string, unknown> | null>("/api/curriculum/learning-archive/current"),
 importLearningArchive: (archive: Record<string, unknown>) =>
-    postJson<{
-      archiveId: string;
-      automationDrafts: Array<{
-        draftId: string;
-        enabled: false;
-        lineageId: string;
-        name: string;
-        schedule: null;
-        state: "draft";
-      }>;
-      changed: boolean;
-      documentId: string;
-      draftCount: number;
-      evidence: {
-        accepted: Array<{ checkId: string; lessonRef: string }>;
-        conflicted: number;
-        inserted: number;
-        migrated: number;
-        skipped: number;
-      };
-      packageCount: number;
-      previousArchiveId: string | null;
-      rootHash: string;
-      virtualFsEntryCount: number;
-    }>("/api/curriculum/learning-archive/import", { archive }),
+    postJson<LearningArchiveWriteReceipt>("/api/curriculum/learning-archive/import", { archive }),
+syncLearningArchive: (archive: Record<string, unknown>) =>
+    postJson<LearningArchiveWriteReceipt>("/api/curriculum/learning-archive/sync", { archive }),
 adoptLearningArchiveAutomationDraft: (draftId: string) =>
     postJson<{
       adopted: boolean;

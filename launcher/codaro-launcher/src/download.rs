@@ -218,7 +218,10 @@ fn stream_to_part(
 ) -> Result<()> {
     if let Some(parent) = part.parent() {
         fs::create_dir_all(parent).with_context(|| {
-            format!("Failed to create download directory `{}`.", parent.display())
+            format!(
+                "Failed to create download directory `{}`.",
+                parent.display()
+            )
         })?;
     }
     let mut file = OpenOptions::new()
@@ -408,14 +411,21 @@ mod tests {
 
         let dir = tempdir().unwrap();
         let dest = dir.path().join("artifact.bin");
-        let sha =
-            download_to_file(&format!("http://{addr}/artifact.bin"), &dest, &fast_config(), &|_, _| {})
-                .unwrap();
+        let sha = download_to_file(
+            &format!("http://{addr}/artifact.bin"),
+            &dest,
+            &fast_config(),
+            &|_, _| {},
+        )
+        .unwrap();
 
         handle.join().unwrap();
         assert_eq!(sha, expected);
         assert_eq!(fs::read(&dest).unwrap(), body);
-        assert!(!part_path(&dest).exists(), ".part는 finalize 후 사라져야 한다");
+        assert!(
+            !part_path(&dest).exists(),
+            ".part는 finalize 후 사라져야 한다"
+        );
     }
 
     #[test]
@@ -437,8 +447,10 @@ mod tests {
                     let resp = "HTTP/1.1 503 Service Unavailable\r\nContent-Length: 0\r\nRetry-After: 0\r\n\r\n";
                     stream.write_all(resp.as_bytes()).unwrap();
                 } else {
-                    let header =
-                        format!("HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n", server_body.len());
+                    let header = format!(
+                        "HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n",
+                        server_body.len()
+                    );
                     stream.write_all(header.as_bytes()).unwrap();
                     stream.write_all(&server_body).unwrap();
                 }
@@ -448,8 +460,13 @@ mod tests {
 
         let dir = tempdir().unwrap();
         let dest = dir.path().join("artifact.bin");
-        let sha =
-            download_to_file(&format!("http://{addr}/a"), &dest, &fast_config(), &|_, _| {}).unwrap();
+        let sha = download_to_file(
+            &format!("http://{addr}/a"),
+            &dest,
+            &fast_config(),
+            &|_, _| {},
+        )
+        .unwrap();
 
         handle.join().unwrap();
         assert_eq!(sha, expected);
@@ -506,7 +523,8 @@ mod tests {
         let dest = dir.path().join("artifact.bin");
         let mut config = fast_config();
         config.segment_timeout = Duration::from_secs(2);
-        let sha = download_to_file(&format!("http://{addr}/a"), &dest, &config, &|_, _| {}).unwrap();
+        let sha =
+            download_to_file(&format!("http://{addr}/a"), &dest, &config, &|_, _| {}).unwrap();
 
         handle.join().unwrap();
         assert_eq!(sha, expected);
@@ -565,8 +583,12 @@ mod tests {
 
         let dir = tempdir().unwrap();
         let dest = dir.path().join("artifact.bin");
-        let result =
-            download_to_file(&format!("http://{addr}/missing"), &dest, &fast_config(), &|_, _| {});
+        let result = download_to_file(
+            &format!("http://{addr}/missing"),
+            &dest,
+            &fast_config(),
+            &|_, _| {},
+        );
 
         handle.join().unwrap();
         assert!(result.is_err());

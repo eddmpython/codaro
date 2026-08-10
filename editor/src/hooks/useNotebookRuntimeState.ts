@@ -290,6 +290,7 @@ export function useNotebookRuntimeState({
       value,
       previousVariables: variables,
     });
+    if (outcome.sessionId !== sessionId) setSessionId(outcome.sessionId);
     if (outcome.results) setResults((current) => ({ ...current, ...outcome.results }));
     if (outcome.variables) setVariables(outcome.variables);
     if (outcome.diagnostics) setDiagnostics(outcome.diagnostics);

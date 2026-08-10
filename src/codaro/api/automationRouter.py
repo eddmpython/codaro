@@ -198,6 +198,7 @@ def createAutomationRouter(state: Any) -> APIRouter:
     def apiListTasks():
         return listAutomationTasksPayload(
             workspaceRoot=str(getattr(state, "workspaceRoot", ".")),
+            proofArchive=getattr(state, "proofArchive", None),
         )
 
     @router.post("/api/tasks")
@@ -237,6 +238,7 @@ def createAutomationRouter(state: Any) -> APIRouter:
             return getAutomationTaskPayload(
                 taskId,
                 workspaceRoot=str(getattr(state, "workspaceRoot", ".")),
+                proofArchive=getattr(state, "proofArchive", None),
             )
         except AutomationTaskFlowError as error:
             failAutomationTaskFlow(error)
@@ -287,7 +289,11 @@ def createAutomationRouter(state: Any) -> APIRouter:
     @router.get("/api/tasks/{taskId}/runs")
     def apiGetRuns(taskId: str, limit: int = Query(20)):
         try:
-            return listAutomationTaskRunsPayload(taskId, limit=limit)
+            return listAutomationTaskRunsPayload(
+                taskId,
+                limit=limit,
+                proofArchive=getattr(state, "proofArchive", None),
+            )
         except AutomationTaskFlowError as error:
             failAutomationTaskFlow(error)
 

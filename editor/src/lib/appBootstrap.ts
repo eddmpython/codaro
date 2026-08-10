@@ -115,7 +115,7 @@ export async function loadAppBootstrapState(): Promise<AppBootstrapState> {
     optional(codaroApi.bootstrap, fallbackBootstrap),
   ]);
   const apiOnline = health.online && bootstrapResult.online;
-  if (apiOnline && bootstrapResult.data.publicationTarget === "server") {
+  if (apiOnline && ["server", "local"].includes(bootstrapResult.data.publicationTarget ?? "")) {
     const sessionId = await createInitialSession();
     const loadedDocument = bootstrapResult.data.documentPath
       ? await loadBootstrapDocument(bootstrapResult.data.documentPath)

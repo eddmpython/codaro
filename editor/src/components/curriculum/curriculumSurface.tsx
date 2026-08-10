@@ -32,6 +32,8 @@ export function CurriculumView({
   selectedContentId,
   storageError,
   onDraftChange,
+  onPrepareLearningPromotion,
+  onPromoteLearningBlock,
   onNavigateBlock,
   onRunBlock,
   onSelectBlock,
@@ -53,6 +55,14 @@ export function CurriculumView({
   selectedContentId: string;
   storageError?: string;
   onDraftChange: (blockId: string, value: string) => void;
+  onPrepareLearningPromotion: (block: BlockConfig, source: string) => Promise<{
+    draftId: string;
+    requiredInputNames: string[];
+  }>;
+  onPromoteLearningBlock: (
+    draftId: string,
+    inputs: Record<string, unknown>,
+  ) => Promise<{ name: string; promoted: boolean }>;
   onNavigateBlock: (blockId: string) => void;
   onRunBlock: (block: BlockConfig, sourceOverride?: string) => void;
   onSelectBlock: (blockId: string) => void;
@@ -159,6 +169,8 @@ export function CurriculumView({
                 section={section}
                 selectedBlockId={selectedBlockId}
                 onDraftChange={onDraftChange}
+                onPrepareLearningPromotion={onPrepareLearningPromotion}
+                onPromoteLearningBlock={onPromoteLearningBlock}
                 onRunBlock={runLearnerBlock}
                 onSelectBlock={onSelectBlock}
               />

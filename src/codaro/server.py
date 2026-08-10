@@ -273,8 +273,18 @@ def createServerApp(
                     "lifespan %s",
                     formatLogFields(status="automation-session-close-failed", error=str(automationCloseError)),
                 )
+            try:
+                state.publicationWorkbench.close()
+            except Exception as publicationCloseError:  # noqa: BLE001 - shutdown must continue
+                logger.exception(
+                    "lifespan %s",
+                    formatLogFields(status="publication-close-failed", error=str(publicationCloseError)),
+                )
         try:
-            state.sessionManager.destroyAll()
+            if publicationRuntime is not None:
+                publicationRuntime.close()
+            else:
+                state.sessionManager.destroyAll()
         except Exception as destroyError:  # noqa: BLE001 — shutdown must continue
             logger.exception("lifespan %s", formatLogFields(status="destroy-failed", error=str(destroyError)))
 
@@ -483,6 +493,24 @@ def createPublishedServerApp(
     return app
 
 
+def createPublishedLocalApp(
+    outputRoot: str | Path,
+    *,
+    approvedPolicyHash: str,
+    environment: Mapping[str, str] | None = None,
+) -> FastAPI:
+    from .publication.localRuntime import PublishedLocalRuntime
+
+    runtime = PublishedLocalRuntime(
+        outputRoot,
+        approvedPolicyHash=approvedPolicyHash,
+        environment=environment,
+    )
+    app = createServerApp(mode="app", publicationRuntime=runtime)
+    app.state.publicationRuntime = runtime
+    return app
+
+
 def serveServerPublication(
     outputRoot: str | Path,
     *,
@@ -498,6 +526,35 @@ def serveServerPublication(
     visibleHost = "127.0.0.1" if host in {"0.0.0.0", "::"} else host
     url = f"http://{visibleHost}:{resolvedPort}/app"
     print(f"Serving server publication at {url}")
+    if openBrowser:
+        webbrowser.open(url)
+    uvicorn.run(app, host=host, port=resolvedPort, log_level="warning", loop=createServerEventLoop)
+
+
+def serveLocalPublication(
+    outputRoot: str | Path,
+    *,
+    approvedPolicyHash: str,
+    host: str = "127.0.0.1",
+    port: int = 8766,
+    openBrowser: bool = True,
+    environment: Mapping[str, str] | None = None,
+) -> None:
+    import webbrowser
+
+    if host not in {"127.0.0.1", "localhost", "::1"}:
+        from .publication import PublicationBuildError
+
+        raise PublicationBuildError("local publication은 localhost에서만 실행할 수 있습니다.")
+    app = createPublishedLocalApp(
+        outputRoot,
+        approvedPolicyHash=approvedPolicyHash,
+        environment=environment,
+    )
+    resolvedPort = resolveBindablePort(host, port)
+    visibleHost = "127.0.0.1" if host == "::1" else host
+    url = f"http://{visibleHost}:{resolvedPort}/app"
+    print(f"Serving local publication at {url}")
     if openBrowser:
         webbrowser.open(url)
     uvicorn.run(app, host=host, port=resolvedPort, log_level="warning", loop=createServerEventLoop)

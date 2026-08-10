@@ -345,6 +345,9 @@ export async function executeBrowserStrongCheck(
   source: string,
 ): Promise<BrowserStrongOutputCheckResult> {
   const expected = expectedDisplay(spec);
+  if (spec.executor !== "browser-worker") {
+    return failed("unsupported", expected, "", "이 검사는 로컬 실행 환경에서만 확인할 수 있습니다.");
+  }
   const capability = resolveCheckSandboxCapability("web", spec.kind);
   if (capability !== "strong") {
     return failed("unsupported", expected, "", checkSandboxCapabilityMessage(capability));

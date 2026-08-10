@@ -81,6 +81,10 @@ jobs:
       - name: Run backend gate
         run: uv run python -X utf8 tests/run.py gate backend
 
+      - name: Verify proof runtime security
+        if: matrix.python-version == '3.12'
+        run: uv run python -X utf8 tests/run.py gate runtime-security
+
       - name: Run learning evidence contract
         if: matrix.python-version == '3.12'
         run: uv run python -X utf8 tests/run.py gate learning-evidence-contract
@@ -162,7 +166,7 @@ jobs:
 
   experience:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 180
     env:
       CODARO_FRONTEND_BUILD_REUSE: "1"
     steps:
@@ -205,6 +209,34 @@ jobs:
       - name: Install locked browser matrix
         timeout-minutes: 15
         run: uv run python -m playwright install --with-deps chromium firefox webkit
+
+      - name: Verify static publication
+        timeout-minutes: 15
+        run: uv run python -X utf8 tests/run.py gate static-publication
+
+      - name: Verify server publication
+        timeout-minutes: 20
+        run: uv run python -X utf8 tests/run.py gate server-publication
+
+      - name: Verify block embedding
+        timeout-minutes: 15
+        run: uv run python -X utf8 tests/run.py gate block-embedding
+
+      - name: Verify local publication
+        timeout-minutes: 20
+        run: uv run python -X utf8 tests/run.py gate local-publication
+
+      - name: Verify deployment adapters
+        timeout-minutes: 10
+        run: uv run python -X utf8 tests/run.py gate deployment-adapters
+
+      - name: Verify reference product journeys
+        timeout-minutes: 30
+        run: uv run python -X utf8 tests/run.py gate reference-products
+
+      - name: Verify automation proof states
+        timeout-minutes: 25
+        run: uv run python -X utf8 tests/run.py gate automation-ide-audit
 
       - name: Verify visual assets
         # 2코어 러너의 firefox/webkit 페이지 로드가 느려 instructional 매트릭스가
@@ -300,7 +332,7 @@ jobs:
 
   webview2-evergreen:
     runs-on: windows-latest
-    timeout-minutes: 35
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
@@ -328,6 +360,17 @@ jobs:
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Build native launcher
+        working-directory: launcher/codaro-launcher
+        run: cargo build
+
+      - name: Install Chromium
+        run: uv run python -m playwright install chromium
+
+      - name: Verify direct learning product bridge
+        timeout-minutes: 20
+        run: uv run python -X utf8 tests/run.py gate learning-product-bridge
 
       - name: Cache WebView2 smoke cargo build
         uses: actions/cache@v4

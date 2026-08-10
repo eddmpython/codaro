@@ -35,15 +35,16 @@ export async function dueAssessmentSectionIds(
   ], projection.outcomes.flatMap(
     (outcome) => outcome.creditEventIds,
   ));
-  const acceptedApplications = acceptedApplicationCredits(canonicalEvents, projection.invalidEventIds);
   const masteryByOutcome = new Map(projection.outcomes.map((outcome) => [outcome.outcomeId, outcome]));
   const due = new Set<string>();
 
   for (const contract of contracts) {
     if (contract.assessmentMode === "capstone") {
-      const completed = acceptedApplications.some((credit) => credit.sectionId === contract.sectionId);
       const sourceCompleted = accepted.some((credit) => contract.sourceSectionIds.includes(credit.sectionId));
-      if (!completed && sourceCompleted) due.add(contract.sectionId);
+      // A capstone is also the gateway from verified learning evidence to a reusable
+      // capability. Keep it mounted after credit so its promotion action cannot
+      // disappear between evidence persistence and the learner's next click.
+      if (sourceCompleted) due.add(contract.sectionId);
       continue;
     }
     const completed = accepted.filter((credit) => credit.sectionId === contract.sectionId);
@@ -73,29 +74,6 @@ export async function dueAssessmentSectionIds(
     }
   }
   return due;
-}
-
-function acceptedApplicationCredits(
-  events: LearningEvent[],
-  invalidEventIds: string[],
-): AcceptedCredit[] {
-  const invalid = new Set(invalidEventIds);
-  const byId = new Map(events.map((event) => [event.eventId, event]));
-  const accepted: AcceptedCredit[] = [];
-  for (const credit of events) {
-    if (credit.kind !== "CreditGranted" || invalid.has(credit.eventId)) continue;
-    const slices = Array.isArray(credit.creditSlices) ? credit.creditSlices.filter(isRecord) : [];
-    if (!slices.length || slices.some((slice) => slice.creditMode !== "capstone")) continue;
-    const run = byId.get(String(credit.runEventId));
-    if (!run || run.kind !== "RunObserved") continue;
-    const context = run.runContext as Record<string, unknown>;
-    accepted.push({
-      evidenceTime: evidenceAvailabilityTime(parseEvidenceTime(credit.evidenceTime, credit.appendReceiptAt)),
-      outcomeIds: slices.map((slice) => String(slice.outcomeId ?? "")).filter(Boolean),
-      sectionId: String(context.sectionId),
-    });
-  }
-  return accepted;
 }
 
 function acceptedCredits(

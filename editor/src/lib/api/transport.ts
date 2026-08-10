@@ -14,12 +14,14 @@ const configuredApiBase = import.meta.env.VITE_CODARO_API_BASE?.replace(/\/$/, "
 
 export class CodaroApiError extends Error {
   readonly status: number;
+  readonly code?: string;
   readonly diagnostic?: ProviderDiagnostic;
 
-  constructor(status: number, message: string, diagnostic?: ProviderDiagnostic) {
+  constructor(status: number, message: string, diagnostic?: ProviderDiagnostic, code?: string) {
     super(message);
     this.name = "CodaroApiError";
     this.status = status;
+    this.code = code;
     this.diagnostic = diagnostic;
   }
 }
@@ -41,16 +43,18 @@ export async function requestJson<T>(path: string, init?: RequestInit): Promise<
 
   if (!response.ok) {
     let detail = response.statusText;
+    let code: string | undefined;
     let diagnostic: ProviderDiagnostic | undefined;
     try {
       const payload = (await response.json()) as ApiErrorPayload;
       const parsed = parseApiErrorPayload(payload, detail);
       detail = parsed.message;
+      code = parsed.code;
       diagnostic = parsed.diagnostic;
     } catch {
       detail = response.statusText;
     }
-    throw new CodaroApiError(response.status, `${response.status} ${detail}`, diagnostic);
+    throw new CodaroApiError(response.status, `${response.status} ${detail}`, diagnostic, code);
   }
 
   if (response.status === 204) return undefined as T;
@@ -102,16 +106,18 @@ export async function postStreamChat(
 
   if (!response.ok) {
     let detail = response.statusText;
+    let code: string | undefined;
     let diagnostic: ProviderDiagnostic | undefined;
     try {
       const payload = (await response.json()) as ApiErrorPayload;
       const parsed = parseApiErrorPayload(payload, detail);
       detail = parsed.message;
+      code = parsed.code;
       diagnostic = parsed.diagnostic;
     } catch {
       detail = response.statusText;
     }
-    throw new CodaroApiError(response.status, `${response.status} ${detail}`, diagnostic);
+    throw new CodaroApiError(response.status, `${response.status} ${detail}`, diagnostic, code);
   }
   if (!response.body) throw new Error("stream body unavailable");
 
@@ -149,15 +155,21 @@ type ApiErrorPayload = {
 };
 
 function parseApiErrorPayload(payload: ApiErrorPayload, fallback: string): {
+  code?: string;
   message: string;
   diagnostic?: ProviderDiagnostic;
 } {
   const detail = payload.detail;
   if (isProviderDiagnostic(detail)) {
-    return { message: detail.message ?? fallback, diagnostic: detail };
+    return {
+      code: typeof detail.code === "string" ? detail.code : undefined,
+      message: detail.message ?? fallback,
+      diagnostic: detail,
+    };
   }
   if (payload.error) {
     return {
+      code: typeof payload.error.code === "string" ? payload.error.code : undefined,
       message: payload.error.message ?? payload.message ?? fallback,
       diagnostic: payload.error,
     };

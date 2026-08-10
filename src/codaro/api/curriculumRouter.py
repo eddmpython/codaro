@@ -213,6 +213,17 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
 
     @router.post("/api/curriculum/learning-archive/import")
     def apiImportCurriculumLearningArchive(request: CurriculumLearningArchiveRequest) -> dict[str, object]:
+        return persistCurriculumLearningArchive(request, action="learning-archive-import")
+
+    @router.post("/api/curriculum/learning-archive/sync")
+    def apiSyncCurriculumLearningArchive(request: CurriculumLearningArchiveRequest) -> dict[str, object]:
+        return persistCurriculumLearningArchive(request, action="learning-archive-sync")
+
+    def persistCurriculumLearningArchive(
+        request: CurriculumLearningArchiveRequest,
+        *,
+        action: str,
+    ) -> dict[str, object]:
         try:
             receipt = importLearningArchive(
                 request.archive,
@@ -224,7 +235,7 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
         logger.info(
             "curriculum %s",
             formatLogFields(
-                action="learning-archive-import",
+                action=action,
                 archiveId=receipt["archiveId"],
                 changed=receipt["changed"],
                 evidenceInserted=receipt["evidence"]["inserted"],

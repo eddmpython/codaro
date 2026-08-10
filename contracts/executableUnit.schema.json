@@ -15,11 +15,14 @@
     "statePolicy",
     "runtimeTarget",
     "sourceSpan",
-    "sourceHash",
+    "entryBlockHash",
+    "sourceFileHash",
+    "sourceRevisionHash",
     "dependencyHash",
     "assetHashes",
     "checkScenarioIds",
     "evidenceReceiptIds",
+    "proofLineage",
     "diagnostics"
   ],
   "properties": {
@@ -37,7 +40,9 @@
     "statePolicy": { "$ref": "#/$defs/StatePolicy" },
     "runtimeTarget": { "$ref": "#/$defs/RuntimeTarget" },
     "sourceSpan": { "$ref": "#/$defs/SourceSpan" },
-    "sourceHash": { "$ref": "#/$defs/ContentHash" },
+    "entryBlockHash": { "$ref": "#/$defs/ProofHash" },
+    "sourceFileHash": { "$ref": "#/$defs/ContentHash" },
+    "sourceRevisionHash": { "$ref": "#/$defs/ContentHash" },
     "dependencyHash": { "$ref": "#/$defs/ContentHash" },
     "assetHashes": {
       "type": "object",
@@ -53,6 +58,12 @@
       "uniqueItems": true,
       "items": { "type": "string", "minLength": 1 }
     },
+    "proofLineage": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/ProofLineage" }
+      ]
+    },
     "diagnostics": {
       "type": "array",
       "items": { "$ref": "#/$defs/CapabilityDiagnostic" }
@@ -62,6 +73,47 @@
     "ContentHash": {
       "type": "string",
       "pattern": "^sha256-[0-9a-f]{64}$"
+    },
+    "ProofHash": {
+      "type": "string",
+      "pattern": "^sha256-(?:[0-9a-f]{64}|[A-Za-z0-9_-]{43})$"
+    },
+    "ProofLineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "sourceRevisionReceiptId",
+        "sourceBlockHash",
+        "dependencyHash",
+        "learningCreditIds",
+        "learningCheckIds",
+        "lineageHash"
+      ],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "kind": { "const": "codaro.proof-lineage" },
+        "sourceRevisionReceiptId": {
+          "type": "string",
+          "pattern": "^sourceRevision:sha256-[A-Za-z0-9_-]{43}$"
+        },
+        "sourceBlockHash": { "$ref": "#/$defs/ProofHash" },
+        "dependencyHash": { "$ref": "#/$defs/ProofHash" },
+        "learningCreditIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "learningCheckIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "lineageHash": { "$ref": "#/$defs/ProofHash" }
+      }
     },
     "StatePolicy": {
       "type": "string",

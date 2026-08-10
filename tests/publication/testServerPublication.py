@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import hashlib
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 from pathlib import Path
+import threading
 import zipfile
 
 from fastapi.testclient import TestClient
@@ -10,6 +12,7 @@ import pytest
 
 from codaro.document import AppConfig, BlockConfig, CodaroDocument, DocumentMetadata
 from codaro.document.percentFormat import writePercentDocument
+from codaro.document.service import loadDocument
 from codaro.publication import (
     PublicationBuildError,
     buildServerPublication,
@@ -98,6 +101,37 @@ def testServerBuildIsImmutableAndRollbackRestoresVerifiedPointer(tmp_path: Path)
     rolledBack = rollbackServerPublication(output, first.bundleHash)
     assert rolledBack.bundleHash == first.bundleHash
     assert verifyServerPublication(output).bundleHash == first.bundleHash
+
+
+def testServerAppBundleUsesCompleteStableExecutionProjection(tmp_path: Path) -> None:
+    shell = _shell(tmp_path)
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    document = CodaroDocument(
+        id="server-projection-fixture",
+        title="서버 실행 프로젝션",
+        blocks=[
+            BlockConfig(id="consumer", type="code", content="result = source + 1\nprint(result)"),
+            BlockConfig(id="provider", type="code", content="source = 41"),
+            BlockConfig(
+                id="hidden-effect",
+                type="code",
+                content="from pathlib import Path\nPath('projection.txt').write_text('ran')",
+            ),
+        ],
+        metadata=DocumentMetadata(sourceFormat="percent"),
+        app=AppConfig(title="서버 실행 프로젝션", entryBlockIds=["consumer"], statePolicy="perSession"),
+    )
+    source = workspace / "app.py"
+    source.write_text(writePercentDocument(document), encoding="utf-8")
+
+    built = buildServerPublication(source, tmp_path / "server-app", webBuildRoot=shell)
+
+    assert built.manifest["entryBlockIds"] == ["consumer"]
+    assert built.manifest["executionBlockIds"] == ["provider", "consumer", "hidden-effect"]
+    assert built.manifest["executionProjectionHash"].startswith("sha256-")
+    bundled = loadDocument(str(built.bundleRoot / built.manifest["documentPath"]))
+    assert [block.id for block in bundled.blocks] == built.manifest["executionBlockIds"]
 
 
 def testServerBuildRejectsDynamicSecretAndUnverifiedWheel(tmp_path: Path) -> None:
@@ -254,6 +288,111 @@ def testPublishedServerBlocksFilesystemOutsideSessionWorkspace(tmp_path: Path) -
         assert "outside the workspace" in response.text
         sessionPath = app.state.publicationRuntime._sessionPaths[sessionId]
         assert not sessionPath.parent.joinpath("escape.txt").exists()
+
+
+def testPublishedServerAllowsDeclaredHostnameRoundtripAndBlocksOtherPort(tmp_path: Path) -> None:
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self) -> None:
+            body = b"network-policy-ready"
+            self.send_response(200)
+            self.send_header("Content-Type", "text/plain")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, format: str, *args: object) -> None:
+            del format, args
+
+    upstream = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    upstreamThread = threading.Thread(target=upstream.serve_forever, daemon=True)
+    upstreamThread.start()
+    try:
+        port = int(upstream.server_address[1])
+        shell = _shell(tmp_path)
+        workspace = tmp_path / "workspace"
+        workspace.mkdir()
+        code = (
+            "import urllib.request\n"
+            f"with urllib.request.urlopen('http://localhost:{port}/', timeout=3) as response:\n"
+            "    print(response.read().decode('utf-8'))"
+        )
+        source = _document(workspace, code)
+        output = tmp_path / "server-app"
+        built = buildServerPublication(source, output, webBuildRoot=shell)
+        assert built.manifest["runtime"]["networkOrigins"] == [f"http://localhost:{port}"]
+        app = createPublishedServerApp(output)
+        with TestClient(app) as client:
+            sessionId = client.post("/api/kernel/create", json={}).json()["sessionId"]
+            response = client.post(
+                f"/api/kernel/{sessionId}/execute-all",
+                json={"blocks": _runtimeBlocks(code), "notebookName": "server"},
+            )
+            assert response.status_code == 200
+            assert "network-policy-ready" in response.text
+            assert "destination is not declared" not in response.text
+    finally:
+        upstream.shutdown()
+        upstream.server_close()
+        upstreamThread.join(timeout=5)
+
+
+def testPublishedServerBindsSessionsToBrowserAndRejectsCapacityWithoutEviction(tmp_path: Path) -> None:
+    shell = _shell(tmp_path)
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    code = "print('owned-session-ready')"
+    source = _document(workspace, code)
+    output = tmp_path / "server-app"
+    buildServerPublication(source, output, webBuildRoot=shell)
+    app = createPublishedServerApp(output)
+
+    with TestClient(app) as client:
+        sessions: list[tuple[str, str]] = []
+        for _ in range(10):
+            client.cookies.clear()
+            created = client.post("/api/kernel/create", json={})
+            assert created.status_code == 200
+            owner = created.cookies.get("codaro_published_owner")
+            assert owner
+            sessions.append((created.json()["sessionId"], owner))
+
+        firstSession, firstOwner = sessions[0]
+        client.cookies.clear()
+        full = client.post("/api/kernel/create", json={})
+        assert full.status_code == 429
+        assert full.json()["error"]["code"] == "publication_session_capacity"
+
+        client.cookies.set("codaro_published_owner", firstOwner)
+        stillAlive = client.post(
+            f"/api/kernel/{firstSession}/execute-all",
+            json={"blocks": _runtimeBlocks(code), "notebookName": "server"},
+        )
+        assert stillAlive.status_code == 200
+        assert "owned-session-ready" in stillAlive.text
+
+        _, otherOwner = sessions[1]
+        client.cookies.clear()
+        client.cookies.set("codaro_published_owner", otherOwner)
+        forbidden = client.get(f"/api/kernel/{firstSession}/variables")
+        assert forbidden.status_code == 403
+        assert forbidden.json()["error"]["code"] == "publication_session_forbidden"
+
+
+def testPublishedServerLimitsSessionsPerBrowser(tmp_path: Path) -> None:
+    shell = _shell(tmp_path)
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    source = _document(workspace, "print('ready')")
+    output = tmp_path / "server-app"
+    buildServerPublication(source, output, webBuildRoot=shell)
+    app = createPublishedServerApp(output)
+
+    with TestClient(app) as client:
+        for _ in range(3):
+            assert client.post("/api/kernel/create", json={}).status_code == 200
+        rejected = client.post("/api/kernel/create", json={})
+        assert rejected.status_code == 429
+        assert rejected.json()["error"]["code"] == "publication_owner_session_limit"
 
 
 def testServerCorruptionAndPathTraversalAreRejectedBeforeStartup(tmp_path: Path) -> None:

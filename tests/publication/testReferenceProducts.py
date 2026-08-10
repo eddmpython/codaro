@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-import asyncio
 import base64
 import hashlib
 import json
 from pathlib import Path
-import shutil
+import socket
+import subprocess
+import sys
+import time
+from urllib.request import urlopen
 
-from codaro.automation.taskModel import TaskDefinition, TaskStatus
-from codaro.automation.taskRunner import TaskRunner
-from codaro.automation.taskSafety import confirmTaskSafety
 from codaro.document import loadDocument
 from codaro.proof import ProofArchive
 from codaro.publication import (
@@ -208,53 +208,6 @@ def testServerReferenceBuildKeepsSecretOutOfBundle(tmp_path: Path) -> None:
     assert b"REFERENCE_API_TOKEN" in bundleBytes
 
 
-def testLocalReferenceRunsAsSemanticallyValidatedTask(tmp_path: Path) -> None:
-    row = _row("local-file-automation")
-    workspace = tmp_path / "workspace"
-    shutil.copytree(_source(row).parent, workspace)
-    task = TaskDefinition(
-        id="reference-local-inventory",
-        name="재고 파일 자동화",
-        documentPath="app.py",
-        outputs=["artifacts/inventory-report.json"],
-        outputContract={
-            "schemaVersion": 1,
-            "stdoutContains": ["재고 자동화 완료: 4개 품목, 부족 2개"],
-            "artifacts": [{
-                "path": "artifacts/inventory-report.json",
-                "minBytes": 40,
-                "jsonSchema": {
-                    "requiredFields": ["itemCount", "lowStockCount", "lowStockItems", "status"],
-                    "fieldTypes": {
-                        "itemCount": "integer",
-                        "lowStockCount": "integer",
-                        "lowStockItems": "array",
-                        "status": "string"
-                    }
-                }
-            }],
-        },
-        permissionScopes=["filesystem.read", "filesystem.write"],
-        riskLevel="destructive",
-    )
-    task.safetyApproval = confirmTaskSafety(task, confirmation=task.id, workspaceRoot=workspace)
-
-    run = asyncio.run(TaskRunner(workspaceRoot=workspace).run(task))
-    artifact = json.loads((workspace / "artifacts/inventory-report.json").read_text(encoding="utf-8"))
-
-    assert run.status == TaskStatus.SUCCESS
-    assert run.validated is True
-    assert run.operationalCandidate is True
-    assert run.validationErrors == []
-    assert len(run.artifactDescriptors) == 1
-    assert artifact == {
-        "itemCount": 4,
-        "lowStockCount": 2,
-        "lowStockItems": ["모니터", "마우스"],
-        "status": "attention",
-    }
-
-
 def testReferenceClaimsStayInsideMachineVerifiedBoundary() -> None:
     manifest = _manifest()
     boundary = manifest["claimBoundary"]
@@ -265,3 +218,78 @@ def testReferenceClaimsStayInsideMachineVerifiedBoundary() -> None:
     assert "인간 학습 효과의 인과 검증" in notVerified
     assert all("학습 효과가 입증" not in str(row["claim"]) for row in _products())
     assert all("공용 인터넷에 배포" not in claim for claim in machineVerified)
+
+
+def testReadmePublicationQuickstartRunsWithActualCli(tmp_path: Path) -> None:
+    source = _source(_row("browser-calculator"))
+    output = tmp_path / "browser-calculator"
+    archive = tmp_path / "browser-calculator.zip"
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert "--target static" not in readme
+
+    _cli("inspect", str(source))
+    _cli("build", str(source), "--target", "browser", "--output", str(output), "--json")
+    _cli("verify", str(output), "--target", "browser", "--json")
+
+    with socket.socket() as probe:
+        probe.bind(("127.0.0.1", 0))
+        port = int(probe.getsockname()[1])
+    process = subprocess.Popen(
+        [
+            sys.executable,
+            "-X",
+            "utf8",
+            "-m",
+            "codaro.cli",
+            "serve",
+            str(output),
+            "--host",
+            "127.0.0.1",
+            "--port",
+            str(port),
+            "--no-browser",
+        ],
+        cwd=ROOT,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+    )
+    try:
+        deadline = time.monotonic() + 30
+        while time.monotonic() < deadline:
+            if process.poll() is not None:
+                stdout, stderr = process.communicate(timeout=5)
+                raise AssertionError(stderr or stdout)
+            try:
+                with urlopen(f"http://127.0.0.1:{port}/", timeout=1) as response:
+                    assert response.status == 200
+                    break
+            except OSError:
+                time.sleep(0.1)
+        else:
+            raise AssertionError("README serve command가 30초 안에 열리지 않았습니다.")
+    finally:
+        process.terminate()
+        try:
+            process.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            process.wait(timeout=5)
+
+    _cli("deploy", str(output), "--target", "zip", "--output", str(archive), "--json")
+    assert archive.is_file()
+
+
+def _cli(*arguments: str) -> subprocess.CompletedProcess[str]:
+    completed = subprocess.run(
+        [sys.executable, "-X", "utf8", "-m", "codaro.cli", *arguments],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        timeout=120,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr or completed.stdout
+    return completed

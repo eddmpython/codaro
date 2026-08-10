@@ -409,6 +409,41 @@ def testKernelCreateAndExecute() -> None:
     client.delete(f"/api/kernel/{sessionId}")
 
 
+def testKernelWidgetCallbackLivesInOwningWorkerSession() -> None:
+    client = TestClient(createServerApp())
+    ownerSessionId = client.post("/api/kernel/create", json={}).json()["sessionId"]
+    otherSessionId = client.post("/api/kernel/create", json={}).json()["sessionId"]
+    execute = client.post(
+        f"/api/kernel/{ownerSessionId}/execute",
+        json={
+            "blockId": "widget",
+            "code": (
+                "from codaro.outputDescriptor import ui\n"
+                "widget = ui.button('증가', onClick=lambda: 'clicked')\n"
+                "widget"
+            ),
+        },
+    )
+
+    assert execute.status_code == 200
+    callbackId = execute.json()["data"]["events"]["click"]
+    missing = client.post(
+        f"/api/kernel/{otherSessionId}/ui-event",
+        json={"callbackId": callbackId, "eventType": "click", "payload": None},
+    )
+    clicked = client.post(
+        f"/api/kernel/{ownerSessionId}/ui-event",
+        json={"callbackId": callbackId, "eventType": "click", "payload": None},
+    )
+    assert missing.status_code == 404
+    assert missing.json()["error"]["code"] == "ui_callback_not_found"
+    assert clicked.status_code == 200
+    assert clicked.json()["status"] == "ok"
+    assert clicked.json()["result"] == "clicked"
+    client.delete(f"/api/kernel/{ownerSessionId}")
+    client.delete(f"/api/kernel/{otherSessionId}")
+
+
 def testKernelDestroyIsIdempotent() -> None:
     client = TestClient(createServerApp())
     sessionId = client.post("/api/kernel/create", json={}).json()["sessionId"]

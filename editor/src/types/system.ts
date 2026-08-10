@@ -5,7 +5,7 @@ export type BootstrapPayload = {
   documentPath: string | null;
   workspaceRoot: string;
   rootPath: string;
-  publicationTarget?: "server";
+  publicationTarget?: "server" | "local";
   bundleHash?: string;
 };
 

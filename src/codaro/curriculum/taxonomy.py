@@ -6,6 +6,7 @@ taxonomy.lessonOutcomes는 backfill 용도다.
 """
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Iterable, Literal
 
@@ -227,7 +228,13 @@ class CurriculumTaxonomy(BaseModel):
 
 
 def _defaultTaxonomyPath() -> Path:
-    return Path(__file__).resolve().parents[3] / "curricula" / "python" / "_taxonomy.yml"
+    configured = os.environ.get("CODARO_STUDY_DIR")
+    if configured:
+        return Path(configured).expanduser().resolve() / "_taxonomy.yml"
+    devRoot = Path(__file__).resolve().parents[3] / "curricula" / "python"
+    if devRoot.exists():
+        return devRoot / "_taxonomy.yml"
+    return Path(__file__).resolve().parent.parent / "curricula" / "python" / "_taxonomy.yml"
 
 
 def loadTaxonomy(path: str | Path | None = None) -> CurriculumTaxonomy:

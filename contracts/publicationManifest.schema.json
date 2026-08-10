@@ -10,6 +10,9 @@
     "compilerManifestHash",
     "sourceRevisionHash",
     "entryBlockIds",
+    "executionBlockIds",
+    "executionProjectionHash",
+    "proof",
     "documentPath",
     "runtime",
     "files",
@@ -27,11 +30,20 @@
       "uniqueItems": true,
       "items": { "type": "string", "minLength": 1, "maxLength": 200 }
     },
+    "executionBlockIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1, "maxLength": 200 }
+    },
+    "executionProjectionHash": { "$ref": "#/$defs/ContentHash" },
+    "proof": { "$ref": "#/$defs/PublicationProof" },
     "documentPath": { "$ref": "#/$defs/RelativePath" },
     "runtime": {
       "oneOf": [
         { "$ref": "#/$defs/BrowserPublicationRuntime" },
-        { "$ref": "#/$defs/ServerPublicationRuntime" }
+        { "$ref": "#/$defs/ServerPublicationRuntime" },
+        { "$ref": "#/$defs/LocalPublicationRuntime" }
       ]
     },
     "files": {
@@ -52,6 +64,96 @@
     "ContentHash": {
       "type": "string",
       "pattern": "^sha256-[0-9a-f]{64}$"
+    },
+    "ProofHash": {
+      "type": "string",
+      "pattern": "^sha256-(?:[0-9a-f]{64}|[A-Za-z0-9_-]{43})$"
+    },
+    "PublicationProof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "verificationStatus", "lineages", "proofHash"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "verificationStatus": { "enum": ["verified", "unverified"] },
+        "lineages": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/PublicationProofLineage" }
+        },
+        "proofHash": { "$ref": "#/$defs/ProofHash" }
+      }
+    },
+    "PublicationProofLineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "sourceRevisionReceiptId",
+        "promotionBuildArtifactReceiptId",
+        "sourceBlockHash",
+        "dependencyHash",
+        "learningCreditIds",
+        "learningCheckIds",
+        "lineageHash",
+        "coveredBlockIds",
+        "verificationStatus",
+        "permissionReceiptId",
+        "functionalCheckReceiptId",
+        "operationalRunReceiptId",
+        "artifactHashes"
+      ],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "kind": { "const": "codaro.proof-lineage" },
+        "sourceRevisionReceiptId": {
+          "type": "string",
+          "pattern": "^sourceRevision:sha256-[A-Za-z0-9_-]{43}$"
+        },
+        "promotionBuildArtifactReceiptId": {
+          "type": "string",
+          "pattern": "^buildArtifact:sha256-[A-Za-z0-9_-]{43}$"
+        },
+        "sourceBlockHash": { "$ref": "#/$defs/ProofHash" },
+        "dependencyHash": { "$ref": "#/$defs/ProofHash" },
+        "learningCreditIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "learningCheckIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "lineageHash": { "$ref": "#/$defs/ProofHash" },
+        "coveredBlockIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "maxLength": 200 }
+        },
+        "verificationStatus": { "enum": ["verified", "unverified"] },
+        "permissionReceiptId": {
+          "type": ["string", "null"],
+          "pattern": "^permission:sha256-[A-Za-z0-9_-]{43}$"
+        },
+        "functionalCheckReceiptId": {
+          "type": ["string", "null"],
+          "pattern": "^functionalCheck:sha256-[A-Za-z0-9_-]{43}$"
+        },
+        "operationalRunReceiptId": {
+          "type": ["string", "null"],
+          "pattern": "^operationalRun:sha256-[A-Za-z0-9_-]{43}$"
+        },
+        "artifactHashes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/ProofHash" }
+        }
+      }
     },
     "RelativePath": {
       "type": "string",
@@ -109,6 +211,87 @@
         "policyHash": { "$ref": "#/$defs/ContentHash" },
         "maxMemoryMb": { "type": "integer", "minimum": 64, "maximum": 4096 },
         "maxExecutionSeconds": { "type": "integer", "minimum": 1, "maximum": 3600 }
+      }
+    },
+    "LocalPublicationRuntime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "pythonVersion",
+        "requirementsPath",
+        "permissionScopes",
+        "effects",
+        "secretRefs",
+        "networkOrigins",
+        "statePolicy",
+        "policyHash",
+        "maxMemoryMb",
+        "maxExecutionSeconds",
+        "maxChildProcesses",
+        "apiAllowlist"
+      ],
+      "properties": {
+        "kind": { "const": "local" },
+        "pythonVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+$" },
+        "requirementsPath": { "$ref": "#/$defs/RelativePath" },
+        "permissionScopes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "filesystem.read",
+              "filesystem.write",
+              "network",
+              "process.execute",
+              "gui.display",
+              "secret.read"
+            ]
+          }
+        },
+        "effects": { "$ref": "#/$defs/EffectSpec" },
+        "secretRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}$" }
+        },
+        "networkOrigins": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^https?://[^/]+$" }
+        },
+        "statePolicy": { "type": "string", "enum": ["none", "perSession", "shared"] },
+        "policyHash": { "$ref": "#/$defs/ContentHash" },
+        "maxMemoryMb": { "type": "integer", "minimum": 64, "maximum": 8192 },
+        "maxExecutionSeconds": { "type": "integer", "minimum": 1, "maximum": 3600 },
+        "maxChildProcesses": { "type": "integer", "minimum": 0, "maximum": 32 },
+        "apiAllowlist": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "EffectSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "filesystemRead",
+        "filesystemWrite",
+        "networkOrigins",
+        "process",
+        "gui",
+        "secretRefs"
+      ],
+      "properties": {
+        "filesystemRead": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+        "filesystemWrite": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+        "networkOrigins": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+        "process": { "type": "boolean" },
+        "gui": { "type": "boolean" },
+        "secretRefs": { "type": "array", "uniqueItems": true, "items": { "type": "string" } }
       }
     },
     "PublicationFile": {

@@ -5,7 +5,7 @@ from pathlib import Path
 import stat
 import uuid
 
-from .codaroFormat import parseCodaroDocument, writeCodaroDocument
+from .codaroFormat import isCodaroFormat, parseCodaroDocument, writeCodaroDocument
 from .jupyterFormat import parseJupyterDocument, writeJupyterDocument
 from .percentFormat import isPercentFormat, parsePercentDocument, writePercentDocument
 from .models import AppConfig, BlockConfig, CodaroDocument, DocumentMetadata, RuntimeConfig
@@ -50,6 +50,9 @@ def loadDocument(pathLike: str) -> CodaroDocument:
     if suffix == ".ipynb":
         return parseJupyterDocument(source, path)
 
+    if isCodaroFormat(source):
+        return parseCodaroDocument(source, path)
+
     if isPercentFormat(source):
         return parsePercentDocument(source, path)
 
@@ -63,7 +66,6 @@ def saveDocument(pathLike: str, document: CodaroDocument) -> Path:
         update={
             "title": document.title or path.stem,
             "metadata": document.metadata.model_copy(update={"updatedAt": DocumentMetadata().updatedAt}),
-            "app": document.app.model_copy(update={"title": document.title or path.stem}),
         }
     )
 

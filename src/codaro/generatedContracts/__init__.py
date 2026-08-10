@@ -21,6 +21,7 @@ from .executableUnit import (
     CapabilityDiagnostic,
     EffectSpec,
     ExecutableUnitSpec,
+    ProofLineage,
     RuntimeTarget,
     SourceSpan,
 )
@@ -31,6 +32,8 @@ from .publicationManifest import (
     PublicationFileRole,
     PublicationManifest,
     PublicationPackage,
+    PublicationProof,
+    PublicationProofLineage,
     PublicationRuntime,
     PublicationTarget,
 )
@@ -51,6 +54,7 @@ __all__ = [
     "CapabilityDiagnostic",
     "EffectSpec",
     "ExecutableUnitSpec",
+    "ProofLineage",
     "RuntimeTarget",
     "SourceSpan",
     "PUBLICATION_MANIFEST_CONTRACT_SHA256",
@@ -59,6 +63,8 @@ __all__ = [
     "PublicationFileRole",
     "PublicationManifest",
     "PublicationPackage",
+    "PublicationProof",
+    "PublicationProofLineage",
     "PublicationRuntime",
     "PublicationTarget",
 ]

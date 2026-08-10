@@ -11,6 +11,7 @@ use sha2::Sha256;
 use std::io::{BufRead, BufReader, Read, Write};
 
 const PIPE_PREFIX: &str = r"\\.\pipe\codaro-check-";
+const PIPE_CONNECT_TIMEOUT_MS: u32 = 5_000;
 const MAX_FRAME_BYTES: usize = 1024 * 1024;
 type HmacSha256 = Hmac<Sha256>;
 
@@ -62,7 +63,11 @@ pub fn run(paths: &LauncherPaths, args: CheckBrokerArgs) -> Result<()> {
     let run_id = validate_pipe_name(&args.pipe_name)?;
     let secret = read_bootstrap_secret()?;
     let mut sandbox = AppContainerSandbox::create(paths, &run_id)?;
-    let mut pipe = create_pipe(&args.pipe_name, sandbox.sid_string())?;
+    let mut pipe = create_pipe(
+        &args.pipe_name,
+        sandbox.sid_string(),
+        PIPE_CONNECT_TIMEOUT_MS,
+    )?;
     let request_bytes = read_frame(&mut pipe)?;
     let envelope: RequestEnvelope = serde_json::from_slice(&request_bytes)
         .context("check broker request envelope is invalid")?;
@@ -358,12 +363,18 @@ fn write_frame(stream: &mut impl Write, payload: &[u8]) -> Result<()> {
 }
 
 #[cfg(windows)]
-fn create_pipe(pipe_name: &str, appcontainer_sid: &str) -> Result<std::fs::File> {
+fn create_pipe(
+    pipe_name: &str,
+    appcontainer_sid: &str,
+    connect_timeout_ms: u32,
+) -> Result<std::fs::File> {
     use crate::check_sandbox::current_user_sid_string;
     use std::os::windows::io::FromRawHandle;
     use std::ptr;
+    use std::time::{Duration, Instant};
     use windows_sys::Win32::Foundation::{
-        ERROR_PIPE_CONNECTED, GetLastError, INVALID_HANDLE_VALUE, LocalFree,
+        ERROR_NO_DATA, ERROR_PIPE_CONNECTED, ERROR_PIPE_LISTENING, GetLastError,
+        INVALID_HANDLE_VALUE, LocalFree,
     };
     use windows_sys::Win32::Security::Authorization::{
         ConvertStringSecurityDescriptorToSecurityDescriptorW, SDDL_REVISION_1,
@@ -371,7 +382,8 @@ fn create_pipe(pipe_name: &str, appcontainer_sid: &str) -> Result<std::fs::File>
     use windows_sys::Win32::Security::{PSECURITY_DESCRIPTOR, SECURITY_ATTRIBUTES};
     use windows_sys::Win32::Storage::FileSystem::PIPE_ACCESS_DUPLEX;
     use windows_sys::Win32::System::Pipes::{
-        ConnectNamedPipe, CreateNamedPipeW, PIPE_READMODE_BYTE, PIPE_TYPE_BYTE, PIPE_WAIT,
+        ConnectNamedPipe, CreateNamedPipeW, PIPE_NOWAIT, PIPE_READMODE_BYTE, PIPE_TYPE_BYTE,
+        PIPE_WAIT, SetNamedPipeHandleState,
     };
 
     let user_sid = current_user_sid_string()?;
@@ -401,7 +413,7 @@ fn create_pipe(pipe_name: &str, appcontainer_sid: &str) -> Result<std::fs::File>
             pipe_name_wide.as_ptr(),
             PIPE_ACCESS_DUPLEX
                 | windows_sys::Win32::Storage::FileSystem::FILE_FLAG_FIRST_PIPE_INSTANCE,
-            PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
+            PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_NOWAIT,
             1,
             MAX_FRAME_BYTES as u32 + 4,
             MAX_FRAME_BYTES as u32 + 4,
@@ -415,12 +427,37 @@ fn create_pipe(pipe_name: &str, appcontainer_sid: &str) -> Result<std::fs::File>
     if handle == INVALID_HANDLE_VALUE {
         return Err(std::io::Error::last_os_error()).context("failed to create check broker pipe");
     }
-    let connected = unsafe { ConnectNamedPipe(handle, ptr::null_mut()) };
-    if connected == 0 && unsafe { GetLastError() } != ERROR_PIPE_CONNECTED {
+    let deadline = Instant::now() + Duration::from_millis(u64::from(connect_timeout_ms));
+    loop {
+        let connected = unsafe { ConnectNamedPipe(handle, ptr::null_mut()) };
+        let error = unsafe { GetLastError() };
+        if connected != 0 || error == ERROR_PIPE_CONNECTED {
+            break;
+        }
+        if error != ERROR_PIPE_LISTENING && error != ERROR_NO_DATA {
+            unsafe {
+                windows_sys::Win32::Foundation::CloseHandle(handle);
+            }
+            return Err(std::io::Error::from_raw_os_error(error as i32))
+                .context("failed to connect check broker pipe");
+        }
+        if Instant::now() >= deadline {
+            unsafe {
+                windows_sys::Win32::Foundation::CloseHandle(handle);
+            }
+            bail!("timed out waiting for the check broker client");
+        }
+        std::thread::sleep(Duration::from_millis(25));
+    }
+    let mut wait_mode = PIPE_READMODE_BYTE | PIPE_WAIT;
+    if unsafe { SetNamedPipeHandleState(handle, &mut wait_mode, ptr::null_mut(), ptr::null_mut()) }
+        == 0
+    {
         unsafe {
             windows_sys::Win32::Foundation::CloseHandle(handle);
         }
-        return Err(std::io::Error::last_os_error()).context("failed to connect check broker pipe");
+        return Err(std::io::Error::last_os_error())
+            .context("failed to restore blocking check broker pipe mode");
     }
     Ok(unsafe { std::fs::File::from_raw_handle(handle) })
 }
@@ -435,7 +472,11 @@ fn wide(value: &str) -> Vec<u16> {
 }
 
 #[cfg(not(windows))]
-fn create_pipe(_pipe_name: &str, _appcontainer_sid: &str) -> Result<std::fs::File> {
+fn create_pipe(
+    _pipe_name: &str,
+    _appcontainer_sid: &str,
+    _connect_timeout_ms: u32,
+) -> Result<std::fs::File> {
     bail!("check broker is only available on Windows")
 }
 
@@ -483,5 +524,25 @@ mod tests {
             ..envelope
         };
         assert!(verify_request_envelope(&tampered, &secret).is_err());
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn pipe_listener_expires_without_a_client() {
+        use super::create_pipe;
+        use crate::check_sandbox::current_user_sid_string;
+        use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let pipe_name = format!(r"\\.\pipe\codaro-check-timeout-{unique:032x}");
+        let sid = current_user_sid_string().unwrap();
+        let started = Instant::now();
+        let error = create_pipe(&pipe_name, &sid, 100).unwrap_err();
+
+        assert!(error.to_string().contains("timed out waiting"));
+        assert!(started.elapsed() < Duration::from_secs(2));
     }
 }

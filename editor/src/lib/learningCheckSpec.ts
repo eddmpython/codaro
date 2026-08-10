@@ -33,7 +33,9 @@ export type LearningExpectedPath = {
 );
 
 export type StrongOutputCheckSpecV1 = {
-  executor: "browser-worker";
+  artifactContractId?: string;
+  artifactContractVersion?: number;
+  executor: "browser-worker" | "local-sandbox";
   fixture: LearningFixtureV1;
   fixtureHash: string;
   fixtureId: string;
@@ -189,7 +191,12 @@ export function parseStrongOutputCheckSpec(
 function parseStrongCheckBase(
   value: Record<string, unknown> | undefined,
 ): Omit<StrongOutputCheckSpecV1, "kind" | "payload"> | null {
-  if (!value || value.version !== 1 || value.strength !== "strong" || value.executor !== "browser-worker") return null;
+  if (
+    !value
+    || value.version !== 1
+    || value.strength !== "strong"
+    || (value.executor !== "browser-worker" && value.executor !== "local-sandbox")
+  ) return null;
   const fixture = mapValue(value.fixture);
   const filesValue = fixture.files;
   const files = Array.isArray(filesValue)
@@ -213,7 +220,7 @@ function parseStrongCheckBase(
     version: textValue(item.version),
   }));
   const spec: Omit<StrongOutputCheckSpecV1, "kind" | "payload"> = {
-    executor: "browser-worker",
+    executor: value.executor,
     fixture: { directories, env, files, stdin },
     fixtureHash: textValue(value.fixtureHash),
     fixtureId: textValue(value.fixtureId),
@@ -223,6 +230,19 @@ function parseStrongCheckBase(
     timeoutMs: numberValue(value.timeoutMs),
     version: 1,
   };
+  const hasArtifactContract = Object.prototype.hasOwnProperty.call(value, "artifactContractId")
+    || Object.prototype.hasOwnProperty.call(value, "artifactContractVersion");
+  if (hasArtifactContract) {
+    const artifactContractId = textValue(value.artifactContractId);
+    const artifactContractVersion = numberValue(value.artifactContractVersion);
+    if (
+      !artifactContractId
+      || !Number.isSafeInteger(artifactContractVersion)
+      || artifactContractVersion < 1
+    ) return null;
+    spec.artifactContractId = artifactContractId;
+    spec.artifactContractVersion = artifactContractVersion;
+  }
   if (!spec.id || !spec.fixtureId || !spec.fixtureHash) return null;
   if (spec.timeoutMs < 250 || spec.timeoutMs > 15_000) return null;
   if (files.some((file) => !file.path || unsafeFixturePath(file.path))) return null;

@@ -54,9 +54,11 @@ Codaro에서 기준 파일은 아래 순서로 본다. 같은 의미의 규칙�
 | app projection과 미리보기 | `editor/src/components/app/appProjection.tsx`, `editor/src/App.tsx` | AppSpec entry, layout, code visibility, session state, reactive result와 last-good 오류 투영 기준 |
 | 기능 블록 compiler | `docs/skills/architecture/publication-compiler.md`, `src/codaro/publication/compiler.py`, `src/codaro/kernel/reactivePlan.py`, `contracts/executableUnit.schema.json` | entry dependency closure, effect, package, asset hash와 browser/server/local/blocked 판정의 단일 기준 |
 | server publication | `docs/skills/architecture/server-publication.md`, `src/codaro/publication/serverBuilder.py`, `src/codaro/publication/serverRuntime.py`, `contracts/publicationManifest.schema.json` | immutable server bundle, session worker, secret와 permission, rollback 기준 |
+| local publication | `docs/skills/architecture/local-publication.md`, `src/codaro/publication/localBuilder.py`, `src/codaro/publication/localRuntime.py`, `contracts/publicationManifest.schema.json` | immutable local bundle, launch-time permission 승인, localhost runtime과 rollback 기준 |
 | 기능 블록 임베딩 | `docs/skills/architecture/block-embedding.md`, `src/codaro/publication/embedBuilder.py`, `editor/src/embed/`, `contracts/embedMessage.schema.json` | entry closure bundle, Web Component mode, message origin과 iframe sandbox 기준 |
 | 학습 결과 제품 승격 | `docs/skills/architecture/learning-product-bridge.md`, `src/codaro/api/learningArchiveAutomation.py`, `src/codaro/proof/`, `src/codaro/automation/taskModel.py` | strong application evidence, 동일 source block, sealed Task provenance와 operational proof 기준 |
 | 배포 adapter | `docs/skills/architecture/deployment-adapters.md`, `src/codaro/publication/adapters/`, `contracts/deploymentAdapter.schema.json`, `contracts/deploymentReceipt.schema.json` | provider-neutral prepare, upload, probe, activate, rollback과 deployment proof 기준 |
+| publication 작업면 | `src/codaro/publication/workbench.py`, `src/codaro/api/publicationRouter.py`, `editor/src/components/app/deploymentGuide.tsx`, `editor/src/hooks/useProductGuiControl.ts` | 제품 안 build, verify, serve, stop, embed, deploy, rollback job과 GUI/API 의미 일치 |
 | reference product | `examples/apps/referenceProducts.json`, `contracts/referenceProducts.schema.json`, `docs/skills/architecture/reference-products.md`, `tests/publication/verifyReferenceProducts.py`, `tests/publication/verifyReferenceProductsPlaywright.py` | browser, server, local의 실제 제품 journey, 성능과 보안 예산, 공개 claim 경계 |
 | 문서 블록 조작 | `src/codaro/document/blockOperations.py` | 블록 삽입/삭제/이동/수정과 실행 대상 코드 블록 검증 기준 |
 | 노트북 생성 | `src/codaro/document/notebookGeneration.py` | tool이 생성하거나 분리한 노트북 document와 저장 payload를 조립하는 document 경계 |
@@ -93,7 +95,7 @@ Codaro에서 기준 파일은 아래 순서로 본다. 같은 의미의 규칙�
 | check feasibility | `contracts/checkSandboxFeasibilityDecision.json` | runtime tier별 strong eligibility와 `localRequired` 판정 |
 | canonical learning evidence | `contracts/learningEvent.schema.json`, `editor/src/lib/canonicalLearningEvidence.ts` | 실행, check와 credit의 append-only transaction |
 | mastery policy | `src/codaro/curriculum/masteryPolicy.py`, `editor/src/lib/masteryPolicy.ts` | generated policy 기반 단일 mastery projection |
-| proof graph | `contracts/sourceRevision.schema.json`, `contracts/operationalReceipt.schema.json`, `contracts/deploymentReceipt.schema.json`, `src/codaro/proof/` | source, build, permission, check, operational run, deployment의 content identity와 append-only archive |
+| proof graph | `contracts/sourceRevision.schema.json`, `contracts/operationalReceipt.schema.json`, `contracts/deploymentReceipt.schema.json`, `src/codaro/proof/`, `src/codaro/publication/proofLineage.py` | source, build, permission, check, operational run, publication, deployment의 content identity와 append-only archive |
 
 ## Share Pack System
 

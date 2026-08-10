@@ -54,6 +54,7 @@ class LocalEngine(ExecutionEngine):
         self._processLock = threading.RLock()
         self._commandLock = threading.RLock()
         self._disposed = False
+        self._executionContextDestroyed = False
         self._workerBusy = threading.Event()
         self._interruptCount = 0
         self._resourceLimits = resourceLimits or _defaultResourceLimits()
@@ -163,6 +164,7 @@ class LocalEngine(ExecutionEngine):
         *,
         mode: str = "auto",
         graceMs: int = 250,
+        restartWorker: bool = True,
     ) -> InterruptResult:
         if not self._workerBusy.is_set():
             return InterruptResult(
@@ -202,7 +204,8 @@ class LocalEngine(ExecutionEngine):
             self._interruptCount += 1
             self._supervisor.detach()
             self._terminateWorkerLocked()
-            self._startWorkerLocked()
+            if restartWorker:
+                self._startWorkerLocked()
 
         self._registry.clear()
         self._cellDefinitions.clear()
@@ -214,7 +217,29 @@ class LocalEngine(ExecutionEngine):
             requestedMode=mode,
             appliedMode="hard",
             preservedState=False,
-            message="Execution killed. All state lost.",
+            message=(
+                "Execution killed. All state lost."
+                if restartWorker
+                else "Execution context destroyed. All state lost."
+            ),
+        )
+
+    def destroyExecutionContext(self) -> InterruptResult:
+        """Irreversibly stop this context without creating a replacement worker."""
+        wasBusy = self._workerBusy.is_set()
+        with self._processLock:
+            processWasAlive = self._process is not None and self._process.is_alive()
+            self._executionContextDestroyed = True
+            self._interruptCount += 1
+            self._supervisor.detach()
+            self._terminateWorkerLocked()
+        self.status = "idle"
+        return InterruptResult(
+            interrupted=wasBusy or processWasAlive,
+            requestedMode="destroy",
+            appliedMode="hard" if wasBusy or processWasAlive else "none",
+            preservedState=False,
+            message="Execution context destroyed. No replacement worker will be created.",
         )
 
     def _trySoftInterrupt(self, graceMs: int) -> bool:
@@ -408,6 +433,8 @@ class LocalEngine(ExecutionEngine):
         with self._commandLock:
             if self._disposed:
                 raise RuntimeError("Engine has been disposed.")
+            if self._executionContextDestroyed:
+                raise RuntimeError("Execution context has been destroyed.")
             with self._processLock:
                 self._ensureWorkerLocked()
                 connection = self._connection
@@ -425,7 +452,7 @@ class LocalEngine(ExecutionEngine):
                     continue
                 if isinstance(response, dict) and response.get("kind") == "response":
                     response = response.get("response", {})
-                if isinstance(response, dict) and response.get("error"):
+                if isinstance(response, dict) and response.get("error") and "status" not in response:
                     raise RuntimeError(str(response["error"]))
                 return response
 
@@ -453,6 +480,8 @@ class LocalEngine(ExecutionEngine):
             self._ensureWorkerLocked()
 
     def _ensureWorkerLocked(self) -> None:
+        if self._executionContextDestroyed:
+            raise RuntimeError("Execution context has been destroyed.")
         if self._process is not None and self._process.is_alive() and self._connection is not None:
             return
         self._startWorkerLocked()

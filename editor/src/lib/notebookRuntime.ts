@@ -1,4 +1,4 @@
-import { codaroApi, type ReactiveResponse } from "@/lib/api";
+import { CodaroApiError, codaroApi, type ReactiveResponse } from "@/lib/api";
 import { runAutomationSessionCell } from "@/lib/automationCellRuntime";
 import type { ResultMap } from "@/lib/assistantContext";
 import {
@@ -133,6 +133,7 @@ export async function runNotebookBlock({
   runtimePackages = [],
   sessionId,
   automationSessionId = null,
+  retryMissingSession = true,
 }: {
   apiOnline: boolean;
   block: BlockConfig;
@@ -141,6 +142,7 @@ export async function runNotebookBlock({
   runtimePackages?: string[];
   sessionId: string | null;
   automationSessionId?: string | null;
+  retryMissingSession?: boolean;
 }): Promise<RunBlockResult> {
   if (isPersistentAutomationBlock(block)) {
     if (!apiOnline) {
@@ -233,6 +235,18 @@ export async function runNotebookBlock({
       },
     };
   } catch (error) {
+    if (retryMissingSession && sessionId && isMissingRuntimeSession(error)) {
+      return runNotebookBlock({
+        apiOnline,
+        block,
+        code,
+        localExecutionCount,
+        runtimePackages,
+        sessionId: null,
+        automationSessionId,
+        retryMissingSession: false,
+      });
+    }
     return {
       sessionId: activeSession.sessionId,
       notice: {
@@ -253,6 +267,7 @@ export async function runReactiveNotebook({
   previousVariables,
   sessionId,
   automationSessionId = null,
+  retryMissingSession = true,
 }: {
   apiOnline: boolean;
   codeBlocks: BlockConfig[];
@@ -262,6 +277,7 @@ export async function runReactiveNotebook({
   previousVariables: VariableInfo[];
   sessionId: string | null;
   automationSessionId?: string | null;
+  retryMissingSession?: boolean;
 }): Promise<RunNotebookResult> {
   if (isPersistentAutomationBlock(firstBlock)) {
     if (!apiOnline) {
@@ -385,6 +401,19 @@ export async function runReactiveNotebook({
       },
     };
   } catch (error) {
+    if (retryMissingSession && sessionId && isMissingRuntimeSession(error)) {
+      return runReactiveNotebook({
+        apiOnline,
+        codeBlocks,
+        document,
+        drafts,
+        firstBlock,
+        previousVariables,
+        sessionId: null,
+        automationSessionId,
+        retryMissingSession: false,
+      });
+    }
     return {
       sessionId: activeSession.sessionId,
       notice: {
@@ -405,6 +434,7 @@ export async function runAllNotebook({
   previousVariables,
   sessionId,
   automationSessionId = null,
+  retryMissingSession = true,
 }: {
   apiOnline: boolean;
   codeBlocks: BlockConfig[];
@@ -414,6 +444,7 @@ export async function runAllNotebook({
   previousVariables: VariableInfo[];
   sessionId: string | null;
   automationSessionId?: string | null;
+  retryMissingSession?: boolean;
 }): Promise<RunNotebookResult> {
   const firstKernelBlock = codeBlocks.find(isKernelExecutableBlock);
   if (isPersistentAutomationBlock(firstBlock) && !firstKernelBlock) {
@@ -426,6 +457,7 @@ export async function runAllNotebook({
       previousVariables,
       sessionId,
       automationSessionId,
+      retryMissingSession,
     });
   }
 
@@ -509,6 +541,19 @@ export async function runAllNotebook({
       },
     };
   } catch (error) {
+    if (retryMissingSession && sessionId && isMissingRuntimeSession(error)) {
+      return runAllNotebook({
+        apiOnline,
+        codeBlocks,
+        document,
+        drafts,
+        firstBlock,
+        previousVariables,
+        sessionId: null,
+        automationSessionId,
+        retryMissingSession: false,
+      });
+    }
     return {
       sessionId: activeSession.sessionId,
       notice: {
@@ -528,6 +573,7 @@ export async function setNotebookUiValue({
   elementId,
   value,
   previousVariables,
+  retryMissingSession = true,
 }: {
   sessionId: string | null;
   document: CodaroDocument;
@@ -536,6 +582,7 @@ export async function setNotebookUiValue({
   elementId: string;
   value: unknown;
   previousVariables: VariableInfo[];
+  retryMissingSession?: boolean;
 }): Promise<{ sessionId: string | null; results?: ResultMap; variables?: VariableInfo[]; diagnostics?: ReactiveDiagnostics }> {
   if (!sessionId) {
     try {
@@ -582,6 +629,32 @@ export async function setNotebookUiValue({
       diagnostics: extractDiagnostics(payload),
     };
   } catch (error) {
+    if (retryMissingSession && sessionId && isMissingRuntimeSession(error)) {
+      const replacement = await ensureRuntimeSession(null);
+      if (!replacement.sessionId) return { sessionId: null };
+      const runtimeBlocks = documentRuntimeBlocks(document, drafts);
+      try {
+        const preflight = await preflightRuntimePackages(
+          replacement.sessionId,
+          inferDocumentRuntimePackages(document, drafts),
+        );
+        if (preflight.failed) return { sessionId: replacement.sessionId };
+        await codaroApi.executeAll(replacement.sessionId, runtimeBlocks, document.title);
+      } catch (initializationError) {
+        console.warn("replacement session initialization failed", initializationError);
+        return { sessionId: replacement.sessionId };
+      }
+      return setNotebookUiValue({
+        sessionId: replacement.sessionId,
+        document,
+        drafts,
+        blockId,
+        elementId,
+        value,
+        previousVariables,
+        retryMissingSession: false,
+      });
+    }
     console.warn("set-ui-value failed", error);
     return { sessionId };
   }
@@ -643,6 +716,18 @@ function uniquePackages(packageNames: string[]) {
     packagesByName.set(normalizePackageName(trimmed), trimmed);
   }
   return Array.from(packagesByName.values()).sort((left, right) => left.localeCompare(right));
+}
+
+function isMissingRuntimeSession(error: unknown) {
+  if (!(error instanceof Error) && (!error || typeof error !== "object")) return false;
+  const candidate = error as {
+    code?: unknown;
+    diagnostic?: { code?: unknown };
+    status?: unknown;
+  };
+  return (error instanceof CodaroApiError || candidate.status === 404)
+    && candidate.status === 404
+    && (candidate.code === "session_not_found" || candidate.diagnostic?.code === "session_not_found");
 }
 
 function packagePreflightFailureNotice(result: PackageInstallResult): AppNotice {

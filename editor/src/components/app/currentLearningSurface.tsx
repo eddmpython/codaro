@@ -5,7 +5,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import {
   captureBrowserLearningWorkspaceAutosave,
+  learningArtifactPromotionStatus,
   persistBrowserLearningWorkspace,
+  promoteLearningArtifact,
+  readPersistedLearningArchive,
   type BrowserLearningWorkspaceAutosaveInput,
 } from "@/lib/browserLearningArchive";
 import { CUSTOM_CURRICULUM_CATEGORY } from "@/lib/customCurricula";
@@ -13,6 +16,7 @@ import { useLessonSectionProgress } from "@/hooks/useLessonSectionProgress";
 import { useLocale } from "@/lib/localeContext";
 import { cn } from "@/lib/utils";
 import { groupCurriculumSections } from "@/components/curriculum/curriculumSectionRenderer";
+import { AUTOMATION_UPDATED_EVENT } from "@/lib/automationState";
 import type {
   BlockConfig,
   CodaroDocument,
@@ -59,6 +63,31 @@ export function CurrentLearningSurface(props: CurrentLearningSurfaceProps) {
     selectedCategory: props.selectedCategory,
     selectedContentId: props.selectedContentId,
   });
+  const prepareLearningPromotion = useCallback(async (block: BlockConfig, source: string) => {
+    if (!props.curriculumDocument) throw new Error("학습 문서를 불러온 뒤 다시 시도해 주세요.");
+    const document = props.curriculumDocument.blocks.some((candidate) => candidate.id === block.id)
+      ? props.curriculumDocument
+      : { ...props.curriculumDocument, blocks: [...props.curriculumDocument.blocks, block] };
+    await persistBrowserLearningWorkspace(captureBrowserLearningWorkspaceAutosave({
+      document,
+      drafts: { ...props.drafts, [block.id]: source },
+      lessonRef,
+    }));
+    const materialized = await readPersistedLearningArchive(lessonRef);
+    const draft = materialized?.automationDrafts.find((candidate) => candidate.sourceBlockIds.includes(block.id));
+    if (!draft) throw new Error("현재 코드에 연결된 강한 application 결과물이 없습니다.");
+    const status = await learningArtifactPromotionStatus(draft.draftId);
+    if (!status.eligible) throw new Error(status.reason || "현재 결과는 기능 블록으로 만들 수 없습니다.");
+    return {
+      draftId: draft.draftId,
+      requiredInputNames: status.requiredInputNames,
+    };
+  }, [lessonRef, props.curriculumDocument, props.drafts]);
+  const promoteLearningBlock = useCallback(async (draftId: string, inputs: Record<string, unknown>) => {
+    const receipt = await promoteLearningArtifact(draftId, inputs);
+    window.dispatchEvent(new CustomEvent(AUTOMATION_UPDATED_EVENT));
+    return { name: receipt.task.name, promoted: receipt.promoted };
+  }, []);
 
   useEffect(() => {
     if (previousLessonRef.current !== lessonRef) {
@@ -133,6 +162,8 @@ export function CurrentLearningSurface(props: CurrentLearningSurfaceProps) {
         selectedContentId={props.selectedContentId}
         selectedContentLabel={selectedContentLabel}
         storageError={storageError}
+        onPrepareLearningPromotion={prepareLearningPromotion}
+        onPromoteLearningBlock={promoteLearningBlock}
         renderCodeCellEditor={({ ariaLabel, autoFocus = false, draft, onChange, onFocus, onRun }) => (
           <CodeCellEditor
             ariaLabel={ariaLabel}

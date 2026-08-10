@@ -4,6 +4,7 @@ import asyncio
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from ..proof import OperationalRunReceipt, ProofArchiveError
 from .eStop import getEmergencyStop
 from .operationalProof import recordPromotedTaskOperationalRun
 from .recipeAuthoring import buildAutomationTaskDraft, validateAutomationTaskRecipeText
@@ -108,7 +109,11 @@ def _requireTaskReady(task: TaskDefinition, *, workspaceRoot: str, source: str) 
         raise AutomationTaskFlowError(409, error.message) from error
 
 
-def listAutomationTasksPayload(*, workspaceRoot: str = ".") -> dict[str, Any]:
+def listAutomationTasksPayload(
+    *,
+    workspaceRoot: str = ".",
+    proofArchive: "ProofArchive | None" = None,
+) -> dict[str, Any]:
     registry = getTaskRegistry()
     tasks = registry.listTasks()
     entries: list[dict[str, Any]] = []
@@ -119,7 +124,7 @@ def listAutomationTasksPayload(*, workspaceRoot: str = ".") -> dict[str, Any]:
         entry = _serializeAutomationTask(task, workspaceRoot=workspaceRoot)
         lastRun = registry.getLastRun(task.id)
         if lastRun is not None:
-            entry["lastRun"] = lastRun.serialize()
+            entry["lastRun"] = _serializeTaskRun(lastRun, proofArchive=proofArchive)
         entries.append(entry)
     return {
         "tasks": entries,
@@ -264,7 +269,12 @@ def createAutomationTaskFromRecipePayload(
     }
 
 
-def getAutomationTaskPayload(taskId: str, *, workspaceRoot: str = ".") -> dict[str, Any]:
+def getAutomationTaskPayload(
+    taskId: str,
+    *,
+    workspaceRoot: str = ".",
+    proofArchive: "ProofArchive | None" = None,
+) -> dict[str, Any]:
     registry = getTaskRegistry()
     task = registry.get(taskId)
     if task is None:
@@ -272,7 +282,7 @@ def getAutomationTaskPayload(taskId: str, *, workspaceRoot: str = ".") -> dict[s
     lastRun = registry.getLastRun(taskId)
     result = _serializeAutomationTask(task, workspaceRoot=workspaceRoot)
     if lastRun:
-        result["lastRun"] = lastRun.serialize()
+        result["lastRun"] = _serializeTaskRun(lastRun, proofArchive=proofArchive)
     return result
 
 
@@ -377,12 +387,15 @@ async def runAutomationTaskPayload(
         raise AutomationTaskFlowError(404, "Task not found")
     _requireTaskReady(task, workspaceRoot=workspaceRoot, source="task-manual-run")
     run = await TaskRunner(workspaceRoot=workspaceRoot).run(task)
+    operationalReceiptId = _recordOperationalProof(
+        task,
+        run,
+        proofArchive=proofArchive,
+        workspaceRoot=workspaceRoot,
+    )
+    run.operationalReceiptId = operationalReceiptId
     registry.addRun(run)
-    operationalReceiptId = _recordOperationalProof(task, run, proofArchive=proofArchive)
-    return {
-        **run.serialize(),
-        **({"operationalReceiptId": operationalReceiptId} if operationalReceiptId else {}),
-    }
+    return _serializeTaskRun(run, proofArchive=proofArchive)
 
 
 def _recordOperationalProof(
@@ -390,14 +403,25 @@ def _recordOperationalProof(
     run: TaskRun,
     *,
     proofArchive: "ProofArchive | None",
+    workspaceRoot: str,
 ) -> str | None:
     if proofArchive is None:
         return None
-    receipt = recordPromotedTaskOperationalRun(task, run, proofArchive=proofArchive)
+    receipt = recordPromotedTaskOperationalRun(
+        task,
+        run,
+        proofArchive=proofArchive,
+        workspaceRoot=workspaceRoot,
+    )
     return receipt.receiptId if receipt is not None else None
 
 
-def listAutomationTaskRunsPayload(taskId: str, *, limit: int) -> dict[str, Any]:
+def listAutomationTaskRunsPayload(
+    taskId: str,
+    *,
+    limit: int,
+    proofArchive: "ProofArchive | None" = None,
+) -> dict[str, Any]:
     from dataclasses import asdict
 
     registry = getTaskRegistry()
@@ -407,9 +431,52 @@ def listAutomationTaskRunsPayload(taskId: str, *, limit: int) -> dict[str, Any]:
     runs = registry.getRuns(taskId, limit=limit)
     # 직전 대비 diff를 동봉 — 프론트가 "무엇이 바뀌었나"를 한 번의 호출로 렌더한다.
     return {
-        "runs": [run.serialize() for run in runs],
+        "runs": [_serializeTaskRun(run, proofArchive=proofArchive) for run in runs],
         "diff": asdict(registry.getRunDiff(taskId)),
     }
+
+
+def _serializeTaskRun(
+    run: TaskRun,
+    *,
+    proofArchive: "ProofArchive | None",
+) -> dict[str, Any]:
+    payload = run.serialize()
+    receiptId = run.operationalReceiptId
+    if not receiptId:
+        return payload
+    receipt = None
+    if proofArchive is not None:
+        try:
+            candidate = proofArchive.receiptById(receiptId)
+            if isinstance(candidate, OperationalRunReceipt):
+                proofArchive.resolveLineage(candidate.receiptId)
+                receipt = candidate
+        except ProofArchiveError:
+            receipt = None
+    artifactHashes = sorted({
+        str(item.get("contentHash"))
+        for item in run.artifactDescriptors
+        if isinstance(item, dict) and item.get("origin") == "created" and item.get("contentHash")
+    })
+    if (
+        receipt is None
+        or receipt.taskId != run.taskId
+        or receipt.runId != run.id
+        or receipt.sourceHash != run.sourceHash
+        or receipt.buildArtifactHash != run.buildArtifactHash
+        or receipt.inputHash != run.inputHash
+        or receipt.artifactHashes != artifactHashes
+    ):
+        payload["operationalReceiptId"] = None
+        payload["proofStatus"] = (
+            "contract-passed"
+            if run.semanticStatus == "contract-passed"
+            else "contract-failed"
+            if run.semanticStatus == "contract-failed"
+            else "semantic-not-checked"
+        )
+    return payload
 
 
 def _scheduleTaskRun(taskId: str, schedule: str, workspaceRoot: str) -> bool:

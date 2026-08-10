@@ -21,6 +21,7 @@ from .reactivePlan import (
     getAllExecutionOrder,
     getReactiveOrder,
     reactivePlanPayload,
+    stableTopologicalOrder,
 )
 from .reactivePlan import buildReactiveGraph as buildReactiveGraphFromAnalysis
 from .session import KernelSession
@@ -55,6 +56,8 @@ async def executeReactive(
     graph: ReactiveGraph | None = None,
 ) -> tuple[list[ExecutionOutput], list[str]]:
     activeGraph = graph or buildReactiveGraph(blocks)
+    if _executionBlocked(activeGraph):
+        return [], []
     executionOrder = getReactiveOrder(activeGraph, changedBlockId, includeSource=includeSource)
     return await executePlanned(
         session,
@@ -74,6 +77,8 @@ async def executeAll(
     graph: ReactiveGraph | None = None,
 ) -> tuple[list[ExecutionOutput], list[str]]:
     activeGraph = graph or buildReactiveGraph(blocks)
+    if _executionBlocked(activeGraph):
+        return [], []
     return await executePlanned(
         session,
         blocks,
@@ -116,6 +121,11 @@ async def executePlanned(
     return results, executionOrder
 
 
+def _executionBlocked(graph: ReactiveGraph) -> bool:
+    diagnostics = diagnosticsFromGraph(graph)
+    return bool(diagnostics.cycles or diagnostics.multipleDefinitions)
+
+
 __all__ = [
     "BlockNode",
     "ReactiveDiagnostics",
@@ -138,4 +148,5 @@ __all__ = [
     "previewReactiveOrder",
     "reactiveDiagnostics",
     "reactivePlanPayload",
+    "stableTopologicalOrder",
 ]

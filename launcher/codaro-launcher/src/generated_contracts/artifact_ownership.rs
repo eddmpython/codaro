@@ -3,8 +3,10 @@
 // Owners SHA-256: 2b5c5ea00cef0dff326ad9457fd577d8d9c4e5aa48561822713f5f89b3a20273
 use serde::{Deserialize, Serialize};
 
-pub const ARTIFACT_OWNERSHIP_CONTRACT_SHA256: &str = "4679b9c14619d69672ff06da0291dd45c71b100ee6e8a0b5698fb96cd55eb113";
-pub const ARTIFACT_OWNERSHIP_OWNERS_SHA256: &str = "2b5c5ea00cef0dff326ad9457fd577d8d9c4e5aa48561822713f5f89b3a20273";
+pub const ARTIFACT_OWNERSHIP_CONTRACT_SHA256: &str =
+    "4679b9c14619d69672ff06da0291dd45c71b100ee6e8a0b5698fb96cd55eb113";
+pub const ARTIFACT_OWNERSHIP_OWNERS_SHA256: &str =
+    "2b5c5ea00cef0dff326ad9457fd577d8d9c4e5aa48561822713f5f89b3a20273";
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]

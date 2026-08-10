@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from importlib.resources import files
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 from typing import Any
 
@@ -32,6 +33,7 @@ from ..proof import (
     sealProofReceipt,
 )
 from ..publication import compileExecutableUnit
+from ..publication.proofLineage import createPromotedBlockPayload, proofLineageHash
 
 
 def adoptLearningArchiveAutomationDraft(
@@ -173,54 +175,106 @@ def promoteLearningArtifactToExecutableUnit(
             blocks=[BlockConfig(id=sourceBlockId, type="automation", content=sourceCode)],
             metadata=DocumentMetadata(sourceFormat="percent"),
         )
-        sourceText = writePercentDocument(document)
-        compiled = compileExecutableUnit(
+        previewCompiled = compileExecutableUnit(
             document,
             sourceBlockId,
             sourcePath=relativePath,
-            sourceText=sourceText,
+            sourceText=writePercentDocument(document),
             workspaceRoot=workspaceRoot,
             checkScenarioIds=proof["taskVariantIds"],
             evidenceReceiptIds=proof["creditEventIds"],
         )
-        if compiled.targetDecision.selected == "blocked":
+        if previewCompiled.targetDecision.selected == "blocked":
             raise LearningArchiveError("이 학습 블록은 기능 블록으로 컴파일할 수 없습니다.")
-        requiredInputs = list(compiled.unit["inputSchema"].get("required", []))
+        requiredInputs = list(previewCompiled.unit["inputSchema"].get("required", []))
         selectedInputs = dict(inputs or {})
         if set(selectedInputs) != set(requiredInputs):
             raise LearningArchiveError(
                 "기능 블록 입력은 컴파일된 입력 계약과 정확히 일치해야 합니다: "
                 + ", ".join(requiredInputs)
             )
-        outputContract = _applicationOutputContract(proof["artifacts"], proof["artifactContractIds"])
-        permissionScopes = _permissionScopes(compiled.unit["effects"])
-        effectSetHash = contentDigest(canonicalJson(compiled.unit["effects"]))
+        outputContract = _applicationOutputContract(
+            proof["artifacts"],
+            proof["artifactContractIds"],
+            requiredInputNames=requiredInputs,
+            selectedInputs=selectedInputs,
+        )
+        previewEffectSetHash = contentDigest(canonicalJson(previewCompiled.unit["effects"]))
         sourceReceipt = sealProofReceipt({
             "kind": "sourceRevision",
             "sourceHash": sourceBlockHash,
-            "dependencyHash": compiled.unit["dependencyHash"],
-            "packageSetHash": contentDigest(canonicalJson(sorted(compiled.packages))),
-            "effectSetHash": effectSetHash,
+            "dependencyHash": previewCompiled.unit["dependencyHash"],
+            "packageSetHash": contentDigest(canonicalJson(sorted(previewCompiled.packages))),
+            "effectSetHash": previewEffectSetHash,
             "documentPath": relativePath,
-            "blockIds": [sourceBlockId],
+            "blockIds": sorted({sourceBlockId, *previewCompiled.unit["dependencyBlockIds"]}),
             "createdAt": datetime.now(tz=UTC).isoformat(),
         })
         assert isinstance(sourceReceipt, SourceRevision)
+        lineageHash = proofLineageHash(
+            sourceRevisionReceiptId=sourceReceipt.receiptId,
+            sourceBlockHash=sourceBlockHash,
+            dependencyHash=previewCompiled.unit["dependencyHash"],
+            learningCreditIds=proof["creditEventIds"],
+            learningCheckIds=proof["taskVariantIds"],
+        )
+        promotedPayload = createPromotedBlockPayload(
+            sourceRevisionReceiptId=sourceReceipt.receiptId,
+            sourceBlockHash=sourceBlockHash,
+            dependencyHash=previewCompiled.unit["dependencyHash"],
+            learningCreditIds=proof["creditEventIds"],
+            learningCheckIds=proof["taskVariantIds"],
+        )
+        document = document.model_copy(update={
+            "blocks": [
+                document.blocks[0].model_copy(update={
+                    "role": "automation",
+                    "executionKind": "task",
+                    "sourceType": "promoted",
+                    "payload": promotedPayload,
+                })
+            ]
+        })
+        targetPath = Path(workspaceRoot).expanduser().resolve() / relativePath
+        saveDocument(str(targetPath), document)
+        try:
+            persistedSourceBytes = targetPath.read_bytes()
+            persistedSourceText = persistedSourceBytes.decode("utf-8")
+        except (OSError, UnicodeDecodeError) as error:
+            raise LearningArchiveError("저장된 기능 블록 source bytes를 읽을 수 없습니다.") from error
+        storedDocument = loadDocument(str(targetPath))
+        if documentSourceHash(storedDocument) != sourceBlockHash:
+            raise LearningArchiveError("저장 후 source block hash가 학습 evidence와 달라졌습니다.")
+        compiled = compileExecutableUnit(
+            storedDocument,
+            sourceBlockId,
+            sourcePath=relativePath,
+            sourceText=persistedSourceText,
+            workspaceRoot=workspaceRoot,
+        )
+        if compiled.targetDecision.selected == "blocked":
+            raise LearningArchiveError("이 학습 블록은 기능 블록으로 컴파일할 수 없습니다.")
+        if list(compiled.unit["inputSchema"].get("required", [])) != requiredInputs:
+            raise LearningArchiveError("저장된 build의 입력 계약이 preview와 달라졌습니다.")
+        if (
+            compiled.unit["entryBlockHash"] != sourceReceipt.sourceHash
+            or compiled.unit["dependencyHash"] != sourceReceipt.dependencyHash
+            or sorted({sourceBlockId, *compiled.unit["dependencyBlockIds"]}) != sourceReceipt.blockIds
+            or contentDigest(canonicalJson(sorted(compiled.packages))) != sourceReceipt.packageSetHash
+            or contentDigest(canonicalJson(compiled.unit["effects"])) != sourceReceipt.effectSetHash
+        ):
+            raise LearningArchiveError("저장된 build가 archive된 source revision 계약과 달라졌습니다.")
         buildReceipt = sealProofReceipt({
             "kind": "buildArtifact",
             "sourceRevisionId": sourceReceipt.receiptId,
             "sourceHash": sourceReceipt.sourceHash,
-            "buildArtifactHash": contentDigest(sourceText),
-            "manifestHash": compiled.manifestHash,
+            "buildArtifactHash": contentDigest(persistedSourceBytes),
+            "manifestHash": lineageHash,
             "target": "local",
             "createdAt": datetime.now(tz=UTC).isoformat(),
         })
         assert isinstance(buildReceipt, BuildArtifact)
-        targetPath = Path(workspaceRoot).expanduser().resolve() / relativePath
-        saveDocument(str(targetPath), document)
-        storedDocument = loadDocument(str(targetPath))
-        if documentSourceHash(storedDocument) != sourceBlockHash:
-            raise LearningArchiveError("저장 후 source block hash가 학습 evidence와 달라졌습니다.")
+        permissionScopes = _permissionScopes(compiled.unit["effects"])
         proofArchive.appendReceipt(sourceReceipt)
         proofArchive.appendReceipt(buildReceipt)
         provenanceCore: dict[str, Any] = {
@@ -235,9 +289,13 @@ def promoteLearningArtifactToExecutableUnit(
             "learningArtifactHashes": proof["artifactContentHashes"],
             "sourceBlockHash": sourceBlockHash,
             "publicationSourceHash": compiled.sourceRevision.sourceHash,
+            "publicationRevisionHash": compiled.sourceRevision.revisionHash,
             "sourceRevisionReceiptId": sourceReceipt.receiptId,
             "buildArtifactReceiptId": buildReceipt.receiptId,
             "requiredInputNames": requiredInputs,
+            "learningFixtureHashes": proof["fixtureHashes"],
+            "inputSelectionMode": "learner",
+            "learnerSelectedInputHash": contentDigest(canonicalJson(selectedInputs)),
             "executableUnit": compiled.unit,
         }
         provenance = {
@@ -280,7 +338,6 @@ def learningArtifactPromotionStatus(
             draft.sourceBlockIds,
             proof["sourceCodeHashes"],
         )
-        _applicationOutputContract(proof["artifacts"], proof["artifactContractIds"])
         document = CodaroDocument(
             id=f"learning-feature-{sourceBlockHash.removeprefix('sha256-')[:12]}",
             title=draft.name,
@@ -298,12 +355,18 @@ def learningArtifactPromotionStatus(
         )
         if compiled.targetDecision.selected == "blocked":
             raise LearningArchiveError("이 학습 블록은 기능 블록으로 컴파일할 수 없습니다.")
+        requiredInputNames = list(compiled.unit["inputSchema"].get("required", []))
+        _applicationOutputContract(
+            proof["artifacts"],
+            proof["artifactContractIds"],
+            requiredInputNames=requiredInputNames,
+        )
         return {
             "eligible": True,
             "reason": "strong-application-proof",
             "capabilityDomainId": proof["capabilityDomainId"],
             "sourceBlockHash": sourceBlockHash,
-            "requiredInputNames": list(compiled.unit["inputSchema"].get("required", [])),
+            "requiredInputNames": requiredInputNames,
         }
     except (LearningArchiveError, ValueError) as error:
         return {
@@ -370,6 +433,7 @@ def _promotionCapabilityProof(
     eventsById = {str(event.get("eventId")): event for event in canonicalEvents}
     artifacts: list[dict[str, object]] = []
     artifactContractIds: set[tuple[str, int]] = set()
+    fixtureHashes: set[str] = set()
     for receipt in receipts:
         run = eventsById.get(receipt.runEventId)
         if not isinstance(run, dict):
@@ -377,14 +441,17 @@ def _promotionCapabilityProof(
         context = run.get("runContext") if isinstance(run.get("runContext"), dict) else {}
         contractId = context.get("artifactContractId")
         contractVersion = context.get("artifactContractVersion")
+        fixtureHash = context.get("fixtureHash")
         if isinstance(contractId, str) and isinstance(contractVersion, int):
             artifactContractIds.add((contractId, contractVersion))
+        if isinstance(fixtureHash, str) and fixtureHash:
+            fixtureHashes.add(fixtureHash)
         artifacts.extend(
             dict(item)
             for item in run.get("artifactDescriptors", [])
             if isinstance(item, dict) and item.get("origin") == "created"
         )
-    if not artifacts or len(artifactContractIds) != 1:
+    if not artifacts or len(artifactContractIds) != 1 or not fixtureHashes:
         raise LearningArchiveError("기능 블록 승격에는 하나의 strong artifact contract가 필요합니다.")
     claimIds = sorted({
         taxonomy.taskFamilyById(receipt.taskFamilyId).ownerClaimId
@@ -400,6 +467,7 @@ def _promotionCapabilityProof(
         "taskVariantIds": sorted({receipt.taskVariantId for receipt in receipts}),
         "artifacts": artifacts,
         "artifactContractIds": sorted(artifactContractIds),
+        "fixtureHashes": sorted(fixtureHashes),
     }
 
 
@@ -422,35 +490,71 @@ def _verifiedSourceBlock(
 def _applicationOutputContract(
     artifacts: list[dict[str, object]],
     contractIds: list[tuple[str, int]],
+    *,
+    requiredInputNames: list[str],
+    selectedInputs: dict[str, Any] | None = None,
 ) -> dict[str, object]:
     contractId, contractVersion = contractIds[0]
     safeId = re.fullmatch(r"[A-Za-z0-9._-]+", contractId)
-    contractPath = Path(__file__).resolve().parents[3] / "contracts" / "learning-content" / "artifacts" / f"{contractId}.json"
-    if safeId is None or not contractPath.is_file():
+    contractResource = files("codaro.generatedContracts").joinpath(f"{contractId}.json")
+    if safeId is None or not contractResource.is_file():
         raise LearningArchiveError("artifact contract 파일을 찾을 수 없습니다.")
     try:
-        contract = json.loads(contractPath.read_text(encoding="utf-8"))
+        contract = json.loads(contractResource.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:
         raise LearningArchiveError("artifact contract를 읽을 수 없습니다.") from error
     if contract.get("artifactContractId") != contractId or contract.get("version") != contractVersion:
         raise LearningArchiveError("artifact contract identity가 application evidence와 일치하지 않습니다.")
     requiredFields = contract.get("requiredFields")
     fieldTypes = contract.get("fieldTypes")
-    if not isinstance(requiredFields, list) or not isinstance(fieldTypes, dict):
+    inputBindings = contract.get("inputBindings")
+    artifactPathInput = contract.get("artifactPathInput")
+    if (
+        not isinstance(requiredFields, list)
+        or not isinstance(fieldTypes, dict)
+        or not isinstance(inputBindings, dict)
+        or not inputBindings
+        or not isinstance(artifactPathInput, str)
+        or artifactPathInput not in requiredInputNames
+        or not all(
+            isinstance(field, str)
+            and field in requiredFields
+            and isinstance(inputName, str)
+            and inputName in requiredInputNames
+            for field, inputName in inputBindings.items()
+        )
+    ):
         raise LearningArchiveError("artifact contract의 JSON 의미 검사가 유효하지 않습니다.")
-    descriptors = []
-    for artifact in artifacts:
-        path = artifact.get("path")
-        if not isinstance(path, str) or not path:
-            continue
-        descriptors.append({
-            "path": path,
+    selectedArtifactPath = None
+    if selectedInputs is not None:
+        selectedArtifactPath = selectedInputs.get(artifactPathInput)
+        if (
+            not isinstance(selectedArtifactPath, str)
+            or not selectedArtifactPath
+            or "\\" in selectedArtifactPath
+            or ":" in selectedArtifactPath
+            or PurePosixPath(selectedArtifactPath).is_absolute()
+            or ".." in PurePosixPath(selectedArtifactPath).parts
+        ):
+            raise LearningArchiveError("기능 블록 산출물 경로 입력이 workspace 상대 경로가 아닙니다.")
+    artifactPaths = sorted({
+        path
+        for artifact in artifacts
+        if isinstance((path := artifact.get("path")), str) and path
+    })
+    outputPaths = [selectedArtifactPath] if selectedArtifactPath is not None else artifactPaths
+    descriptors = [
+        {
+            "path": selectedArtifactPath or path,
             "minBytes": 2,
             "jsonSchema": {
                 "requiredFields": requiredFields,
                 "fieldTypes": fieldTypes,
             },
-        })
+            "inputBindings": inputBindings,
+        }
+        for path in outputPaths
+    ]
     if not descriptors:
         raise LearningArchiveError("application evidence에 재실행 산출물 경로가 없습니다.")
     return {"schemaVersion": 1, "artifacts": descriptors}

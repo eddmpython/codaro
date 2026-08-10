@@ -12,8 +12,16 @@ import csv
 import json
 from pathlib import Path
 import subprocess
+import sys
 
-del subprocess
+worker_status = subprocess.run(
+    [sys.executable, "-c", "print('inventory-worker-ready')"],
+    check=True,
+    capture_output=True,
+    text=True,
+).stdout.strip()
+if worker_status != "inventory-worker-ready":
+    raise RuntimeError("재고 처리 worker가 준비되지 않았습니다.")
 with Path("data/inventory.csv").open(encoding="utf-8", newline="") as inventory_file:
     inventory_rows = list(csv.DictReader(inventory_file))
 del inventory_file

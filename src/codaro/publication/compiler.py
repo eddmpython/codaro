@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import ast
+import base64
+import builtins
 from dataclasses import asdict, dataclass, field
 import hashlib
 import json
@@ -14,7 +16,16 @@ from ..document.analysis import analyzeCellBindings, analyzeMarkdownRefs
 from ..document.models import BlockConfig, CodaroDocument
 from ..document.percentFormat import percentBlockSourceSpans, writePercentDocument
 from ..generatedContracts import CapabilityDiagnostic, EffectSpec, ExecutableUnitSpec, RuntimeTarget, SourceSpan
-from ..kernel.reactivePlan import buildReactiveGraph, dependencyClosure, diagnosticsFromGraph
+from ..kernel.reactivePlan import (
+    ReactiveGraph,
+    buildReactiveGraph,
+    dependencyClosure,
+    diagnosticsFromGraph,
+    getAllExecutionOrder,
+    stableTopologicalOrder,
+)
+from ..runtime.executionPolicy import ExecutionPolicyError, canonicalNetworkOrigin
+from .proofLineage import promotedBlockProofLineage
 
 
 _HASH_PREFIX = "sha256-"
@@ -122,6 +133,8 @@ class CompilationReport:
     schemaVersion: Literal[1]
     runtimeTarget: RuntimeTarget
     entryBlockIds: tuple[str, ...]
+    executionBlockIds: tuple[str, ...]
+    executionProjectionHash: str
     units: tuple[CompilationResult, ...]
     diagnostics: tuple[CapabilityDiagnostic, ...]
     sourceRevision: SourceRevision
@@ -132,6 +145,8 @@ class CompilationReport:
             "schemaVersion": self.schemaVersion,
             "runtimeTarget": self.runtimeTarget,
             "entryBlockIds": list(self.entryBlockIds),
+            "executionBlockIds": list(self.executionBlockIds),
+            "executionProjectionHash": self.executionProjectionHash,
             "units": [unit.payload() for unit in self.units],
             "diagnostics": list(self.diagnostics),
             "sourceRevision": self.sourceRevision.payload(),
@@ -163,6 +178,7 @@ def compileDocument(
     sourceText: str | None = None,
     workspaceRoot: str | Path | None = None,
     packageLock: Mapping[str, Any] | None = None,
+    executionScope: Literal["app", "entryClosure"] = "app",
 ) -> CompilationReport:
     resolvedSource, displayPath, resolvedRoot = _sourceContext(document, sourcePath, sourceText, workspaceRoot)
     sourceRevision = _sourceRevision(document, resolvedSource, displayPath, packageLock)
@@ -174,17 +190,19 @@ def compileDocument(
             if block.type in {"code", "markdown", "automation"}
         ]
     )
+    graph = _documentGraph(document)
+    executionBlockIds = tuple(_executionProjectionBlockIds(graph, entryBlockIds, executionScope))
     results = tuple(
         compileExecutableUnit(
             document,
-            entryBlockId,
+            blockId,
             sourcePath=displayPath,
             sourceText=resolvedSource,
             workspaceRoot=resolvedRoot,
             packageLock=packageLock,
             sourceRevision=sourceRevision,
         )
-        for entryBlockId in entryBlockIds
+        for blockId in executionBlockIds
     )
     diagnostics = tuple(
         _dedupeDiagnostics([diagnostic for result in results for diagnostic in result.unit["diagnostics"]])
@@ -194,10 +212,22 @@ def compileDocument(
         key=lambda target: _TARGET_ORDER[target],
         default="blocked",
     )
+    blockById = {block.id: block for block in document.blocks}
+    projectionPayload = [
+        {
+            "blockId": blockId,
+            "type": blockById[blockId].type,
+            "contentHash": sourceRevision.blockHashes[blockId],
+        }
+        for blockId in executionBlockIds
+    ]
+    executionProjectionHash = _contentHash(_canonicalBytes(projectionPayload))
     manifestPayload = {
         "schemaVersion": 1,
         "sourceRevision": sourceRevision.payload(),
         "entryBlockIds": entryBlockIds,
+        "executionBlockIds": executionBlockIds,
+        "executionProjectionHash": executionProjectionHash,
         "unitManifestHashes": [result.manifestHash for result in results],
         "runtimeTarget": runtimeTarget,
     }
@@ -205,6 +235,8 @@ def compileDocument(
         schemaVersion=1,
         runtimeTarget=runtimeTarget,
         entryBlockIds=entryBlockIds,
+        executionBlockIds=executionBlockIds,
+        executionProjectionHash=executionProjectionHash,
         units=results,
         diagnostics=diagnostics,
         sourceRevision=sourceRevision,
@@ -229,17 +261,7 @@ def compileExecutableUnit(
     blockById = {block.id: block for block in document.blocks}
     if entryBlockId not in blockById:
         raise ValueError(f"entry block does not exist: {entryBlockId}")
-    graph = buildReactiveGraph(
-        [
-            {
-                **block.model_dump(),
-                "type": "code" if block.type == "automation" else block.type,
-            }
-            for block in document.blocks
-        ],
-        analyzeCellBindings,
-        analyzeMarkdownRefs,
-    )
+    graph = _documentGraph(document)
     try:
         closureIds = dependencyClosure(graph, entryBlockId)
     except KeyError as exc:
@@ -285,12 +307,31 @@ def compileExecutableUnit(
     diagnostics = _dedupeDiagnostics(diagnostics)
     decision = _targetDecision(requiredTarget, diagnostics)
     dependencyIds = [blockId for blockId in closureIds if blockId != entryBlockId]
-    unresolvedUses = sorted(
-        {name for blockId in closureIds for name in graph.nodes[blockId].uses if not graph.definedBy.get(name)}
-    )
+    pythonBuiltinNames = frozenset(dir(builtins))
+    unresolvedUses = sorted({
+        name
+        for blockId in closureIds
+        for name in graph.nodes[blockId].uses
+        if not graph.definedBy.get(name) and name not in pythonBuiltinNames
+    })
     entryDefines = graph.nodes[entryBlockId].defines
     dependencyPayload = [{"blockId": blockId, "contentHash": revision.blockHashes[blockId]} for blockId in closureIds]
     sourceSpan = spans.get(entryBlockId, fallbackSpans[entryBlockId])
+    proofLineage = promotedBlockProofLineage(
+        blockById[entryBlockId].sourceType,
+        blockById[entryBlockId].payload,
+    )
+    resolvedCheckScenarioIds = sorted(set(checkScenarioIds or []))
+    resolvedEvidenceReceiptIds = sorted(set(evidenceReceiptIds or []))
+    if proofLineage is not None:
+        lineageCheckIds = list(proofLineage["learningCheckIds"])
+        lineageCreditIds = list(proofLineage["learningCreditIds"])
+        if resolvedCheckScenarioIds and resolvedCheckScenarioIds != lineageCheckIds:
+            raise ValueError("caller check IDs do not match promoted block proof lineage")
+        if resolvedEvidenceReceiptIds and resolvedEvidenceReceiptIds != lineageCreditIds:
+            raise ValueError("caller evidence IDs do not match promoted block proof lineage")
+        resolvedCheckScenarioIds = lineageCheckIds
+        resolvedEvidenceReceiptIds = lineageCreditIds
     unit: ExecutableUnitSpec = {
         "schemaVersion": 1,
         "unitId": "unit:"
@@ -314,11 +355,14 @@ def compileExecutableUnit(
         "statePolicy": document.app.statePolicy,
         "runtimeTarget": decision.selected,
         "sourceSpan": sourceSpan,
-        "sourceHash": revision.sourceHash,
+        "entryBlockHash": _proofHash(blockById[entryBlockId].content.encode("utf-8")),
+        "sourceFileHash": revision.sourceHash,
+        "sourceRevisionHash": revision.revisionHash,
         "dependencyHash": _contentHash(_canonicalBytes(dependencyPayload)),
         "assetHashes": assets,
-        "checkScenarioIds": sorted(set(checkScenarioIds or [])),
-        "evidenceReceiptIds": sorted(set(evidenceReceiptIds or [])),
+        "checkScenarioIds": resolvedCheckScenarioIds,
+        "evidenceReceiptIds": resolvedEvidenceReceiptIds,
+        "proofLineage": proofLineage,
         "diagnostics": diagnostics,
     }
     manifestPayload = {
@@ -335,6 +379,40 @@ def compileExecutableUnit(
         packages=tuple(sorted(document.runtime.packages)),
         manifestHash=_contentHash(_canonicalBytes(manifestPayload)),
     )
+
+
+def _documentGraph(document: CodaroDocument) -> ReactiveGraph:
+    return buildReactiveGraph(
+        [
+            {
+                **block.model_dump(),
+                "type": "code" if block.type == "automation" else block.type,
+            }
+            for block in document.blocks
+        ],
+        analyzeCellBindings,
+        analyzeMarkdownRefs,
+    )
+
+
+def _executionProjectionBlockIds(
+    graph: ReactiveGraph,
+    entryBlockIds: tuple[str, ...],
+    executionScope: Literal["app", "entryClosure"],
+) -> list[str]:
+    if executionScope not in {"app", "entryClosure"}:
+        raise ValueError(f"unsupported execution scope: {executionScope}")
+    for entryBlockId in entryBlockIds:
+        if entryBlockId not in graph.nodes:
+            raise ValueError(f"entry block is not executable: {entryBlockId}")
+    if executionScope == "app":
+        return getAllExecutionOrder(graph)
+    included = {
+        blockId
+        for entryBlockId in entryBlockIds
+        for blockId in dependencyClosure(graph, entryBlockId)
+    }
+    return stableTopologicalOrder(graph, included)
 
 
 def _sourceContext(
@@ -516,7 +594,6 @@ class _EffectCollector(ast.NodeVisitor):
                 "local", "OS_API_REQUIRES_LOCAL", f"운영체제 API {module}은 로컬 실행이 필요합니다.", node
             )
         elif root in {item.split(".", 1)[0] for item in _NETWORK_MODULES}:
-            self.networkOrigins.add("dynamic")
             self._raiseTarget(
                 "server", "NETWORK_REQUIRES_SERVER", f"네트워크 모듈 {module}은 서버 실행이 필요합니다.", node
             )
@@ -743,17 +820,6 @@ def _graphDiagnostics(
                     spans.get(blockId, fallbackSpans[blockId]),
                 )
             )
-    for variable, consumer, _provider in graphDiagnostics.definitionOrder:
-        if consumer in closure:
-            result.append(
-                _diagnostic(
-                    consumer,
-                    "DEFINITION_ORDER_BLOCKED",
-                    f"{variable}을 정의 셀보다 먼저 사용해 실행 순서를 보장할 수 없습니다.",
-                    "blocked",
-                    spans.get(consumer, fallbackSpans[consumer]),
-                )
-            )
     return result
 
 
@@ -874,8 +940,10 @@ def _keywordString(node: ast.Call, name: str) -> str | None:
 def _urlOrigin(value: str | None) -> str:
     if not value:
         return "dynamic"
-    parsed = urlsplit(value)
-    return f"{parsed.scheme}://{parsed.netloc}" if parsed.scheme and parsed.netloc else "dynamic"
+    try:
+        return canonicalNetworkOrigin(value)
+    except ExecutionPolicyError:
+        return "dynamic"
 
 
 def _packageName(requirement: str) -> str:
@@ -896,3 +964,8 @@ def _canonicalBytes(value: Any) -> bytes:
 
 def _contentHash(payload: bytes) -> str:
     return f"{_HASH_PREFIX}{hashlib.sha256(payload).hexdigest()}"
+
+
+def _proofHash(payload: bytes) -> str:
+    encoded = base64.urlsafe_b64encode(hashlib.sha256(payload).digest()).decode("ascii").rstrip("=")
+    return f"{_HASH_PREFIX}{encoded}"

@@ -51,6 +51,12 @@ async function loadFromManifest(manifestUrl: URL): Promise<LoadedStaticPublicati
   const rawDocument = JSON.parse(new TextDecoder().decode(documentBytes));
   const normalized = normalizeDocumentPayload(rawDocument, { fallbackIdPrefix: "publication" });
   if (!normalized) throw new Error("정적 publication 문서 형식이 잘못됐습니다.");
+  const bundledExecutionBlockIds = normalized.blocks
+    .filter((block) => block.type === "code" || block.type === "automation" || block.type === "markdown")
+    .map((block) => block.id);
+  if (JSON.stringify(bundledExecutionBlockIds) !== JSON.stringify(manifest.executionBlockIds)) {
+    throw new Error("정적 publication execution projection이 bundle 문서와 다릅니다.");
+  }
   return { baseUrl, document: normalized, manifest };
 }
 
@@ -70,16 +76,26 @@ function parseManifest(raw: unknown): PublicationManifest {
   const requiredStrings = [
     "compilerManifestHash",
     "sourceRevisionHash",
+    "executionProjectionHash",
     "documentPath",
     "manifestHash",
   ] as const;
   if (requiredStrings.some((key) => typeof raw[key] !== "string")) {
     throw new Error("정적 publication manifest 필드가 잘못됐습니다.");
   }
-  if (!Array.isArray(raw.entryBlockIds) || !Array.isArray(raw.files)
+  if (!Array.isArray(raw.entryBlockIds) || !Array.isArray(raw.executionBlockIds) || !Array.isArray(raw.files)
       || !Array.isArray(raw.dataAssets) || !Array.isArray(raw.packageAssets)
-      || !isRecord(raw.runtime)) {
+      || !isRecord(raw.runtime) || !isRecord(raw.proof)) {
     throw new Error("정적 publication manifest 목록이 잘못됐습니다.");
+  }
+  if (
+    raw.proof.schemaVersion !== 1
+    || !["verified", "unverified"].includes(String(raw.proof.verificationStatus))
+    || !Array.isArray(raw.proof.lineages)
+    || typeof raw.proof.proofHash !== "string"
+    || (raw.proof.verificationStatus === "verified" && raw.proof.lineages.length === 0)
+  ) {
+    throw new Error("정적 publication proof 계약이 잘못됐습니다.");
   }
   if ("kind" in raw.runtime) throw new Error("server runtime은 정적 publication에서 열 수 없습니다.");
   const manifest = raw as unknown as PublicationManifest;

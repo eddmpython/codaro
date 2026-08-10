@@ -81,6 +81,36 @@ class PublicationInspectRequest(BaseModel):
     packageLock: dict[str, Any] = Field(default_factory=dict)
 
 
+class PublicationBuildRequest(BaseModel):
+    sourcePath: str
+    outputPath: str | None = None
+    target: Literal["browser", "server", "local", "embed"]
+    entryBlockId: str | None = None
+    packageLock: dict[str, Any] = Field(default_factory=dict)
+
+
+class PublicationOutputRequest(BaseModel):
+    outputPath: str
+    target: Literal["browser", "server", "local", "embed"]
+    approvedPolicyHash: str | None = None
+
+
+class PublicationStopRequest(BaseModel):
+    serverId: str
+
+
+class PublicationDeployRequest(BaseModel):
+    publicationPath: str
+    outputPath: str
+    target: Literal["folder", "zip", "self-host"]
+
+
+class PublicationRollbackRequest(BaseModel):
+    outputPath: str
+    target: Literal["browser", "server", "local", "embed", "folder", "zip", "self-host"]
+    versionId: str
+
+
 class EnvironmentInfo(BaseModel):
     pythonVersion: str
     platform: str

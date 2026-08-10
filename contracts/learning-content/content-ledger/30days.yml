@@ -642,7 +642,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "30days/day30_최종프로젝트"
     identityLedgerRef: "identity-ledger/30days.yml"
-    lessonContentHash: "948c0c87ef1b06cc93ee5bf597b5b2d5d51d8b61cc53b30432315ab356580c5b"
+    lessonContentHash: "a0c60d3d4b10fa3bd1da955a0168fcc70c7fdd28327f575bd993860d85fb93a5"
     disposition: migrate
     ownerPacket: "01-python-foundation"
     eligiblePathIds: ["pythonFoundation","reportAutomationFoundation"]

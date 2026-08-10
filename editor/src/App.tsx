@@ -44,7 +44,7 @@ import {
   type ReconnectVariant,
 } from "@/lib/providerReconnectPolicy";
 import { WidgetSessionProvider } from "@/lib/widgetSession";
-import { isServerPublicationPage } from "@/lib/serverPublication";
+import { isPublishedAppPage } from "@/lib/serverPublication";
 import {
   installBlockEmbedFrameBridge,
   resolveBlockEmbedFrameConfig,
@@ -66,7 +66,7 @@ import type {
 const CURRICULUM_HOME_ROUTE = "__curriculum-home__";
 
 function App() {
-  const serverPublicationPage = isServerPublicationPage();
+  const publishedAppPage = isPublishedAppPage();
   const blockEmbedFrame = useRef(resolveBlockEmbedFrameConfig()).current;
   const [surface, setSurface, runRouteState, navigateRunRoute, routeRestoreRevision] = useSurfaceRoute();
   const initialRouteLesson = lessonRefFromKey(runRouteState.lessonKey);
@@ -103,7 +103,7 @@ function App() {
     else setDesignSurface("chat");
   }, [setDesignSurface, surface]);
   const [loadState, setLoadState] = useState<LoadState>("loading");
-  const [serverAppMode, setServerAppMode] = useState<boolean | null>(serverPublicationPage ? true : null);
+  const [serverAppMode, setServerAppMode] = useState<boolean | null>(publishedAppPage ? true : null);
   const [appPreviewOpen, setAppPreviewOpen] = useState(false);
   const [notebookDocumentPath, setNotebookDocumentPath] = useState<string | null>(null);
   // apiOnline 은 부트스트랩 1회가 아니라 라이브 연결 스토어가 소유한다(세션 중간 끊김 감지).
@@ -455,11 +455,11 @@ function App() {
   // 끊겼다가 다시 연결되면(offline→online) 자동화 스냅샷을 한 번 새로고침해 멈춰 있던 상태를 회복한다.
   const apiOnlinePrevRef = useRef(apiOnline);
   useEffect(() => {
-    if (!serverPublicationPage && !apiOnlinePrevRef.current && apiOnline) {
+    if (!publishedAppPage && !apiOnlinePrevRef.current && apiOnline) {
       void refreshAutomation();
     }
     apiOnlinePrevRef.current = apiOnline;
-  }, [apiOnline, refreshAutomation, serverPublicationPage]);
+  }, [apiOnline, publishedAppPage, refreshAutomation]);
 
   const openSharePackCurriculum = useCallback(async (packId: string, path: string, version?: string | null) => {
     const payload = await loadSharePackCurriculum(packId, path, version);
@@ -550,8 +550,10 @@ function App() {
     notebookPersistence,
     notebookRunning,
     notebookToolsOpen,
+    notebookDocumentPath,
     notice,
     prompt,
+    publicationTarget: diagnostics.capability?.runtimeTarget ?? null,
     reactiveEnabled,
     referenceLoading,
     refreshAutomation,
@@ -714,7 +716,7 @@ function App() {
         onToggleTerminal={toggleTerminal}
       />
 
-      <SidebarInset className="relative flex h-svh min-h-0 min-w-0 flex-col overflow-hidden">
+      <SidebarInset className="relative flex h-svh min-h-0 min-w-0 flex-col overflow-clip">
         <div
           className={surface === "editor"
             ? "relative h-12 shrink-0 bg-background"

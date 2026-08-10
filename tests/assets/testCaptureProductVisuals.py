@@ -324,13 +324,20 @@ class CaptureProductVisualsTest(unittest.TestCase):
                 )
                 self.assertEqual(
                     [task["id"] for task in index["tasks"]],
-                    ["task-daily-summary", "task-workbook-cleanup"],
+                    [
+                        "task-daily-summary",
+                        "task-workbook-cleanup",
+                        "task-contract-passed",
+                        "task-operational-proof",
+                    ],
                 )
                 self.assertEqual(
                     {task["updatedAt"] for task in index["tasks"]},
                     {
                         "2026-07-22T08:00:00+00:00",
                         "2026-07-23T08:00:00+00:00",
+                        "2026-07-24T08:00:00+00:00",
+                        "2026-07-25T08:00:00+00:00",
                     },
                 )
 

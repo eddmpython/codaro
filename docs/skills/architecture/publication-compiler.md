@@ -26,6 +26,10 @@ whenToUse: publication target, ExecutableUnit, package lock, asset 수집, edito
 
 같은 source와 같은 lock은 같은 closure와 manifest hash를 만든다. compiler는 source나 workspace 파일을 변경하지 않는다.
 
+`entryBlockHash`, `sourceFileHash`, `sourceRevisionHash`는 서로 다른 identity다. `entryBlockHash`는 실행 entry의 UTF-8 source bytes이며 학습 `SourceRevision.sourceHash`와 비교한다. `sourceFileHash`는 metadata를 포함한 전체 Percent bytes다. `sourceRevisionHash`는 문서 경로, 전체 source, block, package lock을 합친 compiler revision이다. publication proof는 이 셋을 서로 대신 사용하지 않는다.
+
+`sourceType="promoted"` 블록은 versioned payload의 proof lineage가 필수다. compiler는 source revision receipt ID, source block hash, dependency hash, learning credit ID, learning check ID를 검증해 `ExecutableUnitSpec.proofLineage`로 그대로 전달한다. payload의 ID나 hash가 한 byte라도 달라지면 lineage hash 검증에서 닫힌다.
+
 ## target 정책
 
 | target | 허용 경계 | 대표 승급 또는 차단 사유 |

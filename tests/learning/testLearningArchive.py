@@ -361,6 +361,7 @@ def testLearningArchiveApiUsesConfiguredWorkspaceInsteadOfProcessRoot(
 
     with TestClient(createServerApp(workspaceRoot=workspaceRoot)) as client:
         missing = client.get("/api/curriculum/learning-archive/current")
+        synced = client.post("/api/curriculum/learning-archive/sync", json={"archive": archive})
         imported = client.post("/api/curriculum/learning-archive/import", json={"archive": archive})
         draftId = imported.json()["automationDrafts"][0]["draftId"]
         adopted = client.post(
@@ -377,8 +378,12 @@ def testLearningArchiveApiUsesConfiguredWorkspaceInsteadOfProcessRoot(
 
     assert missing.status_code == 200
     assert missing.json() is None
+    assert synced.status_code == 200
+    assert synced.json()["archiveId"] == archive["manifest"]["archiveId"]
+    assert synced.json()["changed"] is True
     assert imported.status_code == 200
     assert imported.json()["archiveId"] == archive["manifest"]["archiveId"]
+    assert imported.json()["changed"] is False
     assert imported.json()["automationDrafts"][0]["enabled"] is False
     assert imported.json()["automationDrafts"][0]["schedule"] is None
     assert adopted.status_code == 200

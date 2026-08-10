@@ -1181,36 +1181,42 @@ assessment:
     outcomeIds: [python.projectDelivery]
     unseen: true
     sourceSectionIds:
-    - day30-validate-pipeline-retrieval
+    - day30-sales-report-mastery
     title: 검증된 JSON 보고서를 자동화로 넘기기
     subtitle: 로컬에서 결과물과 내용을 함께 확인
-    goal: 새 입력을 집계해 JSON 파일을 만들고 저장된 내용을 다시 읽어 검증한다.
-    why: 반환값만 맞는 코드와 다시 열 수 있는 결과물을 만든 코드를 구분해야 자동화로 이어갈 수 있습니다.
-    explanation: 이 과제는 로컬 격리 실행에서 두 입력을 처리하고 생성된 JSON 파일의 내용과 해시를 증거로 남깁니다.
+    goal: 이미 검증한 count, total, average를 입력받아 JSON 보고서로 저장하고 다시 읽어 확인한다.
+    why: 함수 테스트만 통과한 코드가 아니라, 사용자가 고른 입력과 출력 경로로 다시 실행할 수 있어야 자동화로 이어집니다.
+    explanation: 강검증은 build_validated_report 함수와 생성된 JSON 파일을 함께 확인합니다. 같은 소스는 승격 후 count, total, average, outputPath를 입력받는 자동화로 실행됩니다.
     tips:
-    - 함수 이름과 매개변수는 그대로 두고 함수 본문을 완성하세요.
-    - 보고서를 저장한 뒤 같은 파일을 다시 읽어 반환값의 persisted에 넣으세요.
+    - 함수 이름과 count, total, average, outputPath 매개변수는 그대로 두세요.
+    - 보고서를 저장한 뒤 같은 outputPath를 다시 읽어 반환값의 persisted에 넣으세요.
+    - 함수 아래의 try/except/else는 강검증에서는 건너뛰고, 자동화 실행 때는 사용자 입력으로 함수를 한 번 호출합니다.
     exercise:
-      prompt: build_validated_report(rows, output_name)가 count, total, average 보고서를 JSON으로 저장하고 report와 다시 읽은 persisted를 함께 반환하도록 완성하세요.
+      prompt: build_validated_report(count, total, average, outputPath)가 보고서를 JSON으로 저장하고 report와 다시 읽은 persisted를 함께 반환하도록 완성하세요. 함수 아래의 자동화 호출부는 그대로 두세요.
       starterCode: |-
-        def build_validated_report(rows, output_name):
+        def build_validated_report(count, total, average, outputPath):
             raise NotImplementedError
+
+        if all(name in globals() for name in ('count', 'total', 'average', 'outputPath')):
+            automation_result = build_validated_report(count, total, average, outputPath)
       solution: |-
-        def build_validated_report(rows, output_name):
+        def build_validated_report(count, total, average, outputPath):
             import json
             from pathlib import Path
-            amounts = [float(row['amount']) for row in rows]
             report = {
-                'count': len(amounts),
-                'total': sum(amounts),
-                'average': sum(amounts) / len(amounts) if amounts else 0,
+                'count': count,
+                'total': total,
+                'average': average,
             }
-            target = Path(output_name)
+            target = Path(outputPath)
             target.write_text(json.dumps(report, ensure_ascii=False, sort_keys=True), encoding='utf-8')
             return {'report': report, 'persisted': json.loads(target.read_text(encoding='utf-8'))}
+
+        if all(name in globals() for name in ('count', 'total', 'average', 'outputPath')):
+            automation_result = build_validated_report(count, total, average, outputPath)
       hints:
-      - amounts를 먼저 만든 뒤 count, total, average를 계산하세요.
-      - Path.write_text로 저장하고 json.loads로 같은 파일을 다시 읽으세요.
+      - 매개변수 count, total, average를 report dict의 같은 이름에 연결하세요.
+      - Path(outputPath).write_text로 저장하고 json.loads로 같은 파일을 다시 읽으세요.
     check:
       id: python.30days.day30.report-artifact.application.behavior.v1
       version: 1
@@ -1235,16 +1241,18 @@ assessment:
         cases:
         - id: retail
           arguments:
-          - value:
-            - {item: pen, amount: '1000'}
-            - {item: book, amount: '2500'}
+          - value: 2
+          - value: 3500.0
+          - value: 1750.0
           - value: report-retail.json
           expectedReturn:
             report: {count: 2, total: 3500.0, average: 1750.0}
             persisted: {count: 2, total: 3500.0, average: 1750.0}
         - id: empty
           arguments:
-          - value: []
+          - value: 0
+          - value: 0
+          - value: 0
           - value: report-empty.json
           expectedReturn:
             report: {count: 0, total: 0, average: 0}

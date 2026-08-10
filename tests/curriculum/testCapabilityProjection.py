@@ -8,6 +8,7 @@ from codaro.curriculum.capabilityProjection import projectCapability
 from codaro.curriculum.learningEvent import learningEventDigest, sealLearningEvent
 from codaro.curriculum.taxonomy import TaskFamilyDef, TaskFamilyVariantDef, loadTaxonomy
 from codaro.proof import contentDigest, sealProofReceipt, validateOperationalLink
+from codaro.executionIsolation import proofExecutionIsolationPolicyHash
 
 
 def _transaction(
@@ -264,6 +265,9 @@ def testApplicationProofRequiresLocalArtifactAndOnlyTrustsLinkedOperationalRecei
         "taskId": "task-report",
         "runId": "run-report",
         "runtimeTier": "local",
+        "isolationProfile": "codaro-local-restricted-v1",
+        "isolationPolicyHash": proofExecutionIsolationPolicyHash(),
+        "isolationTerminationStatus": "destroyed",
         "learnerSelectedInput": True,
         "startedAt": "2026-01-03T00:00:00+00:00",
         "finishedAt": "2026-01-03T00:01:00+00:00",

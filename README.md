@@ -46,7 +46,7 @@
 
 > **한 줄로** - 웹에서는 바로 배우고, Local에서는 같은 코드를 내 환경의 반복 업무로 확장합니다.
 
-같은 Python 셀을 앱, 자동화, 검증된 배포 산출물로 이어갑니다. Codaro는 browser, server, local 실행 경계를 소스에서 판정하고, 같은 Percent Python 파일로 앱 미리보기와 재현 가능한 bundle을 만듭니다.
+Python 셀을 target별 앱, 자동화 또는 검증된 배포 산출물로 이어갑니다. Codaro는 browser, server, local 실행 경계를 소스에서 판정하고, 각 Percent Python 파일로 앱 미리보기와 재현 가능한 bundle을 만듭니다.
 
 provider 없이 folder, ZIP, self-host 산출물까지 만들고 검증할 수 있습니다. 공용 URL의 DNS, TLS, uptime과 외부 provider의 지속성은 이 기계 검증 범위에 포함하지 않습니다.
 
@@ -162,12 +162,12 @@ Local은 웹 학습의 입장권이 아닙니다. 실제 파일·폴더, 임의 
 
 ```powershell
 codaro inspect examples/apps/browser-calculator/app.py
-codaro build examples/apps/browser-calculator/app.py --target static --output ./browser-calculator
+codaro build examples/apps/browser-calculator/app.py --target browser --output ./browser-calculator
 codaro serve ./browser-calculator
 codaro deploy ./browser-calculator --target zip --output ./browser-calculator.zip
 ```
 
-정적 bundle은 외부 network 요청 없이 동작하고, 서버 bundle은 secret 이름만 보존하며 값은 client payload에 포함하지 않습니다. Local 자동화는 명시한 파일 권한과 의미적 output contract를 통과해야 운영 증거가 됩니다. 상세 계약은 [reference product 문서](docs/skills/architecture/reference-products.md)에 있습니다.
+정적 bundle은 외부 network 요청 없이 동작하고, 서버 bundle은 secret 이름만 보존하며 값은 client payload에 포함하지 않습니다. Local 앱은 exact policy hash를 사용자가 승인한 뒤 immutable session에서 파일과 process 작업을 실행합니다. 학습 결과가 운영 증거로 승격되는 별도 계약은 Day30 golden journey가 검증합니다. 상세 계약은 [reference product 문서](docs/skills/architecture/reference-products.md)에 있습니다.
 
 ## Codaro vs Jupyter · marimo · Streamlit · ipynb
 

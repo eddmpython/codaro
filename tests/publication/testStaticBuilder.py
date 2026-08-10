@@ -120,6 +120,12 @@ def testTwoCleanBuildsReuseSameImmutableBundleAndPreserveSource(tmp_path: Path) 
     assert "https://cdn.example" not in index
     assert "const isLocalPreview = true" in index
     assert first.manifest["dataAssets"][0]["sourcePath"] == "data.csv"
+    assert first.manifest["executionBlockIds"] == ["entry"]
+    assert first.manifest["executionProjectionHash"].startswith("sha256-")
+    publicationDocument = json.loads(
+        first.bundleRoot.joinpath("document.json").read_text(encoding="utf-8")
+    )
+    assert [block["id"] for block in publicationDocument["blocks"]] == ["entry"]
     runtimeManifest = json.loads(first.bundleRoot.joinpath("pyodide-assets.json").read_text(encoding="utf-8"))
     assert runtimeManifest["packageRoot"] == "./vendor/pyodide/"
     assert all(item["url"].startswith("./vendor/pyodide/") for item in runtimeManifest["files"])
@@ -178,6 +184,33 @@ def testUnsupportedTargetReportsExactCompilerBlockerAndKeepsPreviousActive(tmp_p
 
     assert excInfo.value.diagnostics[0]["sourceSpan"]["startLine"] >= 1
     assert verifyPublication(output).bundleHash == previous.bundleHash
+
+
+def testAppBuildAnalyzesHiddenRunAllBlockOutsideVisibleEntries(tmp_path: Path) -> None:
+    shell = _shell(tmp_path)
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    document = CodaroDocument(
+        id="full-projection-fixture",
+        title="전체 실행 프로젝션",
+        blocks=[
+            BlockConfig(id="visible", type="code", content="print('visible')"),
+            BlockConfig(
+                id="hidden-network",
+                type="code",
+                content="import requests\nrequests.get('https://example.com')",
+            ),
+        ],
+        metadata=DocumentMetadata(sourceFormat="percent"),
+        app=AppConfig(title="전체 실행 프로젝션", entryBlockIds=["visible"]),
+    )
+    source = workspace / "app.py"
+    source.write_text(writePercentDocument(document), encoding="utf-8")
+
+    with pytest.raises(PublicationBuildError, match="NETWORK_REQUIRES_SERVER"):
+        buildStaticPublication(source, tmp_path / "site", webBuildRoot=shell)
+
+    assert not (tmp_path / "site/active.json").exists()
 
 
 def testPackageWheelMustBeHashedAndStayInsideWorkspace(tmp_path: Path) -> None:

@@ -36,7 +36,8 @@ probe
 activate
   -> 검증 성공 뒤 pointer 원자 교체
 receipt
-  -> SourceRevision, BuildArtifact, DeploymentReceipt를 한 archive transaction으로 기록
+  -> 일반 문서는 새 SourceRevision, BuildArtifact, DeploymentReceipt를 기록
+  -> promoted 문서는 기존 SourceRevision과 publication BuildArtifact에 DeploymentReceipt를 연결
 ```
 
 probe가 실패하면 active pointer와 proof archive는 바뀌지 않는다. activate 도중 검증이나 state 기록이 실패하면 이전 pointer와 state를 복원한다. rollback은 보존된 immutable version의 pointer만 다시 활성화하고 source와 bundle bytes를 덮어쓰지 않는다.
@@ -52,9 +53,15 @@ probe가 실패하면 active pointer와 proof archive는 바뀌지 않는다. ac
 
 `DeploymentReceipt`는 검증된 배포 artifact가 어느 source와 build에서 왔는지 증명한다. URL의 uptime, DNS, TLS, 실제 사용자 도달 여부는 증명하지 않는다. provider upload 오류는 기존 build receipt, learning evidence, 이전 deployment pointer를 수정하지 않는다.
 
+promoted publication은 manifest가 참조한 `SourceRevision`과 정확한 publication `BuildArtifact`가 archive에서 resolve되지 않으면 pointer를 활성화하지 않는다. 전체 Percent revision hash를 source block hash로 합성하지 않는다. source, evidence, permission, operational artifact, publication artifact 중 하나가 달라지면 manifest 또는 build identity가 바뀌므로 기존 deployment receipt를 재사용할 수 없다. 일반 문서는 배포할 수 있지만 결과 status는 항상 `unverified`다.
+
 ## 앱 표면
 
-저장된 Local 문서의 앱 미리보기에는 compiler가 판정한 browser 또는 server target에 맞는 build, ZIP, self-host 명령을 표시한다. local 또는 blocked 기능은 웹 bundle을 만들 수 있다고 안내하지 않는다. 이 표면은 provider credential을 받거나 저장하지 않는다.
+저장된 Local 문서의 앱 미리보기는 `PublicationWorkbench`와 `/api/publication/*`를 통해 build, verify, localhost serve, stop, embed, folder, ZIP, self-host, rollback을 직접 실행한다. 터미널 명령 복사는 이 여정의 필수 단계가 아니다. 각 동작은 bounded job ID, 상태, 결과 receipt ID 또는 구체적 compiler diagnostic을 반환한다.
+
+`editor/src/components/app/deploymentGuide.tsx`와 `window.codaroGui`의 `publication.*` action은 같은 HTTP API를 사용한다. 화면과 GUI control이 별도 build 규칙을 갖지 않는다. 서버가 시작한 localhost publication은 workbench가 소유하며 제품 서버 종료 때 함께 닫힌다.
+
+local 또는 blocked 기능은 browser bundle을 만들 수 있다고 안내하지 않는다. local target은 immutable local publication 계약이 준비된 경우 그 경로를 사용하고, 그렇지 않으면 명시적으로 차단한다. 이 표면은 provider credential을 받거나 저장하지 않는다.
 
 ## 검증
 

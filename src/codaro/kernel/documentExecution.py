@@ -32,6 +32,7 @@ async def captureDocument(
     *,
     manager: SessionManager,
     onBlock: Callable[[BlockConfig], None] | None = None,
+    onSessionCreated: Callable[[KernelSession], None] | None = None,
     executableBlockTypes: frozenset[str] = frozenset({"code"}),
     inputPrelude: str = "",
 ) -> CaptureResult:
@@ -48,6 +49,8 @@ async def captureDocument(
     error = ""
     failedBlockId = ""
     try:
+        if onSessionCreated is not None:
+            onSessionCreated(session)
         if inputPrelude:
             preludeResult = await session.execute(inputPrelude, blockId="codaro-task-inputs")
             if preludeResult.status == "error":

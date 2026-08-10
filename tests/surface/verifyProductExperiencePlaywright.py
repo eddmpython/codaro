@@ -716,6 +716,83 @@ def seedLocalAutomationFixture(storageRoot: Path, workspaceRoot: Path) -> None:
         "# %% [code]\nraise FileNotFoundError('입력 워크북을 찾지 못했습니다.')\n",
         encoding="utf-8",
     )
+    (automationRoot / "contract_report.py").write_text(
+        "# %% [code]\nprint('계약을 통과했습니다.')\n",
+        encoding="utf-8",
+    )
+    from codaro.executionIsolation import proofExecutionIsolationPolicyHash
+    from codaro.proof import ProofArchive, contentDigest, sealProofReceipt
+
+    proofSourceHash = contentDigest("automation-ui-proof-source")
+    proofBuildHash = contentDigest((automationRoot / "contract_report.py").read_bytes())
+    proofInputHash = contentDigest("automation-ui-proof-input")
+    proofArtifactHash = contentDigest("automation-ui-proof-artifact")
+    proofSource = sealProofReceipt({
+        "kind": "sourceRevision",
+        "sourceHash": proofSourceHash,
+        "dependencyHash": contentDigest("automation-ui-proof-dependencies"),
+        "packageSetHash": contentDigest("automation-ui-proof-packages"),
+        "effectSetHash": contentDigest("automation-ui-proof-effects"),
+        "documentPath": "automation/contract_report.py",
+        "blockIds": ["proof-report"],
+        "createdAt": "2026-07-25T07:59:00+00:00",
+    })
+    proofBuild = sealProofReceipt({
+        "kind": "buildArtifact",
+        "sourceRevisionId": proofSource.receiptId,
+        "sourceHash": proofSourceHash,
+        "buildArtifactHash": proofBuildHash,
+        "manifestHash": contentDigest("automation-ui-proof-manifest"),
+        "target": "local",
+        "createdAt": "2026-07-25T07:59:10+00:00",
+    })
+    proofPermission = sealProofReceipt({
+        "kind": "permission",
+        "sourceRevisionId": proofSource.receiptId,
+        "sourceHash": proofSourceHash,
+        "effectSetHash": proofSource.effectSetHash,
+        "permissionSetHash": contentDigest("automation-ui-proof-permissions"),
+        "approvedAt": "2026-07-25T07:59:20+00:00",
+    })
+    proofCheck = sealProofReceipt({
+        "kind": "functionalCheck",
+        "sourceRevisionId": proofSource.receiptId,
+        "sourceHash": proofSourceHash,
+        "buildArtifactReceiptId": proofBuild.receiptId,
+        "buildArtifactHash": proofBuildHash,
+        "inputHash": proofInputHash,
+        "checkSpecHash": contentDigest("automation-ui-proof-check"),
+        "artifactHashes": [proofArtifactHash],
+        "passed": True,
+        "checkedAt": "2026-07-25T08:00:01+00:00",
+    })
+    proofOperational = sealProofReceipt({
+        "kind": "operationalRun",
+        "sourceRevisionId": proofSource.receiptId,
+        "sourceHash": proofSourceHash,
+        "buildArtifactReceiptId": proofBuild.receiptId,
+        "buildArtifactHash": proofBuildHash,
+        "inputHash": proofInputHash,
+        "permissionReceiptId": proofPermission.receiptId,
+        "permissionSetHash": proofPermission.permissionSetHash,
+        "functionalCheckReceiptId": proofCheck.receiptId,
+        "artifactHashes": [proofArtifactHash],
+        "learningEvidenceCreditIds": ["automation-ui-credit"],
+        "learningEvidenceArtifactHashes": [contentDigest("automation-ui-learning-artifact")],
+        "capabilityDomainId": "automation-ui-proof",
+        "taskId": "task-operational-proof",
+        "runId": "run-operational-proof",
+        "runtimeTier": "local",
+        "isolationProfile": "codaro-local-restricted-v1",
+        "isolationPolicyHash": proofExecutionIsolationPolicyHash(),
+        "isolationTerminationStatus": "destroyed",
+        "learnerSelectedInput": True,
+        "startedAt": "2026-07-25T08:00:00+00:00",
+        "finishedAt": "2026-07-25T08:00:01+00:00",
+    })
+    proofArchive = ProofArchive(storageRoot / "proofArchive.sqlite3")
+    for proofReceipt in (proofSource, proofBuild, proofPermission, proofCheck, proofOperational):
+        proofArchive.appendReceipt(proofReceipt)
     permissionScopes = [
         "filesystem.read",
         "filesystem.write",
@@ -753,6 +830,36 @@ def seedLocalAutomationFixture(storageRoot: Path, workspaceRoot: Path) -> None:
             "riskLevel": "destructive",
             "safetyApproval": None,
         },
+        {
+            "id": "task-contract-passed",
+            "name": "계약 통과 보고서",
+            "description": "실행 산출물이 의미 계약을 통과한 상태를 보여줍니다.",
+            "documentPath": "automation/contract_report.py",
+            "schedule": None,
+            "inputs": {"period": "this-week"},
+            "outputs": ["stdout"],
+            "createdAt": "2026-07-24T08:00:00+00:00",
+            "updatedAt": "2026-07-24T08:00:00+00:00",
+            "enabled": False,
+            "permissionScopes": permissionScopes,
+            "riskLevel": "destructive",
+            "safetyApproval": None,
+        },
+        {
+            "id": "task-operational-proof",
+            "name": "운영 증거 보고서",
+            "description": "새 입력과 산출물 계약을 통과해 운영 증거가 기록된 상태입니다.",
+            "documentPath": "automation/contract_report.py",
+            "schedule": None,
+            "inputs": {"period": "today"},
+            "outputs": ["stdout"],
+            "createdAt": "2026-07-25T08:00:00+00:00",
+            "updatedAt": "2026-07-25T08:00:00+00:00",
+            "enabled": False,
+            "permissionScopes": permissionScopes,
+            "riskLevel": "destructive",
+            "safetyApproval": None,
+        },
     ]
     runs = {
         "task-daily-summary": [
@@ -760,6 +867,8 @@ def seedLocalAutomationFixture(storageRoot: Path, workspaceRoot: Path) -> None:
                 "id": "run-daily-summary",
                 "taskId": "task-daily-summary",
                 "status": "success",
+                "executionStatus": "success",
+                "semanticStatus": "not-checked",
                 "startedAt": "2026-07-23T08:00:00+00:00",
                 "finishedAt": "2026-07-23T08:00:01+00:00",
                 "durationMs": 846,
@@ -773,12 +882,57 @@ def seedLocalAutomationFixture(storageRoot: Path, workspaceRoot: Path) -> None:
                 "id": "run-workbook-cleanup",
                 "taskId": "task-workbook-cleanup",
                 "status": "failed",
+                "executionStatus": "success",
+                "semanticStatus": "contract-failed",
                 "startedAt": "2026-07-22T08:00:00+00:00",
                 "finishedAt": "2026-07-22T08:00:00+00:00",
                 "durationMs": 219,
                 "output": "",
                 "error": "입력 워크북을 찾지 못했습니다.",
                 "variables": {"workbook": "weekly_report.xlsx"},
+            }
+        ],
+        "task-contract-passed": [
+            {
+                "id": "run-contract-passed",
+                "taskId": "task-contract-passed",
+                "status": "success",
+                "executionStatus": "success",
+                "semanticStatus": "contract-passed",
+                "startedAt": "2026-07-24T08:00:00+00:00",
+                "finishedAt": "2026-07-24T08:00:01+00:00",
+                "durationMs": 312,
+                "output": "계약을 통과했습니다.",
+                "error": None,
+                "variables": {},
+            }
+        ],
+        "task-operational-proof": [
+            {
+                "id": "run-operational-proof",
+                "taskId": "task-operational-proof",
+                "status": "success",
+                "executionStatus": "success",
+                "semanticStatus": "contract-passed",
+                "sourceHash": proofSourceHash,
+                "buildArtifactHash": proofBuildHash,
+                "inputHash": proofInputHash,
+                "artifactDescriptors": [{
+                    "schemaVersion": 1,
+                    "kind": "file",
+                    "origin": "created",
+                    "path": "report.json",
+                    "byteLength": 32,
+                    "contentHash": proofArtifactHash,
+                    "fileCount": 1,
+                }],
+                "operationalReceiptId": proofOperational.receiptId,
+                "startedAt": "2026-07-25T08:00:00+00:00",
+                "finishedAt": "2026-07-25T08:00:01+00:00",
+                "durationMs": 410,
+                "output": "운영 증거가 기록되었습니다.",
+                "error": None,
+                "variables": {},
             }
         ],
     }
@@ -813,6 +967,8 @@ def startLocalServer() -> tuple[Any, threading.Thread, int, tempfile.TemporaryDi
         if [task.id for task in registry.listTasks()] != [
             "task-daily-summary",
             "task-workbook-cleanup",
+            "task-contract-passed",
+            "task-operational-proof",
         ]:
             raise RuntimeError("Local automation fixture did not load deterministically")
     except Exception:
@@ -917,10 +1073,69 @@ def releaseLocalKernelSessions(page: Any, case: dict[str, Any], localPort: int) 
 
 def captureStableViewport(page: Any, screenshotPath: Path) -> None:
     page.mouse.move(0, 0)
+    page.evaluate(
+        """
+        async () => {
+          if (document.fonts) await document.fonts.ready;
+          await new Promise((resolve) => {
+            let previous = '';
+            let stableFrames = 0;
+            let stableSince = performance.now();
+            const sample = () => {
+              const root = document.documentElement;
+              const scrollAreas = [...document.querySelectorAll(
+                "[data-slot='scroll-area-viewport']"
+              )].filter((node) => node instanceof HTMLElement);
+              for (const scrollArea of scrollAreas) {
+                const pinnedTop = scrollArea.getAttribute('data-visual-capture-scroll-top');
+                if (pinnedTop !== null) scrollArea.scrollTop = Number(pinnedTop);
+              }
+              const current = [
+                window.scrollX,
+                window.scrollY,
+                window.innerWidth,
+                window.innerHeight,
+                root.scrollWidth,
+                root.scrollHeight,
+                ...scrollAreas.flatMap((scrollArea) => [
+                  scrollArea.scrollTop,
+                  scrollArea.scrollHeight,
+                  scrollArea.clientHeight,
+                ]),
+              ].join(':');
+              if (current === previous) {
+                stableFrames += 1;
+              } else {
+                stableFrames = 0;
+                stableSince = performance.now();
+              }
+              previous = current;
+              if (stableFrames >= 4 && performance.now() - stableSince >= 500) {
+                resolve();
+                return;
+              }
+              requestAnimationFrame(sample);
+            };
+            requestAnimationFrame(sample);
+          });
+        }
+        """
+    )
     page.add_style_tag(
         content="""
         .cm-cursor,
         .cm-dropCursor {
+          visibility: hidden !important;
+        }
+        * {
+          overflow-anchor: none !important;
+          scrollbar-width: none !important;
+        }
+        *::-webkit-scrollbar {
+          width: 0 !important;
+          height: 0 !important;
+        }
+        [data-slot="scroll-area-scrollbar"] {
           visibility: hidden !important;
         }
         """
@@ -930,6 +1145,31 @@ def captureStableViewport(page: Any, screenshotPath: Path) -> None:
         animations="disabled",
         caret="hide",
         full_page=False,
+    )
+    page.evaluate(
+        """
+        async () => {
+          if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+          }
+          const pinnedScrollAreas = [...document.querySelectorAll(
+            '[data-visual-capture-scroll-top]'
+          )];
+          document.querySelectorAll('[data-visual-capture-spacer]')
+            .forEach((node) => node.remove());
+          pinnedScrollAreas.forEach((node) => {
+              const origin = node.getAttribute('data-visual-capture-scroll-origin');
+              node.removeAttribute('data-visual-capture-scroll-top');
+              node.removeAttribute('data-visual-capture-scroll-origin');
+              if (origin !== null && node instanceof HTMLElement) {
+                node.scrollTop = Number(origin);
+              }
+            });
+          await new Promise((resolve) => requestAnimationFrame(
+            () => requestAnimationFrame(resolve)
+          ));
+        }
+        """
     )
 
 
@@ -3364,6 +3604,12 @@ async ({ surface, expectedTier }) => {
     automationTaskDetailCount: document.querySelectorAll("[data-automation-task-detail]").length,
     automationEStopControlCount: document.querySelectorAll("[data-automation-estop-control='true']").length,
     automationRunCommandCount: document.querySelectorAll("[data-automation-run-command='true']").length,
+    automationExecutionStatus:
+      document.querySelector("[data-automation-run-execution-status]")
+        ?.getAttribute("data-automation-run-execution-status") || null,
+    automationProofStatus:
+      document.querySelector("[data-automation-run-proof-status]")
+        ?.getAttribute("data-automation-run-proof-status") || null,
     automationSafetyState:
       document.querySelector("[data-automation-safety-state]")?.getAttribute("data-automation-safety-state") || null,
     automationRiskLevel:
@@ -4019,6 +4265,8 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
             "task detail": audit["automationTaskDetailCount"],
             "E-Stop control": audit["automationEStopControlCount"],
             "run command": audit["automationRunCommandCount"],
+            "execution status": int(bool(audit["automationExecutionStatus"])),
+            "proof status": int(bool(audit["automationProofStatus"])),
             "safety state": int(bool(audit["automationSafetyState"])),
             "destructive risk": int(audit["automationRiskLevel"] == "destructive"),
             "permission scopes": audit["automationPermissionScopeCount"],
@@ -4185,6 +4433,8 @@ def runBrowserMatrix(
                         """
                     )
                 page = context.new_page()
+                if os.environ.get("CODARO_PRODUCT_GATE") == "product-visual-capture":
+                    page.clock.set_fixed_time("2026-08-10T00:00:00Z")
                 webArtifactEvidence: dict[str, Any] | None = None
                 checkCapabilityEvidence: dict[str, Any] | None = None
                 checkStateEvidence: dict[str, Any] | None = None
@@ -4349,6 +4599,15 @@ def runBrowserMatrix(
                         inspector = page.locator("[data-automation-run-inspector='true']")
                         if inspector.get_attribute("data-automation-selected-task") != firstTaskId:
                             raise AssertionError("automation inspector did not select the first task")
+                        if (
+                            inspector.locator("[data-automation-run-execution-status]").get_attribute(
+                                "data-automation-run-execution-status"
+                            ) != "success"
+                            or inspector.locator("[data-automation-run-proof-status]").get_attribute(
+                                "data-automation-run-proof-status"
+                            ) != "semantic-not-checked"
+                        ):
+                            raise AssertionError("successful execution without semantic validation was not distinct")
                         safetyPanel = inspector.locator("[data-automation-safety-state]")
                         runCommand = inspector.locator("[data-automation-run-command='true']")
                         enabledToggle = inspector.locator("[data-automation-task-enabled='true']")
@@ -4426,6 +4685,38 @@ def runBrowserMatrix(
                         stderrText = inspector.locator("[data-automation-run-stream='stderr']").inner_text()
                         if "워크북을 찾지 못했습니다" not in stderrText:
                             raise AssertionError("automation inspector did not follow task selection to stderr")
+                        if (
+                            inspector.locator("[data-automation-run-execution-status]").get_attribute(
+                                "data-automation-run-execution-status"
+                            ) != "success"
+                            or inspector.locator("[data-automation-run-proof-status]").get_attribute(
+                                "data-automation-run-proof-status"
+                            ) != "contract-failed"
+                        ):
+                            raise AssertionError("contract failure was not separated from successful execution")
+                        expectedProofStates = {
+                            "계약 통과 보고서": "contract-passed",
+                            "운영 증거 보고서": "operational-proof",
+                        }
+                        for taskName, expectedProofState in expectedProofStates.items():
+                            target = selectors.filter(has_text=taskName)
+                            if target.count() != 1:
+                                raise AssertionError(f"automation proof fixture is missing: {taskName}")
+                            target.click(timeout=20_000)
+                            page.wait_for_function(
+                                """
+                                (proofState) => document.querySelector('[data-automation-run-proof-status]')
+                                  ?.getAttribute('data-automation-run-proof-status') === proofState
+                                """,
+                                arg=expectedProofState,
+                                timeout=20_000,
+                            )
+                            if inspector.locator(
+                                "[data-automation-run-execution-status]"
+                            ).get_attribute("data-automation-run-execution-status") != "success":
+                                raise AssertionError(
+                                    f"automation execution status drifted for {taskName}"
+                                )
                     if case.get("openCurriculumHome"):
                         homeEntry = page.locator('[data-curriculum-home-entry="true"]')
                         if not homeEntry.count() or not homeEntry.first.is_visible():
@@ -5489,7 +5780,9 @@ def runBrowserMatrix(
                             """,
                             timeout=120_000,
                         )
-                        firstCheck = page.locator('[data-learning-check-result]').last
+                        firstCheck = exerciseParts.nth(exerciseIndex).locator(
+                            '[data-learning-check-result]'
+                        ).last
                         firstState = firstCheck.get_attribute("data-learning-check-result")
                         expectedInitialState = (
                             "unsupported"
@@ -5675,6 +5968,71 @@ def runBrowserMatrix(
                             capabilityScreenshot = (
                                 SCREENSHOT_ROOT / colorScheme
                                 / f"{case['name']}-local-required.png"
+                            )
+                            firstCheck.evaluate(
+                                """
+                                async (element) => {
+                                  const viewport = element.closest(
+                                    "[data-slot='scroll-area-viewport']"
+                                  );
+                                  if (!(viewport instanceof HTMLElement)) {
+                                    throw new Error('learning scroll viewport is missing');
+                                  }
+                                  if (document.fonts) await document.fonts.ready;
+                                  viewport.setAttribute(
+                                    'data-visual-capture-scroll-origin',
+                                    '0',
+                                  );
+                                  const spacer = document.createElement('div');
+                                  spacer.setAttribute('aria-hidden', 'true');
+                                  spacer.setAttribute('data-visual-capture-spacer', 'true');
+                                  spacer.style.height = `${viewport.clientHeight}px`;
+                                  spacer.style.pointerEvents = 'none';
+                                  spacer.style.width = '1px';
+                                  viewport.append(spacer);
+                                  let previous = '';
+                                  let stableFrames = 0;
+                                  let stableSince = performance.now();
+                                  for (let attempt = 0; attempt < 180; attempt += 1) {
+                                    const viewportRect = viewport.getBoundingClientRect();
+                                    const elementRect = element.getBoundingClientRect();
+                                    const elementOffset = viewport.scrollTop
+                                      + elementRect.top
+                                      - viewportRect.top;
+                                    const fixedTop = Math.max(0, Math.min(
+                                      viewport.scrollHeight - viewport.clientHeight,
+                                      Math.round(elementOffset
+                                        - (viewport.clientHeight - elementRect.height) / 2),
+                                    ));
+                                    viewport.setAttribute(
+                                      'data-visual-capture-scroll-top',
+                                      String(fixedTop),
+                                    );
+                                    viewport.scrollTo({ behavior: 'instant', left: 0, top: fixedTop });
+                                    window.scrollTo(0, 0);
+                                    await new Promise((resolve) => requestAnimationFrame(resolve));
+                                    const settledRect = element.getBoundingClientRect();
+                                    const current = [
+                                      viewport.scrollTop,
+                                      viewport.scrollHeight,
+                                      viewport.clientHeight,
+                                      settledRect.top,
+                                      settledRect.height,
+                                      window.scrollX,
+                                      window.scrollY,
+                                    ].map((value) => Math.round(value * 1000) / 1000).join(':');
+                                    if (current === previous) {
+                                      stableFrames += 1;
+                                    } else {
+                                      stableFrames = 0;
+                                      stableSince = performance.now();
+                                    }
+                                    previous = current;
+                                    if (stableFrames >= 4 && performance.now() - stableSince >= 500) return;
+                                  }
+                                  throw new Error('learning capture viewport did not settle');
+                                }
+                                """
                             )
                             captureStableViewport(page, capabilityScreenshot)
                             checkCapabilityEvidence["screenshot"] = str(
@@ -6635,7 +6993,9 @@ def runBrowserMatrix(
                             """,
                             timeout=120_000,
                         )
-                        firstCheck = page.locator('[data-learning-check-result]').last
+                        firstCheck = exerciseParts.nth(exerciseIndex).locator(
+                            '[data-learning-check-result]'
+                        ).last
                         firstState = firstCheck.get_attribute("data-learning-check-result")
                         if firstState != case["initialCheckState"]:
                             localExercise = exerciseParts.nth(exerciseIndex)

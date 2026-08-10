@@ -185,7 +185,10 @@ pub fn stage_release_with_progress(
         )?;
         extract_zip_archive(&archive, &python_runtime_dir)?;
         fs::write(&runtime_marker, &runtime_sha).with_context(|| {
-            format!("Failed to write runtime marker `{}`.", runtime_marker.display())
+            format!(
+                "Failed to write runtime marker `{}`.",
+                runtime_marker.display()
+            )
         })?;
         let runtime_tree_sha = runtime_tree_sha256(&python_runtime_dir)?;
         fs::write(&runtime_tree_marker, runtime_tree_sha).with_context(|| {
@@ -229,7 +232,9 @@ pub fn stage_release_with_progress(
             &bundle_wheels_dir,
             &bundle.wheel_url,
             &bundle.sha256,
-            &|received, total| progress(&format!("bundle:{}", bundle.package_name), received, total),
+            &|received, total| {
+                progress(&format!("bundle:{}", bundle.package_name), received, total)
+            },
         )?;
         installed_bundles.push(installed_bundle(bundle, staged_path.clone()));
         bundle_paths.push(staged_path);
@@ -841,7 +846,9 @@ fn install_wheels_into_site_packages(
 
     // .pyc 사전 컴파일 — best-effort. 실패해도 import 시 lazy 컴파일되므로 설치는 성공으로 본다.
     if let Err(error) = precompile_site_packages(python_executable, site_packages_dir, logs_dir) {
-        eprintln!("Codaro bytecode precompile skipped (will compile lazily on first run): {error:#}");
+        eprintln!(
+            "Codaro bytecode precompile skipped (will compile lazily on first run): {error:#}"
+        );
     }
     Ok(())
 }

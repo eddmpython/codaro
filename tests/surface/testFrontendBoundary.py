@@ -454,6 +454,19 @@ def testUiAndHookLayersDoNotCallTransportApiDirectly() -> None:
     assert offenders == []
 
 
+def testPublicationOperationsOwnsPublicationApiBoundary() -> None:
+    operations = _read("editor/src/lib/publicationOperations.ts")
+    deployment = _read("editor/src/components/app/deploymentGuide.tsx")
+    gui = _read("editor/src/hooks/useProductGuiControl.ts")
+
+    assert 'import { publicationApi } from "@/lib/api/publicationApi"' in operations
+    assert "export const publicationOperations" in operations
+    assert "publicationOperations" in deployment
+    assert "publicationOperations" in gui
+    assert "publicationApi" not in deployment
+    assert "publicationApi" not in gui
+
+
 def testProviderProfileDisplayLogicLivesInLibBoundary() -> None:
     hook = _read("editor/src/hooks/useAssistantTurnState.ts")
     panel = _read("editor/src/components/assistant/assistantPanel.tsx")

@@ -366,9 +366,32 @@ GATES: dict[str, Gate] = {
     ),
     "automation-ide-audit": Gate(
         tier="surface",
-        description="자동화 IDE의 task/schedule/webhook/workflow/E-Stop/audit/frontend surface 연결을 확인한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/automation/verifyAutomationIdeAudit.py")),),
-        ci_required=False,
+        description="자동화 IDE의 task/schedule/webhook/workflow/E-Stop/audit와 실행·의미·운영 증거 UI 상태를 확인한다.",
+        commands=(
+            command(("npm", "run", "build"), cwd="editor"),
+            command(("uv", "run", "python", "-X", "utf8", "tests/automation/verifyAutomationIdeAudit.py")),
+            command((
+                "uv", "run", "python", "-X", "utf8",
+                "tests/automation/verifyAutomationProofStatesPlaywright.py",
+            ), timeoutSeconds=1200),
+        ),
+    ),
+    "runtime-security": Gate(
+        tier="fast",
+        description="proof 실행의 최소 환경, 자손·native 차단, network pinning, 실행 중 E-Stop, receipt 격리를 검증한다.",
+        commands=(
+            command(("uv", "run", "python", "-X", "utf8", "-m", "pytest", "tests/runtime/testTaskExecutionPolicy.py::testTaskWorkerExposesOnlyDeclaredSecretAndMinimumRuntimeEnvironment", "-q", "--tb=short"), timeoutSeconds=60),
+            command(("uv", "run", "python", "-X", "utf8", "-m", "pytest", "tests/runtime/testTaskExecutionPolicy.py::testProofIsolationBlocksChildProcessEvenWhenScopeIsApproved", "-q", "--tb=short"), timeoutSeconds=60),
+            command(("uv", "run", "python", "-X", "utf8", "-m", "pytest", "tests/runtime/testTaskExecutionPolicy.py::testProofIsolationBlocksCtypesNativeInterop", "-q", "--tb=short"), timeoutSeconds=60),
+            command(("uv", "run", "python", "-X", "utf8", "-m", "pytest", "tests/runtime/testTaskExecutionPolicy.py::testSecretBearingArtifactCannotBecomeOperationalProof", "-q", "--tb=short"), timeoutSeconds=60),
+            command(("uv", "run", "python", "-X", "utf8", "-m", "pytest", "tests/runtime/testTaskExecutionPolicy.py::testEmergencyStopDestroysRunningSingleBlockBeforeLaterWrite", "-q", "--tb=short"), timeoutSeconds=60),
+            command(("uv", "run", "python", "-X", "utf8", "-m", "pytest", "tests/runtime/testTaskExecutionPolicy.py::testEmergencyStopBetweenSessionBindAndFirstExecuteCannotRestartWorker", "-q", "--tb=short"), timeoutSeconds=60),
+            command(("uv", "run", "python", "-X", "utf8", "-m", "pytest", "tests/runtime/testTaskExecutionPolicy.py::testSemanticOutputContractCreatesValidatedCandidateWithSamePolicyHash", "-q", "--tb=short"), timeoutSeconds=60),
+            command(("uv", "run", "python", "-X", "utf8", "-m", "pytest", "tests/runtime/testNetworkExecutionPolicy.py", "-q", "--tb=short"), timeoutSeconds=60),
+            command(("uv", "run", "python", "-X", "utf8", "-m", "pytest", "tests/publication/testServerPublication.py::testPublishedServerIsolatesSessionsRejectsSourceChangesAndRedactsSecrets", "-q", "--tb=short"), timeoutSeconds=60),
+            command(("uv", "run", "python", "-X", "utf8", "-m", "pytest", "tests/publication/testServerPublication.py::testPublishedServerBlocksFilesystemOutsideSessionWorkspace", "-q", "--tb=short"), timeoutSeconds=60),
+            command(("uv", "run", "python", "-X", "utf8", "-m", "pytest", "tests/proof/testProofArchive.py::testOperationalReceiptRejectsSpoofedIsolationPolicy", "-q", "--tb=short"), timeoutSeconds=60),
+        ),
     ),
     "service-readiness-audit": Gate(
         tier="surface",
@@ -726,7 +749,6 @@ GATES: dict[str, Gate] = {
             command(("npm", "run", "build"), cwd="editor"),
             command(("uv", "run", "python", "-X", "utf8", "tests/publication/verifyStaticPublicationPlaywright.py"), timeoutSeconds=600),
         ),
-        ci_required=False,
     ),
     "server-publication": Gate(
         tier="surface",
@@ -743,7 +765,6 @@ GATES: dict[str, Gate] = {
             command(("npm", "run", "build"), cwd="editor"),
             command(("uv", "run", "python", "-X", "utf8", "tests/publication/verifyServerPublicationPlaywright.py"), timeoutSeconds=600),
         ),
-        ci_required=False,
     ),
     "block-embedding": Gate(
         tier="surface",
@@ -760,7 +781,20 @@ GATES: dict[str, Gate] = {
             command(("npm", "run", "build"), cwd="editor"),
             command(("uv", "run", "python", "-X", "utf8", "tests/publication/verifyBlockEmbedPlaywright.py"), timeoutSeconds=600),
         ),
-        ci_required=False,
+    ),
+    "local-publication": Gate(
+        tier="surface",
+        description="immutable local app bundle의 build, 검증, 권한 승인, serve와 rollback을 확인한다.",
+        commands=(
+            command((
+                "uv", "run", "python", "-X", "utf8", "-m", "pytest",
+                "tests/publication/testLocalPublication.py",
+                "tests/publication/testPublicationWorkbench.py",
+                "-q", "--tb=short",
+            ), timeoutSeconds=900),
+            command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/genProductContracts.py", "--check")),
+            command(("npm", "run", "check"), cwd="editor"),
+        ),
     ),
     "learning-product-bridge": Gate(
         tier="surface",
@@ -771,15 +805,19 @@ GATES: dict[str, Gate] = {
                 "tests/learning/testLearningProductBridge.py",
                 "tests/curriculum/testCapabilityProjection.py",
                 "tests/proof/testProofArchive.py",
+                "tests/runtime/testTaskExecutionPolicy.py::testUnchangedPreexistingArtifactCannotBecomeFreshOperationalEvidence",
+                "tests/runtime/testTaskExecutionPolicy.py::testSuccessfulExecutionWithoutContractRemainsSemanticallyUnchecked",
+                "tests/automation/testTaskRunPersistence.py::testRunSerializationKeepsExecutionSemanticAndOperationalProofStates",
+                "tests/automation/testTaskRunPersistence.py::testApiProjectionRejectsUnresolvedOperationalReceiptId",
                 "-q", "--tb=short",
             ), timeoutSeconds=600),
             command(("npm", "run", "check"), cwd="editor"),
+            command(("npm", "run", "build"), cwd="editor", timeoutSeconds=600),
             command((
                 "uv", "run", "python", "-X", "utf8",
                 "tests/learning/verifyLearningProductBridgePlaywright.py",
             ), timeoutSeconds=600),
         ),
-        ci_required=False,
     ),
     "deployment-adapters": Gate(
         tier="fast",
@@ -788,6 +826,7 @@ GATES: dict[str, Gate] = {
             command((
                 "uv", "run", "python", "-X", "utf8", "-m", "pytest",
                 "tests/publication/testDeploymentAdapters.py",
+                "tests/publication/testProofLineage.py",
                 "tests/contracts/testProofContracts.py",
                 "tests/proof/testProofArchive.py",
                 "tests/runtime/testCli.py",
@@ -795,7 +834,6 @@ GATES: dict[str, Gate] = {
             )),
             command(("npm", "run", "check"), cwd="editor"),
         ),
-        ci_required=False,
     ),
     "reference-products": Gate(
         tier="surface",
@@ -814,7 +852,6 @@ GATES: dict[str, Gate] = {
                 "tests/publication/verifyReferenceProductsPlaywright.py",
             ), timeoutSeconds=1200),
         ),
-        ci_required=False,
     ),
     "gui-control-browser": Gate(
         tier="surface",
@@ -1072,11 +1109,13 @@ PRODUCT_QUALITY_GATES = (
     "root-clean",
     "docs",
     "backend",
+    "runtime-security",
     "architecture-boundary",
     "publication-compiler",
     "static-publication",
     "server-publication",
     "block-embedding",
+    "local-publication",
     "learning-product-bridge",
     "deployment-adapters",
     "reference-products",
@@ -1123,8 +1162,16 @@ PRODUCT_RELEASE_GATES = (
     "root-clean",
     "docs",
     "backend",
+    "runtime-security",
     "architecture-boundary",
     "publication-compiler",
+    "static-publication",
+    "server-publication",
+    "block-embedding",
+    "local-publication",
+    "learning-product-bridge",
+    "deployment-adapters",
+    "reference-products",
     "editor-build",
     "landing-build",
     "mobile-layout",
@@ -1186,6 +1233,22 @@ def changedCycleGates(paths: tuple[str, ...] | None = None) -> tuple[str, ...]:
         normalized = path.replace("\\", "/")
         if normalized.startswith(("src/", "tests/")) or normalized in {"pyproject.toml", "uv.lock"}:
             addGate("backend")
+        if normalized.startswith((
+            "src/codaro/automation/eStop.py",
+            "src/codaro/automation/operationalProof.py",
+            "src/codaro/automation/taskExecution.py",
+            "src/codaro/automation/taskModel.py",
+            "src/codaro/automation/taskRunner.py",
+            "src/codaro/kernel/",
+            "src/codaro/proof/",
+            "src/codaro/publication/serverRuntime.py",
+            "src/codaro/runtime/",
+            "tests/proof/",
+            "tests/publication/testServerPublication.py",
+            "tests/runtime/testNetworkExecutionPolicy.py",
+            "tests/runtime/testTaskExecutionPolicy.py",
+        )) or normalized == "contracts/operationalReceipt.schema.json":
+            addGate("runtime-security")
         if normalized.startswith("editor/"):
             addGate("editor-build")
             addGate("gui-control-browser")
@@ -2138,8 +2201,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 71:
-        failures.append(f"expected 71 gates, found {len(GATES)}")
+    if len(GATES) != 73:
+        failures.append(f"expected 73 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

@@ -14,9 +14,18 @@ from typing import Any, Mapping
 import uuid
 
 from ..document.models import CodaroDocument
+from ..document.percentFormat import writePercentDocument
 from ..document.service import loadDocument
 from ..generatedContracts import PublicationManifest
+from ..proof import ProofArchive
 from .compiler import CompilationReport, compileDocument
+from .immutablePointer import activateImmutablePointer, rollbackImmutablePointer
+from .proofLineage import (
+    PublicationProofError,
+    publicationProof,
+    recordPublicationBuildArtifacts,
+    validatePublicationProof,
+)
 from .staticBuilder import PublicationBuildError
 
 
@@ -53,6 +62,7 @@ def buildServerPublication(
     webBuildRoot: str | Path | None = None,
     maxMemoryMb: int = 512,
     maxExecutionSeconds: int = 300,
+    proofArchive: ProofArchive | None = None,
 ) -> ServerPublicationBuildResult:
     source = Path(sourcePath).expanduser().resolve()
     output = Path(outputRoot).expanduser().resolve()
@@ -63,8 +73,7 @@ def buildServerPublication(
     if not 1 <= maxExecutionSeconds <= 3600:
         raise PublicationBuildError("server maxExecutionSeconds는 1에서 3600 사이여야 합니다.")
 
-    sourceBytes = source.read_bytes()
-    sourceText = sourceBytes.decode("utf-8")
+    sourceText = source.read_text(encoding="utf-8")
     document = loadDocument(str(source))
     if document.app.statePolicy == "shared":
         raise PublicationBuildError("shared state server publication은 아직 지원하지 않습니다. perSession을 선택하세요.")
@@ -81,6 +90,15 @@ def buildServerPublication(
             f"server publication을 만들 수 없습니다. {_diagnosticSummary(report)}",
             diagnostics=diagnostics,
         )
+    try:
+        proof = publicationProof(
+            [result.unit for result in report.units],
+            report.executionBlockIds,
+            document.runtime.packages,
+            proofArchive,
+        )
+    except PublicationProofError as exc:
+        raise PublicationBuildError(f"server publication proof를 검증할 수 없습니다: {exc}") from exc
 
     effects = _serverEffects(report)
     if "dynamic" in effects["secretRefs"]:
@@ -89,6 +107,11 @@ def buildServerPublication(
         raise PublicationBuildError("동적 network 목적지는 server publication에서 허용하지 않습니다.")
     if any(not _SECRET_REF.fullmatch(name) for name in effects["secretRefs"]):
         raise PublicationBuildError("server secret reference 이름이 안전하지 않습니다.")
+    blockById = {block.id: block for block in document.blocks}
+    publicationDocument = document.model_copy(
+        update={"blocks": [blockById[blockId] for blockId in report.executionBlockIds]}
+    )
+    publicationSourceBytes = writePercentDocument(publicationDocument).encode("utf-8")
 
     permissionScopes = _permissionScopes(effects)
     policyHash = _contentHash(_canonicalBytes({
@@ -115,8 +138,8 @@ def buildServerPublication(
         _copyServerShell(shellRoot, staging / "shell")
         templateRoot = staging / "workspace-template"
         templateRoot.mkdir(parents=True)
-        documentPath = f"workspace-template/{source.name}"
-        (staging / documentPath).write_bytes(sourceBytes)
+        documentPath = "workspace-template/publication.py"
+        (staging / documentPath).write_bytes(publicationSourceBytes)
         dataAssets = _collectServerDataAssets(report, source.parent, templateRoot)
         packageAssets, requirements = _collectServerPackages(
             document,
@@ -134,6 +157,9 @@ def buildServerPublication(
             "compilerManifestHash": report.manifestHash,
             "sourceRevisionHash": report.sourceRevision.revisionHash,
             "entryBlockIds": list(report.entryBlockIds),
+            "executionBlockIds": list(report.executionBlockIds),
+            "executionProjectionHash": report.executionProjectionHash,
+            "proof": proof,
             "documentPath": documentPath,
             "runtime": {
                 "kind": "server",
@@ -168,8 +194,18 @@ def buildServerPublication(
             os.replace(staging, finalRoot)
 
         _verifyServerBundleRoot(finalRoot, bundleHash=bundleHash)
+        try:
+            recordPublicationBuildArtifacts(
+                proof,
+                proofArchive,
+                buildArtifactHash=bundleHash,
+                manifestHash=manifestHash,
+                target="server",
+            )
+        except PublicationProofError as exc:
+            raise PublicationBuildError(f"server publication build proof를 기록할 수 없습니다: {exc}") from exc
         activePayload = _activePayload(output, finalRoot, bundleHash)
-        _writeJsonAtomically(output / "active.json", activePayload)
+        activateImmutablePointer(output, activePayload)
         verified = verifyServerPublication(output)
         return ServerPublicationBuildResult(
             outputRoot=output,
@@ -210,14 +246,25 @@ def verifyServerPublication(outputRoot: str | Path) -> ServerPublicationVerifica
 
 def rollbackServerPublication(outputRoot: str | Path, bundleHash: str) -> ServerPublicationVerification:
     output = Path(outputRoot).expanduser().resolve()
-    if not re.fullmatch(r"sha256-[0-9a-f]{64}", bundleHash):
-        raise PublicationBuildError("rollback bundle hash가 올바르지 않습니다.")
-    bundleRoot = (output / "bundles" / bundleHash.removeprefix(_HASH_PREFIX)).resolve()
-    if bundleRoot.parent != (output / "bundles").resolve():
-        raise PublicationBuildError("rollback bundle 경계가 올바르지 않습니다.")
-    _verifyServerBundleRoot(bundleRoot, bundleHash=bundleHash)
-    _writeJsonAtomically(output / "active.json", _activePayload(output, bundleRoot, bundleHash))
-    return verifyServerPublication(output)
+
+    def candidate(bundleRoot: Path, contentHash: str):
+        verified = _verifyServerBundleRoot(bundleRoot, bundleHash=contentHash)
+        return _activePayload(output, bundleRoot, contentHash), ServerPublicationVerification(
+            outputRoot=output,
+            bundleRoot=bundleRoot,
+            bundleHash=contentHash,
+            manifest=verified[0],
+            fileCount=verified[1],
+            totalBytes=verified[2],
+        )
+
+    return rollbackImmutablePointer(
+        output,
+        target="server",
+        contentHash=bundleHash,
+        collection="bundles",
+        candidate=candidate,
+    )
 
 
 def prepareServerPackageEnvironment(verified: ServerPublicationVerification) -> Path | None:
@@ -460,6 +507,13 @@ def _verifyServerBundleRoot(bundleRoot: Path, *, bundleHash: str) -> tuple[Publi
     manifestHash = unsigned.pop("manifestHash", None)
     if manifestHash != _contentHash(_canonicalBytes(unsigned)):
         raise PublicationBuildError("server publication manifest hash가 일치하지 않습니다.")
+    try:
+        validatePublicationProof(
+            manifest.get("proof"),
+            executionBlockIds=manifest.get("executionBlockIds") if isinstance(manifest.get("executionBlockIds"), list) else [],
+        )
+    except PublicationProofError as exc:
+        raise PublicationBuildError(f"server publication proof가 손상됐습니다: {exc}") from exc
     files = manifest.get("files")
     if not isinstance(files, list):
         raise PublicationBuildError("server publication files가 목록이 아닙니다.")
@@ -486,6 +540,7 @@ def _verifyServerBundleRoot(bundleRoot: Path, *, bundleHash: str) -> tuple[Publi
     }
     if actual != listed:
         raise PublicationBuildError("server publication manifest와 실제 파일 목록이 다릅니다.")
+    _verifyServerExecutionProjection(manifest, bundleRoot)
     publicationFileHash = _fileHash(bundleRoot / "publication.json")
     calculatedBundleHash = _contentHash(_canonicalBytes({
         "manifestHash": manifestHash,
@@ -494,6 +549,37 @@ def _verifyServerBundleRoot(bundleRoot: Path, *, bundleHash: str) -> tuple[Publi
     if bundleHash != calculatedBundleHash or bundleRoot.name != bundleHash.removeprefix(_HASH_PREFIX):
         raise PublicationBuildError("server bundle hash가 일치하지 않습니다.")
     return manifest, len(files) + 1, totalBytes + (bundleRoot / "publication.json").stat().st_size  # type: ignore[return-value]
+
+
+def _verifyServerExecutionProjection(manifest: dict[str, Any], bundleRoot: Path) -> None:
+    blockIds = manifest.get("executionBlockIds")
+    projectionHash = manifest.get("executionProjectionHash")
+    documentPath = _safeRelativePath(manifest.get("documentPath"), "documentPath")
+    if (
+        not isinstance(blockIds, list)
+        or not blockIds
+        or len(blockIds) != len(set(blockIds))
+        or any(not isinstance(blockId, str) or not blockId for blockId in blockIds)
+        or not isinstance(projectionHash, str)
+    ):
+        raise PublicationBuildError("server publication execution projection 계약이 잘못됐습니다.")
+    document = loadDocument(str(_resolvedBundleFile(bundleRoot, documentPath)))
+    executionBlocks = [
+        block
+        for block in document.blocks
+        if block.type in {"code", "automation", "markdown"}
+    ]
+    actualIds = [block.id for block in executionBlocks]
+    actualProjectionHash = _contentHash(_canonicalBytes([
+        {
+            "blockId": block.id,
+            "type": block.type,
+            "contentHash": _contentHash(block.content.encode("utf-8")),
+        }
+        for block in executionBlocks
+    ]))
+    if actualIds != blockIds or actualProjectionHash != projectionHash:
+        raise PublicationBuildError("server publication execution projection이 bundle 문서와 다릅니다.")
 
 
 def _activePayload(output: Path, bundleRoot: Path, bundleHash: str) -> dict[str, object]:

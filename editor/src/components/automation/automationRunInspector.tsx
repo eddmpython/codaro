@@ -42,7 +42,12 @@ export function AutomationRunInspector({
             {task ? task.name || task.documentPath : t("automation.task.notSelected")}
           </div>
         </div>
-        {task ? <RunStatusBadge run={run} /> : null}
+        {task ? (
+          <div className="flex flex-wrap justify-end gap-1.5">
+            <RunStatusBadge run={run} />
+            <RunProofBadge run={run} />
+          </div>
+        ) : null}
       </header>
 
       {task ? (
@@ -135,7 +140,8 @@ export function AutomationRunInspector({
 
           <dl className="grid grid-cols-2 gap-x-3 gap-y-2 px-3 py-3 text-xs">
             <RunDatum label={t("automation.task.trigger")} value={task.schedule || t("automation.task.manual")} />
-            <RunDatum label={t("automation.metric.status")} value={runStatusText(run, t)} />
+            <RunDatum label={t("automation.run.executionTitle")} value={runStatusText(run, t)} />
+            <RunDatum label={t("automation.run.proofTitle")} value={runProofText(run, t)} />
             <RunDatum label={t("automation.task.startedAt")} value={formatRunDate(run?.startedAt, locale, t)} />
             <RunDatum label={t("automation.task.finishedAt")} value={formatRunDate(run?.finishedAt, locale, t)} />
             <RunDatum label={t("automation.task.duration")} value={formatDuration(run?.durationMs, t)} />
@@ -178,13 +184,30 @@ export function AutomationRunInspector({
 
 function RunStatusBadge({ run }: { run: TaskRun | null }) {
   const { t } = useLocale();
-  const status = run?.status ?? "idle";
+  const status = runExecutionStatus(run);
   const variant = status === "failed" || status === "error" || status === "cancelled"
     ? "destructive"
     : status === "running" ? "secondary" : "outline";
   return (
-    <Badge data-automation-run-status={status} variant={variant}>
+    <Badge
+      data-automation-run-execution-status={status}
+      data-automation-run-status={status}
+      variant={variant}
+    >
       {runStatusText(run, t)}
+    </Badge>
+  );
+}
+
+function RunProofBadge({ run }: { run: TaskRun | null }) {
+  const { t } = useLocale();
+  const proofStatus = run?.proofStatus ?? "semantic-not-checked";
+  const variant = proofStatus === "contract-failed"
+    ? "destructive"
+    : proofStatus === "operational-proof" ? "secondary" : "outline";
+  return (
+    <Badge data-automation-run-proof-status={proofStatus} variant={variant}>
+      {runProofText(run, t)}
     </Badge>
   );
 }
@@ -232,6 +255,7 @@ function runStatusText(
   t: (key: string, values?: Record<string, string | number>) => string,
 ) {
   if (!run) return t("automation.run.statusIdle");
+  const status = runExecutionStatus(run);
   const keyByStatus: Record<string, string> = {
     cancelled: "automation.run.statusCancelled",
     error: "automation.run.statusFailed",
@@ -240,7 +264,27 @@ function runStatusText(
     running: "automation.run.statusRunning",
     success: "automation.run.statusSuccess",
   };
-  return t(keyByStatus[run.status] ?? "automation.run.statusUnknown", { status: run.status });
+  return t(keyByStatus[status] ?? "automation.run.statusUnknown", { status });
+}
+
+function runExecutionStatus(run: TaskRun | null) {
+  if (!run) return "idle";
+  if (run.executionStatus && run.executionStatus !== "not-started") return run.executionStatus;
+  return run.status;
+}
+
+function runProofText(
+  run: TaskRun | null,
+  t: (key: string, values?: Record<string, string | number>) => string,
+) {
+  const proofStatus = run?.proofStatus ?? "semantic-not-checked";
+  const keyByStatus: Record<string, string> = {
+    "semantic-not-checked": "automation.run.proofNotChecked",
+    "contract-passed": "automation.run.proofContractPassed",
+    "contract-failed": "automation.run.proofContractFailed",
+    "operational-proof": "automation.run.proofOperational",
+  };
+  return t(keyByStatus[proofStatus] ?? "automation.run.proofUnknown", { status: proofStatus });
 }
 
 function formatRunDate(

@@ -250,7 +250,15 @@ function AppPreviewToolbar({
         </details>
 
         <div className="ml-auto">
-          <DeploymentGuide runtimeTarget={deploymentTarget} sourcePath={sourcePath} />
+          <DeploymentGuide
+            entryBlockId={candidates.find((candidate) => selectedIds.has(candidate.id))?.id ?? null}
+            runtimeTarget={deploymentTarget}
+            sourcePath={sourcePath}
+            sourceFingerprint={JSON.stringify({
+              app,
+              blocks: candidates.map((block) => ({ content: block.content, id: block.id, type: block.type })),
+            })}
+          />
         </div>
       </div>
     </div>

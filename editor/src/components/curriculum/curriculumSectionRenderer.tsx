@@ -8,7 +8,8 @@ import { learningEvidenceRuntimeTier, recordLearningAttemptEvidence } from "@/li
 import { PROGRESS_UPDATED_EVENT } from "@/lib/curriculumProgressEvent";
 import { dueAssessmentSectionIds, type AssessmentQueueContract } from "@/lib/curriculumAssessmentQueue";
 import { CodePayload, ExecutionOutput, IconButton, LoadingInline } from "@/components/app/appPrimitives";
-import { Lightbulb, Loader2, Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Lightbulb, Loader2, Play, Workflow } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CurriculumLearningCell, curriculumInitialDraft } from "./curriculumLearningCell";
 import { isRecord, payloadTextList, readPayloadText, readSectionContract } from "./curriculumSurfaceHelpers";
@@ -28,6 +29,8 @@ export function CurriculumSectionCard({
   section,
   selectedBlockId,
   onDraftChange,
+  onPrepareLearningPromotion,
+  onPromoteLearningBlock,
   onRunBlock,
   onSelectBlock,
 }: {
@@ -42,6 +45,14 @@ export function CurriculumSectionCard({
   section: CurriculumSectionGroup;
   selectedBlockId: string;
   onDraftChange: (blockId: string, value: string) => void;
+  onPrepareLearningPromotion?: (block: BlockConfig, source: string) => Promise<{
+    draftId: string;
+    requiredInputNames: string[];
+  }>;
+  onPromoteLearningBlock?: (
+    draftId: string,
+    inputs: Record<string, unknown>,
+  ) => Promise<{ name: string; promoted: boolean }>;
   onRunBlock: (block: BlockConfig, sourceOverride?: string) => void;
   onSelectBlock: (blockId: string) => void;
 }) {
@@ -93,6 +104,8 @@ export function CurriculumSectionCard({
           section={section}
           selectedBlockId={selectedBlockId}
           onDraftChange={onDraftChange}
+          onPrepareLearningPromotion={onPrepareLearningPromotion}
+          onPromoteLearningBlock={onPromoteLearningBlock}
           onRunBlock={onRunBlock}
           onSelectBlock={onSelectBlock}
         />
@@ -272,6 +285,8 @@ export function StructuredSectionLearningBody({
   section,
   selectedBlockId,
   onDraftChange,
+  onPrepareLearningPromotion,
+  onPromoteLearningBlock,
   onRunBlock,
   onSelectBlock,
 }: {
@@ -285,6 +300,14 @@ export function StructuredSectionLearningBody({
   section: CurriculumSectionGroup;
   selectedBlockId: string;
   onDraftChange: (blockId: string, value: string) => void;
+  onPrepareLearningPromotion?: (block: BlockConfig, source: string) => Promise<{
+    draftId: string;
+    requiredInputNames: string[];
+  }>;
+  onPromoteLearningBlock?: (
+    draftId: string,
+    inputs: Record<string, unknown>,
+  ) => Promise<{ name: string; promoted: boolean }>;
   onRunBlock: (block: BlockConfig, sourceOverride?: string) => void;
   onSelectBlock: (blockId: string) => void;
 }) {
@@ -305,6 +328,12 @@ export function StructuredSectionLearningBody({
   const [attemptCheck, setAttemptCheck] = useState<LearningAttemptCheck | null>(null);
   const [checkPending, setCheckPending] = useState(false);
   const [evidenceSaveState, setEvidenceSaveState] = useState<"idle" | "saving" | "stored" | "error">("idle");
+  const [promotionBusy, setPromotionBusy] = useState(false);
+  const [promotionDraftId, setPromotionDraftId] = useState("");
+  const [promotionInputNames, setPromotionInputNames] = useState<string[]>([]);
+  const [promotionInputs, setPromotionInputs] = useState<Record<string, string>>({});
+  const [promotionMessage, setPromotionMessage] = useState("");
+  const [promotionState, setPromotionState] = useState<"idle" | "inputs" | "promoted" | "error">("idle");
   const recordedAttemptRef = useRef("");
   const exerciseDraftRef = useRef(exerciseDraft);
 
@@ -336,6 +365,11 @@ export function StructuredSectionLearningBody({
     setAttemptCheck(null);
     setCheckPending(true);
     setEvidenceSaveState("idle");
+    setPromotionDraftId("");
+    setPromotionInputNames([]);
+    setPromotionInputs({});
+    setPromotionMessage("");
+    setPromotionState("idle");
     void evaluateLearningAttempt(
       exercise.guide?.checkConfig,
       exerciseResult,
@@ -403,6 +437,98 @@ export function StructuredSectionLearningBody({
       window.dispatchEvent(new CustomEvent(PROGRESS_UPDATED_EVENT));
     }
   }, [attemptCheck, category, contentId, exercise, exerciseResult]);
+
+  const promotePreparedDraft = async (draftId: string, inputNames: string[]) => {
+    if (!onPromoteLearningBlock) return;
+    if (inputNames.length) {
+      setPromotionDraftId(draftId);
+      setPromotionInputNames(inputNames);
+      setPromotionState("inputs");
+      return;
+    }
+    const receipt = await onPromoteLearningBlock(draftId, {});
+    setPromotionMessage(
+      receipt.promoted
+        ? `“${receipt.name}” 기능을 만들었습니다. 자동화에서 직접 켜기 전에는 실행되지 않습니다.`
+        : `“${receipt.name}” 기능은 이미 자동화에 있습니다.`,
+    );
+    setPromotionState("promoted");
+  };
+  const preparePromotion = async () => {
+    if (!exercise || !onPrepareLearningPromotion || !onPromoteLearningBlock) return;
+    setPromotionBusy(true);
+    setPromotionMessage("");
+    try {
+      const candidate = await onPrepareLearningPromotion(exercise, exerciseDraftRef.current);
+      await promotePreparedDraft(candidate.draftId, candidate.requiredInputNames);
+    } catch (error) {
+      setPromotionMessage(error instanceof Error ? error.message : String(error));
+      setPromotionState("error");
+    } finally {
+      setPromotionBusy(false);
+    }
+  };
+  const promoteWithInputs = async () => {
+    if (!promotionDraftId || !onPromoteLearningBlock) return;
+    setPromotionBusy(true);
+    try {
+      const inputs = Object.fromEntries(promotionInputNames.map((name) => {
+        const raw = promotionInputs[name]?.trim();
+        if (!raw) throw new Error(`기능 입력이 비어 있습니다: ${name}`);
+        try {
+          return [name, JSON.parse(raw) as unknown];
+        } catch {
+          throw new Error(`기능 입력은 JSON 값이어야 합니다: ${name}`);
+        }
+      }));
+      const receipt = await onPromoteLearningBlock(promotionDraftId, inputs);
+      setPromotionMessage(
+        receipt.promoted
+          ? `“${receipt.name}” 기능을 만들었습니다. 자동화에서 직접 켜기 전에는 실행되지 않습니다.`
+          : `“${receipt.name}” 기능은 이미 자동화에 있습니다.`,
+      );
+      setPromotionState("promoted");
+    } catch (error) {
+      setPromotionMessage(error instanceof Error ? error.message : String(error));
+      setPromotionState("error");
+    } finally {
+      setPromotionBusy(false);
+    }
+  };
+  const resultMatchesCurrentDraft = Boolean(
+    exerciseResult
+    && typeof exerciseResult.sourceCode === "string"
+    && exerciseResult.sourceCode === exerciseDraft,
+  );
+  const createdArtifactCount = attemptCheck?.artifacts?.filter((artifact) => artifact.origin === "created").length ?? 0;
+  const applicationPromotionBlockedReason = sectionAssessmentRole(section) === "application"
+    ? !attemptCheck?.passed
+      ? "강한 산출물 검증을 통과하면 이 코드를 기능으로 만들 수 있습니다."
+      : attemptCheck.evidence !== "strong"
+        ? "현재 검증은 연습용입니다. Local 강검증으로 결과물까지 확인해야 기능으로 만들 수 있습니다."
+        : !resultMatchesCurrentDraft
+          ? "실행 뒤 코드가 바뀌었습니다. 현재 코드를 다시 실행해 검증해 주세요."
+          : createdArtifactCount === 0
+            ? "검증된 결과물 파일이 없습니다. 과제에서 요구한 파일을 만든 뒤 다시 실행해 주세요."
+            : evidenceSaveState === "saving"
+              ? "검증 기록을 저장하고 있습니다."
+              : evidenceSaveState === "error"
+                ? "검증 기록을 저장하지 못했습니다. 현재 코드를 다시 실행해 주세요."
+                : evidenceSaveState !== "stored"
+                  ? "검증 기록이 준비되면 기능으로 만들 수 있습니다."
+                  : ""
+    : "";
+  const applicationPromotionAvailable = Boolean(
+    exercise
+    && attemptCheck?.passed
+    && attemptCheck.evidence === "strong"
+    && resultMatchesCurrentDraft
+    && createdArtifactCount > 0
+    && evidenceSaveState === "stored"
+    && sectionAssessmentRole(section) === "application"
+    && onPrepareLearningPromotion
+    && onPromoteLearningBlock,
+  );
 
   return (
     <div className="space-y-7 px-4 py-5 sm:px-6">
@@ -566,6 +692,50 @@ export function StructuredSectionLearningBody({
               ) : null}
               {!attemptCheck.passed && exercise.guide?.hints?.[0] ? (
                 <p className="mt-1 leading-6 text-foreground">다음 수정: {exercise.guide.hints[0]}</p>
+              ) : null}
+              {applicationPromotionBlockedReason ? (
+                <p className="mt-2 leading-6 text-muted-foreground" data-learning-promotion="blocked">
+                  {applicationPromotionBlockedReason}
+                </p>
+              ) : null}
+              {applicationPromotionAvailable && promotionState !== "promoted" ? (
+                <div className="mt-3 border-t border-current/20 pt-3" data-learning-promotion="available">
+                  {promotionState === "inputs" ? (
+                    <div className="grid gap-2" data-learning-promotion-inputs="true">
+                      {promotionInputNames.map((name) => (
+                        <label className="grid gap-1 text-xs text-muted-foreground" key={name}>
+                          {name}
+                          <input
+                            className="min-h-9 rounded-md border border-border bg-background px-2 font-mono text-foreground"
+                            placeholder='JSON 값, 예: "report.json"'
+                            value={promotionInputs[name] ?? ""}
+                            onChange={(event) => setPromotionInputs((current) => ({
+                              ...current,
+                              [name]: event.currentTarget.value,
+                            }))}
+                          />
+                        </label>
+                      ))}
+                      <Button className="w-fit" disabled={promotionBusy} size="sm" type="button" onClick={() => void promoteWithInputs()}>
+                        {promotionBusy ? <Loader2 className="animate-spin" /> : <Workflow />}
+                        입력 확인 후 기능으로 만들기
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button disabled={promotionBusy} size="sm" type="button" variant="outline" onClick={() => void preparePromotion()}>
+                      {promotionBusy ? <Loader2 className="animate-spin" /> : <Workflow />}
+                      기능으로 만들기
+                    </Button>
+                  )}
+                </div>
+              ) : null}
+              {promotionMessage ? (
+                <p
+                  className={cn("mt-2 leading-6", promotionState === "error" ? "text-destructive" : "text-foreground")}
+                  data-learning-promotion-state={promotionState}
+                >
+                  {promotionMessage}
+                </p>
               ) : null}
             </div>
           ) : null}

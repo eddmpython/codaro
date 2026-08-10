@@ -12,6 +12,7 @@ from ..curriculum.progress import ProgressTracker
 from ..curriculum.studyLoader import StudyLoader
 from ..kernel.manager import SessionManager
 from ..proof.archive import ProofArchive
+from ..publication.workbench import PublicationWorkbench
 from ..runtime import ExecutionEngine, LocalEngine
 
 
@@ -34,6 +35,7 @@ class ServerState:
     learningEvidenceArchiveStore: LearningEvidenceArchiveStore
     learningArchiveRoot: Path
     proofArchive: ProofArchive
+    publicationWorkbench: PublicationWorkbench
 
 
 def createServerState(
@@ -79,4 +81,5 @@ def createServerState(
         learningEvidenceArchiveStore=learningEvidenceArchiveStore,
         learningArchiveRoot=codaroHome / "learningArchives",
         proofArchive=proofArchive,
+        publicationWorkbench=PublicationWorkbench(proofArchive=proofArchive),
     )

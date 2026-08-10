@@ -18,7 +18,16 @@ import webbrowser
 
 from ..document.service import loadDocument
 from ..generatedContracts import PublicationAsset, PublicationFile, PublicationManifest, PublicationPackage
+from ..proof import ProofArchive
 from .compiler import CompilationReport, compileDocument
+from .proofLineage import (
+    PublicationProofError,
+    publicationProof,
+    recordPublicationBuildArtifacts,
+    validatePublicationProof,
+)
+from .errors import PublicationBuildError
+from .immutablePointer import activateImmutablePointer, rollbackImmutablePointer
 
 
 _HASH_PREFIX = "sha256-"
@@ -34,12 +43,6 @@ _STATIC_CSP = (
     "style-src 'self' 'unsafe-inline'; "
     "worker-src 'self' blob:"
 )
-
-
-class PublicationBuildError(RuntimeError):
-    def __init__(self, message: str, *, diagnostics: list[dict[str, Any]] | None = None) -> None:
-        super().__init__(message)
-        self.diagnostics = diagnostics or []
 
 
 @dataclass(frozen=True, slots=True)
@@ -69,6 +72,7 @@ def buildStaticPublication(
     webBuildRoot: str | Path | None = None,
     entryBlockIds: Sequence[str] | None = None,
     closureOnly: bool = False,
+    proofArchive: ProofArchive | None = None,
 ) -> PublicationBuildResult:
     source = Path(sourcePath).expanduser().resolve()
     output = Path(outputRoot).expanduser().resolve()
@@ -93,11 +97,21 @@ def buildStaticPublication(
         sourceText=sourceText,
         workspaceRoot=source.parent,
         packageLock=packageLock,
+        executionScope="entryClosure" if closureOnly else "app",
     )
     if report.runtimeTarget != "browser":
         diagnostics = [dict(item) for item in report.diagnostics]
         detail = _diagnosticSummary(report)
         raise PublicationBuildError(f"browser publication을 만들 수 없습니다. {detail}", diagnostics=diagnostics)
+    try:
+        proof = publicationProof(
+            [result.unit for result in report.units],
+            report.executionBlockIds,
+            document.runtime.packages,
+            proofArchive,
+        )
+    except PublicationProofError as exc:
+        raise PublicationBuildError(f"publication proof를 검증할 수 없습니다: {exc}") from exc
 
     shellRoot = _resolveWebBuildRoot(webBuildRoot)
     _requireStaticShell(shellRoot)
@@ -114,14 +128,8 @@ def buildStaticPublication(
         packageAssets, runtimePackages = _collectPackageAssets(
             report, source.parent, staging, packageLock or {}
         )
-        publicationBlocks = document.blocks
-        if closureOnly:
-            includedBlockIds = {
-                blockId
-                for result in report.units
-                for blockId in (result.unit["entryBlockId"], *result.unit["dependencyBlockIds"])
-            }
-            publicationBlocks = [block for block in document.blocks if block.id in includedBlockIds]
+        blockById = {block.id: block for block in document.blocks}
+        publicationBlocks = [blockById[blockId] for blockId in report.executionBlockIds]
         publicationDocument = document.model_copy(
             update={
                 "id": f"publication-{report.sourceRevision.revisionHash.removeprefix(_HASH_PREFIX)[:24]}",
@@ -148,6 +156,9 @@ def buildStaticPublication(
             "compilerManifestHash": report.manifestHash,
             "sourceRevisionHash": report.sourceRevision.revisionHash,
             "entryBlockIds": list(report.entryBlockIds),
+            "executionBlockIds": list(report.executionBlockIds),
+            "executionProjectionHash": report.executionProjectionHash,
+            "proof": proof,
             "documentPath": documentPath,
             "runtime": {
                 "pythonIndexPath": "vendor/pyodide/",
@@ -181,14 +192,26 @@ def buildStaticPublication(
         else:
             os.replace(staging, finalRoot)
 
+        try:
+            recordPublicationBuildArtifacts(
+                proof,
+                proofArchive,
+                buildArtifactHash=bundleHash,
+                manifestHash=manifestHash,
+                target="browser",
+            )
+        except PublicationProofError as exc:
+            raise PublicationBuildError(f"publication build proof를 기록할 수 없습니다: {exc}") from exc
+
         activePayload = {
             "schemaVersion": 1,
+            "target": "browser",
             "bundleHash": bundleHash,
             "bundlePath": finalRoot.relative_to(output).as_posix(),
             "indexHash": indexHash,
             "publicationFileHash": publicationFileHash,
         }
-        _writeJsonAtomically(output / "active.json", activePayload)
+        activateImmutablePointer(output, activePayload)
         verified = verifyPublication(output)
         return PublicationBuildResult(
             outputRoot=output,
@@ -208,7 +231,36 @@ def verifyPublication(outputRoot: str | Path) -> PublicationVerification:
     output = Path(outputRoot).expanduser().resolve()
     activePath = output / "active.json"
     active = _readJsonObject(activePath, "active pointer")
-    if active.get("schemaVersion") != 1:
+    return _verifyPublicationActive(output, active)
+
+
+def verifyPublicationBundle(outputRoot: str | Path, bundleHash: str) -> PublicationVerification:
+    output = Path(outputRoot).expanduser().resolve()
+    if not re.fullmatch(r"sha256-[0-9a-f]{64}", bundleHash):
+        raise PublicationBuildError("publication bundle hash가 올바르지 않습니다.")
+    bundleRoot = (output / "bundles" / bundleHash.removeprefix(_HASH_PREFIX)).resolve()
+    active = _browserActivePayload(output, bundleRoot, bundleHash)
+    return _verifyPublicationActive(output, active)
+
+
+def rollbackPublication(outputRoot: str | Path, bundleHash: str) -> PublicationVerification:
+    output = Path(outputRoot).expanduser().resolve()
+
+    def candidate(bundleRoot: Path, contentHash: str):
+        active = _browserActivePayload(output, bundleRoot, contentHash)
+        return active, _verifyPublicationActive(output, active)
+
+    return rollbackImmutablePointer(
+        output,
+        target="browser",
+        contentHash=bundleHash,
+        collection="bundles",
+        candidate=candidate,
+    )
+
+
+def _verifyPublicationActive(output: Path, active: dict[str, Any]) -> PublicationVerification:
+    if active.get("schemaVersion") != 1 or active.get("target") not in {None, "browser"}:
         raise PublicationBuildError("지원하지 않는 active pointer입니다.")
     bundlePath = _safeRelativePath(active.get("bundlePath"), "bundlePath")
     bundleRoot = (output / Path(*PurePosixPath(bundlePath).parts)).resolve()
@@ -222,6 +274,13 @@ def verifyPublication(outputRoot: str | Path) -> PublicationVerification:
     unsigned.pop("manifestHash", None)
     if manifestHash != _contentHash(_canonicalBytes(unsigned)):
         raise PublicationBuildError("publication manifest hash가 일치하지 않습니다.")
+    try:
+        validatePublicationProof(
+            manifest.get("proof"),
+            executionBlockIds=manifest.get("executionBlockIds") if isinstance(manifest.get("executionBlockIds"), list) else [],
+        )
+    except PublicationProofError as exc:
+        raise PublicationBuildError(f"publication proof가 손상됐습니다: {exc}") from exc
 
     listed: set[str] = set()
     totalBytes = 0
@@ -252,6 +311,7 @@ def verifyPublication(outputRoot: str | Path) -> PublicationVerification:
             actual.add(relative)
     if actual != listed:
         raise PublicationBuildError("publication manifest와 실제 파일 목록이 다릅니다.")
+    _verifyExecutionProjection(manifest, bundleRoot)
     if active.get("indexHash") != _fileHash(bundleRoot / "index.html"):
         raise PublicationBuildError("publication index가 손상됐습니다.")
     if active.get("publicationFileHash") != _fileHash(bundleRoot / "publication.json"):
@@ -274,6 +334,17 @@ def verifyPublication(outputRoot: str | Path) -> PublicationVerification:
         fileCount=len(files) + 2,
         totalBytes=totalBytes + (bundleRoot / "index.html").stat().st_size + (bundleRoot / "publication.json").stat().st_size,
     )
+
+
+def _browserActivePayload(output: Path, bundleRoot: Path, bundleHash: str) -> dict[str, object]:
+    return {
+        "schemaVersion": 1,
+        "target": "browser",
+        "bundleHash": bundleHash,
+        "bundlePath": bundleRoot.relative_to(output).as_posix(),
+        "indexHash": _fileHash(bundleRoot / "index.html"),
+        "publicationFileHash": _fileHash(bundleRoot / "publication.json"),
+    }
 
 
 def startPublicationServer(
@@ -462,6 +533,43 @@ def _rewriteRuntimeManifest(path: Path, packageRoot: str) -> None:
             raise PublicationBuildError(f"{path.name} file 계약이 잘못됐습니다.")
         item["url"] = f"./{packageRoot}{item['path']}"
     _writeCanonicalJson(path, payload)
+
+
+def _verifyExecutionProjection(manifest: dict[str, Any], bundleRoot: Path) -> None:
+    blockIds = manifest.get("executionBlockIds")
+    projectionHash = manifest.get("executionProjectionHash")
+    if (
+        not isinstance(blockIds, list)
+        or not blockIds
+        or len(blockIds) != len(set(blockIds))
+        or any(not isinstance(blockId, str) or not blockId for blockId in blockIds)
+        or not isinstance(projectionHash, str)
+    ):
+        raise PublicationBuildError("publication execution projection 계약이 잘못됐습니다.")
+    documentPath = _safeRelativePath(manifest.get("documentPath"), "documentPath")
+    document = _readJsonObject(
+        _resolvedBundleFile(bundleRoot, documentPath),
+        "publication document",
+    )
+    blocks = document.get("blocks")
+    if not isinstance(blocks, list):
+        raise PublicationBuildError("publication document blocks가 목록이 아닙니다.")
+    executionBlocks = [
+        block
+        for block in blocks
+        if isinstance(block, dict) and block.get("type") in {"code", "automation", "markdown"}
+    ]
+    actualIds = [block.get("id") for block in executionBlocks]
+    actualProjectionHash = _contentHash(_canonicalBytes([
+        {
+            "blockId": block.get("id"),
+            "type": block.get("type"),
+            "contentHash": _contentHash(str(block.get("content") or "").encode("utf-8")),
+        }
+        for block in executionBlocks
+    ]))
+    if actualIds != blockIds or actualProjectionHash != projectionHash:
+        raise PublicationBuildError("publication execution projection이 bundle 문서와 다릅니다.")
 
 
 def _rewriteIndex(path: Path, title: str) -> None:

@@ -4,10 +4,12 @@ import asyncio
 from pathlib import Path
 
 import pytest
+import yaml
 
 import codaro.api.learningArchiveAutomation as bridge
 from codaro.automation.taskRegistry import TaskRegistry
 from codaro.automation.taskRunner import TaskRunner
+from codaro.automation.taskModel import TaskRun
 from codaro.automation.taskSafety import confirmTaskSafety
 from codaro.curriculum.evidenceArchive import (
     buildLearningEvidenceArchive,
@@ -23,9 +25,13 @@ from codaro.curriculum.learningArchive import (
     buildLearningArchive,
     commitLearningArchiveImport,
 )
-from codaro.proof import ProofArchive
+from codaro.proof import ProofArchive, canonicalJson, contentDigest
 from codaro.curriculum.learningEvent import learningEventDigest, sealLearningEvent
+from codaro.curriculum.localStrongCheck import runLocalStrongCheck
 from codaro.curriculum.taxonomy import loadTaxonomy
+from codaro.document import BlockConfig, CodaroDocument, DocumentMetadata
+from codaro.document.percentFormat import writePercentDocument
+from codaro.publication import compileExecutableUnit
 
 
 SOURCE = """from pathlib import Path
@@ -34,6 +40,61 @@ import json
 report = {"count": count, "total": total, "average": average}
 Path(outputPath).write_text(json.dumps(report), encoding="utf-8")
 """.rstrip()
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def testArtifactContractPackagedBytesMatchAuthoringContract() -> None:
+    assert (
+        ROOT / "src/codaro/generatedContracts/python.report.json.v1.json"
+    ).read_bytes() == (
+        ROOT / "contracts/learning-content/artifacts/python.report.json.v1.json"
+    ).read_bytes()
+
+
+def testLearnerSelectedArtifactPathProducesOneOperationalDescriptor() -> None:
+    contract = bridge._applicationOutputContract(
+        [{"path": "fixture-a.json"}, {"path": "fixture-b.json"}],
+        [("python.report.json.v1", 1)],
+        requiredInputNames=["average", "count", "outputPath", "total"],
+        selectedInputs={
+            "average": 2,
+            "count": 1,
+            "outputPath": "operational.json",
+            "total": 2,
+        },
+    )
+
+    assert [item["path"] for item in contract["artifacts"]] == ["operational.json"]
+
+
+def testDay30GoldenApplicationPassesStrongCheckAndCompilesExactTaskInputs(tmp_path: Path) -> None:
+    lessonPath = next((ROOT / "curricula/python/basics/30days").glob("day30_*.yaml"))
+    lesson = yaml.safe_load(lessonPath.read_text(encoding="utf-8"))
+    application = lesson["assessment"]["applicationVariants"][0]
+    solution = application["exercise"]["solution"]
+
+    checked = runLocalStrongCheck(
+        application["check"],
+        solution,
+        artifactStoreRoot=tmp_path / "artifacts",
+    )
+    assert checked["passed"] is True
+
+    document = CodaroDocument(
+        id="day30-golden-application",
+        title="Day 30 golden application",
+        blocks=[BlockConfig(id="entry", type="automation", content=solution)],
+        metadata=DocumentMetadata(sourceFormat="percent"),
+    )
+    sourceText = writePercentDocument(document)
+    compiled = compileExecutableUnit(
+        document,
+        "entry",
+        sourcePath=tmp_path / "day30-golden.py",
+        sourceText=sourceText,
+        workspaceRoot=tmp_path,
+    )
+    assert compiled.unit["inputSchema"]["required"] == ["average", "count", "outputPath", "total"]
 
 
 def _archive(source: str = SOURCE) -> dict[str, object]:
@@ -88,6 +149,7 @@ def _proof(source: str = SOURCE) -> dict[str, object]:
         "artifactContentHashes": [digestText("learning-report")],
         "sourceCodeHashes": [digestBytes(source.encode("utf-8"))],
         "taskVariantIds": ["python.report.delivery.application.v1"],
+        "fixtureHashes": [digestText("fixture")],
         "artifacts": [{
             "byteLength": 38,
             "contentHash": digestText("learning-report"),
@@ -334,17 +396,55 @@ def testStrongLearningBlockPromotesWithOneHashAndRecordsOnlySemanticFreshRun(
     if run.validated is not True:
         pytest.fail(f"{run.error}\n{run.validationErrors}", pytrace=False)
     assert run.operationalCandidate is True
-    operational = bridge.recordPromotedTaskOperationalRun(task, run, proofArchive=proofArchive)
+    unisolated = TaskRun.deserialize(run.serialize())
+    unisolated.isolationTerminationStatus = "active"
+    assert bridge.recordPromotedTaskOperationalRun(
+        task,
+        unisolated,
+        proofArchive=proofArchive,
+        workspaceRoot=workspace,
+    ) is None
+    operational = bridge.recordPromotedTaskOperationalRun(
+        task,
+        run,
+        proofArchive=proofArchive,
+        workspaceRoot=workspace,
+    )
 
     assert operational is not None
     assert operational.sourceHash == task.provenance["sourceBlockHash"]
     assert operational.learningEvidenceCreditIds == task.provenance["creditEventIds"]
+    assert operational.isolationProfile == "codaro-local-restricted-v1"
+    assert operational.isolationPolicyHash == run.isolationPolicyHash
+    assert operational.isolationTerminationStatus == "destroyed"
     assert operational.learnerSelectedInput is True
     assert proofArchive.receiptById(operational.receiptId) == operational
 
+    firstArtifactHash = run.artifactDescriptors[0]["contentHash"]
+    firstInputHash = run.inputHash
+    task.inputs = {"average": 4, "count": 2, "outputPath": "report.json", "total": 8}
+    task.safetyApproval = confirmTaskSafety(task, confirmation=task.id, workspaceRoot=workspace)
+    secondRun = asyncio.run(TaskRunner(workspaceRoot=workspace).run(task))
+    secondOperational = bridge.recordPromotedTaskOperationalRun(
+        task,
+        secondRun,
+        proofArchive=proofArchive,
+        workspaceRoot=workspace,
+    )
+    assert secondRun.semanticStatus == "contract-passed"
+    assert secondOperational is not None
+    assert secondRun.inputHash != firstInputHash
+    assert secondRun.artifactDescriptors[0]["contentHash"] != firstArtifactHash
+    assert secondOperational.inputHash == secondRun.inputHash
+
     task.inputs = {}
     replay = asyncio.run(TaskRunner(workspaceRoot=workspace).run(task))
-    assert bridge.recordPromotedTaskOperationalRun(task, replay, proofArchive=proofArchive) is None
+    assert bridge.recordPromotedTaskOperationalRun(
+        task,
+        replay,
+        proofArchive=proofArchive,
+        workspaceRoot=workspace,
+    ) is None
 
 
 def testSourceMismatchAndJsonShapeFailureNeverProduceOperationalProof(
@@ -372,7 +472,7 @@ def testSourceMismatchAndJsonShapeFailureNeverProduceOperationalProof(
             inputs={"average": 2, "count": 1, "outputPath": "report.json", "total": 2},
         )
 
-    badSource = SOURCE.replace('"count": count', '"count": "wrong"')
+    badSource = SOURCE.replace('"count": count', '"count": str(count)')
     commitLearningArchiveImport(_archive(badSource), storeRoot)
     archive = bridge.readCurrentLearningArchive(storeRoot)
     draftId = archive["automationDrafts"][0]["draftId"]
@@ -383,7 +483,7 @@ def testSourceMismatchAndJsonShapeFailureNeverProduceOperationalProof(
         workspaceRoot=workspace,
         proofArchive=proofArchive,
         taskRegistry=registry,
-        inputs={"average": 2, "outputPath": "report.json", "total": 2},
+        inputs={"average": 2, "count": 1, "outputPath": "report.json", "total": 2},
     )
     task = registry.get(promoted["task"]["id"])
     assert task is not None
@@ -392,4 +492,131 @@ def testSourceMismatchAndJsonShapeFailureNeverProduceOperationalProof(
     run = asyncio.run(TaskRunner(workspaceRoot=workspace).run(task))
     assert run.validated is False
     assert "artifact-json-field-type:report.json:count" in run.validationErrors
-    assert bridge.recordPromotedTaskOperationalRun(task, run, proofArchive=proofArchive) is None
+    assert bridge.recordPromotedTaskOperationalRun(
+        task,
+        run,
+        proofArchive=proofArchive,
+        workspaceRoot=workspace,
+    ) is None
+
+
+def testInputIndependentMutantCannotPassLearnerSelectedInputContract(tmp_path: Path) -> None:
+    mutant = """from pathlib import Path
+import json
+
+ignored = (count, total, average)
+report = {"count": 1, "total": 2, "average": 2}
+Path(outputPath).write_text(json.dumps(report), encoding="utf-8")
+""".rstrip()
+    storeRoot = tmp_path / "archives"
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    commitLearningArchiveImport(_strongArchive(mutant), storeRoot)
+    archive = bridge.readCurrentLearningArchive(storeRoot)
+    registry = TaskRegistry(tmp_path / "tasks")
+    proofArchive = ProofArchive(tmp_path / "proof.sqlite3")
+    promoted = bridge.promoteLearningArtifactToExecutableUnit(
+        archive["automationDrafts"][0]["draftId"],
+        storeRoot=storeRoot,
+        workspaceRoot=workspace,
+        proofArchive=proofArchive,
+        taskRegistry=registry,
+        inputs={"average": 3, "count": 4, "outputPath": "mutant.json", "total": 12},
+    )
+    task = registry.get(promoted["task"]["id"])
+    assert task is not None
+    task.safetyApproval = confirmTaskSafety(task, confirmation=task.id, workspaceRoot=workspace)
+
+    run = asyncio.run(TaskRunner(workspaceRoot=workspace).run(task))
+
+    assert run.executionStatus == "success"
+    assert run.semanticStatus == "contract-failed"
+    assert "input-binding-mismatch:mutant.json:count" in run.validationErrors
+    assert "input-binding-mismatch:mutant.json:total" in run.validationErrors
+    assert bridge.recordPromotedTaskOperationalRun(
+        task,
+        run,
+        proofArchive=proofArchive,
+        workspaceRoot=workspace,
+    ) is None
+
+
+def testOneByteMetadataDriftMakesArchivedBuildStale(tmp_path: Path) -> None:
+    storeRoot = tmp_path / "archives"
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    commitLearningArchiveImport(_strongArchive(), storeRoot)
+    archive = bridge.readCurrentLearningArchive(storeRoot)
+    registry = TaskRegistry(tmp_path / "tasks")
+    proofArchive = ProofArchive(tmp_path / "proof.sqlite3")
+    inputs = {"average": 2, "count": 1, "outputPath": "report.json", "total": 2}
+    promoted = bridge.promoteLearningArtifactToExecutableUnit(
+        archive["automationDrafts"][0]["draftId"],
+        storeRoot=storeRoot,
+        workspaceRoot=workspace,
+        proofArchive=proofArchive,
+        taskRegistry=registry,
+        inputs=inputs,
+    )
+    task = registry.get(promoted["task"]["id"])
+    assert task is not None and task.provenance is not None
+    documentPath = workspace / task.documentPath
+    archivedBytes = documentPath.read_bytes()
+    mutatedBytes = archivedBytes.replace(b"learning-feature-", b"mearning-feature-", 1)
+    assert len(mutatedBytes) == len(archivedBytes)
+    assert sum(left != right for left, right in zip(archivedBytes, mutatedBytes, strict=True)) == 1
+    documentPath.write_bytes(mutatedBytes)
+    task.safetyApproval = confirmTaskSafety(task, confirmation=task.id, workspaceRoot=workspace)
+
+    run = asyncio.run(TaskRunner(workspaceRoot=workspace).run(task))
+    archivedBuild = proofArchive.receiptById(str(task.provenance["buildArtifactReceiptId"]))
+
+    assert run.executionStatus == "success"
+    assert run.semanticStatus == "contract-passed"
+    assert run.sourceHash == task.provenance["sourceBlockHash"]
+    assert archivedBuild is not None
+    assert run.buildArtifactHash != archivedBuild.buildArtifactHash
+    assert bridge.recordPromotedTaskOperationalRun(
+        task,
+        run,
+        proofArchive=proofArchive,
+        workspaceRoot=workspace,
+    ) is None
+
+
+def testRehashedSpoofProvenanceCannotReplaceArchivedLineage(tmp_path: Path) -> None:
+    storeRoot = tmp_path / "archives"
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    commitLearningArchiveImport(_strongArchive(), storeRoot)
+    archive = bridge.readCurrentLearningArchive(storeRoot)
+    registry = TaskRegistry(tmp_path / "tasks")
+    proofArchive = ProofArchive(tmp_path / "proof.sqlite3")
+    promoted = bridge.promoteLearningArtifactToExecutableUnit(
+        archive["automationDrafts"][0]["draftId"],
+        storeRoot=storeRoot,
+        workspaceRoot=workspace,
+        proofArchive=proofArchive,
+        taskRegistry=registry,
+        inputs={"average": 2, "count": 1, "outputPath": "report.json", "total": 2},
+    )
+    task = registry.get(promoted["task"]["id"])
+    assert task is not None and task.provenance is not None
+    task.safetyApproval = confirmTaskSafety(task, confirmation=task.id, workspaceRoot=workspace)
+    run = asyncio.run(TaskRunner(workspaceRoot=workspace).run(task))
+    provenanceCore = {
+        **{key: value for key, value in task.provenance.items() if key != "promotionHash"},
+        "creditEventIds": ["spoofed-credit"],
+    }
+    task.provenance = {
+        **provenanceCore,
+        "promotionHash": contentDigest(canonicalJson(provenanceCore)),
+    }
+
+    assert run.semanticStatus == "contract-passed"
+    assert bridge.recordPromotedTaskOperationalRun(
+        task,
+        run,
+        proofArchive=proofArchive,
+        workspaceRoot=workspace,
+    ) is None

@@ -8,13 +8,14 @@ import inspect
 import io
 import os
 from pathlib import Path
+import socket
 import sys
+import threading
 import traceback
 from typing import Any
-from urllib.parse import urlsplit
 import warnings
 
-from .executionPolicy import ExecutionSecurityPolicy
+from .executionPolicy import ExecutionSecurityPolicy, networkOriginEndpoint
 
 # numpy/scipy/scikit-learn이 쓰는 OpenBLAS는 기본적으로 CPU 코어 수만큼 스레드 버퍼를 미리
 # 잡는다. spawn으로 만든 worker(특히 여러 세션이 동시에 떠 있을 때)에서는 이 할당이 실패해
@@ -50,9 +51,21 @@ def runLocalWorker(
     clearEnvironment: bool = False,
     pythonPaths: list[str] | None = None,
 ) -> None:
+    policy = ExecutionSecurityPolicy.deserialize(executionPolicy) if executionPolicy is not None else None
+    if policy is not None and policy.environmentMode == "minimal-declared" and not clearEnvironment:
+        raise RuntimeError("proof execution requires a cleared worker environment")
     if clearEnvironment:
+        # Windows의 Winsock/DNS와 Python 표준 경로 해석은 SystemRoot를
+        # 필요로 한다. 사용자 shell 환경은 전달하지 않되 이 두 OS runtime
+        # identity만 spawn 시점 값에서 보존한다.
+        platformEnvironment = {
+            name: os.environ[name]
+            for name in ("SYSTEMROOT", "WINDIR")
+            if os.environ.get(name)
+        }
         os.environ.clear()
         os.environ.update({
+            **platformEnvironment,
             "MPLBACKEND": "Agg",
             "OPENBLAS_NUM_THREADS": "1",
             "OMP_NUM_THREADS": "1",
@@ -74,8 +87,8 @@ def runLocalWorker(
     if targetCwd is not None and str(targetCwd) not in sys.path:
         sys.path.insert(0, str(targetCwd))
 
-    if executionPolicy is not None:
-        _installExecutionPolicyAuditHook(ExecutionSecurityPolicy.deserialize(executionPolicy))
+    if policy is not None:
+        _installExecutionPolicyAuditHook(policy)
 
     if interruptFlag is not None:
         _installInterruptTrace(interruptFlag)
@@ -222,6 +235,7 @@ def _workerSend(connection, data: Any) -> None:
 
 def _installExecutionPolicyAuditHook(policy: ExecutionSecurityPolicy) -> None:
     workspaceRoot = policy.workspaceRoot
+    networkGuard = _NetworkDestinationGuard(policy)
     runtimeReadRoots = tuple({
         Path(sys.base_prefix).resolve(),
         Path(sys.prefix).resolve(),
@@ -274,39 +288,137 @@ def _installExecutionPolicyAuditHook(policy: ExecutionSecurityPolicy) -> None:
             "socket.gethostbyname",
         }:
             _requireScope(policy, "network", event)
-            _requireNetworkDestination(policy, event, args)
+            networkGuard.require(event, args)
             return
-        if event == "subprocess.Popen" or event == "os.system" or event.startswith("os.exec") or event.startswith("os.spawn"):
+        if (
+            event in {
+                "subprocess.Popen",
+                "os.system",
+                "os.fork",
+                "os.forkpty",
+                "os.posix_spawn",
+                "os.posix_spawnp",
+                "os.startfile",
+            }
+            or event.startswith("os.exec")
+            or event.startswith("os.spawn")
+        ):
             _requireScope(policy, "process.execute", event)
+            if policy.childProcessMode == "deny":
+                raise PermissionError(
+                    f"Codaro execution policy blocked {event}; child processes are disabled by the isolation profile"
+                )
+            return
+        if event.startswith("ctypes.") and policy.nativeInteropMode == "audit-deny":
+            raise PermissionError(
+                f"Codaro execution policy blocked {event}; native interop is disabled by the isolation profile"
+            )
 
     sys.addaudithook(audit)
 
 
-def _requireNetworkDestination(
-    policy: ExecutionSecurityPolicy,
-    event: str,
-    args: tuple[object, ...],
-) -> None:
-    if not policy.networkOrigins:
-        return
-    host = _networkHost(event, args)
-    allowedHosts = {urlsplit(origin).hostname for origin in policy.networkOrigins}
-    if host is None or host.lower().rstrip(".") not in {item.lower().rstrip(".") for item in allowedHosts if item}:
+class _NetworkDestinationGuard:
+    """Bind declared URL origins to the exact DNS answers used by this worker.
+
+    Python's audit hook sees the hostname during ``getaddrinfo`` and the resolved
+    numeric address during ``connect``.  Treating those two values as unrelated
+    blocks normal HTTP clients, while globally allowing every resolved address
+    lets direct-IP and DNS rebinding bypass the origin contract.  This guard pins
+    addresses once before the audit hook is installed and grants a connect only
+    after the declared hostname was resolved for the same port.
+    """
+
+    def __init__(self, policy: ExecutionSecurityPolicy) -> None:
+        self._declared: dict[tuple[str, int], frozenset[str]] = {}
+        self._pending: dict[tuple[str, int], int] = {}
+        self._lock = threading.Lock()
+        for origin in policy.networkOrigins:
+            host, port = networkOriginEndpoint(origin)
+            addresses = _resolvePinnedAddresses(host, port)
+            self._declared[(host.lower().rstrip("."), port)] = frozenset(addresses)
+
+    def require(self, event: str, args: tuple[object, ...]) -> None:
+        if not self._declared:
+            return
+        host, port = _networkDestination(event, args)
+        if host is None:
+            raise PermissionError(f"Codaro execution policy blocked {event}; destination is not declared")
+        normalizedHost = host.lower().rstrip(".")
+        if event in {"socket.getaddrinfo", "socket.gethostbyname"}:
+            matching = [
+                (declaredPort, addresses)
+                for (declaredHost, declaredPort), addresses in self._declared.items()
+                if declaredHost == normalizedHost and (port is None or declaredPort == port)
+            ]
+            if not matching:
+                raise PermissionError(f"Codaro execution policy blocked {event}; destination is not declared")
+            with self._lock:
+                for declaredPort, addresses in matching:
+                    for address in addresses:
+                        key = (address, declaredPort)
+                        self._pending[key] = self._pending.get(key, 0) + 1
+            return
+        if event == "socket.gethostbyaddr":
+            if any(normalizedHost in addresses for addresses in self._declared.values()):
+                return
+            raise PermissionError(f"Codaro execution policy blocked {event}; destination is not declared")
+        if port is None:
+            raise PermissionError(f"Codaro execution policy blocked {event}; destination is not declared")
+        declaredAddresses = self._declared.get((normalizedHost, port))
+        if declaredAddresses is not None:
+            return
+        with self._lock:
+            key = (normalizedHost, port)
+            remaining = self._pending.get(key, 0)
+            if remaining > 0:
+                if remaining == 1:
+                    self._pending.pop(key, None)
+                else:
+                    self._pending[key] = remaining - 1
+                return
         raise PermissionError(f"Codaro execution policy blocked {event}; destination is not declared")
 
 
-def _networkHost(event: str, args: tuple[object, ...]) -> str | None:
+def _resolvePinnedAddresses(host: str, port: int) -> set[str]:
+    try:
+        rows = socket.getaddrinfo(host, port, type=socket.SOCK_STREAM)
+    except OSError as error:
+        raise PermissionError(f"Codaro execution policy could not resolve declared destination {host}:{port}") from error
+    addresses = {
+        str(row[4][0]).lower().rstrip(".")
+        for row in rows
+        if isinstance(row[4], tuple) and row[4]
+    }
+    if not addresses:
+        raise PermissionError(f"Codaro execution policy could not resolve declared destination {host}:{port}")
+    return addresses
+
+
+def _networkDestination(event: str, args: tuple[object, ...]) -> tuple[str | None, int | None]:
     if not args:
-        return None
+        return None, None
     candidate: object = args[1] if event in {"socket.bind", "socket.connect"} and len(args) > 1 else args[0]
+    port: int | None = None
     if isinstance(candidate, tuple) and candidate:
+        if len(candidate) > 1 and isinstance(candidate[1], int):
+            port = candidate[1]
         candidate = candidate[0]
+    elif event == "socket.getaddrinfo" and len(args) > 1:
+        rawPort = args[1]
+        if isinstance(rawPort, int):
+            port = rawPort
+        elif isinstance(rawPort, str) and rawPort.isdigit():
+            port = int(rawPort)
     if isinstance(candidate, bytes):
         try:
             candidate = candidate.decode("ascii")
         except UnicodeDecodeError:
-            return None
-    return candidate if isinstance(candidate, str) and candidate else None
+            return None, port
+    return (candidate if isinstance(candidate, str) and candidate else None), port
+
+
+def _networkHost(event: str, args: tuple[object, ...]) -> str | None:
+    return _networkDestination(event, args)[0]
 
 
 def _auditPath(value: object) -> Path | None:

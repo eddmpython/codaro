@@ -174,7 +174,17 @@ def runLocalStrongCheckAttempt(
             if not verdict.passed:
                 return failedResult("mismatch", expected, actual, verdict.feedback), False
             acceptedOutputFeedback = verdict.feedback if verdict.tier != "exact" else ""
-        elif actual != expected:
+        elif normalized["kind"] == "behavior" and not behaviorResultMatches(expected, actual):
+            return (
+                failedResult(
+                    "mismatch",
+                    expected,
+                    actual,
+                    f"기대 결과와 로컬 격리 실행 결과가 다릅니다. 기대: {displayOutput(expected)}, 실제: {displayOutput(actual)}",
+                ),
+                False,
+            )
+        elif normalized["kind"] != "behavior" and actual != expected:
             return (
                 failedResult(
                     "mismatch",
@@ -573,6 +583,41 @@ def stableJson(value: Any) -> str:
             for key in sorted(value)
         ) + "}"
     return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+
+
+def behaviorResultMatches(expected: str, actual: str) -> bool:
+    try:
+        expectedValue = json.loads(expected)
+        actualValue = json.loads(actual)
+    except (json.JSONDecodeError, TypeError):
+        return False
+    return jsonValuesEquivalent(expectedValue, actualValue)
+
+
+def jsonValuesEquivalent(expected: Any, actual: Any) -> bool:
+    if isinstance(expected, bool) or isinstance(actual, bool):
+        return isinstance(expected, bool) and isinstance(actual, bool) and expected == actual
+    if isinstance(expected, (int, float)) or isinstance(actual, (int, float)):
+        return (
+            isinstance(expected, (int, float))
+            and isinstance(actual, (int, float))
+            and expected == actual
+        )
+    if isinstance(expected, list) or isinstance(actual, list):
+        return (
+            isinstance(expected, list)
+            and isinstance(actual, list)
+            and len(expected) == len(actual)
+            and all(jsonValuesEquivalent(left, right) for left, right in zip(expected, actual))
+        )
+    if isinstance(expected, dict) or isinstance(actual, dict):
+        return (
+            isinstance(expected, dict)
+            and isinstance(actual, dict)
+            and expected.keys() == actual.keys()
+            and all(jsonValuesEquivalent(expected[key], actual[key]) for key in expected)
+        )
+    return type(expected) is type(actual) and expected == actual
 
 
 def fixtureHash(value: dict[str, Any]) -> str:

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 import json
+import os
 from pathlib import Path
 import shutil
 import sys
@@ -80,14 +81,19 @@ def _mobileContract(page) -> dict[str, object]:
     }
 
 
-def _staticProduct(browser, source: Path, output: Path, productId: str) -> dict[str, object]:
-    from codaro.publication import buildStaticPublication, startPublicationServer, verifyPublication
+def _staticProduct(browser, source: Path, output: Path, row: dict[str, object]) -> dict[str, object]:
+    from codaro.proof import ProofArchive
+    from codaro.publication.workbench import PublicationWorkbench
 
-    built = buildStaticPublication(source, output)
-    verified = verifyPublication(output)
-    server, url = startPublicationServer(output, port=0)
-    thread = threading.Thread(target=server.serve_forever, daemon=True)
-    thread.start()
+    productId = str(row["id"])
+    archive = ProofArchive(output.parent / f"{productId}-proof.sqlite3")
+    archive.initialize()
+    workbench = PublicationWorkbench(proofArchive=archive)
+    built = _finished(workbench, workbench.build(sourcePath=source, outputPath=output, target="browser"))
+    _finished(workbench, workbench.verify(outputPath=output, target="browser"))
+    served = _finished(workbench, workbench.serve(outputPath=output, target="browser"))
+    url = str(served["result"]["url"])
+    serverId = str(served["result"]["serverId"])
     observations = {key: [] for key in ("externalRequests", "failedRequests", "consoleErrors", "pageErrors")}
     context = browser.new_context(viewport={"width": 1280, "height": 820})
     page = context.new_page()
@@ -127,20 +133,42 @@ def _staticProduct(browser, source: Path, output: Path, productId: str) -> dict[
         mobile = _mobileContract(page)
         if mobile["overflowPx"] > 1 or mobile["headingCount"] != 1:
             raise AssertionError(f"{productId} mobile 또는 heading 계약이 실패했습니다: {mobile}")
-        if readyMs > MAX_READY_MS or interactionMs > MAX_INTERACTION_MS or verified.totalBytes > MAX_STATIC_BYTES:
+        bundleRoot = Path(str(built["result"]["bundleRoot"]))
+        totalBytes = sum(path.stat().st_size for path in bundleRoot.rglob("*") if path.is_file())
+        if readyMs > MAX_READY_MS or interactionMs > MAX_INTERACTION_MS or totalBytes > MAX_STATIC_BYTES:
             raise AssertionError(f"{productId} performance budget을 넘었습니다.")
         if any(observations.values()):
             raise AssertionError(f"{productId} browser 오류: {observations}")
+        executed = ["build", "serve"]
+        if "embed" in row["journey"]:
+            embedOutput = output.parent / f"{productId}-embed"
+            _finished(workbench, workbench.build(
+                sourcePath=source,
+                outputPath=embedOutput,
+                target="embed",
+                entryBlockId=str(row["entryBlockIds"][-1]),
+            ))
+            _finished(workbench, workbench.verify(outputPath=embedOutput, target="embed"))
+            executed.append("embed")
+        if "deploy" in row["journey"]:
+            _finished(workbench, workbench.deploy(
+                publicationPath=output,
+                outputPath=output.parent / f"{productId}-deploy",
+                target="folder",
+            ))
+            executed.append("deploy")
+        proof = _proofResult(archive, row, executed)
         return {
             "id": productId,
             "runtimeTarget": "browser",
-            "bundleHash": built.bundleHash,
-            "manifestHash": built.manifest["manifestHash"],
+            "bundleHash": built["result"]["bundleHash"],
+            "manifestHash": built["result"]["receiptId"],
             "readyMs": readyMs,
             "interactionMs": interactionMs,
-            "totalBytes": verified.totalBytes,
+            "totalBytes": totalBytes,
             "mobile": mobile,
             "failureRecovered": recovered,
+            **proof,
             **observations,
         }
     except Exception as error:
@@ -155,28 +183,24 @@ def _staticProduct(browser, source: Path, output: Path, productId: str) -> dict[
         ) from error
     finally:
         context.close()
-        server.shutdown()
-        server.server_close()
-        thread.join(timeout=5)
+        _finished(workbench, workbench.stop(serverId))
+        workbench.close()
 
 
-def _serverProduct(browser, source: Path, output: Path) -> dict[str, object]:
-    import uvicorn
+def _serverProduct(browser, source: Path, output: Path, row: dict[str, object]) -> dict[str, object]:
+    from codaro.proof import ProofArchive
+    from codaro.publication.workbench import PublicationWorkbench
 
-    from codaro.publication import buildServerPublication, verifyServerPublication
-    from codaro.server import createPublishedServerApp
-
-    built = buildServerPublication(source, output)
-    verified = verifyServerPublication(output)
-    app = createPublishedServerApp(output, environment={"REFERENCE_API_TOKEN": SECRET_VALUE})
-    config = uvicorn.Config(app, host="127.0.0.1", port=0, log_level="warning")
-    server = uvicorn.Server(config)
-    thread = threading.Thread(target=server.run, daemon=True)
-    thread.start()
-    port = waitForServerPort(server)
-    if port is None:
-        raise AssertionError("reference server app이 시작되지 않았습니다.")
-    url = f"http://127.0.0.1:{port}/app"
+    archive = ProofArchive(output.parent / "server-secret-app-proof.sqlite3")
+    archive.initialize()
+    workbench = PublicationWorkbench(proofArchive=archive)
+    previousSecret = os.environ.get("REFERENCE_API_TOKEN")
+    os.environ["REFERENCE_API_TOKEN"] = SECRET_VALUE
+    built = _finished(workbench, workbench.build(sourcePath=source, outputPath=output, target="server"))
+    _finished(workbench, workbench.verify(outputPath=output, target="server"))
+    served = _finished(workbench, workbench.serve(outputPath=output, target="server"))
+    url = str(served["result"]["url"])
+    serverId = str(served["result"]["serverId"])
     observations = {key: [] for key in ("externalRequests", "failedRequests", "consoleErrors", "pageErrors")}
     context = browser.new_context(viewport={"width": 1280, "height": 820})
     page = context.new_page()
@@ -195,63 +219,133 @@ def _serverProduct(browser, source: Path, output: Path) -> dict[str, object]:
         mobile = _mobileContract(page)
         if mobile["overflowPx"] > 1 or any(observations.values()):
             raise AssertionError(f"server reference browser 계약 실패: mobile={mobile}, errors={observations}")
+        _finished(workbench, workbench.deploy(
+            publicationPath=output,
+            outputPath=output.parent / "server-secret-app-deploy",
+            target="folder",
+        ))
+        proof = _proofResult(archive, row, ["build", "serve", "deploy"])
         return {
             "id": "server-secret-app",
             "runtimeTarget": "server",
-            "bundleHash": built.bundleHash,
-            "manifestHash": verified.manifest["manifestHash"],
+            "bundleHash": built["result"]["bundleHash"],
+            "manifestHash": built["result"]["receiptId"],
             "readyMs": readyMs,
             "interactionMs": interactionMs,
             "secretRedacted": True,
             "mobile": mobile,
+            **proof,
             **observations,
         }
     finally:
         context.close()
-        server.should_exit = True
-        thread.join(timeout=20)
+        _finished(workbench, workbench.stop(serverId))
+        workbench.close()
+        if previousSecret is None:
+            os.environ.pop("REFERENCE_API_TOKEN", None)
+        else:
+            os.environ["REFERENCE_API_TOKEN"] = previousSecret
 
 
-def _localProduct(browser, sourceRoot: Path, workspace: Path) -> dict[str, object]:
-    import uvicorn
-
-    from codaro.server import createServerApp
+def _localProduct(browser, sourceRoot: Path, workspace: Path, row: dict[str, object]) -> dict[str, object]:
+    from codaro.proof import ProofArchive
+    from codaro.publication.workbench import PublicationWorkbench
 
     shutil.copytree(sourceRoot, workspace)
     source = workspace / "app.py"
-    app = createServerApp(mode="app", documentPath=source, workspaceRoot=workspace)
-    config = uvicorn.Config(app, host="127.0.0.1", port=0, log_level="warning")
-    server = uvicorn.Server(config)
-    thread = threading.Thread(target=server.run, daemon=True)
-    thread.start()
-    port = waitForServerPort(server)
-    if port is None:
-        raise AssertionError("reference Local app이 시작되지 않았습니다.")
-    url = f"http://127.0.0.1:{port}/app"
+    sourceSnapshot = _fileSnapshot(workspace)
+    output = workspace.parent / f"{workspace.name}-bundle"
+    archive = ProofArchive(workspace.parent / "local-file-automation-proof.sqlite3")
+    archive.initialize()
+    workbench = PublicationWorkbench(proofArchive=archive)
+    built = _finished(workbench, workbench.build(sourcePath=source, outputPath=output, target="local"))
+    if _fileSnapshot(workspace) != sourceSnapshot:
+        raise AssertionError("Local publication build가 source workspace를 변경했습니다.")
+    _finished(workbench, workbench.verify(outputPath=output, target="local"))
+    policyHash = str(built["result"]["policyHash"])
+    served = _finished(workbench, workbench.serve(
+        outputPath=output,
+        target="local",
+        approvedPolicyHash=policyHash,
+    ))
+    url = str(served["result"]["url"])
+    serverId = str(served["result"]["serverId"])
     observations = {key: [] for key in ("externalRequests", "failedRequests", "consoleErrors", "pageErrors")}
     context = browser.new_context(viewport={"width": 1280, "height": 820})
     page = context.new_page()
     _observePage(page, _origin(url), observations)
     try:
         readyMs = _openApp(page, url, "재고 자동화 완료: 4개 품목, 부족 2개")
-        artifact = workspace / "artifacts/inventory-report.json"
-        if not artifact.is_file():
-            raise AssertionError("Local app이 inventory artifact를 만들지 못했습니다.")
         mobile = _mobileContract(page)
         if mobile["overflowPx"] > 1 or any(observations.values()):
             raise AssertionError(f"Local reference browser 계약 실패: mobile={mobile}, errors={observations}")
+        source.write_text(source.read_text(encoding="utf-8").replace("layout = \"stack\"", "layout = \"notebook\""), encoding="utf-8")
+        second = _finished(workbench, workbench.build(sourcePath=source, outputPath=output, target="local"))
+        if second["result"]["bundleHash"] == built["result"]["bundleHash"]:
+            raise AssertionError("Local reference rollback fixture가 두 build를 만들지 못했습니다.")
+        _finished(workbench, workbench.rollback(
+            outputPath=output,
+            target="local",
+            versionId=str(built["result"]["bundleHash"]),
+        ))
+        proof = _proofResult(archive, row, ["build", "serve", "rollback"])
         return {
             "id": "local-file-automation",
             "runtimeTarget": "local",
+            "bundleHash": built["result"]["bundleHash"],
+            "manifestHash": built["result"]["receiptId"],
+            "policyHash": policyHash,
             "readyMs": readyMs,
-            "artifact": json.loads(artifact.read_text(encoding="utf-8")),
             "mobile": mobile,
+            **proof,
             **observations,
         }
     finally:
         context.close()
-        server.should_exit = True
-        thread.join(timeout=20)
+        if serverId:
+            _finished(workbench, workbench.stop(serverId))
+        workbench.close()
+
+
+def _fileSnapshot(root: Path) -> list[tuple[str, bytes]]:
+    return [
+        (path.relative_to(root).as_posix(), path.read_bytes())
+        for path in sorted(root.rglob("*"))
+        if path.is_file()
+    ]
+
+
+def _finished(workbench, job: dict[str, object]) -> dict[str, object]:
+    deadline = time.monotonic() + 180
+    current = job
+    while current["status"] == "running" and time.monotonic() < deadline:
+        time.sleep(0.05)
+        refreshed = workbench.job(str(current["id"]))
+        if refreshed is None:
+            raise AssertionError(f"publication job이 사라졌습니다: {current['id']}")
+        current = refreshed
+    if current["status"] != "completed":
+        raise AssertionError(f"publication job 실패: {current}")
+    return current
+
+
+def _proofResult(archive, row: dict[str, object], journey: list[str]) -> dict[str, object]:
+    declaredJourney = [str(item) for item in row["journey"]]
+    if journey != declaredJourney:
+        raise AssertionError(f"{row['id']} journey mismatch: {journey} != {declaredJourney}")
+    receipts = archive.receipts()
+    proofKinds = sorted({receipt.kind for receipt in receipts})
+    expectedKinds = sorted(str(item) for item in row["expectedProofKinds"])
+    if proofKinds != expectedKinds:
+        raise AssertionError(f"{row['id']} proof mismatch: {proofKinds} != {expectedKinds}")
+    for receipt in receipts:
+        if receipt.kind == "deployment":
+            archive.resolveLineage(receipt.receiptId)
+    return {
+        "journey": journey,
+        "proofKinds": proofKinds,
+        "receiptIds": [receipt.receiptId for receipt in receipts],
+    }
 
 
 def main() -> int:
@@ -292,17 +386,19 @@ def main() -> int:
                         browser,
                         ROOT / byId[productId]["sourcePath"],
                         scratch / productId,
-                        productId,
+                        byId[productId],
                     ))
                 results.append(_serverProduct(
                     browser,
                     ROOT / byId["server-secret-app"]["sourcePath"],
                     scratch / "server-secret-app",
+                    byId["server-secret-app"],
                 ))
                 results.append(_localProduct(
                     browser,
                     (ROOT / byId["local-file-automation"]["sourcePath"]).parent,
                     scratch / "local-file-automation",
+                    byId["local-file-automation"],
                 ))
                 browser.close()
         if {row["id"] for row in results} != set(byId):

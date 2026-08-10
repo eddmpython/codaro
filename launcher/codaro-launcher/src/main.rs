@@ -733,13 +733,13 @@ fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
             }
             Event::UserEvent(AppEvent::Progress(payload)) => {
                 let json = serde_json::to_string(&payload).unwrap_or_default();
-                let _ =
-                    webview.evaluate_script(&format!("window.setProgress&&window.setProgress({json})"));
+                let _ = webview
+                    .evaluate_script(&format!("window.setProgress&&window.setProgress({json})"));
             }
             Event::UserEvent(AppEvent::Fail(card)) => {
                 let json = serde_json::to_string(&card).unwrap_or_default();
-                let _ =
-                    webview.evaluate_script(&format!("window.setFailure&&window.setFailure({json})"));
+                let _ = webview
+                    .evaluate_script(&format!("window.setFailure&&window.setFailure({json})"));
             }
             Event::UserEvent(AppEvent::ShowWindow) => {
                 window.set_visible(true);
@@ -892,7 +892,11 @@ fn watch_test_zoom_requests(path: PathBuf, proxy: tao::event_loop::EventLoopProx
 }
 
 /// 다운로드 진행 콜백 `(artifact_label, received, total)`을 사용자용 IPC 진행률로 변환한다.
-fn download_progress_payload(label: &str, received: u64, total: Option<u64>) -> ipc::ProgressPayload {
+fn download_progress_payload(
+    label: &str,
+    received: u64,
+    total: Option<u64>,
+) -> ipc::ProgressPayload {
     fn mb(bytes: u64) -> f64 {
         bytes as f64 / (1024.0 * 1024.0)
     }
@@ -1070,11 +1074,9 @@ fn run_doctor(paths: &LauncherPaths) -> Result<()> {
     let active_release = stores.active_release.load_optional()?;
     let update_config = load_update_config(&stores)?;
     let active_python_executable = active_release.as_ref().and_then(|state| {
-        LauncherPaths::resolve_python_executable(
-            &paths.runtime_store_dir(&state.runtime_version),
-        )
-        .ok()
-        .map(|path| path.display().to_string())
+        LauncherPaths::resolve_python_executable(&paths.runtime_store_dir(&state.runtime_version))
+            .ok()
+            .map(|path| path.display().to_string())
     });
     let payload = serde_json::json!({
         "appRoot": paths.root(),
@@ -2099,7 +2101,10 @@ mod tests {
     use tempfile::tempdir;
 
     #[test]
-    #[cfg_attr(target_os = "macos", ignore = "covered on Windows/Ubuntu; macOS hosted runners time out fake Python backend probes")]
+    #[cfg_attr(
+        target_os = "macos",
+        ignore = "covered on Windows/Ubuntu; macOS hosted runners time out fake Python backend probes"
+    )]
     fn launch_active_backend_rolls_back_to_last_known_good_on_health_failure() {
         let _guard = test_guard();
         let temp_dir = tempdir().unwrap();
@@ -2150,7 +2155,10 @@ mod tests {
     }
 
     #[test]
-    #[cfg_attr(target_os = "macos", ignore = "covered on Windows/Ubuntu; macOS hosted runners time out fake Python backend probes")]
+    #[cfg_attr(
+        target_os = "macos",
+        ignore = "covered on Windows/Ubuntu; macOS hosted runners time out fake Python backend probes"
+    )]
     fn launch_active_backend_restarts_after_runtime_crash_and_clears_crash_state() {
         let _guard = test_guard();
         let temp_dir = tempdir().unwrap();
@@ -2186,7 +2194,10 @@ mod tests {
     }
 
     #[test]
-    #[cfg_attr(target_os = "macos", ignore = "covered on Windows/Ubuntu; macOS hosted runners time out fake Python backend probes")]
+    #[cfg_attr(
+        target_os = "macos",
+        ignore = "covered on Windows/Ubuntu; macOS hosted runners time out fake Python backend probes"
+    )]
     fn launch_active_backend_freezes_release_after_repeated_crashes_and_rolls_back() {
         let _guard = test_guard();
         let temp_dir = tempdir().unwrap();
@@ -2351,7 +2362,10 @@ mod tests {
     }
 
     #[test]
-    #[cfg_attr(target_os = "macos", ignore = "covered on Windows/Ubuntu; macOS hosted runners time out fake Python backend probes")]
+    #[cfg_attr(
+        target_os = "macos",
+        ignore = "covered on Windows/Ubuntu; macOS hosted runners time out fake Python backend probes"
+    )]
     fn sync_updates_applies_available_release() {
         let _guard = test_guard();
         let temp_dir = tempdir().unwrap();
@@ -2393,7 +2407,10 @@ mod tests {
     }
 
     #[test]
-    #[cfg_attr(target_os = "macos", ignore = "covered on Windows/Ubuntu; macOS hosted runners time out fake Python backend probes")]
+    #[cfg_attr(
+        target_os = "macos",
+        ignore = "covered on Windows/Ubuntu; macOS hosted runners time out fake Python backend probes"
+    )]
     fn launch_active_backend_can_sync_updates_before_dry_run() {
         let _guard = test_guard();
         let temp_dir = tempdir().unwrap();
@@ -2451,7 +2468,10 @@ mod tests {
     }
 
     #[test]
-    #[cfg_attr(target_os = "macos", ignore = "covered on Windows/Ubuntu; macOS hosted runners time out fake Python backend probes")]
+    #[cfg_attr(
+        target_os = "macos",
+        ignore = "covered on Windows/Ubuntu; macOS hosted runners time out fake Python backend probes"
+    )]
     fn apply_update_promotes_staged_release_after_probe() {
         let _guard = test_guard();
         let temp_dir = tempdir().unwrap();

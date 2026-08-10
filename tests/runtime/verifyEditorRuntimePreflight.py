@@ -101,7 +101,7 @@ def sourceContractFailures() -> list[str]:
     required = {
         EDITOR_PACKAGE: (
             "\"pyproc:assets\"",
-            "vite build && npm run pyproc:assets",
+            "vite build",
         ),
         PYPROC_ASSET_SCRIPT: (
             "CODARO_WEB_OUT",
@@ -365,6 +365,16 @@ function loadModule(filePath, customRequire) {{
 
 const calls = [];
 let installFails = false;
+let missingSessionId = null;
+let sessionSequence = 1;
+class FakeCodaroApiError extends Error {{
+  constructor(status, message, diagnostic, code) {{
+    super(message);
+    this.status = status;
+    this.diagnostic = diagnostic;
+    this.code = code;
+  }}
+}}
 let automationFixture = "success";
 const fakeResult = {{
   type: "execute_result",
@@ -402,10 +412,13 @@ const cancelledBackendPayload = {{
 const fakeApi = {{
   createSession: async () => {{
     calls.push(["createSession"]);
-    return {{ sessionId: "session-1", status: "ready" }};
+    return {{ sessionId: `session-${{sessionSequence++}}`, status: "ready" }};
   }},
   sessionPackagesList: async (sessionId) => {{
     calls.push(["packages-check", sessionId]);
+    if (sessionId === missingSessionId) {{
+      throw new FakeCodaroApiError(404, "404 Session not found.", {{ code: "session_not_found" }}, "session_not_found");
+    }}
     return [{{ name: "numpy", version: "1.0.0" }}];
   }},
   sessionPackageInstall: async (sessionId, name) => {{
@@ -441,6 +454,9 @@ const fakeApi = {{
   }},
   executeAll: async (sessionId, blocks) => {{
     calls.push(["cell-call-all", sessionId, blocks.map((block) => block.id)]);
+    if (sessionId === missingSessionId) {{
+      throw new FakeCodaroApiError(404, "404 Session not found.", {{ code: "session_not_found" }}, "session_not_found");
+    }}
     return {{
       results: blocks
         .filter((item) => item.type === "code")
@@ -743,7 +759,7 @@ const automationCellRuntime = loadModule({automationRuntimePath}, (specifier) =>
   return require(specifier);
 }});
 const runtime = loadModule({runtimePath}, (specifier) => {{
-  if (specifier === "@/lib/api") return {{ codaroApi: fakeApi }};
+  if (specifier === "@/lib/api") return {{ CodaroApiError: FakeCodaroApiError, codaroApi: fakeApi }};
   if (specifier === "@/lib/automationCellRuntime") return automationCellRuntime;
   if (specifier === "@/lib/browserPythonRuntime") return {{
     executeBrowserBlock: async (blockId, code, executionCount) => ({{
@@ -775,6 +791,7 @@ const runtime = loadModule({runtimePath}, (specifier) => {{
       cycles: [], multipleDefinitions: [], crossCellMutations: [], staleBlockIds: [], dependents: {{}},
     }},
   }};
+  if (specifier === "@/lib/staticPublication") return {{ staticPublicationManifestUrl: () => null }};
   if (specifier === "@/types") return {{}};
   return require(specifier);
 }});
@@ -954,6 +971,32 @@ await runtime.runAllNotebook({{
   sessionId: "session-1",
 }});
 assert.deepEqual(calls.map((call) => call[0]), ["cell-call-all"]);
+
+calls.length = 0;
+missingSessionId = "session-stale";
+const recovered = await runtime.runAllNotebook({{
+  apiOnline: true,
+  codeBlocks: [block],
+  document: {{
+    id: "doc-recovered",
+    title: "Recovered",
+    runtime: {{ defaultEngine: "local", reactiveMode: "hybrid", packages: [] }},
+    blocks: [{{ ...block, content: "print('recovered')" }}],
+  }},
+  drafts: {{}},
+  firstBlock: block,
+  previousVariables: [],
+  sessionId: "session-stale",
+}});
+assert.equal(recovered.sessionId, "session-2");
+assert.deepEqual(calls.map((call) => call[0]), [
+  "cell-call-all",
+  "createSession",
+  "cell-call-all",
+]);
+assert.equal(calls.filter((call) => call[0] === "cell-call-all" && call[1] === "session-stale").length, 1);
+assert.equal(calls.filter((call) => call[0] === "cell-call-all" && call[1] === "session-2").length, 1);
+missingSessionId = null;
 
 calls.length = 0;
 const browserReactive = await runtime.runReactiveNotebook({{

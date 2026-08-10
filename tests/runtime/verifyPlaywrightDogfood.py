@@ -32,13 +32,6 @@ def runDogfoodScenarios() -> dict[str, Any]:
 
     import uvicorn
     from codaro.server import createServerApp
-    from codaro.outputDescriptor import ui
-    from codaro.uiCallbacks import resetCallbacks
-
-    resetCallbacks()
-    clicks: list[str] = []
-    descriptor = ui.button("증가", onClick=lambda: clicks.append("clicked"))
-    callbackId = descriptor["events"]["click"]
 
     app = createServerApp(mode="edit")
     config = uvicorn.Config(app, host="127.0.0.1", port=0, log_level="warning")
@@ -99,15 +92,31 @@ def runDogfoodScenarios() -> dict[str, Any]:
                 )
                 createResp = createResponse.json()
                 sessionId = createResp.get("sessionId")
+                executeResponse = ctx2.request.post(
+                    f"{base}/api/kernel/{sessionId}/execute",
+                    data={
+                        "blockId": "dogfood-widget",
+                        "code": (
+                            "from codaro.outputDescriptor import ui\n"
+                            "widget = ui.button('증가', onClick=lambda: 'clicked')\n"
+                            "widget"
+                        ),
+                    },
+                )
+                executePayload = executeResponse.json()
+                descriptor = executePayload.get("data") or {}
+                callbackId = (descriptor.get("events") or {}).get("click")
                 clickResponse = ctx2.request.post(
                     f"{base}/api/kernel/{sessionId}/ui-event",
                     data={"callbackId": callbackId, "eventType": "click", "payload": None},
                 )
+                clickPayload = clickResponse.json()
                 record("widget-click-round-trip", {
                     "sessionId": sessionId,
+                    "executeStatus": executeResponse.status,
                     "httpStatus": clickResponse.status,
-                    "callbackFired": clicks == ["clicked"],
-                    "responseStatus": clickResponse.json().get("status"),
+                    "callbackFired": clickPayload.get("result") == "clicked",
+                    "responseStatus": clickPayload.get("status"),
                 })
                 ctx2.close()
 

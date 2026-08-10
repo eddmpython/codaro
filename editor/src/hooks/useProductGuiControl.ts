@@ -8,6 +8,12 @@ import {
   type GuiActionDefinition,
 } from "@/lib/guiControl";
 import type { NotebookPersistenceState } from "@/lib/notebookPersistence";
+import type { RuntimeTarget } from "@/lib/generatedContracts/executableUnit";
+import {
+  publicationOperations,
+  type PublicationDeploymentTarget,
+  type PublicationTarget,
+} from "@/lib/publicationOperations";
 import type { ResultMap } from "@/lib/assistantContext";
 import type { RunRouteState } from "@/lib/runRouteState";
 import {
@@ -56,8 +62,10 @@ type UseProductGuiControlOptions = {
   notebookPersistence: NotebookPersistenceState;
   notebookRunning: boolean;
   notebookToolsOpen: boolean;
+  notebookDocumentPath: string | null;
   notice: AppNotice;
   prompt: string;
+  publicationTarget: RuntimeTarget | null;
   reactiveEnabled: boolean;
   referenceLoading: boolean;
   refreshAutomation: () => Promise<void>;
@@ -296,6 +304,66 @@ export function useProductGuiControl(options: UseProductGuiControlOptions): void
     },
     {
       args: {
+        entryBlockId: { type: "string" },
+        target: { required: true, type: "string", values: ["browser", "server", "local", "embed"] },
+      },
+      available: () => options.surface === "editor" && Boolean(options.notebookDocumentPath),
+      channel: "product",
+      description: "Build an immutable publication through the same API used by App Preview.",
+      id: "publication.build",
+      run: async (args) => {
+        const sourcePath = requirePublicationSource(options.notebookDocumentPath);
+        const target = guiString(args, "target", { values: ["browser", "server", "local", "embed"] }) as PublicationTarget;
+        const entryBlockId = guiOptionalString(args, "entryBlockId");
+        return publicationOperations.buildPublication(sourcePath, target, entryBlockId);
+      },
+      unavailableReason: () => "publication build requires a saved editor document",
+    },
+    publicationOutputAction("publication.verify", "Verify an immutable publication bundle.", (outputPath, target) => (
+      publicationOperations.verifyPublication(outputPath, target)
+    )),
+    publicationOutputAction("publication.serve", "Serve a verified publication bundle locally.", (outputPath, target, args) => (
+      publicationOperations.servePublication(outputPath, target, guiOptionalString(args, "approvedPolicyHash") ?? undefined)
+    )),
+    {
+      args: { serverId: { required: true, type: "string" } },
+      channel: "product",
+      description: "Stop a publication server started by the workbench.",
+      id: "publication.stop",
+      run: (args) => publicationOperations.stopPublication(guiString(args, "serverId")),
+    },
+    {
+      args: {
+        outputPath: { required: true, type: "string" },
+        publicationPath: { required: true, type: "string" },
+        target: { required: true, type: "string", values: ["folder", "zip", "self-host"] },
+      },
+      channel: "product",
+      description: "Deploy a verified publication through a provider-neutral local adapter.",
+      id: "publication.deploy",
+      run: (args) => publicationOperations.deployPublication(
+        guiString(args, "publicationPath"),
+        guiString(args, "outputPath"),
+        guiString(args, "target", { values: ["folder", "zip", "self-host"] }) as PublicationDeploymentTarget,
+      ),
+    },
+    {
+      args: {
+        outputPath: { required: true, type: "string" },
+        target: { required: true, type: "string", values: ["browser", "server", "local", "embed", "folder", "zip", "self-host"] },
+        versionId: { required: true, type: "string" },
+      },
+      channel: "product",
+      description: "Restore a verified publication or deployment version.",
+      id: "publication.rollback",
+      run: (args) => publicationOperations.rollbackPublication(
+        guiString(args, "outputPath"),
+        guiString(args, "target", { values: ["browser", "server", "local", "embed", "folder", "zip", "self-host"] }) as PublicationDeploymentTarget | PublicationTarget,
+        guiString(args, "versionId"),
+      ),
+    },
+    {
+      args: {
         category: { required: true, type: "string" },
         contentId: { required: true, type: "string" },
       },
@@ -499,6 +567,10 @@ function productGuiState(options: UseProductGuiControlOptions) {
       selectedCellId: options.selectedBlockId || null,
       title: options.document.title,
     },
+    publication: {
+      runtimeTarget: options.publicationTarget,
+      sourcePath: options.notebookDocumentPath,
+    },
     notice: {
       detail: options.notice.detail,
       title: options.notice.title,
@@ -514,6 +586,33 @@ function productGuiState(options: UseProductGuiControlOptions) {
     runtimeTier: options.runRouteState.runtimeTier,
     surface: options.surface,
   };
+}
+
+function publicationOutputAction(
+  id: string,
+  description: string,
+  run: (outputPath: string, target: PublicationTarget, args: Record<string, unknown>) => Promise<unknown>,
+): GuiActionDefinition {
+  return {
+    args: {
+      approvedPolicyHash: { type: "string" },
+      outputPath: { required: true, type: "string" },
+      target: { required: true, type: "string", values: ["browser", "server", "local", "embed"] },
+    },
+    channel: "product",
+    description,
+    id,
+    run: (args) => run(
+      guiString(args, "outputPath"),
+      guiString(args, "target", { values: ["browser", "server", "local", "embed"] }) as PublicationTarget,
+      args,
+    ),
+  };
+}
+
+function requirePublicationSource(sourcePath: string | null): string {
+  if (!sourcePath) throw new GuiControlError("unavailable", "publication requires a saved document");
+  return sourcePath;
 }
 
 function layoutAction(

@@ -25,6 +25,11 @@ from ...proof import (
     sealProofReceipt,
 )
 from ..embedBuilder import verifyBlockEmbed
+from ..proofLineage import (
+    PublicationProofError,
+    publicationBuildArtifact,
+    validatePublicationProof,
+)
 from ..serverBuilder import verifyServerPublication
 from ..staticBuilder import PublicationBuildError, verifyPublication
 
@@ -116,7 +121,9 @@ class DeploymentOutcome:
     artifactPath: Path
     artifactHash: str
     manifestHash: str
+    verificationStatus: Literal["verified", "unverified"]
     deploymentReceipt: DeploymentReceipt
+    deploymentReceipts: tuple[DeploymentReceipt, ...]
 
 
 @runtime_checkable
@@ -454,26 +461,27 @@ def deployPublication(
     uploaded = adapter.upload(prepared)
     probe = adapter.probe(uploaded)
     _requireMatchingProbe(uploaded, probe)
+    timestamp = verifiedAt or datetime.now(UTC).isoformat()
+    sourceReceipts, buildReceipts, deploymentReceipts, verificationStatus = _deploymentProof(
+        prepared.source,
+        probe,
+        prepared.adapter.target,
+        timestamp,
+        proofArchive,
+    )
     previousVersion: str | None = None
     activated = False
     try:
         previousVersion = adapter.activate(uploaded)
         activated = True
-        timestamp = verifiedAt or datetime.now(UTC).isoformat()
-        sourceReceipt, buildReceipt, deploymentReceipt = _deploymentProof(
-            prepared.source,
-            probe,
-            prepared.adapter.target,
-            timestamp,
-        )
         if proofArchive is not None:
             proofArchive.mergeArchive({
                 "archiveKind": "codaro.proof-archive",
                 "schemaVersion": 1,
                 "receipts": [
-                    sourceReceipt.model_dump(mode="json"),
-                    buildReceipt.model_dump(mode="json"),
-                    deploymentReceipt.model_dump(mode="json"),
+                    *(receipt.model_dump(mode="json") for receipt in sourceReceipts),
+                    *(receipt.model_dump(mode="json") for receipt in buildReceipts),
+                    *(receipt.model_dump(mode="json") for receipt in deploymentReceipts),
                 ],
             })
         return DeploymentOutcome(
@@ -484,7 +492,9 @@ def deployPublication(
             artifactPath=uploaded.artifactPath,
             artifactHash=probe.artifactHash,
             manifestHash=probe.manifestHash,
-            deploymentReceipt=deploymentReceipt,
+            verificationStatus=verificationStatus,
+            deploymentReceipt=deploymentReceipts[0],
+            deploymentReceipts=deploymentReceipts,
         )
     except BaseException:
         if activated and previousVersion is not None:
@@ -504,8 +514,69 @@ def _deploymentProof(
     probe: DeploymentProbe,
     target: DeploymentTarget,
     timestamp: str,
-) -> tuple[SourceRevision, BuildArtifact, DeploymentReceipt]:
+    proofArchive: ProofArchive | None,
+) -> tuple[
+    tuple[SourceRevision, ...],
+    tuple[BuildArtifact, ...],
+    tuple[DeploymentReceipt, ...],
+    Literal["verified", "unverified"],
+]:
     manifest = source.manifest
+    try:
+        executionBlockIds = manifest.get("executionBlockIds")
+        if not isinstance(executionBlockIds, list):
+            dependencyBlockIds = manifest.get("dependencyBlockIds")
+            entryBlockId = manifest.get("entryBlockId")
+            executionBlockIds = [*(dependencyBlockIds if isinstance(dependencyBlockIds, list) else []), entryBlockId]
+        proof = validatePublicationProof(manifest.get("proof"), executionBlockIds=executionBlockIds)
+    except PublicationProofError as exc:
+        raise DeploymentError(f"publication proof를 검증할 수 없습니다: {exc}") from exc
+    lineages = proof["lineages"]
+    if lineages:
+        if proofArchive is None:
+            raise DeploymentError("proof lineage가 있는 publication 배포에는 ProofArchive가 필요합니다.")
+        buildTarget: Literal["browser", "server", "local"] = (
+            "server" if source.publicationTarget == "server" else "browser"
+        )
+        resolvedSources: list[SourceRevision] = []
+        resolvedBuilds: list[BuildArtifact] = []
+        deploymentReceipts: list[DeploymentReceipt] = []
+        for lineage in lineages:
+            resolvedSource = proofArchive.receiptById(str(lineage["sourceRevisionReceiptId"]))
+            if not isinstance(resolvedSource, SourceRevision):
+                raise DeploymentError("publication source revision receipt가 archive에서 resolve되지 않습니다.")
+            try:
+                resolvedBuild = publicationBuildArtifact(
+                    proofArchive,
+                    sourceRevisionReceiptId=resolvedSource.receiptId,
+                    buildArtifactHash=source.buildArtifactHash,
+                    manifestHash=source.manifestHash,
+                    target=buildTarget,
+                )
+            except PublicationProofError as exc:
+                raise DeploymentError(str(exc)) from exc
+            deploymentReceipt = sealProofReceipt({
+                "kind": "deployment",
+                "sourceRevisionId": resolvedSource.receiptId,
+                "sourceHash": resolvedSource.sourceHash,
+                "buildArtifactReceiptId": resolvedBuild.receiptId,
+                "buildArtifactHash": resolvedBuild.buildArtifactHash,
+                "manifestHash": resolvedBuild.manifestHash,
+                "deploymentArtifactHash": probe.artifactHash,
+                "target": target,
+                "verifiedAt": timestamp,
+            })
+            assert isinstance(deploymentReceipt, DeploymentReceipt)
+            resolvedSources.append(resolvedSource)
+            resolvedBuilds.append(resolvedBuild)
+            deploymentReceipts.append(deploymentReceipt)
+        return (
+            tuple(resolvedSources),
+            tuple(resolvedBuilds),
+            tuple(deploymentReceipts),
+            proof["verificationStatus"],
+        )
+
     sourceHash = str(manifest.get("sourceRevisionHash") or source.buildArtifactHash)
     entryBlockIds = manifest.get("entryBlockIds")
     blockIds = sorted(set(str(item) for item in entryBlockIds)) if isinstance(entryBlockIds, list) else ["publication"]
@@ -547,7 +618,7 @@ def _deploymentProof(
         "verifiedAt": timestamp,
     })
     assert isinstance(deploymentReceipt, DeploymentReceipt)
-    return sourceReceipt, buildReceipt, deploymentReceipt
+    return (sourceReceipt,), (buildReceipt,), (deploymentReceipt,), "unverified"
 
 
 def _deploymentPaths(output: Path, target: str, active: Mapping[str, object]) -> set[str]:

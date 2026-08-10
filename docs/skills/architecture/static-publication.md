@@ -43,6 +43,8 @@ app-site/
 
 `PublicationManifest@1`은 compiler manifest, source revision, entry block, document, runtime, data, wheel, 전체 file hash를 고정한다. `active.json`은 index와 manifest file hash를 포함하고 현재 immutable bundle만 가리킨다. 같은 입력의 두 build는 같은 hash 디렉터리를 재사용한다.
 
+manifest의 `proof`는 일반 문서에서는 `unverified`와 빈 lineage를 기록한다. promoted 블록은 `ProofArchive`의 기존 `SourceRevision`과 정확한 local promotion `BuildArtifact`를 resolve한 뒤에만 build한다. entry source, dependency closure, package, effect 계약을 다시 대조하고, operational run이 permission, functional check, artifact, learning credit과 완전하게 연결된 경우에만 실행 블록 전체를 `verified`로 표시한다. publication bundle은 같은 source root를 가리키는 새 `BuildArtifact`를 archive에 추가한다.
+
 ## runtime과 네트워크
 
 browser Python core와 process runtime 파일은 editor build에 버전 고정 자산으로 포함한다. 정적 index는 모든 app shell URL을 상대 경로로 바꾸고 외부 preconnect를 제거한다. CSP의 `connect-src`는 same-origin만 허용한다. 실제 Chromium gate는 page request, failed request, console error, page error를 모두 관찰해 외부 요청과 조용한 fallback이 0인지 확인한다.
