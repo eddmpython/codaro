@@ -4433,7 +4433,10 @@ def runBrowserMatrix(
                         """
                     )
                 page = context.new_page()
-                if os.environ.get("CODARO_PRODUCT_GATE") == "product-visual-capture":
+                if (
+                    os.environ.get("CODARO_PRODUCT_GATE") == "product-visual-capture"
+                    and case["name"] == "web-day2-progression-desktop"
+                ):
                     page.clock.set_fixed_time("2026-08-10T00:00:00Z")
                 webArtifactEvidence: dict[str, Any] | None = None
                 checkCapabilityEvidence: dict[str, Any] | None = None
