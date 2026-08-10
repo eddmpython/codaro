@@ -1073,6 +1073,25 @@ def releaseLocalKernelSessions(page: Any, case: dict[str, Any], localPort: int) 
 
 def captureStableViewport(page: Any, screenshotPath: Path) -> None:
     page.mouse.move(0, 0)
+    page.add_style_tag(
+        content="""
+        .cm-cursor,
+        .cm-dropCursor {
+          visibility: hidden !important;
+        }
+        * {
+          overflow-anchor: none !important;
+          scrollbar-width: none !important;
+        }
+        *::-webkit-scrollbar {
+          width: 0 !important;
+          height: 0 !important;
+        }
+        [data-slot="scroll-area-scrollbar"] {
+          visibility: hidden !important;
+        }
+        """
+    )
     page.evaluate(
         """
         async () => {
@@ -1118,25 +1137,6 @@ def captureStableViewport(page: Any, screenshotPath: Path) -> None:
             };
             requestAnimationFrame(sample);
           });
-        }
-        """
-    )
-    page.add_style_tag(
-        content="""
-        .cm-cursor,
-        .cm-dropCursor {
-          visibility: hidden !important;
-        }
-        * {
-          overflow-anchor: none !important;
-          scrollbar-width: none !important;
-        }
-        *::-webkit-scrollbar {
-          width: 0 !important;
-          height: 0 !important;
-        }
-        [data-slot="scroll-area-scrollbar"] {
-          visibility: hidden !important;
         }
         """
     )
@@ -6002,10 +6002,12 @@ def runBrowserMatrix(
                                     const elementOffset = viewport.scrollTop
                                       + elementRect.top
                                       - viewportRect.top;
+                                    const targetTop = Math.round(
+                                      viewport.clientHeight * 0.44,
+                                    );
                                     const fixedTop = Math.max(0, Math.min(
                                       viewport.scrollHeight - viewport.clientHeight,
-                                      Math.round(elementOffset
-                                        - (viewport.clientHeight - elementRect.height) / 2),
+                                      Math.round(elementOffset - targetTop),
                                     ));
                                     viewport.setAttribute(
                                       'data-visual-capture-scroll-top',
