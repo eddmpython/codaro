@@ -40,6 +40,7 @@ codaro/
 ├── demos/            # public launch demos and quickstart material
 ├── docs/             # skills SSOT and public blog source
 ├── editor/           # product UI surface
+├── examples/         # production contract를 소비하는 runnable reference products
 ├── landing/          # GitHub Pages and docs/blog web surface
 ├── launcher/         # desktop launcher, packaging notes, release updater
 ├── mainPlan/         # 미완료 initiative/workstream만 두는 임시 TODO tree
@@ -75,6 +76,7 @@ Root files are limited to package metadata, repository behavior contracts, and p
 | --- | --- |
 | Python backend/runtime/domain code | `src/codaro/` |
 | Product UI components and hooks | `editor/src/` |
+| Runnable reference products and manifests | `examples/apps/` |
 | Public docs/blog app code | `landing/` |
 | Product philosophy, architecture, ops rules | `docs/skills/` |
 | Long-form public posts | `docs/blog/` |

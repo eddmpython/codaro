@@ -59,6 +59,7 @@ REQUIRED_ROOT_DIRS = {
     "demos",
     "docs",
     "editor",
+    "examples",
     "landing",
     "launcher",
     "mainPlan",

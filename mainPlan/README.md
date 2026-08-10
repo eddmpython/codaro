@@ -65,6 +65,4 @@ mainPlan/
 
 아래 표에는 아직 남아 있는 제품 작업만 둔다. 끝난 작업의 기록은 이 트리가 아니라 commit message와 `git log`가 소유한다.
 
-| 순서 | 이니셔티브 | 상태 | 목표 |
-| --- | --- | --- | --- |
-| 00 | [검증 계보를 가진 Python 플랫폼](00-proof-carrying-python-platform/README.md) | 진행 | 하나의 Python 블록을 학습, 앱, 자동화, 배포에서 같은 계약과 해시로 사용한다. |
+현재 활성 이니셔티브가 없다.

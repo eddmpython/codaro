@@ -461,7 +461,14 @@ class _EffectCollector(ast.NodeVisitor):
             mode = _literalString(node.args[1]) if len(node.args) > 1 else _keywordString(node, "mode") or "r"
             self._recordFile(node.args[0] if node.args else None, write=any(flag in mode for flag in "wax+"), node=node)
         method = lowered.rsplit(".", 1)[-1]
-        if method in _READ_METHODS:
+        if method == "open" and name != "open":
+            mode = _literalString(node.args[0]) if node.args else _keywordString(node, "mode") or "r"
+            self._recordFile(
+                _pathReceiver(node.func, node.args),
+                write=any(flag in mode for flag in "wax+"),
+                node=node,
+            )
+        elif method in _READ_METHODS:
             self._recordFile(_pathReceiver(node.func, node.args), write=False, node=node)
         if method in _WRITE_METHODS:
             self._recordFile(_pathReceiver(node.func, node.args), write=True, node=node)

@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codaro.dev/contracts/referenceProducts.schema.json",
+  "title": "Codaro Reference Products",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "kind", "products", "claimBoundary"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "kind": { "const": "codaro.reference-products" },
+    "products": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": { "$ref": "#/$defs/Product" }
+    },
+    "claimBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["machineVerified", "notVerified"],
+      "properties": {
+        "machineVerified": { "$ref": "#/$defs/StringList" },
+        "notVerified": { "$ref": "#/$defs/StringList" }
+      }
+    }
+  },
+  "$defs": {
+    "StringList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "Product": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "title", "sourcePath", "runtimeTarget", "entryBlockIds",
+        "assetPaths", "secretRefs", "journey", "expectedProofKinds", "claim"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,63}$" },
+        "title": { "type": "string", "minLength": 1 },
+        "sourcePath": { "type": "string", "pattern": "^[A-Za-z0-9_./-]+[.]py$" },
+        "runtimeTarget": { "enum": ["browser", "server", "local"] },
+        "entryBlockIds": { "$ref": "#/$defs/StringList" },
+        "assetPaths": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "secretRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]+$" }
+        },
+        "journey": {
+          "type": "array",
+          "minItems": 3,
+          "uniqueItems": true,
+          "items": { "enum": ["author", "preview", "build", "serve", "embed", "task", "deploy"] }
+        },
+        "expectedProofKinds": { "$ref": "#/$defs/StringList" },
+        "claim": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

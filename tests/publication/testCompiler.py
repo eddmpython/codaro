@@ -76,6 +76,41 @@ def testRelativeReadBecomesHashedBrowserAssetAndChangesManifest(tmp_path: Path) 
     assert first.manifestHash != second.manifestHash
 
 
+def testPathOpenInDependencyClosureBecomesHashedBrowserAsset(tmp_path: Path) -> None:
+    data = tmp_path / "data"
+    data.mkdir()
+    (data / "sales.csv").write_text("region,amount\n서울,10\n", encoding="utf-8")
+    document = _document([
+        (
+            "load-sales",
+            "from pathlib import Path\n"
+            "with Path('data/sales.csv').open(encoding='utf-8', newline='') as source:\n"
+            "    rows = source.read().splitlines()\n"
+            "del source",
+        ),
+        ("entry", "row_count = len(rows)"),
+    ])
+
+    result = _compile(document, tmp_path)
+
+    assert result.targetDecision.selected == "browser"
+    assert result.unit["dependencyBlockIds"] == ["load-sales"]
+    assert result.unit["effects"]["filesystemRead"] == ["data/sales.csv"]
+    assert set(result.unit["assetHashes"]) == {"data/sales.csv"}
+
+
+def testPathOpenWriteRequiresServer(tmp_path: Path) -> None:
+    document = _document([
+        ("entry", "from pathlib import Path\nPath('result.txt').open(mode='w').write('ok')"),
+    ])
+
+    result = _compile(document, tmp_path)
+
+    assert result.targetDecision.selected == "server"
+    assert result.unit["effects"]["filesystemWrite"] == ["result.txt"]
+    assert "FILESYSTEM_WRITE_REQUIRES_SERVER" in {item["code"] for item in result.unit["diagnostics"]}
+
+
 def testSensitiveFileCannotBecomeBrowserPublicationAsset(tmp_path: Path) -> None:
     (tmp_path / ".env").write_text("SERVICE_TOKEN=secret", encoding="utf-8")
     document = _document([("entry", "from pathlib import Path\nsecret = Path('.env').read_text()")])

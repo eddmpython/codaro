@@ -57,6 +57,7 @@ Codaro에서 기준 파일은 아래 순서로 본다. 같은 의미의 규칙�
 | 기능 블록 임베딩 | `docs/skills/architecture/block-embedding.md`, `src/codaro/publication/embedBuilder.py`, `editor/src/embed/`, `contracts/embedMessage.schema.json` | entry closure bundle, Web Component mode, message origin과 iframe sandbox 기준 |
 | 학습 결과 제품 승격 | `docs/skills/architecture/learning-product-bridge.md`, `src/codaro/api/learningArchiveAutomation.py`, `src/codaro/proof/`, `src/codaro/automation/taskModel.py` | strong application evidence, 동일 source block, sealed Task provenance와 operational proof 기준 |
 | 배포 adapter | `docs/skills/architecture/deployment-adapters.md`, `src/codaro/publication/adapters/`, `contracts/deploymentAdapter.schema.json`, `contracts/deploymentReceipt.schema.json` | provider-neutral prepare, upload, probe, activate, rollback과 deployment proof 기준 |
+| reference product | `examples/apps/referenceProducts.json`, `contracts/referenceProducts.schema.json`, `docs/skills/architecture/reference-products.md`, `tests/publication/verifyReferenceProducts.py`, `tests/publication/verifyReferenceProductsPlaywright.py` | browser, server, local의 실제 제품 journey, 성능과 보안 예산, 공개 claim 경계 |
 | 문서 블록 조작 | `src/codaro/document/blockOperations.py` | 블록 삽입/삭제/이동/수정과 실행 대상 코드 블록 검증 기준 |
 | 노트북 생성 | `src/codaro/document/notebookGeneration.py` | tool이 생성하거나 분리한 노트북 document와 저장 payload를 조립하는 document 경계 |
 | 프론트 문서 조작 | `editor/src/lib/documentModel.ts` | draft 생성, block 병합, payload 정규화 |

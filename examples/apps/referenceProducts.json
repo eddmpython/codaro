@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "kind": "codaro.reference-products",
+  "products": [
+    {
+      "id": "browser-calculator",
+      "title": "반응형 견적 계산기",
+      "sourcePath": "examples/apps/browser-calculator/app.py",
+      "runtimeTarget": "browser",
+      "entryBlockIds": ["price-widget", "quantity-widget", "total-view"],
+      "assetPaths": [],
+      "secretRefs": [],
+      "journey": ["author", "preview", "build", "serve", "embed", "deploy"],
+      "expectedProofKinds": ["sourceRevision", "buildArtifact", "deployment"],
+      "claim": "브라우저에서 입력을 바꾸면 dependency closure만 다시 계산되는 앱을 만든다."
+    },
+    {
+      "id": "csv-dashboard",
+      "title": "CSV 지역 매출 대시보드",
+      "sourcePath": "examples/apps/csv-dashboard/app.py",
+      "runtimeTarget": "browser",
+      "entryBlockIds": ["region-widget", "summary-view"],
+      "assetPaths": ["examples/apps/csv-dashboard/data/sales.csv"],
+      "secretRefs": [],
+      "journey": ["author", "preview", "build", "serve", "deploy"],
+      "expectedProofKinds": ["sourceRevision", "buildArtifact", "deployment"],
+      "claim": "검증된 CSV snapshot과 필터 입력을 함께 담은 정적 대시보드를 만든다."
+    },
+    {
+      "id": "snapshot-report",
+      "title": "운영 상태 snapshot 보고서",
+      "sourcePath": "examples/apps/snapshot-report/app.py",
+      "runtimeTarget": "browser",
+      "entryBlockIds": ["report-view"],
+      "assetPaths": ["examples/apps/snapshot-report/data/status.json"],
+      "secretRefs": [],
+      "journey": ["author", "preview", "build", "serve", "deploy"],
+      "expectedProofKinds": ["sourceRevision", "buildArtifact", "deployment"],
+      "claim": "생성 시각과 source hash가 고정된 데이터를 외부 요청 없는 보고서로 만든다."
+    },
+    {
+      "id": "server-secret-app",
+      "title": "Secret 참조 서버 상태 앱",
+      "sourcePath": "examples/apps/server-secret-app/app.py",
+      "runtimeTarget": "server",
+      "entryBlockIds": ["request-widget", "server-result"],
+      "assetPaths": [],
+      "secretRefs": ["REFERENCE_API_TOKEN"],
+      "journey": ["author", "preview", "build", "serve", "deploy"],
+      "expectedProofKinds": ["sourceRevision", "buildArtifact", "deployment"],
+      "claim": "Secret 값을 client bundle에 넣지 않는 session 격리 서버 앱을 만든다."
+    },
+    {
+      "id": "local-file-automation",
+      "title": "재고 파일 자동화 대시보드",
+      "sourcePath": "examples/apps/local-file-automation/app.py",
+      "runtimeTarget": "local",
+      "entryBlockIds": ["automation-run"],
+      "assetPaths": ["examples/apps/local-file-automation/data/inventory.csv"],
+      "secretRefs": [],
+      "journey": ["author", "preview", "task"],
+      "expectedProofKinds": ["sourceRevision", "buildArtifact", "permission", "functionalCheck", "operationalRun"],
+      "claim": "명시한 파일 권한과 output contract로 재실행 가능한 로컬 자동화를 만든다."
+    }
+  ],
+  "claimBoundary": {
+    "machineVerified": [
+      "같은 Percent Python source의 app, build, embed, task projection",
+      "localhost와 LAN에서 검증 가능한 immutable browser와 server bundle",
+      "content hash가 연결된 build, operational, deployment receipt",
+      "provider 없이 생성 가능한 folder, ZIP, self-host 산출물"
+    ],
+    "notVerified": [
+      "공용 인터넷 URL의 uptime, DNS, TLS",
+      "인간 학습 효과의 인과 검증",
+      "외부 provider의 서비스 지속성",
+      "브라우저 bundle 속 Python source의 비공개성"
+    ]
+  }
+}

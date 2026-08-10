@@ -171,6 +171,9 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "learning-product-bridge": (
         "output/test-runner/learning-product-bridge/learning-product-bridge-report.json",
     ),
+    "reference-products": (
+        "output/test-runner/reference-products/reference-products-report.json",
+    ),
     "quality-cycle": ("output/test-runner/quality-cycle/sequence-summary.json",),
     "product-release": ("output/test-runner/product-release/sequence-summary.json",),
     "preflight": ("output/test-runner/preflight/sequence-summary.json",),
@@ -794,6 +797,25 @@ GATES: dict[str, Gate] = {
         ),
         ci_required=False,
     ),
+    "reference-products": Gate(
+        tier="surface",
+        description="다섯 실제 Percent Python 제품의 build, serve, embed, Task, desktop/mobile, 보안, 성능과 claim을 검증한다.",
+        commands=(
+            command((
+                "uv", "run", "python", "-X", "utf8", "-m", "pytest",
+                "tests/publication/testReferenceProducts.py",
+                "-q", "--tb=short",
+            ), timeoutSeconds=600),
+            command(("uv", "run", "python", "-X", "utf8", "tests/publication/verifyReferenceProducts.py")),
+            command(("npm", "run", "build"), cwd="editor"),
+            command(("npm", "run", "build"), cwd="landing"),
+            command((
+                "uv", "run", "python", "-X", "utf8",
+                "tests/publication/verifyReferenceProductsPlaywright.py",
+            ), timeoutSeconds=1200),
+        ),
+        ci_required=False,
+    ),
     "gui-control-browser": Gate(
         tier="surface",
         description="버전된 GUI 제어 API와 실제 Chromium의 명령, 클릭, 키 입력, 모바일 포커스, AX tree, geometry 폐쇄 루프를 확인한다.",
@@ -1057,6 +1079,7 @@ PRODUCT_QUALITY_GATES = (
     "block-embedding",
     "learning-product-bridge",
     "deployment-adapters",
+    "reference-products",
     "design-system-contract",
     "theme-runtime-browser",
     "visual-accessibility-browser",
@@ -2115,8 +2138,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 70:
-        failures.append(f"expected 70 gates, found {len(GATES)}")
+    if len(GATES) != 71:
+        failures.append(f"expected 71 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:
