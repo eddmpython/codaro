@@ -309,6 +309,7 @@ def testYamlToDocumentMaterializesMasteryVariantAtLessonEnd() -> None:
             "masteryVariants": [{
                 "id": "mastery-task",
                 "mode": "mastery",
+                "assessmentMode": "transfer",
                 "unseen": False,
                 "sourceSectionIds": ["learn"],
                 "title": "혼자 완성하기",

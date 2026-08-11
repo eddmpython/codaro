@@ -284,7 +284,7 @@ DOGFOOD_REQUIREMENTS = (
                 "AssignmentRoomPanel",
             )),
             ("editor/src/components/curriculum/curriculumSectionRenderer.tsx", (
-                "storeStrongLearningEvidence",
+                "recordLearningAttemptEvidence",
                 "PROGRESS_UPDATED_EVENT",
             )),
             ("tests/surface/verifyProductExperiencePlaywright.py", (

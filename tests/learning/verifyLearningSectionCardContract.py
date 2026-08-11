@@ -150,7 +150,7 @@ def main() -> int:
         "exercise direct editor aria label": "직접 해보기 코드 편집기",
         "accent action token": "bg-accent-brand",
         "automatic attempt evaluation": "evaluateLearningAttempt",
-        "strong evidence persistence": "storeStrongLearningEvidence",
+        "canonical attempt evidence persistence": "recordLearningAttemptEvidence",
         "automatic check result marker": "data-learning-check-result={attemptCheck.state}",
         "practice evidence marker": "data-learning-check-evidence={attemptCheck.evidence}",
         "result marker": 'data-learning-section-part="result"',

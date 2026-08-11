@@ -606,7 +606,7 @@ function documentFromCurriculumYaml(
   const assessment = mapValue(yaml.assessment);
   const masterySections: YamlMap[] = arrayOfMaps(assessment.masteryVariants).map((variant) => ({
     ...variant,
-    assessmentMode: textValue(variant.assessmentMode) || "mastery",
+    assessmentMode: "mastery",
   }));
   const sections = [...arrayOfMaps(yaml.sections), ...masterySections];
   const materializedYaml = { ...yaml, sections };

@@ -43,7 +43,7 @@ def yamlToDocument(
     intro = _mapValue(content.get("intro"))
     assessment = _mapValue(content.get("assessment"))
     masterySections = [
-        {**variant, "assessmentMode": variant.get("assessmentMode") or "mastery"}
+        {**variant, "assessmentMode": "mastery"}
         for variant in _arrayOfMaps(assessment.get("masteryVariants"))
     ]
     sections = [*_arrayOfMaps(content.get("sections")), *masterySections]
