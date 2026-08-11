@@ -1,9 +1,7 @@
 import type { BlockConfig, CodaroDocument, CurriculumContentSummary } from "@/types";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useSnippetAutoRun } from "@/hooks/useSnippetAutoRun";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { readLearningEvidenceEvents } from "@/lib/learningEvidenceOperations";
-import { PROGRESS_UPDATED_EVENT } from "@/lib/curriculumProgressEvent";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -12,8 +10,9 @@ import type { RenderCodeCellEditor, ResultMap } from "./curriculumSurfaceModels"
 export { CurriculumHeaderProgress } from "./curriculumOverview";
 export { CurriculumCellToc } from "./curriculumToc";
 import { LearningOverviewHeader } from "./curriculumOverview";
-import { CurriculumSectionCard, dueAssessmentBlocks, groupCurriculumSections } from "./curriculumSectionRenderer";
+import { CurriculumSectionCard, groupCurriculumSections } from "./curriculumSectionRenderer";
 import { lessonVerifySections } from "./curriculumSurfaceHelpers";
+import { useDueAssessmentBlocks } from "./useDueAssessmentBlocks";
 
 export function CurriculumView({
   apiOnline,
@@ -68,7 +67,11 @@ export function CurriculumView({
   onSelectBlock: (blockId: string) => void;
   onSelectLesson: (contentId: string) => void;
 }) {
-  const [assessmentBlocks, setAssessmentBlocks] = useState<BlockConfig[]>([]);
+  const assessmentBlocks = useDueAssessmentBlocks({
+    blocks: document.blocks,
+    category: selectedCategory,
+    contentId: selectedContentId,
+  });
   const visibleBlocks = useMemo(() => [...document.blocks, ...assessmentBlocks], [assessmentBlocks, document.blocks]);
   const curriculumSections = useMemo(() => groupCurriculumSections(visibleBlocks), [visibleBlocks]);
   // 검증 진행 분모는 기본 문서의 강한 검증 지점으로 고정한다. due 평가 섹션이
@@ -100,31 +103,6 @@ export function CurriculumView({
   const nextLesson = selectedContentIndex >= 0 && selectedContentIndex < contents.length - 1
     ? contents[selectedContentIndex + 1]
     : null;
-
-  useEffect(() => {
-    let active = true;
-    const refreshAssessments = () => {
-      void Promise.all([
-        import("@/lib/curriculaRegistry").then(({ registryAssessmentBlocks }) => (
-          registryAssessmentBlocks(selectedCategory, selectedContentId)
-        )),
-        readLearningEvidenceEvents(selectedCategory, selectedContentId),
-      ]).then(async ([candidates, events]) => {
-        const dueBlocks = await dueAssessmentBlocks(document.blocks, candidates, events);
-        if (active) setAssessmentBlocks(dueBlocks);
-      }).catch((error: unknown) => {
-        if (!active) return;
-        setAssessmentBlocks([]);
-        console.error("learning assessment queue refresh failed", error);
-      });
-    };
-    refreshAssessments();
-    window.addEventListener(PROGRESS_UPDATED_EVENT, refreshAssessments);
-    return () => {
-      active = false;
-      window.removeEventListener(PROGRESS_UPDATED_EVENT, refreshAssessments);
-    };
-  }, [document.blocks, selectedCategory, selectedContentId]);
 
   return (
     <ScrollArea
