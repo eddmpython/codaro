@@ -9,6 +9,22 @@ from codaro.server import EditorBuildError, getEditorBuildStatus, requireEditorB
 from codaro.server import resolveWebBuildRoot
 
 
+def writeEditorBuild(root: Path, index: str = "<html></html>") -> None:
+    import hashlib
+    import json
+
+    (root / "_app").mkdir(exist_ok=True)
+    (root / "index.html").write_text(index, encoding="utf-8")
+    payload = {
+        "version": 1,
+        "generationId": "test-generation",
+        "basePath": "/",
+        "indexSha256": hashlib.sha256(index.encode("utf-8")).hexdigest(),
+        "references": [],
+    }
+    (root / "build-generation.json").write_text(json.dumps(payload), encoding="utf-8")
+
+
 def testGetEditorBuildStatusReportsMissingPaths(tmp_path: Path) -> None:
     status = getEditorBuildStatus(tmp_path)
 
@@ -18,6 +34,7 @@ def testGetEditorBuildStatusReportsMissingPaths(tmp_path: Path) -> None:
     assert status.missingPaths == (
         tmp_path / "index.html",
         tmp_path / "_app",
+        tmp_path / "build-generation.json",
     )
 
 
@@ -27,8 +44,33 @@ def testRequireEditorBuildReadyIncludesBuildInstructions(tmp_path: Path) -> None
 
     message = str(excInfo.value)
     assert "npm run build" in message
-    assert "npm run build:watch" in message
     assert "index.html" in message
+
+
+def testGetEditorBuildStatusRejectsMissingHashedChunk(tmp_path: Path) -> None:
+    import hashlib
+    import json
+
+    index = '<script type="module" src="/_app/index-missing.js"></script>'
+    (tmp_path / "_app").mkdir()
+    (tmp_path / "index.html").write_text(index, encoding="utf-8")
+    (tmp_path / "build-generation.json").write_text(json.dumps({
+        "version": 1,
+        "generationId": "broken-generation",
+        "basePath": "/",
+        "indexSha256": hashlib.sha256(index.encode("utf-8")).hexdigest(),
+        "references": [{
+            "url": "/_app/index-missing.js",
+            "path": "_app/index-missing.js",
+            "sha256": "0" * 64,
+            "contentType": "text/javascript",
+        }],
+    }), encoding="utf-8")
+
+    status = getEditorBuildStatus(tmp_path)
+
+    assert status.status == "invalid"
+    assert status.integrityErrors == ("index.html 참조 파일이 없습니다: _app/index-missing.js",)
 
 
 def testRunServerRaisesWhenEditorBuildIsMissing(monkeypatch, tmp_path: Path) -> None:
@@ -49,8 +91,7 @@ def testRunServerRaisesWhenEditorBuildIsMissing(monkeypatch, tmp_path: Path) -> 
 
 
 def testRunServerStartsWithExistingEditorBuild(monkeypatch, tmp_path: Path) -> None:
-    (tmp_path / "_app").mkdir()
-    (tmp_path / "index.html").write_text("<html></html>", encoding="utf-8")
+    writeEditorBuild(tmp_path)
 
     captured = {}
 

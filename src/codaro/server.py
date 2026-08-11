@@ -1,12 +1,17 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
+import json
+import mimetypes
 import os
 import time
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Mapping
+from urllib.parse import urlparse
 
 from fastapi import HTTPException
 from fastapi import FastAPI, Request, Response
@@ -76,7 +81,9 @@ class EditorBuildStatus:
     status: str
     indexPath: Path
     assetsPath: Path
+    manifestPath: Path
     missingPaths: tuple[Path, ...]
+    integrityErrors: tuple[str, ...]
 
 
 class EditorBuildError(RuntimeError):
@@ -96,37 +103,137 @@ def _displayPath(path: Path) -> str:
         return path.as_posix()
 
 
+class _EditorReferenceParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.references: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        del tag
+        for name, value in attrs:
+            if name in {"href", "src"} and value and _isLocalEditorReference(value):
+                self.references.append(value)
+
+
+def _isLocalEditorReference(value: str) -> bool:
+    parsed = urlparse(value)
+    return not parsed.scheme and not parsed.netloc and not value.startswith(("//", "#"))
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _expectedContentType(path: Path) -> str:
+    overrides = {
+        ".js": "text/javascript",
+        ".mjs": "text/javascript",
+        ".json": "application/json",
+        ".webmanifest": "application/manifest+json",
+    }
+    return overrides.get(path.suffix.lower()) or mimetypes.guess_type(path.name)[0] or "application/octet-stream"
+
+
+def _editorBuildIntegrityErrors(buildRoot: Path, indexPath: Path, manifestPath: Path) -> tuple[str, ...]:
+    errors: list[str] = []
+    try:
+        payload = json.loads(manifestPath.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
+        return (f"build-generation.json을 읽을 수 없습니다: {error}",)
+    if payload.get("version") != 1:
+        errors.append("build-generation.json version은 1이어야 합니다.")
+    expectedIndexHash = payload.get("indexSha256")
+    if not isinstance(expectedIndexHash, str) or _sha256(indexPath) != expectedIndexHash:
+        errors.append("index.html이 기록된 build generation과 일치하지 않습니다.")
+
+    references = payload.get("references")
+    if not isinstance(references, list):
+        return (*errors, "build-generation.json references가 배열이 아닙니다.")
+    parser = _EditorReferenceParser()
+    try:
+        parser.feed(indexPath.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError) as error:
+        return (*errors, f"index.html을 읽을 수 없습니다: {error}")
+    manifestUrls = {
+        entry.get("url")
+        for entry in references
+        if isinstance(entry, dict) and isinstance(entry.get("url"), str)
+    }
+    if manifestUrls != set(parser.references):
+        errors.append("index.html의 로컬 참조가 build generation 목록과 일치하지 않습니다.")
+
+    resolvedRoot = buildRoot.resolve()
+    for entry in references:
+        if not isinstance(entry, dict):
+            errors.append("build generation 참조 항목이 객체가 아닙니다.")
+            continue
+        relativePath = entry.get("path")
+        if not isinstance(relativePath, str) or not relativePath:
+            errors.append("build generation 참조 경로가 비어 있습니다.")
+            continue
+        target = (resolvedRoot / relativePath).resolve()
+        try:
+            target.relative_to(resolvedRoot)
+        except ValueError:
+            errors.append(f"빌드 루트 밖의 참조입니다: {relativePath}")
+            continue
+        if not target.is_file():
+            errors.append(f"index.html 참조 파일이 없습니다: {relativePath}")
+            continue
+        if entry.get("sha256") != _sha256(target):
+            errors.append(f"참조 파일 해시가 일치하지 않습니다: {relativePath}")
+        expectedContentType = _expectedContentType(target)
+        if entry.get("contentType") != expectedContentType:
+            errors.append(f"참조 파일 content type이 일치하지 않습니다: {relativePath}")
+    return tuple(errors)
+
+
 def getEditorBuildStatus(webBuildRoot: Path | None = None) -> EditorBuildStatus:
     buildRoot = webBuildRoot or WEB_BUILD_ROOT
     indexPath = buildRoot / "index.html"
     assetsPath = buildRoot / "_app"
+    manifestPath = buildRoot / "build-generation.json"
     missingPaths = tuple(
         path
         for path, exists in (
             (indexPath, indexPath.is_file()),
             (assetsPath, assetsPath.is_dir()),
+            (manifestPath, manifestPath.is_file()),
         )
         if not exists
     )
+    integrityErrors = (
+        ()
+        if missingPaths
+        else _editorBuildIntegrityErrors(buildRoot, indexPath, manifestPath)
+    )
     return EditorBuildStatus(
-        status="ready" if not missingPaths else "missing",
+        status="missing" if missingPaths else "invalid" if integrityErrors else "ready",
         indexPath=indexPath,
         assetsPath=assetsPath,
+        manifestPath=manifestPath,
         missingPaths=missingPaths,
+        integrityErrors=integrityErrors,
     )
 
 
 def buildEditorInstructions(status: EditorBuildStatus) -> str:
-    missing = ", ".join(_displayPath(path) for path in status.missingPaths) or _displayPath(status.indexPath)
+    problem = (
+        ", ".join(_displayPath(path) for path in status.missingPaths)
+        or "; ".join(status.integrityErrors)
+        or _displayPath(status.indexPath)
+    )
     return "\n".join(
         [
-            f"Codaro editor build is missing: {missing}",
+            f"Codaro editor build is {status.status}: {problem}",
             "Run:",
             "  cd editor",
             "  npm install",
             "  npm run build",
-            "For iterative editor work:",
-            "  npm run build:watch",
         ]
     )
 
@@ -143,9 +250,11 @@ def requireEditorBuildReady(
         logger.error(
             "editor %s",
             formatLogFields(
-                status="missing",
+                status=status.status,
                 indexPath=_displayPath(status.indexPath),
                 assetsPath=_displayPath(status.assetsPath),
+                manifestPath=_displayPath(status.manifestPath),
+                integrityErrors=" | ".join(status.integrityErrors) or None,
             ),
         )
     raise EditorBuildError(buildEditorInstructions(status))
