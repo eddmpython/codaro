@@ -14,7 +14,7 @@ from pathlib import Path
 snapshot = json.loads(Path("data/status.json").read_text(encoding="utf-8"))
 
 # %% [code] id=report-view
-from codaro.outputDescriptor import hstack, stat
+from codaro import hstack, stat
 
 hstack([
     stat("처리 건수", snapshot["processed"], caption=snapshot["generatedAt"]),

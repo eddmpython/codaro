@@ -8,7 +8,7 @@
 # ///
 
 # %% [code] id=request-widget
-from codaro.outputDescriptor import ui
+from codaro import ui
 
 request_count = ui.number(2, min=1, max=20, step=1, label="요청 수")
 request_count

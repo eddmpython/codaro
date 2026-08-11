@@ -17,7 +17,7 @@ del sales_file
 regions = ["전체", *sorted({row["region"] for row in sales_rows})]
 
 # %% [code] id=region-widget
-from codaro.outputDescriptor import ui
+from codaro import ui
 
 region = ui.dropdown(regions, value="전체", label="지역")
 region

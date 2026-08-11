@@ -1,3 +1,5 @@
+from importlib.metadata import PackageNotFoundError, version
+
 from .appRuntime import (
     App,
     accordion,
@@ -18,11 +20,19 @@ from .appRuntime import (
 )
 from .cli import main
 from .customTool import tool
+from .server import createServerApp
+
+try:
+    __version__ = version("codaro")
+except PackageNotFoundError:
+    __version__ = "0.0.0+source"
 
 __all__ = [
+    "__version__",
     "accordion",
     "App",
     "callout",
+    "createServerApp",
     "hstack",
     "html",
     "main",

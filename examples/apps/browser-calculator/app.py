@@ -12,7 +12,7 @@
 # 단가와 수량을 바꾸면 합계 셀만 새 값으로 계산됩니다.
 
 # %% [code] id=price-widget
-from codaro.outputDescriptor import ui
+from codaro import ui
 
 price = ui.number(12500, min=0, max=1000000, step=500, label="단가")
 price
