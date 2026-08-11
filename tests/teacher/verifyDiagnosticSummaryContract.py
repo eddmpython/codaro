@@ -111,7 +111,7 @@ CHECKS = (
         (
             "showStatusNotice",
             "notice.tone === \"warning\"",
-            "text-amber-500",
+            "text-warning",
             "data-diagnostic-export-copy",
             "topbar.copyDiagnostic",
         ),
