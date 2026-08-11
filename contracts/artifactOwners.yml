@@ -27,6 +27,17 @@ artifacts:
       - src/codaro/generatedContracts/executableUnit.py
       - src/codaro/generatedContracts/executableUnit.schema.json
       - editor/src/lib/generatedContracts/executableUnit.ts
+  - artifactId: reference-products
+    role: source
+    owner: product-architecture
+    sourcePath: contracts/referenceProducts.schema.json
+    surfacePaths:
+      - examples/apps/referenceProducts.json
+      - src/codaro/generatedContracts/referenceProducts.py
+      - src/codaro/generatedContracts/referenceProducts.schema.json
+      - editor/src/lib/generatedContracts/referenceProducts.ts
+      - tests/publication/verifyReferenceProducts.py
+      - tests/publication/verifyReferenceProductsPlaywright.py
   - artifactId: publication-manifest
     role: source
     owner: product-architecture

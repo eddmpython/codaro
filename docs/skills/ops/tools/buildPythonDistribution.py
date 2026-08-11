@@ -30,12 +30,14 @@ REQUIRED_WHEEL_FILES = {
     "codaro/curricula/python/__init__.py",
     "codaro/generatedContracts/artifactOwnership.py",
     "codaro/generatedContracts/artifactOwnership.schema.json",
+    "codaro/generatedContracts/referenceProducts.schema.json",
 }
 REQUIRED_SDIST_SUFFIXES = {
     "/src/codaro/webBuild/index.html",
     "/src/codaro/curricula/python/__init__.py",
     "/src/codaro/generatedContracts/artifactOwnership.py",
     "/src/codaro/generatedContracts/artifactOwnership.schema.json",
+    "/src/codaro/generatedContracts/referenceProducts.schema.json",
 }
 
 

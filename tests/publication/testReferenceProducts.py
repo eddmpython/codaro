@@ -122,11 +122,39 @@ def testReferenceManifestIsClosedAndContainsExactlyFiveProducts() -> None:
     assert set(manifest) == {"schemaVersion", "kind", "products", "claimBoundary"}
     expectedProductFields = {
         "id", "title", "sourcePath", "runtimeTarget", "entryBlockIds", "assetPaths",
-        "secretRefs", "journey", "expectedProofKinds", "claim",
+        "secretRefs", "journey", "claim",
+    }
+    expectedJourneyFields = {
+        "plainPython", "publicSdkImports", "appProjection", "embedModes",
+        "publicationSteps", "proofKinds", "claimBoundary",
     }
     assert all(set(row) == expectedProductFields for row in _products())
+    assert schema["$defs"]["Journey"]["additionalProperties"] is False
+    assert set(schema["$defs"]["Journey"]["required"]) == expectedJourneyFields
+    assert all(set(row["journey"]) == expectedJourneyFields for row in _products())
     assert all(_source(row).is_file() for row in _products())
     assert all((ROOT / path).is_file() for row in _products() for path in row["assetPaths"])
+
+
+def testEveryReferenceSourceDeclaresItsCompleteProductJourney() -> None:
+    expectedImports = {
+        "browser-calculator": ["ui"],
+        "csv-dashboard": ["ui"],
+        "snapshot-report": ["hstack", "stat"],
+        "server-secret-app": ["ui"],
+        "local-file-automation": [],
+    }
+    for row in _products():
+        journey = row["journey"]
+        assert journey["plainPython"] is True
+        assert journey["publicSdkImports"] == expectedImports[row["id"]]
+        assert journey["appProjection"] is True
+        assert journey["claimBoundary"] == "machineVerified"
+        assert journey["publicationSteps"][0:2] == ["build", "serve"]
+        assert ("embed" in journey["publicationSteps"]) == bool(journey["embedModes"])
+    assert _row("browser-calculator")["journey"]["embedModes"] == [
+        "output", "interactive", "editable",
+    ]
 
 
 def testEveryReferenceProductRoundTripsAndCompilerMatchesDeclaredTarget() -> None:

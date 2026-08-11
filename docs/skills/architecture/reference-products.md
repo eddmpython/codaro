@@ -13,6 +13,8 @@ whenToUse: app runtime, publication, embed, Task, 배포, landing 제품 문구 
 
 `examples/apps/referenceProducts.json`이 제품 집합과 claim 경계의 SSOT다. 정확히 다섯 제품을 유지하며 각 제품은 별도 예외 허용 목록이 아니라 production contract의 실제 소비자다.
 
+각 제품의 `journey`는 `plainPython`, `publicSdkImports`, `appProjection`, `embedModes`, `publicationSteps`, `proofKinds`, `claimBoundary`를 가진 닫힌 객체다. machine verifier는 source AST의 root SDK import, plain Python 실행과 app entry projection을 확인하고, browser verifier는 같은 행의 target publication 단계, proof와 embed mode를 이어서 확인한다. 계산기만 output, interactive, editable embed를 선언하며 세 모드를 실제 Chromium에서 모두 소비한다.
+
 | 제품 | target | 전체 journey |
 | --- | --- | --- |
 | 반응형 견적 계산기 | browser | plain Python, app projection, static build, serve, output·interactive·editable embed, deploy |
@@ -36,7 +38,8 @@ whenToUse: app runtime, publication, embed, Task, 배포, landing 제품 문구 
 ## 성능 예산
 
 - app ready: 180초 이하
-- widget interaction: 8초 이하
+- browser와 embed widget interaction: 8초 이하
+- server worker widget interaction: 15초 이하
 - static bundle: 제품당 300 MiB 이하
 - static 외부 request: 0건
 - mobile horizontal overflow: 1px 이하
@@ -45,7 +48,7 @@ whenToUse: app runtime, publication, embed, Task, 배포, landing 제품 문구 
 
 ## 정직한 claim 경계
 
-기계 검증은 reference source의 plain Python 실행과 app projection, 해당 target build와 serve, 계산기 output·interactive·editable embed, 로컬 publication, content hash가 연결된 deployment receipt와 rollback, localhost 또는 LAN bundle 검증까지다. 학습 strong evidence에서 Task operational proof로 이어지는 same-source 계약은 [[learning-product-bridge]]의 Day30 golden이 별도로 증명한다.
+기계 검증은 reference source의 plain Python 실행, public SDK import와 app projection, 해당 target build와 serve, 계산기 output·interactive·editable embed, 로컬 publication, content hash가 연결된 deployment receipt와 rollback, localhost 또는 LAN bundle 검증까지다. 학습 strong evidence에서 Task operational proof로 이어지는 same-source 계약은 [[learning-product-bridge]]의 Day30 golden이 증명하고 `python-product`가 같은 current commit에 결속한다.
 
 빈 환경 built wheel의 public Python SDK와 CLI는 `python-sdk` gate가 direct wheel, `uv add --find-links`, exact wheel `uvx`, root import, server mount, CLI와 package data를 통과할 때만 machine-verified 범위에 들어간다. 공용 인터넷 URL의 DNS, TLS, uptime, provider 지속성, 인간 학습 효과, `shared` app state, 범용 IDE 전체와 browser bundle source 비공개성은 증명하지 않는다.
 

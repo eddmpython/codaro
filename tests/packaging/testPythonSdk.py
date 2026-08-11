@@ -136,6 +136,7 @@ def testInstalledVerifierCoversWheelUvAddUvxMountAndResources() -> None:
         "host.mount('/codaro', createServerApp",
         "packageRoot / 'curricula' / 'python'",
         "artifactOwnership.schema.json",
+        "referenceProducts.schema.json",
         "plainPythonReference",
         "localWheelContent",
         "workspaceMetadataBefore",

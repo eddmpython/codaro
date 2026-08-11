@@ -21,6 +21,7 @@ MANIFEST_PATH = ROOT / "examples/apps/referenceProducts.json"
 SECRET_VALUE = "reference-browser-secret-canary-86420"
 MAX_READY_MS = 180_000
 MAX_INTERACTION_MS = 8_000
+MAX_SERVER_INTERACTION_MS = 15_000
 MAX_STATIC_BYTES = 300 * 1024 * 1024
 
 
@@ -81,6 +82,110 @@ def _mobileContract(page) -> dict[str, object]:
     }
 
 
+def _calculatorEmbedModes(browser, output: Path) -> dict[str, object]:
+    from codaro.publication import startBlockEmbedServer
+    from playwright.sync_api import expect
+
+    server, url = startBlockEmbedServer(output, port=0)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    origin = _origin(url)
+    observations = {key: [] for key in ("externalRequests", "failedRequests", "consoleErrors", "pageErrors")}
+    context = browser.new_context(viewport={"width": 1280, "height": 900})
+    page = context.new_page()
+    _observePage(page, origin, observations)
+    try:
+        page.goto(url, wait_until="domcontentloaded", timeout=MAX_READY_MS)
+        page.wait_for_function(
+            "() => document.querySelector('codaro-block')?.dataset.codaroEmbedReady === 'true'",
+            timeout=MAX_READY_MS,
+        )
+        page.evaluate(
+            """() => {
+              for (const mode of ['output', 'editable']) {
+                const block = document.createElement('codaro-block');
+                block.setAttribute('src', './embed.json');
+                block.setAttribute('mode', mode);
+                document.querySelector('main').append(block);
+              }
+            }"""
+        )
+        page.wait_for_function(
+            "() => [...document.querySelectorAll('codaro-block')].length === 3 && [...document.querySelectorAll('codaro-block')].every((item) => item.dataset.codaroEmbedReady === 'true')",
+            timeout=MAX_READY_MS,
+        )
+        blocks = page.locator("codaro-block")
+        modes = [blocks.nth(index).get_attribute("data-codaro-embed-mode") for index in range(3)]
+        if modes != ["interactive", "output", "editable"]:
+            raise AssertionError(f"calculator embed mode projection이 다릅니다: {modes}")
+
+        interactiveFrame = blocks.nth(0).locator("iframe").content_frame
+        quantity = interactiveFrame.locator('[data-widget-ui="number"]').nth(1)
+        quantity.wait_for(timeout=MAX_READY_MS)
+        quantity.fill("4")
+        interactiveFrame.get_by_text("검증된 견적 합계: 50,000원", exact=True).wait_for(
+            timeout=MAX_INTERACTION_MS
+        )
+
+        outputFrame = blocks.nth(1).locator("iframe").content_frame
+        outputWidget = outputFrame.locator('[data-widget-ui="number"]').first
+        outputWidget.wait_for(timeout=MAX_READY_MS)
+        if outputWidget.evaluate("element => getComputedStyle(element).pointerEvents") != "none":
+            raise AssertionError("calculator output embed가 widget interaction을 차단하지 않았습니다.")
+
+        editableFrame = blocks.nth(2).locator("iframe").content_frame
+        sourceEditor = editableFrame.locator(
+            '[data-app-editable-source="total-view"] textarea'
+        )
+        sourceEditor.wait_for(timeout=MAX_READY_MS)
+        sourceEditor.fill(
+            "if int(quantity.value) <= 0:\n"
+            "    raise ValueError('수량은 1 이상이어야 합니다')\n"
+            "total = int(price.value) * int(quantity.value)\n"
+            "f'편집 실행 합계: {total:,}원'"
+        )
+        editableStarted = time.perf_counter()
+        editableFrame.locator('[data-app-entry="total-view"]').get_by_role(
+            "button", name="코드 실행"
+        ).click()
+        totalEntry = editableFrame.locator('[data-app-entry="total-view"]')
+        try:
+            expect(totalEntry).to_contain_text(
+                "편집 실행 합계: 25,000원",
+                timeout=MAX_READY_MS,
+            )
+        except AssertionError as error:
+            currentErrorEntry = totalEntry.locator('[data-app-current-error="true"]')
+            currentError = currentErrorEntry.text_content() if currentErrorEntry.count() else None
+            currentText = totalEntry.text_content() or ""
+            stale = totalEntry.get_attribute("data-app-output-stale")
+            raise AssertionError(
+                "calculator editable embed의 코드 실행이 완료되지 않았습니다: "
+                f"stale={stale}, currentError={currentError or '없음'}, content={currentText}"
+            ) from error
+        editableInteractionMs = int((time.perf_counter() - editableStarted) * 1000)
+        if editableInteractionMs > MAX_INTERACTION_MS:
+            raise AssertionError(
+                "calculator editable embed interaction 예산을 넘었습니다: "
+                f"{editableInteractionMs}ms > {MAX_INTERACTION_MS}ms"
+            )
+        if any(observations.values()):
+            raise AssertionError(f"calculator embed browser 오류: {observations}")
+        return {
+            "modes": ["output", "interactive", "editable"],
+            "interactiveRecalculated": True,
+            "outputInteractionBlocked": True,
+            "editableRunObserved": True,
+            "editableInteractionMs": editableInteractionMs,
+            **observations,
+        }
+    finally:
+        context.close()
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
+
+
 def _staticProduct(browser, source: Path, output: Path, row: dict[str, object]) -> dict[str, object]:
     from codaro.proof import ProofArchive
     from codaro.publication.workbench import PublicationWorkbench
@@ -139,8 +244,11 @@ def _staticProduct(browser, source: Path, output: Path, row: dict[str, object]) 
             raise AssertionError(f"{productId} performance budget을 넘었습니다.")
         if any(observations.values()):
             raise AssertionError(f"{productId} browser 오류: {observations}")
+        journey = row["journey"]
+        publicationSteps = list(journey["publicationSteps"])
         executed = ["build", "serve"]
-        if "embed" in row["journey"]:
+        embedConsumption: dict[str, object] | None = None
+        if "embed" in publicationSteps:
             embedOutput = output.parent / f"{productId}-embed"
             _finished(workbench, workbench.build(
                 sourcePath=source,
@@ -149,8 +257,15 @@ def _staticProduct(browser, source: Path, output: Path, row: dict[str, object]) 
                 entryBlockId=str(row["entryBlockIds"][-1]),
             ))
             _finished(workbench, workbench.verify(outputPath=embedOutput, target="embed"))
+            if productId == "browser-calculator":
+                embedConsumption = _calculatorEmbedModes(browser, embedOutput)
+                if embedConsumption["modes"] != journey["embedModes"]:
+                    raise AssertionError(
+                        f"{productId} embed mode evidence가 다릅니다: "
+                        f"{embedConsumption['modes']} != {journey['embedModes']}"
+                    )
             executed.append("embed")
-        if "deploy" in row["journey"]:
+        if "deploy" in publicationSteps:
             _finished(workbench, workbench.deploy(
                 publicationPath=output,
                 outputPath=output.parent / f"{productId}-deploy",
@@ -168,6 +283,7 @@ def _staticProduct(browser, source: Path, output: Path, row: dict[str, object]) 
             "totalBytes": totalBytes,
             "mobile": mobile,
             "failureRecovered": recovered,
+            "embedConsumption": embedConsumption,
             **proof,
             **observations,
         }
@@ -213,9 +329,14 @@ def _serverProduct(browser, source: Path, output: Path, row: dict[str, object]) 
         page.locator('[data-widget-ui="number"]').fill("3")
         page.wait_for_function(
             "() => document.body.textContent?.includes('서버 처리: 15건, credential=[redacted]')",
-            timeout=MAX_INTERACTION_MS,
+            timeout=MAX_READY_MS,
         )
         interactionMs = int((time.perf_counter() - started) * 1000)
+        if interactionMs > MAX_SERVER_INTERACTION_MS:
+            raise AssertionError(
+                "server reference interaction 예산을 넘었습니다: "
+                f"{interactionMs}ms > {MAX_SERVER_INTERACTION_MS}ms"
+            )
         mobile = _mobileContract(page)
         if mobile["overflowPx"] > 1 or any(observations.values()):
             raise AssertionError(f"server reference browser 계약 실패: mobile={mobile}, errors={observations}")
@@ -237,6 +358,16 @@ def _serverProduct(browser, source: Path, output: Path, row: dict[str, object]) 
             **proof,
             **observations,
         }
+    except Exception as error:
+        bodyText = ""
+        try:
+            bodyText = page.locator("body").inner_text()[:4000].replace(SECRET_VALUE, "[secret]")
+        except Exception as diagnosticError:  # noqa: BLE001 - diagnostics must not mask the original failure
+            bodyText = f"<body unavailable: {type(diagnosticError).__name__}>"
+        raise AssertionError(
+            f"server-secret-app Chromium journey 실패: {type(error).__name__}: {error}; "
+            f"body={bodyText!r}; observations={observations}"
+        ) from error
     finally:
         context.close()
         _finished(workbench, workbench.stop(serverId))
@@ -330,12 +461,13 @@ def _finished(workbench, job: dict[str, object]) -> dict[str, object]:
 
 
 def _proofResult(archive, row: dict[str, object], journey: list[str]) -> dict[str, object]:
-    declaredJourney = [str(item) for item in row["journey"]]
+    journeyContract = row["journey"]
+    declaredJourney = [str(item) for item in journeyContract["publicationSteps"]]
     if journey != declaredJourney:
         raise AssertionError(f"{row['id']} journey mismatch: {journey} != {declaredJourney}")
     receipts = archive.receipts()
     proofKinds = sorted({receipt.kind for receipt in receipts})
-    expectedKinds = sorted(str(item) for item in row["expectedProofKinds"])
+    expectedKinds = sorted(str(item) for item in journeyContract["proofKinds"])
     if proofKinds != expectedKinds:
         raise AssertionError(f"{row['id']} proof mismatch: {proofKinds} != {expectedKinds}")
     for receipt in receipts:
@@ -366,6 +498,7 @@ def main() -> int:
         "budgets": {
             "maxReadyMs": MAX_READY_MS,
             "maxInteractionMs": MAX_INTERACTION_MS,
+            "maxServerInteractionMs": MAX_SERVER_INTERACTION_MS,
             "maxStaticBytes": MAX_STATIC_BYTES,
             "externalRequests": 0,
             "mobileOverflowPx": 1,
@@ -376,6 +509,28 @@ def main() -> int:
             raise AssertionError("machine reference product 검증이 먼저 통과해야 합니다.")
         manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
         byId = {row["id"]: row for row in manifest["products"]}
+        machineById = {row["id"]: row for row in machine.get("products", [])}
+        if set(machineById) != set(byId):
+            raise AssertionError("machine report가 다섯 source journey를 모두 포함하지 않습니다.")
+        for productId, row in byId.items():
+            evidence = machineById[productId].get("journeyEvidence")
+            journey = row["journey"]
+            if not isinstance(evidence, dict):
+                raise AssertionError(f"{productId} machine journey evidence가 없습니다.")
+            if evidence.get("publicSdkImports", {}).get("observed") != sorted(journey["publicSdkImports"]):
+                raise AssertionError(f"{productId} public SDK import evidence가 다릅니다.")
+            if evidence.get("appProjection", {}).get("entryBlockIds") != row["entryBlockIds"]:
+                raise AssertionError(f"{productId} app projection evidence가 다릅니다.")
+            if evidence.get("publication", {}).get("target") != row["runtimeTarget"]:
+                raise AssertionError(f"{productId} publication target evidence가 다릅니다.")
+            if evidence.get("publication", {}).get("steps") != journey["publicationSteps"]:
+                raise AssertionError(f"{productId} publication step evidence가 다릅니다.")
+            if evidence.get("embedModes") != journey["embedModes"]:
+                raise AssertionError(f"{productId} embed mode evidence가 다릅니다.")
+            if evidence.get("proofKinds") != journey["proofKinds"]:
+                raise AssertionError(f"{productId} proof kind evidence가 다릅니다.")
+            if evidence.get("claimBoundary") != journey["claimBoundary"]:
+                raise AssertionError(f"{productId} claim boundary evidence가 다릅니다.")
         with tempfile.TemporaryDirectory(prefix="codaro-reference-browser-") as temporary:
             scratch = Path(temporary)
             with sync_playwright() as playwright:
@@ -404,6 +559,25 @@ def main() -> int:
         if {row["id"] for row in results} != set(byId):
             raise AssertionError("다섯 reference product의 browser 결과가 모두 없습니다.")
         report["products"] = results
+        report["sameSourceJourney"] = {
+            "plainPython": all(row["plainPythonExitCode"] == 0 for row in machineById.values()),
+            "publicSdkImports": all(
+                not row["journeyEvidence"]["publicSdkImports"]["internalImports"]
+                for row in machineById.values()
+            ),
+            "appProjection": all(
+                row["journeyEvidence"]["appProjection"]["declared"] is True
+                for row in machineById.values()
+            ),
+            "publicationTargets": sorted({row["runtimeTarget"] for row in results}),
+            "calculatorEmbedModes": next(
+                row["embedConsumption"]["modes"]
+                for row in results
+                if row["id"] == "browser-calculator"
+            ),
+            "proofKinds": sorted({kind for row in results for kind in row["proofKinds"]}),
+            "claimBoundary": sorted({row["journey"]["claimBoundary"] for row in byId.values()}),
+        }
         report["status"] = "passed"
         report["claimBoundary"] = manifest["claimBoundary"]
     except Exception as error:  # noqa: BLE001 - gate report must retain unexpected failures

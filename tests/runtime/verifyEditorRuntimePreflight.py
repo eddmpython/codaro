@@ -145,6 +145,9 @@ def sourceContractFailures() -> list[str]:
             "installBrowserPythonRuntimeDiagnostics",
             "planBrowserReactiveNotebook",
             "runBrowserReactiveNotebook",
+            "appRuntimeSource",
+            "_codaroBrowserNames",
+            "_codaroPackage.__version__ = '0.0.0+browser'",
         ),
         AUTOMATION_CELL_RUNTIME: (
             "runAutomationCell",

@@ -138,12 +138,16 @@ def buildBlockEmbed(
         )
 
     output.mkdir(parents=True, exist_ok=True)
+    projectionEntryBlockIds = (
+        *compiled.unit["dependencyBlockIds"],
+        entryBlockId,
+    )
     publication = buildStaticPublication(
         source,
         output / "publication",
         packageLock=packageLock,
         webBuildRoot=webBuildRoot,
-        entryBlockIds=(entryBlockId,),
+        entryBlockIds=projectionEntryBlockIds,
         closureOnly=True,
         proofArchive=proofArchive,
     )

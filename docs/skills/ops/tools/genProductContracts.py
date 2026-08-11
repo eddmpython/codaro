@@ -23,15 +23,24 @@ APP_SPEC_PATH = ROOT / "contracts" / "appSpec.schema.json"
 EXECUTABLE_UNIT_PATH = ROOT / "contracts" / "executableUnit.schema.json"
 PUBLICATION_MANIFEST_PATH = ROOT / "contracts" / "publicationManifest.schema.json"
 EMBED_MESSAGE_PATH = ROOT / "contracts" / "embedMessage.schema.json"
+REFERENCE_PRODUCTS_SCHEMA_PATH = ROOT / "contracts" / "referenceProducts.schema.json"
+REFERENCE_PRODUCTS_MANIFEST_PATH = ROOT / "examples" / "apps" / "referenceProducts.json"
 PYTHON_APP_SPEC_PATH = ROOT / "src" / "codaro" / "generatedContracts" / "appSpec.py"
+PYTHON_REFERENCE_PRODUCTS_PATH = ROOT / "src" / "codaro" / "generatedContracts" / "referenceProducts.py"
 PYTHON_EXECUTABLE_UNIT_PATH = ROOT / "src" / "codaro" / "generatedContracts" / "executableUnit.py"
 PYTHON_PUBLICATION_MANIFEST_PATH = ROOT / "src" / "codaro" / "generatedContracts" / "publicationManifest.py"
 PACKAGED_APP_SPEC_PATH = ROOT / "src" / "codaro" / "generatedContracts" / "appSpec.schema.json"
+PACKAGED_REFERENCE_PRODUCTS_PATH = (
+    ROOT / "src" / "codaro" / "generatedContracts" / "referenceProducts.schema.json"
+)
 PACKAGED_EXECUTABLE_UNIT_PATH = ROOT / "src" / "codaro" / "generatedContracts" / "executableUnit.schema.json"
 PACKAGED_PUBLICATION_MANIFEST_PATH = (
     ROOT / "src" / "codaro" / "generatedContracts" / "publicationManifest.schema.json"
 )
 TYPESCRIPT_APP_SPEC_PATH = ROOT / "editor" / "src" / "lib" / "generatedContracts" / "appSpec.ts"
+TYPESCRIPT_REFERENCE_PRODUCTS_PATH = (
+    ROOT / "editor" / "src" / "lib" / "generatedContracts" / "referenceProducts.ts"
+)
 TYPESCRIPT_EXECUTABLE_UNIT_PATH = (
     ROOT / "editor" / "src" / "lib" / "generatedContracts" / "executableUnit.ts"
 )
@@ -131,6 +140,76 @@ def loadJsonSchema(path: Path) -> tuple[dict[str, Any], str]:
     return schema, sha256Bytes(payload)
 
 
+def validateReferenceProductsContract() -> None:
+    schema, _schemaHash = loadJsonSchema(REFERENCE_PRODUCTS_SCHEMA_PATH)
+    try:
+        manifest = json.loads(REFERENCE_PRODUCTS_MANIFEST_PATH.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ContractGenerationError(f"cannot read reference product manifest: {exc}") from exc
+    if not isinstance(manifest, dict) or set(manifest) != {
+        "schemaVersion", "kind", "products", "claimBoundary",
+    }:
+        raise ContractGenerationError("reference product manifest root fields are invalid")
+    if manifest.get("schemaVersion") != 1 or manifest.get("kind") != "codaro.reference-products":
+        raise ContractGenerationError("reference product manifest identity is invalid")
+
+    definitions = schema.get("$defs")
+    if not isinstance(definitions, dict):
+        raise ContractGenerationError("reference product schema needs $defs")
+    productSchema = definitions.get("Product")
+    journeySchema = definitions.get("Journey")
+    if not isinstance(productSchema, dict) or not isinstance(journeySchema, dict):
+        raise ContractGenerationError("reference product schema needs Product and Journey definitions")
+    productFields = set(productSchema.get("required", ()))
+    journeyFields = set(journeySchema.get("required", ()))
+    if productSchema.get("additionalProperties") is not False or productFields != set(productSchema.get("properties", {})):
+        raise ContractGenerationError("reference Product must be a closed object")
+    if journeySchema.get("additionalProperties") is not False or journeyFields != set(journeySchema.get("properties", {})):
+        raise ContractGenerationError("reference Journey must be a closed object")
+
+    products = manifest.get("products")
+    if not isinstance(products, list) or len(products) != 5:
+        raise ContractGenerationError("reference product manifest must contain exactly five products")
+    productIds: set[str] = set()
+    allowedModes = {"output", "interactive", "editable"}
+    allowedSteps = {"build", "serve", "embed", "deploy", "rollback"}
+    for index, row in enumerate(products):
+        if not isinstance(row, dict) or set(row) != productFields:
+            raise ContractGenerationError(f"reference products[{index}] fields are invalid")
+        productId = row.get("id")
+        if not isinstance(productId, str) or not productId or productId in productIds:
+            raise ContractGenerationError(f"reference products[{index}].id is missing or duplicate")
+        sourcePath = row.get("sourcePath")
+        if not isinstance(sourcePath, str) or not (ROOT / sourcePath).is_file():
+            raise ContractGenerationError(f"reference products[{index}].sourcePath is missing")
+        journey = row.get("journey")
+        if not isinstance(journey, dict) or set(journey) != journeyFields:
+            raise ContractGenerationError(f"reference products[{index}].journey fields are invalid")
+        modes = journey.get("embedModes")
+        steps = journey.get("publicationSteps")
+        proofKinds = journey.get("proofKinds")
+        imports = journey.get("publicSdkImports")
+        if journey.get("plainPython") is not True or journey.get("appProjection") is not True:
+            raise ContractGenerationError(f"reference products[{index}] must require plain Python and app projection")
+        if not isinstance(modes, list) or len(modes) != len(set(modes)) or not set(modes) <= allowedModes:
+            raise ContractGenerationError(f"reference products[{index}].embedModes are invalid")
+        if not isinstance(steps, list) or len(steps) < 3 or len(steps) != len(set(steps)) or not set(steps) <= allowedSteps:
+            raise ContractGenerationError(f"reference products[{index}].publicationSteps are invalid")
+        if ("embed" in steps) != bool(modes):
+            raise ContractGenerationError(f"reference products[{index}] embed step and modes differ")
+        if not isinstance(proofKinds, list) or len(proofKinds) != len(set(proofKinds)):
+            raise ContractGenerationError(f"reference products[{index}].proofKinds are invalid")
+        if not isinstance(imports, list) or len(imports) != len(set(imports)):
+            raise ContractGenerationError(f"reference products[{index}].publicSdkImports are invalid")
+        boundary = journey.get("claimBoundary")
+        claimBoundary = manifest.get("claimBoundary")
+        if boundary not in {"machineVerified", "notVerified"} or not isinstance(claimBoundary, dict):
+            raise ContractGenerationError(f"reference products[{index}].claimBoundary is invalid")
+        if not isinstance(claimBoundary.get(boundary), list):
+            raise ContractGenerationError(f"reference products[{index}].claimBoundary list is missing")
+        productIds.add(productId)
+
+
 def generatedHeader(schemaHash: str, ownersHash: str, comment: str) -> str:
     return (
         f"{comment} Generated by docs/skills/ops/tools/genProductContracts.py.\n"
@@ -176,6 +255,21 @@ from .appSpec import (
     AppSpec,
     AppStatePolicy,
 )
+from .referenceProducts import (
+    REFERENCE_CLAIM_BOUNDARIES,
+    REFERENCE_EMBED_MODES,
+    REFERENCE_PUBLICATION_STEPS,
+    REFERENCE_PRODUCTS_CONTRACT_SHA256,
+    REFERENCE_RUNTIME_TARGETS,
+    ReferenceClaimBoundary,
+    ReferenceEmbedMode,
+    ReferenceProduct,
+    ReferenceProductClaims,
+    ReferenceProductJourney,
+    ReferenceProductsManifest,
+    ReferencePublicationStep,
+    ReferenceRuntimeTarget,
+)
 from .executableUnit import (
     EXECUTABLE_UNIT_CONTRACT_SHA256,
     RUNTIME_TARGETS,
@@ -210,6 +304,19 @@ __all__ = [
     "AppLayout",
     "AppSpec",
     "AppStatePolicy",
+    "REFERENCE_CLAIM_BOUNDARIES",
+    "REFERENCE_EMBED_MODES",
+    "REFERENCE_PUBLICATION_STEPS",
+    "REFERENCE_PRODUCTS_CONTRACT_SHA256",
+    "REFERENCE_RUNTIME_TARGETS",
+    "ReferenceClaimBoundary",
+    "ReferenceEmbedMode",
+    "ReferenceProduct",
+    "ReferenceProductClaims",
+    "ReferenceProductJourney",
+    "ReferenceProductsManifest",
+    "ReferencePublicationStep",
+    "ReferenceRuntimeTarget",
     "EXECUTABLE_UNIT_CONTRACT_SHA256",
     "RUNTIME_TARGETS",
     "CapabilityDiagnostic",
@@ -267,6 +374,103 @@ export type AppSpec = {{
   hideCode: boolean;
   entryBlockIds: string[];
   statePolicy: AppStatePolicy;
+}};
+'''
+
+
+def referenceProductsPythonSource(schemaHash: str, ownersHash: str) -> str:
+    return generatedHeader(schemaHash, ownersHash, "#") + f'''from typing import Literal, TypedDict
+
+
+REFERENCE_PRODUCTS_CONTRACT_SHA256 = "{schemaHash}"
+REFERENCE_RUNTIME_TARGETS = ("browser", "server", "local")
+REFERENCE_EMBED_MODES = ("output", "interactive", "editable")
+REFERENCE_PUBLICATION_STEPS = ("build", "serve", "embed", "deploy", "rollback")
+REFERENCE_CLAIM_BOUNDARIES = ("machineVerified", "notVerified")
+ReferenceRuntimeTarget = Literal["browser", "server", "local"]
+ReferenceEmbedMode = Literal["output", "interactive", "editable"]
+ReferencePublicationStep = Literal["build", "serve", "embed", "deploy", "rollback"]
+ReferenceClaimBoundary = Literal["machineVerified", "notVerified"]
+
+
+class ReferenceProductJourney(TypedDict):
+    plainPython: Literal[True]
+    publicSdkImports: list[str]
+    appProjection: Literal[True]
+    embedModes: list[ReferenceEmbedMode]
+    publicationSteps: list[ReferencePublicationStep]
+    proofKinds: list[str]
+    claimBoundary: ReferenceClaimBoundary
+
+
+class ReferenceProduct(TypedDict):
+    id: str
+    title: str
+    sourcePath: str
+    runtimeTarget: ReferenceRuntimeTarget
+    entryBlockIds: list[str]
+    assetPaths: list[str]
+    secretRefs: list[str]
+    journey: ReferenceProductJourney
+    claim: str
+
+
+class ReferenceProductClaims(TypedDict):
+    machineVerified: list[str]
+    notVerified: list[str]
+
+
+class ReferenceProductsManifest(TypedDict):
+    schemaVersion: Literal[1]
+    kind: Literal["codaro.reference-products"]
+    products: list[ReferenceProduct]
+    claimBoundary: ReferenceProductClaims
+'''
+
+
+def referenceProductsTypeScriptSource(schemaHash: str, ownersHash: str) -> str:
+    return generatedHeader(schemaHash, ownersHash, "//") + f'''export const REFERENCE_PRODUCTS_CONTRACT_SHA256 = "{schemaHash}" as const;
+export const REFERENCE_RUNTIME_TARGETS = ["browser", "server", "local"] as const;
+export const REFERENCE_EMBED_MODES = ["output", "interactive", "editable"] as const;
+export const REFERENCE_PUBLICATION_STEPS = ["build", "serve", "embed", "deploy", "rollback"] as const;
+export const REFERENCE_CLAIM_BOUNDARIES = ["machineVerified", "notVerified"] as const;
+export type ReferenceRuntimeTarget = (typeof REFERENCE_RUNTIME_TARGETS)[number];
+export type ReferenceEmbedMode = (typeof REFERENCE_EMBED_MODES)[number];
+export type ReferencePublicationStep = (typeof REFERENCE_PUBLICATION_STEPS)[number];
+export type ReferenceClaimBoundary = (typeof REFERENCE_CLAIM_BOUNDARIES)[number];
+
+export type ReferenceProductJourney = {{
+  plainPython: true;
+  publicSdkImports: string[];
+  appProjection: true;
+  embedModes: ReferenceEmbedMode[];
+  publicationSteps: ReferencePublicationStep[];
+  proofKinds: string[];
+  claimBoundary: ReferenceClaimBoundary;
+}};
+
+export type ReferenceProduct = {{
+  id: string;
+  title: string;
+  sourcePath: string;
+  runtimeTarget: ReferenceRuntimeTarget;
+  entryBlockIds: string[];
+  assetPaths: string[];
+  secretRefs: string[];
+  journey: ReferenceProductJourney;
+  claim: string;
+}};
+
+export type ReferenceProductClaims = {{
+  machineVerified: string[];
+  notVerified: string[];
+}};
+
+export type ReferenceProductsManifest = {{
+  schemaVersion: 1;
+  kind: "codaro.reference-products";
+  products: ReferenceProduct[];
+  claimBoundary: ReferenceProductClaims;
 }};
 '''
 
@@ -665,7 +869,9 @@ def rustModSource(schemaHash: str, ownersHash: str) -> str:
 
 def expectedOutputs() -> dict[Path, str]:
     _schema, _owners, schemaHash, ownersHash = loadSources()
+    validateReferenceProductsContract()
     _appSpec, appSpecHash = loadJsonSchema(APP_SPEC_PATH)
+    _referenceProducts, referenceProductsHash = loadJsonSchema(REFERENCE_PRODUCTS_SCHEMA_PATH)
     _executableUnit, executableUnitHash = loadJsonSchema(EXECUTABLE_UNIT_PATH)
     _publicationManifest, publicationManifestHash = loadJsonSchema(PUBLICATION_MANIFEST_PATH)
     embedMessage = json.loads(EMBED_MESSAGE_PATH.read_text(encoding="utf-8"))
@@ -677,10 +883,15 @@ def expectedOutputs() -> dict[Path, str]:
         PACKAGED_SCHEMA_PATH: SCHEMA_PATH.read_text(encoding="utf-8"),
         TYPESCRIPT_PATH: typeScriptSource(schemaHash, ownersHash),
         PYTHON_APP_SPEC_PATH: appSpecPythonSource(appSpecHash, ownersHash),
+        PYTHON_REFERENCE_PRODUCTS_PATH: referenceProductsPythonSource(referenceProductsHash, ownersHash),
         PYTHON_EXECUTABLE_UNIT_PATH: executableUnitPythonSource(executableUnitHash, ownersHash),
         PACKAGED_APP_SPEC_PATH: APP_SPEC_PATH.read_text(encoding="utf-8"),
+        PACKAGED_REFERENCE_PRODUCTS_PATH: REFERENCE_PRODUCTS_SCHEMA_PATH.read_text(encoding="utf-8"),
         PACKAGED_EXECUTABLE_UNIT_PATH: EXECUTABLE_UNIT_PATH.read_text(encoding="utf-8"),
         TYPESCRIPT_APP_SPEC_PATH: appSpecTypeScriptSource(appSpecHash, ownersHash),
+        TYPESCRIPT_REFERENCE_PRODUCTS_PATH: referenceProductsTypeScriptSource(
+            referenceProductsHash, ownersHash
+        ),
         TYPESCRIPT_EXECUTABLE_UNIT_PATH: executableUnitTypeScriptSource(executableUnitHash, ownersHash),
         PYTHON_PUBLICATION_MANIFEST_PATH: publicationManifestPythonSource(publicationManifestHash, ownersHash),
         PACKAGED_PUBLICATION_MANIFEST_PATH: PUBLICATION_MANIFEST_PATH.read_text(encoding="utf-8"),

@@ -32,3 +32,14 @@ def testStaticPublicationUsesOnlyItsHashedRuntimePackages() -> None:
     assert '"codaro"' in inference
     assert '"pyodide"' in inference
     assert '"js"' in inference
+
+
+def testEditableEmbedRunsTheReactiveDependencyClosure() -> None:
+    app = (ROOT / "editor/src/App.tsx").read_text(encoding="utf-8")
+    hook = (ROOT / "editor/src/hooks/useNotebookRuntimeState.ts").read_text(encoding="utf-8")
+
+    assert "appRuntimeActive = serverAppMode === true || blockEmbedFrame !== null" in app
+    assert 'curriculumRuntimeActive = !appRuntimeActive && surface === "curriculum"' in app
+    assert 'blockEmbedFrame?.mode === "editable" ? block.content : drafts[block.id] ?? block.content' in app
+    assert 'reactiveCellExecution: surface === "editor" || blockEmbedFrame?.mode === "editable"' in app
+    assert "if (reactiveCellExecution && reactiveEnabled && isKernelExecutableBlock(block))" in hook

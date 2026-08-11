@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 from datetime import UTC, datetime
 import hashlib
 import json
@@ -38,6 +39,24 @@ def gitHead() -> str:
     return completed.stdout.strip()
 
 
+def publicSdkImports(sourceText: str) -> tuple[list[str], list[str]]:
+    rootImports: list[str] = []
+    internalImports: list[str] = []
+    for node in ast.walk(ast.parse(sourceText)):
+        if isinstance(node, ast.ImportFrom) and node.level == 0:
+            if node.module == "codaro":
+                rootImports.extend(alias.name for alias in node.names)
+            elif isinstance(node.module, str) and node.module.startswith("codaro."):
+                internalImports.append(node.module)
+        elif isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name == "codaro":
+                    rootImports.append("codaro")
+                elif alias.name.startswith("codaro."):
+                    internalImports.append(alias.name)
+    return sorted(rootImports), sorted(internalImports)
+
+
 def main() -> int:
     from codaro.document import loadDocument
     from codaro.publication import compileDocument
@@ -68,17 +87,35 @@ def main() -> int:
             for row in products:
                 productId = str(row["id"])
                 source = ROOT / str(row["sourcePath"])
+                sourceText = source.read_text(encoding="utf-8")
+                journey = row["journey"]
+                if not isinstance(journey, dict):
+                    raise AssertionError(f"{productId} journey가 닫힌 객체가 아닙니다.")
+                observedImports, internalImports = publicSdkImports(sourceText)
+                expectedImports = sorted(str(item) for item in journey["publicSdkImports"])
+                if observedImports != expectedImports or internalImports:
+                    raise AssertionError(
+                        f"{productId} public SDK import가 다릅니다: "
+                        f"observed={observedImports}, expected={expectedImports}, internal={internalImports}"
+                    )
                 document = loadDocument(str(source))
                 compilation = compileDocument(
                     document,
                     sourcePath=source,
-                    sourceText=source.read_text(encoding="utf-8"),
+                    sourceText=sourceText,
                     workspaceRoot=source.parent,
                 )
                 if compilation.runtimeTarget != row["runtimeTarget"]:
                     raise AssertionError(
                         f"{productId} target이 다릅니다: {compilation.runtimeTarget} != {row['runtimeTarget']}"
                     )
+                if document.app.entryBlockIds != row["entryBlockIds"]:
+                    raise AssertionError(
+                        f"{productId} app projection entry가 다릅니다: "
+                        f"{document.app.entryBlockIds} != {row['entryBlockIds']}"
+                    )
+                if journey["plainPython"] is not True or journey["appProjection"] is not True:
+                    raise AssertionError(f"{productId} plain Python 또는 app projection 계약이 꺼져 있습니다.")
                 productRoot = scratch / productId
                 shutil.copytree(source.parent, productRoot)
                 environment = dict(os.environ)
@@ -105,6 +142,28 @@ def main() -> int:
                     "sourcePreserved": hashlib.sha256(source.read_bytes()).hexdigest() == sourceHashesBefore[productId],
                     "artifactCreated": artifactPath.is_file(),
                     "diagnosticCodes": sorted({item["code"] for item in compilation.diagnostics}),
+                    "journeyEvidence": {
+                        "plainPython": {
+                            "declared": True,
+                            "exitCode": completed.returncode,
+                        },
+                        "publicSdkImports": {
+                            "declared": expectedImports,
+                            "observed": observedImports,
+                            "internalImports": internalImports,
+                        },
+                        "appProjection": {
+                            "declared": True,
+                            "entryBlockIds": list(document.app.entryBlockIds),
+                        },
+                        "publication": {
+                            "target": compilation.runtimeTarget,
+                            "steps": list(journey["publicationSteps"]),
+                        },
+                        "embedModes": list(journey["embedModes"]),
+                        "proofKinds": list(journey["proofKinds"]),
+                        "claimBoundary": journey["claimBoundary"],
+                    },
                 })
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
         landing = (ROOT / "landing/src/pages/home.jsx").read_text(encoding="utf-8")

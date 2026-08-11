@@ -164,6 +164,7 @@ lessonCount = sum(
 )
 assert lessonCount == {expectedLessonCount}
 assert (packageRoot / 'generatedContracts' / 'artifactOwnership.schema.json').is_file()
+assert (packageRoot / 'generatedContracts' / 'referenceProducts.schema.json').is_file()
 with tempfile.TemporaryDirectory(prefix='codaro-sdk-mount-') as directory:
     host = FastAPI()
     host.mount('/codaro', createServerApp(workspaceRoot=Path(directory)))

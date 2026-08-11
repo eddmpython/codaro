@@ -359,9 +359,11 @@ function App() {
     onNotice: applyNotice,
   });
 
-  const activeDocument = surface === "curriculum" && curriculumDocument ? curriculumDocument : document;
-  const activeDrafts = surface === "curriculum" ? curriculumDrafts : drafts;
-  const activeSelectedBlockId = surface === "curriculum" ? selectedCurriculumBlockId : selectedBlockId;
+  const appRuntimeActive = serverAppMode === true || blockEmbedFrame !== null;
+  const curriculumRuntimeActive = !appRuntimeActive && surface === "curriculum";
+  const activeDocument = curriculumRuntimeActive && curriculumDocument ? curriculumDocument : document;
+  const activeDrafts = curriculumRuntimeActive ? curriculumDrafts : drafts;
+  const activeSelectedBlockId = curriculumRuntimeActive ? selectedCurriculumBlockId : selectedBlockId;
   const selectedBlock = activeDocument.blocks.find((block) => block.id === activeSelectedBlockId) ?? activeDocument.blocks.find(isExecutableBlock) ?? activeDocument.blocks[0];
   const {
     canRun,
@@ -386,6 +388,7 @@ function App() {
     document: activeDocument,
     drafts: activeDrafts,
     onNotice: applyNotice,
+    reactiveCellExecution: surface === "editor" || blockEmbedFrame?.mode === "editable",
     selectNotebookBlock: selectBlock,
     selectedBlock,
     sourcePath: surface === "editor" ? notebookDocumentPath : null,
@@ -611,7 +614,10 @@ function App() {
     packages: document.runtime?.packages ?? [],
     blocks: document.blocks
       .filter((block) => isExecutableBlock(block) || block.type === "markdown")
-      .map((block) => [block.id, drafts[block.id] ?? block.content]),
+      .map((block) => [
+        block.id,
+        blockEmbedFrame?.mode === "editable" ? block.content : drafts[block.id] ?? block.content,
+      ]),
   });
   const lastAutomaticAppRunRef = useRef<string | null>(null);
   const runNotebookRef = useRef(runNotebook);

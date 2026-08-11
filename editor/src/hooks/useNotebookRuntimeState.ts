@@ -32,6 +32,7 @@ type UseNotebookRuntimeStateOptions = {
   document: CodaroDocument;
   drafts: Record<string, string>;
   onNotice: (notice: AppNotice) => void;
+  reactiveCellExecution: boolean;
   selectNotebookBlock: (blockId: string) => void;
   selectedBlock: BlockConfig | undefined;
   sourcePath: string | null;
@@ -67,6 +68,7 @@ export function useNotebookRuntimeState({
   document,
   drafts,
   onNotice,
+  reactiveCellExecution,
   selectNotebookBlock,
   selectedBlock,
   sourcePath,
@@ -138,7 +140,7 @@ export function useNotebookRuntimeState({
     onNotice({ tone: "default", title: translate("runtime.cellRunning"), detail: blockLabel(block) });
 
     try {
-      if (surface === "editor" && reactiveEnabled && isKernelExecutableBlock(block)) {
+      if (reactiveCellExecution && reactiveEnabled && isKernelExecutableBlock(block)) {
         const executionDrafts = sourceOverride === undefined
           ? drafts
           : { ...drafts, [block.id]: sourceOverride };
@@ -206,6 +208,7 @@ export function useNotebookRuntimeState({
     document,
     drafts,
     onNotice,
+    reactiveCellExecution,
     reactiveEnabled,
     results,
     sessionId,

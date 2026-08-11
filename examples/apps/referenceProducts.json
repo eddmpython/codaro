@@ -10,8 +10,15 @@
       "entryBlockIds": ["price-widget", "quantity-widget", "total-view"],
       "assetPaths": [],
       "secretRefs": [],
-      "journey": ["build", "serve", "embed", "deploy"],
-      "expectedProofKinds": ["sourceRevision", "buildArtifact", "deployment"],
+      "journey": {
+        "plainPython": true,
+        "publicSdkImports": ["ui"],
+        "appProjection": true,
+        "embedModes": ["output", "interactive", "editable"],
+        "publicationSteps": ["build", "serve", "embed", "deploy"],
+        "proofKinds": ["sourceRevision", "buildArtifact", "deployment"],
+        "claimBoundary": "machineVerified"
+      },
       "claim": "브라우저에서 입력을 바꾸면 dependency closure만 다시 계산되는 앱을 만든다."
     },
     {
@@ -22,8 +29,15 @@
       "entryBlockIds": ["region-widget", "summary-view"],
       "assetPaths": ["examples/apps/csv-dashboard/data/sales.csv"],
       "secretRefs": [],
-      "journey": ["build", "serve", "deploy"],
-      "expectedProofKinds": ["sourceRevision", "buildArtifact", "deployment"],
+      "journey": {
+        "plainPython": true,
+        "publicSdkImports": ["ui"],
+        "appProjection": true,
+        "embedModes": [],
+        "publicationSteps": ["build", "serve", "deploy"],
+        "proofKinds": ["sourceRevision", "buildArtifact", "deployment"],
+        "claimBoundary": "machineVerified"
+      },
       "claim": "검증된 CSV snapshot과 필터 입력을 함께 담은 정적 대시보드를 만든다."
     },
     {
@@ -34,8 +48,15 @@
       "entryBlockIds": ["report-view"],
       "assetPaths": ["examples/apps/snapshot-report/data/status.json"],
       "secretRefs": [],
-      "journey": ["build", "serve", "deploy"],
-      "expectedProofKinds": ["sourceRevision", "buildArtifact", "deployment"],
+      "journey": {
+        "plainPython": true,
+        "publicSdkImports": ["hstack", "stat"],
+        "appProjection": true,
+        "embedModes": [],
+        "publicationSteps": ["build", "serve", "deploy"],
+        "proofKinds": ["sourceRevision", "buildArtifact", "deployment"],
+        "claimBoundary": "machineVerified"
+      },
       "claim": "생성 시각과 source hash가 고정된 데이터를 외부 요청 없는 보고서로 만든다."
     },
     {
@@ -46,8 +67,15 @@
       "entryBlockIds": ["request-widget", "server-result"],
       "assetPaths": [],
       "secretRefs": ["REFERENCE_API_TOKEN"],
-      "journey": ["build", "serve", "deploy"],
-      "expectedProofKinds": ["sourceRevision", "buildArtifact", "deployment"],
+      "journey": {
+        "plainPython": true,
+        "publicSdkImports": ["ui"],
+        "appProjection": true,
+        "embedModes": [],
+        "publicationSteps": ["build", "serve", "deploy"],
+        "proofKinds": ["sourceRevision", "buildArtifact", "deployment"],
+        "claimBoundary": "machineVerified"
+      },
       "claim": "Secret 값을 client bundle에 넣지 않는 session 격리 서버 앱을 만든다."
     },
     {
@@ -58,8 +86,15 @@
       "entryBlockIds": ["automation-run"],
       "assetPaths": ["examples/apps/local-file-automation/data/inventory.csv"],
       "secretRefs": [],
-      "journey": ["build", "serve", "rollback"],
-      "expectedProofKinds": [],
+      "journey": {
+        "plainPython": true,
+        "publicSdkImports": [],
+        "appProjection": true,
+        "embedModes": [],
+        "publicationSteps": ["build", "serve", "rollback"],
+        "proofKinds": [],
+        "claimBoundary": "machineVerified"
+      },
       "claim": "명시한 파일과 process 권한으로 재실행 가능한 immutable 로컬 앱을 만든다."
     }
   ],

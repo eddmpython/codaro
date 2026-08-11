@@ -7,6 +7,7 @@
 // scheduleBrowserPythonRuntimeWarm()으로 같은 싱글턴을 미리 올려 첫 셀 실행 지연을 줄인다.
 // 단일 boot 경로는 SharedArrayBuffer/COOP-COEP가 필요 없어 정적 호스팅에서도 돈다.
 import analysisSource from "../../../src/codaro/document/analysis.py?raw";
+import appRuntimeSource from "../../../src/codaro/appRuntime.py?raw";
 import figureCaptureSource from "../../../src/codaro/runtime/figureCapture.py?raw";
 import reactivePlanSource from "../../../src/codaro/kernel/reactivePlan.py?raw";
 import outputDescriptorSource from "../../../src/codaro/outputDescriptor.py?raw";
@@ -404,6 +405,7 @@ function installBrowserCodaroModules(runtime: PyRuntime): void {
     ["codaro.uiCallbacks", uiCallbacksSource],
     ["codaro.uiValue", uiValueSource],
     ["codaro.outputDescriptor", outputDescriptorSource],
+    ["codaro.appRuntime", appRuntimeSource],
   ];
   const code = [
     "import sys as _codaroSys",
@@ -420,6 +422,12 @@ function installBrowserCodaroModules(runtime: PyRuntime): void {
     "    _codaroSys.modules[_codaroModuleName] = _codaroModule",
     "    exec(_codaroModuleSource, _codaroModule.__dict__)",
     "    setattr(_codaroPackage, _codaroModuleName.rsplit('.', 1)[-1], _codaroModule)",
+    "_codaroBrowserApi = _codaroSys.modules['codaro.appRuntime']",
+    "_codaroBrowserNames = ('App', 'accordion', 'callout', 'hstack', 'html', 'md', 'markdown', 'plain', 'sidebar', 'stat', 'state', 'stop', 'tabs', 'text', 'ui', 'vstack')",
+    "for _codaroBrowserName in _codaroBrowserNames:",
+    "    setattr(_codaroPackage, _codaroBrowserName, getattr(_codaroBrowserApi, _codaroBrowserName))",
+    "_codaroPackage.__all__ = list(_codaroBrowserNames)",
+    "_codaroPackage.__version__ = '0.0.0+browser'",
   ].join("\n");
   runtime.run(code);
 }
