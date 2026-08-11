@@ -95,6 +95,8 @@ def testLocalHomeIsAnOperationalRuntimeEntry() -> None:
 
     for marker in (
         'data-local-home-surface="true"',
+        'data-local-home-ready="true"',
+        'data-product-surface-ready="home"',
         'data-local-home-resume="true"',
         'data-local-home-operations="true"',
         'data-local-home-commands="true"',
@@ -694,9 +696,10 @@ def testAppMountsOneResponsiveProductShellForEveryRouteAlias() -> None:
     assert "onSurfaceChange={selectSurface}" in app
     assert "data-active-product-surface={surface}" in app
     assert "data-product-surface-view={props.surface}" in mainSurface
+    assert 'props.surface === "home"' in mainSurface
     assert 'props.surface === "curriculum" && Boolean(props.selectedContentId)' in mainSurface
-    assert 'data-product-surface-state={waitsForCurriculumLesson ? "content-loading" : "ready"}' in mainSurface
-    assert "data-product-surface-ready={waitsForCurriculumLesson ? undefined : props.surface}" in mainSurface
+    assert 'data-product-surface-state={waitsForNestedReadySurface ? "content-loading" : "ready"}' in mainSurface
+    assert "data-product-surface-ready={waitsForNestedReadySurface ? undefined : props.surface}" in mainSurface
     assert 'data-product-surface-state="loading"' in mainSurface
     assert "data-product-surface-loading={surface}" in mainSurface
     assert 'role="status"' in mainSurface
@@ -719,6 +722,9 @@ def testCurriculumReadyMarkerWaitsForNamedEditorAction() -> None:
         assert 'data-learning-run-control="true"' in source
         assert "label={`${blockLabel(" in source
         assert 'label="셀 실행"' not in source
+    assert 'strength: attemptCheck.evidence === "strong" ? "strong" : "weak"' in sectionRenderer
+    assert "rememberLearningAttempt(recordKey)" in sectionRenderer
+    assert "data-learning-attempt-record-state" in sectionRenderer
 
 
 def testProductSidebarKeepsSurfaceTreesInFocusedFiles() -> None:

@@ -1,6 +1,6 @@
 # pyproc 피드백
 
-상태: 진행
+상태: 완료
 
 ## 목표
 
@@ -15,6 +15,7 @@ Web과 Local 모두 실제 코드 입력, 실행, 검증 상태, PNG 증거까�
 | 공개 Web, Edge 151 | `Hello World` 첫 실습에 `print("Hello Codaro")` 입력, 실행, strong 검증 완료 | AX 전체 912개, 행동 후보 159개, compact 19,611 bytes, 최종 PNG SHA-256 `c99b1d4f58ede0e9d3e116f9fde801044a4a8db5058aae89e1cc0cacbf407594` |
 | Local, `uv run codaro --no-browser --port 8765` | `/api/health` 성공 뒤 빈 화면 | `src/codaro/webBuild/index.html`이 존재하지 않는 JS 4개를 참조, AX node 2개, 빈 PNG SHA-256 `5174949aa8c450d15c99ba1d0bf15bd8d4256f8bd54eaac56ca8e1ec3a844d8c` |
 | Local 재검증, Edge 151 | `print('Hello Codaro')` trusted 입력, Local kernel 실행, 출력과 `data-learning-check-result="verified"`, `연습 완료` 확인 | AX 전체 837개, 행동 후보 135개, compact 18,069 bytes, 최종 PNG SHA-256 `a9109d5530612fddd55280369367700e5eb0b369cd6d8912c4308062769b2645` |
+| 자동 동일 여정, Chromium 149 | Web은 `verified`, strong, 진도 1이고 Local은 `provisional`, practice, 진도 0 | 두 환경 모두 출력 `Hello Codaro`, Web AX 1,355개, Local AX 1,565개, 편집기와 고유 실행 action 각 10개, Local strong event 0개, 종료 뒤 active session 0개 |
 
 Local에서 누락된 참조는 다음과 같다.
 
@@ -28,24 +29,20 @@ Local에서 누락된 참조는 다음과 같다.
 1. 완료, P0 Local build 원자성: `index.html`, preload, JS, CSS의 content hash 집합을 한 build generation으로
    생성하고, CLI가 `ready`를 출력하기 전에 모든 참조의 존재와 content type을 검사한다. 하나라도
    없으면 서버를 열지 않고 복구 명령을 포함한 진단으로 실패한다.
-2. 진행, P1 학습 준비 상태: Local 홈은 로딩 shell 뒤 실제 resume action이 준비됐음을 나타내는
-   기계 판독 표식이 없다. `data-product-surface-ready="curriculum"`도 선택 lesson의 첫 editor와 action이
-   실제로 mount된 뒤에만 ready를 뜻하게 하고 lesson identity를 함께 기록한다.
+2. 완료, P1 학습 준비 상태: Local 홈의 실제 surface와 선택 lesson의 editor가 mount된 뒤에만
+   `data-product-surface-ready`와 lesson identity를 기록한다. 바깥 shell은 그전까지 `content-loading`을 유지한다.
 3. 완료, P1 action 이름: 모든 `셀 실행` 버튼의 accessible name에 block label을 포함한다. 첫 실습은
    `Hello World 실습 셀 실행`처럼 editor 이름과 같은 label 축을 써서 열 개의 동일 버튼을 구분한다.
-4. P1 화면 예산: 한 lesson에서 AX 912개와 editor 10개를 동시에 노출하는 현재 구조를 측정 gate로
-   관리한다. Local 재검증은 AX 837개였다. active section과 인접 section 중심의 지연 mount를 검토하되
-   검색, URL section, 키보드 이동, 학습 맥락은 보존한다.
-5. P2 배포 자산: 공개 lesson에서 `/favicon.svg`가 site base를 잃고 repository root로 요청되어 404가
-   발생한다. 배포 base-aware asset URL로 고친다.
-6. 완료, Web과 Local에서 같은 첫 실습을 자동 실행하고 output, `verified`, 진도, screenshot을 같은
-   report에 묶는다.
-7. P0 강한 증거 의미: Local은 strong check API가 200이고 DOM은 `verified`였지만 화면은 OS 격리
-   검증기가 준비되지 않아 강한 학습 증거로 저장하지 않았다고 알렸다. 행동 성공과 강한 증거 저장을
-   서로 다른 상태로 투영하고, 둘이 불일치하면 `verified` 하나로 축약하지 않는다.
-8. P1 archive 첫 동기화: 첫 Local 학습 진입에서 `학습 archive object가 import plan과 일치하지 않습니다`
-   400이 발생한 뒤 같은 세션 재시도는 200으로 회복했다. 정상 fresh profile에서 오류 요청 없이 한 번에
-   동기화되도록 import plan과 archive 생성 순서를 맞춘다.
+4. 완료, P1 화면 예산: 동일 여정 gate가 Chromium CDP 전체 AX tree를 1,650개 이하로 제한한다. 현재
+   Web은 1,355개, Local은 1,565개이며 편집기와 실행 action은 각각 10개다. 예산을 넘기 전에는 검색,
+   URL section, 키보드 이동 맥락을 바꿀 지연 mount를 도입하지 않는다.
+5. 완료, P2 배포 자산: favicon과 module asset URL을 배포 base 기준으로 생성하고 404가 없음을 검사한다.
+6. 완료, Web과 Local에서 같은 첫 실습을 자동 실행하고 output, 상태, 증거 강도, 진도, screenshot을 같은
+   report에 묶는다. 제품 완결 가능 여부와 OS 격리 blocker도 같은 report에서 판정한다.
+7. 완료, P0 강한 증거 의미: OS 격리 검증기가 없는 Local 성공은 `provisional`과 practice로 투영한다.
+   행동 성공은 보여주되 strong event와 진도는 만들지 않으며, native 격리 fixture만 `verified`가 된다.
+8. 완료, P1 archive 첫 동기화: 같은 root와 blob을 가진 archive의 생성 시각 차이를 허용하는 의미 검증으로
+   fresh profile 첫 동기화의 import plan 충돌을 제거했다. 실제 동일 여정에서 400 없이 한 번에 동기화됐다.
 
 ## 영향 파일
 
@@ -73,10 +70,12 @@ Local에서 누락된 참조는 다음과 같다.
 - 새 build contract는 `index.html`의 모든 local `_app/` 참조가 실제 파일이고 200으로 응답하는지 검사한다.
 - 의도적으로 hashed chunk 하나를 뺀 fixture에서 CLI가 `ready` 전에 hard fail하는 부정 회귀를 둔다.
 - 학습 Playwright gate는 첫 editor readiness 뒤 `Hello World 실습 셀 실행`을 role과 name으로 하나만 찾는다.
-- Web과 Local 모두 `print("Hello Codaro")`, 출력 `Hello Codaro`, `data-learning-check-result="verified"`,
-  진도 갱신, 최종 screenshot을 검증한다.
+- Web과 Local 모두 `print("Hello Codaro")`, 출력 `Hello Codaro`, 상태, 증거 강도, 진도, 최종 screenshot을
+  검증한다. Web은 `verified`와 strong, 진도 1을 기대하고 격리 검증기가 없는 Local은 `provisional`과
+  practice, 진도 0을 기대한다.
 - Local strong check가 `verified`이면 evidence archive에도 strong 증거가 저장됐음을 검사한다. OS 검증기가
-  준비되지 않은 fixture에서는 별도 상태와 진단을 기대하고 `verified`를 금지한다.
+  준비되지 않은 fixture에서는 `provisional`과 진단을 기대하고 strong event와 `verified`를 금지한다.
+- 첫 lesson의 전체 AX tree는 1,650개 이하이고 편집기 수와 고유 실행 action 수가 일치해야 한다.
 - fresh Local profile의 첫 archive sync가 400이나 console error 없이 한 번에 200인지 검사한다.
 - 공개 base fixture에서 favicon과 module preload 404가 0개인지 검사한다.
 - 변경 뒤 `uv run python -X utf8 tests/run.py python-product`, `quality-cycle`, `preflight`를 current commit에서 실행한다.
@@ -90,7 +89,9 @@ Local에서 누락된 참조는 다음과 같다.
 
 ## 평가
 
-- 개발자 렌즈: build 원자성과 고유 실행 이름은 실제 재검증에서 효과가 확인됐다. 남은 위험은 UI의
-  `verified`와 evidence 저장 의미가 어긋나는 점, fresh archive가 첫 요청에서만 400인 점이다.
-- PM 렌즈: Web과 Local 모두 첫 학습 행동은 끝까지 동작한다. 다만 Local은 사용자에게 완료를 보여주면서
-  강한 증거는 저장하지 않으므로 학습 이력 신뢰를 아직 제품 완결로 선언할 수 없다.
+- 개발자 렌즈: build 원자성, 실제 준비 표식, 고유 실행 이름, 화면 예산, 상태 의미, 첫 archive 동기화가
+  자동 동일 여정에서 함께 통과했다. 페이지 종료 중 늦게 생성된 커널도 실제 폐기가 끝난 뒤 목록에서
+  제거되어 Windows 작업 폴더 핸들을 남기지 않는다.
+- PM 렌즈: Web과 Local 모두 첫 학습 행동과 동일 출력을 제공한다. Web은 강한 진도를 부여하고 Local은
+  OS 격리 검증기가 없으면 `동작 확인`까지만 보여주므로 과장된 완료가 사라졌다. Local을 제품 완결로
+  선언하려면 실제 OS 격리 검증기가 별도로 필요하다는 blocker도 report에 남는다.

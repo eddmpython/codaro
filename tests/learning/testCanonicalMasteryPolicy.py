@@ -847,6 +847,16 @@ const supported = await buildCanonicalStrongCheckEvents(
   input({aiHelpUsed: true, fixtureHash: hash("d"), sectionId: "supported"}),
   evidence("d", "2026-07-04T00:00:00.000Z"), [],
 );
+const provisionalEvidence = {
+  ...evidence("e", "2026-07-05T00:00:00.000Z"),
+  errorClass: "provisional",
+  strength: "weak",
+};
+const provisional = await buildCanonicalStrongCheckEvents(
+  input({fixtureHash: hash("e"), sectionId: "provisional"}),
+  provisionalEvidence,
+  [],
+);
 const credit = (events) => events.find((event) => event.kind === "CreditGranted");
 process.stdout.write(JSON.stringify({
   acquisitionKinds: acquisition.map((event) => event.kind),
@@ -854,6 +864,7 @@ process.stdout.write(JSON.stringify({
   reinforcementState: credit(reinforcement).creditSlices[0].preAttemptState,
   transferKinds: invalidTransfer.map((event) => event.kind),
   supportedKinds: supported.map((event) => event.kind),
+  provisionalKinds: provisional.map((event) => event.kind),
 }));
 """ % json.dumps(bundlePath.as_uri())
     completed = subprocess.run(
@@ -870,6 +881,7 @@ process.stdout.write(JSON.stringify({
         "reinforcementState": "independent",
         "transferKinds": ["RunObserved", "CheckEvaluated"],
         "supportedKinds": ["RunObserved", "CheckEvaluated", "SupportProvided"],
+        "provisionalKinds": ["RunObserved", "CheckEvaluated"],
     }
 
 

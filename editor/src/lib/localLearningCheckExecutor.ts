@@ -19,11 +19,11 @@ export async function executeLocalStrongCheck(
     const result = await requestLocalStrongCheck(spec, source);
     const strongEligible = capability === "strong"
       && localStrongEvidenceEligible(result.isolation, result.windowsBuild);
+    const provisional = result.passed && !strongEligible;
     return {
       ...result,
-      detail: strongEligible
-        ? result.detail
-        : checkSandboxCapabilityMessage("provisional"),
+      detail: provisional ? checkSandboxCapabilityMessage("provisional") : result.detail,
+      state: provisional ? "provisional" as const : result.state,
       strongEligible,
     };
   } catch (error) {

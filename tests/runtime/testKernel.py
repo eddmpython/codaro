@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import threading
 from pathlib import Path
 
 import pytest
@@ -485,4 +486,28 @@ def testSessionManagerLifecycle() -> None:
     assert manager.destroySession("missing") is False
 
     manager.destroyAll()
+    assert manager.sessionCount == 0
+
+
+def testSessionManagerKeepsSessionVisibleUntilDisposeCompletes() -> None:
+    disposeStarted = threading.Event()
+    allowDispose = threading.Event()
+
+    class BlockingSession(KernelSession):
+        def dispose(self) -> None:
+            disposeStarted.set()
+            assert allowDispose.wait(timeout=2)
+
+    session = BlockingSession()
+    manager = SessionManager(sessionFactory=lambda _workingDirectory: session)
+    manager.createSession()
+    destroyThread = threading.Thread(target=manager.destroySession, args=(session.sessionId,))
+    destroyThread.start()
+
+    assert disposeStarted.wait(timeout=2)
+    assert session.sessionId in manager._sessions
+    allowDispose.set()
+    destroyThread.join(timeout=2)
+
+    assert not destroyThread.is_alive()
     assert manager.sessionCount == 0

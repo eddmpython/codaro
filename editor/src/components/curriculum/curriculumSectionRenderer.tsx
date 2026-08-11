@@ -14,6 +14,18 @@ import { cn } from "@/lib/utils";
 import { CurriculumLearningCell, curriculumInitialDraft } from "./curriculumLearningCell";
 import { isRecord, payloadTextList, readPayloadText, readSectionContract } from "./curriculumSurfaceHelpers";
 import type { CurriculumSectionGroup, RenderCodeCellEditor, ResultMap } from "./curriculumSurfaceModels";
+
+const recordedLearningAttemptKeys = new Set<string>();
+
+function rememberLearningAttempt(key: string): boolean {
+  if (recordedLearningAttemptKeys.has(key)) return false;
+  recordedLearningAttemptKeys.add(key);
+  if (recordedLearningAttemptKeys.size > 2_048) {
+    const oldest = recordedLearningAttemptKeys.values().next().value;
+    if (typeof oldest === "string") recordedLearningAttemptKeys.delete(oldest);
+  }
+  return true;
+}
 import { cellDomId } from "./curriculumNavigation";
 import { SectionNarrative } from "./curriculumOverview";
 
@@ -388,9 +400,19 @@ export function StructuredSectionLearningBody({
   useEffect(() => {
     if (!exercise || !exerciseResult) return;
     if (!attemptCheck?.checkId || !attemptCheck.fixtureHash) return;
-    const recordKey = `${exercise.id}:${exerciseResult.executionCount}:${attemptCheck.evidence}:${attemptCheck.checkId}`;
+    const recordKey = JSON.stringify([
+      category,
+      contentId,
+      exercise.id,
+      exerciseResult.executionCount,
+      attemptCheck.checkId,
+      attemptCheck.evidence,
+      attemptCheck.state,
+      attemptCheck.source,
+    ]);
     if (recordedAttemptRef.current === recordKey) return;
     recordedAttemptRef.current = recordKey;
+    if (!rememberLearningAttempt(recordKey)) return;
     if (attemptCheck.executor === "browser-worker" || attemptCheck.executor === "local-sandbox") {
       setEvidenceSaveState("saving");
       const evidenceInput = {
@@ -417,7 +439,7 @@ export function StructuredSectionLearningBody({
           outcomeIds: payloadTextList(section.contract?.outcomeIds),
           passed: attemptCheck.passed,
           recommendedHintLevel: 0,
-          strength: "strong",
+          strength: attemptCheck.evidence === "strong" ? "strong" : "weak",
           capabilityClaimId: readPayloadText(section.contract?.capabilityClaimId) || undefined,
           capabilityClaimVersion: payloadPositiveInt(section.contract?.capabilityClaimVersion),
           taskFamilyId: readPayloadText(section.contract?.taskFamilyId) || undefined,
@@ -666,6 +688,7 @@ export function StructuredSectionLearningBody({
               data-learning-check-result={attemptCheck.state}
               data-learning-check-evidence={attemptCheck.evidence}
               data-learning-check-executor={attemptCheck.executor}
+              data-learning-attempt-record-state={attemptCheck.checkId ? evidenceSaveState : undefined}
               data-learning-evidence-state={
                 attemptCheck.passed && attemptCheck.evidence === "strong"
                   ? evidenceSaveState
@@ -675,7 +698,9 @@ export function StructuredSectionLearningBody({
             >
               <div className="font-bold text-foreground">
                 {attemptCheck.passed
-                  ? "연습 완료"
+                  ? attemptCheck.state === "provisional"
+                    ? "동작 확인"
+                    : "연습 완료"
                   : attemptCheck.state === "unsupported"
                     ? "출력을 확인해 보세요"
                     : "다시 확인해 보세요"}

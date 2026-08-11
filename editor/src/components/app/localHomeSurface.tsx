@@ -51,7 +51,13 @@ export function LocalHomeSurface({
     .slice(0, 7);
 
   return (
-    <ScrollArea className="h-full min-h-0" data-local-home-surface="true">
+    <ScrollArea
+      className="h-full min-h-0"
+      data-local-home-ready="true"
+      data-local-home-surface="true"
+      data-product-surface-ready="home"
+      data-product-surface-state="ready"
+    >
       <main className="min-h-full bg-background pb-10">
         <header className="border-b border-border px-4 py-5 sm:px-6 lg:px-8">
           <div className="mx-auto flex max-w-[1480px] flex-wrap items-end justify-between gap-4">

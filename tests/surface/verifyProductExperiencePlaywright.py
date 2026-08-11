@@ -17,6 +17,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote, urlsplit, urlunsplit
+from urllib.request import urlopen
 
 import yaml
 
@@ -1076,6 +1077,27 @@ def releaseLocalKernelSessions(page: Any, case: dict[str, Any], localPort: int) 
                     )
 
 
+def waitForLocalKernelSessionsReleased(localPort: int, timeout: float = 10.0) -> None:
+    deadline = time.monotonic() + timeout
+    activeIds: list[str] = []
+    while time.monotonic() < deadline:
+        remaining = max(0.1, deadline - time.monotonic())
+        with urlopen(f"http://127.0.0.1:{localPort}/api/kernel/sessions", timeout=remaining) as response:
+            sessions = json.loads(response.read().decode("utf-8"))
+        if not isinstance(sessions, list):
+            raise RuntimeError("kernel session lifecycle recheck returned a non-array payload")
+        activeIds = []
+        for session in sessions:
+            sessionId = session.get("sessionId") if isinstance(session, dict) else None
+            if not isinstance(sessionId, str) or not sessionId:
+                raise RuntimeError("kernel session lifecycle recheck returned an invalid session id")
+            activeIds.append(sessionId)
+        if not activeIds:
+            return
+        time.sleep(0.05)
+    raise RuntimeError(f"pagehide left active kernel sessions: {activeIds}")
+
+
 def captureStableViewport(page: Any, screenshotPath: Path) -> None:
     page.mouse.move(0, 0)
     page.add_style_tag(
@@ -2047,6 +2069,8 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "verifyBrowserLocalRequiredHandoff": True,
             "verifyLegacyProgressMigration": True,
             "verifyDayOneCommentPrompt": True,
+            "captureCanonicalLearningEvidence": True,
+            "verifyLessonScreenBudget": True,
             "initialCheckState": "mismatch",
             "requireInlineHint": True,
             "solutionCode": "print('Hello Codaro')",
@@ -2966,11 +2990,14 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "waitFor": "[data-learning-section-card]",
             "runLocalLearningCell": True,
             "expectedCheckExecutor": "local-sandbox",
+            "expectedFinalCheckState": "provisional",
             "exerciseIndex": 0,
             "initialCheckState": "mismatch",
             "solutionCode": "name = 'Codaro'\nprint('Hello', name)",
             "expectedEvidenceCount": 0,
             "expectVerifiedSections": 0,
+            "captureCanonicalLearningEvidence": True,
+            "verifyLessonScreenBudget": True,
         },
         {
             "name": "local-learning-evidence-desktop",
@@ -3116,6 +3143,8 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
         local_case.pop("runLearningCell", None)
         local_case["runLocalLearningCell"] = True
         local_case["expectedCheckExecutor"] = "local-sandbox"
+        local_case["expectedFinalCheckState"] = "provisional"
+        local_case["expectVerifiedSections"] = 0
         if not source_case["name"].startswith("web-schedule-"):
             local_case["expectedArtifactEvidence"] = True
         elif source_case["name"] != "web-schedule-job-desktop":
@@ -3436,9 +3465,23 @@ async ({ surface, expectedTier }) => {
   const activeProductSurfaceView = document.querySelector(
     "[data-product-surface-view]"
   )?.getAttribute("data-product-surface-view") || null;
-  const activeProductSurfaceState = document.querySelector(
-    "[data-product-surface-view] [data-product-surface-state]"
+  const activeProductSurfaceState = (
+    document.querySelector(
+      "[data-product-surface-view] [data-product-surface-ready][data-product-surface-state]"
+    ) || document.querySelector(
+      "[data-product-surface-view] [data-product-surface-state]"
+    )
   )?.getAttribute("data-product-surface-state") || null;
+  const lessonEditors = [...document.querySelectorAll(
+    "[data-learning-lesson-ref] .cm-editor"
+  )];
+  const lessonRunActions = [...document.querySelectorAll(
+    '[data-learning-lesson-ref] [data-learning-run-control="true"]'
+  )];
+  const lessonRunActionNames = lessonRunActions.map(actionName);
+  const readyLesson = document.querySelector(
+    '[data-learning-lesson-ready][data-product-surface-ready="curriculum"]'
+  );
   try {
     const evidenceStore = await new Promise((resolve, reject) => {
       const request = indexedDB.open("codaro-learning-evidence-v1", 3);
@@ -3550,6 +3593,10 @@ async ({ surface, expectedTier }) => {
     minimumMobileProductTargetHeight,
     activeProductSurfaceView,
     activeProductSurfaceState,
+    lessonEditorCount: lessonEditors.length,
+    lessonRunActionCount: lessonRunActions.length,
+    lessonRunActionNames,
+    lessonReadyRef: readyLesson?.getAttribute("data-learning-lesson-ready") || null,
     chatTextareaCount: document.querySelectorAll(
       "[data-product-surface-view='chat'] textarea"
     ).length,
@@ -3781,6 +3828,27 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
         failures.append(
             f"{name}: canonical cascade layer order was not injected before split CSS"
         )
+    if case.get("verifyLessonScreenBudget"):
+        editorCount = int(audit.get("lessonEditorCount") or 0)
+        actionCount = int(audit.get("lessonRunActionCount") or 0)
+        actionNames = list(audit.get("lessonRunActionNames") or [])
+        accessibilityNodeCount = int(audit.get("accessibilityNodeCount") or 0)
+        if editorCount < 1 or editorCount > 10:
+            failures.append(f"{name}: lesson editor budget exceeded: {editorCount}/10")
+        if actionCount != editorCount:
+            failures.append(
+                f"{name}: lesson run action count {actionCount} does not match editor count {editorCount}"
+            )
+        if "셀 실행" in actionNames or len(set(actionNames)) != len(actionNames):
+            failures.append(f"{name}: lesson run action names are ambiguous: {actionNames}")
+        if not audit.get("lessonReadyRef"):
+            failures.append(f"{name}: interactive lesson readiness marker is missing")
+        accessibilityNodeBudget = int(audit.get("accessibilityNodeBudget") or 1650)
+        if accessibilityNodeCount < 1 or accessibilityNodeCount > accessibilityNodeBudget:
+            failures.append(
+                f"{name}: accessibility tree budget exceeded: "
+                f"{accessibilityNodeCount}/{accessibilityNodeBudget}"
+            )
     if audit["visibleSocialLinkIds"] != ["github", "support", "youtube", "threads", "email"]:
         failures.append(
             f"{name}: shared SNS rail is missing or reordered: {audit['visibleSocialLinkIds']}"
@@ -4353,6 +4421,11 @@ def runBrowserMatrix(
                 elif selectedCase == "local-learning-evidence-desktop":
                     selectedNames.add("web-lesson-mobile")
                     selectedNames.add("local-strong-learning-desktop")
+                elif selectedCase == "canonical-learning-parity":
+                    selectedNames = {
+                        "web-lesson-mobile",
+                        "local-strong-learning-desktop",
+                    }
                 elif selectedCase == "w0-assessment-progression":
                     selectedNames = {
                         "web-pathlib-assessment-progression-desktop",
@@ -6263,6 +6336,48 @@ def runBrowserMatrix(
                                 arg=int(case["expectVerifiedSections"]),
                                 timeout=20_000,
                             )
+                        if case.get("captureCanonicalLearningEvidence"):
+                            finalCheck = exerciseParts.nth(exerciseIndex).locator(
+                                '[data-learning-check-result]'
+                            ).last
+                            finalOutput = exerciseParts.nth(exerciseIndex).locator(
+                                '[data-learning-section-part="result"] pre'
+                            ).last
+                            finalCheck.scroll_into_view_if_needed(timeout=20_000)
+                            canonicalScreenshot = (
+                                SCREENSHOT_ROOT / colorScheme
+                                / f"{case['name']}-canonical-learning.png"
+                            )
+                            captureStableViewport(page, canonicalScreenshot)
+                            checkCapabilityEvidence = {
+                                "behaviorPassed": finalCheck.get_attribute(
+                                    "data-learning-check-result"
+                                ) == "verified",
+                                "checkKind": exerciseParts.nth(exerciseIndex).get_attribute(
+                                    "data-learning-check-kind"
+                                ),
+                                "evidence": finalCheck.get_attribute(
+                                    "data-learning-check-evidence"
+                                ),
+                                "feedback": finalCheck.inner_text(),
+                                "output": finalOutput.inner_text().strip()
+                                if finalOutput.count()
+                                else "",
+                                "state": finalCheck.get_attribute(
+                                    "data-learning-check-result"
+                                ),
+                                "verifiedSections": page.evaluate(
+                                    """
+                                    () => Number(
+                                      document.querySelector('[data-curriculum-header-progress="true"]')
+                                        ?.getAttribute('data-curriculum-header-completed') || 0
+                                    )
+                                    """
+                                ),
+                                "screenshot": str(
+                                    canonicalScreenshot.relative_to(ROOT)
+                                ).replace("\\", "/"),
+                            }
                         if case.get("verifyCanonicalKeyboardJourney"):
                             expectedNextLesson = str(case["expectNextLesson"])
                             focusedNextLesson = ""
@@ -7122,10 +7237,24 @@ def runBrowserMatrix(
                             raise AssertionError(
                                 f"Local check expected executor {case['expectedCheckExecutor']}, got {firstExecutor}"
                             )
+                        page.wait_for_function(
+                            """
+                            (element) => element.getAttribute(
+                              'data-learning-attempt-record-state'
+                            ) === 'stored'
+                            """,
+                            arg=firstCheck.element_handle(),
+                            timeout=20_000,
+                        )
+                        initialEvidenceExpected = localEvidenceExpected + 1
+                        waitForLocalLearningEvidenceEventCount(
+                            page,
+                            initialEvidenceExpected,
+                        )
                         beforeEvidenceCount = readLocalLearningEvidenceSummary(page)["events"]
-                        if beforeEvidenceCount != localEvidenceExpected:
+                        if beforeEvidenceCount != initialEvidenceExpected:
                             raise AssertionError(
-                                f"failed Local attempt changed evidence count: expected {localEvidenceExpected}, "
+                                f"failed Local attempt evidence expected {initialEvidenceExpected}, "
                                 f"got {beforeEvidenceCount}"
                             )
                         localExercise = exerciseParts.nth(exerciseIndex)
@@ -7154,9 +7283,12 @@ def runBrowserMatrix(
                                 f"checkState={firstCheck.get_attribute('data-learning-check-result')}; "
                                 f"editor={codeEditor.inner_text()[:800]}"
                             ) from executionError
+                        expectedFinalCheckState = str(
+                            case.get("expectedFinalCheckState", "provisional")
+                        )
                         try:
                             page.wait_for_selector(
-                                '[data-learning-check-result="verified"]',
+                                f'[data-learning-check-result="{expectedFinalCheckState}"]',
                                 timeout=120_000,
                             )
                         except Exception as verificationError:
@@ -7164,45 +7296,77 @@ def runBrowserMatrix(
                             state = lastCheck.get_attribute("data-learning-check-result") if lastCheck.count() else "missing"
                             detail = lastCheck.inner_text()[:800] if lastCheck.count() else "no check feedback"
                             raise AssertionError(
-                                "Local solution did not verify; "
+                                f"Local solution did not reach {expectedFinalCheckState}; "
                                 f"final state={state}: {detail}; transport={localCheckTransport}"
                             ) from verificationError
-                        verifiedCheck = page.locator('[data-learning-check-result="verified"]').last
-                        verifiedExecutor = verifiedCheck.get_attribute("data-learning-check-executor")
-                        if verifiedExecutor != case["expectedCheckExecutor"]:
+                        finalCheck = page.locator(
+                            f'[data-learning-check-result="{expectedFinalCheckState}"]'
+                        ).last
+                        finalExecutor = finalCheck.get_attribute("data-learning-check-executor")
+                        if finalExecutor != case["expectedCheckExecutor"]:
                             raise AssertionError(
-                                f"verified Local check expected executor {case['expectedCheckExecutor']}, got {verifiedExecutor}"
+                                f"Local check expected executor {case['expectedCheckExecutor']}, got {finalExecutor}"
                             )
                         expectedTransport = {"aborted": 1, "expectedConsoleErrors": 1, "requests": 3}
                         if case.get("interruptSolutionStrongCheckOnce") and localCheckTransport != expectedTransport:
                             raise AssertionError(
                                 f"Local strong-check transport retry was not exercised exactly once: {localCheckTransport}"
                             )
-                        verifiedEvidence = verifiedCheck.get_attribute(
+                        finalEvidence = finalCheck.get_attribute(
                             "data-learning-check-evidence"
                         )
+                        page.wait_for_function(
+                            """
+                            (element) => element.getAttribute(
+                              'data-learning-attempt-record-state'
+                            ) === 'stored'
+                            """,
+                            arg=finalCheck.element_handle(),
+                            timeout=20_000,
+                        )
                         if (
-                            verifiedEvidence != "practice"
-                            or "강한 학습 증거" not in verifiedCheck.inner_text()
-                            or page.locator('[data-learning-evidence-state="stored"]').count()
+                            expectedFinalCheckState == "provisional"
+                            and (
+                                finalEvidence != "practice"
+                                or "강한 학습 증거" not in finalCheck.inner_text()
+                                or page.locator('[data-learning-evidence-state="stored"]').count()
+                            )
                         ):
                             raise AssertionError(
                                 "Local provisional check was presented as strong evidence: "
-                                f"evidence={verifiedEvidence}, feedback={verifiedCheck.inner_text()[:500]}"
+                                f"evidence={finalEvidence}, feedback={finalCheck.inner_text()[:500]}"
                             )
+                        if (
+                            expectedFinalCheckState == "verified"
+                            and (
+                                finalEvidence != "strong"
+                                or not page.locator('[data-learning-evidence-state="stored"]').count()
+                            )
+                        ):
+                            raise AssertionError(
+                                "Local native check did not persist strong evidence: "
+                                f"evidence={finalEvidence}, feedback={finalCheck.inner_text()[:500]}"
+                            )
+                        localOutput = localExercise.locator(
+                            '[data-learning-section-part="result"] pre'
+                        ).last
                         checkCapabilityEvidence = {
+                            "behaviorPassed": expectedFinalCheckState in {"provisional", "verified"},
                             "checkKind": localExercise.get_attribute(
                                 "data-learning-check-kind"
                             ),
-                            "evidence": verifiedEvidence,
-                            "feedback": verifiedCheck.inner_text(),
-                            "state": "verified",
-                            "strongEventCount": beforeEvidenceCount,
+                            "evidence": finalEvidence,
+                            "feedback": finalCheck.inner_text(),
+                            "output": localOutput.inner_text().strip()
+                            if localOutput.count()
+                            else "",
+                            "state": expectedFinalCheckState,
+                            "strongEventCount": 0,
                         }
-                        verifiedCheck.scroll_into_view_if_needed(timeout=20_000)
+                        finalCheck.scroll_into_view_if_needed(timeout=20_000)
                         capabilityScreenshot = (
                             SCREENSHOT_ROOT / colorScheme
-                            / f"{case['name']}-provisional.png"
+                            / f"{case['name']}-{expectedFinalCheckState}.png"
                         )
                         captureStableViewport(page, capabilityScreenshot)
                         checkCapabilityEvidence["screenshot"] = str(
@@ -7218,6 +7382,19 @@ def runBrowserMatrix(
                                 """,
                                 arg=int(case["expectVerifiedSections"]),
                                 timeout=20_000,
+                            )
+                        checkCapabilityEvidence["verifiedSections"] = page.evaluate(
+                            """
+                            () => Number(
+                              document.querySelector('[data-curriculum-header-progress="true"]')
+                                ?.getAttribute('data-curriculum-header-completed') || 0
+                            )
+                            """
+                        )
+                        localEvidenceExpected = readLocalLearningEvidenceSummary(page)["events"]
+                        if localEvidenceExpected <= beforeEvidenceCount:
+                            raise AssertionError(
+                                "Local solution attempt was not written to the evidence archive"
                             )
                         case["expectedEvidenceCount"] = localEvidenceExpected
                         waitForLocalLearningEvidenceEventCount(page, localEvidenceExpected)
@@ -7236,8 +7413,21 @@ def runBrowserMatrix(
                                 archiveTier: archive?.manifest?.runtimeTier,
                                 allLocal: archive?.events?.every(
                                   (event) => event?.runtimeTier === 'local'
-                                    && String(event?.eventId || '').startsWith('local-strong:')
+                                    && (
+                                      String(event?.eventId || '').startsWith('local-attempt:')
+                                      || String(event?.eventId || '').startsWith('local-strong:')
+                                    )
                                 ),
+                                creditCount: (archive?.events || []).flatMap(
+                                  (event) => event?.canonicalEvents || []
+                                ).filter((event) => event?.kind === 'CreditGranted').length,
+                                strongEventCount: (archive?.events || []).filter(
+                                  (event) => event?.strength === 'strong'
+                                ).length,
+                                weakAttemptCount: (archive?.events || []).filter(
+                                  (event) => event?.kind === 'AttemptObserved'
+                                    && event?.strength === 'weak'
+                                ).length,
                                 artifactEventCount: artifactEvents.length,
                                 allArtifactsSealed: artifactEvents.every((event) => event.artifacts.every(
                                   (artifact) => {
@@ -7287,12 +7477,24 @@ def runBrowserMatrix(
                             localEvidenceIdentity.get("archiveTier") != expectedArchiveTier
                             or localEvidenceIdentity.get("allLocal") is not True
                             or localEvidenceIdentity.get("eventCount") != localEvidenceExpected
+                            or (
+                                expectedFinalCheckState == "provisional"
+                                and (
+                                    localEvidenceIdentity.get("strongEventCount") != 0
+                                    or localEvidenceIdentity.get("creditCount") != 0
+                                    or int(localEvidenceIdentity.get("weakAttemptCount") or 0)
+                                    != localEvidenceExpected
+                                )
+                            )
                             or localEvidenceIdentity.get("allArtifactsSealed") is not True
                             or int(localEvidenceIdentity.get("artifactEventCount") or 0) < localArtifactEvidenceExpected
                             or localEvidenceIdentity.get("allPackagesSealed") is not True
                             or int(localEvidenceIdentity.get("packageEventCount") or 0) < localPackageEvidenceExpected
                         ):
                             raise AssertionError(f"Local evidence identity is not native: {localEvidenceIdentity}")
+                        checkCapabilityEvidence["strongEventCount"] = int(
+                            localEvidenceIdentity.get("strongEventCount") or 0
+                        )
                         releaseLocalKernelSessions(page, case, localPort)
                         page.reload(wait_until="domcontentloaded", timeout=30_000)
                         page.wait_for_selector("[data-learning-section-card]", timeout=30_000)
@@ -7579,6 +7781,20 @@ def runBrowserMatrix(
                         AUDIT_SCRIPT,
                         {"surface": case["surface"], "expectedTier": case.get("expectedTier")},
                     )
+                    if case.get("verifyLessonScreenBudget"):
+                        devtoolsSession = context.new_cdp_session(page)
+                        try:
+                            accessibilityTree = devtoolsSession.send(
+                                "Accessibility.getFullAXTree"
+                            )
+                            audit["accessibilityNodeCount"] = len(
+                                accessibilityTree.get("nodes") or []
+                            )
+                            # Chromium CDP의 full tree는 Edge compact tree보다 ignored 내부
+                            # node를 더 포함하므로 같은 제품 화면의 엔진별 실측 상한을 따로 둔다.
+                            audit["accessibilityNodeBudget"] = 1650
+                        finally:
+                            devtoolsSession.detach()
                     screenshotPath = SCREENSHOT_ROOT / colorScheme / f"{case['name']}.png"
                     screenshotPath.parent.mkdir(parents=True, exist_ok=True)
                     captureStableViewport(page, screenshotPath)
@@ -7852,17 +8068,18 @@ def runBrowserMatrix(
                         if results and results[-1].get("name") == case["name"]:
                             results[-1].setdefault("failures", []).append(message)
 
-                    try:
-                        if not page.is_closed():
-                            releaseLocalKernelSessions(page, case, localPort)
-                    except (OSError, PlaywrightError, RuntimeError, ValueError) as exc:
-                        recordCleanupFailure("kernel release", exc)
+                    localPageLifecycle = not page.is_closed() and urlsplit(page.url).port == localPort
                     try:
                         if not page.is_closed():
                             page.goto("about:blank", wait_until="commit", timeout=5_000)
                             page.wait_for_timeout(150)
                     except PlaywrightError as exc:
                         recordCleanupFailure("navigation", exc)
+                    try:
+                        if localPageLifecycle:
+                            waitForLocalKernelSessionsReleased(localPort)
+                    except (OSError, RuntimeError, TimeoutError, ValueError) as exc:
+                        recordCleanupFailure("kernel release", exc)
                     try:
                         context.close()
                     except PlaywrightError as exc:
@@ -7919,6 +8136,52 @@ def main() -> int:
         if localState is not None:
             localState.cleanup()
 
+    casesByName = {case.get("name"): case for case in results}
+    webCanonical = casesByName.get("web-lesson-mobile")
+    localCanonical = casesByName.get("local-strong-learning-desktop")
+    canonicalLearningParity: dict[str, Any] | None = None
+    if webCanonical is not None and localCanonical is not None:
+        webEvidence = webCanonical.get("checkCapabilityEvidence") or {}
+        localEvidence = localCanonical.get("checkCapabilityEvidence") or {}
+        normalizeOutput = lambda value: "\n".join(
+            line.rstrip() for line in str(value or "").strip().splitlines()
+        )
+        webOutput = normalizeOutput(webEvidence.get("output"))
+        localOutput = normalizeOutput(localEvidence.get("output"))
+        sameOutput = webOutput == localOutput == "Hello Codaro"
+        bothBehaviorPassed = (
+            webEvidence.get("behaviorPassed") is True
+            and localEvidence.get("behaviorPassed") is True
+        )
+        creditPolicyAligned = (
+            webEvidence.get("state") == "verified"
+            and webEvidence.get("evidence") == "strong"
+            and int(webEvidence.get("verifiedSections") or 0) == 1
+            and localEvidence.get("state") == "provisional"
+            and localEvidence.get("evidence") == "practice"
+            and int(localEvidence.get("verifiedSections") or 0) == 0
+        )
+        parityPassed = sameOutput and bothBehaviorPassed and creditPolicyAligned
+        canonicalLearningParity = {
+            "status": "passed" if parityPassed else "failed",
+            "sameLesson": "30days/day01_헬로월드",
+            "sameOutput": sameOutput,
+            "bothBehaviorPassed": bothBehaviorPassed,
+            "creditPolicyAligned": creditPolicyAligned,
+            "productCompletionEligible": localEvidence.get("evidence") == "strong",
+            "completionBlocker": (
+                None
+                if localEvidence.get("evidence") == "strong"
+                else "Local OS 격리 검증기가 없어 동작 확인은 강한 학습 진도로 승격되지 않았다."
+            ),
+            "web": webEvidence,
+            "local": localEvidence,
+        }
+        if not parityPassed:
+            failures.append(
+                "canonical Web and Local learning report did not preserve output and evidence policy"
+            )
+
     report = {
         "gate": os.environ.get("CODARO_PRODUCT_GATE", "product-experience-browser"),
         "status": "passed" if not failures else "failed",
@@ -7931,6 +8194,7 @@ def main() -> int:
         "browser": {"engine": "chromium", "version": browserVersion},
         "caseCount": len(results),
         "cases": results,
+        "canonicalLearningParity": canonicalLearningParity,
         "failures": failures,
         "reportPath": str(reportPath.relative_to(ROOT)).replace("\\", "/"),
         "scope": "representative Chromium matrix; full engine and manual AT release matrices remain separate",

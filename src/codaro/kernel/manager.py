@@ -111,28 +111,38 @@ class SessionManager:
 
     def destroySession(self, sessionId: str) -> bool:
         with self._lock:
-            session = self._sessions.pop(sessionId, None)
-            self._lastActivity.pop(sessionId, None)
-        if session is None:
-            return False
-        session.dispose()
+            session = self._sessions.get(sessionId)
+            if session is None:
+                return False
+            try:
+                session.dispose()
+            finally:
+                self._sessions.pop(sessionId, None)
+                self._lastActivity.pop(sessionId, None)
         if self._onSessionDestroyed is not None:
             self._onSessionDestroyed(session)
         return True
 
     def destroyAll(self) -> None:
+        errors: list[BaseException] = []
+        disposed: list[KernelSession] = []
         with self._lock:
             sessions = list(self._sessions.values())
-            self._sessions.clear()
-            self._lastActivity.clear()
-        errors: list[BaseException] = []
-        for session in sessions:
-            try:
-                session.dispose()
-                if self._onSessionDestroyed is not None:
+            for session in sessions:
+                try:
+                    session.dispose()
+                    disposed.append(session)
+                except (OSError, RuntimeError) as error:
+                    errors.append(error)
+                finally:
+                    self._sessions.pop(session.sessionId, None)
+                    self._lastActivity.pop(session.sessionId, None)
+        if self._onSessionDestroyed is not None:
+            for session in disposed:
+                try:
                     self._onSessionDestroyed(session)
-            except (OSError, RuntimeError) as error:
-                errors.append(error)
+                except (OSError, RuntimeError) as error:
+                    errors.append(error)
         if errors:
             raise RuntimeError(
                 f"failed to destroy {len(errors)} of {len(sessions)} sessions: {errors[0]}"

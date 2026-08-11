@@ -98,7 +98,8 @@ type MainSurfaceProps = {
 };
 
 export function MainSurface(props: MainSurfaceProps) {
-  const waitsForCurriculumLesson = props.surface === "curriculum" && Boolean(props.selectedContentId);
+  const waitsForNestedReadySurface = props.surface === "home"
+    || (props.surface === "curriculum" && Boolean(props.selectedContentId));
   return (
     <div
       className="h-full min-h-0 min-w-0 outline-none"
@@ -108,8 +109,8 @@ export function MainSurface(props: MainSurfaceProps) {
       <Suspense fallback={<SurfaceLoading surface={props.surface} />}>
         <div
           className="h-full min-h-0 min-w-0"
-          data-product-surface-ready={waitsForCurriculumLesson ? undefined : props.surface}
-          data-product-surface-state={waitsForCurriculumLesson ? "content-loading" : "ready"}
+          data-product-surface-ready={waitsForNestedReadySurface ? undefined : props.surface}
+          data-product-surface-state={waitsForNestedReadySurface ? "content-loading" : "ready"}
         >
           <MainSurfaceContent {...props} />
         </div>

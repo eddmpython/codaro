@@ -368,6 +368,8 @@ def testNotebookRuntimeReleasesKernelSessionOnPageHide() -> None:
     assert "codaroApi.destroySession(sessionId, options.keepalive ?? false)" in runtime
     assert 'window.addEventListener("pagehide", release)' in runtimeHook
     assert "releaseRuntimeSession(sessionId, { keepalive: true })" in runtimeHook
+    assert "runtimeActiveRef.current = false" in runtimeHook
+    assert "releaseAbandonedSession(outcome.sessionId)" in runtimeHook
 
 
 def testAutomationBlocksRemainExecutableInNotebookModel() -> None:

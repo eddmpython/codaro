@@ -24,7 +24,7 @@ export type LearningAttemptCheck = {
   packages?: LearningEvidencePackageAsset[];
   passed: boolean;
   source: string;
-  state: "error" | "mismatch" | "unsupported" | "verified";
+  state: "error" | "mismatch" | "provisional" | "unsupported" | "verified";
 };
 
 export async function evaluateLearningAttempt(
@@ -208,13 +208,14 @@ function decodePythonStringRepr(value: string): string {
 }
 
 function learnerFeedback(
-  state: "error" | "mismatch" | "unsupported" | "verified",
+  state: "error" | "mismatch" | "provisional" | "unsupported" | "verified",
   detail: string,
 ): string {
   if (state === "verified") {
     return acceptedDifferenceFeedback(detail) ? detail : "목표대로 동작했습니다.";
   }
   if (state === "mismatch") return detail;
+  if (state === "provisional") return detail;
   if (state === "unsupported") return detail;
   return "자동 확인을 마치지 못했습니다. 잠시 뒤 셀을 다시 실행해 주세요.";
 }

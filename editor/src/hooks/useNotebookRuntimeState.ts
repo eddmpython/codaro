@@ -87,6 +87,7 @@ export function useNotebookRuntimeState({
   const [diagnostics, setDiagnostics] = useState<ReactiveDiagnostics>(emptyReactiveDiagnostics);
   const [capability, setCapability] = useState<PublicationCompilationReport | null>(null);
   const [automationSessions, setAutomationSessions] = useState<Record<string, string>>({});
+  const runtimeActiveRef = useRef(true);
   // 마지막 실행 시점에 보낸 셀 내용 스냅샷. 이후 draft가 달라지면 그 셀과 다운스트림이 stale.
   const [lastRunContent, setLastRunContent] = useState<Record<string, string>>({});
 
@@ -94,6 +95,24 @@ export function useNotebookRuntimeState({
   const hasRunnableNotebook = codeBlocks.some((block) => (drafts[block.id] ?? block.content).trim());
   const currentResult = selectedBlock ? results[selectedBlock.id] : undefined;
   const canRun = true;
+
+  useEffect(() => {
+    runtimeActiveRef.current = true;
+    const deactivate = () => {
+      runtimeActiveRef.current = false;
+    };
+    window.addEventListener("pagehide", deactivate);
+    return () => {
+      runtimeActiveRef.current = false;
+      window.removeEventListener("pagehide", deactivate);
+    };
+  }, []);
+
+  const releaseAbandonedSession = useCallback(async (outcomeSessionId: string | null | undefined) => {
+    if (runtimeActiveRef.current) return false;
+    if (outcomeSessionId) await releaseRuntimeSession(outcomeSessionId);
+    return true;
+  }, []);
 
   const resetRuntimeState = useCallback(() => {
     setResults({});
@@ -134,7 +153,7 @@ export function useNotebookRuntimeState({
   }, [apiOnline, document, drafts, inspectPublication, sourcePath, surface]);
 
   const executeBlock = useCallback(async (block: BlockConfig, sourceOverride?: string) => {
-    if (!isExecutableBlock(block)) return;
+    if (!runtimeActiveRef.current || !isExecutableBlock(block)) return;
     const code = sourceOverride ?? resolveBlockRunCode(block, drafts, { emptySnippetFallback: surface === "curriculum" });
     setRunningBlockId(block.id);
     onNotice({ tone: "default", title: translate("runtime.cellRunning"), detail: blockLabel(block) });
@@ -153,6 +172,7 @@ export function useNotebookRuntimeState({
           previousVariables: variables,
           sessionId,
         });
+        if (await releaseAbandonedSession(outcome.sessionId)) return;
         if (outcome.sessionId && outcome.sessionId !== sessionId) setSessionId(outcome.sessionId);
         if (outcome.results) {
           setResults((current) => ({ ...current, ...outcome.results }));
@@ -182,6 +202,7 @@ export function useNotebookRuntimeState({
         sessionId,
         automationSessionId: automationSessions[block.id] ?? null,
       });
+      if (await releaseAbandonedSession(outcome.sessionId)) return;
       if (outcome.sessionId && outcome.sessionId !== sessionId) setSessionId(outcome.sessionId);
       if (outcome.automationSessionKey) {
         setAutomationSessions((current) => applyAutomationSessionOutcome(
@@ -199,7 +220,7 @@ export function useNotebookRuntimeState({
       if (outcome.variables) setVariables(outcome.variables);
       if (outcome.notice) onNotice(outcome.notice);
     } finally {
-      setRunningBlockId(null);
+      if (runtimeActiveRef.current) setRunningBlockId(null);
     }
   }, [
     apiOnline,
@@ -210,6 +231,7 @@ export function useNotebookRuntimeState({
     onNotice,
     reactiveCellExecution,
     reactiveEnabled,
+    releaseAbandonedSession,
     results,
     sessionId,
     surface,
@@ -233,6 +255,7 @@ export function useNotebookRuntimeState({
   }, [executeBlock, selectNotebookBlock, surface]);
 
   const runNotebook = useCallback(async () => {
+    if (!runtimeActiveRef.current) return;
     const defaultBlock = codeBlocks.find(isKernelExecutableBlock) ?? codeBlocks[0];
     const firstBlock = selectedBlock && isExecutableBlock(selectedBlock) ? selectedBlock : defaultBlock;
     if (!firstBlock) return;
@@ -250,6 +273,7 @@ export function useNotebookRuntimeState({
         sessionId,
         automationSessionId: automationSessions[firstBlock.id] ?? null,
       });
+      if (await releaseAbandonedSession(outcome.sessionId)) return;
       if (outcome.sessionId && outcome.sessionId !== sessionId) setSessionId(outcome.sessionId);
       if (outcome.automationSessionKey) {
         setAutomationSessions((current) => applyAutomationSessionOutcome(
@@ -277,12 +301,12 @@ export function useNotebookRuntimeState({
       }
       if (outcome.notice) onNotice(outcome.notice);
     } finally {
-      setNotebookRunning(false);
+      if (runtimeActiveRef.current) setNotebookRunning(false);
     }
-  }, [apiOnline, automationSessions, codeBlocks, document, drafts, onNotice, selectedBlock, sessionId, variables]);
+  }, [apiOnline, automationSessions, codeBlocks, document, drafts, onNotice, releaseAbandonedSession, selectedBlock, sessionId, variables]);
 
   const setUiValue = useCallback(async (blockId: string, elementId: string, value: unknown) => {
-    if (!sessionId && apiOnline) return;
+    if (!runtimeActiveRef.current || (!sessionId && apiOnline)) return;
     // 위젯 값 변경 → 그 변수를 쓰는 다운스트림 셀 출력만 갱신(위젯 정의 셀은 재실행 안 함).
     const outcome = await setNotebookUiValue({
       sessionId,
@@ -293,11 +317,12 @@ export function useNotebookRuntimeState({
       value,
       previousVariables: variables,
     });
+    if (await releaseAbandonedSession(outcome.sessionId)) return;
     if (outcome.sessionId !== sessionId) setSessionId(outcome.sessionId);
     if (outcome.results) setResults((current) => ({ ...current, ...outcome.results }));
     if (outcome.variables) setVariables(outcome.variables);
     if (outcome.diagnostics) setDiagnostics(outcome.diagnostics);
-  }, [apiOnline, sessionId, document, drafts, variables]);
+  }, [apiOnline, sessionId, document, drafts, releaseAbandonedSession, variables]);
 
   // 코드 편집(draft≠마지막 실행 내용)으로 stale해진 셀 + 다운스트림 전이 + 백엔드 early-stop stale.
   const staleBlockIds = useMemo(() => {

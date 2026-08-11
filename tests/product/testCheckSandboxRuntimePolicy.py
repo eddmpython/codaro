@@ -160,6 +160,7 @@ def test_runtime_policy_requires_native_isolation_before_local_strong_evidence()
 
   let localCalls = 0;
   let localIsolation = "python-audit-hook";
+  let localPassed = true;
   let localWindowsBuild = null;
   const localExecutor = load({json.dumps(str(LOCAL_EXECUTOR))}, (specifier) => {{
     if (specifier === "@/lib/api") return {{
@@ -173,8 +174,8 @@ def test_runtime_policy_requires_native_isolation_before_local_strong_evidence()
             executor: "local-sandbox",
             expected: "ok",
             isolation: localIsolation,
-            passed: true,
-            state: "verified",
+            passed: localPassed,
+            state: localPassed ? "verified" : "mismatch",
             windowsBuild: localWindowsBuild,
           }};
         }},
@@ -196,16 +197,27 @@ def test_runtime_policy_requires_native_isolation_before_local_strong_evidence()
   const provisional = await localExecutor.executeLocalStrongCheck({{ ...behaviorSpec, kind: "output" }}, "print('ok')");
   assert.equal(provisional.passed, true);
   assert.equal(provisional.strongEligible, false);
+  assert.equal(provisional.state, "provisional");
   assert.match(provisional.detail, /강한 학습 증거/);
   assert.equal(localCalls, 1);
+
+  localPassed = false;
+  const mismatch = await localExecutor.executeLocalStrongCheck({{ ...behaviorSpec, kind: "output" }}, "print('no')");
+  assert.equal(mismatch.passed, false);
+  assert.equal(mismatch.strongEligible, false);
+  assert.equal(mismatch.state, "mismatch");
+  assert.equal(mismatch.detail, "provisional pass");
+  assert.equal(localCalls, 2);
+  localPassed = true;
 
   localIsolation = "windows-appcontainer";
   localWindowsBuild = 19045;
   const native = await localExecutor.executeLocalStrongCheck({{ ...behaviorSpec, kind: "output" }}, "print('ok')");
   assert.equal(native.passed, true);
   assert.equal(native.strongEligible, true);
+  assert.equal(native.state, "verified");
   assert.equal(native.detail, "provisional pass");
-  assert.equal(localCalls, 2);
+  assert.equal(localCalls, 3);
 
   localWindowsBuild = 19044;
   const unsupportedBuild = await localExecutor.executeLocalStrongCheck(
@@ -214,8 +226,9 @@ def test_runtime_policy_requires_native_isolation_before_local_strong_evidence()
   );
   assert.equal(unsupportedBuild.passed, true);
   assert.equal(unsupportedBuild.strongEligible, false);
+  assert.equal(unsupportedBuild.state, "provisional");
   assert.match(unsupportedBuild.detail, /강한 학습 증거/);
-  assert.equal(localCalls, 3);
+  assert.equal(localCalls, 4);
   localWindowsBuild = 19045;
 
   let localAttemptResult = provisional;
@@ -248,6 +261,7 @@ def test_runtime_policy_requires_native_isolation_before_local_strong_evidence()
   );
   assert.equal(checked.passed, true);
   assert.equal(checked.evidence, "practice");
+  assert.equal(checked.state, "provisional");
   assert.match(checked.feedback, /강한 학습 증거/);
 
   localAttemptResult = native;
@@ -259,6 +273,7 @@ def test_runtime_policy_requires_native_isolation_before_local_strong_evidence()
   );
   assert.equal(nativeChecked.passed, true);
   assert.equal(nativeChecked.evidence, "strong");
+  assert.equal(nativeChecked.state, "verified");
   assert.equal(nativeChecked.feedback, "목표대로 동작했습니다.");
 }})().catch((error) => {{
   console.error(error);
