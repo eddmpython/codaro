@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sourceManifestHash": "sha256-4810df8ebc0df2cf467a429fd93296e7ed6262898daef8f7a9285bf38f219bcd",
+  "sourceManifestHash": "sha256-ec6dbe9ccd25ca88e43a205583ff19d3d59da073bf3cfe66a2a4883fafcfa5dd",
   "assets": [
     {
       "id": "runLearningDetail",
@@ -2670,8 +2670,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run/local-required-light.png",
-      "sourceHash": "sha256-f08120d2b2b0d40a1e4d763b9223f0a2908625a97450f0d75342331996bada79",
-      "sourceGitHead": "3b333faf1cdafa64f96de71c5ba9bc7667876d8d",
+      "sourceHash": "sha256-c65f5a4ecf95b213d4ee027b3b798933d11aa9e70ad4cd5ad5adcc00bb82268f",
+      "sourceGitHead": "65f80afbd159d0f387c145506a3b72daa24b178e",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -2759,51 +2759,51 @@
       "themePairId": "runStateLocalRequired",
       "outputs": [
         {
-          "byteLength": 10848,
+          "byteLength": 10788,
           "format": "avif",
           "height": 405,
-          "integrity": "sha256-c42fc8b6e3a51adba4f86e9ecbacf429c9416a77e23ce2d614cac6e3ba9b8549",
-          "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-480-f08120d2b2b0.avif",
+          "integrity": "sha256-2c445b7580cb4b6cab3f814104e090d9955113ed2e3885afea607425c0236225",
+          "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-480-c65f5a4ecf95.avif",
           "width": 480
         },
         {
-          "byteLength": 11202,
+          "byteLength": 11352,
           "format": "webp",
           "height": 405,
-          "integrity": "sha256-7357973d27417473587ef19ad1900c630b072735c40f50e21422d62d4b8aacf1",
-          "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-480-f08120d2b2b0.webp",
+          "integrity": "sha256-67b3bf1dfa18c3498afbbb559431d5337afc4dd3d9a82d209c0168a27711ddc2",
+          "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-480-c65f5a4ecf95.webp",
           "width": 480
         },
         {
-          "byteLength": 20392,
+          "byteLength": 20070,
           "format": "avif",
           "height": 608,
-          "integrity": "sha256-710ba59d4b34831be3b78daf6412691b765986704a902142b02176616e0a0514",
-          "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-720-f08120d2b2b0.avif",
+          "integrity": "sha256-ed681c65963364ed653f39a73b3f7ec777f840a11f622a68af544d20d9a17f86",
+          "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-720-c65f5a4ecf95.avif",
           "width": 720
         },
         {
-          "byteLength": 22510,
+          "byteLength": 22556,
           "format": "webp",
           "height": 608,
-          "integrity": "sha256-2827119b5358e92bfa4adc62b401c2dfda05f849cf517ea510459a2aebf2f217",
-          "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-720-f08120d2b2b0.webp",
+          "integrity": "sha256-4f90aabff61b069b50ccff38181b2d2b7317a890cda7f5a7fa4b5288d4b5088e",
+          "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-720-c65f5a4ecf95.webp",
           "width": 720
         },
         {
-          "byteLength": 22386,
+          "byteLength": 22358,
           "format": "avif",
           "height": 760,
-          "integrity": "sha256-6d7108b0e337481e35270155917803981373225e5a0997a2701bf416d1024969",
-          "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-900-f08120d2b2b0.avif",
+          "integrity": "sha256-2cc2ac2e7ed4482cadfe6c57b99e8fb6a9c00c62a02b89ed3567cc9e016eba6a",
+          "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-900-c65f5a4ecf95.avif",
           "width": 900
         },
         {
-          "byteLength": 31768,
+          "byteLength": 33874,
           "format": "webp",
           "height": 760,
-          "integrity": "sha256-bdc2bf3df260be576b5f0ab21c98831c982879e440baac83641de29becfb000f",
-          "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-900-f08120d2b2b0.webp",
+          "integrity": "sha256-2bc15bb49f21f4ef9d10276089bc4476ed40d183c2ce1c673114447edf374a82",
+          "publicPath": "/visuals/files/runStateLocalRequiredLight/runStateLocalRequiredLight-900-c65f5a4ecf95.webp",
           "width": 900
         }
       ]

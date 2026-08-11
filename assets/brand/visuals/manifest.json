@@ -1751,8 +1751,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run/local-required-light.png",
-      "sourceHash": "sha256-f08120d2b2b0d40a1e4d763b9223f0a2908625a97450f0d75342331996bada79",
-      "sourceGitHead": "3b333faf1cdafa64f96de71c5ba9bc7667876d8d",
+      "sourceHash": "sha256-c65f5a4ecf95b213d4ee027b3b798933d11aa9e70ad4cd5ad5adcc00bb82268f",
+      "sourceGitHead": "65f80afbd159d0f387c145506a3b72daa24b178e",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
