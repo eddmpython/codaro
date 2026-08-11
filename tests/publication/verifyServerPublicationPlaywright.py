@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 import json
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 import threading
@@ -24,6 +25,18 @@ SECRET_VALUE = "server-browser-secret-canary-24680"
 
 def utcTimestamp() -> str:
     return datetime.now(tz=UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def gitHead() -> str:
+    completed = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    )
+    return completed.stdout.strip()
 
 
 def publicationDocument(path: Path) -> None:
@@ -88,6 +101,7 @@ def main() -> int:
     report: dict[str, object] = {
         "schemaVersion": 1,
         "gate": "server-publication",
+        "gitHead": gitHead(),
         "generatedAt": utcTimestamp(),
         "status": "failed",
     }
@@ -228,7 +242,7 @@ def main() -> int:
                 raise AssertionError("server publication이 종료 시간 안에 session worker를 정리하지 못했습니다.")
             server = None
             thread = None
-    except BaseException as error:
+    except Exception as error:  # noqa: BLE001 - gate report must retain unexpected failures
         report["error"] = f"{type(error).__name__}: {error}"
         report["externalRequests"] = externalRequests
         report["failedRequests"] = failedRequests
@@ -237,8 +251,8 @@ def main() -> int:
         if pageOne is not None:
             try:
                 report["bodyText"] = pageOne.locator("body").inner_text()[:4000]
-            except BaseException:
-                pass
+            except Exception as diagnosticError:  # noqa: BLE001 - diagnostics must not mask the original error
+                report["bodyTextError"] = f"{type(diagnosticError).__name__}: {diagnosticError}"
         REPORT_PATH.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
         print(json.dumps(report, ensure_ascii=False, indent=2))
         return 1

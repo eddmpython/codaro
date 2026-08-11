@@ -45,6 +45,18 @@ def utcTimestamp() -> str:
     return datetime.now(tz=UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def gitHead() -> str:
+    completed = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    )
+    return completed.stdout.strip()
+
+
 def lessonSolutions() -> tuple[str, str]:
     content = yaml.safe_load(LESSON_PATH.read_text(encoding="utf-8"))
     assessment = content["assessment"]
@@ -678,6 +690,7 @@ def main() -> int:
     report: dict[str, object] = {
         "schemaVersion": 2,
         "gate": "learning-product-bridge",
+        "gitHead": gitHead(),
         "generatedAt": utcTimestamp(),
         "status": "failed",
     }

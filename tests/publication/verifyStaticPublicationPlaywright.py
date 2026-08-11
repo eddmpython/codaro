@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 import json
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 import threading
@@ -17,6 +18,18 @@ REPORT_PATH = REPORT_DIR / "static-publication-report.json"
 
 def utcTimestamp() -> str:
     return datetime.now(tz=UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def gitHead() -> str:
+    completed = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    )
+    return completed.stdout.strip()
 
 
 def publicationDocument(path: Path) -> None:
@@ -66,6 +79,7 @@ def main() -> int:
     report: dict[str, object] = {
         "schemaVersion": 1,
         "gate": "static-publication",
+        "gitHead": gitHead(),
         "generatedAt": utcTimestamp(),
         "status": "failed",
     }
@@ -152,7 +166,7 @@ def main() -> int:
                 report["screenshot"] = str(screenshot.relative_to(ROOT)).replace("\\", "/")
                 context.close()
                 browser.close()
-    except BaseException as error:
+    except Exception as error:  # noqa: BLE001 - gate report must retain unexpected failures
         report["error"] = f"{type(error).__name__}: {error}"
         report["externalRequests"] = externalRequests
         report["failedRequests"] = failedRequests
@@ -164,8 +178,8 @@ def main() -> int:
                 screenshot = REPORT_DIR / "static-publication-failed.png"
                 page.screenshot(path=str(screenshot), full_page=False)
                 report["screenshot"] = str(screenshot.relative_to(ROOT)).replace("\\", "/")
-            except BaseException:
-                pass
+            except Exception as diagnosticError:  # noqa: BLE001 - diagnostics must not mask the original error
+                report["bodyTextError"] = f"{type(diagnosticError).__name__}: {diagnosticError}"
         REPORT_PATH.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
         print(json.dumps(report, ensure_ascii=False, indent=2))
         return 1

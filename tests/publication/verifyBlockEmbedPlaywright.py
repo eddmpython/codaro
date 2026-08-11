@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 import json
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 import threading
@@ -17,6 +18,18 @@ REPORT_PATH = REPORT_DIR / "block-embedding-report.json"
 
 def utcTimestamp() -> str:
     return datetime.now(tz=UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def gitHead() -> str:
+    completed = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    )
+    return completed.stdout.strip()
 
 
 def publicationDocument(path: Path) -> None:
@@ -54,6 +67,7 @@ def main() -> int:
     report: dict[str, object] = {
         "schemaVersion": 1,
         "gate": "block-embedding",
+        "gitHead": gitHead(),
         "generatedAt": utcTimestamp(),
         "status": "failed",
     }
