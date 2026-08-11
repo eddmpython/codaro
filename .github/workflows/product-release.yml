@@ -50,14 +50,11 @@ jobs:
       - name: Run tests
         run: uv run --extra dev pytest tests/ -v --tb=short
 
-      - name: Stage base curriculum into package
-        run: |
-          rm -rf src/codaro/curricula
-          cp -r curricula src/codaro/curricula
-          test -f src/codaro/curricula/python/__init__.py
+      - name: Build and verify distribution payload
+        run: uv run python -X utf8 docs/skills/ops/tools/buildPythonDistribution.py --output-root dist
 
-      - name: Build wheel
-        run: uv build
+      - name: Verify Python SDK from the built wheel
+        run: uv run python -X utf8 tests/packaging/verifyPythonSdk.py --dist-root dist --skip-build
 
       - name: Read package version
         id: package
@@ -85,34 +82,6 @@ jobs:
           path: .
           format: spdx-json
           output-file: release-assets/codaro.spdx.json
-
-      - name: Verify wheel includes editor frontend and base curriculum
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          import zipfile
-
-          wheel = next(Path("dist").glob("codaro-*.whl"))
-          with zipfile.ZipFile(wheel) as archive:
-              names = set(archive.namelist())
-          if "codaro/webBuild/index.html" not in names:
-              raise SystemExit("codaro/webBuild/index.html missing from wheel")
-          if not any(name.startswith("codaro/webBuild/_app/") for name in names):
-              raise SystemExit("codaro/webBuild/_app/ assets missing from wheel")
-          if "codaro/curricula/python/__init__.py" not in names:
-              raise SystemExit("codaro/curricula/python/__init__.py missing from wheel")
-          if "codaro/generatedContracts/artifactOwnership.py" not in names:
-              raise SystemExit("generated product contract type missing from wheel")
-          if "codaro/generatedContracts/artifactOwnership.schema.json" not in names:
-              raise SystemExit("generated product contract schema missing from wheel")
-          lessonCount = sum(
-              1 for name in names
-              if name.startswith("codaro/curricula/python/") and name.endswith(".yaml")
-          )
-          if lessonCount == 0:
-              raise SystemExit("codaro/curricula/python/*.yaml lessons missing from wheel")
-          print(f"verified packaged editor frontend and {lessonCount} curriculum lessons in {wheel}")
-          PY
 
       - name: Upload dist artifact
         uses: actions/upload-artifact@v4
