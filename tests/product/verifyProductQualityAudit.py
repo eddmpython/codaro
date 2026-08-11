@@ -302,7 +302,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "\"commands\": [\"doctor\", \"state show\"]",
                 "HEALTH_TIMEOUT",
                 "backendWheel:codaro/webBuild",
-                "Verify wheel includes editor frontend",
+                "python-distribution-payload-builder",
                 "stage_release_can_use_editor_build_bundled_in_backend_wheel",
                 "launch_config_uses_bundled_editor_when_archive_editor_is_missing",
                 "last-known-good-release.json",

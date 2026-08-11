@@ -107,14 +107,24 @@ EVIDENCE = (
         ),
     ),
     Evidence(
+        "python-distribution-payload-builder",
+        "docs/skills/ops/tools/buildPythonDistribution.py",
+        (
+            "stagePythonBuildContext",
+            "verifyPythonDistribution",
+            "codaro/webBuild/index.html",
+            "codaro/webBuild/_app/",
+            "codaro/curricula/python/__init__.py",
+        ),
+    ),
+    Evidence(
         "packaged-editor-wheel-publish-gate",
         ".github/workflows/product-release.yml",
         (
-            "Verify wheel includes editor frontend",
-            "codaro/webBuild/index.html",
-            "codaro/webBuild/_app/",
-            "Stage base curriculum into package",
-            "codaro/curricula/python/__init__.py",
+            "Build and verify distribution payload",
+            "docs/skills/ops/tools/buildPythonDistribution.py",
+            "Verify Python SDK from the built wheel",
+            "tests/packaging/verifyPythonSdk.py",
         ),
     ),
     Evidence(
