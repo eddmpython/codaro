@@ -84,7 +84,7 @@ let browserExecutionQueue: Promise<void> = Promise.resolve();
 const stdoutLines: string[] = [];
 const stderrLines: string[] = [];
 let previousVariables = new Map<string, VariableInfo>();
-const attemptedPackages = new Set<string>();
+const loadedPackages = new Set<string>();
 const browserFsRoot = "/home/web/codaro";
 const browserFsCellsDir = `${browserFsRoot}/cells`;
 const browserFsRunsDir = `${browserFsRoot}/runs`;
@@ -355,13 +355,14 @@ async function ensurePackages(runtime: PyRuntime, packages: string[]): Promise<v
   for (const name of packages) {
     const requested = name.trim();
     const key = requested.toLowerCase();
-    if (!key || attemptedPackages.has(key)) continue;
-    attemptedPackages.add(key);
+    if (!key || loadedPackages.has(key)) continue;
     try {
       await runtime.loadPackages([requested]);
+      loadedPackages.add(key);
     } catch {
       try {
         await runtime.install(requested);
+        loadedPackages.add(key);
       } catch (error) {
         console.warn(`browser kernel package unavailable: ${key}`, error);
       }
@@ -719,10 +720,14 @@ function normalizeBrowserPythonResult(value: unknown): {
 function pythonProxyToJs(value: unknown): unknown {
   const proxy = value as { toJs?: (options?: Record<string, unknown>) => unknown };
   if (typeof proxy?.toJs !== "function") return value;
-  return proxy.toJs({
-    create_pyproxies: false,
-    dict_converter: (entries: Iterable<readonly [PropertyKey, unknown]>) => Object.fromEntries(entries),
-  });
+  try {
+    return proxy.toJs({
+      create_pyproxies: false,
+      dict_converter: (entries: Iterable<readonly [PropertyKey, unknown]>) => Object.fromEntries(entries),
+    });
+  } catch {
+    return null;
+  }
 }
 
 function isBrowserWidgetDescriptor(value: unknown): value is Record<string, unknown> {

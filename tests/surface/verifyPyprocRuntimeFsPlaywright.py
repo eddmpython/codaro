@@ -204,6 +204,18 @@ def jsVerifyPyprocRuntimeFs() -> str:
   const checks = [];
   const diagnostics = window.__codaroBrowserPythonDiagnostics;
   if (!diagnostics) throw new Error('browser runtime diagnostics not installed');
+  const pyodideManifest = await fetch('/pyodide-assets.json', { cache: 'no-store' }).then((response) => response.json());
+  const expectedPackageBase = `https://cdn.jsdelivr.net/pyodide/v${pyodideManifest.packageVersion}/full/`;
+  if (pyodideManifest.packageBaseUrl !== expectedPackageBase) {
+    throw new Error('pyodide package base is not version-pinned: ' + pyodideManifest.packageBaseUrl);
+  }
+  const pyodideLock = await fetch('/vendor/pyodide/pyodide-lock.json', { cache: 'no-store' })
+    .then((response) => response.json());
+  const matplotlibWheel = pyodideLock.packages?.matplotlib?.file_name;
+  if (typeof matplotlibWheel !== 'string' || !matplotlibWheel.startsWith(expectedPackageBase)) {
+    throw new Error('matplotlib wheel is not resolved against the pinned package base: ' + matplotlibWheel);
+  }
+  checks.push({ caseId: 'pyodide-package-base', passed: true, status: 'passed', packageBaseUrl: expectedPackageBase });
   const firstCode = "value = 41\\nvalue + 1";
   const first = await diagnostics.executeBlock('cell-fs-source', firstCode, 1, []);
   if (first.status !== 'success') throw new Error('first browser cell failed: ' + first.stderr);
