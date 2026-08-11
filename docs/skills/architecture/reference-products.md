@@ -47,7 +47,7 @@ whenToUse: app runtime, publication, embed, Task, 배포, landing 제품 문구 
 
 기계 검증은 reference source의 plain Python 실행과 app projection, 해당 target build와 serve, 계산기 output·interactive·editable embed, 로컬 publication, content hash가 연결된 deployment receipt와 rollback, localhost 또는 LAN bundle 검증까지다. 학습 strong evidence에서 Task operational proof로 이어지는 same-source 계약은 [[learning-product-bridge]]의 Day30 golden이 별도로 증명한다.
 
-빈 환경 built wheel의 public Python SDK와 CLI는 `python-sdk` gate가 green이 되기 전까지 reference claim의 not-verified 경계다. 공용 인터넷 URL의 DNS, TLS, uptime, provider 지속성, 인간 학습 효과, `shared` app state, 범용 IDE 전체와 browser bundle source 비공개성도 증명하지 않는다.
+빈 환경 built wheel의 public Python SDK와 CLI는 `python-sdk` gate가 direct wheel, `uv add --find-links`, exact wheel `uvx`, root import, server mount, CLI와 package data를 통과할 때만 machine-verified 범위에 들어간다. 공용 인터넷 URL의 DNS, TLS, uptime, provider 지속성, 인간 학습 효과, `shared` app state, 범용 IDE 전체와 browser bundle source 비공개성은 증명하지 않는다.
 
 README와 landing은 manifest의 `machineVerified` 범위보다 넓은 효과나 가용성을 약속할 수 없다. `verifyReferenceProducts.py`가 source 보존, plain Python 실행, compiler target과 공개 문구를 먼저 검사하고, Playwright 검증은 그 machine report가 통과한 경우에만 시작한다.
 

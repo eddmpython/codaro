@@ -298,11 +298,11 @@ def validatePythonProductClaims(failures: list[str]) -> dict[str, int]:
         "전체 앱 publication",
         "output, interactive, editable embed",
         "operational proof 승격",
+        "public Python SDK와 CLI",
     ):
         if token not in machineText:
             failures.append(f"machine-verified Python product claim is missing {token}")
     for token in (
-        "public Python SDK와 CLI",
         "uptime, DNS, TLS",
         "hideCode의 보안성",
         "shared app state",

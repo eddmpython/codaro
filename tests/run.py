@@ -157,6 +157,7 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "plan-quality": (
         "output/test-runner/plan-quality/plan-fact-audit.json",
     ),
+    "python-sdk": ("output/test-runner/python-sdk/python-sdk-report.json",),
     "provider-settings-browser": ("output/test-runner/provider-settings-browser/provider-settings-report.json",),
     "playwright-curriculum-runtime": (
         "output/test-runner/playwright-curriculum-runtime/playwright-curriculum-runtime-report.json",
@@ -374,6 +375,32 @@ GATES: dict[str, Gate] = {
                 "uv", "run", "python", "-X", "utf8",
                 "tests/automation/verifyAutomationProofStatesPlaywright.py",
             ), timeoutSeconds=1200),
+        ),
+    ),
+    "python-sdk": Gate(
+        tier="fast",
+        description="비파괴 build context의 wheel·sdist와 빈 환경 public import, mount, uv add, uvx, CLI, package data를 확인한다.",
+        commands=(
+            command((
+                "uv",
+                "run",
+                "python",
+                "-X",
+                "utf8",
+                "-m",
+                "pytest",
+                "tests/packaging/testPythonSdk.py",
+                "-q",
+                "--tb=short",
+            )),
+            command((
+                "uv",
+                "run",
+                "python",
+                "-X",
+                "utf8",
+                "tests/packaging/verifyPythonSdk.py",
+            ), timeoutSeconds=1800),
         ),
     ),
     "runtime-security": Gate(
@@ -1111,6 +1138,7 @@ PRODUCT_QUALITY_GATES = (
     "backend",
     "runtime-security",
     "architecture-boundary",
+    "python-sdk",
     "publication-compiler",
     "static-publication",
     "server-publication",
@@ -1164,6 +1192,7 @@ PRODUCT_RELEASE_GATES = (
     "backend",
     "runtime-security",
     "architecture-boundary",
+    "python-sdk",
     "publication-compiler",
     "static-publication",
     "server-publication",
@@ -1233,6 +1262,18 @@ def changedCycleGates(paths: tuple[str, ...] | None = None) -> tuple[str, ...]:
         normalized = path.replace("\\", "/")
         if normalized.startswith(("src/", "tests/")) or normalized in {"pyproject.toml", "uv.lock"}:
             addGate("backend")
+        if (
+            normalized in {
+                "pyproject.toml",
+                ".github/workflows/publish.yml",
+                ".github/workflows/publish.yaml",
+                ".github/workflows/product-release.yml",
+            }
+            or normalized == "src/codaro/__init__.py"
+            or normalized.startswith("tests/packaging/")
+            or normalized == "docs/skills/ops/tools/buildPythonDistribution.py"
+        ):
+            addGate("python-sdk")
         if normalized.startswith((
             "src/codaro/automation/eStop.py",
             "src/codaro/automation/operationalProof.py",
@@ -2201,8 +2242,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 73:
-        failures.append(f"expected 73 gates, found {len(GATES)}")
+    if len(GATES) != 74:
+        failures.append(f"expected 74 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

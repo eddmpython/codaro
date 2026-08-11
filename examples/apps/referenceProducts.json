@@ -71,10 +71,10 @@
       "localhost와 LAN에서 검증 가능한 immutable browser, server, local bundle",
       "content hash가 연결된 build, operational, deployment receipt와 rollback",
       "strong learning evidence에서 동일 source 기능 블록, 의미 검증 Task와 operational proof 승격",
-      "provider 없이 생성 가능한 folder, ZIP, self-host 산출물"
+      "provider 없이 생성 가능한 folder, ZIP, self-host 산출물",
+      "built wheel을 빈 환경에 설치한 public Python SDK와 CLI"
     ],
     "notVerified": [
-      "built wheel을 빈 환경에 설치한 public Python SDK와 CLI",
       "공용 인터넷 URL의 uptime, DNS, TLS",
       "인간 학습 효과의 인과 검증",
       "외부 provider의 서비스 지속성",

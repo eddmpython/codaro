@@ -216,7 +216,7 @@ def testReferenceClaimsStayInsideMachineVerifiedBoundary() -> None:
     notVerified = boundary["notVerified"]
     assert "공용 인터넷 URL의 uptime, DNS, TLS" in notVerified
     assert "인간 학습 효과의 인과 검증" in notVerified
-    assert "built wheel을 빈 환경에 설치한 public Python SDK와 CLI" in notVerified
+    assert "built wheel을 빈 환경에 설치한 public Python SDK와 CLI" in machineVerified
     assert any("plain Python 실행" in claim for claim in machineVerified)
     assert any("전체 앱 publication" in claim for claim in machineVerified)
     assert any("output, interactive, editable embed" in claim for claim in machineVerified)
