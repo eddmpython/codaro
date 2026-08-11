@@ -216,8 +216,29 @@ def testReferenceClaimsStayInsideMachineVerifiedBoundary() -> None:
     notVerified = boundary["notVerified"]
     assert "공용 인터넷 URL의 uptime, DNS, TLS" in notVerified
     assert "인간 학습 효과의 인과 검증" in notVerified
+    assert "built wheel을 빈 환경에 설치한 public Python SDK와 CLI" in notVerified
+    assert any("plain Python 실행" in claim for claim in machineVerified)
+    assert any("전체 앱 publication" in claim for claim in machineVerified)
+    assert any("output, interactive, editable embed" in claim for claim in machineVerified)
+    assert any("operational proof 승격" in claim for claim in machineVerified)
     assert all("학습 효과가 입증" not in str(row["claim"]) for row in _products())
     assert all("공용 인터넷에 배포" not in claim for claim in machineVerified)
+
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    for required in (
+        "Codaro형 local-first Python IDE",
+        "전체 앱",
+        "부분 임베딩",
+        "output, interactive, editable",
+        "공용 URL의 DNS, TLS, uptime",
+    ):
+        assert required in readme
+    for unsupported in (
+        "범용 IDE의 모든 기능",
+        "hideCode로 source를 보호",
+        "공용 인터넷 uptime을 보장",
+    ):
+        assert unsupported not in readme
 
 
 def testReadmePublicationQuickstartRunsWithActualCli(tmp_path: Path) -> None:

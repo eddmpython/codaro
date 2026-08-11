@@ -24,7 +24,7 @@ README는 외부 진입점이다. 제품 철학 전체를 README에 길게 복�
 
 ## 제품 사상
 
-Codaro의 제품 표면은 `editor/`다. 현재 `editor/`는 React + shadcn/ui 기준이며, 폐기된 이전 편집기는 제품 기준에서 제외한다.
+Codaro는 평범한 Percent Python 파일을 학습하고 개발하는 Codaro형 local-first Python IDE다. 제품 표면은 `editor/`이며 현재 React + shadcn/ui 기준이다. 폐기된 이전 편집기는 제품 기준에서 제외한다.
 
 제품은 네 개의 1급 표면으로 정리한다.
 
@@ -86,7 +86,7 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [ai-sensory-system](identity/ai-sensory-system.md)
 - [external-channels-mobile](identity/external-channels-mobile.md)
 
-## Architecture (22) - 5층 구조
+## Architecture (25) - 5층 구조
 
 - [repository-structure](architecture/repository-structure.md)
 - [ssot-map](architecture/ssot-map.md)
@@ -102,6 +102,7 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [learning-product-bridge](architecture/learning-product-bridge.md)
 - [deployment-adapters](architecture/deployment-adapters.md)
 - [reference-products](architecture/reference-products.md)
+- [python-product-journey](architecture/python-product-journey.md)
 - [frontend-product-surface](architecture/frontend-product-surface.md)
 - [gui-control-contract](architecture/gui-control-contract.md)
 - [curriculum-authoring](architecture/curriculum-authoring.md)

@@ -15,7 +15,7 @@ whenToUse: app runtime, publication, embed, Task, 배포, landing 제품 문구 
 
 | 제품 | target | 전체 journey |
 | --- | --- | --- |
-| 반응형 견적 계산기 | browser | static build, serve, interactive embed, deploy |
+| 반응형 견적 계산기 | browser | plain Python, app projection, static build, serve, output·interactive·editable embed, deploy |
 | CSV 지역 매출 대시보드 | browser | asset snapshot build, serve, deploy |
 | 운영 상태 snapshot 보고서 | browser | 외부 요청 없는 build, serve, deploy |
 | Secret 참조 서버 상태 앱 | server | server build, session serve, secret redaction, deploy |
@@ -31,6 +31,7 @@ whenToUse: app runtime, publication, embed, Task, 배포, landing 제품 문구 
 - desktop과 390px mobile에서 앱 projection, heading, entry, overflow를 실제 Chromium으로 확인한다.
 - 실패한 reactive output은 stale로 표시하고 수정 뒤 같은 session에서 회복해야 한다.
 - reference source는 build, serve, plain Python 실행으로 수정되지 않는다.
+- IDE, 앱, embed와 publication은 reference source를 복사하거나 전용 문법으로 변환하지 않는다.
 
 ## 성능 예산
 
@@ -44,7 +45,9 @@ whenToUse: app runtime, publication, embed, Task, 배포, landing 제품 문구 
 
 ## 정직한 claim 경계
 
-기계 검증은 reference source별 app, 해당 target build와 serve, 계산기 embed, 로컬 publication, content hash가 연결된 deployment receipt, localhost 또는 LAN bundle 검증까지다. 학습 strong evidence에서 Task operational proof로 이어지는 same-source 계약은 [[learning-product-bridge]]의 Day30 golden이 별도로 증명한다. 공용 인터넷 URL의 DNS, TLS, uptime, provider 지속성, 인간 학습 효과, browser bundle source 비공개성은 증명하지 않는다.
+기계 검증은 reference source의 plain Python 실행과 app projection, 해당 target build와 serve, 계산기 output·interactive·editable embed, 로컬 publication, content hash가 연결된 deployment receipt와 rollback, localhost 또는 LAN bundle 검증까지다. 학습 strong evidence에서 Task operational proof로 이어지는 same-source 계약은 [[learning-product-bridge]]의 Day30 golden이 별도로 증명한다.
+
+빈 환경 built wheel의 public Python SDK와 CLI는 `python-sdk` gate가 green이 되기 전까지 reference claim의 not-verified 경계다. 공용 인터넷 URL의 DNS, TLS, uptime, provider 지속성, 인간 학습 효과, `shared` app state, 범용 IDE 전체와 browser bundle source 비공개성도 증명하지 않는다.
 
 README와 landing은 manifest의 `machineVerified` 범위보다 넓은 효과나 가용성을 약속할 수 없다. `verifyReferenceProducts.py`가 source 보존, plain Python 실행, compiler target과 공개 문구를 먼저 검사하고, Playwright 검증은 그 machine report가 통과한 경우에만 시작한다.
 

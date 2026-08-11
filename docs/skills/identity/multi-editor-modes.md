@@ -21,6 +21,15 @@ Codaro의 제품 표면은 `editor/`이고, 사용자에게 보이는 표면은 
 네 표면 모두 같은 문서 모델, 같은 실행 엔진, 같은 API 위에서 동작한다.
 사용자는 대화로 학습 → 학습 셀에서 공부 → 노트북에서 코드 작성 → 자동화로 등록 → 태스크 예약 실행의 **연속 흐름**을 가진다.
 
+## Codaro형 IDE 경계
+
+Codaro는 범용 편집기 기능 수로 경쟁하는 IDE가 아니다. 평범한 Percent Python source를 편집하고 저장하며 reactive graph로 실행하고, 변수와 출력 확인, 앱 preview, publication 작업면, 자동화 승격까지 같은 source 위에서 잇는 local-first Python IDE다.
+
+- source control UI, 범용 debugger, extension marketplace와 실시간 공동 편집은 필수 제품 claim이 아니다.
+- 전체 앱 publication은 AppSpec과 compiler target을 사용한다.
+- 부분 임베딩은 선택한 entry block과 dependency closure만 output, interactive, editable bundle로 만든다.
+- Python SDK는 같은 authoring API와 publication owner를 library로 노출하며 별도 runtime을 만들지 않는다.
+
 ## 앱 projection
 
 앱은 다섯 번째 편집 표면이 아니라 같은 노트북을 결과 중심으로 읽는 projection이다. 편집기의 `앱 미리보기` 버튼은 한 번의 행동으로 이 projection을 열고, `codaro app notebook.py`는 같은 projection을 editor chrome 없이 연다.
@@ -30,6 +39,7 @@ Codaro의 제품 표면은 `editor/`이고, 사용자에게 보이는 표면은 
 - `notebook`, `stack`, `grid`, `learning` layout과 entry, code visibility, state policy 변경은 AppSpec으로 자동 저장한다.
 - `none`과 `perSession`은 현재 앱 projection에서 실행할 수 있다. `shared`는 안전한 공유 상태 owner가 생기기 전까지 명확한 안내와 함께 실행을 차단한다.
 - 앱은 노트북의 reactive graph, kernel session, widget callback을 그대로 사용한다. 앱 전용 실행기나 복제된 notebook state를 만들지 않는다.
+- 앱 전체를 배포하거나 선택 기능 블록만 다른 페이지에 넣을 수 있다. 두 경로 모두 같은 source와 compiler closure를 사용하고, 부분 임베딩을 다섯 번째 편집 표면으로 취급하지 않는다.
 - 현재 실행이 실패하면 마지막 정상 결과를 `stale`로 표시하고 현재 오류를 함께 보여 준다. 실패를 이전 성공으로 위장하지 않는다.
 - 브라우저 session마다 widget state와 kernel session을 격리한다.
 
@@ -49,3 +59,4 @@ Codaro의 제품 표면은 `editor/`이고, 사용자에게 보이는 표면은 
 - [[automation-tasks-reports]] - 자동화, 태스크, 실행 결과 산출물
 - [[widget-bridge]] - 모드별 위젯 렌더링
 - [[percent-format]] - AppSpec의 파일 저장 계약
+- [[python-product-journey]] - IDE에서 앱, 부분 임베딩, publication과 SDK까지의 전체 여정

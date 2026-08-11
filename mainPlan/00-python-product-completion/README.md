@@ -1,6 +1,6 @@
 # 00 Python 제품 완결
 
-상태: 설계
+상태: 구현 중
 
 ## 목표
 
@@ -14,9 +14,8 @@ Codaro를 범용 편집기 복제품이 아니라 **평범한 Percent Python 파
 
 ## 범위
 
-1. [00 제품 계약](00-product-contract/README.md)에서 제품 정의와 공개 주장을 구현 및 gate 범위에 맞춘다.
-2. [01 Python SDK](01-python-sdk/README.md)에서 `uv add codaro`와 `uvx codaro`를 실제 wheel 기준으로 닫는다.
-3. [02 제품 여정](02-product-journey/README.md)에서 IDE, 앱, 부분 embed, publication, 자동화를 current commit의 단일 gate sequence로 증명한다.
+1. [01 Python SDK](01-python-sdk/README.md)에서 `uv add codaro`와 `uvx codaro`를 실제 wheel 기준으로 닫는다.
+2. [02 제품 여정](02-product-journey/README.md)에서 IDE, 앱, 부분 embed, publication, 자동화를 current commit의 단일 gate sequence로 증명한다.
 
 ## 제품 경계
 
@@ -28,10 +27,9 @@ Codaro를 범용 편집기 복제품이 아니라 **평범한 Percent Python 파
 
 ## 구현 순서
 
-1. 제품 계약의 한 줄 정의와 claim matrix를 먼저 고정해 이후 SDK와 gate가 검증해야 할 대상을 확정한다.
-2. 공개 Python import와 비파괴 wheel build를 구현하고 빈 환경에서 SDK와 CLI를 실행한다.
-3. 기존 publication 및 proof gate를 재사용하는 `python-product` sequence를 만들고 stale 청사진과 공개 문구를 current evidence에 결속한다.
-4. 각 workstream의 구현, 지정 gate, 문서 갱신이 끝나면 해당 폴더를 삭제한다. 세 workstream이 모두 사라지면 이 initiative와 활성 링크를 삭제한다.
+1. 공개 Python import와 비파괴 wheel build를 구현하고 빈 환경에서 SDK와 CLI를 실행한다.
+2. 기존 publication 및 proof gate를 재사용하는 `python-product` sequence를 만들고 reference claim을 current evidence에 결속한다.
+3. 각 workstream의 구현, 지정 gate, 문서 갱신이 끝나면 해당 폴더를 삭제한다. 모든 workstream이 사라지면 이 initiative와 활성 링크를 삭제한다.
 
 ## 종료 조건
 

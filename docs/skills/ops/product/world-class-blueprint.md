@@ -11,11 +11,11 @@ whenToUse: 장기 제품 전략, 학습/자동화 통합 기능, 경쟁 포지�
 
 # 세계 1위 학습·자동화 청사진
 
-이 문서는 Codaro를 "좋은 로컬 노트북"이 아니라 **세계 최고 수준의 실행형 학습 + 개인 자동화 AI**로 만들기 위한 PRD다. 기준 id는 `world-class-blueprint`다. 목표는 거대 범용 모델, 대형 강의 플랫폼, SaaS 자동화 플랫폼을 정면으로 복제하는 것이 아니다. Codaro가 1위가 될 수 있는 카테고리를 선명히 정의하고, 그 카테고리에서 제품, 학습 성과, 자동화 성공률, 신뢰성, 배포 품질을 증거로 이기는 것이다.
+이 문서는 Codaro를 "좋은 로컬 노트북"이 아니라 **하나의 Python source를 학습, IDE 작성, 앱, 부분 임베딩, publication과 자동화로 잇는 제품**으로 만들기 위한 PRD다. 기준 id는 `world-class-blueprint`다. 목표는 범용 편집기, 대형 강의 플랫폼, SaaS 자동화 플랫폼을 정면으로 복제하는 것이 아니다. Codaro가 이길 수 있는 카테고리를 선명히 정의하고 제품, 학습 성과, 자동화 성공률, 신뢰성, 배포 품질을 증거로 판정한다.
 
 ## 한 줄 정의
 
-Codaro는 **배우는 코드가 즉시 실행되고, 실행한 코드가 안전한 개인 자동화로 성장하는 local-first AI 스튜디오**다.
+Codaro는 **평범한 Percent Python 파일을 학습하고 개발해 전체 앱, 선택 기능 블록, 자동화 태스크와 재사용 가능한 Python API로 승격하고 browser, server, local에 publication하는 Codaro형 local-first Python IDE**다.
 
 ## 핵심 판단
 
@@ -56,7 +56,7 @@ Codaro는 **배우는 코드가 즉시 실행되고, 실행한 코드가 안전�
 
 ## 카테고리 정의
 
-Codaro가 만들어야 할 카테고리는 **Executable Learning Automation Studio**다.
+Codaro가 만드는 카테고리는 **Executable Python Product IDE**다.
 
 이 카테고리의 조건:
 
@@ -66,6 +66,8 @@ Codaro가 만들어야 할 카테고리는 **Executable Learning Automation Stud
 - 자동화는 블랙박스 agent 행동이 아니라 percent-format Python recipe다.
 - 자동화의 첫 실행은 기본 dry-run이며, 실제 side effect는 확인과 audit 뒤에만 허용한다.
 - 같은 문서는 에디터에서는 노트북, 커리큘럼에서는 학습 셀, 자동화에서는 task 원본이 된다.
+- 같은 source에서 전체 앱과 선택 기능 블록을 만들고 browser, server, local target의 검증된 publication으로 전달한다.
+- Python SDK와 CLI는 IDE, compiler, publication owner를 재사용하며 별도 제품 규칙을 만들지 않는다.
 - AI는 선택적이다. AI 없이도 기본 커리큘럼과 로컬 실행은 완주 가능해야 한다.
 
 ## 성공 정의
@@ -74,10 +76,11 @@ Codaro가 1위라고 말하려면 아래 중 하나가 아니라 전부가 증�
 
 | 축 | 1위 기준 | 증거 |
 |---|---|---|
+| Python 제품 여정 | 평범한 `.py`가 IDE 편집과 reactive 실행, 전체 앱, 부분 임베딩, publication, 자동화와 SDK까지 같은 source로 이어진다. | `python-product`, `app-runtime`, `reference-products` |
 | 학습 성과 | 초보자가 설명을 소비하는 데서 끝나지 않고 예측, 실행, 오류 수정, 검증, 실무 변주를 완주한다. | `curriculum-quality-matrix`, `curriculum-top-tier-audit`, 학습 세션 completion telemetry |
 | 실행 신뢰 | 셀 실행, 패키지 준비, runtime 복구가 사용자에게 이해 가능한 행동으로 이어진다. | `runtime-recovery-contract`, `runtime-recovery-browser`, `editor-runtime-preflight` |
-| 자동화 전환 | 학습에서 만든 코드가 dry-run recipe, task, schedule, webhook으로 자연스럽게 승격된다. | 새 `learning-to-automation-e2e` gate, `automation-ide-audit` |
-| 자동화 안전 | 클릭, 입력, 파일 쓰기, 외부 전송 같은 side effect가 정책, 확인, E-Stop, audit 아래에서만 실행된다. | `automation-ide-audit`, 새 `automation-safety-benchmark` |
+| 자동화 전환 | 학습에서 만든 코드가 기능 블록, 의미 검증 Task, operational proof로 자연스럽게 승격된다. | `learning-product-bridge`, `automation-ide-audit` |
+| 자동화 안전 | 클릭, 입력, 파일 쓰기, 외부 전송 같은 side effect가 정책, 확인, E-Stop, audit 아래에서만 실행된다. | `runtime-security`, `automation-ide-audit` |
 | 교사 루프 품질 | AI가 긴 답변 대신 YAML, 셀 읽기/쓰기, 패키지 확인, 셀 실행/검증으로 상태를 바꾼다. | `teacher-e2e`, `assistant-workloop-contract`, `ai-live-smoke` |
 | 운영 품질 | 설치, 업데이트, rollback, diagnostic, provider 설정이 반복 사용에서 깨지지 않는다. | `quality-cycle`, `install-launcher-smoke` |
 | 신뢰와 배포 | 공개 사용자가 로컬 데이터 경계, 보안, 지원, 공급망을 확인할 수 있다. | root trust docs |
@@ -421,10 +424,10 @@ Stop rule:
 - task 등록
 - audit/report 확인
 
-새 gate:
+증거 gate:
 
 ```bash
-uv run python -X utf8 tests/run.py gate learning-to-automation-e2e
+uv run python -X utf8 tests/run.py gate learning-product-bridge
 ```
 
 합격 기준:
@@ -447,10 +450,10 @@ uv run python -X utf8 tests/run.py gate learning-to-automation-e2e
 - lesson outcome rubric
 - instructor export
 
-새 gate:
+증거 gate:
 
 ```bash
-uv run python -X utf8 tests/run.py gate teacher-outcome-benchmark
+uv run python -X utf8 tests/run.py gate learning-efficacy-report
 ```
 
 합격 기준:
@@ -472,10 +475,11 @@ uv run python -X utf8 tests/run.py gate teacher-outcome-benchmark
 - E-Stop visible everywhere
 - task report replay
 
-새 gate:
+증거 gate:
 
 ```bash
-uv run python -X utf8 tests/run.py gate automation-safety-benchmark
+uv run python -X utf8 tests/run.py gate runtime-security
+uv run python -X utf8 tests/run.py gate automation-ide-audit
 ```
 
 합격 기준:
@@ -523,6 +527,10 @@ uv run python -X utf8 tests/run.py gate automation-safety-benchmark
 
 | Metric | 목표 |
 |---|---|
+| `sameSourceProductJourneyPassRate` | plain Python, IDE, app, embed, publication, automation, SDK current-commit sequence 100% |
+| `pythonSdkFreshInstallPassRate` | built wheel의 빈 환경 import, mount, CLI 성공률 100% |
+| `publicationVerificationPassRate` | browser, server, local, embed immutable bundle 검증률 100% |
+| `embedClosureIntegrityRate` | output, interactive, editable mode의 entry closure와 protocol 검증률 100% |
 | `learnerToAutomationCompletionRate` | 첫 학습 세션 중 30% 이상이 dry-run 자동화까지 도달 |
 | `firstRunTimeToValue` | 설치 후 5분 안에 실행 결과 또는 dry-run plan 확인 |
 | `exercisePassAfterFeedbackRate` | 실패 후 2회 이내 수정 성공률 70% 이상 |
@@ -546,16 +554,18 @@ uv run python -X utf8 tests/run.py gate automation-safety-benchmark
 
 ## Verification Matrix
 
-| 요구사항 묶음 | 기존 gate | 추가해야 할 gate |
-|---|---|---|
-| 제품 기본 품질 | `quality-cycle`, `product-quality-audit` | 없음 |
-| 첫 사용자 완주 | `dogfood-alpha-audit`, `onboarding-browser` | `learning-to-automation-e2e` |
-| 학습 품질 | `curriculum-quality-matrix`, `curriculum-top-tier-audit`, `learning-system-readiness` | `teacher-outcome-benchmark` |
-| Teacher loop | `teacher-e2e`, `assistant-workloop-contract`, `ai-live-smoke` | live provider learning outcome sample |
-| 자동화 IDE | `automation-ide-audit` | `automation-safety-benchmark` |
-| 런타임 복구 | `runtime-recovery-contract`, `runtime-recovery-browser` | task report replay check |
-| 배포 | `install-launcher-smoke`, `launcher-test` | real backend rollback smoke |
-| 공개 신뢰 | root trust docs | template safety audit |
+| 요구사항 묶음 | current evidence gate |
+|---|---|
+| 제품 기본 품질 | `quality-cycle`, `product-quality-audit`, `product-experience-browser` |
+| Python IDE와 SDK | `architecture-boundary`, `python-sdk`, `app-runtime`, `editor-build` |
+| 앱, 부분 임베딩과 publication | `publication-compiler`, `static-publication`, `server-publication`, `local-publication`, `block-embedding` |
+| 첫 사용자와 자동화 승격 | `dogfood-alpha-audit`, `onboarding-browser`, `learning-product-bridge`, `automation-ide-audit` |
+| 학습 품질 | `curriculum-quality-matrix`, `curriculum-top-tier-audit`, `learning-system-readiness`, `learning-efficacy-report` |
+| Teacher loop | `teacher-e2e`, `assistant-workloop-contract`, `ai-live-smoke` |
+| 자동화 안전 | `runtime-security`, `automation-ide-audit` |
+| 런타임 복구 | `runtime-recovery-contract`, `runtime-recovery-browser` |
+| 배포와 rollback | `deployment-adapters`, `reference-products`, `install-launcher-smoke`, `launcher-test` |
+| 공개 신뢰 | `reference-products`, `landing-public`, root trust docs |
 
 ## Non-goals
 
@@ -616,9 +626,9 @@ uv run python -X utf8 tests/run.py gate automation-safety-benchmark
 
 이 청사진을 "달성했다"고 말하려면 아래가 모두 참이어야 한다.
 
-- `learning-to-automation-e2e`가 최신 clean HEAD에서 통과한다.
-- `teacher-outcome-benchmark`가 학습 성과 기준 9.0 이상을 남긴다.
-- `automation-safety-benchmark`가 unsafe action 차단과 E-Stop을 증명한다.
+- `python-product`가 최신 clean HEAD에서 SDK, 앱, 부분 임베딩, publication과 자동화 증거를 함께 통과한다.
+- `learning-efficacy-report`와 사람 근거 gate가 현재 evidence state를 숨김없이 남긴다.
+- `runtime-security`와 `automation-ide-audit`가 unsafe action 차단과 E-Stop을 증명한다.
 - `quality-cycle`이 최신 clean HEAD에서 통과한다.
 - stale artifact가 없다.
 - README, launch kit, product docs가 "learning + execution + automation studio" 메시지로 일관된다.

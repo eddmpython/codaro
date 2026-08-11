@@ -5,9 +5,9 @@
   Codaro
 </h3>
 
-**다운로드 없이 시작하는 Python 학습, 내 파일과 패키지까지 이어지는 Local 자동화 스튜디오.**
+**평범한 Python 파일 하나를 배우고 개발해 전체 앱, 부분 임베딩, 자동화와 검증된 publication으로 성장시키는 local-first Python IDE.**
 
-웹에서 배우고 직접 코드를 고친 뒤 실행합니다. 실제 파일, 자유로운 패키지, 예약 자동화가 필요해질 때 같은 학습 상태를 Local로 이어갑니다.
+Web에서 배우고 Local에서 편집, reactive 실행, publication과 자동화를 이어갑니다. source는 평범한 Percent Python `.py`로 남아 다른 Python 도구에서도 실행됩니다.
 
 <sub><em>코다로(Codaro) - "코드 아로?" "코드 아로~" 코드와 친해지자는 말장난에서 시작한 이름입니다.</em></sub>
 
@@ -42,11 +42,13 @@
 
 ---
 
-**Codaro**는 **웹 학습, reactive 코드 실행, Local 자동화**를 하나의 문서와 학습 기록으로 잇는 programmable studio입니다. 학습 진입은 Web-first입니다. Local-first는 설치를 강요한다는 뜻이 아니라 실제 파일, 패키지, 프로세스와 자동화 결과를 사용자가 소유한다는 실행 경계입니다.
+**Codaro**는 평범한 Percent Python 파일을 학습하고 개발하는 **Codaro형 local-first Python IDE**입니다. 학습 진입은 Web-first입니다. Local-first는 설치를 강요한다는 뜻이 아니라 실제 파일, 패키지, 프로세스와 자동화 결과를 사용자가 소유한다는 실행 경계입니다.
 
-> **한 줄로** - 웹에서는 바로 배우고, Local에서는 같은 코드를 내 환경의 반복 업무로 확장합니다.
+> **북극성** - 같은 source를 다시 작성하지 않고 전체 앱, 선택한 기능 블록, 자동화 태스크와 재사용 가능한 Python API로 승격하고 browser, server, local에 검증된 산출물로 publication합니다.
 
-Python 셀을 target별 앱, 자동화 또는 검증된 배포 산출물로 이어갑니다. Codaro는 browser, server, local 실행 경계를 소스에서 판정하고, 각 Percent Python 파일로 앱 미리보기와 재현 가능한 bundle을 만듭니다.
+IDE 범위는 Percent Python 편집과 저장, reactive 실행, 변수와 출력 확인, 앱 preview, publication 작업면, 자동화 승격입니다. 범용 debugger, extension marketplace, source control UI 전체를 복제한다고 주장하지 않습니다.
+
+Codaro는 browser, server, local 실행 경계를 source에서 판정합니다. 전체 앱을 publication하거나 선택 entry의 dependency closure만 output, interactive, editable Web Component로 부분 임베딩할 수 있습니다.
 
 provider 없이 folder, ZIP, self-host 산출물까지 만들고 검증할 수 있습니다. 공용 URL의 DNS, TLS, uptime과 외부 provider의 지속성은 이 기계 검증 범위에 포함하지 않습니다.
 
@@ -167,6 +169,20 @@ codaro serve ./browser-calculator
 codaro deploy ./browser-calculator --target zip --output ./browser-calculator.zip
 ```
 
+전체 앱과 부분 임베딩은 별도 source를 요구하지 않습니다.
+
+```powershell
+# 전체 browser 앱
+codaro build examples/apps/browser-calculator/app.py --target browser --output ./browser-calculator
+
+# 선택한 기능 블록과 dependency closure만 interactive Web Component로 생성
+codaro build examples/apps/browser-calculator/app.py --target embed --entry total-view --mode interactive --output ./calculator-embed
+codaro verify ./calculator-embed --target embed
+codaro serve ./calculator-embed
+```
+
+부분 임베딩 mode는 결과만 보여 주는 `output`, host 입력과 widget 상호작용을 허용하는 `interactive`, source 편집까지 포함하는 `editable`입니다. origin과 `postMessage` protocol이 계약과 다르면 bundle은 요청을 거부합니다.
+
 정적 bundle은 외부 network 요청 없이 동작하고, 서버 bundle은 secret 이름만 보존하며 값은 client payload에 포함하지 않습니다. Local 앱은 exact policy hash를 사용자가 승인한 뒤 immutable session에서 파일과 process 작업을 실행합니다. 학습 결과가 운영 증거로 승격되는 별도 계약은 Day30 golden journey가 검증합니다. 상세 계약은 [reference product 문서](docs/skills/architecture/reference-products.md)에 있습니다.
 
 ## Codaro vs Jupyter · marimo · Streamlit · ipynb
@@ -180,6 +196,8 @@ codaro deploy ./browser-calculator --target zip --output ./browser-calculator.zi
 | **사용자가 쓰는 코드** | 평범한 Python (no return) | 평범한 Python | 함수 래핑 + `return` | UI 함수 호출 |
 | **설치 없는 학습 진입** | ✅ Web 지원 레슨 | ⚠ 별도 배포 필요 | ✅ | ✅ 공개 앱일 때 |
 | **로컬 실행 소유권** | ✅ 파일·패키지·프로세스·결과 | ✅ | ✅ | ✅ |
+| **전체 앱 publication** | ✅ browser·server·local | ⚠ 별도 조립 | ✅ | ✅ |
+| **선택 기능 부분 임베딩** | ✅ output·interactive·editable | ⚠ 별도 조립 | ⚠ 앱 단위 | ⚠ 앱 단위 |
 | **AI 셀 단위 tool_use** | ✅ 기본 | ⚠ 확장 | ❌ | ❌ |
 | **자동화 태스크 승격** | ✅ 스케줄·Webhook·DAG·E-Stop | ❌ | ❌ | ❌ |
 | **데스크톱 자동화** | ✅ Vision/Voice/Input | ❌ | ❌ | ❌ |
@@ -394,11 +412,15 @@ uv run codaro pack install ./my-pack
 
 ### 개발자 - PyPI 패키지
 
-PyPI 게시본은 long-lived token 없이 GitHub Actions Trusted Publisher로 발행됩니다. 저장소 릴리즈가 published 된 뒤 `.github/workflows/publish.yaml`이 `pypi` 환경에서 `codaro` wheel과 sdist를 업로드합니다.
+PyPI는 개발자의 Python SDK와 CLI 채널입니다. library로 사용할 때는 프로젝트에 추가하고, CLI만 일회성으로 실행할 때는 `uvx`를 사용합니다. Windows 일반 사용자 런처는 PyPI 최신판을 임의로 받지 않고 GitHub Release manifest가 고정한 exact wheel을 설치합니다.
 
 ```powershell
-uvx codaro
+uv add codaro
+uv run python -c "from codaro import App, createServerApp, ui; print(App, createServerApp, ui)"
+uvx codaro --help
 ```
+
+PyPI 발행은 GitHub Actions Trusted Publisher를 사용하며 버전, tag, GitHub Release와 package publish는 명시적 릴리즈 요청 뒤에만 실행합니다.
 
 ### 5분 체험 - 설치 전에도 가능
 

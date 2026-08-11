@@ -19,6 +19,8 @@ CATALOG_PATH = ROOT / "contracts" / "publicLearningCatalog.json"
 SEARCH_INDEX_PATH = ROOT / "landing" / "src" / "lib" / "generated" / "searchIndex.js"
 LESSON_MODULE_ROOT = ROOT / "landing" / "src" / "lib" / "generated" / "curriculumLessons"
 FAQ_PATH = ROOT / "landing" / "src" / "lib" / "faq.js"
+README_PATH = ROOT / "README.md"
+REFERENCE_PRODUCTS_PATH = ROOT / "examples" / "apps" / "referenceProducts.json"
 REPORT_PATH = ROOT / "output" / "test-runner" / "landing-public" / "public-product-claims-report.json"
 EXPECTED_LESSON_COUNT = 472
 EXPECTED_RUNTIME_COUNTS = {"browser": 310, "local": 162}
@@ -37,6 +39,8 @@ FALSE_CLAIM_PATTERNS = (
         r"(?:in|on)\s+(?:the\s+)?(?:browser|web)",
         re.IGNORECASE,
     ),
+    re.compile(r"범용\s*IDE.{0,20}(?:모든|완전한)\s*기능", re.IGNORECASE),
+    re.compile(r"공용\s*인터넷.{0,30}uptime.{0,20}보장", re.IGNORECASE),
 )
 
 
@@ -55,6 +59,7 @@ def main() -> int:
         llmsFullCounts = validateLlmsFullClaims(expectedRoutes, failures)
         validateFaqClaims(failures)
         validatePublishedDocsClaims(failures)
+        pythonProductClaims = validatePythonProductClaims(failures)
         validateForbiddenClaims(failures)
         summary = {
             "catalogLessons": len(catalogRows),
@@ -62,6 +67,7 @@ def main() -> int:
             "searchRuntimeCounts": searchCounts,
             "llmsRuntimeCounts": llmsCounts,
             "llmsFullRuntimeCounts": llmsFullCounts,
+            "pythonProductClaims": pythonProductClaims,
         }
     except (FileNotFoundError, json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
         failures.append(f"claim audit could not load public evidence: {type(exc).__name__}: {exc}")
@@ -260,6 +266,7 @@ def validatePublishedDocsClaims(failures: list[str]) -> None:
 
 def validateForbiddenClaims(failures: list[str]) -> None:
     publicTexts = {
+        "README": README_PATH.read_text(encoding="utf-8"),
         "home": visibleText((BUILD_ROOT / "index.html").read_text(encoding="utf-8")),
         "learn": visibleText((BUILD_ROOT / "learn" / "index.html").read_text(encoding="utf-8")),
         "llms.txt": (BUILD_ROOT / "llms.txt").read_text(encoding="utf-8"),
@@ -272,6 +279,52 @@ def validateForbiddenClaims(failures: list[str]) -> None:
             match = pattern.search(compact)
             if match:
                 failures.append(f"{source} contains false runtime claim: {match.group(0)[:140]}")
+
+
+def validatePythonProductClaims(failures: list[str]) -> dict[str, int]:
+    manifest = json.loads(REFERENCE_PRODUCTS_PATH.read_text(encoding="utf-8"))
+    boundary = manifest.get("claimBoundary")
+    if not isinstance(boundary, dict):
+        raise ValueError("reference product claimBoundary is missing")
+    machineVerified = boundary.get("machineVerified")
+    notVerified = boundary.get("notVerified")
+    if not isinstance(machineVerified, list) or not isinstance(notVerified, list):
+        raise ValueError("reference product claim lists are invalid")
+
+    machineText = "\n".join(str(claim) for claim in machineVerified)
+    notVerifiedText = "\n".join(str(claim) for claim in notVerified)
+    for token in (
+        "plain Python 실행",
+        "전체 앱 publication",
+        "output, interactive, editable embed",
+        "operational proof 승격",
+    ):
+        if token not in machineText:
+            failures.append(f"machine-verified Python product claim is missing {token}")
+    for token in (
+        "public Python SDK와 CLI",
+        "uptime, DNS, TLS",
+        "hideCode의 보안성",
+        "shared app state",
+        "범용 IDE 전체",
+    ):
+        if token not in notVerifiedText:
+            failures.append(f"not-verified Python product boundary is missing {token}")
+
+    readme = README_PATH.read_text(encoding="utf-8")
+    for token in (
+        "Codaro형 local-first Python IDE",
+        "전체 앱",
+        "부분 임베딩",
+        "output, interactive, editable",
+        "공용 URL의 DNS, TLS, uptime",
+    ):
+        if token not in readme:
+            failures.append(f"README Python product contract is missing {token}")
+    return {
+        "machineVerified": len(machineVerified),
+        "notVerified": len(notVerified),
+    }
 
 
 def parseExportedJson(path: Path, marker: str) -> list[dict[str, Any]]:

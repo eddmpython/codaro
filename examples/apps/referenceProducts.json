@@ -65,17 +65,22 @@
   ],
   "claimBoundary": {
     "machineVerified": [
-      "각 reference source와 해당 target의 app, build, serve projection",
-      "계산기 source의 interactive embed와 로컬 자동화 source의 immutable local publication",
+      "평범한 Percent Python reference source의 plain Python 실행, compiler target과 app projection",
+      "같은 source의 browser, server, local 전체 앱 publication과 계산기 기능 블록 embed",
+      "output, interactive, editable embed의 entry closure, widget 상태, origin과 protocol 거부",
       "localhost와 LAN에서 검증 가능한 immutable browser, server, local bundle",
-      "content hash가 연결된 build, operational, deployment receipt",
+      "content hash가 연결된 build, operational, deployment receipt와 rollback",
+      "strong learning evidence에서 동일 source 기능 블록, 의미 검증 Task와 operational proof 승격",
       "provider 없이 생성 가능한 folder, ZIP, self-host 산출물"
     ],
     "notVerified": [
+      "built wheel을 빈 환경에 설치한 public Python SDK와 CLI",
       "공용 인터넷 URL의 uptime, DNS, TLS",
       "인간 학습 효과의 인과 검증",
       "외부 provider의 서비스 지속성",
-      "브라우저 bundle 속 Python source의 비공개성"
+      "브라우저 bundle 속 Python source의 비공개성과 hideCode의 보안성",
+      "shared app state의 동시 사용자 일관성",
+      "범용 debugger, source control UI, extension marketplace를 포함한 범용 IDE 전체"
     ]
   }
 }
