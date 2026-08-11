@@ -232,11 +232,14 @@ def waitForLearningLessonRoute(page: Any, contentId: str, category: str = "30day
               const url = new URL(window.location.href);
               const shell = document.querySelector('[data-run-route-lesson-key]');
               const learning = document.querySelector('[data-learning-lesson-ref]');
+              const ready = document.querySelector('[data-learning-lesson-ready]');
               return url.searchParams.get('category') === category
                 && url.searchParams.get('lesson') === contentId
                 && shell?.getAttribute('data-run-route-lesson-key') === `${category}/${contentId}`
                 && learning?.getAttribute('data-learning-lesson-ref') === `${category}/${contentId}`
-                && learning?.getAttribute('data-learning-reference-loading') === 'false';
+                && learning?.getAttribute('data-learning-reference-loading') === 'false'
+                && ready?.getAttribute('data-learning-lesson-ready') === `${category}/${contentId}`
+                && ready?.getAttribute('data-product-surface-ready') === 'curriculum';
             }
             """,
             arg={"category": category, "contentId": contentId},
@@ -249,10 +252,12 @@ def waitForLearningLessonRoute(page: Any, contentId: str, category: str = "30day
               const url = new URL(window.location.href);
               const shell = document.querySelector('[data-run-route-lesson-key]');
               const learning = document.querySelector('[data-learning-lesson-ref]');
+              const ready = document.querySelector('[data-learning-lesson-ready]');
               return {
                 category: url.searchParams.get('category'),
                 lesson: url.searchParams.get('lesson'),
                 loading: learning?.getAttribute('data-learning-reference-loading'),
+                ready: ready?.getAttribute('data-learning-lesson-ready'),
                 selected: learning?.getAttribute('data-learning-lesson-ref'),
                 shell: shell?.getAttribute('data-run-route-lesson-key'),
               };
@@ -5806,8 +5811,16 @@ def runBrowserMatrix(
                                     f"{snippetOutput.inner_text()!r}"
                                 )
                         exerciseIndex = 0 if assessmentMode else int(case.get("exerciseIndex", 0))
-                        runButton = exerciseParts.locator('button[aria-label="셀 실행"]').nth(exerciseIndex)
+                        runButton = exerciseParts.locator('button[aria-label$=" 셀 실행"]').nth(exerciseIndex)
                         codeEditor = exerciseParts.locator('.cm-content').nth(exerciseIndex)
+                        if "day01" in page.url:
+                            canonicalRunButton = page.get_by_role(
+                                "button",
+                                name="Hello World 실습 셀 실행",
+                                exact=True,
+                            )
+                            if canonicalRunButton.count() != 1:
+                                raise AssertionError("canonical learning run action is not uniquely named")
                         if case.get("verifyCanonicalKeyboardJourney"):
                             overviewSection = page.locator(
                                 '[data-learning-overview-section]'
@@ -7081,7 +7094,7 @@ def runBrowserMatrix(
                             )
                         exerciseIndex = 0 if assessmentMode else int(case.get("exerciseIndex", 0))
                         runButton = exerciseParts.locator(
-                            'button[aria-label="셀 실행"]'
+                            'button[aria-label$=" 셀 실행"]'
                         ).nth(exerciseIndex)
                         runButton.click(timeout=20_000)
                         page.wait_for_function(

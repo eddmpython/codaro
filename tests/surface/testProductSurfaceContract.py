@@ -536,9 +536,9 @@ def testLongNotebookKeyboardNavigationSharesCodeAndMarkdownBoundaries() -> None:
 
 
 def testLearningAssessmentRefreshIgnoresUnmountedRequestFailures() -> None:
-    curriculumSurface = _read("editor/src/components/curriculum/curriculumSurface.tsx")
-    inactiveGuard = curriculumSurface.index("if (!active) return;")
-    errorLog = curriculumSurface.index(
+    assessmentHook = _read("editor/src/components/curriculum/useDueAssessmentBlocks.ts")
+    inactiveGuard = assessmentHook.index("if (!active) return;")
+    errorLog = assessmentHook.index(
         'console.error("learning assessment queue refresh failed", error);'
     )
 
@@ -694,8 +694,9 @@ def testAppMountsOneResponsiveProductShellForEveryRouteAlias() -> None:
     assert "onSurfaceChange={selectSurface}" in app
     assert "data-active-product-surface={surface}" in app
     assert "data-product-surface-view={props.surface}" in mainSurface
-    assert 'data-product-surface-state="ready"' in mainSurface
-    assert "data-product-surface-ready={props.surface}" in mainSurface
+    assert 'props.surface === "curriculum" && Boolean(props.selectedContentId)' in mainSurface
+    assert 'data-product-surface-state={waitsForCurriculumLesson ? "content-loading" : "ready"}' in mainSurface
+    assert "data-product-surface-ready={waitsForCurriculumLesson ? undefined : props.surface}" in mainSurface
     assert 'data-product-surface-state="loading"' in mainSurface
     assert "data-product-surface-loading={surface}" in mainSurface
     assert 'role="status"' in mainSurface
@@ -703,6 +704,21 @@ def testAppMountsOneResponsiveProductShellForEveryRouteAlias() -> None:
     assert "tabIndex={-1}" in mainSurface
     assert "MobileChat" not in main
     assert "<App />" in main
+
+
+def testCurriculumReadyMarkerWaitsForNamedEditorAction() -> None:
+    currentLearning = _read("editor/src/components/app/currentLearningSurface.tsx")
+    learningCell = _read("editor/src/components/curriculum/curriculumLearningCell.tsx")
+    sectionRenderer = _read("editor/src/components/curriculum/curriculumSectionRenderer.tsx")
+
+    assert 'surface.querySelector(".cm-editor")' in currentLearning
+    assert "data-learning-run-control" in currentLearning
+    assert "data-learning-lesson-ready={lessonReady ? lessonRef : undefined}" in currentLearning
+    assert 'data-product-surface-ready={lessonReady ? "curriculum" : undefined}' in currentLearning
+    for source in (learningCell, sectionRenderer):
+        assert 'data-learning-run-control="true"' in source
+        assert "label={`${blockLabel(" in source
+        assert 'label="셀 실행"' not in source
 
 
 def testProductSidebarKeepsSurfaceTreesInFocusedFiles() -> None:

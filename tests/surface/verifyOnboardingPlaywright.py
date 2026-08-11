@@ -723,8 +723,11 @@ def jsAssertExerciseCheck() -> str:
 (async () => {
   const exercise = document.querySelector('[data-learning-section-part="exercise"]');
   if (!exercise) throw new Error('exercise part missing');
-  const runBtn = exercise.querySelector('button[aria-label="셀 실행"]');
+  const runBtn = exercise.querySelector('button[aria-label$=" 셀 실행"]');
   if (!runBtn) throw new Error('exercise run button missing');
+  if (runBtn.getAttribute('aria-label') !== 'Hello World 실습 셀 실행') {
+    throw new Error(`exercise run button name drifted: ${runBtn.getAttribute('aria-label')}`);
+  }
   runBtn.click();
   let result = null;
   for (let i = 0; i < 80; i++) {

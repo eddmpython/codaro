@@ -595,8 +595,9 @@ export function StructuredSectionLearningBody({
             <div className="flex shrink-0 items-center">
               <IconButton
                 className="astryxWorkCellAction size-8 [&_svg]:size-3.5"
+                data-learning-run-control="true"
                 disabled={!canRun || exerciseRunning}
-                label="셀 실행"
+                label={`${blockLabel(exercise)} 셀 실행`}
                 preserveEditorFocusOnTouch
                 variant="outline"
                 onClick={(event) => {

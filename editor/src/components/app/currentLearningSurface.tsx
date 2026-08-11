@@ -53,6 +53,8 @@ export function CurrentLearningSurface(props: CurrentLearningSurfaceProps) {
   const { t } = useLocale();
   const [tocExpanded, setTocExpanded] = useState(false);
   const lessonRef = `${props.selectedCategory}/${props.selectedContentId}`;
+  const [readyLessonRef, setReadyLessonRef] = useState("");
+  const lessonSurfaceRef = useRef<HTMLDivElement>(null);
   const { creditedSectionIds } = useLessonSectionProgress(lessonRef);
   const previousLessonRef = useRef(lessonRef);
   const pendingLessonFocusRef = useRef("");
@@ -108,6 +110,28 @@ export function CurrentLearningSurface(props: CurrentLearningSurfaceProps) {
     return () => window.cancelAnimationFrame(frame);
   }, [lessonRef, props.curriculumDocument, props.referenceLoading]);
 
+  useEffect(() => {
+    setReadyLessonRef("");
+    const surface = lessonSurfaceRef.current;
+    if (!surface || props.referenceLoading || !props.curriculumDocument) return;
+    let frame = 0;
+    let observer: MutationObserver | null = null;
+    const inspectLessonReadiness = () => {
+      const editor = surface.querySelector(".cm-editor");
+      const action = surface.querySelector('[data-learning-run-control="true"]');
+      if (!editor || !action) return;
+      setReadyLessonRef(lessonRef);
+      observer?.disconnect();
+    };
+    observer = new MutationObserver(inspectLessonReadiness);
+    observer.observe(surface, { childList: true, subtree: true });
+    frame = window.requestAnimationFrame(inspectLessonReadiness);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [lessonRef, props.curriculumDocument, props.referenceLoading]);
+
   if (!props.curriculumDocument) {
     return (
       <div className="grid h-full place-items-center bg-background px-6" data-curriculum-loading="true">
@@ -133,6 +157,7 @@ export function CurrentLearningSurface(props: CurrentLearningSurfaceProps) {
     isCustomCurriculum
       ? curriculumDoc.title
       : props.contents.find((content) => content.contentId === props.selectedContentId)?.title ?? props.selectedContentId;
+  const lessonReady = !props.referenceLoading && readyLessonRef === lessonRef;
 
   return (
     <div
@@ -141,9 +166,13 @@ export function CurrentLearningSurface(props: CurrentLearningSurfaceProps) {
         showToc && "2xl:grid-cols-[minmax(0,1fr)_var(--learning-toc-width)]",
         showToc && "2xl:transition-[grid-template-columns] 2xl:duration-150",
       )}
+      data-learning-lesson-ready={lessonReady ? lessonRef : undefined}
       data-learning-toc-layout={showToc ? (tocExpanded ? "expanded" : "collapsed") : "hidden"}
       data-learning-lesson-ref={`${props.selectedCategory}/${props.selectedContentId}`}
       data-learning-reference-loading={props.referenceLoading ? "true" : "false"}
+      data-product-surface-ready={lessonReady ? "curriculum" : undefined}
+      data-product-surface-state={lessonReady ? "ready" : "content-loading"}
+      ref={lessonSurfaceRef}
       style={tocLayoutStyle}
     >
       <CurriculumView
