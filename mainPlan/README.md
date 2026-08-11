@@ -70,4 +70,4 @@ mainPlan/
 
 ## 활성 이니셔티브
 
-현재 활성 이니셔티브는 없다. 끝난 작업의 기록은 이 트리가 아니라 commit message와 `git log`가 소유한다.
+- [00 Python 제품 완결](00-python-product-completion/README.md) - IDE, 부분 임베딩, publication, Python SDK를 같은 Percent Python 소스의 한 제품 계약으로 닫는다.
