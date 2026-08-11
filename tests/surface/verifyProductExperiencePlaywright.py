@@ -1204,12 +1204,25 @@ def verifyNotebookExecutionStates(
         captureStableViewport(page, screenshotPath)
         stateScreenshots[state] = str(screenshotPath.relative_to(ROOT)).replace("\\", "/")
 
+    def waitForDraftPersistence() -> None:
+        page.wait_for_selector(
+            "[data-notebook-storage-status='pending']",
+            state="attached",
+            timeout=20_000,
+        )
+        page.wait_for_selector(
+            "[data-notebook-storage-status='saved']",
+            state="attached",
+            timeout=30_000,
+        )
+
     editor.fill(
         "import time\n"
         "time.sleep(1.0)\n"
         f"print({successMarker!r})",
         timeout=20_000,
     )
+    waitForDraftPersistence()
     editor.press("Control+Enter", timeout=20_000)
     page.wait_for_selector(
         "[data-notebook-cell-status='running']",
@@ -1240,6 +1253,7 @@ def verifyNotebookExecutionStates(
         f"raise RuntimeError({errorMarker!r})",
         timeout=20_000,
     )
+    waitForDraftPersistence()
     editor.press("Control+Enter", timeout=20_000)
     page.wait_for_selector(
         "[data-notebook-cell-status='running']",
