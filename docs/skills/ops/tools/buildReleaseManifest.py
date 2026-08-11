@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 import tomllib
 from pathlib import Path
@@ -12,16 +13,20 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[4]
 PYPROJECT = ROOT / "pyproject.toml"
 LAUNCHER_MANIFEST = ROOT / "launcher" / "codaro-launcher" / "Cargo.toml"
+RELEASE_COMPATIBILITY = ROOT / "launcher" / "releaseCompatibility.json"
 
 
 def main(argv: list[str] | None = None) -> int:
     args = buildParser().parse_args(argv)
     project = readToml(PYPROJECT)["project"]
     launcherPackage = readToml(LAUNCHER_MANIFEST)["package"]
+    compatibility = readJson(RELEASE_COMPATIBILITY)
 
     packageName = args.package_name or project["name"]
     packageVersion = args.package_version or project["version"]
     launcherVersion = args.launcher_version or launcherPackage["version"]
+    minLauncherVersion = args.min_launcher_version or compatibility["minLauncherVersion"]
+    ensureCompatibilityVersions(minLauncherVersion, launcherVersion)
     releaseTag = args.tag
     releaseBaseUrl = args.release_base_url or f"https://github.com/{args.repo}/releases/download/{releaseTag}"
 
@@ -40,7 +45,7 @@ def main(argv: list[str] | None = None) -> int:
         "channel": channel,
         "releaseId": releaseId,
         "launcherVersion": launcherVersion,
-        "minLauncherVersion": args.min_launcher_version or launcherVersion,
+        "minLauncherVersion": minLauncherVersion,
         "learningEvidenceReaderVersion": args.learning_evidence_reader_version,
         "pythonRuntime": {
             "version": args.python_runtime_version,
@@ -81,7 +86,10 @@ def buildParser() -> argparse.ArgumentParser:
     parser.add_argument("--package-name", help="Backend package name. Defaults to pyproject project.name.")
     parser.add_argument("--package-version", help="Backend package version. Defaults to pyproject project.version.")
     parser.add_argument("--launcher-version", help="Launcher version. Defaults to launcher Cargo.toml package.version.")
-    parser.add_argument("--min-launcher-version", help="Minimum launcher version. Defaults to launcher version.")
+    parser.add_argument(
+        "--min-launcher-version",
+        help="Minimum compatible launcher version. Defaults to launcher/releaseCompatibility.json.",
+    )
     parser.add_argument("--learning-evidence-reader-version", type=int, default=1)
     parser.add_argument("--backend-entry-module", default="codaro.cli")
     parser.add_argument("--backend-console-script", default="codaro")
@@ -97,6 +105,34 @@ def buildParser() -> argparse.ArgumentParser:
 def readToml(path: Path) -> dict[str, Any]:
     with path.open("rb") as handle:
         return tomllib.load(handle)
+
+
+def readJson(path: Path) -> dict[str, Any]:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict) or value.get("schemaVersion") != 1:
+        raise ValueError(f"release compatibility contract is invalid: {path}")
+    if not isinstance(value.get("minLauncherVersion"), str):
+        raise ValueError("release compatibility minLauncherVersion must be a string")
+    return value
+
+
+def ensureCompatibilityVersions(minimum: str, launcher: str) -> None:
+    minimumCore = semverCore(minimum, "minimum launcher version")
+    launcherCore = semverCore(launcher, "launcher version")
+    if minimumCore > launcherCore:
+        raise ValueError(
+            f"minimum launcher version {minimum} cannot exceed launcher version {launcher}"
+        )
+
+
+def semverCore(value: str, label: str) -> tuple[int, int, int]:
+    match = re.fullmatch(
+        r"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?",
+        value.strip(),
+    )
+    if match is None:
+        raise ValueError(f"{label} must be valid semver: {value}")
+    return tuple(int(match.group(index)) for index in range(1, 4))
 
 
 def resolveBackendWheel(

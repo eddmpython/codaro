@@ -499,8 +499,11 @@ launcher는 최소 아래 로그를 남긴다.
 - `update sync`는 check와 apply를 한 번에 수행하고, update config가 허용하면 launcher startup에서도 같은 경로를 재사용한다
 - `autoUpdateOnLaunch` 기본값은 true이며, `launch`와 `launch-active`는 active release 실행 전에 update sync를 시도한다
 - startup auto-update 실패는 기존 active release 실행을 막지 않는 best-effort 경로로 처리한다
+- 공식 `Codaro.exe`는 startup product update보다 launcher self-update를 먼저 확인한다. 새 launcher는 sha256을 검증한 별도 helper로 실행 중인 부모의 종료를 기다린 뒤 실행 파일을 교체하고 원래 인자로 재시작한다
+- 교체된 launcher 재실행이 실패하면 helper는 `.old` 백업을 복원하고 기존 launcher 재실행을 시도한다. custom root와 explicit manifest source는 개발·운영 override를 보존하기 위해 자동 self-update에서 제외한다
 - normal `vX.Y.Z` tag workflow는 exact `codaro` wheel, `release-manifest.json`, managed Windows Python runtime archive, launcher binary, checksums, SPDX SBOM을 같은 GitHub Release에 올린다
 - launcher self-update helper는 launcher-only tag뿐 아니라 `Codaro.exe` asset을 가진 product release tag도 후보로 본다
+- release manifest의 `minLauncherVersion`은 현재 빌드 버전에서 자동 파생하지 않고 `launcher/releaseCompatibility.json`이 소유한다. manifest builder는 이 하한이 launcher 버전보다 높으면 실패한다
 - backend는 `CODARO_WEB_BUILD_ROOT` 환경변수로 managed editor build root를 받을 수 있다
 - launcher는 staged archive editor가 없으면 `site-packages/<backend-package>/webBuild`를 `CODARO_WEB_BUILD_ROOT`로 전달한다
 - package distribution과 bundle 분리 정책은 `launcher/PACKAGING.md`에 정리됐다
@@ -516,7 +519,6 @@ launcher는 최소 아래 로그를 남긴다.
 - launcher update와 backend update의 서명/무결성 검증 레이어를 분리한다
 - background update loop와 foreground startup sync의 역할을 분리한다
 - crash restart/freeze 상태를 launcher log file과 user-facing diagnostics에 연결한다
-- Windows에서 실행 중인 launcher exe를 교체하는 foreground UX 또는 restart helper를 결정한다
 
 ## Verification Left
 

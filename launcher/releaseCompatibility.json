@@ -1,0 +1,5 @@
+{
+  "schemaVersion": 1,
+  "minLauncherVersion": "0.0.12",
+  "rationale": "0.0.12 can stage and activate the current release manifest contract. Newer launchers update themselves before applying product releases."
+}

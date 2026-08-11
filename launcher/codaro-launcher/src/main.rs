@@ -26,7 +26,10 @@ use paths::LauncherPaths;
 use provision::{
     activate_release, load_manifest_from_source, stage_release, stage_release_with_progress,
 };
-use self_update::{apply_self_update, check_launcher_update, download_launcher_update};
+use self_update::{
+    apply_self_update, check_launcher_update, download_launcher_update, finalize_self_update,
+    is_official_launcher_executable, spawn_self_update_helper,
+};
 use serde::{Deserialize, Serialize};
 use state::{
     ActiveReleaseState, ActiveReleaseStore, CrashState, CrashStateStore, CrashStatus,
@@ -261,6 +264,8 @@ enum SelfUpdateSubcommand {
     Check(SelfUpdateCheckArgs),
     Download(SelfUpdateDownloadArgs),
     Apply(SelfUpdateApplyArgs),
+    #[command(hide = true)]
+    Finalize(SelfUpdateFinalizeArgs),
 }
 
 #[derive(Args, Debug)]
@@ -286,6 +291,20 @@ struct SelfUpdateApplyArgs {
     downloaded: PathBuf,
     #[arg(long)]
     current_exe: Option<PathBuf>,
+}
+
+#[derive(Args, Debug)]
+struct SelfUpdateFinalizeArgs {
+    #[arg(long)]
+    downloaded: PathBuf,
+    #[arg(long)]
+    current_exe: PathBuf,
+    #[arg(long)]
+    expected_sha256: String,
+    #[arg(long)]
+    parent_process_id: u32,
+    #[arg(long)]
+    relaunch_args_json: String,
 }
 
 #[derive(Debug, Clone, Serialize, PartialEq, Eq)]
@@ -363,17 +382,29 @@ impl LauncherStateStores {
 }
 
 fn main() -> Result<()> {
+    let relaunch_args = std::env::args_os()
+        .skip(1)
+        .map(|value| value.to_string_lossy().into_owned())
+        .collect::<Vec<_>>();
     let cli = Cli::parse();
+    let allow_auto_self_update = cli.root.is_none();
     let paths = LauncherPaths::discover(cli.root)?;
     paths.ensure_layout()?;
     check_sandbox::reconcile(&paths)?;
 
     match cli.command {
         // 인자 없이 실행 = 탐색기 더블클릭. dartlab처럼 바로 네이티브 창을 띄운다.
-        None => run_launch(&paths, LaunchArgs::default())?,
+        None => run_launch(
+            &paths,
+            LaunchArgs::default(),
+            relaunch_args,
+            allow_auto_self_update,
+        )?,
         Some(Command::Doctor) => run_doctor(&paths)?,
         Some(Command::CheckBroker(args)) => check_broker::run(&paths, args)?,
-        Some(Command::Launch(args)) => run_launch(&paths, args)?,
+        Some(Command::Launch(args)) => {
+            run_launch(&paths, args, relaunch_args, allow_auto_self_update)?
+        }
         Some(Command::Manifest(command)) => run_manifest(command)?,
         Some(Command::State(command)) => run_state(&paths, command)?,
         Some(Command::Release(command)) => run_release(&paths, command)?,
@@ -385,15 +416,23 @@ fn main() -> Result<()> {
     Ok(())
 }
 
+enum ProvisionOutcome {
+    Ready(Child, String),
+    RestartScheduled,
+}
+
 fn provision_and_spawn(
     paths: &LauncherPaths,
     args: &LaunchArgs,
     progress: &dyn Fn(&str, u64, Option<u64>),
-) -> Result<(Child, String)> {
+    relaunch_args: &[String],
+    allow_auto_self_update: bool,
+) -> Result<ProvisionOutcome> {
     use ipc::{ErrorPayload, IpcMessage, LaunchStatus, ProgressPayload, StatusPayload, encode_ipc};
 
     let stores = LauncherStateStores::new(paths);
     let active = stores.active_release.load_optional()?;
+    let update_config = load_update_config(&stores)?;
 
     println!(
         "{}",
@@ -402,6 +441,36 @@ fn provision_and_spawn(
             url: None,
         }))
     );
+
+    if allow_auto_self_update && update_config.auto_update_on_launch {
+        println!(
+            "{}",
+            encode_ipc(&IpcMessage::SetProgress(ProgressPayload {
+                stage: "launcher-update".into(),
+                message: "Checking for launcher updates...".into(),
+                percent: Some(2.0),
+            }))
+        );
+        match schedule_launcher_self_update(paths, &update_config, relaunch_args) {
+            Ok(true) => {
+                println!(
+                    "{}",
+                    encode_ipc(&IpcMessage::SetProgress(ProgressPayload {
+                        stage: "launcher-update".into(),
+                        message: "Restarting with the updated launcher...".into(),
+                        percent: Some(100.0),
+                    }))
+                );
+                return Ok(ProvisionOutcome::RestartScheduled);
+            }
+            Ok(false) => {}
+            Err(error) => {
+                eprintln!(
+                    "Codaro launcher auto-update failed; continuing with current launcher: {error:#}"
+                );
+            }
+        }
+    }
 
     if active.is_none() {
         println!(
@@ -412,7 +481,6 @@ fn provision_and_spawn(
                 percent: None,
             }))
         );
-        let update_config = load_update_config(&stores)?;
         let source = update_config
             .manifest_source
             .as_deref()
@@ -448,7 +516,6 @@ fn provision_and_spawn(
             activate_release(paths, &summary.release_id)?;
         }
     } else {
-        let update_config = load_update_config(&stores)?;
         if update_config.auto_update_on_launch {
             println!(
                 "{}",
@@ -563,10 +630,58 @@ fn provision_and_spawn(
         }
     }
 
-    Ok((child, url))
+    Ok(ProvisionOutcome::Ready(child, url))
 }
 
-fn run_launch(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
+fn schedule_launcher_self_update(
+    paths: &LauncherPaths,
+    update_config: &UpdateConfig,
+    relaunch_args: &[String],
+) -> Result<bool> {
+    if update_config.manifest_source.is_some() {
+        return Ok(false);
+    }
+    let current_exe = std::env::current_exe()
+        .context("Failed to resolve current launcher executable for auto-update.")?;
+    if !is_official_launcher_executable(&current_exe) {
+        return Ok(false);
+    }
+    let Some(release) = check_launcher_update(
+        &update_config.github_repo,
+        LAUNCHER_VERSION,
+        update_config.allows_prerelease(),
+    )?
+    else {
+        return Ok(false);
+    };
+    let expected_sha256 = release
+        .sha256
+        .clone()
+        .context("Launcher auto-update requires a published SHA256 asset.")?;
+    let download_dir = paths
+        .downloads_dir()
+        .join("launcher")
+        .join(&release.version);
+    let downloaded = download_launcher_update(&release, &download_dir)?;
+    if !downloaded.verified {
+        bail!("Launcher auto-update download was not SHA256 verified.");
+    }
+    let _helper = spawn_self_update_helper(
+        &downloaded.downloaded_path,
+        &current_exe,
+        &expected_sha256,
+        std::process::id(),
+        relaunch_args,
+    )?;
+    Ok(true)
+}
+
+fn run_launch(
+    paths: &LauncherPaths,
+    args: LaunchArgs,
+    relaunch_args: Vec<String>,
+    allow_auto_self_update: bool,
+) -> Result<()> {
     use webview::open_in_system_browser;
     // --no-webview: 헤드리스/CLI/스모크 경로. 네이티브 창 없이 백엔드를 띄우고 시스템 브라우저로 연다.
     if args.no_webview {
@@ -578,16 +693,31 @@ fn run_launch(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
                 )))
             );
         };
-        let (mut child, url) = provision_and_spawn(paths, &args, &progress)?;
-        open_in_system_browser(&url)?;
-        let _ = child.wait();
+        match provision_and_spawn(
+            paths,
+            &args,
+            &progress,
+            &relaunch_args,
+            allow_auto_self_update,
+        )? {
+            ProvisionOutcome::Ready(mut child, url) => {
+                open_in_system_browser(&url)?;
+                let _ = child.wait();
+            }
+            ProvisionOutcome::RestartScheduled => {}
+        }
         return Ok(());
     }
     // 기본: 임베디드 WebView2 네이티브 창에서 UI를 띄운다(브라우저 탭이 아니라 런처 자체 창).
-    run_windowed(paths, args)
+    run_windowed(paths, args, relaunch_args, allow_auto_self_update)
 }
 
-fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
+fn run_windowed(
+    paths: &LauncherPaths,
+    args: LaunchArgs,
+    relaunch_args: Vec<String>,
+    allow_auto_self_update: bool,
+) -> Result<()> {
     use std::sync::{Arc, Mutex};
     use tao::dpi::{LogicalSize, PhysicalPosition};
     use tao::event::{Event, WindowEvent};
@@ -698,12 +828,21 @@ fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
                     label, received, total,
                 )));
             };
-            match provision_and_spawn(&setup_paths, &args, &progress) {
-                Ok((child, url)) => {
+            match provision_and_spawn(
+                &setup_paths,
+                &args,
+                &progress,
+                &relaunch_args,
+                allow_auto_self_update,
+            ) {
+                Ok(ProvisionOutcome::Ready(child, url)) => {
                     if let Ok(mut slot) = setup_child.lock() {
                         *slot = Some(child);
                     }
                     let _ = setup_proxy.send_event(AppEvent::Ready(url));
+                }
+                Ok(ProvisionOutcome::RestartScheduled) => {
+                    let _ = setup_proxy.send_event(AppEvent::RestartForUpdate);
                 }
                 Err(err) => {
                     // raw 에러는 로그에만, 사용자에겐 분류된 카드.
@@ -740,6 +879,15 @@ fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
                 let json = serde_json::to_string(&card).unwrap_or_default();
                 let _ = webview
                     .evaluate_script(&format!("window.setFailure&&window.setFailure({json})"));
+            }
+            Event::UserEvent(AppEvent::RestartForUpdate) => {
+                window.set_visible(false);
+                if let Ok(mut slot) = child_slot.lock() {
+                    if let Some(mut child) = slot.take() {
+                        let _ = terminate_backend(&mut child);
+                    }
+                }
+                *control_flow = ControlFlow::Exit;
             }
             Event::UserEvent(AppEvent::ShowWindow) => {
                 window.set_visible(true);
@@ -855,6 +1003,7 @@ enum AppEvent {
     Ready(String),
     Progress(ipc::ProgressPayload),
     Fail(failure::FailureCard),
+    RestartForUpdate,
     ShowWindow,
     SetTestZoom(f64),
     TrayMenu(String),
@@ -915,8 +1064,8 @@ fn download_progress_payload(
         }
     });
     let message = match total {
-        Some(t) => format!("{name} 내려받는 중 — {:.1} / {:.1} MB", mb(received), mb(t)),
-        None => format!("{name} 내려받는 중 — {:.1} MB", mb(received)),
+        Some(t) => format!("{name} 내려받는 중 · {:.1} / {:.1} MB", mb(received), mb(t)),
+        None => format!("{name} 내려받는 중 · {:.1} MB", mb(received)),
     };
     ipc::ProgressPayload {
         stage: "download".into(),
@@ -1032,7 +1181,7 @@ const LAUNCH_HTML: &str = r##"<!DOCTYPE html>
   <div class="avatarWrap"><img class="avatar" src="{{AVATAR_SRC}}" alt="Codaro"></div>
   <div class="logo">Codaro</div>
   <div id="spin" class="spinner"></div>
-  <div id="status" class="status">준비 중 — Python 런타임과 커리큘럼을 설치하고 있어요…<br>처음 실행은 다운로드 때문에 잠시 걸릴 수 있어요.</div>
+  <div id="status" class="status">준비 중 · Python 런타임과 커리큘럼을 설치하고 있어요…<br>처음 실행은 다운로드 때문에 잠시 걸릴 수 있어요.</div>
   <div id="bar" class="bar hide"><div id="barfill" class="barfill"></div></div>
   <div id="err" class="err"></div>
   <script>
@@ -1257,6 +1406,27 @@ fn run_self_update(paths: &LauncherPaths, command: SelfUpdateCommand) -> Result<
                     "currentExe": current_exe,
                     "downloaded": args.downloaded,
                     "backup": backup,
+                }))?
+            );
+        }
+        SelfUpdateSubcommand::Finalize(args) => {
+            hide_console_window();
+            let relaunch_args: Vec<String> = serde_json::from_str(&args.relaunch_args_json)
+                .context("Failed to decode launcher relaunch arguments.")?;
+            let completion = finalize_self_update(
+                &args.downloaded,
+                &args.current_exe,
+                &args.expected_sha256,
+                args.parent_process_id,
+                &relaunch_args,
+            )?;
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&serde_json::json!({
+                    "currentExe": args.current_exe,
+                    "downloaded": args.downloaded,
+                    "backup": completion.backup_path,
+                    "relaunchedProcessId": completion.relaunched_process_id,
                 }))?
             );
         }

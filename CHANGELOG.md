@@ -6,6 +6,18 @@ in this file (see `docs/skills/ops/release/git-and-release.md`).
 
 ## Unreleased
 
+### Changed
+
+- 릴리스 manifest의 `minLauncherVersion`을 현재 launcher 빌드 버전에서 자동 파생하지 않고
+  `launcher/releaseCompatibility.json`이 소유하도록 바꿨다.
+
+### Fixed
+
+- 공식 `Codaro.exe`가 product update보다 launcher self-update를 먼저 확인하고, sha256 검증된
+  restart helper가 실행 중인 부모 종료 후 교체와 재실행을 맡도록 했다. 새 launcher 재실행이
+  실패하면 `.old` 백업을 복원해 구형 launcher와 최신 product release 사이의 업데이트 교착을
+  막는다.
+
 ## 0.0.13 - 2026-08-04
 
 두 달 치 학습 경험·노트북 UX·검증 파이프라인 정리를 묶은 릴리즈다. 학습 진행을 레슨 검증

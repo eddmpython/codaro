@@ -478,6 +478,8 @@ core repo + bundle repos
 - launcher는 `editor.source: "backendWheel"` manifest에서 별도 editor zip 없이 backend wheel 내부 `codaro/webBuild`를 editor root로 사용한다
 - publish workflow는 wheel/sdist 안에 `codaro/webBuild/index.html`, `_app/` asset, 기본 `curricula` package가 포함됐는지 검증한다
 - normal `vX.Y.Z` tag release workflow는 local build dist의 exact wheel URL/sha256을 `release-manifest.json`에 넣고, `Codaro.exe`, backend wheel, checksums, SPDX SBOM, `python-runtime-win-x64.zip`, runtime checksum을 같은 GitHub Release에 업로드한다
+- `launcher/releaseCompatibility.json`이 product manifest의 최소 호환 launcher 버전을 소유하며, manifest builder는 현재 launcher 버전을 최소 버전으로 자동 복제하지 않는다
+- 공식 launcher는 product release 적용 전에 sha256 검증된 launcher update를 확인하고, 별도 restart helper가 실행 파일 교체와 실패 시 `.old` 복원을 담당한다
 - bundle package는 아직 구현되지 않았다
 - `extras`는 아직 정리되지 않았지만 제품 capability용으로 쓰지 않는 것이 확정 방향이다
 - launcher-managed bundle과 user-managed external dependency 경계가 문서로 고정됐다
