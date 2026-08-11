@@ -40,10 +40,12 @@ def testGateNamesAreStable() -> None:
         "docs",
         "backend",
         "architecture-boundary",
+        "python-sdk",
         "publication-compiler",
         "static-publication",
         "server-publication",
         "block-embedding",
+        "local-publication",
         "learning-product-bridge",
         "deployment-adapters",
         "reference-products",
@@ -133,6 +135,9 @@ def testGateNamesAreStable() -> None:
     assert runner.GATE_ARTIFACTS["published-release-smoke"] == (
         "output/test-runner/published-release-smoke/published-release-report.json",
     )
+    assert runner.GATE_ARTIFACTS["python-product"] == (
+        "output/test-runner/python-product/sequence-summary.json",
+    )
     assert runner.GATES["astryx-journey"].commands == (
         runner.GateCommand(
             args=(
@@ -182,9 +187,12 @@ def testGateNamesAreStable() -> None:
         "backend",
         "runtime-security",
         "architecture-boundary",
+        "python-sdk",
+        "app-runtime",
         "publication-compiler",
         "static-publication",
         "server-publication",
+        "local-publication",
         "block-embedding",
         "learning-product-bridge",
         "deployment-adapters",
@@ -234,7 +242,15 @@ def testGateNamesAreStable() -> None:
         "backend",
         "runtime-security",
         "architecture-boundary",
+        "python-sdk",
         "publication-compiler",
+        "static-publication",
+        "server-publication",
+        "block-embedding",
+        "local-publication",
+        "learning-product-bridge",
+        "deployment-adapters",
+        "reference-products",
         "editor-build",
         "landing-build",
         "mobile-layout",
@@ -263,6 +279,23 @@ def testGateNamesAreStable() -> None:
         "product-browser-webview2-fixed",
         "evaluation-contract",
         "plan-quality",
+    )
+    assert runner.PYTHON_PRODUCT_GATES == (
+        "root-clean",
+        "docs",
+        "backend",
+        "architecture-boundary",
+        "python-sdk",
+        "app-runtime",
+        "publication-compiler",
+        "static-publication",
+        "server-publication",
+        "local-publication",
+        "block-embedding",
+        "learning-product-bridge",
+        "deployment-adapters",
+        "reference-products",
+        "automation-ide-audit",
     )
 
 
@@ -300,6 +333,20 @@ def testAuditSelfPasses() -> None:
     runner = loadRunner()
 
     assert runner.auditSelf() == 0
+
+
+def testPythonProductCommandRunsTheCanonicalSequence(monkeypatch) -> None:
+    runner = loadRunner()
+    calls: list[tuple[tuple[str, ...], str]] = []
+
+    def fakeRunGateSequence(gates: tuple[str, ...], *, sequenceName: str) -> int:
+        calls.append((gates, sequenceName))
+        return 0
+
+    monkeypatch.setattr(runner, "runGateSequence", fakeRunGateSequence)
+
+    assert runner.main(["python-product"]) == 0
+    assert calls == [(runner.PYTHON_PRODUCT_GATES, "python-product")]
 
 
 def testGateSequencePrintsReadableSummary(monkeypatch, capsys, tmp_path) -> None:

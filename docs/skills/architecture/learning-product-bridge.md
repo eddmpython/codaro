@@ -40,3 +40,5 @@ uv run python -X utf8 tests/run.py gate learning-product-bridge
 ```
 
 gate는 약한 증거, provenance spoof, stale source, JSON 의미 오류를 거부한다. 실제 production editor Chromium에서 초보자 기본 경로와 entry fast-track 경로가 레슨 실행, 강검증, 결과 카드 승격, safety 확인, Task 실행, capability 표시를 거쳐 같은 source block, ExecutableUnit, 최종 artifact에 도달하는지도 확인한다. 합성 HTML과 사용자 archive export/import는 이 경로에 허용하지 않는다.
+
+이 gate의 same-source 기능 및 자동화 증거는 `python-product`에서 SDK, 앱 projection, publication, embed, deployment와 같은 current commit에 결속된다. 학습 단독 report나 일반 Task 성공만으로 전체 Python 제품 여정을 통과한 것으로 보지 않는다.

@@ -54,7 +54,9 @@ Codaro형 IDE는 범용 편집기 복제품을 뜻하지 않는다. 필수 범�
 
 ## 제품 판정
 
-`python-product` sequence는 architecture, SDK, app runtime, publication 네 target, deployment, reference product와 자동화 증거를 current commit에 결속한다. 개별 gate 성공만으로 전체 제품 완료를 주장하지 않는다. sequence report의 git HEAD와 현재 clean HEAD가 같아야 한다.
+`python-product` sequence는 `root-clean`, `docs`, `backend`, `architecture-boundary`, `python-sdk`, `app-runtime`, `publication-compiler`, `static-publication`, `server-publication`, `local-publication`, `block-embedding`, `learning-product-bridge`, `deployment-adapters`, `reference-products`, `automation-ide-audit`를 이 순서로 실행한다. 각 이름은 기존 gate를 그대로 참조하며 구현 명령을 복사하지 않는다.
+
+`output/test-runner/python-product/sequence-summary.json`의 15개 gate가 모두 hard green이고 `gitHead`와 artifact의 `payloadGitHead`가 현재 clean HEAD와 같을 때만 전체 제품 여정이 통과한다. `quality-cycle`은 이 15개 gate를 같은 순서의 ordered subset으로 소유한다. 개별 gate 성공이나 stale summary로 전체 제품 완료를 주장하지 않는다.
 
 ## 관련
 

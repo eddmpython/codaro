@@ -175,6 +175,7 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "reference-products": (
         "output/test-runner/reference-products/reference-products-report.json",
     ),
+    "python-product": ("output/test-runner/python-product/sequence-summary.json",),
     "quality-cycle": ("output/test-runner/quality-cycle/sequence-summary.json",),
     "product-release": ("output/test-runner/product-release/sequence-summary.json",),
     "preflight": ("output/test-runner/preflight/sequence-summary.json",),
@@ -1132,6 +1133,23 @@ PREFLIGHT_GATES = (
     "docs",
     "backend",
 )
+PYTHON_PRODUCT_GATES = (
+    "root-clean",
+    "docs",
+    "backend",
+    "architecture-boundary",
+    "python-sdk",
+    "app-runtime",
+    "publication-compiler",
+    "static-publication",
+    "server-publication",
+    "local-publication",
+    "block-embedding",
+    "learning-product-bridge",
+    "deployment-adapters",
+    "reference-products",
+    "automation-ide-audit",
+)
 PRODUCT_QUALITY_GATES = (
     "root-clean",
     "docs",
@@ -1139,11 +1157,12 @@ PRODUCT_QUALITY_GATES = (
     "runtime-security",
     "architecture-boundary",
     "python-sdk",
+    "app-runtime",
     "publication-compiler",
     "static-publication",
     "server-publication",
-    "block-embedding",
     "local-publication",
+    "block-embedding",
     "learning-product-bridge",
     "deployment-adapters",
     "reference-products",
@@ -2225,6 +2244,9 @@ def listGates() -> int:
     print("quality-cycle:")
     for name in PRODUCT_QUALITY_GATES:
         print(f"  {name}")
+    print("python-product:")
+    for name in PYTHON_PRODUCT_GATES:
+        print(f"  {name}")
     print("product-release:")
     for name in PRODUCT_RELEASE_GATES:
         print(f"  {name}")
@@ -2253,6 +2275,15 @@ def auditSelf() -> int:
     if unknownProductQuality:
         failures.append(f"unknown product quality gates: {', '.join(unknownProductQuality)}")
 
+    unknownPythonProduct = [name for name in PYTHON_PRODUCT_GATES if name not in gateNames]
+    if unknownPythonProduct:
+        failures.append(f"unknown Python product gates: {', '.join(unknownPythonProduct)}")
+    qualityPythonProductOrder = tuple(
+        name for name in PRODUCT_QUALITY_GATES if name in PYTHON_PRODUCT_GATES
+    )
+    if qualityPythonProductOrder != PYTHON_PRODUCT_GATES:
+        failures.append("quality-cycle does not own the ordered Python product gate sequence")
+
     unknownProductRelease = [name for name in PRODUCT_RELEASE_GATES if name not in gateNames]
     if unknownProductRelease:
         failures.append(f"unknown product release gates: {', '.join(unknownProductRelease)}")
@@ -2277,6 +2308,8 @@ def auditSelf() -> int:
             failures.append(f"gate doc does not mention: {', '.join(missingDocNames)}")
         if "`quality-cycle`" not in docText:
             failures.append("gate doc does not mention: quality-cycle")
+        if "`python-product`" not in docText:
+            failures.append("gate doc does not mention: python-product")
     else:
         failures.append(f"missing gate doc: {GATE_DOC.relative_to(ROOT)}")
 
@@ -2297,6 +2330,7 @@ def buildParser() -> argparse.ArgumentParser:
     subparsers.add_parser("preflight", help="run the default local preflight gates")
     subparsers.add_parser("change-cycle", help="run gates selected from changed files")
     subparsers.add_parser("quality-cycle", help="run the product quality gate sequence")
+    subparsers.add_parser("python-product", help="run the same-source Python product gate sequence")
     subparsers.add_parser("product-release", help="run the release gate sequence without hiding path evidence failures")
     subparsers.add_parser("audit-self", help="validate runner, docs, and CI wiring")
 
@@ -2326,6 +2360,8 @@ def main(argv: list[str] | None = None) -> int:
         return runGateSequence(gates, sequenceName="change-cycle")
     if args.command == "quality-cycle":
         return runGateSequence(PRODUCT_QUALITY_GATES, sequenceName="quality-cycle")
+    if args.command == "python-product":
+        return runGateSequence(PYTHON_PRODUCT_GATES, sequenceName="python-product")
     if args.command == "product-release":
         return runGateSequence(PRODUCT_RELEASE_GATES, sequenceName="product-release")
     if args.command == "audit-self":

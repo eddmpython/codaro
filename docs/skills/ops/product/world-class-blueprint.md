@@ -567,6 +567,8 @@ uv run python -X utf8 tests/run.py gate automation-ide-audit
 | 배포와 rollback | `deployment-adapters`, `reference-products`, `install-launcher-smoke`, `launcher-test` |
 | 공개 신뢰 | `reference-products`, `landing-public`, root trust docs |
 
+`python-product`는 위 matrix 중 Python IDE와 SDK, 앱 및 부분 임베딩, publication, 배포와 rollback, 학습 결과 승격, 자동화 표면을 하나의 current-commit sequence로 묶는 통합 판정이다. `quality-cycle`은 이 15개 gate를 같은 순서의 ordered subset으로 포함한다. 개별 gate report나 오래된 sequence summary만으로 `sameSourceProductJourneyPassRate` 100%를 주장하지 않는다.
+
 ## Non-goals
 
 - 모든 과목을 대형 교육 플랫폼처럼 커버하지 않는다.
