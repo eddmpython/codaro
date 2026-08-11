@@ -307,7 +307,8 @@ def auditCase(
     }
     try:
         page.goto(url, wait_until="domcontentloaded", timeout=45_000)
-        waitForRuntimeState(page, case.expectedTheme, case.expectedDensity)
+        expectedSurface = expectedProductSurface(case)
+        waitForRuntimeState(page, case.expectedTheme, case.expectedDensity, expectedSurface)
         initial = runtimeSnapshot(page)
         result["initial"] = initial
         failures.extend(validateSnapshot(case, initial, phase="initial"))
@@ -315,7 +316,7 @@ def auditCase(
         if case.systemLiveSwitch:
             switchedTheme = oppositeTheme(case.expectedTheme)
             page.emulate_media(color_scheme=switchedTheme)
-            waitForRuntimeState(page, switchedTheme, case.expectedDensity)
+            waitForRuntimeState(page, switchedTheme, case.expectedDensity, expectedSurface)
             afterSystemSwitch = runtimeSnapshot(page)
             result["afterSystemSwitch"] = afterSystemSwitch
             failures.extend(validateSnapshot(case, afterSystemSwitch, phase="system-switch", expectedTheme=switchedTheme))
@@ -326,7 +327,7 @@ def auditCase(
             toggle = page.get_by_role("button", name=toggleLabel, exact=True).first
             toggle.wait_for(state="visible", timeout=20_000)
             toggle.click()
-            waitForRuntimeState(page, toggledTheme, case.expectedDensity)
+            waitForRuntimeState(page, toggledTheme, case.expectedDensity, expectedSurface)
             afterToggle = runtimeSnapshot(page)
             result["afterToggle"] = afterToggle
             failures.extend(validateSnapshot(case, afterToggle, phase="toggle", expectedTheme=toggledTheme))
@@ -336,7 +337,7 @@ def auditCase(
                 )
 
             page.reload(wait_until="domcontentloaded", timeout=45_000)
-            waitForRuntimeState(page, toggledTheme, case.expectedDensity)
+            waitForRuntimeState(page, toggledTheme, case.expectedDensity, expectedSurface)
             afterReload = runtimeSnapshot(page)
             result["afterReload"] = afterReload
             failures.extend(validateSnapshot(case, afterReload, phase="reload", expectedTheme=toggledTheme))
@@ -344,14 +345,14 @@ def auditCase(
                 failures.append(
                     f"{case.name} reload: stored theme {afterReload['storedTheme']!r} != {toggledTheme!r}"
                 )
-    except Exception as exc:  # Playwright errors carry the useful locator/page detail.
+    except Exception as exc:  # noqa: BLE001 - Playwright errors carry useful locator and page detail
         failures.append(f"{case.name}: {type(exc).__name__}: {exc}")
         screenshotPath = workspace / f"{case.name}.png"
         try:
             page.screenshot(path=str(screenshotPath), full_page=True)
             result["failureScreenshot"] = screenshotPath.relative_to(ROOT).as_posix()
-        except Exception:
-            pass
+        except Exception as diagnosticError:  # noqa: BLE001 - diagnostics must not mask the original failure
+            result["failureScreenshotError"] = f"{type(diagnosticError).__name__}: {diagnosticError}"
     finally:
         result["durationMs"] = round((time.monotonic() - caseStarted) * 1000)
         result["passed"] = not failures
@@ -404,23 +405,41 @@ def seedPreferencesScript(case: ThemeRuntimeCase) -> str:
     """
 
 
-def waitForRuntimeState(page: Any, expectedTheme: str, expectedDensity: str) -> None:
+def expectedProductSurface(case: ThemeRuntimeCase) -> str | None:
+    if case.product not in {"run", "local"}:
+        return None
+    return "curriculum" if case.expectedDensity == "learningComfortable" else "editor"
+
+
+def waitForRuntimeState(
+    page: Any,
+    expectedTheme: str,
+    expectedDensity: str,
+    expectedSurface: str | None,
+) -> None:
+    expectedToggle = "라이트 모드로" if expectedTheme == "dark" else "다크 모드로"
     page.wait_for_function(
         """
-        ([theme, density]) => {
+        ([theme, density, activeSurface, toggleLabel]) => {
           const root = document.documentElement;
           const scope = document.querySelector('[data-astryx-theme="codaro"]');
           const densityOwner = scope?.matches(`[data-density="${density}"]`)
             ? scope
             : scope?.querySelector(`[data-density="${density}"]`);
+          const surfaceReady = activeSurface === null
+            || Boolean(document.querySelector(`[data-active-product-surface="${activeSurface}"]`));
+          const toggleReady = [...document.querySelectorAll("button[aria-label]")]
+            .some((button) => button.getAttribute("aria-label") === toggleLabel);
           return root.dataset.theme === theme
             && root.dataset.resolvedTheme === theme
             && root.dataset.density === density
             && Boolean(scope)
-            && Boolean(densityOwner);
+            && Boolean(densityOwner)
+            && surfaceReady
+            && toggleReady;
         }
         """,
-        arg=[expectedTheme, expectedDensity],
+        arg=[expectedTheme, expectedDensity, expectedSurface, expectedToggle],
         timeout=25_000,
     )
     page.evaluate("document.fonts?.ready")
