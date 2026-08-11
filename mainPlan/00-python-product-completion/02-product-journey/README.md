@@ -26,6 +26,7 @@ Percent Python source
 3. `referenceProducts.json`과 검증기를 확장해 plain Python, public SDK import, app projection, embed mode, target publication, proof 및 claim boundary를 source별로 추적한다.
 4. `verifyReferenceProductsPlaywright.py`는 existing five products를 유지하면서 계산기 embed의 output, interactive, editable 소비와 server/local 부정 경계를 확인한다. 새 데모를 추가해 약한 성공 경로를 만들지 않는다.
 5. `world-class-blueprint` Verification Matrix와 gate 문서를 `python-product` sequence에 연결하고 CI는 `python-sdk`를 독립 hard gate로 실행한다. 전체 긴 sequence는 quality-cycle이 소유한다.
+6. [pyproc 피드백](03-pyproc-feedback/README.md)의 Web과 Local 실측 결함을 제품 여정 gate에 반영한다. 특히 Local 정적 bundle 원자성을 먼저 복구한 뒤 동일 학습 여정을 양쪽 runtime에서 다시 통과시킨다.
 
 ## 영향 파일
 
