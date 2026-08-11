@@ -311,6 +311,25 @@ def testAtomicHeadSwapKeepsPreviousArchiveOnInterruptedImport(tmp_path: Path) ->
     assert readCurrentLearningArchive(storeRoot)["manifest"]["archiveId"] == second["manifest"]["archiveId"]
 
 
+def testSameContentSyncAcceptsANewerArchiveTimestamp(tmp_path: Path) -> None:
+    storeRoot = tmp_path / "learning-archives"
+    first = learningArchive()
+    second = deepcopy(first)
+    second["manifest"]["createdAt"] = "2026-07-24T00:02:00+00:00"
+
+    firstReceipt = commitLearningArchiveImport(first, storeRoot)
+    secondReceipt = commitLearningArchiveImport(second, storeRoot)
+
+    assert firstReceipt["changed"] is True
+    assert secondReceipt == {
+        "archiveId": first["manifest"]["archiveId"],
+        "changed": False,
+        "previousArchiveId": first["manifest"]["archiveId"],
+        "rootHash": first["manifest"]["rootHash"],
+    }
+    assert readCurrentLearningArchive(storeRoot)["manifest"]["createdAt"] == first["manifest"]["createdAt"]
+
+
 def testProductImportMergesEvidenceAndKeepsAutomationDisabled(tmp_path: Path) -> None:
     evidenceStore = LearningEvidenceArchiveStore(tmp_path / "evidence.sqlite3")
     evidenceStore.initialize()

@@ -1348,7 +1348,15 @@ def _verifyStoredObject(plan: LearningArchiveImportPlan, objectRoot: Path) -> No
         storedArchive = _ioPath(objectRoot.joinpath("archive.json")).read_bytes()
     except OSError as error:
         raise LearningArchiveError("학습 archive object를 읽을 수 없습니다.") from error
-    if storedArchive != plan.canonicalArchiveBytes:
+    try:
+        storedPlan = prepareLearningArchiveImport(storedArchive)
+    except LearningArchiveError as error:
+        raise LearningArchiveError("학습 archive object가 유효하지 않습니다.") from error
+    if (
+        storedPlan.archiveId != plan.archiveId
+        or storedPlan.rootHash != plan.rootHash
+        or storedPlan.blobs != plan.blobs
+    ):
         raise LearningArchiveError("학습 archive object가 import plan과 일치하지 않습니다.")
     for blobHash, expected in plan.blobs:
         try:
