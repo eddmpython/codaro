@@ -80,7 +80,7 @@ export function CurriculumView({
   // 완성 예제 자동 실행은 hook 이 소유한다. 이 파일은 조립만 한다.
   // 별도 패키지를 요구하는 레슨은 브라우저 커널에서 예제가 반드시 실패하므로 자동 실행하지
   // 않는다. Local 은 패키지를 설치하므로 그대로 돈다.
-  const cancelSnippetAutoRun = useSnippetAutoRun({
+  const { cancelSnippetAutoRun, snippetAutoRunState } = useSnippetAutoRun({
     blocks: document.blocks,
     canRun,
     lessonKey: `${selectedCategory}/${selectedContentId}`,
@@ -127,7 +127,11 @@ export function CurriculumView({
   }, [document.blocks, selectedCategory, selectedContentId]);
 
   return (
-    <ScrollArea className="h-full min-h-0 min-w-0" data-learning-content-pane="true">
+    <ScrollArea
+      className="h-full min-h-0 min-w-0"
+      data-learning-content-pane="true"
+      data-learning-snippet-auto-run-state={snippetAutoRunState}
+    >
       <div className="min-w-0 p-4">
         <div className="mx-auto min-w-0 max-w-5xl">
           <LearningOverviewHeader

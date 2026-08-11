@@ -2130,6 +2130,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "targetAssessmentMode": "mastery",
             "expectCanonicalLesson": "day02_변수와데이터타입",
             "initialCheckState": "mismatch",
+            "waitForSnippetAutoRunSettled": True,
             "expectedLearningVisualAssetId": "pythonFundamentals",
             "solutionCode": (
                 "def describe_value(value):\n"
@@ -5739,6 +5740,36 @@ def runBrowserMatrix(
                         waitForWebLearningEvidenceEventCount(page, 0, timeout=20_000)
                     if case.get("runLearningCell"):
                         page.evaluate("() => localStorage.removeItem('codaro-web-progress-v1')")
+                        if case.get("waitForSnippetAutoRunSettled"):
+                            try:
+                                page.wait_for_selector(
+                                    '[data-learning-snippet-auto-run-state="settled"]',
+                                    timeout=120_000,
+                                )
+                            except Exception as error:
+                                autoRunEvidence = page.evaluate(
+                                    """
+                                    () => {
+                                      const pane = document.querySelector(
+                                        '[data-learning-snippet-auto-run-state]'
+                                      );
+                                      return {
+                                        state: pane?.getAttribute(
+                                          'data-learning-snippet-auto-run-state'
+                                        ) || null,
+                                        running: Array.from(document.querySelectorAll(
+                                          '[data-learning-execution-state="running"]'
+                                        )).map((element) => element.id),
+                                        completedSnippetOutputs: document.querySelectorAll(
+                                          '[data-learning-snippet-output="true"]'
+                                        ).length,
+                                      };
+                                    }
+                                    """
+                                )
+                                raise AssertionError(
+                                    f"snippet auto-run did not settle: {autoRunEvidence}"
+                                ) from error
                         assessmentMode = str(case.get("targetAssessmentMode", ""))
                         exerciseParts = page.locator('[data-learning-section-part="exercise"]')
                         if assessmentMode:

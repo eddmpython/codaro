@@ -1,5 +1,7 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { BlockConfig, ExecutionResult } from "@/types";
+
+export type SnippetAutoRunState = "running" | "settled" | "cancelled";
 
 /**
  * 레슨을 열면 완성 예제를 순서대로 자동 실행한다.
@@ -36,14 +38,19 @@ export function useSnippetAutoRun({
   requiresPackages: boolean;
   results: Record<string, ExecutionResult>;
   runningBlockId: string | null;
-}): () => void {
+}): { cancelSnippetAutoRun: () => void; snippetAutoRunState: SnippetAutoRunState } {
   const queueRef = useRef<string[]>([]);
   const lessonRef = useRef("");
   const pendingRef = useRef<string | null>(null);
+  const [state, setState] = useState<{ lessonKey: string; value: SnippetAutoRunState }>({
+    lessonKey,
+    value: "running",
+  });
   const cancelSnippetAutoRun = useCallback(() => {
     queueRef.current = [];
     pendingRef.current = null;
-  }, []);
+    setState({ lessonKey, value: "cancelled" });
+  }, [lessonKey]);
 
   useEffect(() => {
     if (lessonRef.current === lessonKey) return;
@@ -52,13 +59,23 @@ export function useSnippetAutoRun({
     queueRef.current = blocks
       .filter((block) => block.type === "code" && block.role === "snippet" && block.content.trim())
       .map((block) => block.id);
-  }, [blocks, lessonKey]);
+    setState({
+      lessonKey,
+      value: queueRef.current.length && canRun && !requiresPackages ? "running" : "settled",
+    });
+  }, [blocks, canRun, lessonKey, requiresPackages]);
 
   useEffect(() => {
-    if (!canRun || requiresPackages) return;
+    if (!canRun || requiresPackages) {
+      setState({ lessonKey, value: "settled" });
+      return;
+    }
     if (runningBlockId) {
       // 우리가 보낸 셀이 아니면 학습자가 직접 실행한 것이다. 남은 예제는 보내지 않는다.
-      if (runningBlockId !== pendingRef.current) queueRef.current = [];
+      if (runningBlockId !== pendingRef.current) {
+        queueRef.current = [];
+        setState({ lessonKey, value: "cancelled" });
+      }
       return;
     }
     const pending = pendingRef.current;
@@ -71,10 +88,15 @@ export function useSnippetAutoRun({
       const block = blocks.find((item) => item.id === nextId);
       if (!block) continue;
       pendingRef.current = block.id;
+      setState({ lessonKey, value: "running" });
       onRunBlock(block, block.content);
       return;
     }
-  }, [blocks, canRun, onRunBlock, results, runningBlockId]);
+    setState({ lessonKey, value: "settled" });
+  }, [blocks, canRun, lessonKey, onRunBlock, requiresPackages, results, runningBlockId]);
 
-  return cancelSnippetAutoRun;
+  return {
+    cancelSnippetAutoRun,
+    snippetAutoRunState: state.lessonKey === lessonKey ? state.value : "running",
+  };
 }

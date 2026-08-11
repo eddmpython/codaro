@@ -145,6 +145,8 @@ def sourceContractFailures() -> list[str]:
             "installBrowserPythonRuntimeDiagnostics",
             "planBrowserReactiveNotebook",
             "runBrowserReactiveNotebook",
+            "browserExecutionQueue",
+            "executeBrowserBlockTransaction",
             "appRuntimeSource",
             "_codaroBrowserNames",
             "_codaroPackage.__version__ = '0.0.0+browser'",

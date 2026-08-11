@@ -80,6 +80,7 @@ type PyProcModule = {
 let runtimePromise: Promise<PyRuntime> | null = null;
 let assetIntegrityPromise: Promise<PyProcAssetIntegrity | null> | null = null;
 let pyodideIntegrityPromise: Promise<PyodideAssetIntegrity> | null = null;
+let browserExecutionQueue: Promise<void> = Promise.resolve();
 const stdoutLines: string[] = [];
 const stderrLines: string[] = [];
 let previousVariables = new Map<string, VariableInfo>();
@@ -596,11 +597,31 @@ export async function verifyBrowserAsgiServer() {
 }
 
 /** 셀 하나를 브라우저 WASM CPython에서 진짜 실행한다. */
-export async function executeBrowserBlock(
+export function executeBrowserBlock(
   blockId: string,
   code: string,
   executionCount: number,
   packages: string[] = [],
+): Promise<ExecutionResult> {
+  // 브라우저 커널과 출력 버퍼, 변수 스냅샷은 한 세트의 공유 상태다. 호출자가 각자
+  // 직렬화하더라도 자동 예제와 학습자 실행처럼 서로 다른 흐름이 겹칠 수 있으므로,
+  // 커널 소유자가 코드 실행부터 결과 수집까지 하나의 트랜잭션으로 보장한다.
+  const scheduled = browserExecutionQueue.then(
+    () => executeBrowserBlockTransaction(blockId, code, executionCount, packages),
+    () => executeBrowserBlockTransaction(blockId, code, executionCount, packages),
+  );
+  browserExecutionQueue = scheduled.then(
+    () => undefined,
+    () => undefined,
+  );
+  return scheduled;
+}
+
+async function executeBrowserBlockTransaction(
+  blockId: string,
+  code: string,
+  executionCount: number,
+  packages: string[],
 ): Promise<ExecutionResult> {
   const runtime = await ensureRuntime();
   await ensurePackages(runtime, packages);
