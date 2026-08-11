@@ -660,8 +660,8 @@ def publicExperienceSnapshot(page: Any) -> dict[str, Any]:
           const homeOrderSelectors = [
             ".homeHeroHeadline",
             ".homeProductStatement",
-            ".homeHeroProductFrame",
             ".homeHeroActions",
+            ".homeHeroProductFrame",
             ".homeStudio",
             ".homeStudioResume",
             ".homeStudioPaths",
