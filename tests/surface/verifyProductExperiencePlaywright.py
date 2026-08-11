@@ -1157,6 +1157,14 @@ def captureStableViewport(page: Any, screenshotPath: Path) -> None:
           )];
           document.querySelectorAll('[data-visual-capture-spacer]')
             .forEach((node) => node.remove());
+          document.querySelectorAll('[data-visual-capture-translate-origin]')
+            .forEach((node) => {
+              if (!(node instanceof HTMLElement)) return;
+              node.style.translate = node.getAttribute(
+                'data-visual-capture-translate-origin'
+              ) || '';
+              node.removeAttribute('data-visual-capture-translate-origin');
+            });
           pinnedScrollAreas.forEach((node) => {
               const origin = node.getAttribute('data-visual-capture-scroll-origin');
               node.removeAttribute('data-visual-capture-scroll-top');
@@ -5972,7 +5980,7 @@ def runBrowserMatrix(
                                 SCREENSHOT_ROOT / colorScheme
                                 / f"{case['name']}-local-required.png"
                             )
-                            firstCheck.evaluate(
+                            captureGeometry = firstCheck.evaluate(
                                 """
                                 async (element) => {
                                   const viewport = element.closest(
@@ -6033,13 +6041,56 @@ def runBrowserMatrix(
                                       stableSince = performance.now();
                                     }
                                     previous = current;
-                                    if (stableFrames >= 4 && performance.now() - stableSince >= 500) return;
+                                    if (stableFrames >= 4 && performance.now() - stableSince >= 500) {
+                                      const workCell = element.closest('.astryxWorkCell');
+                                      const captureRoot = viewport.firstElementChild;
+                                      const pixelOffsetY = Math.round(settledRect.top) - settledRect.top;
+                                      if (captureRoot instanceof HTMLElement) {
+                                        captureRoot.setAttribute(
+                                          'data-visual-capture-translate-origin',
+                                          captureRoot.style.translate,
+                                        );
+                                        captureRoot.style.translate = `0 ${pixelOffsetY}px`;
+                                        await new Promise((resolve) => requestAnimationFrame(
+                                          () => requestAnimationFrame(resolve)
+                                        ));
+                                      }
+                                      const rectOf = (node) => {
+                                        if (!(node instanceof Element)) return null;
+                                        const rect = node.getBoundingClientRect();
+                                        return {
+                                          top: rect.top,
+                                          left: rect.left,
+                                          width: rect.width,
+                                          height: rect.height,
+                                        };
+                                      };
+                                      return {
+                                        activeElement: document.activeElement?.getAttribute('aria-label')
+                                          || document.activeElement?.tagName
+                                          || null,
+                                        capturePixelOffsetY: pixelOffsetY,
+                                        captureRoot: rectOf(captureRoot),
+                                        check: rectOf(element),
+                                        description: rectOf(workCell?.querySelector('p')),
+                                        editor: rectOf(workCell?.querySelector('.cm-editor')),
+                                        frame: rectOf(workCell?.querySelector('.astryxWorkCellFrame')),
+                                        output: rectOf(workCell?.querySelector('.astryxWorkCellOutput')),
+                                        runButton: rectOf(workCell?.querySelector('.astryxWorkCellAction')),
+                                        title: rectOf(workCell?.querySelector('h3')),
+                                        viewport: rectOf(viewport),
+                                        viewportClientHeight: viewport.clientHeight,
+                                        viewportScrollHeight: viewport.scrollHeight,
+                                        viewportScrollTop: viewport.scrollTop,
+                                      };
+                                    }
                                   }
                                   throw new Error('learning capture viewport did not settle');
                                 }
                                 """
                             )
                             captureStableViewport(page, capabilityScreenshot)
+                            checkCapabilityEvidence["captureGeometry"] = captureGeometry
                             checkCapabilityEvidence["screenshot"] = str(
                                 capabilityScreenshot.relative_to(ROOT)
                             ).replace("\\", "/")

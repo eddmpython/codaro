@@ -358,6 +358,16 @@ class CaptureProductVisualsTest(unittest.TestCase):
         source = PRODUCT_RUNNER_PATH.read_text(encoding="utf-8")
         self.assertIn("visible capture contains sensitive text signals", source)
 
+    def testLocalRequiredCapturePinsContentToWholePixelsAndRestoresIt(self) -> None:
+        source = PRODUCT_RUNNER_PATH.read_text(encoding="utf-8")
+        self.assertIn(
+            "Math.round(settledRect.top) - settledRect.top",
+            source,
+        )
+        self.assertIn("data-visual-capture-translate-origin", source)
+        self.assertIn("node.style.translate = node.getAttribute", source)
+        self.assertIn("capturePixelOffsetY", source)
+
 
 if __name__ == "__main__":
     unittest.main()
