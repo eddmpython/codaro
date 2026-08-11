@@ -98,3 +98,15 @@ def testFinishedStateIsDeletedInsteadOfMarkedDone() -> None:
             offenders.append(path.relative_to(ROOT).as_posix())
 
     assert offenders == []
+
+
+def testMainPlanRequiresCategoryCompletionAndSelfExhaustion() -> None:
+    body = (MAIN_PLAN / "README.md").read_text(encoding="utf-8")
+    normalizedBody = " ".join(body.split())
+    for requiredRule in (
+        "initiative 하나를 큰 작업 카테고리로 고정한다",
+        "자력으로 수행할 수 있는 모든 경로",
+        "외부 의존",
+        "폴더를 바로 삭제한다",
+    ):
+        assert requiredRule in normalizedBody, f"mainPlan 운영 규칙이 없다: {requiredRule}"

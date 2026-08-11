@@ -31,6 +31,13 @@ mainPlan/
 10. `mainPlan/`만 저장소의 camelCase 이름 규칙에서 예외로 두며 폴더 번호와 kebab-case를 허용한다.
 11. 장기간 소비되는 schema, rubric, wire contract는 `contracts/`, 운영 규칙은 `docs/skills/`, 실행 보고서는 `output/test-runner/`가 소유한다. 임시 TODO가 제품 runtime이나 영구 계약의 source가 되면 안 된다.
 12. leaf의 자체 구현과 검증이 끝났다면 상위 workstream의 독립 승인이나 release 대기를 이유로 leaf를 보관하지 않는다. 아직 필요한 승인·release action만 상위 TODO에 남기고 끝난 leaf는 삭제한다.
+13. 착수할 때 initiative 하나를 큰 작업 카테고리로 고정한다. 내부 packet은 작은 논리 단위로 검증하고
+    커밋하되, 해당 initiative의 자력 구현과 종료 조건을 모두 끝내기 전에는 다른 initiative로 이동하지 않는다.
+14. mainPlan 작성자는 저장소 수정, 테스트, probe, 허용된 도구와 계정, 공개 API 등 자력으로 수행할 수
+    있는 모든 경로를 구현 작업과 종료 조건으로 싣고 실제로 소진한다. 자력 경로가 남은 일을 외부 의존,
+    운영자 작업, 후속 과제, `차단`으로 밀어내지 않는다.
+15. 모든 자력 경로를 소진한 뒤에도 새 권한, 새 자격증명, 제3자 승인, 시간 경과가 반드시 필요할 때만
+    외부 조건으로 기록한다. 이 조건과 무관한 구현은 같은 initiative 안에서 계속 끝낸다.
 
 ## Git 작업 기록
 
