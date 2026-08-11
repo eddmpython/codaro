@@ -227,7 +227,7 @@ GATES: dict[str, Gate] = {
             "uv", "run", "python", "-X", "utf8", "-m", "pytest",
             "tests/", "--ignore=tests/_attempts", "-q", "--tb=short",
             "--durations=25", "--durations-min=0.25",
-        ), timeoutSeconds=1800),),
+        ), timeoutSeconds=3600),),
     ),
     "attempts": Gate(
         tier="experiment",

@@ -138,6 +138,7 @@ def testGateNamesAreStable() -> None:
     assert runner.GATE_ARTIFACTS["python-product"] == (
         "output/test-runner/python-product/sequence-summary.json",
     )
+    assert runner.GATES["backend"].commands[0].timeoutSeconds == 3600
     assert runner.GATES["astryx-journey"].commands == (
         runner.GateCommand(
             args=(

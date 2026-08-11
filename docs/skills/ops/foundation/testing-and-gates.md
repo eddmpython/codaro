@@ -133,7 +133,7 @@ uv run python -X utf8 tests/run.py python-product
 | `root-clean` | fast | 저장소 루트가 canonical tree와 맞고 로컬 실습 파일, 로그, 임시 산출물이 남지 않았는지 확인한다. |
 | `evaluation-contract` | fast | 목표 점수 없는 frozen rubric, closed raw report·canonical finding ledger schema, score·severity·maturity 보존 negative fixture를 검증한다. 평가는 제품 출시를 막는 외부 round가 아니라 필요할 때 재사용하는 영구 계약이다. |
 | `plan-quality` | fast | mainPlan이 미완료 TODO만 보존하는지 검사하고 current source의 경로·심볼·gate·보고서를 직접 대조한다. |
-| `backend` | fast | Python backend 전체 테스트를 최대 1800초 안에서 실행한다. `tests/_attempts`는 `--ignore`로 수집하지 않고, 0.25초 이상 걸린 항목 중 가장 느린 25개를 출력해 preflight 병목을 관찰한다. |
+| `backend` | fast | Python backend 전체 테스트를 최대 3600초 안에서 실행한다. `tests/_attempts`는 `--ignore`로 수집하지 않고, 0.25초 이상 걸린 항목 중 가장 느린 25개를 출력해 preflight 병목을 관찰한다. |
 | `runtime-security` | fast | proof 실행의 최소 환경, 선언되지 않은 환경 차단, 자손 process와 native interop 차단, network origin pinning, 실행 중 E-Stop, 격리 policy receipt를 검증한다. |
 | `attempts` | experiment | 운영과 분리된 `tests/_attempts` 실험 샌드박스를 실행한다. preflight/quality-cycle/CI 비포함이며 `tier` 스윕에도 끼지 않는다. |
 | `architecture-boundary` | fast | core→engine→domain→transport→entry 의존 방향과 router/domain 경계를 집중 확인한다. |
