@@ -525,7 +525,9 @@ def testCurriculumAndNotebookDraftsHaveSeparateStateOwners() -> None:
     assert "const [curriculumDrafts, setCurriculumDrafts]" in curriculumHook
     assert "setCurriculumDrafts(materialized.drafts)" in curriculumHook
     assert "onDraftUpdates" not in curriculumHook
-    assert 'const activeDrafts = surface === "curriculum" ? curriculumDrafts : drafts' in app
+    assert "const appRuntimeActive = serverAppMode === true || blockEmbedFrame !== null" in app
+    assert 'const curriculumRuntimeActive = !appRuntimeActive && surface === "curriculum"' in app
+    assert "const activeDrafts = curriculumRuntimeActive ? curriculumDrafts : drafts" in app
     assert "learningDrafts={curriculumDrafts}" in app
-    assert 'onDraftChange={surface === "curriculum" ? updateCurriculumDraft : updateDraft}' in app
+    assert "onDraftChange={curriculumRuntimeActive ? updateCurriculumDraft : updateDraft}" in app
     assert "applyCurriculumDraftUpdates" in pendingHook

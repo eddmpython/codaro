@@ -785,7 +785,7 @@ function App() {
               onConnectAi={connectAiProvider}
               onCellAsk={askCellAssistant}
               onConfirmTaskSafety={confirmTaskSafety}
-              onDraftChange={surface === "curriculum" ? updateCurriculumDraft : updateDraft}
+              onDraftChange={curriculumRuntimeActive ? updateCurriculumDraft : updateDraft}
               onDeleteCell={(blockId) => {
                 cleanupCellDefinitions(blockId);
                 deleteNotebookCell(blockId);
