@@ -339,7 +339,7 @@ export async function runReactiveNotebook({
       );
       return {
         sessionId,
-        results: results as ResultMap,
+        results: attachRuntimeSources(results as ResultMap, runtimeBlocks),
         variables,
         diagnostics,
         notice: {
@@ -388,7 +388,10 @@ export async function runReactiveNotebook({
         })),
       document.title,
     );
-    const results = Object.fromEntries(payload.results.map((result) => [result.blockId ?? "", result])) as ResultMap;
+    const results = attachRuntimeSources(
+      Object.fromEntries(payload.results.map((result) => [result.blockId ?? "", result])) as ResultMap,
+      documentRuntimeBlocks(document, drafts),
+    );
     return {
       sessionId: activeSession.sessionId,
       results,
@@ -475,7 +478,7 @@ export async function runAllNotebook({
       );
       return {
         sessionId,
-        results: results as ResultMap,
+        results: attachRuntimeSources(results as ResultMap, runtimeBlocks),
         variables,
         diagnostics,
         notice: {
@@ -523,9 +526,12 @@ export async function runAllNotebook({
       runtimeBlocks,
       document.title,
     );
-    const results = Object.fromEntries(
-      payload.results.map((result) => [result.blockId ?? "", result]),
-    ) as ResultMap;
+    const results = attachRuntimeSources(
+      Object.fromEntries(
+        payload.results.map((result) => [result.blockId ?? "", result]),
+      ) as ResultMap,
+      runtimeBlocks,
+    );
     return {
       sessionId: activeSession.sessionId,
       results,
@@ -706,6 +712,19 @@ function documentRuntimeBlocks(
       type: isKernelExecutableBlock(block) ? "code" : "markdown",
       content: drafts[block.id] ?? block.content,
     }));
+}
+
+function attachRuntimeSources(
+  results: ResultMap,
+  runtimeBlocks: Array<{ id: string; content: string }>,
+): ResultMap {
+  const sourceByBlockId = new Map(runtimeBlocks.map((block) => [block.id, block.content]));
+  return Object.fromEntries(
+    Object.entries(results).map(([blockId, result]) => [
+      blockId,
+      { ...result, sourceCode: sourceByBlockId.get(blockId) ?? result.sourceCode },
+    ]),
+  );
 }
 
 function uniquePackages(packageNames: string[]) {

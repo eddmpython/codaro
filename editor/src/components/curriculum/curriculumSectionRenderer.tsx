@@ -400,11 +400,15 @@ export function StructuredSectionLearningBody({
   useEffect(() => {
     if (!exercise || !exerciseResult) return;
     if (!attemptCheck?.checkId || !attemptCheck.fixtureHash) return;
+    if (
+      attemptCheck.executionCount !== exerciseResult.executionCount
+      || attemptCheck.source !== exerciseSource
+    ) return;
     const recordKey = JSON.stringify([
       category,
       contentId,
       exercise.id,
-      exerciseResult.executionCount,
+      attemptCheck.executionCount,
       attemptCheck.checkId,
       attemptCheck.evidence,
       attemptCheck.state,
@@ -427,7 +431,7 @@ export function StructuredSectionLearningBody({
           category,
           checkId: attemptCheck.checkId,
           contentId,
-          executionCount: exerciseResult.executionCount,
+          executionCount: attemptCheck.executionCount,
           expected: attemptCheck.expected,
           errorClass: attemptCheck.state,
           fixtureHash: attemptCheck.fixtureHash,
@@ -458,7 +462,7 @@ export function StructuredSectionLearningBody({
     } else {
       window.dispatchEvent(new CustomEvent(PROGRESS_UPDATED_EVENT));
     }
-  }, [attemptCheck, category, contentId, exercise, exerciseResult]);
+  }, [attemptCheck, category, contentId, exercise, exerciseResult, exerciseSource]);
 
   const promotePreparedDraft = async (draftId: string, inputNames: string[]) => {
     if (!onPromoteLearningBlock) return;

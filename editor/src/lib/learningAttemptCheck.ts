@@ -17,6 +17,7 @@ export type LearningAttemptCheck = {
   artifacts?: LearningEvidenceArtifact[];
   checkId: string;
   evidence: "none" | "practice" | "strong";
+  executionCount: number;
   executor: "browser-worker" | "local-sandbox" | "practice" | "none";
   expected: string;
   feedback: string;
@@ -46,6 +47,7 @@ export async function evaluateLearningAttempt(
       actual,
       checkId: strongSpec?.id ?? "",
       evidence: "none",
+      executionCount: result.executionCount,
       executor: strongSpec ? (runtimeTier === "local" ? "local-sandbox" : "browser-worker") : "none",
       expected,
       feedback: "오류 메시지를 확인하고 코드를 고친 뒤 다시 실행해 보세요.",
@@ -66,6 +68,7 @@ export async function evaluateLearningAttempt(
       evidence: checked.passed
         ? ("strongEligible" in checked && checked.strongEligible === false ? "practice" : "strong")
         : "none",
+      executionCount: result.executionCount,
       executor: checked.executor,
       expected: checked.expected,
       feedback: "strongEligible" in checked && checked.strongEligible === false
@@ -86,6 +89,7 @@ export async function evaluateLearningAttempt(
       actual,
       checkId: "",
       evidence: "none",
+      executionCount: result.executionCount,
       executor: "none",
       expected: "",
       feedback: "이 연습은 자동 확인을 지원하지 않습니다. 출력과 목표를 직접 비교해 보세요.",
@@ -104,6 +108,7 @@ export async function evaluateLearningAttempt(
       actual,
       checkId: "",
       evidence: "none",
+      executionCount: result.executionCount,
       executor: "practice",
       expected,
       feedback: verdict.feedback,
@@ -117,6 +122,7 @@ export async function evaluateLearningAttempt(
     actual,
     checkId: "",
     evidence: "practice",
+    executionCount: result.executionCount,
     executor: "practice",
     expected,
     feedback: verdict.feedback,

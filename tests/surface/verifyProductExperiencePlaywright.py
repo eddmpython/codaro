@@ -333,8 +333,35 @@ def waitForWebLearningEvidenceEventCount(
         if lastCount == expected:
             return
         if lastCount > expected:
+            eventSummary = page.evaluate(
+                """
+                async () => new Promise((resolve, reject) => {
+                  const request = indexedDB.open('codaro-learning-evidence-v1', 3);
+                  request.onerror = () => reject(request.error);
+                  request.onsuccess = () => {
+                    const database = request.result;
+                    const eventRequest = database.transaction('events', 'readonly')
+                      .objectStore('events').getAll();
+                    eventRequest.onerror = () => reject(eventRequest.error);
+                    eventRequest.onsuccess = () => {
+                      const values = eventRequest.result.map((item) => ({
+                        checkId: item?.checkId || null,
+                        eventId: item?.eventId || null,
+                        executionCount: item?.executionCount || null,
+                        kind: item?.kind || null,
+                        passed: item?.passed ?? null,
+                        sourceHash: item?.sourceHash || null,
+                      }));
+                      database.close();
+                      resolve(values);
+                    };
+                  };
+                })
+                """
+            )
             raise AssertionError(
-                f"Web learning evidence exceeded {expected} event(s): {lastCount}"
+                f"Web learning evidence exceeded {expected} event(s): "
+                f"{lastCount}, events={eventSummary}"
             )
         page.wait_for_timeout(100)
     raise AssertionError(
