@@ -237,7 +237,7 @@ def main() -> int:
                     )
             finally:
                 browser.close()
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001 - report the complete installed-product journey failure
         failures.append(str(exc))
     finally:
         if launcher_process is not None:
@@ -489,7 +489,9 @@ def verify_installed_local_learning_strong_credit(
 
     exercise = page.locator("[data-learning-section-part='exercise']").first
     editor = exercise.locator(".cm-content").first
-    run_button = exercise.locator("button[aria-label='셀 실행']").first
+    run_button = exercise.locator(
+        "button[data-learning-run-control='true'][aria-label$=' 셀 실행']"
+    ).first
     local_check_responses: list[Any] = []
     local_check_request_failures: list[str] = []
     page.on(
@@ -2863,7 +2865,9 @@ def capture_deployed_web_learning_archive(playwright: Any) -> dict[str, Any]:
         draft_source = "# deployed public roundtrip\nprint('Hello Codaro')\n"
         exercise = page.locator("[data-learning-section-part='exercise']").first
         exercise.locator(".cm-content").first.fill(draft_source, timeout=20_000)
-        exercise.locator("button[aria-label='셀 실행']").first.click(timeout=20_000)
+        exercise.locator(
+            "button[data-learning-run-control='true'][aria-label$=' 셀 실행']"
+        ).first.click(timeout=20_000)
         exercise.locator("[data-learning-check-result='verified']").wait_for(
             state="visible",
             timeout=120_000,

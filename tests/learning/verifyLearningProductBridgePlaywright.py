@@ -357,7 +357,9 @@ def fillAndRunSection(page: Any, section: Any, source: str) -> dict[str, Any]:
     page.wait_for_timeout(100)
     payload = clickAndAwaitLocalCheck(
         page,
-        lambda: section.locator("button[aria-label='셀 실행']").click(),
+        lambda: section.locator(
+            "button[data-learning-run-control='true'][aria-label$=' 셀 실행']"
+        ).click(),
     )
     requestSource = str(payload.pop("_requestSource", ""))
     if hashlib.sha256(requestSource.encode("utf-8")).digest() != hashlib.sha256(
@@ -553,7 +555,9 @@ def runProductJourney(
         if novice:
             initial = clickAndAwaitLocalCheck(
                 page,
-                lambda: mastery.locator("button[aria-label='셀 실행']").click(),
+                lambda: mastery.locator(
+                    "button[data-learning-run-control='true'][aria-label$=' 셀 실행']"
+                ).click(),
             )
             if initial.get("passed") is not False:
                 raise AssertionError("Novice starter unexpectedly passed the strong check")
