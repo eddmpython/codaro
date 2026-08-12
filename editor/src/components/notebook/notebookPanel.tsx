@@ -61,6 +61,7 @@ import {
   NotebookCommandBar,
   type NotebookWidth,
 } from "@/components/notebook/notebookCommandBar";
+import { MarkdownPreview } from "@/components/notebook/markdownPreview";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
@@ -324,7 +325,7 @@ export function NotebookPanel({
         />
         {cyclePaths.length ? (
           <div className="rounded-md border border-destructive/40 bg-destructive/10 px-2.5 py-1.5 text-[11px] text-destructive">
-            <span className="font-medium">순환 의존</span> — 실행 순서가 정해지지 않습니다: {cyclePaths.join(" · ")}
+            <span className="font-medium">순환 의존</span>: 실행 순서가 정해지지 않습니다: {cyclePaths.join(" · ")}
           </div>
         ) : null}
         {publicationTarget ? (
@@ -981,10 +982,11 @@ function DocumentBlock({
   };
 
   if (block.type === "markdown") {
-    const markdownData = result?.data as { html?: unknown } | null | undefined;
-    const markdownHtml = markdownData && typeof markdownData.html === "string" ? markdownData.html : "";
-    // 미선택 + 렌더 결과가 있으면 미리보기, 선택하면 편집(클릭으로 전환).
-    const showPreview = !isSelected && Boolean(markdownHtml);
+    const markdownData = result?.data as { content?: unknown } | null | undefined;
+    const markdownSource = markdownData && typeof markdownData.content === "string"
+      ? markdownData.content
+      : draft;
+    const showPreview = !isSelected && Boolean(markdownSource.trim());
     return (
       <section
         aria-label={cellAriaLabel}
@@ -1004,12 +1006,7 @@ function DocumentBlock({
           ) : null}
           <InsertCellButton placement="after" onInsertCell={onInsertCell} className="notebookInsertAfter" />
           {showPreview ? (
-            <div
-              className="astryxWorkCellFrame notebookMarkdownPreview prose prose-sm"
-              data-notebook-markdown-preview="true"
-              onClick={onSelect}
-              dangerouslySetInnerHTML={{ __html: markdownHtml }}
-            />
+            <MarkdownPreview label={cellAriaLabel} source={markdownSource} onSelect={onSelect} />
           ) : (
             <Textarea
               aria-label={`${cellAriaLabel} 편집기`}

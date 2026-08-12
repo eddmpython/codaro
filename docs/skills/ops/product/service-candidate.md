@@ -153,8 +153,8 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 - Monaco/CodeMirror, provider/settings, learning surface, 일반 vendor를 한 chunk에 몰아넣지 않는다. React와 일반 vendor를 억지로 나눠 순환 chunk를 만들지 않는다.
 - 기본 커리큘럼 YAML 원문은 bootstrap bundle에 싣지 않는다. 목록은 경량 registry로 만들고, 레슨 YAML은 선택한 레슨을 열 때 lazy loading한다.
 - 공개 문서 surface도 generated docs 본문 HTML을 nav chunk에 싣지 않는다. 문서 목록은 metadata만 들고, 본문은 `docsPages/page*.js`로 분리해 slug route에서 필요한 문서만 로딩한다.
-- `frontend-performance-budget`는 chunk count, 가장 큰 JS chunk, entry JS chunk, 전체 JS/CSS 크기, curriculum lazy loading 계약을 확인하고 `output/test-runner/frontend-performance-budget/performance-report.json`에 `gitHead`, `startedAt`, `completedAt`, `durationMs`, budget 수치를 남긴다.
-- 현재 제품 품질 budget은 가장 큰 JS chunk 400KB 이하, entry JS chunk 320KB 이하, app-shell JS 7.5MB 이하, CSS 160KB 이하로 둔다. 472개 lazy lesson chunk는 app-shell과 분리하고 authored YAML corpus 25MB 이하, 평균 lesson transfer 50KB 이하, 단일 lesson 100KB 이하, YAML 대비 bundle 비율 1.08 이하를 함께 검사한다. 현재 측정은 app shell 1.90MB, entry 180KB, lesson 평균 35.8KB, 최대 72.6KB, bundle 비율 1.0043이다.
+- `frontend-performance-budget`는 chunk count, 가장 큰 app-shell JS chunk, entry JS chunk, 전체 JS/CSS 크기, curriculum과 diagram lazy loading 계약을 확인하고 `output/test-runner/frontend-performance-budget/performance-report.json`에 `gitHead`, `startedAt`, `completedAt`, `durationMs`, budget 수치를 남긴다.
+- 현재 제품 품질 budget은 가장 큰 app-shell JS chunk 400KB 이하, entry JS chunk 320KB 이하, app-shell JS 7.5MB 이하, CSS 160KB 이하로 둔다. 472개 lazy lesson chunk는 app-shell과 분리하고 authored YAML corpus 25MB 이하, 평균 lesson transfer 50KB 이하, 단일 lesson 100KB 이하, YAML 대비 bundle 비율 1.08 이하를 함께 검사한다. Mermaid는 viewport 지연 전용 chunk 1개와 3.5MB 이하를 강제하며, 초기 다운로드 여부는 `markdown-diagram` 브라우저 gate가 검증한다. 현재 측정은 app-shell 2.55MB, entry 245.9KB, Mermaid runtime 3.29MB, lesson 평균 36.2KB, 최대 72.8KB, bundle 비율 1.0016이다.
 - desktop/mobile에서 텍스트, 버튼, 카드, TOC, popover가 겹치지 않아야 한다.
 - `landing-build`는 `docs/skills` 핵심 SSOT 문구가 generated docs에 반영된 상태인지도 확인한다.
 

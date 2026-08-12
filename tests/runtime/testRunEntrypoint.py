@@ -53,6 +53,7 @@ def testGateNamesAreStable() -> None:
         "theme-runtime-browser",
         "visual-accessibility-browser",
         "gui-control-browser",
+        "markdown-diagram",
         "visual-assets",
         "learning-method",
         "learning-evidence-contract",
@@ -129,6 +130,9 @@ def testGateNamesAreStable() -> None:
     assert runner.GATE_ARTIFACTS["gui-control-browser"] == (
         "output/test-runner/gui-control-browser/gui-control-report.json",
     )
+    assert runner.GATE_ARTIFACTS["markdown-diagram"] == (
+        "output/test-runner/markdown-diagram/markdown-diagram-report.json",
+    )
     assert runner.GATE_ARTIFACTS["run-local-state-browser"] == (
         "output/test-runner/run-local-state-browser/run-local-state-report.json",
     )
@@ -177,6 +181,7 @@ def testGateNamesAreStable() -> None:
         "docs",
         "editor-build",
         "gui-control-browser",
+        "markdown-diagram",
         "launcher-check",
         "launcher-test",
         "backend",
@@ -190,6 +195,7 @@ def testGateNamesAreStable() -> None:
         "architecture-boundary",
         "python-sdk",
         "app-runtime",
+        "markdown-diagram",
         "publication-compiler",
         "static-publication",
         "server-publication",
@@ -253,6 +259,7 @@ def testGateNamesAreStable() -> None:
         "deployment-adapters",
         "reference-products",
         "editor-build",
+        "markdown-diagram",
         "landing-build",
         "mobile-layout",
         "frontend-performance-budget",
@@ -288,6 +295,7 @@ def testGateNamesAreStable() -> None:
         "architecture-boundary",
         "python-sdk",
         "app-runtime",
+        "markdown-diagram",
         "publication-compiler",
         "static-publication",
         "server-publication",

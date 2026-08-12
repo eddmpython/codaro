@@ -83,6 +83,9 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "gui-control-browser": (
         "output/test-runner/gui-control-browser/gui-control-report.json",
     ),
+    "markdown-diagram": (
+        "output/test-runner/markdown-diagram/markdown-diagram-report.json",
+    ),
     "visual-assets": ("output/test-runner/visual-assets/visual-assets-report.json",),
     "learning-method": ("output/test-runner/learning-method/learning-flow-report.json",),
     "learning-evidence-contract": (
@@ -376,6 +379,24 @@ GATES: dict[str, Gate] = {
                 "uv", "run", "python", "-X", "utf8",
                 "tests/automation/verifyAutomationProofStatesPlaywright.py",
             ), timeoutSeconds=1200),
+        ),
+    ),
+    "markdown-diagram": Gate(
+        tier="surface",
+        description="Markdown Mermaid 작성, 안전한 공용 렌더링, 접근성, 토큰 반영, viewport 지연 로딩을 실제 Chromium에서 확인한다.",
+        commands=(
+            command(("npm", "run", "check"), cwd="editor"),
+            command(("npm", "run", "build"), cwd="editor"),
+            command((
+                "uv", "run", "python", "-X", "utf8", "-m", "pytest",
+                "tests/surface/testMarkdownDiagramContract.py",
+                "tests/teacher/testConversation.py",
+                "-q", "--tb=short",
+            )),
+            command((
+                "uv", "run", "python", "-X", "utf8",
+                "tests/surface/verifyMarkdownDiagramPlaywright.py",
+            ), timeoutSeconds=600),
         ),
     ),
     "python-sdk": Gate(
@@ -1140,6 +1161,7 @@ PYTHON_PRODUCT_GATES = (
     "architecture-boundary",
     "python-sdk",
     "app-runtime",
+    "markdown-diagram",
     "publication-compiler",
     "static-publication",
     "server-publication",
@@ -1158,6 +1180,7 @@ PRODUCT_QUALITY_GATES = (
     "architecture-boundary",
     "python-sdk",
     "app-runtime",
+    "markdown-diagram",
     "publication-compiler",
     "static-publication",
     "server-publication",
@@ -1221,6 +1244,7 @@ PRODUCT_RELEASE_GATES = (
     "deployment-adapters",
     "reference-products",
     "editor-build",
+    "markdown-diagram",
     "landing-build",
     "mobile-layout",
     "frontend-performance-budget",
@@ -1312,8 +1336,15 @@ def changedCycleGates(paths: tuple[str, ...] | None = None) -> tuple[str, ...]:
         if normalized.startswith("editor/"):
             addGate("editor-build")
             addGate("gui-control-browser")
+            addGate("markdown-diagram")
         if normalized == "tests/surface/verifyGuiControlPlaywright.py":
             addGate("gui-control-browser")
+        if normalized in {
+            "src/codaro/ai/conversation.py",
+            "tests/surface/testMarkdownDiagramContract.py",
+            "tests/surface/verifyMarkdownDiagramPlaywright.py",
+        }:
+            addGate("markdown-diagram")
         if normalized.startswith("landing/"):
             addGate("landing-build")
         if normalized.startswith("launcher/"):
@@ -2264,8 +2295,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 74:
-        failures.append(f"expected 74 gates, found {len(GATES)}")
+    if len(GATES) != 75:
+        failures.append(f"expected 75 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

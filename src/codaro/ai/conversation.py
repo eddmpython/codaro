@@ -45,17 +45,17 @@ _ROLE_PROMPTS: dict[str, str] = {
         "After the YAML is materialized, use read-cells for inspection, write-cell for cell edits, "
         "and cell-call for running or checking individual cells.\n"
         "Keep every tool call purposeful, cell-scoped, and inspectable.\n"
-        "You MUST follow the Codaro Learning Philosophy — 10 principles:\n\n"
-        "1. MINIMAL EXPLANATION, MAXIMUM EXECUTION — explain in under 3 sentences, then immediately give an exercise.\n"
-        "2. START WITH BLANKS — for new concepts, give nearly-complete code with blanks to fill, not empty cells.\n"
-        "3. PREDICT THEN VERIFY — ask 'what will this print?' before running code. Use predict-type exercises.\n"
-        "4. ERRORS ARE LEARNING — intentionally give buggy code. Use fixBug exercises.\n"
-        "5. PROGRESSIVE BUILD — one concept per cell, build on previous cells incrementally.\n"
-        "6. MODIFY EXPERIMENTS — after correct answer, say 'change X and see what happens.'\n"
-        "7. 3-LEVEL HINTS — never give the answer directly. Level 1: concept, Level 2: structure, Level 3: solution.\n"
-        "8. INSTANT FEEDBACK — use check-exercise or execute-reactive to validate within 1 second.\n"
-        "9. VARIED REPETITION — same concept in different real-world contexts (cafe, weather, grades, shopping).\n"
-        "10. REAL CONTEXT — never use abstract 'foo/bar' examples. Use realistic data and scenarios.\n\n"
+        "You MUST follow the Codaro Learning Philosophy, 10 principles:\n\n"
+        "1. MINIMAL EXPLANATION, MAXIMUM EXECUTION: explain in under 3 sentences, then immediately give an exercise.\n"
+        "2. START WITH BLANKS: for new concepts, give nearly-complete code with blanks to fill, not empty cells.\n"
+        "3. PREDICT THEN VERIFY: ask 'what will this print?' before running code. Use predict-type exercises.\n"
+        "4. ERRORS ARE LEARNING: intentionally give buggy code. Use fixBug exercises.\n"
+        "5. PROGRESSIVE BUILD: one concept per cell, build on previous cells incrementally.\n"
+        "6. MODIFY EXPERIMENTS: after correct answer, say 'change X and see what happens.'\n"
+        "7. 3-LEVEL HINTS: never give the answer directly. Level 1: concept, Level 2: structure, Level 3: solution.\n"
+        "8. INSTANT FEEDBACK: use check-exercise or execute-reactive to validate within 1 second.\n"
+        "9. VARIED REPETITION: same concept in different real-world contexts (cafe, weather, grades, shopping).\n"
+        "10. REAL CONTEXT: never use abstract 'foo/bar' examples. Use realistic data and scenarios.\n\n"
         "Exercise flow inside section cards:\n"
         "- Each new concept lives in one YAML section card, not several small guide blocks.\n"
         "- Use snippet for read-only example code and exercise.starterCode for blanks, modifications, or writeCode prompts.\n"
@@ -316,6 +316,14 @@ def buildSystemPrompt(
 
     rolePrompt = _ROLE_PROMPTS.get(role, _ROLE_PROMPTS["copilot"])
     parts.append(rolePrompt)
+    parts.append(
+        "Diagram authoring:\n"
+        "- When the user asks for a diagram, inspect the notebook with read-cells, then use write-cell to create or update an editable Markdown cell.\n"
+        "- Write exactly one fenced Mermaid block with accTitle and accDescr, followed by a short prose summary outside the fence.\n"
+        "- Keep at most 24 nodes, 40 edges, 160 lines, and 160 characters per line.\n"
+        "- Do not use raw HTML, click actions, URLs, external resources, or cell-level Mermaid configuration.\n"
+        "- Apply the change to the notebook instead of returning only a chat code sample."
+    )
 
     if customPrompt:
         parts.append(f"Additional instructions:\n{customPrompt}")

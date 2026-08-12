@@ -24,6 +24,7 @@ MAX_SINGLE_JS_BYTES = 400_000
 MAX_ENTRY_JS_BYTES = 320_000
 MAX_TOTAL_JS_BYTES = 7_500_000
 MAX_APP_SHELL_JS_BYTES = MAX_TOTAL_JS_BYTES
+MAX_LAZY_DIAGRAM_RUNTIME_BYTES = 3_500_000
 # Curriculum lessons are independent lazy chunks. Guard the authored corpus, per-lesson transfer,
 # and bundling overhead separately so adding a useful lesson does not consume app-shell budget.
 MAX_LAZY_CURRICULUM_SOURCE_BYTES = 25_000_000
@@ -85,7 +86,16 @@ def main() -> int:
         item for item in chunkStats if isLazyCurriculumChunk(str(item["name"]), lessonStems)
     ]
     lazyCurriculumChunkNames = {item["name"] for item in lazyCurriculumChunks}
-    appShellChunks = [item for item in chunkStats if item["name"] not in lazyCurriculumChunkNames]
+    lazyDiagramChunks = [
+        item for item in chunkStats if str(item["name"]).startswith("diagramRuntime-")
+    ]
+    lazyDiagramChunkNames = {item["name"] for item in lazyDiagramChunks}
+    appShellChunks = [
+        item
+        for item in chunkStats
+        if item["name"] not in lazyCurriculumChunkNames
+        and item["name"] not in lazyDiagramChunkNames
+    ]
     totalJsBytes = sum(item["bytes"] for item in chunkStats)
     appShellJsBytes = sum(item["bytes"] for item in appShellChunks)
     lazyCurriculumJsBytes = sum(item["bytes"] for item in lazyCurriculumChunks)
@@ -97,16 +107,27 @@ def main() -> int:
     lazyCurriculumBundleRatio = (
         lazyCurriculumJsBytes / lazyCurriculumSourceBytes if lazyCurriculumSourceBytes else 0.0
     )
+    lazyDiagramJsBytes = sum(item["bytes"] for item in lazyDiagramChunks)
     biggestJs = max((item["bytes"] for item in chunkStats), default=0)
+    biggestAppShellJs = max((item["bytes"] for item in appShellChunks), default=0)
     entryJsBytes = max((item["bytes"] for item in chunkStats if item["name"].startswith("index-")), default=0)
     totalCssBytes = sum(item["bytes"] for item in cssStats)
 
-    if biggestJs > MAX_SINGLE_JS_BYTES:
-        failures.append(f"largest JS chunk {biggestJs} exceeds budget {MAX_SINGLE_JS_BYTES}")
+    if biggestAppShellJs > MAX_SINGLE_JS_BYTES:
+        failures.append(
+            f"largest app shell JS chunk {biggestAppShellJs} exceeds budget {MAX_SINGLE_JS_BYTES}"
+        )
     if entryJsBytes > MAX_ENTRY_JS_BYTES:
         failures.append(f"entry JS chunk {entryJsBytes} exceeds budget {MAX_ENTRY_JS_BYTES}")
     if appShellJsBytes > MAX_APP_SHELL_JS_BYTES:
         failures.append(f"app shell JS {appShellJsBytes} exceeds baseline budget {MAX_APP_SHELL_JS_BYTES}")
+    if len(lazyDiagramChunks) != 1:
+        failures.append(f"expected exactly one lazy diagram runtime chunk, found {len(lazyDiagramChunks)}")
+    if lazyDiagramJsBytes > MAX_LAZY_DIAGRAM_RUNTIME_BYTES:
+        failures.append(
+            f"lazy diagram runtime JS {lazyDiagramJsBytes} exceeds budget "
+            f"{MAX_LAZY_DIAGRAM_RUNTIME_BYTES}"
+        )
     if lazyCurriculumSourceBytes > MAX_LAZY_CURRICULUM_SOURCE_BYTES:
         failures.append(
             f"curriculum source {lazyCurriculumSourceBytes} exceeds corpus budget "
@@ -164,15 +185,18 @@ def main() -> int:
         "maxEntryJsBytes": MAX_ENTRY_JS_BYTES,
         "maxTotalJsBytes": MAX_TOTAL_JS_BYTES,
         "maxAppShellJsBytes": MAX_APP_SHELL_JS_BYTES,
+        "maxLazyDiagramRuntimeBytes": MAX_LAZY_DIAGRAM_RUNTIME_BYTES,
         "maxLazyCurriculumSourceBytes": MAX_LAZY_CURRICULUM_SOURCE_BYTES,
         "maxAverageLazyCurriculumJsBytes": MAX_AVERAGE_LAZY_CURRICULUM_JS_BYTES,
         "maxSingleLazyCurriculumJsBytes": MAX_SINGLE_LAZY_CURRICULUM_JS_BYTES,
         "maxLazyCurriculumBundleRatio": MAX_LAZY_CURRICULUM_BUNDLE_RATIO,
-        "totalJsBudgetScope": "app-shell-excluding-lazy-curriculum-chunks",
+        "totalJsBudgetScope": "app-shell-excluding-lazy-curriculum-and-diagram-chunks",
         "maxCssBytes": MAX_CSS_BYTES,
         "chunkCount": len(jsFiles),
         "totalJsBytes": totalJsBytes,
         "appShellJsBytes": appShellJsBytes,
+        "lazyDiagramJsBytes": lazyDiagramJsBytes,
+        "lazyDiagramChunkCount": len(lazyDiagramChunks),
         "lazyCurriculumJsBytes": lazyCurriculumJsBytes,
         "lazyCurriculumChunkCount": len(lazyCurriculumChunks),
         "lazyCurriculumSourceBytes": lazyCurriculumSourceBytes,
@@ -180,9 +204,11 @@ def main() -> int:
         "lazyCurriculumBiggestBytes": lazyCurriculumBiggestBytes,
         "lazyCurriculumBundleRatio": round(lazyCurriculumBundleRatio, 4),
         "biggestJsBytes": biggestJs,
+        "biggestAppShellJsBytes": biggestAppShellJs,
         "entryJsBytes": entryJsBytes,
         "totalCssBytes": totalCssBytes,
         "appShellChunks": appShellChunks,
+        "lazyDiagramChunks": lazyDiagramChunks,
         "lazyCurriculumChunks": lazyCurriculumChunks,
         "chunks": chunkStats,
         "css": cssStats,

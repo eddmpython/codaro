@@ -406,6 +406,61 @@
     cursor: text;
   }
 
+  [data-astryx-theme="codaro"] .markdownDiagramFigure {
+    display: grid;
+    gap: var(--spacing-3);
+    margin: var(--spacing-4) 0;
+    padding: var(--spacing-4) 0;
+    border-top: 1px solid var(--color-border-subtle);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  [data-astryx-theme="codaro"] .markdownDiagramCaption {
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  [data-astryx-theme="codaro"] .markdownDiagramViewport {
+    width: 100%;
+    min-height: 120px;
+    overflow: auto;
+    color: var(--color-text-primary);
+  }
+
+  [data-astryx-theme="codaro"] .markdownDiagramViewport svg {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 120px;
+    margin: 0 auto;
+  }
+
+  [data-astryx-theme="codaro"] .markdownDiagramLoading,
+  [data-astryx-theme="codaro"] .markdownDiagramError {
+    display: flex;
+    min-height: 120px;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-secondary);
+  }
+
+  [data-astryx-theme="codaro"] .markdownDiagramError {
+    flex-direction: column;
+    gap: var(--spacing-1);
+    padding: var(--spacing-4);
+    border-left: 2px solid var(--color-error);
+    align-items: flex-start;
+    color: var(--color-error);
+  }
+
+  [data-astryx-theme="codaro"] .markdownDiagramError span {
+    color: var(--color-text-secondary);
+    font-size: 12px;
+  }
+
   [data-astryx-theme="codaro"] .notebookMarkdownEditor {
     resize: vertical;
   }

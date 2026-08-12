@@ -2,7 +2,7 @@ import type { BlockConfig } from "@/types";
 import { getActiveLocale, type AppLocale } from "@/lib/localeCopy";
 
 export type LearningCellKind = "concept" | "visual" | "snippet" | "practice" | "check" | "reflection" | "automation";
-export type CellAiAction = "explain" | "hint" | "check" | "revise";
+export type CellAiAction = "explain" | "hint" | "check" | "revise" | "diagram";
 
 export function isExecutableBlock(block: BlockConfig) {
   return block.type === "code" || block.type === "automation";
@@ -67,6 +67,9 @@ export function buildCellAiPrompt(action: CellAiAction, block: BlockConfig, ques
     if (action === "revise") {
       return `${base}${questionLine}\n\nRevise this cell to improve clarity and learning value. Propose the change first, and use write-cell only when the edit is clearly useful.`;
     }
+    if (action === "diagram") {
+      return `${base}${questionLine}\n\nTurn this cell's idea into one editable Mermaid diagram in a Markdown cell. First use read-cells to confirm the target and its order. If the target is Markdown, preserve useful prose and update it with exactly one fenced mermaid block. Otherwise insert a Markdown cell immediately after the target. Use write-cell for the change. Add accTitle and accDescr, plus a short prose summary outside the fence. Keep at most 24 nodes, 40 edges, 160 lines, and 160 characters per line. Do not use HTML labels, click actions, URLs, external resources, or cell-level Mermaid configuration. Do not stop at a chat-only code sample.`;
+    }
     return `${base}${questionLine}\n\nExplain this cell in context. Include what the learner should understand, what to run or change next, and how to verify the answer.`;
   }
 
@@ -84,6 +87,10 @@ export function buildCellAiPrompt(action: CellAiAction, block: BlockConfig, ques
 
   if (action === "revise") {
     return `${base}${questionLine}\n\n명확성과 학습 가치를 높이도록 이 셀을 수정해줘. 먼저 변경안을 제안하고, 확실히 유익할 때만 write-cell을 사용해줘.`;
+  }
+
+  if (action === "diagram") {
+    return `${base}${questionLine}\n\n이 셀의 내용을 편집 가능한 Mermaid 다이어그램 하나로 설명해줘. 먼저 read-cells로 대상과 순서를 확인해. 대상이 Markdown이면 유용한 설명을 보존하면서 Mermaid fence 하나를 포함하도록 갱신하고, 다른 셀 유형이면 대상 바로 뒤에 Markdown 셀을 삽입해. 변경에는 write-cell을 사용해. accTitle과 accDescr, fence 밖의 짧은 글 요약도 포함해. 노드는 24개, 연결은 40개, 원문은 160줄, 한 줄은 160자 이내로 제한해. HTML label, 클릭 동작, URL, 외부 리소스, 셀별 Mermaid 설정은 사용하지 마. 채팅에 코드 예시만 보여주고 끝내지 마.`;
   }
 
   return `${base}${questionLine}\n\n이 셀을 맥락 안에서 설명해줘. 학습자가 이해해야 할 것, 다음에 실행하거나 수정할 것, 답을 검증하는 방법을 포함해줘.`;

@@ -13,6 +13,21 @@ const apiProxyTarget = process.env.CODARO_DEV_API_PROXY?.replace(/\/$/, "");
 const codeSplitting = {
   groups: [
     {
+      name: "vitePreload",
+      test: /\0vite[\/]preload-helper\.js$/,
+      priority: 100,
+    },
+    {
+      name: "markdownRuntime",
+      test: /[\\/]node_modules[\\/](?:dompurify|marked)[\\/]/,
+      priority: 80,
+    },
+    {
+      name: "diagramRuntime",
+      test: /[\\/]node_modules[\\/](?:@antfu|@braintree|@chevrotain|@iconify|@mermaid-js|@upsetjs|commander|cose-base|cytoscape(?:-cose-bilkent|-fcose)?|d3(?:-[^\\/]+)?|dagre-d3-es|dayjs|delaunator|es-toolkit|hachure-fill|iconv-lite|import-meta-resolve|internmap|katex|khroma|layout-base|lodash-es|mermaid|package-manager-detector|path-data-parser|points-on-curve|points-on-path|robust-predicates|roughjs|rw|safer-buffer|stylis|tinyexec|ts-dedent|uuid)[\\/]/,
+      priority: 70,
+    },
+    {
       name: "yaml",
       test: /[\\/]node_modules[\\/].*[\\/]yaml[\\/]|[\\/]src[\\/]lib[\\/]curriculaRegistry\.ts$/,
       priority: 60,
@@ -85,6 +100,7 @@ export default defineConfig({
   build: {
     assetsDir: "_app",
     emptyOutDir: true,
+    modulePreload: false,
     outDir: webOutDir || "../src/codaro/webBuild",
     rolldownOptions: {
       output: {

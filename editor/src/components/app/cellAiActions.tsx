@@ -4,6 +4,7 @@ import {
   Loader2,
   MessageSquareText,
   Sparkles,
+  Workflow,
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -117,7 +118,7 @@ export function CellAiActions({
               }
             }}
           />
-          <div className="mt-2 grid grid-cols-3 gap-1.5">
+          <div className="mt-2 grid grid-cols-2 gap-1.5">
             <Button className="h-8 gap-1.5 px-2 text-xs" type="button" variant="secondary" onClick={() => submit("explain")}>
               <MessageSquareText className="size-3.5" />
               질문
@@ -129,6 +130,10 @@ export function CellAiActions({
             <Button className="h-8 gap-1.5 px-2 text-xs" type="button" variant="outline" onClick={() => submit("check")}>
               <CheckCircle2 className="size-3.5" />
               검증
+            </Button>
+            <Button className="h-8 gap-1.5 px-2 text-xs" type="button" variant="outline" onClick={() => submit("diagram")}>
+              <Workflow className="size-3.5" />
+              다이어그램
             </Button>
           </div>
           {helpState ? (
