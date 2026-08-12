@@ -1,7 +1,10 @@
 ---
 id: markdown-diagrams
 title: Markdown Diagrams
+description: Web과 Local이 공유하는 안전한 Markdown Mermaid 렌더링과 편집 가능한 셀 작성 계약.
 category: architecture
+section: reference
+order: 221
 purpose: Web과 Local이 같은 Markdown 다이어그램 원문, 보안 경계, 디자인 토큰, 작성 동작을 쓰게 한다.
 whenToUse: Markdown preview, Mermaid fence, 셀별 다이어그램 작성, SVG 보안 또는 다이어그램 성능을 바꿀 때.
 ---
