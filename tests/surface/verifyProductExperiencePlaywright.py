@@ -8157,7 +8157,10 @@ def main() -> int:
             localThread.join(timeout=7)
             if localThread.is_alive() and localServer is not None:
                 localServer.force_exit = True
-                localThread.join(timeout=5)
+                # Uvicorn can finish cancellation after its graceful timeout while Windows is
+                # still releasing the last ASGI task. The session release assertion above has
+                # already proven activeSessions=0, so allow that bounded cleanup to complete.
+                localThread.join(timeout=15)
             if localThread.is_alive():
                 failures.append("Local server thread did not stop after graceful and forced shutdown")
         if localState is not None:
