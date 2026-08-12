@@ -1,4 +1,4 @@
-"""제품 표면 dogfood smoke — 진짜 chromium으로 surface mount + 핵심 인터랙션 검증.
+"""제품 표면 dogfood smoke, 진짜 chromium으로 surface mount + 핵심 인터랙션 검증.
 
 editor/curriculum/automation/chat 표면이 mount 되는지, ui-event endpoint가 widget
 클릭으로 실제 동작하는지, mobile chat alias가 공용 제품 셸과 teacher API에 도달하는지 확인.
@@ -64,7 +64,7 @@ def runDogfoodScenarios() -> dict[str, Any]:
         with sync_playwright() as p:
             try:
                 browser = p.chromium.launch(headless=True)
-            except Exception as launchError:
+            except Exception as launchError:  # noqa: BLE001, browser launch boundary
                 return {"status": "browser-launch-failed", "error": str(launchError)}
 
             try:
@@ -84,7 +84,7 @@ def runDogfoodScenarios() -> dict[str, Any]:
                 })
                 ctx.close()
 
-                # 2. ui-event 직접 fetch — 위젯 클릭 round-trip
+                # 2. ui-event 직접 fetch, 위젯 클릭 round-trip
                 ctx2 = browser.new_context()
                 createResponse = ctx2.request.post(
                     f"{base}/api/kernel/create",
@@ -125,13 +125,17 @@ def runDogfoodScenarios() -> dict[str, Any]:
                 pageM = ctxM.new_page()
                 pageM.goto(f"{base}/m/chat", wait_until="domcontentloaded", timeout=15000)
                 pageM.wait_for_selector("[data-product-surface-view='chat']", timeout=10000)
+                pageM.wait_for_selector(
+                    "[data-product-surface-view='chat'] [data-product-surface-ready='chat']",
+                    timeout=10000,
+                )
                 pageM.wait_for_selector("[data-product-mobile-nav='true']", timeout=10000)
                 hasInput = pageM.locator("[data-product-surface-view='chat'] textarea").count() == 1
                 hasSend = pageM.locator("[data-product-surface-view='chat'] button[type='submit']").count() == 1
                 activeSurface = pageM.locator(
                     "[data-product-mobile-surface][aria-current='page']"
                 ).get_attribute("data-product-mobile-surface")
-                # AI Teacher endpoint 도달 확인 — 응답 자체는 provider 미설정이면 error지만 endpoint 도달은 검증
+                # AI Teacher endpoint 도달 확인, 응답 자체는 provider 미설정이면 error지만 endpoint 도달은 검증
                 teacherProbe = pageM.evaluate(
                     """async () => {
                         const r = await fetch('/api/ai/chat', {
