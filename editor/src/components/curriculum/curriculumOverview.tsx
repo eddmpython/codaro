@@ -32,6 +32,7 @@ import {
 import type { CurriculumSectionContract, CurriculumSectionGroup } from "./curriculumSurfaceModels";
 import { cellDomId, selectTocBlock } from "./curriculumNavigation";
 import { LearningDomainVisual } from "./learningDomainVisual";
+import { renderInline } from "./curriculumMarkdownRichText";
 import { useLocale } from "@/lib/localeContext";
 
 export function LearningArchiveMenu({
@@ -555,7 +556,8 @@ export function SectionNarrative({ contract }: { contract?: CurriculumSectionCon
   if (!contract) return null;
   const goal = specificLearningCopy(readPayloadText(contract.goal));
   const why = specificLearningCopy(readPayloadText(contract.why));
-  const explanation = specificLearningCopy(readPayloadText(contract.explanation));
+  const sourceExplanation = readPayloadText(contract.explanation);
+  const explanation = specificLearningCopy(sourceExplanation) ? sourceExplanation : "";
   if (!goal && !why && !explanation) return null;
   const explanationParagraphs = explanation.split(/\n{2,}/).map((part) => part.trim()).filter(Boolean);
 
@@ -579,7 +581,7 @@ export function SectionNarrative({ contract }: { contract?: CurriculumSectionCon
         <div className="min-w-0 max-w-[68ch] space-y-3">
           <div className="text-xs font-medium text-muted-foreground">핵심 개념</div>
           {explanationParagraphs.map((paragraph, index) => (
-            <p className="text-md font-normal text-foreground" key={`${paragraph.slice(0, 16)}-${index}`}>{paragraph}</p>
+            <p className="text-md font-normal text-foreground" key={`${paragraph.slice(0, 16)}-${index}`}>{renderInline(paragraph)}</p>
           ))}
         </div>
       ) : null}
