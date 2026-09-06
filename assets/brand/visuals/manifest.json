@@ -368,10 +368,10 @@
     {
       "id": "runLearningDetail",
       "kind": "productScreenshot",
-      "sourceType": "playwrightCapture",
+      "sourceType": "pyprocCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-detail-dark.png",
-      "sourceHash": "sha256-abdec19a2cf07043ec106305c79adb4966791f2063d3891651dbd54e6950a542",
-      "sourceGitHead": "16d39b49fe97de53c6d27cace6b8678471f6999f",
+      "sourceHash": "sha256-f539163d960059caee206b4a34534fdc3b9a0fb9f064027bbaa84648c93afa2d",
+      "sourceGitHead": "41063f9f846f5f5aba7baa37cee2424f41c62832",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -424,7 +424,7 @@
       },
       "capture": {
         "browser": "chromium",
-        "browserVersion": "149.0.7827.55",
+        "browserVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
         "viewport": {
           "width": 900,
           "height": 760
@@ -438,6 +438,9 @@
           "assets/brand/tools/viteLayerOrder.mjs",
           "assets/brand/visuals/learning/python-fundamentals-v1.png",
           "curricula/python/basics/30days",
+          "editor/package-lock.json",
+          "editor/package.json",
+          "editor/scripts/captureProductUi.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/curriculumSidebarTree.tsx",
           "editor/src/components/app/mainSurface.tsx",
@@ -453,9 +456,10 @@
           "editor/src/styles",
           "editor/vite.config.ts",
           "tests/assets/captureProductVisuals.py",
+          "tests/surface/captureProductUi.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-f265740be6b2f8c4d1e1b07883198321878daf710d52525cc6ae27298c825bcb",
+        "sourceSetHash": "sha256-2bc6fd239df3341a8bc625ff4164024e714d324238c57fe33c22fedb7290c33d",
         "platform": "win32"
       },
       "themePairId": "runLearningDetailLight"
@@ -463,10 +467,10 @@
     {
       "id": "runLearningDetailLight",
       "kind": "productScreenshot",
-      "sourceType": "playwrightCapture",
+      "sourceType": "pyprocCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-detail-light.png",
-      "sourceHash": "sha256-96ff05cfcc101899f9c300916a0d75163ec04638f406380c7af4f735ecd7a464",
-      "sourceGitHead": "16d39b49fe97de53c6d27cace6b8678471f6999f",
+      "sourceHash": "sha256-2e067b2c211dc0fc6d2ffcd5851152c21c847aa9bdcb21cb38643f2694443af5",
+      "sourceGitHead": "41063f9f846f5f5aba7baa37cee2424f41c62832",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -519,7 +523,7 @@
       },
       "capture": {
         "browser": "chromium",
-        "browserVersion": "149.0.7827.55",
+        "browserVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
         "viewport": {
           "width": 900,
           "height": 760
@@ -533,6 +537,9 @@
           "assets/brand/tools/viteLayerOrder.mjs",
           "assets/brand/visuals/learning/python-fundamentals-v1.png",
           "curricula/python/basics/30days",
+          "editor/package-lock.json",
+          "editor/package.json",
+          "editor/scripts/captureProductUi.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/curriculumSidebarTree.tsx",
           "editor/src/components/app/mainSurface.tsx",
@@ -548,9 +555,10 @@
           "editor/src/styles",
           "editor/vite.config.ts",
           "tests/assets/captureProductVisuals.py",
+          "tests/surface/captureProductUi.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-f265740be6b2f8c4d1e1b07883198321878daf710d52525cc6ae27298c825bcb",
+        "sourceSetHash": "sha256-2bc6fd239df3341a8bc625ff4164024e714d324238c57fe33c22fedb7290c33d",
         "platform": "win32"
       },
       "themePairId": "runLearningDetail"
@@ -558,10 +566,10 @@
     {
       "id": "runLearningMobile",
       "kind": "productScreenshot",
-      "sourceType": "playwrightCapture",
+      "sourceType": "pyprocCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-mobile-dark.png",
-      "sourceHash": "sha256-ec1aacb523a546df745fe959048b203739d6bbfe37585992801d4be9eef9638f",
-      "sourceGitHead": "16d39b49fe97de53c6d27cace6b8678471f6999f",
+      "sourceHash": "sha256-ef95bf0c171be2fed77805fb162bd036f47076435239086b2e61d0973b52363d",
+      "sourceGitHead": "41063f9f846f5f5aba7baa37cee2424f41c62832",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -611,7 +619,7 @@
       },
       "capture": {
         "browser": "chromium",
-        "browserVersion": "149.0.7827.55",
+        "browserVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
         "viewport": {
           "width": 390,
           "height": 844
@@ -625,6 +633,9 @@
           "assets/brand/tools/viteLayerOrder.mjs",
           "assets/brand/visuals/learning/python-fundamentals-v1.png",
           "curricula/python/basics/30days",
+          "editor/package-lock.json",
+          "editor/package.json",
+          "editor/scripts/captureProductUi.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/curriculumSidebarTree.tsx",
           "editor/src/components/app/mainSurface.tsx",
@@ -640,9 +651,10 @@
           "editor/src/styles",
           "editor/vite.config.ts",
           "tests/assets/captureProductVisuals.py",
+          "tests/surface/captureProductUi.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-f265740be6b2f8c4d1e1b07883198321878daf710d52525cc6ae27298c825bcb",
+        "sourceSetHash": "sha256-2bc6fd239df3341a8bc625ff4164024e714d324238c57fe33c22fedb7290c33d",
         "platform": "win32"
       },
       "themePairId": "runLearningMobileLight"
@@ -650,10 +662,10 @@
     {
       "id": "runLearningMobileLight",
       "kind": "productScreenshot",
-      "sourceType": "playwrightCapture",
+      "sourceType": "pyprocCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-mobile-light.png",
-      "sourceHash": "sha256-44a072c7ed79e2fc04ac7f1d83a5ee383beaaec5ddd29a2332d22cdca355352a",
-      "sourceGitHead": "16d39b49fe97de53c6d27cace6b8678471f6999f",
+      "sourceHash": "sha256-c93ae14726620c3bc8834be69af00a2acaa22c9ef0954470b86248e12b29a408",
+      "sourceGitHead": "41063f9f846f5f5aba7baa37cee2424f41c62832",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -703,7 +715,7 @@
       },
       "capture": {
         "browser": "chromium",
-        "browserVersion": "149.0.7827.55",
+        "browserVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
         "viewport": {
           "width": 390,
           "height": 844
@@ -717,6 +729,9 @@
           "assets/brand/tools/viteLayerOrder.mjs",
           "assets/brand/visuals/learning/python-fundamentals-v1.png",
           "curricula/python/basics/30days",
+          "editor/package-lock.json",
+          "editor/package.json",
+          "editor/scripts/captureProductUi.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/curriculumSidebarTree.tsx",
           "editor/src/components/app/mainSurface.tsx",
@@ -732,9 +747,10 @@
           "editor/src/styles",
           "editor/vite.config.ts",
           "tests/assets/captureProductVisuals.py",
+          "tests/surface/captureProductUi.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-f265740be6b2f8c4d1e1b07883198321878daf710d52525cc6ae27298c825bcb",
+        "sourceSetHash": "sha256-2bc6fd239df3341a8bc625ff4164024e714d324238c57fe33c22fedb7290c33d",
         "platform": "win32"
       },
       "themePairId": "runLearningMobile"
@@ -742,10 +758,10 @@
     {
       "id": "runLearningHero",
       "kind": "productScreenshot",
-      "sourceType": "playwrightCapture",
+      "sourceType": "pyprocCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-hero-dark.png",
-      "sourceHash": "sha256-eddd0dd60e5678660363cd6ab6b6988134c5fbec5887ce96deb2a2d939d6abad",
-      "sourceGitHead": "16d39b49fe97de53c6d27cace6b8678471f6999f",
+      "sourceHash": "sha256-4cb7472a2645e6437899f22af16c139e1222c148e7568405f1134da3800fc398",
+      "sourceGitHead": "41063f9f846f5f5aba7baa37cee2424f41c62832",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -800,7 +816,7 @@
       },
       "capture": {
         "browser": "chromium",
-        "browserVersion": "149.0.7827.55",
+        "browserVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
         "viewport": {
           "width": 1440,
           "height": 900
@@ -812,6 +828,9 @@
           "assets/brand/designSystem/tokens.json",
           "assets/brand/mascot/work/avatar-small.png",
           "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/package-lock.json",
+          "editor/package.json",
+          "editor/scripts/captureProductUi.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/mainSurface.tsx",
           "editor/src/components/app/notebookSurface.tsx",
@@ -824,9 +843,10 @@
           "editor/src/styles",
           "editor/vite.config.ts",
           "tests/assets/captureProductVisuals.py",
+          "tests/surface/captureProductUi.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-cc5a5e6a123b842a374128a9ebab255c3869ea9d6e4e59aa43c250761bc37008",
+        "sourceSetHash": "sha256-5cf14940094a17503fe8f1fe2f91ddd6388da5ed44a9f1105fde66d0cdea26cb",
         "platform": "win32"
       },
       "themePairId": "runLearningHeroLight"
@@ -834,10 +854,10 @@
     {
       "id": "runLearningHeroLight",
       "kind": "productScreenshot",
-      "sourceType": "playwrightCapture",
+      "sourceType": "pyprocCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-hero-light.png",
-      "sourceHash": "sha256-0da6beefbab651275af3395935d717b5bd6fcbe48a03cc8fe901e4058eb13b4f",
-      "sourceGitHead": "16d39b49fe97de53c6d27cace6b8678471f6999f",
+      "sourceHash": "sha256-c2be9306555b9921eea280321970c8e73b50144dd39872b4a357fcc09cd4506f",
+      "sourceGitHead": "41063f9f846f5f5aba7baa37cee2424f41c62832",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -892,7 +912,7 @@
       },
       "capture": {
         "browser": "chromium",
-        "browserVersion": "149.0.7827.55",
+        "browserVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
         "viewport": {
           "width": 1440,
           "height": 900
@@ -904,6 +924,9 @@
           "assets/brand/designSystem/tokens.json",
           "assets/brand/mascot/work/avatar-small.png",
           "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/package-lock.json",
+          "editor/package.json",
+          "editor/scripts/captureProductUi.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/mainSurface.tsx",
           "editor/src/components/app/notebookSurface.tsx",
@@ -916,9 +939,10 @@
           "editor/src/styles",
           "editor/vite.config.ts",
           "tests/assets/captureProductVisuals.py",
+          "tests/surface/captureProductUi.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-cc5a5e6a123b842a374128a9ebab255c3869ea9d6e4e59aa43c250761bc37008",
+        "sourceSetHash": "sha256-5cf14940094a17503fe8f1fe2f91ddd6388da5ed44a9f1105fde66d0cdea26cb",
         "platform": "win32"
       },
       "themePairId": "runLearningHero"
@@ -926,10 +950,10 @@
     {
       "id": "localNotebookDesktop",
       "kind": "productScreenshot",
-      "sourceType": "playwrightCapture",
+      "sourceType": "pyprocCapture",
       "sourcePath": "assets/brand/visuals/product/local-notebook-desktop-dark.png",
-      "sourceHash": "sha256-dd2f8e83899fc2e685a71ad3516a493f7dd09e287584de7232b074fd1b09fa18",
-      "sourceGitHead": "16d39b49fe97de53c6d27cace6b8678471f6999f",
+      "sourceHash": "sha256-f29ce84775f18bc0e14dde56ada9402f37c04e15e0c5622be0ecaf92da6cb733",
+      "sourceGitHead": "41063f9f846f5f5aba7baa37cee2424f41c62832",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -978,7 +1002,7 @@
       },
       "capture": {
         "browser": "chromium",
-        "browserVersion": "149.0.7827.55",
+        "browserVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
         "viewport": {
           "width": 900,
           "height": 640
@@ -990,6 +1014,9 @@
           "assets/brand/designSystem/tokens.json",
           "assets/brand/mascot/work/avatar-small.png",
           "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/package-lock.json",
+          "editor/package.json",
+          "editor/scripts/captureProductUi.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/mainSurface.tsx",
           "editor/src/components/app/notebookSurface.tsx",
@@ -1002,9 +1029,10 @@
           "editor/src/styles",
           "editor/vite.config.ts",
           "tests/assets/captureProductVisuals.py",
+          "tests/surface/captureProductUi.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-cc5a5e6a123b842a374128a9ebab255c3869ea9d6e4e59aa43c250761bc37008",
+        "sourceSetHash": "sha256-5cf14940094a17503fe8f1fe2f91ddd6388da5ed44a9f1105fde66d0cdea26cb",
         "platform": "win32"
       },
       "themePairId": "localNotebookDesktopLight"
@@ -1012,10 +1040,10 @@
     {
       "id": "localNotebookDesktopLight",
       "kind": "productScreenshot",
-      "sourceType": "playwrightCapture",
+      "sourceType": "pyprocCapture",
       "sourcePath": "assets/brand/visuals/product/local-notebook-desktop-light.png",
-      "sourceHash": "sha256-18ccda65e7e7a69ee563648b0b7f74edca4b47b9a067c7881999f00a0c9f2d92",
-      "sourceGitHead": "16d39b49fe97de53c6d27cace6b8678471f6999f",
+      "sourceHash": "sha256-8a696bc46e39dc7dba85c6403aee39c9e423122d1735818a0c0273df038360a4",
+      "sourceGitHead": "41063f9f846f5f5aba7baa37cee2424f41c62832",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1064,7 +1092,7 @@
       },
       "capture": {
         "browser": "chromium",
-        "browserVersion": "149.0.7827.55",
+        "browserVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
         "viewport": {
           "width": 900,
           "height": 640
@@ -1076,6 +1104,9 @@
           "assets/brand/designSystem/tokens.json",
           "assets/brand/mascot/work/avatar-small.png",
           "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/package-lock.json",
+          "editor/package.json",
+          "editor/scripts/captureProductUi.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/mainSurface.tsx",
           "editor/src/components/app/notebookSurface.tsx",
@@ -1088,9 +1119,10 @@
           "editor/src/styles",
           "editor/vite.config.ts",
           "tests/assets/captureProductVisuals.py",
+          "tests/surface/captureProductUi.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-cc5a5e6a123b842a374128a9ebab255c3869ea9d6e4e59aa43c250761bc37008",
+        "sourceSetHash": "sha256-5cf14940094a17503fe8f1fe2f91ddd6388da5ed44a9f1105fde66d0cdea26cb",
         "platform": "win32"
       },
       "themePairId": "localNotebookDesktop"
@@ -1098,10 +1130,10 @@
     {
       "id": "localAutomationDesktop",
       "kind": "productScreenshot",
-      "sourceType": "playwrightCapture",
+      "sourceType": "pyprocCapture",
       "sourcePath": "assets/brand/visuals/product/local-automation-desktop-dark.png",
-      "sourceHash": "sha256-3114a734d5a5306035895cddc9fe20eadaa38f40fe5419f4300ea3e475f30511",
-      "sourceGitHead": "16d39b49fe97de53c6d27cace6b8678471f6999f",
+      "sourceHash": "sha256-7da90407a7ba9bc8458f503aac90f5ed9b40a4e1c986f0037dc4c2a5d8c0a7bc",
+      "sourceGitHead": "41063f9f846f5f5aba7baa37cee2424f41c62832",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1151,7 +1183,7 @@
       },
       "capture": {
         "browser": "chromium",
-        "browserVersion": "149.0.7827.55",
+        "browserVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
         "viewport": {
           "width": 1440,
           "height": 900
@@ -1163,6 +1195,9 @@
           "assets/brand/designSystem/tokens.json",
           "assets/brand/mascot/work/avatar-small.png",
           "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/package-lock.json",
+          "editor/package.json",
+          "editor/scripts/captureProductUi.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/automationSidebarTree.tsx",
           "editor/src/components/app/mainSurface.tsx",
@@ -1176,9 +1211,10 @@
           "editor/src/styles",
           "editor/vite.config.ts",
           "tests/assets/captureProductVisuals.py",
+          "tests/surface/captureProductUi.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-c25496d656ddf6fc3ed9cb62b4352fdd5f12d3903c02fdc24196e6b713d9f324",
+        "sourceSetHash": "sha256-6e7b92b59bb2ec9bdd7b3a0780d20d2f8060f4f6beaee786af91e84fbef8d0a0",
         "platform": "win32"
       },
       "themePairId": "localAutomationDesktopLight"
@@ -1186,10 +1222,10 @@
     {
       "id": "localAutomationDesktopLight",
       "kind": "productScreenshot",
-      "sourceType": "playwrightCapture",
+      "sourceType": "pyprocCapture",
       "sourcePath": "assets/brand/visuals/product/local-automation-desktop-light.png",
-      "sourceHash": "sha256-e7535c9a94c3722a505afd4b9504253c5b536abf33c92a5a933ac29d73f17ebb",
-      "sourceGitHead": "16d39b49fe97de53c6d27cace6b8678471f6999f",
+      "sourceHash": "sha256-5a3f9cc1cf9d32c83dc471564fdaa6e925618b6462e19338d6e18868c78769e2",
+      "sourceGitHead": "41063f9f846f5f5aba7baa37cee2424f41c62832",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1239,7 +1275,7 @@
       },
       "capture": {
         "browser": "chromium",
-        "browserVersion": "149.0.7827.55",
+        "browserVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
         "viewport": {
           "width": 1440,
           "height": 900
@@ -1251,6 +1287,9 @@
           "assets/brand/designSystem/tokens.json",
           "assets/brand/mascot/work/avatar-small.png",
           "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/package-lock.json",
+          "editor/package.json",
+          "editor/scripts/captureProductUi.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/automationSidebarTree.tsx",
           "editor/src/components/app/mainSurface.tsx",
@@ -1264,9 +1303,10 @@
           "editor/src/styles",
           "editor/vite.config.ts",
           "tests/assets/captureProductVisuals.py",
+          "tests/surface/captureProductUi.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-c25496d656ddf6fc3ed9cb62b4352fdd5f12d3903c02fdc24196e6b713d9f324",
+        "sourceSetHash": "sha256-6e7b92b59bb2ec9bdd7b3a0780d20d2f8060f4f6beaee786af91e84fbef8d0a0",
         "platform": "win32"
       },
       "themePairId": "localAutomationDesktop"
@@ -1274,10 +1314,10 @@
     {
       "id": "runStateReady",
       "kind": "productScreenshot",
-      "sourceType": "playwrightCapture",
+      "sourceType": "pyprocCapture",
       "sourcePath": "assets/brand/visuals/product/run/ready-dark.png",
-      "sourceHash": "sha256-eddd0dd60e5678660363cd6ab6b6988134c5fbec5887ce96deb2a2d939d6abad",
-      "sourceGitHead": "16d39b49fe97de53c6d27cace6b8678471f6999f",
+      "sourceHash": "sha256-d5202b14b2b5065802bf847530e0137013b4dbcde10c874dec4d2544fa0a6b98",
+      "sourceGitHead": "41063f9f846f5f5aba7baa37cee2424f41c62832",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1333,7 +1373,7 @@
       },
       "capture": {
         "browser": "chromium",
-        "browserVersion": "149.0.7827.55",
+        "browserVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
         "viewport": {
           "width": 1440,
           "height": 900
@@ -1345,6 +1385,9 @@
           "assets/brand/designSystem/tokens.json",
           "assets/brand/mascot/work/avatar-small.png",
           "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/package-lock.json",
+          "editor/package.json",
+          "editor/scripts/captureProductUi.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/mainSurface.tsx",
           "editor/src/components/app/notebookSurface.tsx",
@@ -1357,9 +1400,10 @@
           "editor/src/styles",
           "editor/vite.config.ts",
           "tests/assets/captureProductVisuals.py",
+          "tests/surface/captureProductUi.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-cc5a5e6a123b842a374128a9ebab255c3869ea9d6e4e59aa43c250761bc37008",
+        "sourceSetHash": "sha256-5cf14940094a17503fe8f1fe2f91ddd6388da5ed44a9f1105fde66d0cdea26cb",
         "platform": "win32"
       },
       "themePairId": "runStateReadyLight"
@@ -1367,10 +1411,10 @@
     {
       "id": "runStateReadyLight",
       "kind": "productScreenshot",
-      "sourceType": "playwrightCapture",
+      "sourceType": "pyprocCapture",
       "sourcePath": "assets/brand/visuals/product/run/ready-light.png",
       "sourceHash": "sha256-0da6beefbab651275af3395935d717b5bd6fcbe48a03cc8fe901e4058eb13b4f",
-      "sourceGitHead": "16d39b49fe97de53c6d27cace6b8678471f6999f",
+      "sourceGitHead": "41063f9f846f5f5aba7baa37cee2424f41c62832",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1426,7 +1470,7 @@
       },
       "capture": {
         "browser": "chromium",
-        "browserVersion": "149.0.7827.55",
+        "browserVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
         "viewport": {
           "width": 1440,
           "height": 900
@@ -1438,6 +1482,9 @@
           "assets/brand/designSystem/tokens.json",
           "assets/brand/mascot/work/avatar-small.png",
           "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/package-lock.json",
+          "editor/package.json",
+          "editor/scripts/captureProductUi.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/mainSurface.tsx",
           "editor/src/components/app/notebookSurface.tsx",
@@ -1450,9 +1497,10 @@
           "editor/src/styles",
           "editor/vite.config.ts",
           "tests/assets/captureProductVisuals.py",
+          "tests/surface/captureProductUi.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-cc5a5e6a123b842a374128a9ebab255c3869ea9d6e4e59aa43c250761bc37008",
+        "sourceSetHash": "sha256-5cf14940094a17503fe8f1fe2f91ddd6388da5ed44a9f1105fde66d0cdea26cb",
         "platform": "win32"
       },
       "themePairId": "runStateReady"
@@ -1460,10 +1508,10 @@
     {
       "id": "runStateRunning",
       "kind": "productScreenshot",
-      "sourceType": "playwrightCapture",
+      "sourceType": "pyprocCapture",
       "sourcePath": "assets/brand/visuals/product/run/running-dark.png",
-      "sourceHash": "sha256-c232b3b97ee4c2ed701d710f00e9cad410085be28ebc5e2299354db5e1bcd328",
-      "sourceGitHead": "16d39b49fe97de53c6d27cace6b8678471f6999f",
+      "sourceHash": "sha256-68cc147036e30a48b8c4927bdad4d988d3184d88f466cfec09659dc811c8e4fb",
+      "sourceGitHead": "41063f9f846f5f5aba7baa37cee2424f41c62832",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1519,7 +1567,7 @@
       },
       "capture": {
         "browser": "chromium",
-        "browserVersion": "149.0.7827.55",
+        "browserVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
         "viewport": {
           "width": 1440,
           "height": 900
@@ -1531,6 +1579,9 @@
           "assets/brand/designSystem/tokens.json",
           "assets/brand/mascot/work/avatar-small.png",
           "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/package-lock.json",
+          "editor/package.json",
+          "editor/scripts/captureProductUi.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/mainSurface.tsx",
           "editor/src/components/app/notebookSurface.tsx",
@@ -1543,9 +1594,10 @@
           "editor/src/styles",
           "editor/vite.config.ts",
           "tests/assets/captureProductVisuals.py",
+          "tests/surface/captureProductUi.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-cc5a5e6a123b842a374128a9ebab255c3869ea9d6e4e59aa43c250761bc37008",
+        "sourceSetHash": "sha256-5cf14940094a17503fe8f1fe2f91ddd6388da5ed44a9f1105fde66d0cdea26cb",
         "evidencePath": "notebookStateEvidence.screenshots.running",
         "platform": "win32"
       },
@@ -1554,10 +1606,10 @@
     {
       "id": "runStateRunningLight",
       "kind": "productScreenshot",
-      "sourceType": "playwrightCapture",
+      "sourceType": "pyprocCapture",
       "sourcePath": "assets/brand/visuals/product/run/running-light.png",
-      "sourceHash": "sha256-b50f30ddf3ad8124356a8f5e4c23e9a81af883334c16325b4c60e9ba43aaab89",
-      "sourceGitHead": "16d39b49fe97de53c6d27cace6b8678471f6999f",
+      "sourceHash": "sha256-7474130d664df61a243b578ff23b675ed1fe35edd0ec4dc2f1d086a811da55be",
+      "sourceGitHead": "41063f9f846f5f5aba7baa37cee2424f41c62832",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1613,7 +1665,7 @@
       },
       "capture": {
         "browser": "chromium",
-        "browserVersion": "149.0.7827.55",
+        "browserVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
         "viewport": {
           "width": 1440,
           "height": 900
@@ -1625,6 +1677,9 @@
           "assets/brand/designSystem/tokens.json",
           "assets/brand/mascot/work/avatar-small.png",
           "assets/brand/tools/viteLayerOrder.mjs",
+          "editor/package-lock.json",
+          "editor/package.json",
+          "editor/scripts/captureProductUi.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/mainSurface.tsx",
           "editor/src/components/app/notebookSurface.tsx",
@@ -1637,9 +1692,10 @@
           "editor/src/styles",
           "editor/vite.config.ts",
           "tests/assets/captureProductVisuals.py",
+          "tests/surface/captureProductUi.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-cc5a5e6a123b842a374128a9ebab255c3869ea9d6e4e59aa43c250761bc37008",
+        "sourceSetHash": "sha256-5cf14940094a17503fe8f1fe2f91ddd6388da5ed44a9f1105fde66d0cdea26cb",
         "evidencePath": "notebookStateEvidence.screenshots.running",
         "platform": "win32"
       },
@@ -1648,10 +1704,10 @@
     {
       "id": "runStateCheckFail",
       "kind": "productScreenshot",
-      "sourceType": "playwrightCapture",
+      "sourceType": "pyprocCapture",
       "sourcePath": "assets/brand/visuals/product/run/check-fail-dark.png",
-      "sourceHash": "sha256-810ee38be6efd5f39ce8f02b4c4478efa07c6e525fdb58767475c1cb5a4cd3e4",
-      "sourceGitHead": "16d39b49fe97de53c6d27cace6b8678471f6999f",
+      "sourceHash": "sha256-04fa985bd7cc157376b88cd44511ac81c28e56dfa0684202c142fd0740a39fe3",
+      "sourceGitHead": "41063f9f846f5f5aba7baa37cee2424f41c62832",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1701,7 +1757,7 @@
       },
       "capture": {
         "browser": "chromium",
-        "browserVersion": "149.0.7827.55",
+        "browserVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
         "viewport": {
           "width": 900,
           "height": 760
@@ -1715,6 +1771,9 @@
           "assets/brand/tools/viteLayerOrder.mjs",
           "assets/brand/visuals/learning/python-fundamentals-v1.png",
           "curricula/python/basics/30days",
+          "editor/package-lock.json",
+          "editor/package.json",
+          "editor/scripts/captureProductUi.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/curriculumSidebarTree.tsx",
           "editor/src/components/app/mainSurface.tsx",
@@ -1730,9 +1789,10 @@
           "editor/src/styles",
           "editor/vite.config.ts",
           "tests/assets/captureProductVisuals.py",
+          "tests/surface/captureProductUi.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-f265740be6b2f8c4d1e1b07883198321878daf710d52525cc6ae27298c825bcb",
+        "sourceSetHash": "sha256-2bc6fd239df3341a8bc625ff4164024e714d324238c57fe33c22fedb7290c33d",
         "evidencePath": "checkStateEvidence.screenshots.mismatch",
         "platform": "win32"
       },
@@ -1741,10 +1801,10 @@
     {
       "id": "runStateCheckFailLight",
       "kind": "productScreenshot",
-      "sourceType": "playwrightCapture",
+      "sourceType": "pyprocCapture",
       "sourcePath": "assets/brand/visuals/product/run/check-fail-light.png",
-      "sourceHash": "sha256-8514fe51bf6a766cafa7af1277d66754202197fd4b08d47b805f57922f50814f",
-      "sourceGitHead": "16d39b49fe97de53c6d27cace6b8678471f6999f",
+      "sourceHash": "sha256-06652ae07014f7845ee7bc24470c01d6eda4af1a11b67a24baa62e1302e06493",
+      "sourceGitHead": "41063f9f846f5f5aba7baa37cee2424f41c62832",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1794,7 +1854,7 @@
       },
       "capture": {
         "browser": "chromium",
-        "browserVersion": "149.0.7827.55",
+        "browserVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
         "viewport": {
           "width": 900,
           "height": 760
@@ -1808,6 +1868,9 @@
           "assets/brand/tools/viteLayerOrder.mjs",
           "assets/brand/visuals/learning/python-fundamentals-v1.png",
           "curricula/python/basics/30days",
+          "editor/package-lock.json",
+          "editor/package.json",
+          "editor/scripts/captureProductUi.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/curriculumSidebarTree.tsx",
           "editor/src/components/app/mainSurface.tsx",
@@ -1823,9 +1886,10 @@
           "editor/src/styles",
           "editor/vite.config.ts",
           "tests/assets/captureProductVisuals.py",
+          "tests/surface/captureProductUi.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-f265740be6b2f8c4d1e1b07883198321878daf710d52525cc6ae27298c825bcb",
+        "sourceSetHash": "sha256-2bc6fd239df3341a8bc625ff4164024e714d324238c57fe33c22fedb7290c33d",
         "evidencePath": "checkStateEvidence.screenshots.mismatch",
         "platform": "win32"
       },
@@ -1834,10 +1898,10 @@
     {
       "id": "runStateCheckPass",
       "kind": "productScreenshot",
-      "sourceType": "playwrightCapture",
+      "sourceType": "pyprocCapture",
       "sourcePath": "assets/brand/visuals/product/run/check-pass-dark.png",
-      "sourceHash": "sha256-72358d7a7cc7b93da3394f34491b68fb25f291cba913975b1e792eca44b89efc",
-      "sourceGitHead": "16d39b49fe97de53c6d27cace6b8678471f6999f",
+      "sourceHash": "sha256-76fba2823f234a1b322a916c16eb089f3f7da6239479fbc11bb10d76fa5fd961",
+      "sourceGitHead": "41063f9f846f5f5aba7baa37cee2424f41c62832",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1887,7 +1951,7 @@
       },
       "capture": {
         "browser": "chromium",
-        "browserVersion": "149.0.7827.55",
+        "browserVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
         "viewport": {
           "width": 768,
           "height": 1024
@@ -1901,6 +1965,9 @@
           "assets/brand/tools/viteLayerOrder.mjs",
           "assets/brand/visuals/learning/python-fundamentals-v1.png",
           "curricula/python/basics/30days",
+          "editor/package-lock.json",
+          "editor/package.json",
+          "editor/scripts/captureProductUi.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/curriculumSidebarTree.tsx",
           "editor/src/components/app/mainSurface.tsx",
@@ -1916,9 +1983,10 @@
           "editor/src/styles",
           "editor/vite.config.ts",
           "tests/assets/captureProductVisuals.py",
+          "tests/surface/captureProductUi.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-f265740be6b2f8c4d1e1b07883198321878daf710d52525cc6ae27298c825bcb",
+        "sourceSetHash": "sha256-2bc6fd239df3341a8bc625ff4164024e714d324238c57fe33c22fedb7290c33d",
         "evidencePath": "checkStateEvidence.screenshots.verified",
         "platform": "win32"
       },
@@ -1927,10 +1995,10 @@
     {
       "id": "runStateCheckPassLight",
       "kind": "productScreenshot",
-      "sourceType": "playwrightCapture",
+      "sourceType": "pyprocCapture",
       "sourcePath": "assets/brand/visuals/product/run/check-pass-light.png",
-      "sourceHash": "sha256-dc05a7119dd8fa90f19f91d74a5c3942e0c4fcf2e5317d0a7b6935b528259fab",
-      "sourceGitHead": "16d39b49fe97de53c6d27cace6b8678471f6999f",
+      "sourceHash": "sha256-0d456aaf714c1e1dce56ff3b1396abdac580958a01e01b4589c59af56b78f44c",
+      "sourceGitHead": "41063f9f846f5f5aba7baa37cee2424f41c62832",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -1980,7 +2048,7 @@
       },
       "capture": {
         "browser": "chromium",
-        "browserVersion": "149.0.7827.55",
+        "browserVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
         "viewport": {
           "width": 768,
           "height": 1024
@@ -1994,6 +2062,9 @@
           "assets/brand/tools/viteLayerOrder.mjs",
           "assets/brand/visuals/learning/python-fundamentals-v1.png",
           "curricula/python/basics/30days",
+          "editor/package-lock.json",
+          "editor/package.json",
+          "editor/scripts/captureProductUi.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/curriculumSidebarTree.tsx",
           "editor/src/components/app/mainSurface.tsx",
@@ -2009,9 +2080,10 @@
           "editor/src/styles",
           "editor/vite.config.ts",
           "tests/assets/captureProductVisuals.py",
+          "tests/surface/captureProductUi.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-f265740be6b2f8c4d1e1b07883198321878daf710d52525cc6ae27298c825bcb",
+        "sourceSetHash": "sha256-2bc6fd239df3341a8bc625ff4164024e714d324238c57fe33c22fedb7290c33d",
         "evidencePath": "checkStateEvidence.screenshots.verified",
         "platform": "win32"
       },
@@ -2020,10 +2092,10 @@
     {
       "id": "runStateLocalRequired",
       "kind": "productScreenshot",
-      "sourceType": "playwrightCapture",
+      "sourceType": "pyprocCapture",
       "sourcePath": "assets/brand/visuals/product/run/local-required-dark.png",
-      "sourceHash": "sha256-67d6e3275e17b51c1402691d1b56a39182ba4224314e83f1430037f0df987f33",
-      "sourceGitHead": "16d39b49fe97de53c6d27cace6b8678471f6999f",
+      "sourceHash": "sha256-078c59bc2096530aa67ac82434efd0274dfc8cb425103bfdc85eb06d1b48afcc",
+      "sourceGitHead": "41063f9f846f5f5aba7baa37cee2424f41c62832",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -2073,7 +2145,7 @@
       },
       "capture": {
         "browser": "chromium",
-        "browserVersion": "149.0.7827.55",
+        "browserVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
         "viewport": {
           "width": 900,
           "height": 760
@@ -2087,6 +2159,9 @@
           "assets/brand/tools/viteLayerOrder.mjs",
           "assets/brand/visuals/learning/python-fundamentals-v1.png",
           "curricula/python/basics/30days",
+          "editor/package-lock.json",
+          "editor/package.json",
+          "editor/scripts/captureProductUi.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/curriculumSidebarTree.tsx",
           "editor/src/components/app/mainSurface.tsx",
@@ -2102,9 +2177,10 @@
           "editor/src/styles",
           "editor/vite.config.ts",
           "tests/assets/captureProductVisuals.py",
+          "tests/surface/captureProductUi.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-f265740be6b2f8c4d1e1b07883198321878daf710d52525cc6ae27298c825bcb",
+        "sourceSetHash": "sha256-2bc6fd239df3341a8bc625ff4164024e714d324238c57fe33c22fedb7290c33d",
         "evidencePath": "checkCapabilityEvidence.screenshot",
         "platform": "win32"
       },
@@ -2113,10 +2189,10 @@
     {
       "id": "runStateLocalRequiredLight",
       "kind": "productScreenshot",
-      "sourceType": "playwrightCapture",
+      "sourceType": "pyprocCapture",
       "sourcePath": "assets/brand/visuals/product/run/local-required-light.png",
-      "sourceHash": "sha256-d0ba915793e9d103f8b13f4b9b46b0fd6ab76dbb9d438ad10f82e4c64d2f8741",
-      "sourceGitHead": "16d39b49fe97de53c6d27cace6b8678471f6999f",
+      "sourceHash": "sha256-1fc276bee59aa0d5e9dece37eb4755339ae2b16db6c882332cd58bf144698ea4",
+      "sourceGitHead": "41063f9f846f5f5aba7baa37cee2424f41c62832",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -2166,7 +2242,7 @@
       },
       "capture": {
         "browser": "chromium",
-        "browserVersion": "149.0.7827.55",
+        "browserVersion": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 Edg/152.0.0.0",
         "viewport": {
           "width": 900,
           "height": 760
@@ -2180,6 +2256,9 @@
           "assets/brand/tools/viteLayerOrder.mjs",
           "assets/brand/visuals/learning/python-fundamentals-v1.png",
           "curricula/python/basics/30days",
+          "editor/package-lock.json",
+          "editor/package.json",
+          "editor/scripts/captureProductUi.mjs",
           "editor/src/App.tsx",
           "editor/src/components/app/curriculumSidebarTree.tsx",
           "editor/src/components/app/mainSurface.tsx",
@@ -2195,9 +2274,10 @@
           "editor/src/styles",
           "editor/vite.config.ts",
           "tests/assets/captureProductVisuals.py",
+          "tests/surface/captureProductUi.py",
           "tests/surface/verifyProductExperiencePlaywright.py"
         ],
-        "sourceSetHash": "sha256-f265740be6b2f8c4d1e1b07883198321878daf710d52525cc6ae27298c825bcb",
+        "sourceSetHash": "sha256-2bc6fd239df3341a8bc625ff4164024e714d324238c57fe33c22fedb7290c33d",
         "evidencePath": "checkCapabilityEvidence.screenshot",
         "platform": "win32"
       },
