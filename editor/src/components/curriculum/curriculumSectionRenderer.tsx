@@ -69,6 +69,8 @@ export function CurriculumSectionCard({
   onSelectBlock: (blockId: string) => void;
 }) {
   const structured = hasStructuredSectionBlocks(section);
+  const leadImages = section.blocks.filter(isSectionLeadImage);
+  const bodySection = { ...section, blocks: section.blocks.filter((block) => !isSectionLeadImage(block)) };
   const sectionHeadingId = `${cellDomId(section.anchorBlockId)}-title`;
 
   return (
@@ -102,6 +104,13 @@ export function CurriculumSectionCard({
         </div>
       </header>
 
+      {leadImages.length ? <div className="space-y-4 px-4 pt-5 sm:px-6">
+        {leadImages.map((block) => <CurriculumLearningCell
+          block={block} canRun={false} draft="" isRunning={false} isSelected={false}
+          key={block.id} renderCodeCellEditor={renderCodeCellEditor} variant="embedded"
+          onDraftChange={() => {}} onRun={() => {}} onSelect={() => {}}
+        />)}
+      </div> : null}
       <SectionNarrative contract={section.contract} />
 
       {structured ? (
@@ -113,7 +122,7 @@ export function CurriculumSectionCard({
           renderCodeCellEditor={renderCodeCellEditor}
           results={results}
           runningBlockId={runningBlockId}
-          section={section}
+          section={bodySection}
           selectedBlockId={selectedBlockId}
           onDraftChange={onDraftChange}
           onPrepareLearningPromotion={onPrepareLearningPromotion}
@@ -123,7 +132,7 @@ export function CurriculumSectionCard({
         />
       ) : (
         <div className="space-y-6 px-4 py-5 sm:px-6">
-          {section.blocks.map((block) => (
+          {bodySection.blocks.map((block) => (
             <CurriculumLearningCell
               block={block}
               canRun={canRun}
@@ -828,6 +837,10 @@ function sectionAssessmentMode(
 
 export function hasStructuredSectionBlocks(section: CurriculumSectionGroup) {
   return section.blocks.some((block) => block.sourceType?.startsWith("sectionContract:"));
+}
+
+export function isSectionLeadImage(block: BlockConfig) {
+  return block.sourceType === "image" && isRecord(block.payload) && block.payload.placement === "sectionLead";
 }
 
 export function structuredSectionParts(section: CurriculumSectionGroup) {

@@ -63,7 +63,7 @@ class VisualAssetManifestTest(unittest.TestCase):
     def testCaptureSourceSetHashDriftIsRejected(self) -> None:
         invalid = deepcopy(self.manifest)
         captureAsset = next(
-            asset for asset in invalid["assets"] if asset["sourceType"] == "playwrightCapture"
+            asset for asset in invalid["assets"] if asset["sourceType"] in {"playwrightCapture", "pyprocCapture"}
         )
         captureAsset["capture"]["sourceSetHash"] = "sha256-" + "0" * 64
         with self.assertRaisesRegex(BUILDER.VisualAssetError, "capture source set hash drift"):

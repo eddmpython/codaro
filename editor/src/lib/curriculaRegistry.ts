@@ -739,7 +739,7 @@ function blocksFromLearningSections(
       }));
     }
 
-    if (sectionHasStructuredFields(section) && !sourceBlocks.length) {
+    if (sectionHasStructuredFields(section) && (!sourceBlocks.length || section.structuredPrimary === true)) {
       blocks.push(...structuredBlocksFromSectionContract(sectionContract));
     }
 

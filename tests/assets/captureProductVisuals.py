@@ -18,12 +18,17 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST_PATH = ROOT / "assets" / "brand" / "visuals" / "manifest.json"
 BUILDER_PATH = ROOT / "assets" / "brand" / "tools" / "buildVisualAssets.py"
-PRODUCT_RUNNER_PATH = ROOT / "tests" / "surface" / "verifyProductExperiencePlaywright.py"
-REPORT_ROOT = ROOT / "output" / "test-runner" / "product-visual-capture"
+PRODUCT_RUNNER_PATH = ROOT / "tests" / "surface" / "captureProductUi.py"
+FIXTURE_PATH = ROOT / "tests" / "surface" / "verifyProductExperiencePlaywright.py"
+REPORT_ROOT = Path(os.environ.get("CODARO_CAPTURE_RUN_DIR", str(ROOT / "output" / "test-runner"))) / "product-visual-capture"
 REPORT_PATH = REPORT_ROOT / "product-visual-capture-report.json"
 CAPTURE_OWNER_PATHS = (
     "tests/assets/captureProductVisuals.py",
     "tests/surface/verifyProductExperiencePlaywright.py",
+    "tests/surface/captureProductUi.py",
+    "editor/scripts/captureProductUi.mjs",
+    "editor/package.json",
+    "editor/package-lock.json",
 )
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 MIN_RASTER_NOISE_PIXELS = 8
@@ -72,7 +77,7 @@ def productCaptureAssets(
         for asset in manifest.get("assets", [])
         if isinstance(asset, dict)
         and asset.get("kind") == "productScreenshot"
-        and asset.get("sourceType") == "playwrightCapture"
+        and asset.get("sourceType") in {"playwrightCapture", "pyprocCapture"}
     ]
     if selectedAssetIds:
         knownIds = {str(asset.get("id")) for asset in assets}
@@ -106,7 +111,7 @@ def productCaptureAssets(
 
 
 def captureCasesByName() -> dict[str, dict[str, Any]]:
-    runner = loadModule("codaro_product_capture_runner", PRODUCT_RUNNER_PATH)
+    runner = loadModule("codaro_product_capture_fixtures", FIXTURE_PATH)
     cases = runner.browserCases(41001, 41002, 41003)
     return {str(case["name"]): case for case in cases}
 
@@ -293,6 +298,8 @@ def runCapture(asset: dict[str, Any], expectedGitHead: str) -> dict[str, Any]:
             "CODARO_PRODUCT_COLOR_SCHEME": theme,
             "CODARO_PRODUCT_GATE": "product-visual-capture",
             "CODARO_PRODUCT_REPORT_PATH": displayPath(reportPath),
+            "CODARO_PRODUCT_EVIDENCE_PATH": str(asset.get("capture", {}).get("evidencePath", "")),
+            "CODARO_CAPTURE_RUN_DIR": str(REPORT_ROOT / "captures" / assetId),
             "PYTHONUTF8": "1",
             "PYTHONIOENCODING": "utf-8",
         }
@@ -320,6 +327,11 @@ def runCapture(asset: dict[str, Any], expectedGitHead: str) -> dict[str, Any]:
     case = cases[0]
     if case.get("name") != fixtureId or case.get("viewport") != asset["capture"]["viewport"]:
         raise ProductVisualCaptureError(f"{assetId}: captured fixture identity or viewport drifted")
+    for field in ("failures", "consoleErrors", "httpFailures", "assetFailures"):
+        if not isinstance(case.get(field), list):
+            raise ProductVisualCaptureError(f"{assetId}: capture evidence is missing: {field}")
+    if not report.get("browser", {}).get("version"):
+        raise ProductVisualCaptureError(f"{assetId}: browser version evidence is missing")
     failures = [
         *report.get("failures", []),
         *case.get("failures", []),
@@ -347,7 +359,7 @@ def runCapture(asset: dict[str, Any], expectedGitHead: str) -> dict[str, Any]:
     if not isinstance(screenshotValue, str) or not screenshotValue:
         raise ProductVisualCaptureError(f"{assetId}: capture screenshot path is missing")
     screenshotPath = (ROOT / screenshotValue).resolve()
-    if not screenshotPath.is_relative_to(ROOT) or not screenshotPath.is_file():
+    if not screenshotPath.is_relative_to(REPORT_ROOT.resolve()) or not screenshotPath.is_file():
         raise ProductVisualCaptureError(f"{assetId}: capture screenshot is missing")
     width, height = pngDimensions(screenshotPath)
     expectedViewport = asset["capture"]["viewport"]
@@ -511,6 +523,7 @@ def updateCaptures(
         )
         capture["pixelComparison"] = comparison
         asset["sourceHash"] = f"sha256-{promotedHash}"
+        asset["sourceType"] = "pyprocCapture"
         asset["sourceGitHead"] = implementationGitHead
         asset["capture"]["browserVersion"] = capture["browserVersion"]
         # 픽셀 비교는 같은 OS 텍스트 래스터라이저에서만 의미가 있다. --check 가
@@ -590,6 +603,8 @@ def parseArgs(argv: list[str]) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     args = parseArgs(list(sys.argv[1:] if argv is None else argv))
+    if not os.environ.get("CODARO_CAPTURE_RUN_DIR"):
+        raise ProductVisualCaptureError("CODARO_CAPTURE_RUN_DIR에 작업별 공통 실행 공간을 지정하세요")
     startedAt = datetime.now(UTC).isoformat()
     started = time.monotonic()
     head = gitHead()

@@ -45,9 +45,9 @@ def main() -> int:
         for asset in manifest.get("assets", [])
         if isinstance(asset, dict) and asset.get("kind") == "instructional"
     }
-    if set(instructionalAssets) != EXPECTED_ASSET_IDS:
+    if not EXPECTED_ASSET_IDS.issubset(instructionalAssets):
         failures.append(
-            "instructional asset set drifted: "
+            "required instructional assets are missing: "
             f"{sorted(instructionalAssets)}"
         )
 

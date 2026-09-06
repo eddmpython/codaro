@@ -35,7 +35,8 @@
           "enum": ["productScreenshot", "outcomeProof", "instructional", "brandCharacter", "socialPreview", "video"]
         },
         "sourceType": {
-          "enum": ["playwrightCapture", "generatedRaster", "authoredRaster", "licensedMedia", "videoCapture"]
+          "enum": ["playwrightCapture",
+        "pyprocCapture", "generatedRaster", "authoredRaster", "licensedMedia", "videoCapture", "sharedRaster"]
         },
         "sourcePath": { "type": "string", "minLength": 1 },
         "sourceHash": { "type": "string", "pattern": "^sha256-[0-9a-f]{64}$" },
@@ -72,7 +73,17 @@
             { "type": "null" }
           ]
         },
-        "lessonContentHash": { "type": ["string", "null"] }
+        "lessonContentHash": { "type": ["string", "null"] },
+        "sharedSource": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["assetId", "url", "pageUrl"],
+          "properties": {
+            "assetId": { "type": "string", "minLength": 1 },
+            "url": { "type": "string", "pattern": "^https://" },
+            "pageUrl": { "type": "string", "pattern": "^https://" }
+          }
+        }
       }
     },
     "rendering": {

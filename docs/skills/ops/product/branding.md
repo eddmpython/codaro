@@ -79,6 +79,48 @@ whenToUse: 새 UI 컴포넌트 추가, 색/반지름/그림자 변경, 랜딩/�
 
 # 브랜드 자산 운영
 
+제품 화면 캡처는 `captureProductVisuals.py`에서 `captureProductUi.py`와
+`editor/scripts/captureProductUi.mjs`로 이어진다. 새 캡처의 sourceType은 `pyprocCapture`다.
+Node 검수 도구는 editor의 개발 의존성 `pyproc-control` npm alias가 가리키는 공개
+`pyproc/control` API를 사용한다. 앱의 `pyproc/runtime` 의존성과 검수 버전은 용도가 다르다.
+정확한 버전은 `editor/package.json`과 lockfile이 소유한다. 앱 자산 생성은 bin shim 대신
+런타임 패키지의 `package.json.bin`에 등록된 공개 명령을 선택해 검수용 버전과 섞이지 않게 한다.
+
+캡처 전에 제품을 빌드하고 `CODARO_WEB_BUILD_ROOT`에 그 출력 경로를 지정한다.
+`CODARO_CAPTURE_RUN_DIR`은 개발 위생 규칙에 따른 작업별 공통 실행 공간이어야 한다.
+서버 상태, 검수용 프로필, 관측 보고서와 PNG는 이 공간에서 만들며 원본 승격을 마친 뒤 정리한다.
+캡처는 코드 실행과 확인 상태를 실제 UI에서 만든다. Python 출력이나 통과 상태를 화면에 주입하지 않는다.
+
+## 블로그 원본을 수업에서 재사용
+
+eddmpython 도구형 글과 공개 Python 수업이 같은 개념을 설명할 때는 이미 검수된 실제 화면을
+재사용한다. 제품 코어나 유료 교안은 가져오지 않는다. 블로그와 수업을 선택적으로 연결하는 방침은
+[eddmpython 콘텐츠 전략](https://github.com/eddmpython/eddmpython/blob/main/skills/specs/operation/contentStrategy.md)이 소유한다.
+
+등록은 기존 `assets/brand/visuals/manifest.json`에서 한다. 공유 원본은 `sharedRaster`로 구분하며
+`provenance.sharedSource`가 블로그 자산 ID와 콘텐츠 주소 URL, 글 주소를 보존한다. SHA-256과
+로컬 원본 위치는 기존 manifest 필드를 사용한다. 별도 이미지 카탈로그를 만들지 않는다.
+
+```powershell
+uv run python -X utf8 assets/brand/tools/fetchSharedVisuals.py
+uv run python -X utf8 assets/brand/tools/buildVisualAssets.py
+```
+
+첫 명령은 명시적으로 등록한 공개 객체만 받고 해시를 확인한다. 기존 원본을 덮어쓰지 않는다.
+이후에는 기존 AVIF/WebP 생성과 Landing·Editor 배포 과정을 따른다. 학습 실행 중 원격 이미지
+서버를 호출하지 않으며 원본과 배포 자산을 Codaro 자체에 포함한다. 형제 저장소가 없어도 동작해야 한다.
+
+수업의 image block은 `assetId`로 등록 이미지를 참조한다. `placement: sectionLead`이면 섹션의
+제목·부제 다음, 설명 이전에 원본을 자르지 않고 보여 준다. 설명과 실행 필드를 함께 쓰는 섹션은
+`structuredPrimary: true`를 지정해 미디어가 코드셀을 대체하지 않게 한다. 같은 개념을 다루는
+블로그와 수업은 같은 원본을 쓸 수 있지만, 다른 개념의 섹션에는 같은 이미지를 반복하지 않는다.
+설명과 시각물의 필수 구성 및 Python 결과 일치 기준은
+[학습 경험](../../architecture/learning-experience.md)의 설명과 직관적 시각물 계약을 따른다.
+
+블로그 도구 화면은 입력·출력과 검토 대상을 설명하는 참고 화면이다. Codaro나 Python 코드의
+실행 증거로 부르지 않는다. 그림의 색과 질감은 원본을 유지하고 출처와 학습 질문은 그림 밖에 표시한다.
+원본 교체는 새 해시와 새 검수를 동반한다. 자동 갱신으로 수업과 이미지의 내용이 갈라지게 하지 않는다.
+
 - 마스코트 원본은 `assets/brand/` 아래에 둔다.
 - 실제 서비스 반영 파일은 제품 표면별 static/public 경로로 export한다.
 - GitHub에 같이 올려서 브랜딩 자산도 저장소 이력으로 관리한다.

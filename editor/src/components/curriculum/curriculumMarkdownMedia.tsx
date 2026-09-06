@@ -13,6 +13,7 @@ export function MediaCell({ block, payload }: { block: BlockConfig; payload: Rec
   const title = payloadText(payload, "title") || block.title || blockLabel(block);
   const description = payloadText(payload, "description") || payloadText(payload, "subtitle");
   const items = payloadItems(payload, "items");
+  const sectionLead = payloadText(payload, "placement") === "sectionLead";
 
   if (sourceType === "image" && assetId) {
     if (!isVisualAssetId(assetId)) {
@@ -21,16 +22,16 @@ export function MediaCell({ block, payload }: { block: BlockConfig; payload: Rec
     const visual = resolveVisualAsset(assetId, { width: 840 });
     return (
       <figure
-        className="grid min-w-0 gap-3 sm:grid-cols-[minmax(240px,0.95fr)_minmax(0,1.05fr)] sm:items-start sm:gap-4"
+        className={sectionLead ? "grid min-w-0 gap-3" : "grid min-w-0 gap-3 sm:grid-cols-[minmax(240px,0.95fr)_minmax(0,1.05fr)] sm:items-start sm:gap-4"}
         data-learning-domain-visual="true"
         data-learning-visual-asset={visual.id}
         data-learning-visual-kind={visual.kind}
       >
-        <picture className="block min-w-0 overflow-hidden rounded-lg border border-border bg-card">
+        <picture className={sectionLead ? "block min-w-0" : "block min-w-0 overflow-hidden rounded-lg border border-border bg-card"}>
           {visual.sources.map((source) => (
             <source
               key={source.format}
-              sizes="(min-width: 640px) 420px, 100vw"
+              sizes={sectionLead ? "(min-width: 1024px) 840px, 100vw" : "(min-width: 640px) 420px, 100vw"}
               srcSet={source.srcSet}
               type={source.type}
             />

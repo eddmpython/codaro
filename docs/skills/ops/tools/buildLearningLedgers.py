@@ -428,32 +428,53 @@ def renderedPathLedger(
     }
 
 
-def validateAppliedTransition(
-    transition: dict[str, Any],
-    plans: dict[str, dict[str, Any]],
-) -> list[str]:
+def validateAppliedTransition(transition: dict[str, Any]) -> list[str]:
+    """이미 적용한 전이는 과거 증거다. 현재 경로의 정답으로 재사용하지 않는다."""
     failures: list[str] = []
     pathDiffs = transition.get("pathDiffs")
     if not isinstance(pathDiffs, list):
         return ["applied taxonomy transition pathDiffs are absent"]
-    byPath = {
-        str(row.get("pathId", "")): row
-        for row in pathDiffs
-        if isinstance(row, dict)
-    }
-    unknownPaths = set(byPath) - set(plans)
-    if unknownPaths:
-        failures.append("applied taxonomy transition contains unknown paths: " + ", ".join(sorted(unknownPaths)))
-        return failures
-    for pathId in sorted(byPath):
-        plan = plans[pathId]
-        targetRefs = list(plan["lessonRefs"])
-        row = byPath[pathId]
-        if row.get("toCount") != len(targetRefs) or row.get("toOrderHash") != orderHash(targetRefs):
-            failures.append(f"applied taxonomy transition target differs: {pathId}")
+    seen: set[str] = set()
+    for row in pathDiffs:
+        if not isinstance(row, dict):
+            failures.append("applied taxonomy transition pathDiff must be a mapping")
+            continue
+        pathId = row.get("pathId")
+        if not isinstance(pathId, str) or not pathId or pathId in seen:
+            failures.append("applied taxonomy transition path IDs are invalid or duplicated")
+            continue
+        seen.add(pathId)
         if row.get("ledgerPath") != f"path-ledgers/{pathId}.yml":
             failures.append(f"applied taxonomy transition ledger path differs: {pathId}")
+        for key in ("fromCount", "toCount"):
+            value = row.get(key)
+            if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+                failures.append(f"applied taxonomy transition {key} is invalid: {pathId}")
+        for key in ("fromOrderHash", "toOrderHash"):
+            value = row.get(key)
+            if not isinstance(value, str) or len(value) != 64 or any(char not in "0123456789abcdef" for char in value):
+                failures.append(f"applied taxonomy transition {key} is invalid: {pathId}")
     return failures
+
+
+def applyLedgerWrites(updates: dict[Path, str]) -> None:
+    """모든 내용을 먼저 만들고, 쓰기 실패 시 이 실행이 바꾼 파일을 복구한다."""
+    originals = {path: path.read_bytes() if path.exists() else None for path in updates}
+    attempted: list[Path] = []
+    try:
+        for path, text in updates.items():
+            if originals[path] is not None and originals[path].decode("utf-8").replace("\r\n", "\n") == text:
+                continue
+            attempted.append(path)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(text, encoding="utf-8")
+    except OSError:
+        for path in reversed(attempted):
+            if originals[path] is None:
+                path.unlink(missing_ok=True)
+            else:
+                path.write_bytes(originals[path])
+        raise
 
 
 def evaluate(write: bool, applyTransition: bool = False) -> list[str]:
@@ -580,17 +601,8 @@ def evaluate(write: bool, applyTransition: bool = False) -> list[str]:
     )
     transitionApplied = recordedTransition.get("applyState") == "applied"
     if transitionApplied:
-        expectedTransition = dict(proposedTransition)
-        expectedTransition["applyState"] = "applied"
-        expectedTransition["pathDiffs"] = [
-            {
-                **row,
-                "ledgerPath": f"path-ledgers/{row.get('pathId')}.yml",
-            }
-            for row in recordedTransition.get("pathDiffs", [])
-            if isinstance(row, dict)
-        ]
-        failures.extend(validateAppliedTransition(expectedTransition, plans))
+        expectedTransition = recordedTransition
+        failures.extend(validateAppliedTransition(recordedTransition))
     else:
         expectedTransition = proposedTransition
     recordedIdentitySummary = loadYaml(IDENTITY_SUMMARY_PATH)
@@ -627,7 +639,15 @@ def evaluate(write: bool, applyTransition: bool = False) -> list[str]:
             duplicatedFields = sorted(forbiddenPathFields & set(row))
             if duplicatedFields:
                 failures.append(f"path duplicates canonical fields {duplicatedFields}: {pathId}/{lessonRef}")
+        if transitionApplied and not write and pathId in plans:
+            current = renderedPathLedger(payload, plans[pathId], len(graph.lessons),
+                                         fileSha256(TAXONOMY_PATH), expectedAggregate)
+            for key, value in current.items():
+                if key != "composerSnapshotDate" and payload.get(key) != value:
+                    failures.append(f"path projection {key} is stale: {pathId}")
 
+    if (write or applyTransition) and failures:
+        return failures
     if applyTransition:
         if transitionReview.get("status") != "approved":
             failures.append("taxonomy transition cannot apply before approved review")
@@ -652,67 +672,41 @@ def evaluate(write: bool, applyTransition: bool = False) -> list[str]:
         appliedPayload["applyState"] = "applied"
         writeGeneratedYaml(TAXONOMY_TRANSITION_PATH, appliedPayload)
     elif write:
-        currentComposerHash = fileSha256(ROOT / "src/codaro/curriculum/planComposer.py")
-        for path, payload in paths.values():
-            recordedComposerHash = str(payload.get("composerVersionHash", ""))
-            text = path.read_text(encoding="utf-8")
-            if recordedComposerHash != currentComposerHash:
-                text = replaceScalar(
-                    text,
-                    "composerVersionHash",
-                    recordedComposerHash,
-                    currentComposerHash,
-                    f"path ledger {payload.get('pathId')}",
-                )
-            recordedSourceSetHash = str(payload.get("sourceSetHash", ""))
-            if recordedSourceSetHash != expectedAggregate:
-                text = replaceScalar(
-                    text,
-                    "sourceSetHash",
-                    recordedSourceSetHash,
-                    expectedAggregate,
-                    f"path ledger {payload.get('pathId')}",
-                )
-            currentTaxonomyHash = fileSha256(TAXONOMY_PATH)
-            recordedTaxonomyHash = str(payload.get("taxonomySnapshotHash", ""))
-            if recordedTaxonomyHash != currentTaxonomyHash:
-                text = replaceScalar(
-                    text,
-                    "taxonomySnapshotHash",
-                    recordedTaxonomyHash,
-                    currentTaxonomyHash,
-                    f"path ledger {payload.get('pathId')}",
-                )
-            if text != path.read_text(encoding="utf-8"):
-                path.write_text(text, encoding="utf-8")
+        updates: dict[Path, str] = {}
+        for pathId, (path, payload) in sorted(paths.items()):
+            if transitionApplied:
+                projected = renderedPathLedger(payload, plans[pathId], len(graph.lessons),
+                                               fileSha256(TAXONOMY_PATH), expectedAggregate)
+                if all(payload.get(key) == value for key, value in projected.items()
+                       if key != "composerSnapshotDate"):
+                    projected["composerSnapshotDate"] = payload.get("composerSnapshotDate")
+                updates[path] = dumpYaml(projected)
         for ledgerPath, changes in identityUpdates.items():
-            text = ledgerPath.read_text(encoding="utf-8")
+            text = updates.get(ledgerPath, ledgerPath.read_text(encoding="utf-8"))
             for lessonRef, key, old, new in changes:
                 text = replaceRowField(text, lessonRef, key, old, new)
-            ledgerPath.write_text(text, encoding="utf-8")
+            updates[ledgerPath] = text
         for ledgerPath, changes in hashUpdates.items():
-            text = ledgerPath.read_text(encoding="utf-8")
+            text = updates.get(ledgerPath, ledgerPath.read_text(encoding="utf-8"))
             for lessonRef, old, new in changes:
                 text = replaceScalar(text, "lessonContentHash", old, new, lessonRef)
-            ledgerPath.write_text(text, encoding="utf-8")
+            updates[ledgerPath] = text
         for ledgerPath, changes in contentFieldUpdates.items():
-            text = ledgerPath.read_text(encoding="utf-8")
+            text = updates.get(ledgerPath, ledgerPath.read_text(encoding="utf-8"))
             for lessonRef, key, old, new in changes:
                 text = replaceRowField(text, lessonRef, key, old, new)
-            ledgerPath.write_text(text, encoding="utf-8")
-        summaryText = SUMMARY_PATH.read_text(encoding="utf-8")
-        summaryText = replaceScalar(
-            summaryText, "sourceSetHash", recordedAggregate, expectedAggregate, "content-ledger summary"
-        )
-        oldDate = str(summary.get("snapshotDate", ""))
-        summaryText = replaceScalar(
-            summaryText, "snapshotDate", oldDate, date.today().isoformat(), "content-ledger summary"
-        )
-        SUMMARY_PATH.write_text(summaryText, encoding="utf-8")
-        writeGeneratedYaml(IDENTITY_SUMMARY_PATH, expectedIdentity)
-        writeGeneratedYaml(ALIAS_MIGRATION_PATH, expectedAlias)
+            updates[ledgerPath] = text
+        summaryText = replaceScalar(SUMMARY_PATH.read_text(encoding="utf-8"),
+                                    "sourceSetHash", recordedAggregate, expectedAggregate,
+                                    "content-ledger summary")
+        summaryText = replaceScalar(summaryText, "snapshotDate", str(summary.get("snapshotDate", "")),
+                                    date.today().isoformat(), "content-ledger summary")
+        updates[SUMMARY_PATH] = summaryText
+        updates[IDENTITY_SUMMARY_PATH] = dumpYaml(expectedIdentity)
+        updates[ALIAS_MIGRATION_PATH] = dumpYaml(expectedAlias)
         if not transitionApplied:
-            writeGeneratedYaml(TAXONOMY_TRANSITION_PATH, expectedTransition)
+            updates[TAXONOMY_TRANSITION_PATH] = dumpYaml(expectedTransition)
+        applyLedgerWrites(updates)
     else:
         if summary.get("canonicalRows") != len(rows):
             failures.append(f"canonicalRows mismatch: {summary.get('canonicalRows')} != {len(rows)}")

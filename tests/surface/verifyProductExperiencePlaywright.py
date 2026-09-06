@@ -3188,7 +3188,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
 
 
 AUDIT_SCRIPT = """
-async ({ surface, expectedTier }) => {
+async ({ surface, expectedTier, captureOnly = false }) => {
   const visible = (element) => {
     const rect = element.getBoundingClientRect();
     const style = getComputedStyle(element);
@@ -3302,6 +3302,16 @@ async ({ surface, expectedTier }) => {
     emailAddress: nonExampleEmailAddresses.length > 0,
     accessCredential: /\\b(?:sk-[A-Za-z0-9_-]{12,}|ghp_[A-Za-z0-9]{12,}|github_pat_[A-Za-z0-9_]{12,}|Bearer\\s+[A-Za-z0-9._~-]{12,})\\b/i.test(visibleText),
   };
+  if (captureOnly) {
+    return {
+      captureRedactionSignals,
+      rootTheme: document.documentElement.getAttribute("data-astryx-theme"),
+      brokenImages,
+      missingImageAlt,
+      viewportWidth: window.innerWidth,
+      documentWidth: document.documentElement.scrollWidth,
+    };
+  }
   const visibleSocialLinks = [...document.querySelectorAll('[data-social-link="codaro"]')]
     .filter(inViewport);
   const visibleSocialLinkIds = visibleSocialLinks

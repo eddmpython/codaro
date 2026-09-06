@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 설치된 pyproc의 공개 CLI로 실행 자산과 SRI manifest를 editor build 산출물에 쓴다.
 import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -49,8 +49,9 @@ function trimSlashes(value) {
 }
 
 function cliPath() {
-  const executable = process.platform === "win32" ? "pyproc-assets.cmd" : "pyproc-assets";
-  return resolve(EDITOR_ROOT, "node_modules", ".bin", executable);
+  const packageRoot = resolve(EDITOR_ROOT, "node_modules", "pyproc");
+  const packageMeta = JSON.parse(readFileSync(resolve(packageRoot, "package.json"), "utf8"));
+  return resolve(packageRoot, packageMeta.bin["pyproc-assets"]);
 }
 
 async function main() {
@@ -67,7 +68,7 @@ async function main() {
   await rm(manifestPath, { force: true });
   await rm(vendorPath, { recursive: true, force: true });
 
-  const result = spawnSync(binary, [
+  const result = spawnSync(process.execPath, [binary,
     "--baseURL", opts.baseURL,
     "--out", manifestPath,
     "--copy-to", vendorPath,
@@ -75,7 +76,6 @@ async function main() {
   ], {
     cwd: EDITOR_ROOT,
     stdio: "inherit",
-    shell: process.platform === "win32",
   });
   if (result.error) throw result.error;
   if (result.status !== 0) throw new Error(`pyproc-assets CLI 실패(exit ${result.status})`);

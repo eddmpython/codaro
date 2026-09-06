@@ -26,3 +26,9 @@ uv run python -X utf8 tests/run.py gate curriculum-quality-matrix
 ```
 
 승인 메타데이터를 바꿀 때는 `applyLearningContentReview.py`의 검증된 입력 경로를 사용한다. 원장과 실제 curriculum source가 달라지면 `learning-content` gate가 실패해야 한다.
+
+`--write`는 현재 레슨의 선수 조건과 합성 결과로 경로 순서도 갱신한다. 이미 적용한
+`evidence/taxonomy-transition.yml`은 당시 승인과 변경의 증거이므로 다시 쓰지 않는다.
+현재 경로는 과거 전이의 목적지 해시가 아니라 현재 합성 결과와 대조한다. 승인 메타데이터는
+이 갱신으로 승인 상태가 바뀌지 않는다. 입력 검증과 전체 직렬화를 마친 뒤에만 파일을 쓰며,
+쓰기 중 오류가 나면 이 실행이 건드린 파일을 원래 바이트로 복구한다.

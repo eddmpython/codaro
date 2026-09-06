@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
+from types import SimpleNamespace
 
 from PIL import Image
 
@@ -31,6 +33,37 @@ class CaptureProductVisualsTest(unittest.TestCase):
     def setUp(self) -> None:
         self.manifest = CAPTURE_TOOL.loadManifest()
         self.assets = CAPTURE_TOOL.productCaptureAssets(self.manifest)
+
+    def testCaptureRequiresMeasuredEmptyFailureLists(self) -> None:
+        asset = self.assets[0]
+        with tempfile.TemporaryDirectory() as temporary:
+            runRoot = Path(temporary)
+            screenshot = runRoot / "capture.png"
+            viewport = asset["capture"]["viewport"]
+            Image.new("RGB", (viewport["width"], viewport["height"])).save(screenshot)
+            case = {"name": asset["provenance"]["fixtureId"], "viewport": viewport,
+                    "screenshot": str(screenshot), "failures": [], "consoleErrors": [],
+                    "httpFailures": [], "assetFailures": [],
+                    "audit": {"captureRedactionSignals": {"windowsUserPath": False}}}
+            report = {"passed": True, "gitHead": "fixtureHead", "failures": [],
+                      "colorScheme": asset["capture"]["theme"], "browser": {"version": "fixtureBrowser"},
+                      "cases": [case]}
+
+            def runFixture(*args, **kwargs):
+                Path(kwargs["env"]["CODARO_PRODUCT_REPORT_PATH"]).write_text(json.dumps(report), encoding="utf-8")
+                return SimpleNamespace(returncode=0)
+
+            with patch.object(CAPTURE_TOOL, "REPORT_ROOT", runRoot), patch.object(CAPTURE_TOOL.subprocess, "run", side_effect=runFixture):
+                measured = CAPTURE_TOOL.runCapture(asset, "fixtureHead")
+                self.assertEqual(measured["screenshotPath"], screenshot)
+                for field in ("failures", "consoleErrors", "httpFailures", "assetFailures"):
+                    value = case.pop(field)
+                    with self.subTest(field=field), self.assertRaisesRegex(CAPTURE_TOOL.ProductVisualCaptureError, "evidence is missing"):
+                        CAPTURE_TOOL.runCapture(asset, "fixtureHead")
+                    case[field] = value
+                case["consoleErrors"] = ["fixture error"]
+                with self.assertRaisesRegex(CAPTURE_TOOL.ProductVisualCaptureError, "product or redaction failure"):
+                    CAPTURE_TOOL.runCapture(asset, "fixtureHead")
 
     def testManifestTargetsRealBrowserFixturesAtExactViewport(self) -> None:
         browserCases = {

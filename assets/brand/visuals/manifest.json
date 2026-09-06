@@ -2,6 +2,370 @@
   "schemaVersion": 1,
   "assets": [
     {
+      "id": "pdfTableSource",
+      "kind": "instructional",
+      "sourceType": "sharedRaster",
+      "sourcePath": "assets/brand/visuals/learning/pdfTableSource.png",
+      "sourceHash": "sha256-3dc1b60478124ab8ce2726e43b9b1635476d853b2c2c307466a77e522eaadd41",
+      "sourceGitHead": "5389097fc4148a2eaef95cc282a07740a37b1817",
+      "provenance": {
+        "author": "eddmpython",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "008-pdf-table/workspace",
+        "promptHash": null,
+        "lessonContentHash": "sha256-4572cc5ed4170a4dad0383ca6305a522694d9e790819cced31f0273a1abad799",
+        "sharedSource": {
+          "assetId": "008-pdf-table/workspace",
+          "url": "https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/3d/3dc1b60478124ab8ce2726e43b9b1635476d853b2c2c307466a77e522eaadd41.png",
+          "pageUrl": "https://eddmpython.com/blog/pdf-table"
+        }
+      },
+      "rendering": {
+        "width": 2524,
+        "height": 1420,
+        "aspectRatio": 1.7774647887323944,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "lesson-context"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          840,
+          1440
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "입고 내역 PDF 원문과 상품코드, 품목, 수량, 단가, 금액을 읽은 표",
+        "caption": "블로그 PDF 작업대의 참고 화면입니다. Python 실습의 실행 결과 화면은 아닙니다.",
+        "learningQuestion": "PDF의 상품코드와 금액이 추출 결과에서도 같은가?",
+        "decisionShown": "원문과 추출 값을 나란히 비교합니다.",
+        "lessonRefs": [
+          "pdf/04_표추출"
+        ]
+      }
+    },
+    {
+      "id": "pdfTableBatch",
+      "kind": "instructional",
+      "sourceType": "sharedRaster",
+      "sourcePath": "assets/brand/visuals/learning/pdfTableBatch.png",
+      "sourceHash": "sha256-a78046d7058234e6f3fdbea81ddb568610714e2a6faef28fe0fcd12c1bec5dae",
+      "sourceGitHead": "5389097fc4148a2eaef95cc282a07740a37b1817",
+      "provenance": {
+        "author": "eddmpython",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "008-pdf-table/batch",
+        "promptHash": null,
+        "lessonContentHash": "sha256-4572cc5ed4170a4dad0383ca6305a522694d9e790819cced31f0273a1abad799",
+        "sharedSource": {
+          "assetId": "008-pdf-table/batch",
+          "url": "https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/a7/a78046d7058234e6f3fdbea81ddb568610714e2a6faef28fe0fcd12c1bec5dae.png",
+          "pageUrl": "https://eddmpython.com/blog/pdf-table"
+        }
+      },
+      "rendering": {
+        "width": 2832,
+        "height": 1594,
+        "aspectRatio": 1.7766624843161858,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "lesson-context"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          840,
+          1440
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "여러 페이지의 표가 통합할 표 목록에 모인 PDF 작업대",
+        "caption": "블로그 PDF 작업대의 참고 화면입니다. Python 실습의 실행 결과 화면은 아닙니다.",
+        "learningQuestion": "각 페이지의 표가 결과에 모두 포함됐는가?",
+        "decisionShown": "파일과 페이지를 모두 방문해야 누락을 찾습니다.",
+        "lessonRefs": [
+          "pdf/04_표추출"
+        ]
+      }
+    },
+    {
+      "id": "pdfTableEvidence",
+      "kind": "instructional",
+      "sourceType": "sharedRaster",
+      "sourcePath": "assets/brand/visuals/learning/pdfTableEvidence.png",
+      "sourceHash": "sha256-ac6607f39c130900a2339dcb3a401fae4b5d40e879034fb79fca95be789a764d",
+      "sourceGitHead": "5389097fc4148a2eaef95cc282a07740a37b1817",
+      "provenance": {
+        "author": "eddmpython",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "008-pdf-table/trace",
+        "promptHash": null,
+        "lessonContentHash": "sha256-4572cc5ed4170a4dad0383ca6305a522694d9e790819cced31f0273a1abad799",
+        "sharedSource": {
+          "assetId": "008-pdf-table/trace",
+          "url": "https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/ac/ac6607f39c130900a2339dcb3a401fae4b5d40e879034fb79fca95be789a764d.png",
+          "pageUrl": "https://eddmpython.com/blog/pdf-table"
+        }
+      },
+      "rendering": {
+        "width": 1320,
+        "height": 744,
+        "aspectRatio": 1.7741935483870968,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "lesson-context"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          840
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "품목 셀의 원문 무선 마우스와 직접 수정한 무선 마우스 검토가 나란히 표시된 화면",
+        "caption": "블로그 PDF 작업대의 참고 화면입니다. Python 실습의 실행 결과 화면은 아닙니다.",
+        "learningQuestion": "이 값이 어느 파일의 어느 위치에서 왔는가?",
+        "decisionShown": "값과 원본 위치를 함께 보관합니다.",
+        "lessonRefs": [
+          "pdf/04_표추출"
+        ]
+      }
+    },
+    {
+      "id": "pdfTableTotals",
+      "kind": "instructional",
+      "sourceType": "sharedRaster",
+      "sourcePath": "assets/brand/visuals/learning/pdfTableTotals.png",
+      "sourceHash": "sha256-e4eab49322ca2aaa93a758c921c4d3837ae236f736d25480e6c4648505868a30",
+      "sourceGitHead": "5389097fc4148a2eaef95cc282a07740a37b1817",
+      "provenance": {
+        "author": "eddmpython",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "008-pdf-table/totals",
+        "promptHash": null,
+        "lessonContentHash": "sha256-4572cc5ed4170a4dad0383ca6305a522694d9e790819cced31f0273a1abad799",
+        "sharedSource": {
+          "assetId": "008-pdf-table/totals",
+          "url": "https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/e4/e4eab49322ca2aaa93a758c921c4d3837ae236f736d25480e6c4648505868a30.png",
+          "pageUrl": "https://eddmpython.com/blog/pdf-table"
+        }
+      },
+      "rendering": {
+        "width": 1320,
+        "height": 744,
+        "aspectRatio": 1.7741935483870968,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "lesson-context"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          840
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "금액 열의 읽은 합계와 기준 합계가 모두 1723000으로 일치하는 화면",
+        "caption": "블로그 PDF 작업대의 참고 화면입니다. Python 실습의 실행 결과 화면은 아닙니다.",
+        "learningQuestion": "숫자로 바꿀 열과 문자로 남길 열은 무엇인가?",
+        "decisionShown": "금액을 계산하되 상품코드의 앞자리 0은 보존합니다.",
+        "lessonRefs": [
+          "pdf/04_표추출"
+        ]
+      }
+    },
+    {
+      "id": "pdfTableOcr",
+      "kind": "instructional",
+      "sourceType": "sharedRaster",
+      "sourcePath": "assets/brand/visuals/learning/pdfTableOcr.png",
+      "sourceHash": "sha256-b805f0132362a7578a1ee49423df7a4f3663e864ac0b503a898b56c1bdcfabc5",
+      "sourceGitHead": "5389097fc4148a2eaef95cc282a07740a37b1817",
+      "provenance": {
+        "author": "eddmpython",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "008-pdf-table/ocr",
+        "promptHash": null,
+        "lessonContentHash": "sha256-4572cc5ed4170a4dad0383ca6305a522694d9e790819cced31f0273a1abad799",
+        "sharedSource": {
+          "assetId": "008-pdf-table/ocr",
+          "url": "https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/b8/b805f0132362a7578a1ee49423df7a4f3663e864ac0b503a898b56c1bdcfabc5.png",
+          "pageUrl": "https://eddmpython.com/blog/pdf-table"
+        }
+      },
+      "rendering": {
+        "width": 2524,
+        "height": 1420,
+        "aspectRatio": 1.7774647887323944,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "lesson-context"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          840,
+          1440
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "스캔한 입고 내역에서 글자를 인식해 상품코드와 금액을 읽은 작업대",
+        "caption": "블로그 PDF 작업대의 참고 화면입니다. Python 실습의 실행 결과 화면은 아닙니다.",
+        "learningQuestion": "페이지에 보이는 글자를 PDF 텍스트로 읽을 수 있는가?",
+        "decisionShown": "이미지 속 글자는 OCR 결과를 원문과 대조합니다.",
+        "lessonRefs": [
+          "pdf/04_표추출"
+        ]
+      }
+    },
+    {
+      "id": "pdfTableExport",
+      "kind": "instructional",
+      "sourceType": "sharedRaster",
+      "sourcePath": "assets/brand/visuals/learning/pdfTableExport.png",
+      "sourceHash": "sha256-e3604e34c9e2644d291e907850bc53b62d07e63be93016d445e7d563e0082712",
+      "sourceGitHead": "5389097fc4148a2eaef95cc282a07740a37b1817",
+      "provenance": {
+        "author": "eddmpython",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "008-pdf-table/download",
+        "promptHash": null,
+        "lessonContentHash": "sha256-4572cc5ed4170a4dad0383ca6305a522694d9e790819cced31f0273a1abad799",
+        "sharedSource": {
+          "assetId": "008-pdf-table/download",
+          "url": "https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/e3/e3604e34c9e2644d291e907850bc53b62d07e63be93016d445e7d563e0082712.png",
+          "pageUrl": "https://eddmpython.com/blog/pdf-table"
+        }
+      },
+      "rendering": {
+        "width": 2832,
+        "height": 1594,
+        "aspectRatio": 1.7766624843161858,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "lesson-context"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          840,
+          1440
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "3개 표 12행을 엑셀로 내보내는 버튼과 원문을 함께 표시한 작업대",
+        "caption": "블로그 PDF 작업대의 참고 화면입니다. Python 실습의 실행 결과 화면은 아닙니다.",
+        "learningQuestion": "저장된 행에 값과 원본 위치가 함께 남는가?",
+        "decisionShown": "엑셀을 다시 열어 행과 출처를 확인합니다.",
+        "lessonRefs": [
+          "pdf/04_표추출"
+        ]
+      }
+    },
+    {
       "id": "runLearningDetail",
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",

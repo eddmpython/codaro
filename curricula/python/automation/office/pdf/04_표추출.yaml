@@ -1,633 +1,313 @@
 meta:
   id: pdf_04
-  title: PDF 표 추출
+  title: PDF 표를 모아 엑셀로 저장
   order: 4
   category: pdf
   difficulty: ⭐⭐
-  badge: 기초
+  badge: 실습
   packages:
     - pdfplumber
-    - pandas
     - reportlab
+    - openpyxl
   tags:
-    - extract_tables
+    - PDF 표 추출
+    - 일괄 처리
     - pdfplumber
-    - pandas
-    - 통계 PDF
+    - 원문 대조
   outcomes:
     - automation.pdf.extract
   prerequisites:
     - automation.pdf.extract
-    - pandas.intro
-  estimatedMinutes: 55
+  estimatedMinutes: 60
   seo:
-    title: "PDF 표를 코드로 추출 - pdfplumber + pandas"
-    description: "국세청·통계청 PDF의 표를 pdfplumber로 뽑아 pandas DataFrame과 CSV로 정리한다. 선 없는 표·병합 셀 한계와 해결법을 함께 다룬다."
+    title: PDF 여러 개의 표를 Python으로 추출해 엑셀에 모으기
+    description: 공통 예제 PDF 두 개에서 12행을 추출하고 원본 위치와 검토 목록을 엑셀에 저장한다. 블로그 도구와 같은 입력으로 Python 결과를 확인한다.
     keywords:
-      - pdfplumber extract_tables
       - PDF 표 추출
-      - 정부 통계 PDF
-      - PDF to CSV
+      - pdfplumber
+      - PDF 엑셀 변환
 
 intro:
-  direction: "정부 통계·세금계산서·금융 보고서의 표를 코드로 뽑아 DataFrame과 CSV로 변환한다. 90분 손작업이 10초로 줄어드는 흐름이다."
+  direction: 입고 PDF 두 개를 읽어 12행의 표와 원본 파일명, 페이지가 붙은 엑셀을 만듭니다. 블로그 PDF 작업대의 예제 파일을 그대로 사용하므로 상품코드와 금액을 서로 대조할 수 있습니다. 함수와 반복문을 읽을 수 있는 학습자가 내 컴퓨터에서 Python으로 따라 하는 실습입니다.
   benefits:
-    - "HR 윤대리의 PDF 표 → 엑셀 옮기기 작업 90분을 10초로 줄인다."
-    - "extract_tables의 기본·튜닝 옵션과 한계를 모두 다뤄 본인 PDF에 맞는 전략을 결정한다."
-    - "추출 결과가 그대로 pandas DataFrame이 되어 openpyxl 트랙·통계 트랙의 입력으로 직결된다."
-  diagram:
-    steps:
-      - label: "1. 표 PDF 만들기"
-        detail: "reportlab Platypus Table로 선 있는 표 PDF를 즉석 생성."
-      - label: "2. extract_tables 기본"
-        detail: "pdfplumber.open으로 표를 추출해 리스트 of 리스트로 확인."
-      - label: "3. DataFrame과 CSV"
-        detail: "추출 결과를 pandas DataFrame으로 만들고 CSV로 저장."
-      - label: "4. 튜닝과 한계"
-        detail: "선 없는 표는 table_settings로, 병합 셀과 줄바꿈은 후처리로 다룬다."
-    runtime:
-      - label: "Platypus로 샘플 표"
-        detail: "07강에서 다룰 Platypus Table을 본 강의에서 미리 활용해 표 있는 PDF를 만듦."
-      - label: "DataFrame 검증"
-        detail: "shape, columns, dtypes 단위로 assert. CSV 재오픈으로 round-trip 확인."
+    - 여러 파일의 모든 페이지에서 같은 양식의 표를 모읍니다.
+    - 상품코드의 앞자리 0을 보존하고 금액을 숫자로 바꿉니다.
+    - 읽지 못한 페이지를 검토 목록에 남겨 누락을 찾습니다.
 
 sections:
+  - id: prepare
+    title: 실행 환경과 예제 파일
+    subtitle: 같은 PDF로 블로그와 Python 결과를 비교합니다
+    structuredPrimary: true
+    goal: 작업 폴더에서 Python 패키지와 예제 PDF 두 개를 확인합니다.
+    why: 다른 예제를 쓰면 행 수가 다른 이유가 입력 때문인지 추출 때문인지 알기 어렵습니다.
+    explanation: |-
+      [Codaro 설치 안내](https://eddmpython.github.io/codaro/)를 따라 내 컴퓨터에서 실행하는 Local을 준비합니다. 새 작업 폴더를 열고 이 수업을 선택합니다. pdfplumber는 PDF를 읽고, openpyxl은 엑셀을 저장하는 Python 라이브러리입니다. reportlab은 이미지 PDF를 구분하는 실험에 씁니다. 레슨의 패키지 준비 안내에서 세 패키지를 설치합니다.
+
+      [pdfTables.py](https://raw.githubusercontent.com/eddmpython/codaro/main/demos/pdfTables/pdfTables.py)를 작업 폴더에 저장합니다. 이 파일에는 표 영역 찾기, 폴더 읽기, 엑셀 저장 함수가 들어 있습니다. 같은 폴더 안에 input 폴더를 만들고 [입고내역_창고A.pdf](https://raw.githubusercontent.com/eddmpython/codaro/main/demos/pdfTables/fixtures/입고내역_창고A.pdf)와 [입고내역_창고B.pdf](https://raw.githubusercontent.com/eddmpython/codaro/main/demos/pdfTables/fixtures/입고내역_창고B.pdf)를 이름 그대로 저장합니다. A는 2페이지, B는 1페이지입니다.
+
+      아래 코드를 실행해 패키지 버전과 PDF 이름 두 개가 나오는지 확인합니다. 파일 확인에서 멈추면 첫 줄에 출력된 작업 폴더를 열어 pdfTables.py와 input의 위치를 맞춥니다. 이후 코드 셀도 이 작업 폴더에서 실행합니다.
+    snippet: |-
+      from pathlib import Path
+      import pdfplumber
+      import reportlab
+      import openpyxl
+
+      print("작업 폴더", Path.cwd())
+      assert Path("pdfTables.py").is_file(), "이 폴더에 pdfTables.py를 저장하세요"
+      paths = [Path("input/입고내역_창고A.pdf"), Path("input/입고내역_창고B.pdf")]
+      for path in paths:
+          assert path.is_file(), f"파일 위치 확인: {path.resolve()}"
+      print("pdfplumber", pdfplumber.__version__)
+      print("reportlab", reportlab.Version)
+      print("openpyxl", openpyxl.__version__)
+      print([path.name for path in paths])
+
   - id: step1_make_table_pdf
-    title: "1단계. 표가 들어간 PDF 만들기"
+    title: 한 페이지의 표 추출
+    subtitle: 원문에 있는 다섯 열과 첫 상품을 읽습니다
     structuredPrimary: true
-    subtitle: "reportlab Platypus Table"
-    goal: "선이 있는 3×4 표가 들어간 한 페이지 PDF를 만든다."
-    why: "국세청 부가세 신고서·통계청 분기 통계·금융감독원 공시는 모두 표 중심 PDF입니다. 추출 실험을 하려면 같은 모양의 표 PDF가 먼저 있어야 하고, 외부 다운로드 의존을 없애기 위해 reportlab Platypus Table로 즉석 만듭니다. 같은 패턴이 07강의 보고서 양식과 10강의 청구서 명세표에서 그대로 재사용됩니다."
+    goal: 창고 A의 첫 표에서 상품코드 0012와 금액 456,000을 읽습니다.
+    why: 화면에서 표처럼 보이는 것과 코드가 읽은 행과 열이 같은지 먼저 확인합니다.
     explanation: |-
-      Platypus의 Table은 list-of-lists를 받아 표를 그립니다. TableStyle로 선과 헤더 굵기를 지정합니다. SimpleDocTemplate.build로 표가 들어간 PDF를 한 번에 저장합니다.
-    tips:
-      - "Platypus Table은 콘텐츠 분량이 페이지를 넘으면 자동으로 다음 페이지로 잘립니다. 본 강의는 한 페이지 안에 들어가게 작게 만듭니다."
+      이미지는 [블로그 PDF 작업대](https://eddmpython.com/blog/pdf-table)의 원문과 추출 결과입니다. Python도 같은 입고 PDF를 읽습니다. 준비한 pdfTables.py에서 findTables 함수를 불러옵니다. 이 함수는 격자로 둘러싸인 표를 먼저 찾고, 예제처럼 세로선이 없으면 열 제목 사이와 가로선을 기준으로 표를 찾습니다. findTables는 이번 실습에서 제공하는 함수이고, pdfplumber에 원래 있는 함수 이름은 find_tables입니다.
     snippet: |-
-      from pathlib import Path
-      from tempfile import TemporaryDirectory
-      from reportlab.lib import colors
-      from reportlab.lib.pagesizes import A4
-      from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
-
-      def buildTablePdf(path):
-          rows = [
-              ["region", "q1", "q2", "q3"],
-              ["Seoul", "120", "135", "150"],
-              ["Busan", "80", "78", "92"],
-              ["Daegu", "60", "65", "70"],
-          ]
-          doc = SimpleDocTemplate(str(path), pagesize=A4)
-          tbl = Table(rows)
-          tbl.setStyle(TableStyle([
-              ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
-              ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-          ]))
-          doc.build([tbl])
-
-      workdir = TemporaryDirectory()
-      pdfPath = Path(workdir.name) / "table.pdf"
-      buildTablePdf(pdfPath)
-      pdfPath.stat().st_size > 0
-    exercise:
-      prompt: "표 행을 5개로 늘리고(Incheon, Daejeon 추가) PDF 크기가 양수인지 확인하세요."
-      starterCode: |-
-        from pathlib import Path
-        from tempfile import TemporaryDirectory
-        from reportlab.lib import colors
-        from reportlab.lib.pagesizes import A4
-        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
-
-        def buildTablePdf(path):
-            rows = [
-                ["region", "q1", "q2", "q3"],
-                ["Seoul", "120", "135", "150"],
-                ["Busan", "80", "78", "92"],
-                ["Daegu", "60", "65", "70"],
-                [___, "55", "60", "62"],
-                [___, "50", "52", "58"],
-            ]
-            doc = SimpleDocTemplate(str(path), pagesize=A4)
-            tbl = Table(rows)
-            tbl.setStyle(TableStyle([
-                ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
-            ]))
-            doc.build([tbl])
-
-        workdir = TemporaryDirectory()
-        pdfPath = Path(workdir.name) / "t.pdf"
-        buildTablePdf(pdfPath)
-        pdfPath.stat().st_size > 0
-      hints:
-        - "도시 이름 문자열 두 개 추가."
-    check:
-      noError: "리스트 행 길이가 모두 같아야 합니다."
-      resultCheck: "True 출력."
-
-  - id: step2_extract_basic
-    title: "2단계. extract_tables 기본"
-    structuredPrimary: true
-    subtitle: "pdfplumber.open + page.extract_tables()"
-    goal: "1단계의 표 PDF를 추출해 리스트 of 리스트로 확인한다."
-    why: "추출 결과의 구조를 먼저 봐야 후처리 전략이 보입니다. raw 결과가 어떤 모양인지 손에 익히는 게 본 단계의 목적입니다."
-    explanation: |-
-      pdfplumber.open(path)를 with로 열고 page.extract_tables()를 호출하면 [[row, row, ...]] 형태의 리스트 of 리스트가 나옵니다. 단일 표 PDF는 첫 원소를 쓰면 됩니다.
-    tips:
-      - "extract_tables 결과는 모두 문자열입니다. 숫자 변환은 후처리 단계에서 따로 해야 합니다."
-    snippet: |-
-      from pathlib import Path
-      from tempfile import TemporaryDirectory
       import pdfplumber
-      from reportlab.lib import colors
-      from reportlab.lib.pagesizes import A4
-      from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+      from pdfTables import findTables
 
-      def buildTablePdf(path):
-          rows = [
-              ["region", "q1", "q2", "q3"],
-              ["Seoul", "120", "135", "150"],
-              ["Busan", "80", "78", "92"],
-          ]
-          doc = SimpleDocTemplate(str(path), pagesize=A4)
-          tbl = Table(rows)
-          tbl.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.5, colors.black)]))
-          doc.build([tbl])
-
-      workdir = TemporaryDirectory()
-      pdfPath = Path(workdir.name) / "t.pdf"
-      buildTablePdf(pdfPath)
-
-      with pdfplumber.open(pdfPath) as doc:
-          tables = doc.pages[0].extract_tables()
-      len(tables), len(tables[0]), len(tables[0][0])
-    exercise:
-      prompt: "extract_tables의 첫 표에서 두 번째 행의 첫 컬럼이 'Seoul'인지 확인하세요."
-      starterCode: |-
-        from pathlib import Path
-        from tempfile import TemporaryDirectory
-        import pdfplumber
-        from reportlab.lib import colors
-        from reportlab.lib.pagesizes import A4
-        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
-
-        def buildTablePdf(path):
-            rows = [
-                ["region", "q1", "q2", "q3"],
-                ["Seoul", "120", "135", "150"],
-                ["Busan", "80", "78", "92"],
-            ]
-            doc = SimpleDocTemplate(str(path), pagesize=A4)
-            tbl = Table(rows)
-            tbl.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.5, colors.black)]))
-            doc.build([tbl])
-
-        workdir = TemporaryDirectory()
-        pdfPath = Path(workdir.name) / "t.pdf"
-        buildTablePdf(pdfPath)
-
-        with pdfplumber.open(pdfPath) as doc:
-            tables = doc.pages[0].extract_tables()
-        tables[0][___][___] == "Seoul"
-      hints:
-        - "두 번째 행은 index 1, 첫 컬럼은 index 0."
-    check:
-      noError: "with 블록 안에서 결과를 변수에 저장한 후 밖에서 사용해야 합니다."
-      resultCheck: "True 출력."
-
-  - id: step3_to_dataframe
-    title: "3단계. DataFrame과 CSV"
-    structuredPrimary: true
-    subtitle: "pandas.DataFrame + to_csv"
-    goal: "추출한 표를 pandas DataFrame으로 만들고 CSV로 저장한 뒤 다시 읽어 확인한다."
-    why: "추출의 진짜 가치는 DataFrame이나 CSV로 다른 도구로 넘기는 데 있습니다. pandas로 변환되는 순간 분석·시각화·openpyxl로 연결됩니다."
-    explanation: |-
-      tables[0]의 첫 행을 컬럼명으로, 나머지를 데이터로 사용해 DataFrame을 만듭니다. to_csv로 임시 폴더에 저장하고 pd.read_csv로 다시 읽어 행 수가 보존되는지 확인합니다.
-    tips:
-      - "to_csv에 index=False를 주지 않으면 자동 인덱스가 컬럼으로 들어갑니다. 표 데이터는 보통 index=False가 안전합니다."
-    snippet: |-
-      from pathlib import Path
-      from tempfile import TemporaryDirectory
-      import pandas as pd
-      import pdfplumber
-      from reportlab.lib import colors
-      from reportlab.lib.pagesizes import A4
-      from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
-
-      def buildTablePdf(path):
-          rows = [
-              ["region", "q1", "q2", "q3"],
-              ["Seoul", "120", "135", "150"],
-              ["Busan", "80", "78", "92"],
-              ["Daegu", "60", "65", "70"],
-          ]
-          doc = SimpleDocTemplate(str(path), pagesize=A4)
-          tbl = Table(rows)
-          tbl.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.5, colors.black)]))
-          doc.build([tbl])
-
-      workdir = TemporaryDirectory()
-      base = Path(workdir.name)
-      pdfPath = base / "t.pdf"
-      csvPath = base / "t.csv"
-      buildTablePdf(pdfPath)
-
-      with pdfplumber.open(pdfPath) as doc:
-          rawTable = doc.pages[0].extract_tables()[0]
-      df = pd.DataFrame(rawTable[1:], columns=rawTable[0])
-      df.to_csv(csvPath, index=False)
-      reloaded = pd.read_csv(csvPath)
-      df.shape, reloaded.shape
-    exercise:
-      prompt: "df의 'q1' 컬럼을 정수로 변환한 뒤 합계를 확인하세요."
-      starterCode: |-
-        from pathlib import Path
-        from tempfile import TemporaryDirectory
-        import pandas as pd
-        import pdfplumber
-        from reportlab.lib import colors
-        from reportlab.lib.pagesizes import A4
-        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
-
-        def buildTablePdf(path):
-            rows = [
-                ["region", "q1", "q2", "q3"],
-                ["Seoul", "120", "135", "150"],
-                ["Busan", "80", "78", "92"],
-                ["Daegu", "60", "65", "70"],
-            ]
-            doc = SimpleDocTemplate(str(path), pagesize=A4)
-            tbl = Table(rows)
-            tbl.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.5, colors.black)]))
-            doc.build([tbl])
-
-        workdir = TemporaryDirectory()
-        pdfPath = Path(workdir.name) / "t.pdf"
-        buildTablePdf(pdfPath)
-
-        with pdfplumber.open(pdfPath) as doc:
-            rawTable = doc.pages[0].extract_tables()[0]
-        df = pd.DataFrame(rawTable[1:], columns=rawTable[0])
-        df["q1"] = df["q1"].astype(___)
-        df["q1"].sum()
-      hints:
-        - "정수 타입은 int."
-    check:
-      noError: "astype 인자는 type 이름."
-      resultCheck: "출력이 260이어야 합니다."
-
-  - id: step4_tuning_limits
-    title: "4단계. 튜닝과 한계"
-    structuredPrimary: true
-    subtitle: "table_settings로 선 없는 표 처리"
-    goal: "선이 없는 표는 vertical_strategy='text'로, 병합 셀은 후처리로 다룬다."
-    why: "한국 정부 PDF의 표 대부분은 선 없는 텍스트 정렬 기반입니다. 기본 옵션으로는 잡히지 않고 table_settings 튜닝이 필요합니다."
-    explanation: |-
-      pdfplumber.Page.extract_tables(table_settings={'vertical_strategy': 'text', 'horizontal_strategy': 'text'})는 선이 아니라 텍스트 위치를 기준으로 표를 잡습니다. 완벽하지 않지만 선이 없는 PDF에 첫 시도로 적합합니다. 결과가 어긋날 때는 손이 더 빠른 케이스도 인정합니다.
-    tips:
-      - "튜닝 옵션이 무력한 PDF도 있습니다. 그런 경우 PDF를 텍스트로 추출한 뒤 정규식으로 표 형태를 복원하는 게 더 빠를 수 있습니다."
-    snippet: |-
-      from pathlib import Path
-      from tempfile import TemporaryDirectory
-      import pdfplumber
-      from reportlab.pdfgen.canvas import Canvas
-
-      def buildTextTablePdf(path):
-          canvas = Canvas(str(path))
-          canvas.setFont("Helvetica", 11)
-          rows = [
-              ["region", "q1", "q2", "q3"],
-              ["Seoul", "120", "135", "150"],
-              ["Busan", "80", "78", "92"],
-          ]
-          yPos = 750
-          for row in rows:
-              for colIdx, value in enumerate(row):
-                  canvas.drawString(72 + colIdx * 80, yPos, value)
-              yPos -= 20
-          canvas.showPage()
-          canvas.save()
-
-      workdir = TemporaryDirectory()
-      pdfPath = Path(workdir.name) / "txt_table.pdf"
-      buildTextTablePdf(pdfPath)
-
-      with pdfplumber.open(pdfPath) as doc:
-          textTables = doc.pages[0].extract_tables(table_settings={
-              "vertical_strategy": "text",
-              "horizontal_strategy": "text",
-          })
-      textTables[0][0] if textTables else None
-    exercise:
-      prompt: "extractTextTable(path) 함수를 직접 작성하세요. 선이 없는 표 PDF에서 vertical/horizontal strategy를 'text'로 두고 첫 표를 추출해 돌려주거나, 표가 없으면 빈 리스트를 돌려줘야 합니다."
-      starterCode: |-
-        from pathlib import Path
-        from tempfile import TemporaryDirectory
-        import pdfplumber
-        from reportlab.pdfgen.canvas import Canvas
-
-        def buildTextTablePdf(path):
-            canvas = Canvas(str(path))
-            canvas.setFont("Helvetica", 11)
-            rows = [
-                ["region", "q1", "q2", "q3"],
-                ["Seoul", "120", "135", "150"],
-                ["Busan", "80", "78", "92"],
-            ]
-            yPos = 750
-            for row in rows:
-                for colIdx, value in enumerate(row):
-                    canvas.drawString(72 + colIdx * 80, yPos, value)
-                yPos -= 20
-            canvas.showPage()
-            canvas.save()
-
-        def extractTextTable(path):
-            ___  # pdfplumber.open(path) with 블록 안에서 strategy 두 값 모두 'text'로 extract_tables 호출, 첫 표 또는 [] 반환
-
-        workdir = TemporaryDirectory()
-        pdfPath = Path(workdir.name) / "txt_table.pdf"
-        buildTextTablePdf(pdfPath)
-        table = extractTextTable(pdfPath)
-        assert table and table[0]
-        table[0]
-      hints:
-        - "with pdfplumber.open(path) as doc: tables = doc.pages[0].extract_tables(table_settings={...}); return tables[0] if tables else []"
-        - "table_settings의 vertical_strategy, horizontal_strategy 두 값을 'text'로."
-    check:
-      noError: "strategy 값은 문자열."
-      resultCheck: "True 출력."
-
-  - id: validation
-    title: "5단계. 검증 루프 - 추출 → DataFrame → CSV 왕복"
-    structuredPrimary: true
-    subtitle: "shape·합계·CSV 재오픈 통합 assert"
-    goal: "추출 → DataFrame → CSV 저장 → 재오픈까지 한 셀에서 자동 검증한다."
-    why: "표 추출은 round-trip 검증이 핵심입니다. 추출만 되면 사람이 일일이 비교해야 하지만, CSV 재오픈까지 자동으로 비교하면 회귀가 사전에 잡힙니다."
-    explanation: |-
-      df.shape, 합계, CSV 재오픈 결과까지 모두 assert로 묶습니다. 이 패턴이 10강 청구서 생성기의 데이터 검증 골격이 됩니다.
-    tips:
-      - "CSV는 dtype 정보가 사라집니다. 재오픈 후 합계 비교는 직접 astype으로 강제하세요."
-    snippet: |-
-      from pathlib import Path
-      from tempfile import TemporaryDirectory
-      import pandas as pd
-      import pdfplumber
-      from reportlab.lib import colors
-      from reportlab.lib.pagesizes import A4
-      from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
-
-      def buildAndExtract(path, csvPath):
-          rows = [
-              ["region", "q1", "q2", "q3"],
-              ["Seoul", "120", "135", "150"],
-              ["Busan", "80", "78", "92"],
-              ["Daegu", "60", "65", "70"],
-          ]
-          doc = SimpleDocTemplate(str(path), pagesize=A4)
-          tbl = Table(rows)
-          tbl.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.5, colors.black)]))
-          doc.build([tbl])
-          with pdfplumber.open(path) as document:
-              raw = document.pages[0].extract_tables()[0]
-          df = pd.DataFrame(raw[1:], columns=raw[0])
-          df.to_csv(csvPath, index=False)
-          return df
-
-      vault = TemporaryDirectory()
-      base = Path(vault.name)
-      pdfPath = base / "vault.pdf"
-      csvPath = base / "vault.csv"
-      df = buildAndExtract(pdfPath, csvPath)
-
-      assert df.shape == (3, 4)
-      reloaded = pd.read_csv(csvPath)
-      assert reloaded.shape == df.shape
-      assert reloaded["q1"].astype(int).sum() == 260
-      df.shape, reloaded.shape
-    exercise:
-      prompt: "행을 한 개 추가(Incheon 55/60/62)하고 shape와 q1 합계 검증을 그대로 통과시키세요."
-      starterCode: |-
-        from pathlib import Path
-        from tempfile import TemporaryDirectory
-        import pandas as pd
-        import pdfplumber
-        from reportlab.lib import colors
-        from reportlab.lib.pagesizes import A4
-        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
-
-        def buildAndExtract(path, csvPath):
-            rows = [
-                ["region", "q1", "q2", "q3"],
-                ["Seoul", "120", "135", "150"],
-                ["Busan", "80", "78", "92"],
-                ["Daegu", "60", "65", "70"],
-                [___, ___, ___, ___],
-            ]
-            doc = SimpleDocTemplate(str(path), pagesize=A4)
-            tbl = Table(rows)
-            tbl.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.5, colors.black)]))
-            doc.build([tbl])
-            with pdfplumber.open(path) as document:
-                raw = document.pages[0].extract_tables()[0]
-            df = pd.DataFrame(raw[1:], columns=raw[0])
-            df.to_csv(csvPath, index=False)
-            return df
-
-        vault = TemporaryDirectory()
-        base = Path(vault.name)
-        pdfPath = base / "v.pdf"
-        csvPath = base / "v.csv"
-        df = buildAndExtract(pdfPath, csvPath)
-        assert df.shape == (4, 4)
-        assert df["q1"].astype(int).sum() == 315
-        df.shape
-      hints:
-        - "Incheon의 q1은 55."
-    check:
-      noError: "행 길이가 헤더와 같아야 합니다."
-      resultCheck: "출력이 (4, 4)이어야 합니다."
-
-  - id: misconception
-    title: "6단계. 흔한 오개념 차단"
-    subtitle: "extract_tables는 모든 표를 잡는다?"
-    goal: "선이 없거나 셀이 병합된 표에서 결과가 어긋날 수 있다는 점을 인지한다."
-    why: "한국 공공기관 PDF의 표는 선 없거나 헤더가 세로 병합된 경우가 많습니다. 결과가 어긋나면 자동화의 신뢰가 깨집니다."
-    explanation: |-
-      세로 병합 셀의 경우 첫 행에만 값이 들어가고 이어지는 행은 빈 문자열이 됩니다. 후처리로 ffill (forward fill)을 적용하면 일반 표 형태로 정규화할 수 있습니다. 손이 더 빠른 경우도 인정하고, 단순 일회성 작업은 손으로 가는 것도 자동화의 한 선택입니다.
-    tips:
-      - "df.fillna(method='ffill')는 deprecation 됐고 df.ffill()를 권장합니다."
-    snippet: |-
-      import pandas as pd
-
-      raw = [
-          ["region", "metric", "value"],
-          ["Seoul", "q1", "120"],
-          ["",       "q2", "135"],
-          ["Busan",  "q1", "80"],
-          ["",       "q2", "78"],
-      ]
-      df = pd.DataFrame(raw[1:], columns=raw[0])
-      df["region"] = df["region"].replace("", pd.NA).ffill()
-      df
-    exercise:
-      prompt: "Daegu 행 두 개를 더해(q1 60, q2 65) ffill 후 빈 region이 없는지 확인하세요."
-      starterCode: |-
-        import pandas as pd
-
-        raw = [
-            ["region", "metric", "value"],
-            ["Seoul", "q1", "120"],
-            ["",       "q2", "135"],
-            ["Busan",  "q1", "80"],
-            ["",       "q2", "78"],
-            ["Daegu",  "q1", ___],
-            ["",       "q2", ___],
-        ]
-        df = pd.DataFrame(raw[1:], columns=raw[0])
-        df["region"] = df["region"].replace("", pd.NA).ffill()
-        df["region"].isna().sum() == 0
-      hints:
-        - "숫자 문자열 두 개. 예: '60', '65'."
-    check:
-      noError: "리스트 원소는 문자열."
-      resultCheck: "True 출력."
-
-  - id: practice
-    title: "실습 - 종합 미션 2개"
-    subtitle: "표 PDF → CSV 도구"
-    goal: "표 추출과 후처리 패턴을 결합한 실용 함수 두 개를 작성한다."
-    why: "표 추출은 데이터 분석의 시작 지점입니다. 손으로 옮기지 않게 만드는 게 모든 후속 작업의 시간을 줄입니다."
-    explanation: |-
-      미션1은 여러 표가 포함된 PDF에서 모든 표를 추출해 DataFrame 리스트로 돌려주는 함수, 미션2는 한 PDF의 모든 표를 한 CSV에 누적해 저장하는 함수입니다.
-    tips:
-      - "미션 변수 prefix: multi*(미션1), agg*(미션2)."
-    snippet: |-
-      from pathlib import Path
-      from tempfile import TemporaryDirectory
-      import pandas as pd
-      import pdfplumber
-    exercise:
-      prompt: "두 미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
-      starterCode: |-
-        from pathlib import Path
-        from tempfile import TemporaryDirectory
-        import pandas as pd
-        import pdfplumber
-
-        ___
-      hints:
-        - "미션1: extractAllAsFrames(path) -> list[DataFrame]"
-        - "미션2: extractToOneCsv(path, csvPath) -> DataFrame"
-    check:
-      noError: "함수가 정의되고 호출되어야 합니다."
-      resultCheck: "미션1은 list, 미션2는 DataFrame 반환."
+      with pdfplumber.open("input/입고내역_창고A.pdf") as document:
+          found = findTables(document.pages[0])
+          raw = found[0].extract()
+      print(raw[0])
+      print(raw[1])
+      print("데이터 행", len(raw) - 1)
+      assert raw[1] == ["0012", "무선 마우스", "24", "19,000", "456,000"]
+      assert len(raw) - 1 == 4
     blocks:
-      - type: tip
-        content: "extract_tables는 페이지마다 호출해야 합니다. 모든 페이지를 순회하면서 결과를 누적하세요."
-      - type: expansion
-        title: "미션1: 여러 표를 DataFrame 리스트로"
-        blocks:
-          - type: code
-            title: "데이터 준비"
-            content: |-
-              from pathlib import Path
-              from tempfile import TemporaryDirectory
-              import pdfplumber
-              from reportlab.lib import colors
-              from reportlab.lib.pagesizes import A4
-              from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
-
-              def buildMultiTablePdf(path):
-                  table1 = [["region", "q1"], ["Seoul", "120"], ["Busan", "80"]]
-                  table2 = [["product", "price"], ["A", "10"], ["B", "20"], ["C", "30"]]
-                  doc = SimpleDocTemplate(str(path), pagesize=A4)
-                  style = TableStyle([("GRID", (0, 0), (-1, -1), 0.5, colors.black)])
-                  flows = [Table(table1, style=style), Spacer(1, 12), Table(table2, style=style)]
-                  doc.build(flows)
-
-              multiDir = TemporaryDirectory()
-              multiPath = Path(multiDir.name) / "multi.pdf"
-              buildMultiTablePdf(multiPath)
-              multiPath.stat().st_size > 0
-          - type: code
-            title: "함수 정의와 검증"
-            content: |-
-              import pandas as pd
-
-              def extractAllAsFrames(path):
-                  frames = []
-                  with pdfplumber.open(path) as document:
-                      for page in document.pages:
-                          for raw in page.extract_tables():
-                              if raw:
-                                  frames.append(pd.DataFrame(raw[1:], columns=raw[0]))
-                  return frames
-
-              frames = extractAllAsFrames(multiPath)
-              assert len(frames) == 2
-              assert frames[0].shape == (2, 2)
-              assert frames[1].shape == (3, 2)
-              [f.shape for f in frames]
-      - type: expansion
-        title: "미션2: 한 PDF의 모든 표를 한 CSV로"
-        blocks:
-          - type: code
-            title: "데이터 준비"
-            content: |-
-              from pathlib import Path
-              from tempfile import TemporaryDirectory
-              import pdfplumber
-              from reportlab.lib import colors
-              from reportlab.lib.pagesizes import A4
-              from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
-
-              def buildAggPdf(path):
-                  table1 = [["region", "value"], ["Seoul", "120"], ["Busan", "80"]]
-                  table2 = [["region", "value"], ["Daegu", "60"], ["Incheon", "55"]]
-                  doc = SimpleDocTemplate(str(path), pagesize=A4)
-                  style = TableStyle([("GRID", (0, 0), (-1, -1), 0.5, colors.black)])
-                  doc.build([Table(table1, style=style), Spacer(1, 12), Table(table2, style=style)])
-
-              aggDir = TemporaryDirectory()
-              aggPath = Path(aggDir.name) / "agg.pdf"
-              aggCsv = Path(aggDir.name) / "agg.csv"
-              buildAggPdf(aggPath)
-              aggPath.stat().st_size > 0
-          - type: code
-            title: "함수 정의와 검증"
-            content: |-
-              import pandas as pd
-
-              def extractToOneCsv(path, csvPath):
-                  frames = []
-                  with pdfplumber.open(path) as document:
-                      for page in document.pages:
-                          for raw in page.extract_tables():
-                              if raw:
-                                  frames.append(pd.DataFrame(raw[1:], columns=raw[0]))
-                  combined = pd.concat(frames, ignore_index=True)
-                  combined.to_csv(csvPath, index=False)
-                  return combined
-
-              combined = extractToOneCsv(aggPath, aggCsv)
-              assert combined.shape == (4, 2)
-              reloaded = pd.read_csv(aggCsv)
-              assert reloaded.shape == (4, 2)
-              combined
-
-  - id: extensions
-    title: "확장 변주"
-    blocks:
+      - type: image
+        placement: sectionLead
+        assetId: pdfTableSource
       - type: text
         content: |-
-          표 추출 패턴의 실무 응용 아이디어입니다.
+          document.pages[0]은 첫 페이지이고 found[0]은 그 페이지에서 찾은 첫 표입니다. extract()로 값을 읽으면 raw[0]에 열 제목이, raw[1]에 첫 상품이 들어갑니다. 출력된 첫 상품을 PDF 표의 첫 데이터 행과 비교합니다. 데이터 행은 제목을 뺀 4행입니다.
+    exercise:
+      prompt: 두 번째 상품을 출력하고 상품코드가 0013인지 확인합니다. 읽을 행 번호를 바꿔 보세요
+      starterCode: |-
+        import pdfplumber
+        from pdfTables import findTables
+
+        with pdfplumber.open("input/입고내역_창고A.pdf") as document:
+            raw = findTables(document.pages[0])[0].extract()
+        rowNumber = 1
+        print(raw[rowNumber])
+        assert raw[rowNumber][0] == "0013"
+      solution: |-
+        import pdfplumber
+        from pdfTables import findTables
+
+        with pdfplumber.open("input/입고내역_창고A.pdf") as document:
+            raw = findTables(document.pages[0])[0].extract()
+        rowNumber = 2
+        print(raw[rowNumber])
+        assert raw[rowNumber][0] == "0013"
+      hints:
+        - 0번 행은 열 제목이고 1번 행은 첫 상품입니다.
+    check:
+      noError: 두 번째 상품의 코드가 0013인지 assert로 확인합니다.
+      resultCheck: "['0013', '키보드', '15', '45,000', '675,000']"
+
+  - id: allPages
+    title: 모든 파일과 페이지
+    subtitle: 첫 표만 읽는 인덱스를 반복문으로 바꿉니다
+    structuredPrimary: true
+    goal: PDF 두 개의 3페이지에서 상품코드 12개를 모읍니다.
+    why: pages[0]과 found[0]만 쓰면 뒤쪽 페이지와 두 번째 표가 빠집니다.
+    explanation: |-
+      블로그의 여러 페이지 목록처럼 코드에서도 파일과 페이지를 하나씩 방문합니다. input 폴더의 PDF를 파일명 순으로 읽고, document.pages의 각 페이지에서 findTables로 찾은 표를 꺼냅니다. raw[1:]은 제목을 뺀 데이터 행입니다. 코드를 실행하면 파일명, 페이지 번호, 그 표의 행 수가 세 줄 나오고 마지막에 상품코드 12개가 나옵니다.
+    snippet: |-
+      from pathlib import Path
+      import pdfplumber
+      from pdfTables import findTables
+
+      codes = []
+      for path in sorted(Path("input").glob("*.pdf")):
+          with pdfplumber.open(path) as document:
+              for page in document.pages:
+                  for table in findTables(page):
+                      raw = table.extract()
+                      codes.extend(row[0] for row in raw[1:])
+                      print(path.name, page.page_number, len(raw) - 1)
+      print(codes)
+      assert codes == [f"{number:04d}" for number in range(12, 24)]
+    blocks:
+      - type: image
+        placement: sectionLead
+        assetId: pdfTableBatch
+      - type: text
+        content: |-
+          예제 폴더에는 창고 A와 창고 B 파일만 두고 실행합니다. 출력은 창고 A의 1페이지와 2페이지, 창고 B의 1페이지 순서이고 각각 4행입니다. 마지막 코드는 0023이어야 합니다.
+
+  - id: sourceLocation
+    title: 원본 위치 보존
+    subtitle: 값마다 파일명과 페이지, 표 번호를 함께 남깁니다
+    structuredPrimary: true
+    goal: 창고 A의 첫 페이지에서 읽은 상품코드를 원문으로 되짚습니다.
+    why: 값이 이상할 때 파일과 페이지를 다시 찾을 수 있어야 고칠 수 있습니다.
+    explanation: |-
+      블로그에서 셀을 누르면 원문 위치가 표시됩니다. Python 결과에도 파일명과 페이지를 남깁니다. 아래 코드는 이미지와 같은 창고 A의 첫 페이지에서 표를 읽고, 그 표의 첫 상품과 출처를 한 사전에 담습니다. bbox는 표의 왼쪽, 위쪽, 오른쪽, 아래쪽 좌표입니다. 좌표는 PDF 왼쪽 위를 기준으로 하며 단위는 포인트입니다.
+    snippet: |-
+      from pathlib import Path
+      import pdfplumber
+      from pdfTables import findTables
+
+      path = Path("input/입고내역_창고A.pdf")
+      with pdfplumber.open(path) as document:
+          page = document.pages[0]
+          found = findTables(page)[0]
+          record = {"file": path.name, "page": page.page_number,
+                    "table": 1, "box": list(found.bbox), "values": found.extract()[1]}
+      print(record)
+      assert record["page"] == 1 and record["values"][0] == "0012"
+    blocks:
+      - type: image
+        placement: sectionLead
+        assetId: pdfTableEvidence
+      - type: text
+        content: |-
+          입고내역_창고A.pdf의 1페이지를 열어 첫 상품이 0012 무선 마우스인지 확인합니다. box는 상품 한 칸이 아니라 표 전체의 위치입니다.
+
+  - id: numbers
+    title: 코드와 금액 구분
+    subtitle: 앞자리 0은 남기고 금액만 숫자로 바꿉니다
+    structuredPrimary: true
+    goal: 상품코드는 문자열로 보존하면서 수량과 단가로 금액을 검사합니다.
+    why: 모든 열을 숫자로 바꾸면 0012가 12가 되고, 모든 열을 문자열로 두면 금액을 계산할 수 없습니다.
+    explanation: |-
+      이미지 속 작업대에서는 숫자로 읽을 열을 고른 뒤 합계를 확인합니다. Python도 PDF에서 읽은 수량, 단가, 금액만 정수로 바꿉니다. readInteger는 쉼표가 들어간 정수 형식을 검사하고 숫자를 돌려주는 제공 함수입니다. 첫 행의 금액 456,000은 수량 24에 단가 19,000을 곱한 값과 같습니다.
+    snippet: |-
+      import pdfplumber
+      from pdfTables import findTables, readInteger
+
+      with pdfplumber.open("input/입고내역_창고A.pdf") as document:
+          raw = findTables(document.pages[0])[0].extract()
+      row = dict(zip(raw[0], raw[1], strict=True))
+      for name in ["수량", "단가 (원)", "금액 (원)"]:
+          row[name] = readInteger(row[name])
+      assert row["상품코드"] == "0012"
+      assert row["수량"] * row["단가 (원)"] == row["금액 (원)"]
+      print(row["상품코드"], row["금액 (원)"])
+    exercise:
+      prompt: 수량이 25개인 새 입력에서 금액을 고쳐 검사를 통과시키세요
+      starterCode: |-
+        code = "0012"
+        quantity = 25
+        unitPrice = 19000
+        amount = 456000
+        assert quantity * unitPrice == amount
+        print(code, amount)
+      solution: |-
+        code = "0012"
+        quantity = 25
+        unitPrice = 19000
+        amount = 475000
+        assert quantity * unitPrice == amount
+        print(code, amount)
+      hints:
+        - 25 곱하기 19000을 계산하세요
+    check:
+      noError: 수량과 단가를 곱한 금액이 입력 금액과 같은지 확인합니다.
+      resultCheck: 0012 475000
+    blocks:
+      - type: image
+        placement: sectionLead
+        assetId: pdfTableTotals
+      - type: text
+        content: |-
+          합계가 맞으면 모든 값도 맞을까요? 행별 곱셈이나 전체 합계가 맞더라도 품목과 상품코드까지 옳다는 뜻은 아닙니다. 숫자 검사와 원문 대조는 함께 해야 합니다.
+
+  - id: imagePages
+    title: 이미지 PDF 구분
+    subtitle: 글자가 없는 페이지를 빈 표로 넘기지 않습니다
+    structuredPrimary: true
+    goal: 이미지로 저장된 페이지를 OCR 검토 대상으로 분리합니다.
+    why: PDF 안의 글자를 읽는 방법으로 사진 속 글자까지 읽을 수는 없습니다.
+    explanation: |-
+      이미지와 스캔본은 OCR로 사진 속 글자를 읽어야 합니다. pdfplumber 자체에는 OCR 기능이 없습니다. 아래 코드는 글자 모양이 그려진 이미지를 PDF에 넣고, 텍스트 개수는 0이고 이미지 개수는 1이라는 것을 확인합니다. BytesIO는 PDF 내용을 파일로 저장하지 않고 메모리에 담아 두는 데 씁니다. 이 실험은 메모리 안에서만 실행하므로 input 폴더의 예제 PDF는 바뀌지 않습니다.
+    snippet: |-
+      from io import BytesIO
+      from PIL import Image, ImageDraw
+      from reportlab.pdfgen import canvas
+      from reportlab.lib.utils import ImageReader
+      import pdfplumber
+
+      picture = Image.new("RGB", (600, 180), "white")
+      ImageDraw.Draw(picture).text((30, 60), "0012   456,000", fill="black", font_size=32)
+      source = BytesIO()
+      writer = canvas.Canvas(source)
+      writer.drawImage(ImageReader(picture), 60, 600, width=300, height=90)
+      writer.save()
+      source.seek(0)
+      with pdfplumber.open(source) as document:
+          page = document.pages[0]
+          counts = (len(page.chars), len(page.images))
+      assert counts == (0, 1)
+      print("텍스트", counts[0], "이미지", counts[1], "OCR 검토 필요")
+    blocks:
+      - type: image
+        placement: sectionLead
+        assetId: pdfTableOcr
+      - type: text
+        content: |-
+          이미지 속 작업대에서는 제목이 다른 글자로 읽히고 수량 한 칸이 비었습니다. 다운로드한 Python 도구는 OCR을 실행하지 않고 이런 페이지를 검토 목록에 기록합니다. 텍스트가 없는 빈 페이지나 도형으로 저장된 페이지도 있으므로, 텍스트 수만으로 스캔본이라 단정하지 않습니다.
+
+  - id: extensions
+    title: 내 폴더를 엑셀로
+    subtitle: 자동 추출 결과와 검토 목록을 함께 확인합니다
+    structuredPrimary: true
+    goal: 여러 PDF를 처리하고 저장된 12행의 값과 출처를 대조합니다.
+    why: 결과 파일이 생긴 것만 확인하면 추출되지 않은 페이지를 놓칠 수 있습니다.
+    explanation: |-
+      준비한 input 폴더를 extractFolder로 읽고 saveWorkbook으로 result.xlsx를 만듭니다. extractFolder는 파일, 페이지, 표를 순서대로 읽으며 숫자와 빈 칸도 확인합니다. records에는 추출한 행이, issues에는 사람이 확인할 항목이 들어갑니다. 예제 PDF 두 개만 넣으면 블로그와 같은 12행이 나오고 검토 항목은 0건입니다. result.xlsx가 이미 있으면 덮어쓰지 않으므로 실행 전에 코드의 출력 파일명을 result2.xlsx처럼 바꿉니다.
+    snippet: |-
+      from pathlib import Path
+      from openpyxl import load_workbook
+      from pdfTables import extractFolder, saveWorkbook
+
+      records, issues = extractFolder(Path("input"))
+      output = saveWorkbook(records, issues, Path("result.xlsx"))
+      print(f"추출 {len(records)}행 / 검토 {len(issues)}건")
+      book = load_workbook(output)
+      rows = list(book["통합 표"].values)
+      print(rows[1][:5])
+      print("금액 합계", sum(row[4] for row in rows[1:]))
+      assert len(rows) - 1 == 12
+      assert rows[1][0] == "0012" and rows[1][4] == 456000
+      assert rows[1][5:8] == ("입고내역_창고A.pdf", 1, 1)
+      assert sum(row[4] for row in rows[1:]) == 4809000
+      assert book["검토 항목"].max_row == 1
+      book.close()
+    blocks:
+      - type: image
+        placement: sectionLead
+        assetId: pdfTableExport
+      - type: text
+        content: |-
+          result.xlsx의 통합 표 시트를 열어 12행과 합계 4,809,000원을 확인합니다. 첫 상품코드는 0012, 첫 금액은 456000이고 file은 입고내역_창고A.pdf, page는 1입니다. 검토 항목 시트에는 제목 행만 있어야 합니다. [블로그 PDF 작업대](https://eddmpython.com/blog/pdf-table)에서도 같은 예제 PDF 두 개를 열어 표를 모으고 엑셀로 저장합니다. 두 엑셀에서 값과 출처가 같은지 비교합니다.
+      - type: text
+        content: |-
+          검토 항목에는 표를 찾지 못한 페이지, 다른 열 제목, 빈 칸, 숫자 오류와 금액 불일치가 남습니다. 검토 항목이 0건이어도 모든 값이 정확하다는 뜻은 아닙니다. 원본 PDF의 일부 행과 엑셀 값을 비교한 뒤 결과를 사용합니다.
+
+  - id: references
+    title: 더 해 볼 것
+    blocks:
       - type: list
-        style: bullet
         items:
-          - "국세청 부가가치세 신고서 PDF의 매출/매입 표를 분기별 자동 추출"
-          - "금융 보고서 PDF의 재무제표를 DataFrame으로 변환 후 시계열 분석"
-          - "이력서 PDF의 경력 표를 추출해 HRIS에 자동 입력"
-          - "여러 PDF의 동일 양식 표를 모아 하나의 분석용 DataFrame으로 합치기"
-          - "추출 결과를 openpyxl 트랙의 차트·서식 적용해 보고용 xlsx로 변환"
+          - "[pdfTables.py](https://raw.githubusercontent.com/eddmpython/codaro/main/demos/pdfTables/pdfTables.py)의 findTables를 열고 열 제목 사이에서 세로 경계를 구하는 부분을 찾아봅니다."
+          - "[requirements.txt](https://raw.githubusercontent.com/eddmpython/codaro/main/demos/pdfTables/requirements.txt)에서 독립 실행에 사용하는 패키지 버전을 확인합니다."
+          - "창고 B를 입고내역_창고C.pdf로 복사해 input에 추가합니다. 엑셀 저장 코드의 출력 파일명을 새 이름으로, 행 수는 16으로, 합계는 6477000으로 바꿔 실행하면 새 파일명으로 4행이 추가됩니다."
+          - "내 자료는 myPdfs 폴더에 사본으로 넣고 extractFolder의 경로를 바꿉니다. 새 출력 파일명을 지정하고 assert의 행 수, 상품코드, 금액, 출처와 검토 항목 수를 원문에서 확인한 값에 맞춥니다. 다른 양식은 [제공 코드](https://raw.githubusercontent.com/eddmpython/codaro/main/demos/pdfTables/pdfTables.py)의 HEADERS와 findTables도 수정해야 합니다."
+          - "[블로그 OCR 실습](https://eddmpython.com/blog/pdf-table#스캔-pdf의-글자-인식)에서 스캔본 예제를 열고 글자 인식 결과를 원문과 비교합니다."
+          - "[pdfplumber 지원 범위](https://github.com/jsvine/pdfplumber#comparison-to-other-libraries)에서 텍스트 추출과 OCR의 차이를 확인합니다."
 assessment:
   schemaVersion: 1
   performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.

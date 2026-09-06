@@ -113,7 +113,7 @@ def main() -> int:
         provenance = asset.get("provenance", {})
         rendering = asset.get("rendering", {})
         viewport = capture.get("viewport")
-        if asset.get("kind") != "productScreenshot" or asset.get("sourceType") != "playwrightCapture":
+        if asset.get("kind") != "productScreenshot" or asset.get("sourceType") not in {"playwrightCapture", "pyprocCapture"}:
             failures.append(f"{asset_id}: source contract drifted")
         if provenance.get("fixtureId") != fixture_id:
             failures.append(f"{asset_id}: fixture drifted")

@@ -229,7 +229,7 @@ whenToUse: 레슨 카드를 작성·선택할 때(저자), 새 카드 type을 �
 - **`stepCard`/`practiceCard`** - 따라 하는 실습 절차. **`expansion`** - 자유 연습(채점 동결).
 - **`quiz`** - 채점 문제(`question`, `options[]`).
 - **`featureCards`** - 병렬 항목 카드 그리드(`cards[].{title,description}`). **`table`** - 표(`headers[]`, `rows[][]`). **`list`** - 목록(`items[]`, `style: bullet|number|check`).
-- **`image`/`video`/`youtube`** - 미디어. 마크다운 링크 `[text](url)`는 prose/콜아웃/리스트에서 클릭된다(스킴 화이트리스트). 영상은 `<video>`·youtube-nocookie iframe 인라인 임베드. **외부 hotlink 금지** - 자체 자산을 `editor/public/curriculum/<category>/<name>.svg` 상대 경로로.
+- **`image`/`video`/`youtube`** - 미디어. 마크다운 링크 `[text](url)`는 prose/콜아웃/리스트에서 클릭된다(스킴 화이트리스트). 영상은 `<video>`·youtube-nocookie iframe 인라인 임베드. **외부 hotlink 금지**. 등록된 학습 이미지는 `assetId`로 참조하고, 자체 미등록 자산은 `editor/public/curriculum/<category>/` 상대 경로로 둔다. 섹션 선행 이미지의 `placement: sectionLead`와 공유 원본 등록은 [branding](../ops/product/branding.md)의 블로그 원본 재사용 절차를 따른다.
 
 ## 키 컨벤션 (canonical - alias 난립 금지)
 

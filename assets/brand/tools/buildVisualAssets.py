@@ -28,10 +28,12 @@ KINDS = {
 }
 SOURCE_TYPES = {
     "playwrightCapture",
+    "pyprocCapture",
     "generatedRaster",
     "authoredRaster",
     "licensedMedia",
     "videoCapture",
+    "sharedRaster",
 }
 FORMATS = {"avif", "webp"}
 FITS = {"contain", "cover", "natural"}
@@ -146,6 +148,19 @@ def validateVisualManifest(manifest: dict[str, Any]) -> None:
             raise VisualAssetError(f"{assetId}: sourceGitHead must be a full lowercase commit hash")
 
         provenance = requiredObject(asset, "provenance", assetId)
+        if sourceType == "sharedRaster":
+            shared = requiredObject(provenance, "sharedSource", assetId)
+            requiredText(shared, "assetId", assetId)
+            url = requiredText(shared, "url", assetId)
+            pageUrl = requiredText(shared, "pageUrl", assetId)
+            expectedUrl = "https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/"
+            digest = sourceHash.removeprefix("sha256-")
+            if url != f"{expectedUrl}{digest[:2]}/{digest}{sourcePath.suffix}":
+                raise VisualAssetError(f"{assetId}: shared source must pin the exact content-addressed object")
+            if not pageUrl.startswith("https://eddmpython.com/blog/"):
+                raise VisualAssetError(f"{assetId}: shared source requires its public blog page")
+        elif provenance.get("sharedSource") is not None:
+            raise VisualAssetError(f"{assetId}: shared source requires sharedRaster")
         for field in ("author", "license", "fixtureId"):
             requiredText(provenance, field, f"{assetId}.provenance")
         licenseName = provenance["license"]
@@ -229,7 +244,7 @@ def validateVisualManifest(manifest: dict[str, Any]) -> None:
         if not isinstance(lessonRefs, list) or any(not isinstance(item, str) or not item for item in lessonRefs):
             raise VisualAssetError(f"{assetId}: lessonRefs must be a text list")
 
-        if sourceType in {"playwrightCapture", "videoCapture"}:
+        if sourceType in {"playwrightCapture", "pyprocCapture", "videoCapture"}:
             capture = requiredObject(asset, "capture", assetId)
             for field in ("browser", "browserVersion", "theme", "locale"):
                 requiredText(capture, field, f"{assetId}.capture")
@@ -270,7 +285,7 @@ def validateThemePairs(assets: list[dict[str, Any]]) -> None:
             if lightDarkMode == "paired":
                 raise VisualAssetError(f"{assetId}: paired visual requires themePairId")
             continue
-        if asset["kind"] != "productScreenshot" or asset["sourceType"] != "playwrightCapture":
+        if asset["kind"] != "productScreenshot" or asset["sourceType"] not in {"playwrightCapture", "pyprocCapture"}:
             raise VisualAssetError(f"{assetId}: themePairId is limited to product screenshots")
         if lightDarkMode != "paired":
             raise VisualAssetError(f"{assetId}: themePairId requires paired lightDark mode")
