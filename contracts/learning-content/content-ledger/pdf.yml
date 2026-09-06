@@ -92,13 +92,13 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "pdf/04_표추출"
     identityLedgerRef: "identity-ledger/pdf.yml"
-    lessonContentHash: "7a101783bc13fd1be30d52c8b2f30914611049703954510512c81c6496f37fc2"
+    lessonContentHash: "3c5106bceed233b489f871adaccd1b0e5959eec9877e2512f2171cdc6cc21e83"
     disposition: migrate
     ownerPacket: "07-remaining-domains/00-pdf-automation"
     eligiblePathIds: ["pdfAutomation"]
     outcomes: ["automation.pdf.extract"]
-    prerequisites: ["automation.pdf.extract","pandas.intro"]
-    reinforcesOutcomeIds: ["automation.pdf.extract"]
+    prerequisites: ["automation.pdf.read","python.functions","python.dictsAndSets"]
+    reinforcesOutcomeIds: []
     runtimeTier: local
     checkSpecId: "lesson:pdf/04_표추출:required:v1"
     checkKinds: ["file","behavior"]
