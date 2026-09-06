@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from importlib.machinery import PathFinder
 import os
 from concurrent.futures import ThreadPoolExecutor
 from multiprocessing.connection import Connection
@@ -304,6 +305,15 @@ class LocalEngine(ExecutionEngine):
         return await packageOps.listPackages()
 
     async def installPackage(self, packageName: str) -> packageOps.InstallResult:
+        if packageName.isidentifier():
+            folder = self._workingDirectory or self._workspaceRoot
+            spec = PathFinder.find_spec(packageName, [str(folder)])
+            if spec is not None and spec.origin and Path(spec.origin).resolve().is_relative_to(self._workspaceRoot):
+                return packageOps.InstallResult(
+                    package=packageName, success=True, skipped=True,
+                    installer="workspace", environment="workspace",
+                    message="작업 폴더의 Python 모듈을 사용합니다.",
+                )
         return await packageOps.installPackage(packageName)
 
     async def uninstallPackage(self, packageName: str) -> packageOps.InstallResult:

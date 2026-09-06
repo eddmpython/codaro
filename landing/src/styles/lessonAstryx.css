@@ -295,6 +295,29 @@
   margin-top: 5px;
 }
 
+.lessonSectionVisual {
+  margin: 2rem 0;
+}
+
+.lessonSectionVisual picture,
+.lessonSectionVisual img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.lessonSectionVisual figcaption {
+  margin-top: 0.75rem;
+  color: var(--color-text-secondary);
+  font-size: var(--type-sm);
+}
+
+.lessonSectionVisual p {
+  margin-top: 0.5rem;
+  color: var(--color-text-primary);
+}
+
 /* 목표는 accent rail, 팁은 무채 rail. 둘 다 면을 채우지 않는다. */
 .lessonGoal {
   display: grid;

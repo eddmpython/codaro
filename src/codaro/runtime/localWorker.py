@@ -7,6 +7,9 @@ import importlib
 import inspect
 import io
 import os
+import logging
+from multiprocessing.reduction import ForkingPickler
+import pickle
 from pathlib import Path
 import socket
 import sys
@@ -728,6 +731,13 @@ def _buildRegistryMirror(registry: dict[str, object]) -> dict[str, object]:
     snapshot: dict[str, object] = {}
     for name, value in registry.items():
         if not _isSerializable(value):
+            continue
+        try:
+            ForkingPickler.dumps(value)
+        except (TypeError, pickle.PicklingError, AttributeError, ValueError, OSError, RecursionError) as error:
+            logging.getLogger("codaro.runtime").debug(
+                "Registry mirror omitted %s (%s): %s", name, type(value).__name__, error,
+            )
             continue
         snapshot[name] = value
     return snapshot

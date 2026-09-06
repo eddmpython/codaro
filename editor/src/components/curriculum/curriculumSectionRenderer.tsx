@@ -290,6 +290,7 @@ export function sectionInfo(block: BlockConfig) {
  */
 function snippetHasVisibleOutput(result: ExecutionResult | undefined): result is ExecutionResult {
   if (!result || result.status === "error" || result.stderr) return false;
+  if ((result.stdout || "").trim().length > 0) return true;
   if (typeof result.data === "string") return result.data.trim().length > 0;
   if (result.data !== null && result.data !== undefined) return true;
   return (result.stdout || "").trim().length > 0;

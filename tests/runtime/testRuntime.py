@@ -216,6 +216,45 @@ def testLocalEngineInstallPackageDelegates(monkeypatch, tmp_path: Path) -> None:
     engine.dispose()
 
 
+def testLocalModuleDoesNotInstallOrExecuteDuringPreparation(monkeypatch, tmp_path: Path) -> None:
+    (tmp_path / "localTool.py").write_text("raise RuntimeError('must not import during preparation')", encoding="utf-8")
+    package = tmp_path / "localPackage"
+    package.mkdir()
+    (package / "__init__.py").write_text("value = 1", encoding="utf-8")
+    installed = []
+
+    async def fakeInstall(name: str):
+        installed.append(name)
+        return packageOps.InstallResult(package=name, success=True, message="installed")
+
+    monkeypatch.setattr(packageOps, "installPackage", fakeInstall)
+    engine = LocalEngine(workspaceRoot=tmp_path)
+    try:
+        for name in ("localTool", "localPackage"):
+            result = _run(engine.installPackage(name))
+            assert result.success and result.skipped and result.installer == "workspace"
+        _run(engine.installPackage("localTool==1.0"))
+        _run(engine.installPackage("missingTool"))
+        assert installed == ["localTool==1.0", "missingTool"]
+    finally:
+        engine.dispose()
+
+
+def testUnpicklableValuesStayUsableInsideWorker() -> None:
+    engine = LocalEngine()
+    try:
+        first = _run(engine.executeBlock(
+            "import hashlib\nitems = {'digest': hashlib.sha256(b'abc')}\nprint(items['digest'].hexdigest())",
+            blockId="digest",
+        ))
+        assert first.status == "done"
+        assert any(value.name == "items" for value in first.variables)
+        second = _run(engine.executeBlock("print(items['digest'].hexdigest())", blockId="reuse"))
+        assert second.status == "done" and second.stdout == first.stdout
+    finally:
+        engine.dispose()
+
+
 def testLocalEngineListPackagesDelegates(monkeypatch, tmp_path: Path) -> None:
     engine = LocalEngine(workspaceRoot=tmp_path)
 

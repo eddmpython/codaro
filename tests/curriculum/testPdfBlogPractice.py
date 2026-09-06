@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import contextlib
+import asyncio
 import importlib.util
 from io import StringIO
 import json
@@ -24,6 +25,30 @@ SPEC.loader.exec_module(DEMO)
 
 
 class PdfBlogPracticeTest(unittest.TestCase):
+    def testLessonRunsInLocalWorker(self):
+        from codaro.runtime import LocalEngine
+        lesson = yaml.safe_load(LESSON.read_text(encoding="utf-8"))
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            DEMO.makeSamples(folder / "input")
+            shutil.copyfile(ROOT / "demos/pdfTables/pdfTables.py", folder / "pdfTables.py")
+            engine = LocalEngine(workingDirectory=folder, workspaceRoot=folder)
+
+            async def runLesson():
+                ready = await engine.installPackage("pdfTables")
+                self.assertTrue(ready.success and ready.skipped)
+                for section in lesson["sections"]:
+                    if section.get("snippet"):
+                        result = await engine.executeBlock(section["snippet"], blockId=section["id"])
+                        self.assertEqual(result.status, "done", f"{section['id']}: {result.data}")
+                self.assertIn("금액 합계 4809000", result.stdout)
+
+            try:
+                asyncio.run(runLesson())
+                self.assertTrue((folder / "result.xlsx").is_file())
+            finally:
+                engine.dispose()
+
     def testPreparationPrecedesPdfExtraction(self):
         meta = yaml.safe_load(LESSON.read_text(encoding="utf-8"))["meta"]
         self.assertFalse(set(meta["outcomes"]) & set(meta["prerequisites"]))

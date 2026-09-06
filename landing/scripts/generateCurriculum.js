@@ -6,6 +6,7 @@ import { basename, dirname, extname, resolve, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { parse as parseYaml } from "yaml";
+import { sectionContent } from "./curriculumSections.mjs";
 
 const SCRIPT_PATH = fileURLToPath(import.meta.url);
 const __dirname = dirname(SCRIPT_PATH);
@@ -73,6 +74,7 @@ function domainOf(fileRel) {
 const files = existsSync(CURRICULA) ? walkYaml(CURRICULA) : [];
 const inputFingerprint = fingerprintFiles([
   SCRIPT_PATH,
+  resolve(__dirname, "curriculumSections.mjs"),
   TAXONOMY,
   PUBLIC_LEARNING_CATALOG,
   resolve(__dirname, "../package-lock.json"),
@@ -225,6 +227,7 @@ function compactSection(value, index) {
     goal: String(section.goal || ""),
     why: String(section.why || ""),
     explanation: String(section.explanation || ""),
+    ...sectionContent(section),
     snippet: String(section.snippet || ""),
     tips: stringList(section.tips),
     exercise: {

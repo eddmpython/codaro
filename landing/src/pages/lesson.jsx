@@ -6,6 +6,8 @@ import { Heading } from "@astryxdesign/core/Heading";
 import { Text } from "@astryxdesign/core/Text";
 
 import { ProductVisual } from "../components/productVisual.jsx";
+import { resolveVisualAsset } from "../lib/visualAssets.js";
+import { HTMLContent } from "../routes/routePrimitives.jsx";
 import { brand } from "../lib/brand.js";
 import { findCurriculumLesson, loadCurriculumLesson } from "../lib/curriculumLessons.js";
 import { runLessonHref } from "../lib/publicRouting.js";
@@ -172,6 +174,9 @@ function LessonDocument({ lesson, pathId }) {
 }
 
 function LessonSection({ index, section }) {
+  const blocks = section.contentBlocks || [];
+  const leadImages = blocks.filter((block) => block.type === "image" && block.placement === "sectionLead");
+  const bodyBlocks = blocks.filter((block) => !leadImages.includes(block));
   return (
     <section className="lessonSection" id={`lesson-section-${section.id}`}>
       <header>
@@ -181,12 +186,16 @@ function LessonSection({ index, section }) {
           {section.subtitle ? <Text color="secondary">{section.subtitle}</Text> : null}
         </div>
       </header>
+      {leadImages.map((block) => <LessonVisual key={block.assetId} assetId={block.assetId} />)}
       {section.goal ? <p className="lessonGoal"><strong>목표</strong>{section.goal}</p> : null}
       {section.why ? <p className="lessonWhy">{section.why}</p> : null}
       <div className="lessonExplanation">
-        {paragraphs(section.explanation).map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+        <HTMLContent html={section.explanationHtml} />
       </div>
       {section.snippet ? <CodeExample code={section.snippet} label={`${section.title} 예제`} /> : null}
+      {bodyBlocks.map((block, blockIndex) => block.type === "image"
+        ? <LessonVisual key={blockIndex} assetId={block.assetId} />
+        : <div className="lessonExplanation" key={blockIndex}><HTMLContent html={block.html} /></div>)}
       {section.tips.length ? (
         <aside className="lessonTips">
           <strong>실행 전에 볼 것</strong>
@@ -202,6 +211,17 @@ function LessonSection({ index, section }) {
         </div>
       ) : null}
     </section>
+  );
+}
+
+function LessonVisual({ assetId }) {
+  const asset = resolveVisualAsset(assetId);
+  return (
+    <figure className="lessonSectionVisual" data-learning-visual-asset={assetId}>
+      <ProductVisual assetId={assetId} width={960} />
+      <figcaption>{asset.caption}</figcaption>
+      <p>{asset.learning.learningQuestion}</p>
+    </figure>
   );
 }
 
@@ -236,8 +256,4 @@ function LessonMissing() {
       </div>
     </main>
   );
-}
-
-function paragraphs(value) {
-  return String(value || "").split(/\n\s*\n/).map((item) => item.trim()).filter(Boolean);
 }

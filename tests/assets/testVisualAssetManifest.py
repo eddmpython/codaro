@@ -117,8 +117,13 @@ class VisualAssetManifestTest(unittest.TestCase):
             BUILDER.validateVisualManifest(invalid)
 
     def testProprietaryAndLicensedMediaProvenanceStayDistinct(self) -> None:
+        assetIndex = next(
+            index for index, asset in enumerate(self.manifest["assets"])
+            if asset["sourceType"] == "generatedRaster"
+            and asset["provenance"]["license"] == "proprietary-project"
+        )
         invalidProprietary = deepcopy(self.manifest)
-        invalidProprietary["assets"][0]["provenance"]["licenseUrl"] = (
+        invalidProprietary["assets"][assetIndex]["provenance"]["licenseUrl"] = (
             "https://example.com/license"
         )
         with self.assertRaisesRegex(
@@ -128,7 +133,7 @@ class VisualAssetManifestTest(unittest.TestCase):
             BUILDER.validateVisualManifest(invalidProprietary)
 
         invalidLicensed = deepcopy(self.manifest)
-        invalidLicensed["assets"][0]["sourceType"] = "licensedMedia"
+        invalidLicensed["assets"][assetIndex]["sourceType"] = "licensedMedia"
         with self.assertRaisesRegex(
             BUILDER.VisualAssetError,
             "licensedMedia cannot use proprietary-project",
@@ -136,8 +141,8 @@ class VisualAssetManifestTest(unittest.TestCase):
             BUILDER.validateVisualManifest(invalidLicensed)
 
         invalidLicenseUrl = deepcopy(self.manifest)
-        invalidLicenseUrl["assets"][0]["sourceType"] = "licensedMedia"
-        invalidLicenseUrl["assets"][0]["provenance"]["license"] = "CC-BY-4.0"
+        invalidLicenseUrl["assets"][assetIndex]["sourceType"] = "licensedMedia"
+        invalidLicenseUrl["assets"][assetIndex]["provenance"]["license"] = "CC-BY-4.0"
         with self.assertRaisesRegex(
             BUILDER.VisualAssetError,
             "licensedMedia requires an HTTPS licenseUrl",

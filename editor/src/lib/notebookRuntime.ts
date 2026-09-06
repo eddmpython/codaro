@@ -683,7 +683,7 @@ export async function preflightRuntimePackages(
     if (!result.success) {
       return { required, missing, installedByUv, failed: result };
     }
-    installedByUv.push(packageName);
+    if (!result.skipped) installedByUv.push(packageName);
   }
 
   return { required, missing, installedByUv };

@@ -57,6 +57,7 @@ uv run python -X utf8 tests/run.py list
 - 사용자가 에디터에서 라이브러리를 설치해도 내부 경로는 `/api/packages/install` 또는 세션 패키지 capability를 거쳐 `uv pip ... --python .venv`로 실행한다.
 - AI 교사 도구도 같은 경로를 사용한다. `packages-check`로 누락 여부를 확인한 뒤 `packages-install`을 호출한다.
 - plain package가 이미 `.venv`에 설치되어 있으면 `uv pip install`을 다시 실행하지 않고 즉시 성공으로 보고한다. version specifier나 extras가 있으면 정확성을 위해 `uv` 경로를 탄다.
+- Local 세션의 작업 폴더에 같은 이름의 Python 모듈이 있으면 외부 설치 없이 그 파일을 사용한다. 준비 확인은 모듈을 실행하지 않는다. 판정은 `LocalEngine.installPackage`가 소유하며, 에디터는 건너뛴 설치를 새 패키지 설치로 표시하지 않는다.
 - 설치 결과는 `installer: uv`, `environment: project .venv`, `durationMs`, `skipped`를 포함한다. 에디터와 teacher trace는 이 값을 사용해 "uv로 준비 중/완료/이미 준비됨"을 표시한다.
 - 설치 timeout은 긴 wheel 준비를 고려해 `INSTALL_TIMEOUT_SECONDS` 상수로 관리한다. timeout 변경은 `tests/runtime/testSystem.py`에서 함께 고정한다.
 - 직접 `pip install` 명령을 문서, 테스트, UI 안내에 추가하지 않는다.
