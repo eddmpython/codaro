@@ -106,7 +106,7 @@ export function CurriculumView({
 
   return (
     <ScrollArea
-      className="h-full min-h-0 min-w-0"
+      className="h-full min-h-0 min-w-0 [overflow-wrap:anywhere] [&_[data-slot=scroll-area-viewport]>div]:block!"
       data-learning-content-pane="true"
       data-learning-snippet-auto-run-state={snippetAutoRunState}
     >
