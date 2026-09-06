@@ -17,7 +17,9 @@ meta:
   outcomes:
     - automation.pdf.extract
   prerequisites:
-    - automation.pdf.extract
+    - automation.pdf.read
+    - python.functions
+    - python.dictsAndSets
   estimatedMinutes: 60
   seo:
     title: PDF 여러 개의 표를 Python으로 추출해 엑셀에 모으기

@@ -14,7 +14,7 @@
         "licenseUrl": null,
         "fixtureId": "008-pdf-table/workspace",
         "promptHash": null,
-        "lessonContentHash": "sha256-4572cc5ed4170a4dad0383ca6305a522694d9e790819cced31f0273a1abad799",
+        "lessonContentHash": "sha256-3c5106bceed233b489f871adaccd1b0e5959eec9877e2512f2171cdc6cc21e83",
         "sharedSource": {
           "assetId": "008-pdf-table/workspace",
           "url": "https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/3d/3dc1b60478124ab8ce2726e43b9b1635476d853b2c2c307466a77e522eaadd41.png",
@@ -75,7 +75,7 @@
         "licenseUrl": null,
         "fixtureId": "008-pdf-table/batch",
         "promptHash": null,
-        "lessonContentHash": "sha256-4572cc5ed4170a4dad0383ca6305a522694d9e790819cced31f0273a1abad799",
+        "lessonContentHash": "sha256-3c5106bceed233b489f871adaccd1b0e5959eec9877e2512f2171cdc6cc21e83",
         "sharedSource": {
           "assetId": "008-pdf-table/batch",
           "url": "https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/a7/a78046d7058234e6f3fdbea81ddb568610714e2a6faef28fe0fcd12c1bec5dae.png",
@@ -136,7 +136,7 @@
         "licenseUrl": null,
         "fixtureId": "008-pdf-table/trace",
         "promptHash": null,
-        "lessonContentHash": "sha256-4572cc5ed4170a4dad0383ca6305a522694d9e790819cced31f0273a1abad799",
+        "lessonContentHash": "sha256-3c5106bceed233b489f871adaccd1b0e5959eec9877e2512f2171cdc6cc21e83",
         "sharedSource": {
           "assetId": "008-pdf-table/trace",
           "url": "https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/ac/ac6607f39c130900a2339dcb3a401fae4b5d40e879034fb79fca95be789a764d.png",
@@ -196,7 +196,7 @@
         "licenseUrl": null,
         "fixtureId": "008-pdf-table/totals",
         "promptHash": null,
-        "lessonContentHash": "sha256-4572cc5ed4170a4dad0383ca6305a522694d9e790819cced31f0273a1abad799",
+        "lessonContentHash": "sha256-3c5106bceed233b489f871adaccd1b0e5959eec9877e2512f2171cdc6cc21e83",
         "sharedSource": {
           "assetId": "008-pdf-table/totals",
           "url": "https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/e4/e4eab49322ca2aaa93a758c921c4d3837ae236f736d25480e6c4648505868a30.png",
@@ -256,7 +256,7 @@
         "licenseUrl": null,
         "fixtureId": "008-pdf-table/ocr",
         "promptHash": null,
-        "lessonContentHash": "sha256-4572cc5ed4170a4dad0383ca6305a522694d9e790819cced31f0273a1abad799",
+        "lessonContentHash": "sha256-3c5106bceed233b489f871adaccd1b0e5959eec9877e2512f2171cdc6cc21e83",
         "sharedSource": {
           "assetId": "008-pdf-table/ocr",
           "url": "https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/b8/b805f0132362a7578a1ee49423df7a4f3663e864ac0b503a898b56c1bdcfabc5.png",
@@ -317,7 +317,7 @@
         "licenseUrl": null,
         "fixtureId": "008-pdf-table/download",
         "promptHash": null,
-        "lessonContentHash": "sha256-4572cc5ed4170a4dad0383ca6305a522694d9e790819cced31f0273a1abad799",
+        "lessonContentHash": "sha256-3c5106bceed233b489f871adaccd1b0e5959eec9877e2512f2171cdc6cc21e83",
         "sharedSource": {
           "assetId": "008-pdf-table/download",
           "url": "https://huggingface.co/datasets/eddmpython/eddmpython-media/resolve/main/objects/sha256/e3/e3604e34c9e2644d291e907850bc53b62d07e63be93016d445e7d563e0082712.png",

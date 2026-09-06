@@ -24,6 +24,11 @@ SPEC.loader.exec_module(DEMO)
 
 
 class PdfBlogPracticeTest(unittest.TestCase):
+    def testPreparationPrecedesPdfExtraction(self):
+        meta = yaml.safe_load(LESSON.read_text(encoding="utf-8"))["meta"]
+        self.assertFalse(set(meta["outcomes"]) & set(meta["prerequisites"]))
+        self.assertTrue({"automation.pdf.read", "python.functions", "python.dictsAndSets"}.issubset(meta["prerequisites"]))
+
     def testGridTableDoesNotHideOtherTableOnSamePage(self):
         from types import SimpleNamespace
         import pdfplumber
