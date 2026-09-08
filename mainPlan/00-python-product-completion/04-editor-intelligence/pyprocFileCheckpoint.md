@@ -44,7 +44,7 @@ stdout hook, 제어 아티팩트 해제, HTTPS 신뢰, 키 활성화와는 다�
 동일 스크립트의 기본 시나리오도 두 셀에서 파일을 기록한 뒤 clone 검사에서 같은 파일 누락을 발견했다.
 새 profile 두 개에서 파일 누락을 각각 재현했고 직접 공개 API 시나리오에서 복원 불일치도 확인했다.
 
-합성 보고서 SHA-256:
+[원본 합성 보고서](pyprocFileCheckpointEvidence.json)의 SHA-256:
 `6312a8fa909082118c3b88bd9f25dcad4a8a2d271f95168623f473824d261a32`.
 공통 실행 공간의 이번 작업 디렉터리 안 `pyproc-file-contract/report.json`에 공개 호출 결과와
 사용자 에이전트가 있다. `clone`은 `2\nFalse`, `restored`는 `1\nafter`다.
