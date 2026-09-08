@@ -38,7 +38,7 @@ export function AutomationRunInspector({
       <header className="flex min-h-14 items-center gap-3 border-b border-border px-3 py-2">
         <div className="min-w-0 flex-1">
           <div className="text-[10px] font-semibold text-muted-foreground">{t("automation.task.inspector")}</div>
-          <div className="mt-0.5 truncate text-sm font-semibold">
+          <div className="mt-0.5 break-words text-sm font-semibold">
             {task ? task.name || task.documentPath : t("automation.task.notSelected")}
           </div>
         </div>

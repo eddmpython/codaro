@@ -63,7 +63,7 @@ export function CodeIntelligenceTools({ blockId, viewRef, selected, command }: {
     }, [command]);
     if (!intelligence || !selected) return null;
     return (
-        <div className="border-t border-border px-2 py-1 text-xs" data-code-intelligence={blockId}>
+        <div className="border-t border-border px-2 py-1 text-xs [&_button]:h-auto [&_button]:min-h-8 [&_button]:whitespace-normal [&_button]:py-1" data-code-intelligence={blockId}>
             <div className="flex flex-wrap items-center gap-1">
                 {([
                     ["definition", "정의"], ["references", "참조"], ["signature", "인자"],

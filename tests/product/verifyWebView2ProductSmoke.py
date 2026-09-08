@@ -1302,7 +1302,8 @@ def apply_text_only_zoom_fixture(page: Page, *, factor: float) -> None:
           const candidates = [...document.body.querySelectorAll("*")];
           const measurements = [];
           for (const element of candidates) {
-            if (!(element instanceof HTMLElement) || excluded.has(element.tagName)) continue;
+            if (!(element instanceof HTMLElement) || excluded.has(element.tagName)
+              || !element.checkVisibility({ checkVisibilityCSS: true })) continue;
             const hasDirectText = [...element.childNodes].some(
               (node) => node.nodeType === Node.TEXT_NODE && (node.textContent || "").trim(),
             );
