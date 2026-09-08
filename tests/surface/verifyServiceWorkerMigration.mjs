@@ -26,6 +26,7 @@ const cacheKeys = new Set([
 const deletedCacheKeys = [];
 let activationPromise = null;
 let migrationReceipt = null;
+let fetchListener = null;
 
 const shellCache = {
   async addAll() {},
@@ -55,6 +56,7 @@ const context = {
   JSON,
   Promise,
   Response,
+  Headers,
   Set,
   String,
   URL,
@@ -88,6 +90,7 @@ const context = {
     location: { origin: "https://example.test" },
     registration: { scope: `https://example.test${scopePath}` },
     addEventListener(type, listener) {
+      if (type === "fetch") fetchListener = listener;
       if (type !== "activate") return;
       listener({
         waitUntil(promise) {
@@ -126,6 +129,26 @@ assert.deepEqual(
   [...legacyManifest.ownedCacheKeys].sort(),
 );
 assert.equal(migrationReceipt?.unmatchedCacheCount, foreignCacheKeys.length + 2);
+
+const runtimeRequest = new Request(`https://example.test${scopePath}vendor/pyprocMachine/index.js`);
+let cachedRuntime = new Response("old runtime");
+shellCache.match = async () => cachedRuntime.clone();
+shellCache.put = async (_, response) => { cachedRuntime = response; };
+context.caches.match = async () => cachedRuntime.clone();
+context.fetch = async (_, options) => {
+    assert.equal(options.cache, "no-cache");
+    return new Response("new runtime");
+};
+async function fetchRuntime() {
+    let result;
+    fetchListener({ request: runtimeRequest, respondWith: (response) => { result = response; } });
+    return result;
+}
+const freshRuntime = await fetchRuntime();
+assert.equal(await freshRuntime.text(), "new runtime", "fixed runtime URLs must revalidate after a deployment");
+assert.equal(freshRuntime.headers.get("Cross-Origin-Embedder-Policy"), "credentialless");
+context.fetch = async () => { throw new TypeError("offline"); };
+assert.equal(await (await fetchRuntime()).text(), "new runtime", "offline fallback must retain the last fresh runtime");
 
 console.log(
   `ok: service worker deleted ${deletedCacheKeys.length} exact Codaro caches and retained ${foreignCacheKeys.length} foreign caches`,

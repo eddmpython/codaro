@@ -13,12 +13,20 @@ export function CodeIntelligenceTools({ blockId, viewRef, selected, command }: {
     command: { action: AnalysisOperation; sequence: number } | null;
 }) {
     const intelligence = useNotebookIntelligence();
-    const [response, setResponse] = useState<AnalysisResponse | null>(null);
+    const [analysis, setResponse] = useState<AnalysisResponse | null>(null);
+    const version = intelligence?.snapshot().version;
+    const response = analysis?.version === version ? analysis : null;
     const [operation, setOperation] = useState<AnalysisOperation | null>(null);
     const [newName, setNewName] = useState("");
     const [busy, setBusy] = useState(false);
     const [message, setMessage] = useState("");
     const requestSequence = useRef(0);
+    useEffect(() => {
+        requestSequence.current += 1;
+        setResponse(null);
+        setMessage("");
+        setBusy(false);
+    }, [version]);
     useEffect(() => () => { requestSequence.current += 1; }, []);
     const request = async (next: AnalysisOperation) => {
         const view = viewRef.current;

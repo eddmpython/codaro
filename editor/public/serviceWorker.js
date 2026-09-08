@@ -11,44 +11,44 @@ const scopedPath = (path) => new URL(path.replace(/^\/+/, ""), SCOPE_URL).pathna
 const LEGACY_CACHE_MANIFEST_PATH = scopedPath("serviceWorkerLegacyCaches.json");
 const MIGRATION_RECEIPT_PATH = scopedPath(".codaro/service-worker-migration-receipt.json");
 const SHELL_ASSETS = [
-  scopedPath("manifest.json"),
-  scopedPath("favicon.png"),
-  scopedPath("favicon.svg"),
-  LEGACY_CACHE_MANIFEST_PATH,
+    scopedPath("manifest.json"),
+    scopedPath("favicon.png"),
+    scopedPath("favicon.svg"),
+    LEGACY_CACHE_MANIFEST_PATH,
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(SHELL_CACHE).then((cache) => cache.addAll(SHELL_ASSETS)).then(() => self.skipWaiting()),
-  );
+    event.waitUntil(
+        caches.open(SHELL_CACHE).then((cache) => cache.addAll(SHELL_ASSETS)).then(() => self.skipWaiting()),
+    );
 });
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    migrateOwnedLegacyCaches()
-      .then(() => self.clients.claim()),
-  );
+    event.waitUntil(
+        migrateOwnedLegacyCaches()
+            .then(() => self.clients.claim()),
+    );
 });
 
 self.addEventListener("fetch", (event) => {
-  const request = event.request;
-  if (request.method !== "GET") return;
-  const url = new URL(request.url);
-  if (url.origin !== self.location.origin) return;
+    const request = event.request;
+    if (request.method !== "GET") return;
+    const url = new URL(request.url);
+    if (url.origin !== self.location.origin) return;
 
-  if (url.pathname.startsWith(scopedPath("api/")) || url.pathname.startsWith(scopedPath("ws/"))) {
-    event.respondWith(networkFirst(request));
-    return;
-  }
-  if (request.mode === "navigate" || request.headers.get("accept")?.includes("text/html")) {
-    event.respondWith(navigationNetworkFirst(request).then(isolateResponse));
-    return;
-  }
-  if (url.pathname.startsWith(scopedPath("_app/"))) {
-    event.respondWith(assetCacheFirst(request).then(isolateResponse));
-    return;
-  }
-  event.respondWith(shellCacheFirst(request).then(isolateResponse));
+    if (url.pathname.startsWith(scopedPath("api/")) || url.pathname.startsWith(scopedPath("ws/"))) {
+        event.respondWith(networkFirst(request));
+        return;
+    }
+    if (request.mode === "navigate" || request.headers.get("accept")?.includes("text/html")) {
+        event.respondWith(navigationNetworkFirst(request).then(isolateResponse));
+        return;
+    }
+    if (url.pathname.startsWith(scopedPath("_app/"))) {
+        event.respondWith(assetCacheFirst(request).then(isolateResponse));
+        return;
+    }
+    event.respondWith(networkFirst(request, SHELL_CACHE).then(isolateResponse));
 });
 
 function isolateResponse(response) {
@@ -59,135 +59,123 @@ function isolateResponse(response) {
     return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 }
 
-async function shellCacheFirst(request) {
-  const cached = await caches.match(request);
-  if (cached) return cached;
-  try {
+async function assetCacheFirst(request) {
+    const cached = await caches.match(request);
+    if (cached) return cached;
     const response = await fetch(request);
     if (response.ok) {
-      const cache = await caches.open(SHELL_CACHE);
-      cache.put(request, response.clone());
+        const cache = await caches.open(SHELL_CACHE);
+        cache.put(request, response.clone());
     }
     return response;
-  } catch (error) {
-    throw error;
-  }
-}
-
-async function assetCacheFirst(request) {
-  const cached = await caches.match(request);
-  if (cached) return cached;
-  const response = await fetch(request);
-  if (response.ok) {
-    const cache = await caches.open(SHELL_CACHE);
-    cache.put(request, response.clone());
-  }
-  return response;
 }
 
 async function navigationNetworkFirst(request) {
-  try {
-    const response = await fetch(request, { cache: "no-store" });
-    if (response.ok && response.headers.get("content-type")?.includes("text/html")) {
-      const cache = await caches.open(SHELL_CACHE);
-      cache.put(scopedPath("index.html"), response.clone());
+    try {
+        const response = await fetch(request, { cache: "no-store" });
+        if (response.ok && response.headers.get("content-type")?.includes("text/html")) {
+            const cache = await caches.open(SHELL_CACHE);
+            cache.put(scopedPath("index.html"), response.clone());
+        }
+        return response;
+    } catch (error) {
+        const fallback = await caches.match(scopedPath("index.html"));
+        if (fallback) return fallback;
+        throw error;
     }
-    return response;
-  } catch (error) {
-    const fallback = await caches.match(scopedPath("index.html"));
-    if (fallback) return fallback;
-    throw error;
-  }
 }
 
-async function networkFirst(request) {
-  try {
-    const response = await fetch(request);
-    if (response.ok) {
-      const cache = await caches.open(RUNTIME_CACHE);
-      cache.put(request, response.clone());
+async function networkFirst(request, cacheKey = RUNTIME_CACHE) {
+    try {
+        const response = await fetch(request, { cache: "no-cache" });
+        if (response.ok) {
+            try {
+                const cache = await caches.open(cacheKey);
+                await cache.put(request, response.clone());
+            } catch (error) { console.warn("Response cache write failed", error); }
+        }
+        return response;
+    } catch (error) {
+        const cache = await caches.open(cacheKey);
+        const cached = await cache.match(request);
+        if (cached) return cached;
+        throw error;
     }
-    return response;
-  } catch (error) {
-    const cached = await caches.match(request);
-    if (cached) return cached;
-    throw error;
-  }
 }
 
 async function migrateOwnedLegacyCaches() {
-  const availableCacheKeys = await caches.keys();
-  try {
-    const manifest = await loadLegacyCacheManifest();
-    const ownedCacheKeys = new Set(manifest.ownedCacheKeys);
-    const matchedCacheKeys = availableCacheKeys.filter((key) => ownedCacheKeys.has(key));
-    const deletionResults = await Promise.all(
-      matchedCacheKeys.map(async (cacheKey) => ({
-        cacheKey,
-        deleted: await caches.delete(cacheKey),
-      })),
-    );
-    const deletedCacheKeys = deletionResults
-      .filter((result) => result.deleted)
-      .map((result) => result.cacheKey);
-    await writeMigrationReceipt({
-      schemaVersion: 1,
-      migrationId: manifest.migrationId,
-      scopePath: SCOPE_PATH,
-      status: deletedCacheKeys.length === matchedCacheKeys.length ? "completed" : "partial",
-      examinedCacheCount: availableCacheKeys.length,
-      unmatchedCacheCount: availableCacheKeys.length - matchedCacheKeys.length,
-      matchedCacheKeys,
-      deletedCacheKeys,
-      completedAt: new Date().toISOString(),
-    });
-  } catch (error) {
-    await writeMigrationReceipt({
-      schemaVersion: 1,
-      migrationId: "unavailable",
-      scopePath: SCOPE_PATH,
-      status: "skipped",
-      examinedCacheCount: availableCacheKeys.length,
-      unmatchedCacheCount: availableCacheKeys.length,
-      matchedCacheKeys: [],
-      deletedCacheKeys: [],
-      completedAt: new Date().toISOString(),
-      failure: error instanceof Error ? error.message : String(error),
-    });
-  }
+    const availableCacheKeys = await caches.keys();
+    try {
+        const manifest = await loadLegacyCacheManifest();
+        const ownedCacheKeys = new Set(manifest.ownedCacheKeys);
+        const matchedCacheKeys = availableCacheKeys.filter((key) => ownedCacheKeys.has(key));
+        const deletionResults = await Promise.all(
+            matchedCacheKeys.map(async (cacheKey) => ({
+                cacheKey,
+                deleted: await caches.delete(cacheKey),
+            })),
+        );
+        const deletedCacheKeys = deletionResults
+            .filter((result) => result.deleted)
+            .map((result) => result.cacheKey);
+        await writeMigrationReceipt({
+            schemaVersion: 1,
+            migrationId: manifest.migrationId,
+            scopePath: SCOPE_PATH,
+            status: deletedCacheKeys.length === matchedCacheKeys.length ? "completed" : "partial",
+            examinedCacheCount: availableCacheKeys.length,
+            unmatchedCacheCount: availableCacheKeys.length - matchedCacheKeys.length,
+            matchedCacheKeys,
+            deletedCacheKeys,
+            completedAt: new Date().toISOString(),
+        });
+    } catch (error) {
+        await writeMigrationReceipt({
+            schemaVersion: 1,
+            migrationId: "unavailable",
+            scopePath: SCOPE_PATH,
+            status: "skipped",
+            examinedCacheCount: availableCacheKeys.length,
+            unmatchedCacheCount: availableCacheKeys.length,
+            matchedCacheKeys: [],
+            deletedCacheKeys: [],
+            completedAt: new Date().toISOString(),
+            failure: error instanceof Error ? error.message : String(error),
+        });
+    }
 }
 
 async function loadLegacyCacheManifest() {
-  const shellCache = await caches.open(SHELL_CACHE);
-  const response = await shellCache.match(LEGACY_CACHE_MANIFEST_PATH);
-  if (!response) throw new Error("legacy cache manifest is unavailable");
-  const manifest = await response.json();
-  if (
-    !manifest
-    || manifest.schemaVersion !== 1
-    || typeof manifest.migrationId !== "string"
-    || !manifest.migrationId
-    || !Array.isArray(manifest.ownedCacheKeys)
-    || !manifest.ownedCacheKeys.length
-    || manifest.ownedCacheKeys.some((key) => typeof key !== "string" || !key)
-    || new Set(manifest.ownedCacheKeys).size !== manifest.ownedCacheKeys.length
-    || manifest.ownedCacheKeys.includes(SHELL_CACHE)
-    || manifest.ownedCacheKeys.includes(RUNTIME_CACHE)
-  ) {
-    throw new Error("legacy cache manifest is invalid");
-  }
-  return manifest;
+    const shellCache = await caches.open(SHELL_CACHE);
+    const response = await shellCache.match(LEGACY_CACHE_MANIFEST_PATH);
+    if (!response) throw new Error("legacy cache manifest is unavailable");
+    const manifest = await response.json();
+    if (
+        !manifest
+        || manifest.schemaVersion !== 1
+        || typeof manifest.migrationId !== "string"
+        || !manifest.migrationId
+        || !Array.isArray(manifest.ownedCacheKeys)
+        || !manifest.ownedCacheKeys.length
+        || manifest.ownedCacheKeys.some((key) => typeof key !== "string" || !key)
+        || new Set(manifest.ownedCacheKeys).size !== manifest.ownedCacheKeys.length
+        || manifest.ownedCacheKeys.includes(SHELL_CACHE)
+        || manifest.ownedCacheKeys.includes(RUNTIME_CACHE)
+    ) {
+        throw new Error("legacy cache manifest is invalid");
+    }
+    return manifest;
 }
 
 async function writeMigrationReceipt(receipt) {
-  const shellCache = await caches.open(SHELL_CACHE);
-  await shellCache.put(
-    MIGRATION_RECEIPT_PATH,
-    new Response(JSON.stringify(receipt), {
-      headers: {
-        "Cache-Control": "no-store",
-        "Content-Type": "application/json; charset=utf-8",
-      },
-    }),
-  );
+    const shellCache = await caches.open(SHELL_CACHE);
+    await shellCache.put(
+        MIGRATION_RECEIPT_PATH,
+        new Response(JSON.stringify(receipt), {
+            headers: {
+                "Cache-Control": "no-store",
+                "Content-Type": "application/json; charset=utf-8",
+            },
+        }),
+    );
 }

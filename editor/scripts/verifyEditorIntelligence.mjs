@@ -10,6 +10,12 @@ const runRoot = process.env.CODARO_CAPTURE_RUN_DIR;
 assert.ok(runRoot, "CODARO_CAPTURE_RUN_DIR is required");
 await mkdir(runRoot, { recursive: true });
 const url = process.argv[2];
+const appBase = new URL(url);
+appBase.search = "";
+appBase.hash = "";
+if (!appBase.pathname.endsWith("/")) appBase.pathname += "/";
+const machineModuleUrl = new URL("vendor/pyprocMachine/index.js", appBase).href;
+const checkRepair = process.argv.includes("--repair-fixture") || process.argv.includes("--repair-live");
 const origin = new URL(url).origin;
 const packageRoot = new URL("../node_modules/pyproc-control/", import.meta.url);
 const metadata = JSON.parse(await readFile(new URL("package.json", packageRoot), "utf8"));
@@ -57,11 +63,12 @@ async function screenshot(name) {
     await client.deleteArtifact(result.output.actions[0].result.artifactRef);
 }
 try {
-    target = (await client.openTarget(origin + "/build-generation.json", { expectedRisk: "externalEffect", waitUntil: "load" })).output.targetRef;
+    target = (await client.openTarget(new URL("build-generation.json", appBase).href, { expectedRisk: "externalEffect", waitUntil: "load" })).output.targetRef;
     session = (await client.attachSession(target)).output;
     await act({ kind: "navigate", url });
     if (process.argv.includes("--service-worker")) {
-        await evaluate("navigator.serviceWorker.register('/serviceWorker.js', {scope:'/'}).then(()=>navigator.serviceWorker.ready).then(()=>true)");
+        await evaluate("navigator.serviceWorker.register(" + JSON.stringify(new URL("serviceWorker.js", appBase).href) + ", {scope:" + JSON.stringify(appBase.pathname) + "}).then(()=>navigator.serviceWorker.ready).then(()=>true)");
+        await evaluate("caches.open(" + JSON.stringify("codaro-shell-v3:" + appBase.pathname) + ").then(cache=>cache.put(" + JSON.stringify(machineModuleUrl) + ",new Response(\"throw new Error('stale cached runtime used')\",{headers:{'Content-Type':'text/javascript'}}))).then(()=>true)");
         await act({ kind: "navigate", url });
         await waitFor("crossOriginIsolated === true");
     }
@@ -71,7 +78,7 @@ try {
     await observe();
     if (process.argv.includes("--machine-contract")) {
         report.machineContract = await evaluate(`(async () => {
-            const { boot } = await import('/vendor/pyprocMachine/index.js');
+            const { boot } = await import(${JSON.stringify(machineModuleUrl)});
             const machine = await boot();
             try {
                 await machine.run.python("value = 1\\nwith open('state.txt', 'w') as stream:\\n    stream.write('before')");
@@ -123,21 +130,34 @@ try {
     await waitFor("Boolean(document.querySelector(" + JSON.stringify(tools + " .text-destructive") + "))");
     await screenshot("syntaxDiagnostic");
     assert.equal((await evaluate("window.codaroGui.invoke('notebook.setCellSource'," + JSON.stringify({ cellId: cell.id, source: "amount = 3\nprint(amount)" }) + ")")).ok, true);
-    if (process.argv.includes("--repair-fixture")) {
+    await waitFor("!document.querySelector(" + JSON.stringify(tools + " .text-destructive") + ")");
+    if (checkRepair) {
         const source = "a = 1\nprint(a)\nb = 2\nprint(b)";
         const setSource = async (source) => {
             assert.equal((await evaluate("window.codaroGui.invoke('notebook.setCellSource'," + JSON.stringify({ cellId: cell.id, source }) + ")")).ok, true);
         };
         await setSource(source);
+        await act({ kind: "click", selector: "[data-execution-history] summary" });
+        await act({ kind: "click", selector: '[data-machine-action="run"]' });
+        await waitFor("document.querySelector('[data-execution-history]').dataset.machinePhase==='idle'");
+        assert.match(await evaluate("document.querySelector('[data-execution-history]').textContent"), /1번 셀: 실행 완료/);
         const repair = `[data-inline-repair=${JSON.stringify(cell.id)}]`;
         await act({ kind: "click", selector: repair + " summary" });
-        await act({ kind: "fill", selector: '[aria-label="코드 수정 요청"]', value: "두 값을 바꿔줘" });
+        await act({ kind: "fill", selector: '[aria-label="코드 수정 요청"]', value: "a = 1을 a = 3으로, b = 2를 b = 4로 바꿔줘. 다른 줄과 줄바꿈은 그대로 유지해줘." });
         const requestRepair = async () => {
             await act({ kind: "click", selector: repair + " > div:first-of-type button" });
             await waitFor("document.querySelectorAll(" + JSON.stringify(repair + " input[type=checkbox]") + ").length===2");
         };
         await requestRepair();
         await screenshot("repairProposal");
+        await act({ kind: "click", selector: repair + " > div:last-child > button:last-of-type" });
+        await waitFor("document.querySelector(" + JSON.stringify(repair + " [role=status]") + ")?.textContent.startsWith('수정안 실행 완료')");
+        assert.match(await evaluate("document.querySelector(" + JSON.stringify(repair + " [role=status]") + ").textContent"), /3\s+4/);
+        assert.equal((await evaluate("window.codaroGui.getState().notebook.cells")).find((candidate) => candidate.id === cell.id).source, source);
+        await act({ kind: "fill", selector: '[aria-label="복제 환경 검사 코드"]', value: "assert a == 1 and b == 2\nprint('repair parent preserved')" });
+        await act({ kind: "click", selector: '[data-machine-action="verify"]' });
+        await waitFor("document.querySelector('[data-execution-history] pre[role=status]')?.textContent.includes('repair parent preserved')");
+        await screenshot("repairExecutionVerified");
         await act({ kind: "click", selector: repair + " > div:last-child > div:nth-of-type(2) input[type=checkbox]" });
         await act({ kind: "click", selector: repair + " > div:last-child > button:first-of-type" });
         await waitFor("window.codaroGui.getState().notebook.cells.find(cell=>cell.id===" + JSON.stringify(cell.id) + ").source==='a = 3\\nprint(a)\\nb = 2\\nprint(b)'");
@@ -151,7 +171,7 @@ try {
         assert.match(await evaluate("document.querySelector(" + JSON.stringify(repair + " [role=status]") + ").textContent"), /변경|버전/);
         await screenshot("repairConflictRejected");
     }
-    if (!process.argv.includes("--analysis-only") && !process.argv.includes("--repair-fixture")) {
+    if (!process.argv.includes("--analysis-only") && !checkRepair) {
     await act({ kind: "click", selector: "[data-execution-history] summary" });
     await act({ kind: "click", selector: '[data-machine-action="run"]' });
     await waitFor("document.querySelector('[data-execution-history]').dataset.machinePhase==='idle'");

@@ -36,7 +36,7 @@ export function InlineRepair({ blockId, viewRef }: { blockId: string; viewRef: R
             <Input aria-label="코드 수정 요청" value={instruction} maxLength={4000} onChange={(event) => setInstruction(event.target.value)} placeholder="어떻게 바꿀까요?" onKeyDown={(event) => { if (event.key === "Enter" && !event.nativeEvent.isComposing && instruction.trim() && !busy) void request(); }} />
             <Button size="sm" disabled={busy || !instruction.trim()} onClick={() => void request()}>{busy ? "요청 중" : "수정 제안"}</Button>
         </div>
-        {message ? <p className="py-2 text-muted-foreground" role="status">{message}</p> : null}
+        {message ? <p className="whitespace-pre-wrap py-2 text-muted-foreground" role="status">{message}</p> : null}
         {proposal ? <div className="space-y-2 py-2">
             <p>{proposal.explanation}</p>
             {proposal.changes.map((change, index) => <div key={index} className="rounded-md border border-border p-2">

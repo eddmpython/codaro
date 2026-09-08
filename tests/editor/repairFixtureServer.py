@@ -34,7 +34,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--workspace", required=True, type=Path)
     parser.add_argument("--port", required=True, type=int)
+    parser.add_argument("--live-provider", dest="liveProvider", action="store_true")
     args = parser.parse_args()
     args.workspace.mkdir(parents=True, exist_ok=True)
-    aiRouter.buildEditorRepairPayload = repairPayload
+    if not args.liveProvider:
+        aiRouter.buildEditorRepairPayload = repairPayload
     uvicorn.run(createServerApp(workspaceRoot=args.workspace), host="127.0.0.1", port=args.port, log_level="warning")
