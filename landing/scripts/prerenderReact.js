@@ -358,7 +358,6 @@ function lessonInitialDocumentHtml(lesson) {
   const points = lesson.intro?.points?.length
     ? lesson.intro.points.slice(0, 4)
     : lesson.intro?.benefits?.slice(0, 4) || [];
-  const snippet = firstSection?.snippet || firstSection?.exercise?.starterCode || "";
   const prompt = firstSection?.exercise?.prompt || firstSection?.goal || "";
   return [
     `<main class="lessonInitialDocument" data-initial-lesson-ref="${escapeHtml(`${lesson.track}/${lesson.id}`)}" data-public-lesson="${escapeHtml(`${lesson.track}/${lesson.id}`)}">`,
@@ -382,7 +381,6 @@ function lessonInitialDocumentHtml(lesson) {
     `<div class="lessonInitialExercise">`,
     `<span>직접 해보기</span>`,
     prompt ? `<strong>${escapeHtml(prompt)}</strong>` : "",
-    snippet ? `<pre><code>${escapeHtml(snippet)}</code></pre>` : "",
     `<small>편집기를 준비하고 있습니다.</small>`,
     `</div>`,
     `</section>`,
@@ -412,7 +410,6 @@ function lessonInitialDocumentCss() {
     .lessonInitialBody p,.lessonInitialBody li{font-size:16px;line-height:26px}
     .lessonInitialExercise{display:grid;align-content:start;gap:10px;padding:18px;border:1px solid ${themed("--color-border-emphasized")};background:${themed("--color-background-card")}}
     .lessonInitialExercise>span{color:${themed("--color-text-accent")};font-size:12px;font-weight:700}
-    .lessonInitialExercise pre{overflow:auto;margin:2px 0 0;padding:16px;background:${themed("--color-background-muted")};font-size:14px;line-height:22px}
     .lessonInitialExercise small{color:${themed("--color-text-secondary")};font-size:12px;line-height:18px}
     @media(max-width:700px){.lessonInitialDocument{padding-block:32px;padding-inline:${frameInsetNarrow}}.lessonInitialHeader h1{font-size:26px;line-height:34px}.lessonInitialBody{grid-template-columns:1fr;gap:24px;margin-top:28px}}
   `;

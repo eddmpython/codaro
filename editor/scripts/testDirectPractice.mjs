@@ -46,4 +46,15 @@ for (const sample of samples) {
   assert.ok(!html.includes("시작 코드"));
 }
 await import("./testLearningMaterialRepair.mjs");
+const initialDocument = component("../../landing/scripts/prerenderReact.js", "lessonInitialDocumentHtml", {
+  escapeHtml: (value) => String(value),
+});
+const initialHtml = initialDocument({
+  track: "test", id: "practice", title: "직접 작성", intro: {},
+  sections: [{ title: "실습", snippet: seededCode, exercise: { prompt, starterCode: seededCode } }],
+});
+assert.ok(initialHtml.includes(prompt));
+assert.ok(initialHtml.includes("직접 해보기"));
+assert.ok(!initialHtml.includes("DO_NOT_SHOW_STARTER_OR_ANSWER"));
+assert.ok(!/<(?:pre|code|textarea)\b/.test(initialHtml));
 console.log("공개 레슨과 편집기 직접 해보기는 코드 없이 지시문만 렌더링한다.");
