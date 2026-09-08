@@ -553,6 +553,11 @@ def runProductJourney(
         masterySource, applicationSource = lessonSolutions()
         mastery = selectSection(page, "CSV 두 종류를 JSON 보고서로 변환하기")
         if novice:
+            noviceEditor = mastery.locator("[data-learning-exercise-input='editor'] .cm-content").first
+            noviceEditor.wait_for(state="visible", timeout=30_000)
+            if noviceEditor.inner_text().strip():
+                raise AssertionError("Direct practice must start with an empty editor")
+            noviceEditor.fill("pass")
             initial = clickAndAwaitLocalCheck(
                 page,
                 lambda: mastery.locator(
@@ -560,7 +565,7 @@ def runProductJourney(
                 ).click(),
             )
             if initial.get("passed") is not False:
-                raise AssertionError("Novice starter unexpectedly passed the strong check")
+                raise AssertionError("Incomplete novice input unexpectedly passed the strong check")
             mastery.locator("[data-learning-check-result]").wait_for(state="visible", timeout=60_000)
             blocked = mastery.locator("[data-learning-promotion='blocked']")
             if blocked.count():

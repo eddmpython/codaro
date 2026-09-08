@@ -51,7 +51,7 @@ def testLocalPublicationBuildsServesAndCreatesSemanticArtifact(tmp_path: Path) -
             json={"blocks": runtime.expectedBlocks, "notebookName": "local"},
         )
         assert response.status_code == 200, response.text
-        assert "재고 자동화 완료: 4개 품목, 부족 2개" in response.text
+        assert "재고 자동화 완료: 4개 품목, 부족 2개" in response.text, response.json()
         artifact = runtime._sessionPaths[sessionId] / "artifacts/inventory-report.json"
         assert json.loads(artifact.read_text(encoding="utf-8")) == {
             "itemCount": 4,

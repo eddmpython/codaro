@@ -1300,7 +1300,7 @@ def apply_text_only_zoom_fixture(page: Page, *, factor: float) -> None:
           );
           const excluded = new Set(["SCRIPT", "STYLE", "SVG", "PATH"]);
           const candidates = [...document.body.querySelectorAll("*")];
-          let count = 0;
+          const measurements = [];
           for (const element of candidates) {
             if (!(element instanceof HTMLElement) || excluded.has(element.tagName)) continue;
             const hasDirectText = [...element.childNodes].some(
@@ -1317,6 +1317,9 @@ def apply_text_only_zoom_fixture(page: Page, *, factor: float) -> None:
               || style.clipPath === "inset(50%)") continue;
             const baselineFontSize = Number.parseFloat(style.fontSize);
             if (!Number.isFinite(baselineFontSize) || baselineFontSize <= 0) continue;
+            measurements.push({ element, baselineFontSize, baselineLineHeight: Number.parseFloat(style.lineHeight) });
+          }
+          for (const { element, baselineFontSize, baselineLineHeight } of measurements) {
             element.dataset.codaroTextZoomBaselineFontSize = String(baselineFontSize);
             element.dataset.codaroTextZoomOriginalFontSize = element.style.getPropertyValue("font-size");
             element.dataset.codaroTextZoomOriginalFontSizePriority = element.style.getPropertyPriority("font-size");
@@ -1327,7 +1330,6 @@ def apply_text_only_zoom_fixture(page: Page, *, factor: float) -> None:
               `${baselineFontSize * factor}px`,
               "important",
             );
-            const baselineLineHeight = Number.parseFloat(style.lineHeight);
             if (Number.isFinite(baselineLineHeight) && baselineLineHeight > 0) {
               element.style.setProperty(
                 "line-height",
@@ -1335,9 +1337,8 @@ def apply_text_only_zoom_fixture(page: Page, *, factor: float) -> None:
                 "important",
               );
             }
-            count += 1;
           }
-          return count;
+          return measurements.length;
         }""",
         factor,
     )
@@ -2441,6 +2442,7 @@ def notebook_accessibility_tree_state(
     editors = [
         node for node in positioned_nodes
         if node["role"] in {"textbox", "TextField"}
+        or (node["role"] == "region" and node["name"].startswith("Markdown"))
     ]
     cell_actions = [
         node for node in positioned_nodes
@@ -2534,7 +2536,7 @@ def notebook_accessible_name_state(page: Page) -> dict[str, Any]:
             const setSize = cell.getAttribute('aria-setsize');
             const positionLabel = `셀 ${position} / ${setSize}`;
             const content = cell.querySelector(
-              "[data-notebook-input='code'] .cm-content, .notebookMarkdownEditor"
+              "[data-notebook-input='code'] .cm-content, .notebookMarkdownEditor, [data-notebook-markdown-preview='true']"
             );
             const menu = cell.querySelector('.notebookCellMoreTrigger');
             const run = cell.querySelector('.notebookCellRunButton');
@@ -3013,14 +3015,15 @@ def verify_web_to_local_roundtrip(
         state="visible",
         timeout=20_000,
     )
-    learning_data.get_by_role("button", name="자동화로 옮기기").click()
-    learning_data.get_by_text("작업 메뉴에 추가됨", exact=True).wait_for(timeout=20_000)
+    learning_data.get_by_text("강한 결과물 검증 필요", exact=True).wait_for(timeout=20_000)
+    if learning_data.get_by_role("button", name="내 기능으로 사용", exact=True).count():
+        raise VerificationError("Imported source without artifact proof offered promotion")
     task_snapshot = page.evaluate(
         """async (draftId) => {
           const response = await fetch("/api/tasks");
           if (!response.ok) throw new Error(`task list failed: ${response.status}`);
           const payload = await response.json();
-          const task = (payload.tasks || []).find((item) => item?.inputs?.sourceDraftId === draftId);
+          const task = (payload.tasks || []).find((item) => (item?.provenance?.draftId === draftId || item?.inputs?.sourceDraftId === draftId));
           return task ? {
             documentPath: task.documentPath ?? null,
             enabled: task.enabled,
@@ -3082,12 +3085,9 @@ def verify_web_to_local_roundtrip(
         "webRuntimeIdentity": imported.get("runtimeTier") == "web",
         "evidenceImported": imported.get("evidenceEvents") == 1 and imported.get("evidenceConflicts") == 0,
         "draftReload": bool(snapshot["draftRestoredAfterReload"]),
-        "automationDraftAdopted": isinstance(task_snapshot, dict)
-        and task_snapshot.get("sourceDraftId") == draft_id,
-        "automationDisabled": isinstance(task_snapshot, dict)
-        and task_snapshot.get("enabled") is False
-        and task_snapshot.get("schedule") is None,
-        "automationWorkspaceBoundary": task_document_inside_workspace,
+        "unverifiedAutomationNotPromoted": task_snapshot is None,
+        "automationDraftPreserved": bool(reexport_materialized.automationDrafts)
+        and reexport_materialized.automationDrafts[0].draftId == draft_id,
         "portableReexport": snapshot["portablePayload"]
         and snapshot["reexportRuntimeTier"] == "web",
     }

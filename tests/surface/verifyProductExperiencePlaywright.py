@@ -5923,6 +5923,9 @@ def runBrowserMatrix(
                         exerciseIndex = 0 if assessmentMode else int(case.get("exerciseIndex", 0))
                         runButton = exerciseParts.locator('button[aria-label$=" 셀 실행"]').nth(exerciseIndex)
                         codeEditor = exerciseParts.locator('.cm-content').nth(exerciseIndex)
+                        if codeEditor.inner_text().strip():
+                            raise AssertionError('Direct practice must start with an empty editor')
+                        codeEditor.fill('pass')
                         if "day01" in page.url:
                             canonicalRunButton = page.get_by_role(
                                 "button",

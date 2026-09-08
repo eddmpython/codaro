@@ -48,4 +48,4 @@ def testMachinePublicationGeneratedContractMatchesCurrentSources() -> None:
 
 
 def _sourceHash(path: Path) -> str:
-    return "sha256-" + hashlib.sha256(path.read_bytes()).hexdigest()
+    return "sha256-" + hashlib.sha256(path.read_text(encoding="utf-8").encode("utf-8")).hexdigest()
