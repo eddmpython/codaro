@@ -52,9 +52,12 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "httpx>=0.28.1",
+    "openpyxl>=3.1.5",
+    "pdfplumber>=0.11.10",
     "pillow>=12.3.0",
     "playwright==1.61.0",
     "pytest>=9.0.2",
+    "reportlab>=5.0.1",
     "watchdog>=6.0.0",
 ]
 curriculum = [
