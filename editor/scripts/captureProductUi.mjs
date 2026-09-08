@@ -175,7 +175,7 @@ try {
   assert.equal(observed.missingImageAlt, 0);
   assert.ok(observed.documentWidth <= observed.viewportWidth, "문서가 화면 너비를 벗어납니다");
   const observation = (await client.observe(session, { expectedRisk: "read", includeConsole: true,
-    includeNetwork: true, maxNodes: 5 })).output;
+    includeNetwork: true, maxEvents: 200, maxNodes: 5 })).output;
   caseReport.observation = observation;
   const pageObservation = observation.result ?? observation;
   assert.ok(Array.isArray(pageObservation.console), "브라우저 console 관측 결과가 없습니다");
