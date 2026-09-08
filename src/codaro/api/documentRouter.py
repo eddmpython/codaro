@@ -16,6 +16,7 @@ from ..document.blockOperations import (
     updateBlock,
 )
 from ..document.models import CodaroDocument, ExportRequest, ExportResponse, LoadRequest, SaveRequest
+from ..document.codeIntelligence import CodeIntelligenceError, analyzeCode
 from ..document.service import createEmptyDocument, exportDocument, loadDocument, saveDocument
 from ..kernel.documentExecution import executeDocumentCodeBlock
 from ..serverLog import formatLogFields, getServerLogger
@@ -40,6 +41,13 @@ def createDocumentRouter(state: ServerState) -> APIRouter:
     logger = getServerLogger()
     saveLock = Lock()
     latestSaveByDocument: dict[tuple[str, str], tuple[int, Path]] = {}
+
+    @router.post("/api/document/analyze")
+    def apiAnalyzeCode(body: dict[str, Any]) -> dict[str, Any]:
+        try:
+            return analyzeCode(body)
+        except CodeIntelligenceError as exc:
+            fail(400, "code_analysis_invalid", str(exc))
 
     def safeResolvePath(rawPath: str) -> Path:
         try:

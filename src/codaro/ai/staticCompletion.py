@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 
-import jedi
+from ..document.codeIntelligence import analyzeCode, utf16Column
 
 logger = logging.getLogger(__name__)
 
@@ -24,17 +24,19 @@ def staticCompletions(prefix: str, suffix: str = "", *, limit: int = 8) -> list[
     source = prefix + suffix
     lines = prefix.split("\n")
     line = len(lines)
-    column = len(lines[-1])
     try:
-        script = jedi.Script(code=source)
-        completions = script.complete(line, column)
+        completions = analyzeCode({
+            "files": [{"path": "notebook.py", "source": source}],
+            "path": "notebook.py", "version": "completion", "operation": "complete",
+            "line": line, "character": utf16Column(lines[-1], len(lines[-1])),
+        })["items"]
     except (ValueError, RecursionError) as exc:
         logger.debug("static completion skipped: %s", exc)
         return []
 
     results: list[str] = []
     for completion in completions:
-        suffixText = completion.complete
+        suffixText = completion["insertText"]
         if not suffixText or suffixText in results:
             continue
         results.append(suffixText)

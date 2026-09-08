@@ -786,6 +786,7 @@ function App() {
               onCellAsk={askCellAssistant}
               onConfirmTaskSafety={confirmTaskSafety}
               onDraftChange={curriculumRuntimeActive ? updateCurriculumDraft : updateDraft}
+              onDraftUpdates={applyDraftUpdates}
               onDeleteCell={(blockId) => {
                 cleanupCellDefinitions(blockId);
                 deleteNotebookCell(blockId);

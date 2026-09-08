@@ -50,6 +50,7 @@ export type NotebookSurfaceProps = {
   onConnectAi: () => void;
   onDeleteCell: (blockId: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
+  onDraftUpdates: (updates: Record<string, string>) => void;
   onDuplicateCell: (blockId: string) => void;
   onMoveCell: (blockId: string, direction: "up" | "down") => void;
   onNewChat: () => void;
@@ -83,6 +84,7 @@ export function NotebookSurface(props: NotebookSurfaceProps) {
         staleBlockIds={props.staleBlockIds}
         onAddCell={props.onAddCell}
         onDraftChange={props.onDraftChange}
+        onDraftUpdates={props.onDraftUpdates}
         onAcceptPendingBlocks={props.onAcceptPendingBlocks}
         onCellAsk={props.onCellAsk}
         onDeleteCell={props.onDeleteCell}

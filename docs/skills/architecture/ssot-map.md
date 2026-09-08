@@ -18,6 +18,7 @@ Codaro에서 기준 파일은 아래 순서로 본다. 같은 의미의 규칙�
 | 기준 | 파일 | 역할 |
 |---|---|---|
 | repository structure | `docs/skills/architecture/repository-structure.md` | 루트 tree, 로컬/generated root, 새 파일 placement 규칙 |
+| Python 편집기 분석·수정 | `docs/skills/architecture/editor-intelligence.md`, `src/codaro/document/codeIntelligence.py` | 공유 분석과 wire type, 버전 변경 거부, 부분 적용과 실행 상태 검증 경계 |
 | cross-surface product contracts | `contracts/`, `docs/skills/ops/tools/genProductContracts.py` | Python·TypeScript·Rust가 공유하는 wire schema source, artifact owner, surface generated type freshness |
 | architecture layer contract | `docs/skills/architecture/overview.md`, `tests/architecture/testArchitectureLayerContract.py` | 현재 폴더를 `core → engine → domain → transport → entry`로 매핑하고 import 방향을 검사 |
 | dogfood alpha | `docs/skills/ops/product/dogfood-alpha.md` | 첫 사용자 provider 연결, 질문, 학습 생성, 셀 실행, 실패 복구 기준 |

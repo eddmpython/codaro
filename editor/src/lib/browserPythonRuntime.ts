@@ -7,6 +7,7 @@
 // scheduleBrowserPythonRuntimeWarm()으로 같은 싱글턴을 미리 올려 첫 셀 실행 지연을 줄인다.
 // 단일 boot 경로는 SharedArrayBuffer/COOP-COEP가 필요 없어 정적 호스팅에서도 돈다.
 import analysisSource from "../../../src/codaro/document/analysis.py?raw";
+import { loadPythonAssets } from "./pythonAssets";
 import appRuntimeSource from "../../../src/codaro/appRuntime.py?raw";
 import figureCaptureSource from "../../../src/codaro/runtime/figureCapture.py?raw";
 import reactivePlanSource from "../../../src/codaro/kernel/reactivePlan.py?raw";
@@ -61,11 +62,6 @@ type PyProcAssetIntegrity = {
   files?: { path: string; url: string; integrity: string; roles?: string[] }[];
 };
 
-type PyodideAssetIntegrity = {
-  packageRoot?: string;
-  files?: { path: string; url: string; integrity: string; roles?: string[] }[];
-};
-
 type PyProcModule = {
   bootRuntime(opts: {
     stdout?: (line: string) => void;
@@ -79,7 +75,6 @@ type PyProcModule = {
 
 let runtimePromise: Promise<PyRuntime> | null = null;
 let assetIntegrityPromise: Promise<PyProcAssetIntegrity | null> | null = null;
-let pyodideIntegrityPromise: Promise<PyodideAssetIntegrity> | null = null;
 let browserExecutionQueue: Promise<void> = Promise.resolve();
 const stdoutLines: string[] = [];
 const stderrLines: string[] = [];
@@ -122,20 +117,6 @@ async function loadAssetIntegrity(): Promise<PyProcAssetIntegrity | null> {
   return assetIntegrityPromise;
 }
 
-async function loadPyodideIntegrity(): Promise<PyodideAssetIntegrity> {
-  if (!pyodideIntegrityPromise) {
-    const url = staticPublicationManifestUrl()
-      ? publicationAssetUrl("pyodide-assets.json").href
-      : new URL("pyodide-assets.json", new URL(import.meta.env.BASE_URL || "/", window.location.origin)).href;
-    pyodideIntegrityPromise = fetch(url, { cache: "no-store", credentials: "same-origin" })
-      .then(async (response) => {
-        if (!response.ok) throw new Error(`pyodide asset manifest unavailable: ${response.status}`);
-        return response.json() as Promise<PyodideAssetIntegrity>;
-      });
-  }
-  return pyodideIntegrityPromise;
-}
-
 function resolvedAssetUrl(value: string): string {
   if (staticPublicationManifestUrl()) return publicationAssetUrl(value.replace(/^\/+/, "")).href;
   return new URL(value, window.location.href).href;
@@ -146,27 +127,15 @@ async function ensureRuntime(): Promise<PyRuntime> {
     runtimePromise = import("pyproc/runtime")
       .then(async (module) => {
         const { bootRuntime } = module as unknown as PyProcModule;
-        const [assetIntegrity, pyodideIntegrity] = await Promise.all([
+        const [assetIntegrity, pythonAssets] = await Promise.all([
           loadAssetIntegrity(),
-          loadPyodideIntegrity(),
+          loadPythonAssets(staticPublicationManifestUrl() ? publicationAssetUrl("pyodide-assets.json").href : new URL("pyodide-assets.json", new URL(import.meta.env.BASE_URL || "/", window.location.origin)).href, resolvedAssetUrl),
         ]);
-        const pyodideFiles = pyodideIntegrity.files ?? [];
-        const pythonIndexUrl = resolvedAssetUrl(pyodideIntegrity.packageRoot ?? "vendor/pyodide/");
-        const engineScript = pyodideFiles.find((file) => file.roles?.includes("engineScript"));
-        const coreFiles: Record<string, string> = {};
-        for (const file of pyodideFiles) {
-          const url = resolvedAssetUrl(file.url);
-          coreFiles[file.path] = file.integrity;
-          coreFiles[url] = file.integrity;
-          coreFiles[new URL(url).pathname] = file.integrity;
-        }
         const runtime = await bootRuntime({
           stdout: (line: string) => stdoutLines.push(line),
           stderr: (line: string) => stderrLines.push(line),
           ...(assetIntegrity ? { assetIntegrity } : {}),
-          coreIntegrity: { files: coreFiles, required: true },
-          ...(engineScript ? { engineScriptIntegrity: engineScript.integrity } : {}),
-          indexURL: pythonIndexUrl.endsWith("/") ? pythonIndexUrl : `${pythonIndexUrl}/`,
+          ...pythonAssets,
         });
         // matplotlib을 headless로 고정한다. import보다 먼저 정해져야 하므로 부팅 직후에 둔다.
         // 로컬 워커도 같은 값을 쓴다(localWorker.py 상단).

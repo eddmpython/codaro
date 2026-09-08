@@ -11,6 +11,11 @@ import {
 import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import { python } from "@codemirror/lang-python";
 import { codeIndentation } from "@/lib/codeIndentation";
+import { documentEdit, NotebookIntelligenceProvider, useNotebookIntelligence } from "./editorIntelligenceContext";
+import { CodeIntelligenceTools } from "./codeIntelligenceTools";
+import { codeIntelligenceExtension } from "./codeIntelligenceExtension";
+import { ExecutionHistory } from "./executionHistory";
+import { analyzeEditorCode, type AnalysisOperation } from "@/lib/editorIntelligence/service";
 import { bracketMatching, HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import {
   Compartment,
@@ -251,6 +256,7 @@ export function NotebookPanel({
   onCellAsk,
   onDeleteCell,
   onDraftChange,
+  onDraftUpdates,
   onDuplicateCell,
   onMoveCell,
   onRejectPendingBlocks,
@@ -278,6 +284,7 @@ export function NotebookPanel({
   onCellAsk: (action: CellAiAction, block: BlockConfig, question?: string) => void;
   onDeleteCell: (blockId: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
+  onDraftUpdates: (updates: Record<string, string>) => void;
   onDuplicateCell: (blockId: string) => void;
   onMoveCell: (blockId: string, direction: "up" | "down") => void;
   onRejectPendingBlocks: () => void;
@@ -302,6 +309,7 @@ export function NotebookPanel({
     : `${document.blocks.length}개 셀`;
 
   return (
+    <NotebookIntelligenceProvider key={document.id} document={document} drafts={drafts} results={results} onDraftUpdates={onDraftUpdates} onSelectBlock={onSelectBlock}>
     <section
       className="notebookStudio"
       data-notebook-studio="true"
@@ -342,6 +350,7 @@ export function NotebookPanel({
               : " · 이 문서의 기능 블록 계약으로 판정했습니다."}
           </div>
         ) : null}
+        <ExecutionHistory />
       </div>
 
       <ScrollArea className="notebookViewport">
@@ -420,6 +429,7 @@ export function NotebookPanel({
         onWidthChange={setWidth}
       />
     </section>
+    </NotebookIntelligenceProvider>
   );
 }
 
@@ -579,6 +589,8 @@ const aiCommentGutter = gutter({
 });
 
 export function CodeCellEditor({
+  intelligenceBlockId,
+  mode = "editor",
   ariaLabel = "코드 편집기",
   autoFocus = false,
   density = "comfortable",
@@ -594,6 +606,8 @@ export function CodeCellEditor({
   aiComments,
   onAiCommentClick,
 }: {
+  intelligenceBlockId?: string;
+  mode?: "editor" | "learning";
   ariaLabel?: string;
   autoFocus?: boolean;
   density?: "comfortable" | "content-fit";
@@ -618,6 +632,10 @@ export function CodeCellEditor({
   const onRunRef = useRef(onRun);
   const onRunAndAdvanceRef = useRef(onRunAndAdvance);
   const completionContextRef = useRef(completionContext);
+  const intelligence = useNotebookIntelligence();
+  const intelligenceRef = useRef(intelligence);
+  intelligenceRef.current = intelligence;
+  const [intelligenceCommand, setIntelligenceCommand] = useState<{ action: AnalysisOperation; sequence: number } | null>(null);
   const compositionBoundaryRef = useRef({
     active: false,
     endedAt: Number.NEGATIVE_INFINITY,
@@ -633,6 +651,27 @@ export function CodeCellEditor({
   }, [onChange, onFocus, onBoundaryNavigate, onRun, onRunAndAdvance, completionContext]);
 
   const aiCompletionSource = async (context: CompletionContext): Promise<CompletionResult | null> => {
+    if (mode === "learning") return null;
+    if (intelligenceRef.current && intelligenceBlockId) {
+        try {
+            const snapshot = intelligenceRef.current.snapshot();
+            const result = await analyzeEditorCode(snapshot, intelligenceBlockId, context.pos, "complete");
+            if (intelligenceRef.current.snapshot().version !== snapshot.version || context.aborted) return null;
+            const word = context.matchBefore(/[\w\p{L}]+/u);
+            return {
+                from: word?.from ?? context.pos,
+                options: (result.items ?? []).map((item) => ({
+                    label: item.label ?? "",
+                    apply: (word?.text ?? "") + (item.insertText ?? ""),
+                    detail: item.detail,
+                    type: item.kind === "function" ? "function" : item.kind === "class" ? "class" : "variable",
+                })),
+            };
+        } catch (error) {
+            console.warn("Python 자동완성을 가져오지 못했습니다.", error);
+            return null;
+        }
+    }
     const word = context.matchBefore(/[\w.]*/);
     if (!word) return null;
     if (word.from === word.to && !context.explicit) return null;
@@ -667,6 +706,7 @@ export function CodeCellEditor({
         closeBrackets(),
         python(),
         codeIndentation,
+        intelligenceBlockId && mode !== "learning" ? codeIntelligenceExtension(intelligenceBlockId, () => intelligenceRef.current) : [],
         syntaxHighlighting(codaroSyntaxHighlightStyle, { fallback: true }),
         drawSelection({ cursorBlinkRate: 1000, drawRangeCursor: true }),
         highlightActiveLine(),
@@ -719,6 +759,18 @@ export function CodeCellEditor({
         aiCommentLineDecorationField,
         aiCommentGutter,
         Prec.high(keymap.of([
+          { key: "Mod-z", run: () => intelligenceRef.current?.undo() ?? false },
+          ...([
+              ["F12", "definition"], ["Shift-F12", "references"],
+              ["F2", "rename"], ["Mod-Shift-Space", "signature"],
+          ] as const).map(([key, action]) => ({
+              key,
+              run: () => {
+                  if (!intelligenceRef.current || !intelligenceBlockId || mode === "learning") return false;
+                  setIntelligenceCommand((previous) => ({ action, sequence: (previous?.sequence ?? 0) + 1 }));
+                  return true;
+              },
+          })),
           {
             key: "ArrowUp",
             run: (view) => {
@@ -785,7 +837,7 @@ export function CodeCellEditor({
         codeCellEditorTheme,
         density === "content-fit" ? Prec.highest(contentFitCodeCellEditorTheme) : [],
         EditorView.updateListener.of((update) => {
-          if (update.docChanged) {
+          if (update.docChanged && !update.transactions.some((transaction) => transaction.annotation(documentEdit))) {
             onChangeRef.current(update.state.doc.toString());
           }
           if (update.focusChanged && update.view.hasFocus) {
@@ -799,8 +851,10 @@ export function CodeCellEditor({
       state,
       parent: hostRef.current,
     });
+    if (intelligenceBlockId) intelligenceRef.current?.register(intelligenceBlockId, viewRef.current);
 
     return () => {
+      if (intelligenceBlockId) intelligenceRef.current?.register(intelligenceBlockId, null);
       viewRef.current?.destroy();
       viewRef.current = null;
     };
@@ -874,11 +928,14 @@ export function CodeCellEditor({
   }, [aiComments]);
 
   return (
+    <>
     <div
       className="bg-transparent text-code-foreground"
       data-code-editor-density={density}
       ref={hostRef}
     />
+    {intelligenceBlockId ? <CodeIntelligenceTools blockId={intelligenceBlockId} viewRef={viewRef} selected={autoFocus} command={intelligenceCommand} /> : null}
+    </>
   );
 }
 
@@ -1111,6 +1168,7 @@ function DocumentBlock({
         >
           <CodeCellEditor
             ariaLabel={`${cellAriaLabel} 코드 편집기`}
+            intelligenceBlockId={block.id}
             autoFocus={autoFocus}
             placeholderText="Python 코드를 입력하세요"
             value={draft}

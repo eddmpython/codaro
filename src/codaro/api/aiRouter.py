@@ -5,6 +5,7 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel
+from ..ai.editorRepair import EditorRepairError, buildEditorRepairPayload
 
 from ..ai.chatFlow import (
     CHAT_FLOW_ERRORS,
@@ -61,6 +62,15 @@ def _providerUnavailable(exc: Exception) -> HTTPException:
 
 def createAiRouter(state: Any) -> APIRouter:
     router = APIRouter()
+
+    @router.post("/api/ai/editor-repair")
+    def apiEditorRepair(body: dict[str, Any]):
+        try:
+            return buildEditorRepairPayload(body)
+        except EditorRepairError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        except CHAT_FLOW_ERRORS as exc:
+            raise _providerUnavailable(exc) from exc
 
     @router.get("/api/ai/providers")
     def apiAiProviders():

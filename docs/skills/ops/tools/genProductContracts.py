@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 import sys
 from typing import Any
+from typing import Literal, NotRequired, Union, get_args, get_origin, get_type_hints, is_typeddict
+from types import UnionType
 
 import yaml
 
@@ -60,6 +62,36 @@ ROLE_VALUES = ("source", "generated", "packaged", "evidence")
 
 class ContractGenerationError(ValueError):
     pass
+
+
+def editorContractTypeScriptSource() -> str:
+    from codaro.document.codeIntelligence import EDITOR_CONTRACT_TYPES
+
+    def typeName(value: Any) -> str:
+        origin, arguments = get_origin(value), get_args(value)
+        if origin is NotRequired:
+            return typeName(arguments[0])
+        if origin is Literal:
+            return " | ".join(json.dumps(item, ensure_ascii=False) for item in arguments)
+        if origin in (Union, UnionType):
+            return " | ".join(typeName(item) for item in arguments)
+        if origin is list:
+            return f"Array<{typeName(arguments[0])}>"
+        if is_typeddict(value):
+            return value.__name__
+        return {str: "string", int: "number", float: "number", bool: "boolean", type(None): "null"}[value]
+
+    lines = ["// Source: codaro.document.codeIntelligence. Rebuild with genProductContracts.py.", ""]
+    for name, value in EDITOR_CONTRACT_TYPES.items():
+        if not is_typeddict(value):
+            lines.extend([f"export type {name} = {typeName(value)};", ""])
+            continue
+        lines.append(f"export type {name} = {{")
+        for field, fieldType in get_type_hints(value, include_extras=True).items():
+            optional = get_origin(fieldType) is NotRequired or field in value.__optional_keys__
+            lines.append(f"    {field}{'?' if optional else ''}: {typeName(fieldType)};")
+        lines.extend(["};", ""])
+    return "\n".join(lines)
 
 
 def sha256Bytes(data: bytes) -> str:
@@ -882,6 +914,7 @@ def expectedOutputs() -> dict[Path, str]:
         PYTHON_INIT_PATH: pythonInitSource(schemaHash, ownersHash),
         PACKAGED_SCHEMA_PATH: SCHEMA_PATH.read_text(encoding="utf-8"),
         TYPESCRIPT_PATH: typeScriptSource(schemaHash, ownersHash),
+        ROOT / "editor/src/lib/editorIntelligence/types.ts": editorContractTypeScriptSource(),
         PYTHON_APP_SPEC_PATH: appSpecPythonSource(appSpecHash, ownersHash),
         PYTHON_REFERENCE_PRODUCTS_PATH: referenceProductsPythonSource(referenceProductsHash, ownersHash),
         PYTHON_EXECUTABLE_UNIT_PATH: executableUnitPythonSource(executableUnitHash, ownersHash),

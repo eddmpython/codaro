@@ -76,6 +76,7 @@ type MainSurfaceProps = {
   onConfirmTaskSafety: (task: TaskDefinition) => void;
   onDeleteCell: (blockId: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
+  onDraftUpdates: (updates: Record<string, string>) => void;
   onDuplicateCell: (blockId: string) => void;
   onMoveCell: (blockId: string, direction: "up" | "down") => void;
   onNavigateCurriculumBlock: (blockId: string) => void;
@@ -193,6 +194,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
         onConnectAi={props.onConnectAi}
         onDeleteCell={props.onDeleteCell}
         onDraftChange={props.onDraftChange}
+        onDraftUpdates={props.onDraftUpdates}
         onDuplicateCell={props.onDuplicateCell}
         onMoveCell={props.onMoveCell}
         onNewChat={props.onNewChat}

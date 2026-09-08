@@ -188,6 +188,7 @@ export function CurrentLearningSurface(props: CurrentLearningSurfaceProps) {
         onPromoteLearningBlock={promoteLearningBlock}
         renderCodeCellEditor={({ ariaLabel, autoFocus = false, draft, onChange, onFocus, onRun }) => (
           <CodeCellEditor
+            mode="learning"
             ariaLabel={ariaLabel}
             autoFocus={autoFocus}
             density="content-fit"

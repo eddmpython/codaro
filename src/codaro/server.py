@@ -431,6 +431,9 @@ def createServerApp(
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        if publicationRuntime is None:
+            response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+            response.headers["Cross-Origin-Embedder-Policy"] = "credentialless"
         response.headers["Content-Security-Policy"] = (
             (
                 "default-src 'self'; base-uri 'none'; script-src 'self' 'unsafe-inline'; "

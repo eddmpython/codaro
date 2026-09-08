@@ -279,10 +279,15 @@ def supplyChainFacts() -> dict[str, Any]:
     pyprocPin = package.get("dependencies", {}).get("pyproc")
     coreIndex = installedPyprocDefaultIndex()
     browserRuntimeSource = (ROOT / "editor/src/lib/browserPythonRuntime.ts").read_text(encoding="utf-8")
+    pythonAssetsSource = (ROOT / "editor/src/lib/pythonAssets.ts").read_text(encoding="utf-8")
     return {
         "coreCacheConfigured": "coreCacheDir:" in browserRuntimeSource,
         "coreIndex": coreIndex,
-        "coreIntegrityConfigured": "coreIntegrity:" in browserRuntimeSource,
+        "coreIntegrityConfigured": (
+            "loadPythonAssets(" in browserRuntimeSource
+            and "...pythonAssets" in browserRuntimeSource
+            and "coreIntegrity:" in pythonAssetsSource
+        ),
         "manifestFileCount": len(manifest.get("files", [])),
         "manifestSha256": hashlib.sha256(manifestBytes).hexdigest(),
         "packagePin": pyprocPin,

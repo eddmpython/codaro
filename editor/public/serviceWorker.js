@@ -26,8 +26,7 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     migrateOwnedLegacyCaches()
-      .then(() => self.clients.claim())
-      .then(() => refreshWindows()),
+      .then(() => self.clients.claim()),
   );
 });
 
@@ -42,15 +41,23 @@ self.addEventListener("fetch", (event) => {
     return;
   }
   if (request.mode === "navigate" || request.headers.get("accept")?.includes("text/html")) {
-    event.respondWith(navigationNetworkFirst(request));
+    event.respondWith(navigationNetworkFirst(request).then(isolateResponse));
     return;
   }
   if (url.pathname.startsWith(scopedPath("_app/"))) {
-    event.respondWith(assetCacheFirst(request));
+    event.respondWith(assetCacheFirst(request).then(isolateResponse));
     return;
   }
-  event.respondWith(shellCacheFirst(request));
+  event.respondWith(shellCacheFirst(request).then(isolateResponse));
 });
+
+function isolateResponse(response) {
+    if (response.status === 0) return response;
+    const headers = new Headers(response.headers);
+    headers.set("Cross-Origin-Opener-Policy", "same-origin");
+    headers.set("Cross-Origin-Embedder-Policy", "credentialless");
+    return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
 
 async function shellCacheFirst(request) {
   const cached = await caches.match(request);
@@ -181,18 +188,6 @@ async function writeMigrationReceipt(receipt) {
         "Cache-Control": "no-store",
         "Content-Type": "application/json; charset=utf-8",
       },
-    }),
-  );
-}
-
-async function refreshWindows() {
-  const clients = await self.clients.matchAll({ includeUncontrolled: true, type: "window" });
-  await Promise.all(
-    clients.map((client) => {
-      if ("navigate" in client) {
-        return client.navigate(client.url).catch(() => undefined);
-      }
-      return Promise.resolve();
     }),
   );
 }

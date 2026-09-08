@@ -85,6 +85,10 @@ export default defineConfig({
     tailwindcss(),
   ],
   server: {
+    headers: {
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Cross-Origin-Embedder-Policy": "credentialless",
+    },
     fs: {
       allow: [dirname, path.resolve(dirname, "..")],
     },

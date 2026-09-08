@@ -82,7 +82,7 @@ const context = {
     clients: {
       async claim() {},
       async matchAll() {
-        return [];
+        return [{ url: "https://example.test/", navigate: () => new Promise(() => {}) }];
       },
     },
     location: { origin: "https://example.test" },
@@ -100,7 +100,13 @@ const context = {
 
 vm.runInNewContext(workerSource, context, { filename: "serviceWorker.js" });
 assert.ok(activationPromise, "service worker activate handler did not register migration work");
-await activationPromise;
+let activationTimer;
+try {
+    await Promise.race([
+        activationPromise,
+        new Promise((_, reject) => { activationTimer = setTimeout(() => reject(new Error("activation waited for a navigation that needs activation to finish")), 1000); }),
+    ]);
+} finally { clearTimeout(activationTimer); }
 
 assert.deepEqual(
   deletedCacheKeys.sort(),
