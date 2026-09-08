@@ -101,8 +101,12 @@ def main() -> int:
             failures.append(f"{label} must remain lifecycle-generated and untracked")
         if lifecycleScript not in editorScripts:
             failures.append(f"{label} producer script is missing: {lifecycleScript}")
-        if f"npm run {lifecycleScript}" not in editorScripts.get("build", ""):
-            failures.append(f"{label} is not produced by the editor build: {lifecycleScript}")
+        if f"npm run {lifecycleScript}" not in editorScripts.get("precheck", ""):
+            failures.append(f"{label} is not produced before editor checks: {lifecycleScript}")
+    if "npm run check" not in editorScripts.get("build", ""):
+        failures.append("editor build must use the prepared check lifecycle")
+    if editorScripts.get("predev") != "npm run precheck":
+        failures.append("editor dev must use the same generated-source preparation")
     exceptions = manifest.get("trackedExceptions", [])
     if not any(row.get("path") == "src/styles/generated" and row.get("reason") for row in exceptions):
         failures.append("design token generated-source exception is undocumented")

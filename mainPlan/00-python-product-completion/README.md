@@ -15,7 +15,6 @@ Codaro를 범용 편집기 복제품이 아니라 **평범한 Percent Python 파
 ## 범위
 
 1. [02 제품 여정](02-product-journey/README.md)에서 IDE, 앱, 부분 embed, publication, 자동화를 current commit의 단일 gate sequence로 증명한다.
-2. [04 Python 편집기 보강](04-editor-intelligence/README.md)에서 코드 분석·탐색, 실행 정보, 인라인 수정과 실행 검증을 연결한다.
 
 ## 제품 경계
 

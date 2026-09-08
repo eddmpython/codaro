@@ -173,6 +173,7 @@ jobs:
     timeout-minutes: 180
     env:
       CODARO_FRONTEND_BUILD_REUSE: "1"
+      CODARO_CAPTURE_RUN_DIR: ${{ runner.temp }}/codaro-capture
     steps:
       - uses: actions/checkout@v4
 

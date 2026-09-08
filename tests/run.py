@@ -403,6 +403,7 @@ GATES: dict[str, Gate] = {
         tier="fast",
         description="비파괴 build context의 wheel·sdist와 빈 환경 public import, mount, uv add, uvx, CLI, package data를 확인한다.",
         commands=(
+            command(("npm", "run", "build"), cwd="editor"),
             command((
                 "uv",
                 "run",

@@ -2894,6 +2894,7 @@ def capture_deployed_web_learning_archive(playwright: Any) -> dict[str, Any]:
         if not DEPLOYED_WEB_ARCHIVE_PATH.is_file():
             raise VerificationError("deployed Web learning archive download was not saved")
 
+        from codaro.curriculum.evidenceArchive import isLearningAttemptEvidence
         from codaro.curriculum.learningArchive import materializeLearningArchive
 
         archive = json.loads(DEPLOYED_WEB_ARCHIVE_PATH.read_text(encoding="utf-8"))
@@ -2907,9 +2908,11 @@ def capture_deployed_web_learning_archive(playwright: Any) -> dict[str, Any]:
             raise VerificationError("deployed Web archive did not preserve the edited exercise draft")
         evidence_events = materialized.evidenceArchive.get("events", [])
         if not any(
-            isinstance(event, dict)
-            and event.get("kind") == "StrongCheckVerified"
+            isLearningAttemptEvidence(event)
             and event.get("runtimeTier") == "web"
+            and event.get("strength") == "strong"
+            and event.get("passed", True) is True
+            and event.get("runStatus", "success") == "success"
             for event in evidence_events
         ):
             raise VerificationError("deployed Web archive has no stored Web strong-check evidence")
