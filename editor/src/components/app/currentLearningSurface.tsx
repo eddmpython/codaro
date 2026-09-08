@@ -2,7 +2,6 @@ import { CurriculumCellToc, CurriculumView } from "@/components/curriculum/curri
 import { CodeCellEditor } from "@/components/notebook/notebookPanel";
 import { Loader2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { CSSProperties } from "react";
 import {
   captureBrowserLearningWorkspaceAutosave,
   learningArtifactPromotionStatus,
@@ -51,7 +50,6 @@ export type CurrentLearningSurfaceProps = {
 
 export function CurrentLearningSurface(props: CurrentLearningSurfaceProps) {
   const { t } = useLocale();
-  const [tocExpanded, setTocExpanded] = useState(false);
   const lessonRef = `${props.selectedCategory}/${props.selectedContentId}`;
   const [readyLessonRef, setReadyLessonRef] = useState("");
   const lessonSurfaceRef = useRef<HTMLDivElement>(null);
@@ -145,9 +143,6 @@ export function CurrentLearningSurface(props: CurrentLearningSurfaceProps) {
 
   const curriculumDoc = props.curriculumDocument;
   const showToc = groupCurriculumSections(curriculumDoc.blocks).sections.length >= 2;
-  const tocLayoutStyle = showToc
-    ? ({ "--learning-toc-width": tocExpanded ? "18rem" : "3rem" } as CSSProperties)
-    : undefined;
   const isCustomCurriculum = props.selectedCategory === CUSTOM_CURRICULUM_CATEGORY;
   const selectedCategoryLabel =
     isCustomCurriculum
@@ -163,17 +158,15 @@ export function CurrentLearningSurface(props: CurrentLearningSurfaceProps) {
     <div
       className={cn(
         "grid h-full min-h-0 grid-cols-1",
-        showToc && "2xl:grid-cols-[minmax(0,1fr)_var(--learning-toc-width)]",
-        showToc && "2xl:transition-[grid-template-columns] 2xl:duration-150",
+        showToc && "xl:grid-cols-[minmax(0,1fr)_14rem]",
       )}
       data-learning-lesson-ready={lessonReady ? lessonRef : undefined}
-      data-learning-toc-layout={showToc ? (tocExpanded ? "expanded" : "collapsed") : "hidden"}
+      data-learning-toc-layout={showToc ? "fixed" : "hidden"}
       data-learning-lesson-ref={`${props.selectedCategory}/${props.selectedContentId}`}
       data-learning-reference-loading={props.referenceLoading ? "true" : "false"}
       data-product-surface-ready={lessonReady ? "curriculum" : undefined}
       data-product-surface-state={lessonReady ? "ready" : "content-loading"}
       ref={lessonSurfaceRef}
-      style={tocLayoutStyle}
     >
       <CurriculumView
         key={`${props.selectedCategory}/${props.selectedContentId}`}
@@ -215,9 +208,6 @@ export function CurrentLearningSurface(props: CurrentLearningSurfaceProps) {
         <CurriculumCellToc
           creditedSectionIds={creditedSectionIds}
           document={curriculumDoc}
-          expanded={tocExpanded}
-          selectedBlockId={props.selectedCurriculumBlockId}
-          onExpandedChange={setTocExpanded}
           onSelectBlock={props.onNavigateCurriculumBlock}
         />
       ) : null}

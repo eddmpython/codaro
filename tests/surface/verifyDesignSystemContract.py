@@ -382,10 +382,11 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
         failures,
     )
     require(
-        'data-learning-toc-expanded={expanded ? "true" : "false"}' in curriculumToc
-        and "hover:w-72" not in curriculumToc
-        and '--learning-toc-width' in loadingSurface,
-        "curriculum TOC must expand in layout without an overlay hover rail",
+        'data-learning-toc="fixed"' in curriculumToc
+        and 'aria-current={active ? "location" : undefined}' in curriculumToc
+        and "onMouseEnter" not in curriculumToc
+        and "tocExpanded" not in loadingSurface,
+        "curriculum TOC must keep its width and follow the reading position",
         failures,
     )
     require(

@@ -26,7 +26,7 @@ Codaro를 범용 편집기 복제품이 아니라 **평범한 Percent Python 파
 
 ## 구현 순서
 
-1. 기존 publication 및 proof gate를 재사용하는 `python-product` sequence를 만들고 reference claim을 current evidence에 결속한다.
+1. `python-product`, `quality-cycle`, `preflight`를 같은 clean commit에서 검증하고 reference claim을 current evidence에 결속한다.
 2. workstream의 구현, 지정 gate, 문서 갱신이 끝나면 해당 폴더를 삭제한다. 모든 workstream이 사라지면 이 initiative와 활성 링크를 삭제한다.
 
 ## 종료 조건

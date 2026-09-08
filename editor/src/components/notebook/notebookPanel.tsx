@@ -10,6 +10,7 @@ import {
 } from "@codemirror/autocomplete";
 import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import { python } from "@codemirror/lang-python";
+import { codeIndentation } from "@/lib/codeIndentation";
 import { bracketMatching, HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import {
   Compartment,
@@ -665,6 +666,7 @@ export function CodeCellEditor({
         bracketMatching(),
         closeBrackets(),
         python(),
+        codeIndentation,
         syntaxHighlighting(codaroSyntaxHighlightStyle, { fallback: true }),
         drawSelection({ cursorBlinkRate: 1000, drawRangeCursor: true }),
         highlightActiveLine(),

@@ -1,6 +1,6 @@
 # 02 제품 여정
 
-상태: 설계
+상태: 진행
 
 ## 목표
 
@@ -21,12 +21,9 @@ Percent Python source
 
 ## 구현 순서
 
-1. `PYTHON_PRODUCT_GATES`를 `tests/run.py`에 추가해 기존 gate를 의존 순서로 조합한다. `python-product` CLI command와 sequence summary를 추가하되 기존 gate 명령을 복사하지 않는다.
-2. sequence에 `root-clean`, `docs`, `backend`, `architecture-boundary`, `python-sdk`, `app-runtime`, `publication-compiler`, `static-publication`, `server-publication`, `local-publication`, `block-embedding`, `learning-product-bridge`, `deployment-adapters`, `reference-products`, `automation-ide-audit`를 포함한다.
-3. `referenceProducts.json`과 검증기를 확장해 plain Python, public SDK import, app projection, embed mode, target publication, proof 및 claim boundary를 source별로 추적한다.
-4. `verifyReferenceProductsPlaywright.py`는 existing five products를 유지하면서 계산기 embed의 output, interactive, editable 소비와 server/local 부정 경계를 확인한다. 새 데모를 추가해 약한 성공 경로를 만들지 않는다.
-5. `world-class-blueprint` Verification Matrix와 gate 문서를 `python-product` sequence에 연결하고 CI는 `python-sdk`를 독립 hard gate로 실행한다. 전체 긴 sequence는 quality-cycle이 소유한다.
-6. [pyproc 피드백](03-pyproc-feedback/README.md)의 Web과 Local 실측 결함을 제품 여정 gate에 반영한다. 특히 Local 정적 bundle 원자성을 먼저 복구한 뒤 동일 학습 여정을 양쪽 runtime에서 다시 통과시킨다.
+1. `tests/run.py`의 `PYTHON_PRODUCT_GATES` 순서로 현재 제품 여정을 검증한다.
+2. `quality-cycle`과 `preflight`를 같은 clean commit에서 검증하고 각 report의 `gitHead`를 확인한다.
+3. 종료 조건을 충족하면 이 workstream과 상위 이니셔티브, 활성 링크를 함께 삭제한다.
 
 ## 영향 파일
 
@@ -52,7 +49,7 @@ Percent Python source
 ## 테스트
 
 - 각 수정 중에는 소유 gate를 실행한다: `app-runtime`, `publication-compiler`, `static-publication`, `server-publication`, `local-publication`, `block-embedding`, `learning-product-bridge`, `deployment-adapters`, `reference-products`, `automation-ide-audit`.
-- 통합 판정은 `uv run python -X utf8 tests/run.py python-product` 한 명령으로 수행하며 15개 gate가 모두 hard green이어야 한다.
+- 통합 판정은 `uv run python -X utf8 tests/run.py python-product` 한 명령으로 수행하며 `PYTHON_PRODUCT_GATES`에 등록된 gate가 모두 hard green이어야 한다.
 - `uv run python -X utf8 tests/run.py audit-self`가 gate 수, 문서 등록, CI 등록, unknown sequence member를 검사한다.
 - `uv run python -X utf8 tests/run.py quality-cycle`과 `uv run python -X utf8 tests/run.py preflight`를 current clean commit에서 실행한다.
 - product report의 `gitHead`, sequence summary의 `gitHead`, current HEAD가 같아야 하며 stale artifact는 통과로 세지 않는다.
