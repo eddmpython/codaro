@@ -206,7 +206,6 @@ function LessonSection({ index, section }) {
         <div className="lessonExercise">
           <span>직접 해보기</span>
           <p>{section.exercise.prompt}</p>
-          {section.exercise.starterCode ? <CodeExample code={section.exercise.starterCode} label="시작 코드" /> : null}
           {section.check.id ? <small>실행하면 {section.check.strength === "strong" ? "강한 " : ""}검증이 자동 적용됩니다.</small> : null}
         </div>
       ) : null}

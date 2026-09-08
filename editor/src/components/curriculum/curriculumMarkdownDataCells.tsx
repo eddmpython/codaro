@@ -225,7 +225,6 @@ export function StepPracticeCell({ block, payload }: { block: BlockConfig; paylo
 export function PracticePromptCell({ block, payload }: { block: BlockConfig; payload: Record<string, unknown> }) {
   const title = payloadText(payload, "title") || block.title || "실습";
   const content = payloadText(payload, "content") || payloadText(payload, "description") || block.content;
-  const code = payloadText(payload, "code");
   const footer = payloadMap(payload.footer);
   const footerText = payloadText(footer, "text");
 
@@ -236,11 +235,6 @@ export function PracticePromptCell({ block, payload }: { block: BlockConfig; pay
         <h3 className="mt-1 text-[15px] font-bold leading-6 text-foreground">{stripMarkdown(title)}</h3>
         {content ? <p className="mt-1 text-md text-foreground">{stripMarkdown(content)}</p> : null}
       </div>
-      {code ? (
-        <div className="rounded-lg border bg-code">
-          <ScrollableCode code={code} />
-        </div>
-      ) : null}
       {footerText ? <p className="text-sm leading-6 text-muted-foreground">{stripMarkdown(footerText)}</p> : null}
     </div>
   );
