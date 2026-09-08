@@ -16,6 +16,7 @@ import type {
   LessonRetrievalContract,
 } from "@/lib/curriculumLearningProjection";
 import { installablePackageName } from "@/lib/packageInference";
+import { learningTableRows } from "@/lib/learningTable";
 
 const rawCurricula = import.meta.glob([
   "../../../curricula/python/**/*.yaml",
@@ -730,7 +731,7 @@ function blocksFromLearningSections(
           title: sectionTitle,
           subtitle: sectionSubtitle,
           id: textValue(section.id),
-          sectionContract,
+          sectionContract: { ...sectionContract, explanation: textValue(section.explanation ?? section.description ?? section.content) },
           sectionContractGaps: sectionContract.contractGaps,
         },
         role: "title",
@@ -825,7 +826,7 @@ function convertYamlBlock(block: YamlMap, parentRole?: CellRole): BlockConfig[] 
   }
 
   if (sourceType === "table") {
-    const rows = arrayOfMaps(block.rows ?? block.items ?? block.data);
+    const rows = learningTableRows(block.rows ?? block.items ?? block.data, block.headers);
     return [markdownBlock({
       content: formatTable(rows, title || "표"),
       displayKind: "table",

@@ -50,6 +50,18 @@ LEARNER_FACING_SCALAR_PATTERN = re.compile(
 )
 
 
+def testLegacyNarrativeKeepsItsOriginalBlockOwner() -> None:
+    content = {"meta": {"title": "설명 소유권"}, "sections": [{
+        "title": "원문", "blocks": [{"type": "text", "content": "행과 열을 나누어 봅니다."}],
+    }]}
+    contract = lessonContractFromYaml(content)
+    assert contract.sections[0].explanation == "행과 열을 나누어 봅니다."
+    document, _ = yamlToDocument(content, "test", "narrative")
+    title = next(block for block in document.blocks if block.sourceType == "section")
+    assert title.payload["sectionContract"]["explanation"] == ""
+    assert sum(block.content == "행과 열을 나누어 봅니다." for block in document.blocks) == 1
+
+
 def testLessonContractExtractsStructuredSectionFields() -> None:
     content = {
         "meta": {

@@ -15,6 +15,7 @@ Codaro를 범용 편집기 복제품이 아니라 **평범한 Percent Python 파
 ## 범위
 
 1. [02 제품 여정](02-product-journey/README.md)에서 IDE, 앱, 부분 embed, publication, 자동화를 current commit의 단일 gate sequence로 증명한다.
+2. [03 학습 자료와 실습 입력 복구](03-learning-material-repair/README.md)에서 PDF 소개의 표 누락, 설명 중복과 너비, 미리 채워진 실습 입력을 고치고 공유 이미지 사용을 정리한다. 다음 학습 화면 작업은 이 항목에서 시작한다.
 
 ## 제품 경계
 

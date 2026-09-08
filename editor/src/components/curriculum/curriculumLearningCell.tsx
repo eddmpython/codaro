@@ -1,6 +1,7 @@
 import type { BlockConfig, ExecutionResult } from "@/types";
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { initialBlockDraft } from "@/lib/documentModel";
 import { CurriculumMarkdownBody } from "./curriculumMarkdownBody";
 import { blockLabel, stripMarkdown } from "@/lib/cellModel";
 import { CodePayload, ExecutionOutput, IconButton, LoadingInline } from "@/components/app/appPrimitives";
@@ -50,6 +51,7 @@ export function CurriculumLearningCell({
   };
 
   const runCurrentDraft = (sourceOverride?: string) => {
+    if (!(sourceOverride ?? draftRef.current).trim()) return;
     onSelect();
     onRun(sourceOverride ?? draftRef.current);
   };
@@ -134,9 +136,9 @@ export function CurriculumLearningCell({
           </IconButton>
         </div>
         <div className="mt-3 space-y-3">
-          {isSnippetCode && block.description ? <SnippetPracticeIntro block={block} /> : null}
+          {isSnippetCode ? <SnippetPracticeIntro block={block} /> : null}
           {!isSnippetCode && block.guide?.description ? (
-            <p className="max-w-3xl text-md font-normal text-foreground">{stripMarkdown(block.guide.description)}</p>
+            <p className="text-md font-normal text-foreground">{stripMarkdown(block.guide.description)}</p>
           ) : null}
           <div
             className="astryxWorkCellFrame"
@@ -177,7 +179,7 @@ export function SnippetPracticeIntro({ block }: { block: BlockConfig }) {
   return (
     <div className="min-w-0 space-y-2">
       <div className="text-xs font-medium text-muted-foreground">예제</div>
-      {description ? <p className="max-w-3xl text-md font-normal text-foreground">{description}</p> : null}
+      {description ? <p className="text-md font-normal text-foreground">{description}</p> : null}
       <CodePayload value={block.content} />
     </div>
   );
@@ -224,7 +226,5 @@ export function CurriculumSectionTitle({
 }
 
 export function curriculumInitialDraft(block: BlockConfig) {
-  if (block.type !== "code") return block.content;
-  if (block.role === "snippet") return "";
-  return block.content;
+  return initialBlockDraft(block, { emptyExerciseDraft: true, emptySnippetDraft: true });
 }

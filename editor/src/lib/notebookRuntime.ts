@@ -9,6 +9,7 @@ import {
 } from "@/lib/browserPythonRuntime";
 import { isKernelExecutableBlock, isPersistentAutomationBlock } from "@/lib/cellModel";
 import { firstOutputLine } from "@/lib/localRuntime";
+import { initialBlockDraft } from "@/lib/documentModel";
 import { translate } from "@/lib/localeCopy";
 import { staticPublicationManifestUrl } from "@/lib/staticPublication";
 import { inferCodePackages, normalizePackageName } from "@/lib/packageInference";
@@ -122,7 +123,10 @@ export function resolveBlockRunCode(
   drafts: Record<string, string>,
   options: { emptySnippetFallback?: boolean } = {},
 ) {
-  return drafts[block.id] ?? (options.emptySnippetFallback && block.role === "snippet" ? "" : block.content);
+  return drafts[block.id] ?? initialBlockDraft(block, {
+    emptyExerciseDraft: options.emptySnippetFallback,
+    emptySnippetDraft: options.emptySnippetFallback,
+  });
 }
 
 export async function runNotebookBlock({

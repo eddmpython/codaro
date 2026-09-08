@@ -148,7 +148,7 @@ export function MarkdownBlock({ content }: { content: string }) {
   });
   flushLists("tail");
 
-  return <div className="min-w-0 max-w-3xl space-y-3 break-words">{rendered}</div>;
+  return <div className="min-w-0 space-y-3 break-words">{rendered}</div>;
 }
 
 export function ScrollableCode({ code }: { code: string }) {

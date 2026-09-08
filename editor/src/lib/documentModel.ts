@@ -33,59 +33,25 @@ export function draftsFromDocument(document: CodaroDocument) {
 
 export function draftsFromBlocks(
   blocks: BlockConfig[],
-  options: { emptyDuplicateSnippetExerciseDraft?: boolean; emptySnippetDraft?: boolean; includeMarkdown?: boolean } = {},
+  options: { emptyExerciseDraft?: boolean; emptySnippetDraft?: boolean; includeMarkdown?: boolean } = {},
 ) {
-  const duplicateExerciseBlockIds = options.emptyDuplicateSnippetExerciseDraft
-    ? duplicateSnippetExerciseBlockIds(blocks)
-    : new Set<string>();
-
   return Object.fromEntries(
     blocks
       .filter((block) => isExecutableBlock(block) || (options.includeMarkdown && block.type === "markdown"))
       .map((block) => [
         block.id,
-        draftValueForBlock(block, options, duplicateExerciseBlockIds),
+        initialBlockDraft(block, options),
       ]),
   );
 }
 
-function draftValueForBlock(
+export function initialBlockDraft(
   block: BlockConfig,
-  options: { emptyDuplicateSnippetExerciseDraft?: boolean; emptySnippetDraft?: boolean },
-  duplicateExerciseBlockIds: Set<string>,
+  options: { emptyExerciseDraft?: boolean; emptySnippetDraft?: boolean },
 ) {
   if (options.emptySnippetDraft && block.role === "snippet") return "";
-  if (
-    options.emptyDuplicateSnippetExerciseDraft
-    && duplicateExerciseBlockIds.has(block.id)
-  ) {
-    return "";
-  }
+  if (options.emptyExerciseDraft && block.role === "exercise") return "";
   return block.content;
-}
-
-function duplicateSnippetExerciseBlockIds(blocks: BlockConfig[]) {
-  const result = new Set<string>();
-  let activeSnippetContent = "";
-  blocks.forEach((block) => {
-    if (block.sourceType === "section") {
-      activeSnippetContent = "";
-    }
-    if (!isExecutableBlock(block)) return;
-    const content = normalizeDraftCode(block.content);
-    if (block.role === "snippet") {
-      activeSnippetContent = content;
-      return;
-    }
-    if (block.role === "exercise" && content && content === activeSnippetContent) {
-      result.add(block.id);
-    }
-  });
-  return result;
-}
-
-function normalizeDraftCode(value: string) {
-  return value.replace(/\r\n/g, "\n").trim();
 }
 
 export function appendUniqueBlocks(

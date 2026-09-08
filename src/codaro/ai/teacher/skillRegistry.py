@@ -64,8 +64,12 @@ teacherSkills: tuple[TeacherSkill, ...] = (
         skillId="answer-checking",
         purpose="학습자의 코드와 실행 결과를 셀 단위로 검증한다.",
         trigger="사용자가 답 확인, 왜 틀렸는지, 결과 검증을 요청할 때",
-        requiredTools=("read-cells", "cell-call", "get-variables"),
-        policy="셀을 읽거나 실행하지 않고 정답 여부를 단정하지 않는다.",
+        requiredTools=("read-cells", "get-variables"),
+        policy=(
+            "학습 셀은 학습자가 직접 실행한다. 최근 사용자 실행 결과와 셀을 읽고 검증하며 대신 실행하지 않는다. "
+            "첫 시도 전에 정답을 입력하지 않고 실패 뒤에는 수정 단서를 먼저 준다. "
+            "정답은 요청했을 때만 한 번 설명하고 학습자가 가린 뒤 다시 작성하고 실행하게 한다."
+        ),
     ),
     TeacherSkill(
         skillId="automation-authoring",

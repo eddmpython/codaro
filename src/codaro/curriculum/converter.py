@@ -92,7 +92,10 @@ def yamlToDocument(
                         "title": sectionTitle,
                         "subtitle": sectionSubtitle,
                         "id": section.get("id"),
-                        "sectionContract": sectionContract.model_dump(mode="json") if sectionContract else None,
+                        "sectionContract": {
+                            **sectionContract.model_dump(mode="json"),
+                            "explanation": _textValue(section.get("explanation") or section.get("description") or section.get("content")),
+                        } if sectionContract else None,
                         "sectionContractGaps": sectionContract.contractGaps if sectionContract else [],
                     },
                 )

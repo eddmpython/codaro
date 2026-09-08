@@ -118,7 +118,7 @@ export async function loadCurriculumLessonState(
   return {
     document: result.data.document,
     draftUpdates: draftsFromBlocks(result.data.document.blocks, {
-      emptyDuplicateSnippetExerciseDraft: true,
+      emptyExerciseDraft: true,
       emptySnippetDraft: true,
     }),
     notice: {

@@ -1,5 +1,6 @@
 import { blockLabel, stripMarkdown } from "@/lib/cellModel";
 import { cn } from "@/lib/utils";
+import { learningTableRows } from "@/lib/learningTable";
 import type { BlockConfig } from "@/types";
 import { AnatomyCell, AnnotatedCodeCell, BareList, CalloutCell, ChoiceCardsCell, CodeCompareCell, ComparisonPanel, ConceptRowCell, DefinitionCell, DoDontCell, LearningTable, LocalRunnerHero, MisconceptionCell, PracticePromptCell, ProseLearningCell, ResourceCardsCell, SectionLead, StatCell, StepPracticeCell, TerminalCell, TimelineCell, TopRuleGrid } from "./curriculumMarkdownDataCells";
 import { payloadItems, payloadMap, payloadText, payloadTextList } from "./curriculumMarkdownHelpers";
@@ -7,7 +8,7 @@ import { MediaCell } from "./curriculumMarkdownMedia";
 import { MarkdownBlock } from "./curriculumMarkdownRichText";
 
 // 3계층 표면 모델 (curriculum-card-contract.md "카드 시각 규칙"의 SSOT 구현):
-//   읽기 계층  = bare 타이포 (박스·아이콘칩 없음, max-w-3xl)
+//   읽기 계층  = bare 타이포 (박스·아이콘칩 없음,)
 //   신호 계층  = 좌측 2px rail (border-l-2 + pl-4, 배경 없음)
 //   자료/상호작용 계층 = hairline 박스 (rounded-lg border, 코드는 bg-code)
 // 본문은 text-foreground 100%, muted는 키커·캡션·부제 전용.
@@ -20,7 +21,7 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
     const title = payloadText(payload, "title") || block.title || blockLabel(block);
     const subtitle = payloadText(payload, "subtitle") || block.description;
     return (
-      <div className="min-w-0 max-w-3xl">
+      <div className="min-w-0">
         <h2 className="text-lg font-bold text-foreground">{stripMarkdown(title)}</h2>
         {subtitle ? <p className="mt-1 text-sm leading-6 text-muted-foreground">{stripMarkdown(subtitle)}</p> : null}
       </div>
@@ -36,7 +37,7 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
     const points = payloadItems(payload, "points");
     return (
       <div className="space-y-4">
-        <div className="min-w-0 max-w-3xl">
+        <div className="min-w-0">
           <h2 className="text-lg font-bold text-foreground">{stripMarkdown(title)}</h2>
           {subtitle ? <p className="mt-1.5 text-md font-normal text-foreground">{stripMarkdown(subtitle)}</p> : null}
           {description ? <p className="mt-1.5 text-sm leading-6 text-muted-foreground">{stripMarkdown(description)}</p> : null}
@@ -81,7 +82,7 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
   }
 
   if (displayKind === "table") {
-    const rows = payloadItems(payload, "rows");
+    const rows = learningTableRows(payload.rows ?? payload.items ?? payload.data, payload.headers);
     const title = payloadText(payload, "title") || block.title || "";
     return (
       <div className="space-y-3">
@@ -116,11 +117,11 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
     const options = payloadTextList(payload.options);
     return (
       <div className="space-y-3">
-        <div className="min-w-0 max-w-3xl">
+        <div className="min-w-0">
           <div className="text-xs font-medium text-muted-foreground">확인 문제</div>
           <div className="mt-1 text-[15px] font-bold leading-6 text-foreground">{stripMarkdown(question)}</div>
         </div>
-        <div className="grid max-w-3xl gap-2">
+        <div className="grid gap-2">
           {options.map((option, index) => (
             <div className="flex items-start gap-3 rounded-lg border px-4 py-2.5 text-md text-foreground" key={`${option}-${index}`}>
               <span className="mt-1 text-xs font-medium tabular-nums text-muted-foreground">{index + 1}</span>
@@ -201,7 +202,7 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
   return (
     <div className="space-y-3">
       {block.description ? (
-        <p className="max-w-3xl text-sm leading-6 text-muted-foreground">{block.description}</p>
+        <p className="text-sm leading-6 text-muted-foreground">{block.description}</p>
       ) : null}
       <MarkdownBlock content={block.content} />
     </div>

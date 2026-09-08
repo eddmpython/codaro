@@ -31,7 +31,7 @@ export // 블록 소제목(L3) + 부제(L5). 박스·아이콘칩 없이 타이�
 function SectionLead({ title, subtitle }: { title?: string; subtitle?: string }) {
   if (!title && !subtitle) return null;
   return (
-    <div className="min-w-0 max-w-3xl">
+    <div className="min-w-0">
       {title ? <h3 className="text-[15px] font-bold leading-6 text-foreground">{stripMarkdown(title)}</h3> : null}
       {subtitle ? <p className={cn("text-sm leading-6 text-muted-foreground", title && "mt-0.5")}>{stripMarkdown(subtitle)}</p> : null}
     </div>
@@ -63,7 +63,7 @@ export function LocalRunnerHero({ block, payload }: { block: BlockConfig; payloa
 }
 
 export function ProseLearningCell({ block, payload }: { block: BlockConfig; payload: Record<string, unknown> }) {
-  const title = payloadText(payload, "title") || block.title || "";
+  const title = payloadText(payload, "title");
   const subtitle = payloadText(payload, "subtitle") || block.description;
   const content = payloadText(payload, "content") || payloadText(payload, "text") || block.content;
 
@@ -164,7 +164,7 @@ export function CalloutCell({ block, payload }: { block: BlockConfig; payload: R
   const { rail, labelTone, Icon } = resolved;
 
   return (
-    <aside className={cn("min-w-0 max-w-3xl border-l-2 py-0.5 pl-4", rail)}>
+    <aside className={cn("min-w-0 border-l-2 py-0.5 pl-4", rail)}>
       <div className={cn("flex items-center gap-1.5 text-xs font-semibold", labelTone)}>
         <Icon className="size-3.5" />
         {stripMarkdown(title)}
@@ -197,7 +197,7 @@ export function StepPracticeCell({ block, payload }: { block: BlockConfig; paylo
 
   return (
     <div className="space-y-3">
-      <div className="min-w-0 max-w-3xl">
+      <div className="min-w-0">
         <div className="text-xs font-medium text-muted-foreground">{stepNumber ? `STEP ${stepNumber}` : "실습 단계"}</div>
         <h3 className="mt-1 text-[15px] font-bold leading-6 text-foreground">{stripMarkdown(title)}</h3>
         {description ? <p className="mt-1 text-md text-foreground">{stripMarkdown(description)}</p> : null}
@@ -231,7 +231,7 @@ export function PracticePromptCell({ block, payload }: { block: BlockConfig; pay
 
   return (
     <div className="space-y-3">
-      <div className="min-w-0 max-w-3xl">
+      <div className="min-w-0">
         <div className="text-xs font-medium text-muted-foreground">직접 해보기</div>
         <h3 className="mt-1 text-[15px] font-bold leading-6 text-foreground">{stripMarkdown(title)}</h3>
         {content ? <p className="mt-1 text-md text-foreground">{stripMarkdown(content)}</p> : null}
@@ -241,7 +241,7 @@ export function PracticePromptCell({ block, payload }: { block: BlockConfig; pay
           <ScrollableCode code={code} />
         </div>
       ) : null}
-      {footerText ? <p className="max-w-3xl text-sm leading-6 text-muted-foreground">{stripMarkdown(footerText)}</p> : null}
+      {footerText ? <p className="text-sm leading-6 text-muted-foreground">{stripMarkdown(footerText)}</p> : null}
     </div>
   );
 }
@@ -309,7 +309,7 @@ function ConceptRowCell({ block, payload }: { block: BlockConfig; payload: Recor
     <div className="space-y-3">
       <SectionLead subtitle={subtitle} title={title} />
       {rows.length ? (
-        <div className="max-w-3xl divide-y">
+        <div className="divide-y">
           {rows.map((row, index) => {
             const concept = payloadText(row, "concept") || payloadText(row, "title") || payloadText(row, "term") || payloadText(row, "label") || "개념";
             const explain = payloadText(row, "explain") || payloadText(row, "explanation") || payloadText(row, "analogy") || payloadText(row, "description") || payloadText(row, "content");
@@ -375,7 +375,7 @@ function DefinitionCell({ block, payload }: { block: BlockConfig; payload: Recor
     <div className="space-y-3">
       <SectionLead subtitle={subtitle} title={title} />
       {rows.length ? (
-        <div className="max-w-3xl divide-y">
+        <div className="divide-y">
           {rows.map((row, index) => {
             const term = payloadText(row, "term") || payloadText(row, "title") || "용어";
             const english = payloadText(row, "english") || payloadText(row, "en");
@@ -409,7 +409,7 @@ function MisconceptionCell({ block, payload }: { block: BlockConfig; payload: Re
     <div className="space-y-3">
       <SectionLead subtitle={subtitle} title={title} />
       {rows.length ? (
-        <div className="max-w-3xl space-y-3">
+        <div className="space-y-3">
           {rows.map((row, index) => {
             const myth = payloadText(row, "myth") || payloadText(row, "wrong") || payloadText(row, "misconception");
             const truth = payloadText(row, "truth") || payloadText(row, "right") || payloadText(row, "fact") || payloadText(row, "reality");
@@ -440,7 +440,7 @@ function TimelineCell({ block, payload }: { block: BlockConfig; payload: Record<
   return (
     <div className="space-y-3">
       <SectionLead subtitle={subtitle} title={title} />
-      <div className="max-w-3xl space-y-0">
+      <div className="space-y-0">
         {rows.map((row, index) => {
           const label = payloadText(row, "step") || payloadText(row, "label") || String(index + 1);
           const head = payloadText(row, "title") || payloadText(row, "name");
@@ -700,7 +700,7 @@ export function DetailList({ items, label }: { items: Array<Record<string, unkno
 export // bare 불릿 리스트 — 읽기 계층. 항목별 박스·체크아이콘 없음.
 function BareList({ items, ordered = false }: { items: string[]; ordered?: boolean }) {
   return (
-    <ul className="max-w-3xl space-y-1.5">
+    <ul className="space-y-1.5">
       {items.map((item, index) => (
         <li className="flex gap-2.5 text-md text-foreground" key={`${item}-${index}`}>
           {ordered ? (
@@ -716,7 +716,7 @@ function BareList({ items, ordered = false }: { items: string[]; ordered?: boole
 }
 
 export function LearningTable({ rows, fallback }: { rows: Array<Record<string, unknown>>; fallback: string }) {
-  if (!rows.length) return <MarkdownBlock content={fallback} />;
+  if (!rows.length) return <p className="text-sm text-muted-foreground">표에 표시할 자료가 없습니다.</p>;
   const columns = Array.from(rows.reduce((keys, row) => {
     Object.keys(row).forEach((key) => keys.add(key));
     return keys;

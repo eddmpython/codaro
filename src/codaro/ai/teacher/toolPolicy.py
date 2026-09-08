@@ -64,6 +64,7 @@ def normalizeToolPolicyViolations(
 
 @dataclass
 class ToolPolicyState:
+    learningSurface: bool = False
     requiredPackages: set[str] = field(default_factory=set)
     checkedPackages: set[str] = field(default_factory=set)
     installedPackages: set[str] = field(default_factory=set)
@@ -73,15 +74,22 @@ class ToolPolicyState:
     def fromContext(cls, context: dict[str, Any] | None) -> "ToolPolicyState":
         if not isinstance(context, dict):
             return cls()
+        learningSurface = context.get("surface") == "curriculum"
         preflight = context.get("dependencyPreflight")
         if not isinstance(preflight, dict):
-            return cls()
+            return cls(learningSurface=learningSurface)
         packages = preflight.get("packages")
         if not isinstance(packages, list):
-            return cls()
-        return cls(requiredPackages={normalizePackageName(package) for package in packages if normalizePackageName(package)})
+            return cls(learningSurface=learningSurface)
+        return cls(learningSurface=learningSurface, requiredPackages={normalizePackageName(package) for package in packages if normalizePackageName(package)})
 
     def validateStart(self, toolName: str, arguments: dict[str, Any]) -> ToolPolicyViolation | None:
+        if self.learningSurface and toolRequiresDependencyPreflight(toolName):
+            return ToolPolicyViolation(
+                "learner-execution-required",
+                "학습 셀은 학습자가 실행 버튼이나 단축키로 직접 실행해야 합니다. 최근 실행 결과를 읽고 수정 단서를 안내하세요.",
+                toolName,
+            )
         if toolName == "packages-install":
             packageName = normalizePackageName(arguments.get("name", ""))
             if not packageName:

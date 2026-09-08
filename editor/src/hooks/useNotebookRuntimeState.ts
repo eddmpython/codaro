@@ -155,11 +155,12 @@ export function useNotebookRuntimeState({
   const executeBlock = useCallback(async (block: BlockConfig, sourceOverride?: string) => {
     if (!runtimeActiveRef.current || !isExecutableBlock(block)) return;
     const code = sourceOverride ?? resolveBlockRunCode(block, drafts, { emptySnippetFallback: surface === "curriculum" });
+    if (surface === "curriculum" && !code.trim()) return;
     setRunningBlockId(block.id);
     onNotice({ tone: "default", title: translate("runtime.cellRunning"), detail: blockLabel(block) });
 
     try {
-      if (reactiveCellExecution && reactiveEnabled && isKernelExecutableBlock(block)) {
+      if (surface !== "curriculum" && reactiveCellExecution && reactiveEnabled && isKernelExecutableBlock(block)) {
         const executionDrafts = sourceOverride === undefined
           ? drafts
           : { ...drafts, [block.id]: sourceOverride };

@@ -59,7 +59,8 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
 5. **Cell 단위 조작**
    - 읽기는 `read-cells`.
    - 수정/삽입/삭제는 `write-cell`.
-   - 실행/검증은 `cell-call`.
+   - 일반 노트북과 자동화의 실행/검증은 `cell-call`이다. 학습 셀은 학습자가 직접 실행하며 교사는
+     기존 실행 결과를 읽고 수정 단서를 준다. 학습 입력과 정답 공개는 [학습 경험](learning-experience.md)을 따른다.
    - 하위 호환이 필요할 때만 `execute-reactive`, `check-exercise`를 직접 쓴다.
 
 6. **Automation Authoring**

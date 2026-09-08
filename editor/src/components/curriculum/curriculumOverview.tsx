@@ -568,7 +568,7 @@ export function SectionNarrative({ contract }: { contract?: CurriculumSectionCon
           accent는 "지금 해야 할 것"을 뜻하므로 섹션 목표에 data-rail="accent"가 맞다. */}
       {goal || why ? (
         <div
-          className="codaroRail min-w-0 max-w-[68ch]"
+          className="codaroRail min-w-0"
           data-learning-section-goal="true"
           data-rail="accent"
         >
@@ -578,7 +578,7 @@ export function SectionNarrative({ contract }: { contract?: CurriculumSectionCon
         </div>
       ) : null}
       {explanationParagraphs.length ? (
-        <div className="min-w-0 max-w-[68ch] space-y-3">
+        <div className="min-w-0 space-y-3">
           <div className="text-xs font-medium text-muted-foreground">핵심 개념</div>
           {explanationParagraphs.map((paragraph, index) => (
             <p className="text-md font-normal text-foreground" key={`${paragraph.slice(0, 16)}-${index}`}>{renderInline(paragraph)}</p>

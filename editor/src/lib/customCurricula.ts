@@ -201,7 +201,7 @@ export function buildCustomCurriculumApplication(
 ): CustomCurriculumApplication {
   return {
     draftUpdates: draftsFromBlocks(entry.document.blocks, {
-      emptyDuplicateSnippetExerciseDraft: true,
+      emptyExerciseDraft: true,
       emptySnippetDraft: true,
     }),
     document: entry.document,

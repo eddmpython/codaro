@@ -18,7 +18,7 @@ Codaro 커리큘럼은 "설명 문서"가 아니라 학습자가 실행하고 �
 - `pyproject.toml`의 기본 의존성은 Codaro 제품 실행에 필요한 최소 패키지만 둔다.
 - pandas, numpy, matplotlib, sklearn, opencv 같은 학습 주제별 패키지는 기본 의존성에 넣지 않는다.
 - 학습 패키지는 레슨 YAML의 `meta.packages`에 선언한다.
-- 제품 표면과 teacher loop는 `meta.packages`를 보고 `packages-check → packages-install(누락 시에만) → cell-call` 순서로 실행한다.
+- 제품 표면과 teacher loop는 `meta.packages`를 보고 패키지를 확인하고 누락된 패키지만 준비한다. 학습 셀의 실행 주체는 [학습 경험](learning-experience.md)의 직접 실행 계약을 따른다.
 - 설치는 프로젝트 `.venv`를 대상으로 하는 `uv pip ... --python .venv` 경로만 쓴다. 문서, 레슨, 안내 문구에 직접 `pip install`을 넣지 않는다.
 - 이미 설치된 plain package는 재설치하지 않고 `skipped: true` 결과로 "이미 준비됨"을 표시한다.
 - 외부 패키지가 필요한 레슨은 소개 또는 첫 실습 단계에서 설치 경험을 숨기지 않는다. 다만 학습 목표를 "설치법 암기"로 만들지 않고 "필요한 도구를 uv로 준비하고 바로 실행한다"로 설명한다.
@@ -61,7 +61,7 @@ Codaro 커리큘럼은 "설명 문서"가 아니라 학습자가 실행하고 �
    - 신규 레슨은 `sections[].blocks[]`보다 structured section fields를 우선한다.
    - 섹션 하나는 하나의 학습 카드다.
    - 필수 필드: `title`, `subtitle`, `goal`, `why`, `explanation`, `tips`, `snippet`, `exercise.prompt`, `exercise.starterCode`, `exercise.solution`, `exercise.hints`, `check`.
-   - `snippet`은 읽는 예제이고, `exercise.starterCode`는 학습자가 직접 고치는 입력 코드다.
+   - `snippet`은 읽고 직접 실행하는 참고 예제다. `exercise.starterCode`는 저작용 참고 자료이며 실습 입력 초기값이 아니다. 실습 입력, 정답 공개와 섹션 표시 순서는 [학습 경험](learning-experience.md)을 따른다.
    - `instructionRole: reference | workedExample | practice | project`와 `assessmentRole: none | formative | assurance | application`을 분리한다.
    - assurance와 application에는 `assessmentMode`, claim, family, variant, CheckSpec version과 evidence slice를 모두 명시한다.
 

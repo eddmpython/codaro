@@ -845,8 +845,10 @@ def _sectionFlowBlockIsValid(block: Mapping[str, Any], sourceType: str) -> bool:
         return (
             block.get("type") == "code"
             and block.get("role") == "exercise"
-            and _hasText(block.get("content"))
+            and isinstance(block.get("content"), str)
             and isinstance(guide, Mapping)
+            and _hasText(guide.get("description"))
+            and _hasText(guide.get("solution"))
         )
     return False
 

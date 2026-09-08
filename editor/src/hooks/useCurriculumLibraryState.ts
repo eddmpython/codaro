@@ -160,7 +160,9 @@ export function useCurriculumLibraryState({
     setCategories(bootstrap.categories);
     setCategoryGroups(bootstrap.categoryGroups);
     setCategoryTree(bootstrap.categoryTree);
-    setContents(bootstrap.contents);
+    if (!initialSelection || initialSelection.category === bootstrap.selectedCategory) {
+      setContents(bootstrap.contents);
+    }
     setSelectedCategory(initialSelection?.category ?? bootstrap.selectedCategory);
     setSelectedContentId(initialSelection?.contentId ?? bootstrap.selectedContentId);
     if (!initialSelection && bootstrap.curriculumDocument) {

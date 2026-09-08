@@ -446,6 +446,16 @@ def testTeacherClarificationPlanSkipsWhenRequestIsSpecificEnough() -> None:
     assert plan.questions == ()
 
 
+def testTeacherCannotExecuteLearningCells() -> None:
+    policy = ToolPolicyState.fromContext({"surface": "curriculum"})
+    for toolName in ("cell-call", "execute-reactive", "check-exercise"):
+        violation = policy.validateStart(toolName, {})
+        assert violation is not None
+        assert violation.code == "learner-execution-required"
+    assert policy.validateStart("read-cells", {}) is None
+    assert ToolPolicyState.fromContext({"surface": "notebook"}).validateStart("cell-call", {}) is None
+
+
 def testToolPolicyRequiresPackageCheckBeforeInstall() -> None:
     policy = ToolPolicyState.fromContext({"dependencyPreflight": {"packages": ["pandas"]}})
 

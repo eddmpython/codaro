@@ -4,7 +4,8 @@ import { blockLabel, stripBullet, stripMarkdown } from "@/lib/cellModel";
 import { useEffect, useRef, useState } from "react";
 import type { LearningAttemptCheck } from "@/lib/learningAttemptCheck";
 import { evaluateLearningAttempt } from "@/lib/learningAttemptCheck";
-import { learningEvidenceRuntimeTier, recordLearningAttemptEvidence } from "@/lib/learningEvidenceOperations";
+import { learningEvidenceRuntimeTier, readLearningEvidenceEvents, recordLearningAttemptEvidence } from "@/lib/learningEvidenceOperations";
+import { learningEventDigest } from "@/lib/learningEvent";
 import { PROGRESS_UPDATED_EVENT } from "@/lib/curriculumProgressEvent";
 import { dueAssessmentSectionIds, type AssessmentQueueContract } from "@/lib/curriculumAssessmentQueue";
 import { CodePayload, ExecutionOutput, IconButton, LoadingInline } from "@/components/app/appPrimitives";
@@ -97,10 +98,10 @@ export function CurriculumSectionCard({
           ) : readPayloadText(section.contract?.assessmentMode) === "retrieval" ? (
             <span className="mb-1 block text-xs font-medium text-accent-brand">기억에서 다시 풀기</span>
           ) : null}
-          <h2 className="max-w-3xl break-words text-lg font-bold text-foreground" id={sectionHeadingId}>
+          <h2 className="break-words text-lg font-bold text-foreground" id={sectionHeadingId}>
             {section.title}
           </h2>
-          {section.subtitle ? <p className="mt-1 max-w-3xl text-sm font-normal leading-6 text-muted-foreground">{section.subtitle}</p> : null}
+          {section.subtitle ? <p className="mt-1 text-sm font-normal leading-6 text-muted-foreground">{section.subtitle}</p> : null}
         </div>
       </header>
 
@@ -281,13 +282,7 @@ export function sectionInfo(block: BlockConfig) {
   };
 }
 
-/**
- * 자동 실행한 완성 예제의 결과를 화면에 낼지 판정한다.
- *
- * 실패한 실행과 내보일 것이 없는 실행을 모두 뺀다. 앞의 것은 학습자가 만들지 않은 오류라 지금
- * 배우는 개념에서 주의만 뺏고, 뒤의 것은 `import`만 하는 절처럼 결과가 원래 없는 경우여서
- * "출력 없음" 상자만 남는다. 둘 다 절마다 붙으면 읽는 흐름을 끊는다.
- */
+/** 직접 실행한 예제의 출력 여부. 오류는 호출자가 별도로 표시한다. */
 function snippetHasVisibleOutput(result: ExecutionResult | undefined): result is ExecutionResult {
   if (!result || result.status === "error" || result.stderr) return false;
   if ((result.stdout || "").trim().length > 0) return true;
@@ -357,6 +352,42 @@ export function StructuredSectionLearningBody({
   const [promotionMessage, setPromotionMessage] = useState("");
   const [promotionState, setPromotionState] = useState<"idle" | "inputs" | "promoted" | "error">("idle");
   const recordedAttemptRef = useRef("");
+  const evidenceInputRef = useRef<WebStrongCheckEvidenceInput | null>(null);
+  const [answerRead, setAnswerRead] = useState(false);
+  const [answerShown, setAnswerShown] = useState(false);
+  const [answerBusy, setAnswerBusy] = useState(false);
+  const [supportMessage, setSupportMessage] = useState("");
+  useEffect(() => {
+    let active = true;
+    setAnswerShown(false);
+    setAnswerRead(false);
+    evidenceInputRef.current = null;
+    void readLearningEvidenceEvents(category, contentId).then((events) => {
+      if (active) setAnswerRead(events.some((event) => event.blockId === exercise?.id && "answerReveal" in event && event.answerReveal));
+    }).catch(() => {
+      if (active) setSupportMessage("도움 이력을 읽지 못했습니다. 정답 공개 전에 다시 시도해 주세요.");
+    });
+    return () => { active = false; };
+  }, [category, contentId, exercise?.id]);
+  const revealAnswer = async () => {
+    if (answerRead || answerBusy || !evidenceInputRef.current || !attemptCheck || attemptCheck.passed) return;
+    setAnswerBusy(true);
+    try {
+      const events = await readLearningEvidenceEvents(category, contentId);
+      if (events.some((event) => event.blockId === exercise?.id && "answerReveal" in event && event.answerReveal)) {
+        setAnswerRead(true);
+        return;
+      }
+      await recordLearningAttemptEvidence({ ...evidenceInputRef.current, answerReveal: true, passed: false });
+      setAnswerRead(true);
+      setAnswerShown(true);
+      setSupportMessage("");
+    } catch {
+      setSupportMessage("도움 이력을 저장하지 못했습니다. 다시 눌러 주세요.");
+    } finally {
+      setAnswerBusy(false);
+    }
+  };
   const exerciseDraftRef = useRef(exerciseDraft);
 
   useEffect(() => {
@@ -370,7 +401,9 @@ export function StructuredSectionLearningBody({
   };
 
   const runExercise = (sourceOverride?: string) => {
-    if (!exercise) return;
+    if (!exercise || answerBusy) return;
+    if (!(sourceOverride ?? exerciseDraftRef.current).trim()) return;
+    setAnswerShown(false);
     onSelectBlock(exercise.id);
     onRunBlock(exercise, sourceOverride ?? exerciseDraftRef.current);
   };
@@ -409,7 +442,7 @@ export function StructuredSectionLearningBody({
 
   useEffect(() => {
     if (!exercise || !exerciseResult) return;
-    if (!attemptCheck?.checkId || !attemptCheck.fixtureHash) return;
+    if (!attemptCheck) return;
     if (
       attemptCheck.executionCount !== exerciseResult.executionCount
       || attemptCheck.source !== exerciseSource
@@ -427,11 +460,12 @@ export function StructuredSectionLearningBody({
     if (recordedAttemptRef.current === recordKey) return;
     recordedAttemptRef.current = recordKey;
     if (!rememberLearningAttempt(recordKey)) return;
-    if (attemptCheck.executor === "browser-worker" || attemptCheck.executor === "local-sandbox") {
+    {
       setEvidenceSaveState("saving");
       const evidenceInput = {
           actual: attemptCheck.actual,
           aiHelpUsed: false,
+          answerReveal: answerRead,
           artifacts: attemptCheck.artifacts,
           artifactContractId: readPayloadText(section.contract?.artifactContractId) || undefined,
           artifactContractVersion: payloadPositiveInt(section.contract?.artifactContractVersion),
@@ -439,7 +473,7 @@ export function StructuredSectionLearningBody({
           assessmentMode: sectionAssessmentMode(section),
           blockId: exercise.id,
           category,
-          checkId: attemptCheck.checkId,
+          checkId: attemptCheck.checkId || `practice:${section.id}`,
           contentId,
           executionCount: attemptCheck.executionCount,
           expected: attemptCheck.expected,
@@ -462,15 +496,16 @@ export function StructuredSectionLearningBody({
           taskVariantVersion: payloadPositiveInt(section.contract?.taskVariantVersion),
           unseen: section.contract?.unseen === true,
       } satisfies WebStrongCheckEvidenceInput;
-      void recordLearningAttemptEvidence(evidenceInput).then(() => {
+      void learningEventDigest(exercise.guide?.checkConfig ?? {}).then(async (practiceHash) => {
+          const input = { ...evidenceInput, fixtureHash: evidenceInput.fixtureHash || practiceHash };
+          evidenceInputRef.current = input;
+          await recordLearningAttemptEvidence(input);
           setEvidenceSaveState("stored");
           window.dispatchEvent(new CustomEvent(PROGRESS_UPDATED_EVENT));
         }).catch((error: unknown) => {
           setEvidenceSaveState("error");
           console.error("strong learning evidence transaction failed", error);
         });
-    } else {
-      window.dispatchEvent(new CustomEvent(PROGRESS_UPDATED_EVENT));
     }
   }, [attemptCheck, category, contentId, exercise, exerciseResult, exerciseSource]);
 
@@ -570,27 +605,28 @@ export function StructuredSectionLearningBody({
     <div className="space-y-7 px-4 py-5 sm:px-6">
       {parts.snippet ? (
         <div data-learning-section-part="snippet">
-          <div className="pb-1.5 text-xs font-medium text-muted-foreground" data-learning-snippet-kicker="true">완성 예제</div>
+          <div className="flex items-center justify-between pb-1.5">
+            <span className="text-xs font-medium text-muted-foreground" data-learning-snippet-kicker="true">완성 예제</span>
+            <Button disabled={!canRun || runningBlockId !== null} size="sm" variant="outline" onClick={() => onRunBlock(parts.snippet!, parts.snippet!.content)}>
+              <Play /> 예제 실행
+            </Button>
+          </div>
           <CodePayload label="코드" value={parts.snippet.content} />
           {snippetRunning ? (
             <div className="mt-3">
               <LoadingInline label="예제 실행 중" />
             </div>
           ) : null}
-          {/* 실패한 예제는 감춘다. 자동 실행은 결과를 보여주려는 것이고, 학습자가 만들지 않은
-              오류를 오류 박스로 들이밀면 지금 배우는 개념에서 주의만 뺏긴다.
-              import만 하는 절처럼 내보일 것이 없는 예제도 감춘다. "출력 없음" 상자는 정보가
-              아니라 빈 칸이고, 절마다 붙으면 읽는 흐름만 끊는다. */}
-          {!snippetRunning && snippetOutput ? (
+          {!snippetRunning && (snippetOutput || snippetResult?.status === "error") ? (
             <div className="mt-3" data-learning-snippet-output="true">
-              <ExecutionOutput ariaLabel="완성 예제 실행 결과" result={snippetOutput} />
+              <ExecutionOutput ariaLabel="완성 예제 실행 결과" result={snippetResult!} />
             </div>
           ) : null}
         </div>
       ) : null}
 
       {sectionTips.length ? (
-        <aside className="min-w-0 max-w-3xl border-l-2 border-border py-0.5 pl-4" data-learning-section-part="tips">
+        <aside className="min-w-0 border-l-2 border-border py-0.5 pl-4" data-learning-section-part="tips">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
             <Lightbulb className="size-3.5" />
             팁
@@ -623,7 +659,7 @@ export function StructuredSectionLearningBody({
               <div className="text-xs font-medium text-muted-foreground">직접 해보기</div>
               <h3 className="mt-1 break-words text-[15px] font-bold leading-6 text-foreground">{blockLabel(exercise)}</h3>
               {exerciseDescription ? (
-                <p className="mt-1 max-w-3xl text-md font-normal text-foreground">
+                <p className="mt-1 text-md font-normal text-foreground">
                   {exerciseDescription}
                 </p>
               ) : null}
@@ -632,7 +668,7 @@ export function StructuredSectionLearningBody({
               <IconButton
                 className="astryxWorkCellAction size-8 [&_svg]:size-3.5"
                 data-learning-run-control="true"
-                disabled={!canRun || exerciseRunning}
+                disabled={!canRun || exerciseRunning || answerBusy}
                 label={`${blockLabel(exercise)} 셀 실행`}
                 preserveEditorFocusOnTouch
                 variant="outline"
@@ -647,6 +683,7 @@ export function StructuredSectionLearningBody({
           </div>
 
           <div className="mt-3">
+            {!exerciseDraft.trim() ? <p className="mb-2 text-sm text-muted-foreground">설명을 참고해 코드를 직접 입력한 뒤 실행해 보세요.</p> : null}
             <div
               className="astryxWorkCellFrame"
               data-learning-exercise-input="editor"
@@ -732,6 +769,20 @@ export function StructuredSectionLearningBody({
               ) : null}
               {!attemptCheck.passed && exercise.guide?.hints?.[0] ? (
                 <p className="mt-1 leading-6 text-foreground">다음 수정: {exercise.guide.hints[0]}</p>
+              ) : null}
+              {!attemptCheck.passed && attemptCheck.state !== "unsupported" && exercise.guide?.solution ? (
+                <div className="mt-3 space-y-2" data-learning-answer-state={answerShown ? "shown" : answerRead ? "read" : "hidden"}>
+                  {answerShown ? <>
+                    <CodePayload label="풀이 참고" value={exercise.guide.solution} />
+                    <Button data-learning-answer-action="hide" size="sm" variant="outline" onClick={() => setAnswerShown(false)}>정답 가리고 다시 풀기</Button>
+                  </> : answerRead ? (
+                    <p>읽은 풀이를 떠올려 직접 작성하고 실행해 보세요.</p>
+                  ) : <>
+                    <p>수정할 부분을 먼저 생각하고 다시 실행해 보세요. 필요하면 풀이를 한 번 볼 수 있습니다.</p>
+                    <Button data-learning-answer-action="reveal" disabled={answerBusy || evidenceSaveState !== "stored"} size="sm" variant="outline" onClick={() => void revealAnswer()}>정답 한 번 보기</Button>
+                  </>}
+                  {supportMessage ? <p role="alert">{supportMessage}</p> : null}
+                </div>
               ) : null}
               {applicationPromotionBlockedReason ? (
                 <p className="mt-2 leading-6 text-muted-foreground" data-learning-promotion="blocked">

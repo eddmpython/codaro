@@ -653,7 +653,7 @@ def main() -> int:
             failures.append(f"learning surface must not expose terminal command flow: {token}")
 
     markdown_body_tokens = {
-        "reading column width": "max-w-3xl",
+        "section content can shrink": "min-w-0",
         "reading body token": "text-md text-foreground",
         "bare list renderer": "function BareList",
         "top rule grid renderer": "function TopRuleGrid",
@@ -760,7 +760,7 @@ def main() -> int:
         "CodeMirror textbox multiline semantics": '"aria-multiline": "true"',
         "standalone learning editor name": "ariaLabel: `${blockLabel(block)} 코드 편집기`",
         "learning title wraps": "whitespace-normal break-words",
-        "section heading wraps": "max-w-3xl break-words",
+        "section heading wraps": "break-words text-lg",
     }
     editor_accessibility_sources = {
         "learning editor defaults to no autofocus": currentLearningSurfaceText,

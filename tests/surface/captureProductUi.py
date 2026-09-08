@@ -30,7 +30,21 @@ def main() -> int:
         if fixtureId.startswith("local-"):
             localServer, localThread, localPort, localState, _ = FIXTURES.startLocalServer()
         cases = {case["name"]: case for case in FIXTURES.browserCases(1, webPort, localPort)}
+        if fixtureId.startswith("learning-repair-"):
+            _, _, lesson, width = fixtureId.split("-")
+            lessonId = {"00": "00_pdf소개", "04": "04_표추출"}[lesson]
+            cases[fixtureId] = {
+                "name": fixtureId,
+                "url": f"http://127.0.0.1:{webPort}/?surface=curriculum&category=pdf&lesson={lessonId}#curriculum",
+                "viewport": {"width": int(width), "height": 1000},
+                "surface": "web-lesson",
+                "waitFor": "[data-learning-section-card]",
+                "verifyLearningMaterialRepair": True,
+                "lesson": lesson,
+            }
         case = cases[fixtureId]
+        if os.environ.get("CODARO_VERIFY_ANSWER_SUPPORT") == "1":
+            case["verifyAnswerSupport"] = True
         config = {
             "case": case,
             "theme": os.environ["CODARO_PRODUCT_COLOR_SCHEME"],
