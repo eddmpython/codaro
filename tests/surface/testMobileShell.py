@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import subprocess
+from urllib.parse import urljoin, urlparse
 
 ROOT = Path(__file__).resolve().parents[2]
 PUBLIC = ROOT / "editor" / "public"
@@ -35,6 +36,20 @@ def testServiceWorkerImplementsBothStrategies() -> None:
     assert "ownedCacheKeys.has(key)" in source
     assert "LEGACY_CACHE_PREFIXES" not in source
     assert "startsWith(prefix)" not in source
+
+
+def testManifestResourcesStayInsideInstalledBase() -> None:
+    manifest = json.loads((PUBLIC / "manifest.json").read_text(encoding="utf-8"))
+    references = [manifest[key] for key in ("id", "start_url", "scope")]
+    references += [icon["src"] for icon in manifest["icons"]]
+    references += [shortcut["url"] for shortcut in manifest["shortcuts"]]
+    for base in ("https://example.test/", "https://example.test/codaro/run/"):
+        for reference in references:
+            assert urljoin(base + "manifest.json", reference).startswith(base)
+        for icon in manifest["icons"]:
+            resolved = urljoin(base + "manifest.json", icon["src"])
+            relative = urlparse(resolved).path.removeprefix(urlparse(base).path)
+            assert (PUBLIC / relative).is_file()
 
 
 def testServiceWorkerLegacyCacheManifestUsesExactOwnedKeys() -> None:
