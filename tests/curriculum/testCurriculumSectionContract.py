@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ast
 import re
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -48,6 +49,14 @@ STALE_INSTALL_STAGE_PATTERN = re.compile(r"(?m)^\s*(id:\s*step\d*_install|id:\s*
 LEARNER_FACING_SCALAR_PATTERN = re.compile(
     r"^\s*(?:title|subtitle|goal|why|explanation|prompt|description|resultCheck):\s+(.+)$",
 )
+
+
+def testLearningMaterialDraftAndTableContract() -> None:
+    result = subprocess.run(
+        ["node", "editor/scripts/testLearningMaterialRepair.mjs"],
+        cwd=ROOT, capture_output=True, text=True, encoding="utf-8", timeout=30,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
 
 
 def testLegacyNarrativeKeepsItsOriginalBlockOwner() -> None:

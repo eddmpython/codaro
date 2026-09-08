@@ -361,6 +361,8 @@ def _structuredCurriculumDocumentPayload() -> dict:
                 "content": "import pandas as pd\nframe = ___",
                 "guide": {
                     "exerciseType": "sectionPractice",
+                    "description": "sales 열에 10과 20을 넣은 DataFrame을 만드세요.",
+                    "solution": "import pandas as pd\nframe = pd.DataFrame({'sales': [10, 20]})",
                     "hints": ["dict의 key가 열 이름이다."],
                     "checkConfig": {"variable": "frame"},
                     "difficulty": "easy",

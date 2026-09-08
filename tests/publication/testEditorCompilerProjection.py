@@ -42,4 +42,4 @@ def testEditableEmbedRunsTheReactiveDependencyClosure() -> None:
     assert 'curriculumRuntimeActive = !appRuntimeActive && surface === "curriculum"' in app
     assert 'blockEmbedFrame?.mode === "editable" ? block.content : drafts[block.id] ?? block.content' in app
     assert 'reactiveCellExecution: surface === "editor" || blockEmbedFrame?.mode === "editable"' in app
-    assert "if (reactiveCellExecution && reactiveEnabled && isKernelExecutableBlock(block))" in hook
+    assert 'surface !== "curriculum" && reactiveCellExecution && reactiveEnabled && isKernelExecutableBlock(block)' in hook
