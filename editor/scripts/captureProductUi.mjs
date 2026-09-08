@@ -29,6 +29,20 @@ console.log("capture: control startup");
 const client = await PyProcControlClient.start(manifestPath, { startupTimeoutMs: 120000 });
 console.log("capture: control ready");
 let session, target;
+const observationSegments = [];
+async function observeSegment() {
+  const response = (await client.observe(session, { expectedRisk: "read", includeConsole: true, includeNetwork: true, maxEvents: 100, maxNodes: 5 })).output;
+  const value = response.result ?? response;
+  assert.ok(value.eventWindows.every(window => window.complete), "브라우저 이벤트 관측이 잘렸습니다");
+  observationSegments.push(value);
+  return response;
+}
+async function reloadLearningPage() {
+  await observeSegment();
+  await client.detachSession(session);
+  session = (await client.attachSession(target)).output;
+  await client.act(session, [{ kind: "navigate", url: scenario.url, expectedRisk: "externalEffect" }]);
+}
 const caseReport = { name: scenario.name, viewport: scenario.viewport, failures: [] };
 const report = { gitHead: config.gitHead, colorScheme: theme, provider: "pyproc/control",
   passed: false, failures: [], cases: [caseReport] };
@@ -121,11 +135,11 @@ try {
       await evaluate("document.querySelector(" + JSON.stringify(check) + ").scrollIntoView({block:'center'})");
       caseReport.checkStateEvidence.screenshots.verified = await screenshot("verified");
       if (scenario.verifyAnswerSupport) {
-        await client.act(session, [{ kind: "navigate", url: scenario.url, expectedRisk: "externalEffect" }]);
+        await reloadLearningPage();
         await waitFor("document.querySelector(" + JSON.stringify(exercise + " .cm-content") + ")?.innerText.trim() === " + JSON.stringify(scenario.solutionCode));
         await edit(exercise + " .cm-content", "");
         await waitFor("new Promise((resolve,reject)=>{const open=indexedDB.open('codaro-learning-archive-v1');open.onerror=()=>reject(open.error);open.onsuccess=()=>{const db=open.result;const params=new URL(location.href).searchParams;const request=db.transaction('archives','readonly').objectStore('archives').get(params.get('category')+'/'+params.get('lesson'));request.onsuccess=()=>{const archive=request.result?.archive;const id=document.querySelector(" + JSON.stringify(exercise) + ").id.replace(/^curriculum-cell-/,'');const draft=archive?.drafts.find(item=>item.blockId===id);resolve(Boolean(draft && archive.blobs[draft.blobHash]?.byteLength===0));db.close()};request.onerror=()=>{db.close();reject(request.error)}}})");
-        await client.act(session, [{ kind: "navigate", url: scenario.url, expectedRisk: "externalEffect" }]);
+        await reloadLearningPage();
         await waitFor("Boolean(document.querySelector(" + JSON.stringify(exercise + " .cm-content") + "))");
         assert.equal(await evaluate("document.querySelector(" + JSON.stringify(exercise + " .cm-content") + ").innerText.trim()"), "");
         await edit(exercise + " .cm-content", "print('다시 생각')");
@@ -174,14 +188,14 @@ try {
   assert.deepEqual(observed.brokenImages, []);
   assert.equal(observed.missingImageAlt, 0);
   assert.ok(observed.documentWidth <= observed.viewportWidth, "문서가 화면 너비를 벗어납니다");
-  const observation = (await client.observe(session, { expectedRisk: "read", includeConsole: true,
-    includeNetwork: true, maxEvents: 200, maxNodes: 5 })).output;
+  const observation = await observeSegment();
+  caseReport.observationSegments = observationSegments;
   caseReport.observation = observation;
   const pageObservation = observation.result ?? observation;
   assert.ok(Array.isArray(pageObservation.console), "브라우저 console 관측 결과가 없습니다");
   assert.ok(pageObservation.eventWindows.every(window => window.complete), "브라우저 이벤트 관측이 잘렸습니다");
   const initial = caseReport.initialObservation?.result;
-  caseReport.consoleErrors = [...(initial?.console ?? []), ...pageObservation.console]
+  caseReport.consoleErrors = [...(initial?.console ?? []), ...observationSegments.flatMap(segment => segment.console)]
     .filter(event => event.level === "error" || event.type === "error");
   caseReport.httpFailures = await evaluate("performance.getEntriesByType('resource').filter(entry => entry.responseStatus >= 400).map(entry => ({url:entry.name,status:entry.responseStatus}))");
   await waitFor("[...document.images].filter(image => { const r=image.getBoundingClientRect(); return r.width>0 && r.height>0 && r.bottom>0 && r.right>0 && r.top<innerHeight && r.left<innerWidth; }).every(image => image.complete)", 30000);
