@@ -223,6 +223,7 @@
   }
 
   [data-astryx-theme="codaro"] .notebookCell:hover .notebookCellMeta,
+  [data-astryx-theme="codaro"] .notebookCellMeta:has(.notebookCellMore[open]),
   [data-astryx-theme="codaro"] .notebookCellMeta:focus-within {
     opacity: 0.98;
     pointer-events: auto;
@@ -353,13 +354,57 @@
     right: 0;
     z-index: 24;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
     gap: var(--spacing-1);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-element);
     padding: var(--spacing-1);
     background: var(--color-background-popover);
     box-shadow: var(--shadow-med);
+    max-width: calc(100vw - 48px);
+    max-height: min(70vh, 480px);
+    overflow: auto;
+  }
+
+  [data-astryx-theme="codaro"] .notebookCodeActions {
+    display: grid;
+    width: 280px;
+    max-width: 100%;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--spacing-1);
+  }
+
+  [data-astryx-theme="codaro"] .notebookCodeActions button {
+    display: flex;
+    min-height: 36px;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-3);
+    border-radius: var(--radius-element);
+    padding: var(--spacing-1-5) var(--spacing-2);
+    color: var(--color-text-primary);
+    font-size: 12px;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  [data-astryx-theme="codaro"] .notebookCodeActions button:hover,
+  [data-astryx-theme="codaro"] .notebookCodeActions button:focus-visible {
+    background: var(--color-background-muted);
+  }
+
+  [data-astryx-theme="codaro"] .notebookCodeActions kbd {
+    color: var(--color-text-secondary);
+    font-family: var(--font-family-body);
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 760px) {
+    [data-astryx-theme="codaro"] .notebookCodeActions button {
+      min-height: 44px;
+    }
   }
 
   [data-astryx-theme="codaro"] .notebookCellMoreMenu [data-cell-ai-help-trigger="always-visible"] {

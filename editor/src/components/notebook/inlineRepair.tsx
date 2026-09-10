@@ -29,11 +29,10 @@ export function InlineRepair({ blockId, viewRef }: { blockId: string; viewRef: R
         } catch (error) { setMessage(error instanceof Error ? error.message : String(error)); }
         finally { setBusy(false); }
     };
-    return <details className="border-t border-border py-2" data-inline-repair={blockId}>
-        <summary className="cursor-pointer">코드 수정 요청</summary>
+    return <div className="py-2" data-inline-repair={blockId}>
         <p className="py-2 text-muted-foreground">선택한 코드를 수정합니다. 선택 영역이 없으면 이 셀 전체를 사용합니다.</p>
-        <div className="flex gap-2">
-            <Input aria-label="코드 수정 요청" value={instruction} maxLength={4000} onChange={(event) => setInstruction(event.target.value)} placeholder="어떻게 바꿀까요?" onKeyDown={(event) => { if (event.key === "Enter" && !event.nativeEvent.isComposing && instruction.trim() && !busy) void request(); }} />
+        <div className="flex flex-wrap gap-2">
+            <Input autoFocus className="min-w-0 flex-1 basis-48" aria-label="코드 수정 요청" value={instruction} maxLength={4000} onChange={(event) => setInstruction(event.target.value)} placeholder="어떻게 바꿀까요?" onKeyDown={(event) => { if (event.key === "Enter" && !event.nativeEvent.isComposing && instruction.trim() && !busy) void request(); }} />
             <Button size="sm" disabled={busy || !instruction.trim()} onClick={() => void request()}>{busy ? "요청 중" : "수정 제안"}</Button>
         </div>
         {message ? <p className="whitespace-pre-wrap py-2 text-muted-foreground" role="status">{message}</p> : null}
@@ -65,5 +64,5 @@ export function InlineRepair({ blockId, viewRef }: { blockId: string; viewRef: R
                 finally { setBusy(false); }
             }}>복제 환경에서 수정안 실행</Button>
         </div> : null}
-    </details>;
+    </div>;
 }

@@ -12,10 +12,10 @@ import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirro
 import { python } from "@codemirror/lang-python";
 import { codeIndentation } from "@/lib/codeIndentation";
 import { documentEdit, NotebookIntelligenceProvider, useNotebookIntelligence } from "./editorIntelligenceContext";
-import { CodeIntelligenceTools } from "./codeIntelligenceTools";
+import { CodeIntelligenceTools, codeIntelligenceActions, type CodeIntelligenceAction, type CodeIntelligenceCommand } from "./codeIntelligenceTools";
 import { codeIntelligenceExtension } from "./codeIntelligenceExtension";
 import { ExecutionHistory } from "./executionHistory";
-import { analyzeEditorCode, type AnalysisOperation } from "@/lib/editorIntelligence/service";
+import { analyzeEditorCode } from "@/lib/editorIntelligence/service";
 import { bracketMatching, HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import {
   Compartment,
@@ -590,6 +590,7 @@ const aiCommentGutter = gutter({
 
 export function CodeCellEditor({
   intelligenceBlockId,
+  intelligenceMenuCommand = null,
   mode = "editor",
   ariaLabel = "코드 편집기",
   autoFocus = false,
@@ -607,6 +608,7 @@ export function CodeCellEditor({
   onAiCommentClick,
 }: {
   intelligenceBlockId?: string;
+  intelligenceMenuCommand?: CodeIntelligenceCommand | null;
   mode?: "editor" | "learning";
   ariaLabel?: string;
   autoFocus?: boolean;
@@ -635,7 +637,10 @@ export function CodeCellEditor({
   const intelligence = useNotebookIntelligence();
   const intelligenceRef = useRef(intelligence);
   intelligenceRef.current = intelligence;
-  const [intelligenceCommand, setIntelligenceCommand] = useState<{ action: AnalysisOperation; sequence: number } | null>(null);
+  const [intelligenceCommand, setIntelligenceCommand] = useState<CodeIntelligenceCommand | null>(null);
+  useEffect(() => {
+    if (intelligenceMenuCommand) setIntelligenceCommand(intelligenceMenuCommand);
+  }, [intelligenceMenuCommand]);
   const compositionBoundaryRef = useRef({
     active: false,
     endedAt: Number.NEGATIVE_INFINITY,
@@ -760,17 +765,15 @@ export function CodeCellEditor({
         aiCommentGutter,
         Prec.high(keymap.of([
           { key: "Mod-z", run: () => intelligenceRef.current?.undo() ?? false },
-          ...([
-              ["F12", "definition"], ["Shift-F12", "references"],
-              ["F2", "rename"], ["Mod-Shift-Space", "signature"],
-          ] as const).map(([key, action]) => ({
+          ...codeIntelligenceActions.flatMap(({ key, action }) => key ? [{
               key,
-              run: () => {
+              run: (view: EditorView) => {
                   if (!intelligenceRef.current || !intelligenceBlockId || mode === "learning") return false;
+                  if (!view.state.doc.toString().trim()) return false;
                   setIntelligenceCommand((previous) => ({ action, sequence: (previous?.sequence ?? 0) + 1 }));
                   return true;
               },
-          })),
+          }] : []),
           {
             key: "ArrowUp",
             run: (view) => {
@@ -934,7 +937,7 @@ export function CodeCellEditor({
       data-code-editor-density={density}
       ref={hostRef}
     />
-    {intelligenceBlockId ? <CodeIntelligenceTools blockId={intelligenceBlockId} viewRef={viewRef} selected={autoFocus} command={intelligenceCommand} /> : null}
+    {intelligenceBlockId && mode !== "learning" ? <CodeIntelligenceTools blockId={intelligenceBlockId} viewRef={viewRef} selected={autoFocus} command={intelligenceCommand} /> : null}
     </>
   );
 }
@@ -1005,6 +1008,7 @@ function DocumentBlock({
   const markdownEditorRef = useRef<HTMLTextAreaElement | null>(null);
   const markdownCompositionRef = useRef(false);
   const markdownCompositionEndedAtRef = useRef(Number.NEGATIVE_INFINITY);
+  const [intelligenceMenuCommand, setIntelligenceMenuCommand] = useState<CodeIntelligenceCommand | null>(null);
 
   useEffect(() => {
     draftRef.current = draft;
@@ -1169,6 +1173,7 @@ function DocumentBlock({
           <CodeCellEditor
             ariaLabel={`${cellAriaLabel} 코드 편집기`}
             intelligenceBlockId={block.id}
+            intelligenceMenuCommand={intelligenceMenuCommand}
             autoFocus={autoFocus}
             placeholderText="Python 코드를 입력하세요"
             value={draft}
@@ -1212,6 +1217,10 @@ function DocumentBlock({
         onDuplicate={onDuplicate}
         onReorder={onReorderCell}
         onRun={runCurrentDraft}
+        onCodeAction={draft.trim() ? (action) => {
+          onSelect();
+          setIntelligenceMenuCommand((previous) => ({ action, sequence: (previous?.sequence ?? 0) + 1 }));
+        } : undefined}
       />
     </section>
   );
@@ -1233,6 +1242,7 @@ function CellMetaBar({
   onDuplicate,
   onReorder,
   onRun,
+  onCodeAction,
 }: {
   cellLabel: string;
   canMoveUp?: boolean;
@@ -1249,10 +1259,21 @@ function CellMetaBar({
   onDuplicate: () => void;
   onReorder: (direction: "up" | "down") => void;
   onRun?: () => void;
+  onCodeAction?: (action: CodeIntelligenceAction) => void;
 }) {
   // 삭제 버튼은 항상 DOM에 1개만 둔다. 모바일은 더보기 메뉴 안(기본 접힘 계약),
   // 데스크톱은 dartlab처럼 툴바에 직접 노출한다.
   const isMobile = useIsMobile();
+  const moreRef = useRef<HTMLDetailsElement | null>(null);
+  const [moreOpen, setMoreOpen] = useState(false);
+  useEffect(() => {
+    if (!moreOpen) return;
+    const dismiss = (event: PointerEvent) => {
+      if (moreRef.current && !moreRef.current.contains(event.target as Node)) moreRef.current.open = false;
+    };
+    document.addEventListener("pointerdown", dismiss);
+    return () => document.removeEventListener("pointerdown", dismiss);
+  }, [moreOpen]);
   const deleteButton = (
     <IconButton
       className={cn(
@@ -1357,9 +1378,18 @@ function CellMetaBar({
           <Copy />
         </IconButton>
         <details
+          ref={moreRef}
           className="notebookCellMore"
           data-notebook-cell-menu="true"
+          onToggle={(event) => setMoreOpen(event.currentTarget.open)}
           onClick={(event) => event.stopPropagation()}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              event.stopPropagation();
+              event.currentTarget.open = false;
+              event.currentTarget.querySelector("summary")?.focus();
+            }
+          }}
         >
           <summary
             aria-label={`${cellLabel} 작업 더보기`}
@@ -1370,8 +1400,21 @@ function CellMetaBar({
             <MoreHorizontal aria-hidden="true" />
           </summary>
           <div className="notebookCellMoreMenu">
+            {onCodeAction ? <div className="notebookCodeActions" aria-label="코드 도구">
+              {codeIntelligenceActions.map(({ action, label, key }) => <button
+                key={action}
+                type="button"
+                data-code-action={action}
+                onClick={() => {
+                  if (moreRef.current) moreRef.current.open = false;
+                  onCodeAction(action);
+                }}
+              ><span>{label}</span>{key ? <kbd>{key.replace("Mod", /Mac/.test(navigator.userAgent) ? "⌘" : "Ctrl").replaceAll("-", "+")}</kbd> : null}</button>)}
+            </div> : null}
+            <div className="flex items-center gap-1">
             <CellAiActions compact helpState={cellHelp} selected={selected} onAsk={onCellAsk} />
             {isMobile ? deleteButton : null}
+            </div>
           </div>
         </details>
         {isMobile ? null : deleteButton}
