@@ -1656,15 +1656,25 @@ def frontendBuildLock(project: str, timeoutSeconds: int) -> Iterator[bool]:
     try:
         yield waited
     finally:
+        releaseFrontendBuildLock(path, token)
+
+
+def releaseFrontendBuildLock(path: Path, token: str) -> None:
+    deadline = time.monotonic() + 2
+    while True:
         try:
             owner = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            owner = None
-        if isinstance(owner, dict) and owner.get("token") == token:
-            try:
-                path.unlink(missing_ok=True)
-            except OSError:
-                pass
+            if not isinstance(owner, dict) or owner.get("token") != token:
+                return
+            path.unlink(missing_ok=True)
+            return
+        except FileNotFoundError:
+            return
+        except PermissionError:
+            # Windows can deny deletion while a waiting process reads the owner.
+            if time.monotonic() >= deadline:
+                raise
+            time.sleep(0.01)
 
 
 def loadFrontendBuildReceipt(project: str) -> dict[str, object] | None:

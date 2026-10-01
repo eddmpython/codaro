@@ -652,6 +652,34 @@ def testFrontendBuildLockSerializesSameProject(
     assert runner.frontendBuildLockPath("landing").exists() is False
 
 
+def testFrontendBuildLockReleaseRetriesBusyFile(monkeypatch, tmp_path) -> None:
+    runner = loadRunner()
+    path = tmp_path / "landing.lock"
+    path.write_text(json.dumps({"token": "owner"}), encoding="utf-8")
+    unlink = Path.unlink
+    attempts = []
+
+    def busyOnce(target, *args, **kwargs):
+        if target == path:
+            attempts.append(target)
+            if len(attempts) == 1:
+                raise PermissionError("another process is reading the lock")
+        return unlink(target, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "unlink", busyOnce)
+    runner.releaseFrontendBuildLock(path, "owner")
+    assert len(attempts) == 2
+    assert not path.exists()
+
+
+def testFrontendBuildLockReleasePreservesOtherOwner(tmp_path) -> None:
+    runner = loadRunner()
+    path = tmp_path / "landing.lock"
+    path.write_text(json.dumps({"token": "other"}), encoding="utf-8")
+    runner.releaseFrontendBuildLock(path, "owner")
+    assert path.exists()
+
+
 def testConcurrentFrontendBuildFollowerReusesFreshReceiptWithoutOptIn(
     monkeypatch,
     capsys,
