@@ -14,8 +14,8 @@ CATALOG_PATH = ROOT / "contracts" / "publicLearningCatalog.json"
 TAXONOMY_PATH = ROOT / "curricula" / "python" / "_taxonomy.yml"
 VISUAL_MANIFEST_PATH = ROOT / "assets" / "brand" / "visuals" / "manifest.json"
 GENERATOR_PATH = ROOT / "landing" / "scripts" / "generateCurriculum.js"
-EXPECTED_LESSON_COUNT = 472
-EXPECTED_RUNTIME_COUNTS = {"browser": 310, "local": 162}
+EXPECTED_LESSON_COUNT = 473
+EXPECTED_RUNTIME_COUNTS = {"browser": 310, "local": 163}
 FEATURED_PATH_IDS = {
     "pythonFoundation",
     "dataReporting",

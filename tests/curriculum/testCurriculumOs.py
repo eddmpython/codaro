@@ -180,7 +180,7 @@ def testCanonicalLessonGraphCoversAllSources() -> None:
     graph = buildLessonGraph(loader, taxonomy)
     keys = [lesson.key for lesson in graph.lessons]
 
-    assert len(keys) == 472
+    assert len(keys) == 473
     assert len(keys) == len(set(keys))
     assert graph.byKey("builtins/33_tempfile").outcomes == ["builtins.tempFiles"]
     assert graph.byKey("builtins/34_hashlib").outcomes == ["builtins.hashing"]

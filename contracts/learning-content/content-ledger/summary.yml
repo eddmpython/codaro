@@ -1,15 +1,15 @@
 schemaVersion: 1
-snapshotDate: '2026-09-06'
-canonicalRows: 472
-uniqueLessonRefs: 472
+snapshotDate: '2026-10-01'
+canonicalRows: 473
+uniqueLessonRefs: 473
 unownedRows: 0
 emptyOutcomeRows: 0
 reinforcementRows: 245
 dispositionCounts:
-  migrate: 472
+  migrate: 473
   merge: 0
   archive: 0
-sourceSetHash: 76fe3320bf102255fd98f739b6bb3c4b9e9ddb451c860293dc9901c4cecc2f45
+sourceSetHash: f4a7a9209b9ab9237e6daaca0b7c09f5b2291cb350f4fb76db4bd87b5a7e2d56
 baselineTaxonomyHash: b5e9b0b9db4f6ecd89c7be10a5c795f9b991b3ce700d5b5cf044607fc835def2
 composerVersionHash: 82c325cd14b0d6fc2767a2780e69f500d4496e444c3c2271b830179e70be6446
 plannedTaxonomyOutcomeIds:
@@ -27,7 +27,7 @@ ownerPacketCounts:
   07-remaining-domains/05-interactive-dashboards: 22
   07-remaining-domains/23-standard-library-mastery: 35
   07-remaining-domains/14-deep-learning-vision: 10
-  07-remaining-domains/03-scripting-automation: 11
+  07-remaining-domains/03-scripting-automation: 12
   07-remaining-domains/18-sql-analysis: 12
   07-remaining-domains/01-email-automation: 11
   05-office-automation: 25
@@ -55,4 +55,4 @@ ownerPacketCounts:
 ledgerTool: uv run python -X utf8 docs/skills/ops/tools/buildLearningLedgers.py --check
 ledgerToolStatus: implemented-check-and-write
 evidenceMaturity: E0-plan-artifact
-completionRule: canonicalRows=472, unownedRows=0, emptyOutcomeRows=0, targetTaxonomyHash is 64-hex and transition approved, all path rows reference canonical row, authorReviewStatus=approved, evidence commit current
+completionRule: canonicalRows=473, unownedRows=0, emptyOutcomeRows=0, targetTaxonomyHash is 64-hex and transition approved, all path rows reference canonical row, authorReviewStatus=approved, evidence commit current

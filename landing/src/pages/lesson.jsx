@@ -53,6 +53,7 @@ export function LessonPage({ category, contentId, initialLesson = null, pathId =
 
 function LessonDocument({ lesson, pathId }) {
   const browserLesson = lesson.runtimeTier === "browser";
+  const readingOnly = lesson.readingOnly === true;
   const activePathId = lesson.eligiblePathIds.includes(pathId) ? pathId : lesson.eligiblePathIds[0];
   const runHref = useMemo(() => {
     return runLessonHref({
@@ -81,10 +82,10 @@ function LessonDocument({ lesson, pathId }) {
             <Text type="large" textWrap="balance">{lesson.intro.direction || lesson.seo.description}</Text>
             <div className="lessonMetaLine" aria-label="레슨 정보">
               <span><Clock3 size={15} aria-hidden="true" /> 약 {lesson.estimatedMinutes}분</span>
-              <span><MonitorUp size={15} aria-hidden="true" /> {browserLesson ? "Web에서 실행" : "Local 런타임 필요"}</span>
-              <span><CheckCircle2 size={15} aria-hidden="true" /> {browserLesson ? "Web 자동 강검증" : "Local 강검증"}</span>
+              <span><MonitorUp size={15} aria-hidden="true" /> {readingOnly ? "설치 없이 웹에서 읽기" : browserLesson ? "Web에서 실행" : "Local 런타임 필요"}</span>
+              {!readingOnly && <span><CheckCircle2 size={15} aria-hidden="true" /> {browserLesson ? "Web 자동 강검증" : "Local 강검증"}</span>}
             </div>
-            <div className="lessonPrimaryActions">
+            {!readingOnly && <div className="lessonPrimaryActions">
               {browserLesson ? (
                 <Button
                   as="a"
@@ -108,11 +109,11 @@ function LessonDocument({ lesson, pathId }) {
                 {browserLesson ? <Download size={16} aria-hidden="true" /> : <BookOpen size={16} aria-hidden="true" />}
                 {browserLesson ? "파일·자동화로 이어가기" : "Web 지원 레슨 찾아보기"}
               </a>
-            </div>
+            </div>}
           </div>
           <figure className="lessonProductFigure">
             <ProductVisual assetId={lesson.visualAssetId} className="lessonProductImage" eager width={720} />
-            <figcaption>설명과 코드, 실행 결과와 검증이 한 흐름에서 이어집니다.</figcaption>
+            <figcaption>{readingOnly ? "설명과 사례를 읽고 내 작업에 적용할 기준을 정합니다." : "설명과 코드, 실행 결과와 검증이 한 흐름에서 이어집니다."}</figcaption>
           </figure>
         </div>
       </header>
@@ -140,7 +141,7 @@ function LessonDocument({ lesson, pathId }) {
             <LessonSection index={index} key={section.id} section={section} />
           ))}
 
-          <section className="lessonRunBand" aria-labelledby="lesson-run-heading">
+          {!readingOnly && <section className="lessonRunBand" aria-labelledby="lesson-run-heading">
             <div>
               <Heading id="lesson-run-heading" level={2} type="display-3">읽은 코드를 바로 바꾸고 검증합니다.</Heading>
               <Text color="secondary">
@@ -157,7 +158,7 @@ function LessonDocument({ lesson, pathId }) {
               label={browserLesson ? "Run에서 계속" : "Local 열기"}
               icon={browserLesson ? <ArrowRight size={17} aria-hidden="true" /> : <Download size={17} aria-hidden="true" />}
             />
-          </section>
+          </section>}
         </article>
 
         <nav className="lessonToc" aria-label="레슨 목차">
@@ -166,7 +167,7 @@ function LessonDocument({ lesson, pathId }) {
           {lesson.sections.map((section, index) => (
             <a href={`#lesson-section-${section.id}`} key={section.id}>{String(index + 1).padStart(2, "0")} {section.title}</a>
           ))}
-          <a href="#lesson-run-heading">직접 실행</a>
+          {!readingOnly && <a href="#lesson-run-heading">직접 실행</a>}
         </nav>
       </div>
     </main>

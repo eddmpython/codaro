@@ -1,10 +1,29 @@
 schemaVersion: 1
 category: "devTools"
-canonicalRows: 3
+canonicalRows: 4
 lessons:
+  - lessonRef: "devTools/projectRules"
+    identityLedgerRef: "identity-ledger/devTools.yml"
+    lessonContentHash: "9ed863dfbbfde1692d1bb6aca3f6c71c0b70409af0e9dd970b11d35bee63cc49"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/03-scripting-automation"
+    eligiblePathIds: ["scriptingAutomation"]
+    outcomes: ["devLiteracy.projectRules"]
+    prerequisites: []
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:devTools/projectRules:required:v1"
+    checkKinds: []
+    retrievalVariantIds: []
+    transferVariantIds: []
+    artifactDecision: reading-only
+    visualDecision: comparison-table
+    reviewerRoles: [curriculum-owner, learning-qa]
+    authorReviewStatus: pending
+    evidenceCommitRequirement: required-before-done
   - lessonRef: "devTools/commandLineIntro"
     identityLedgerRef: "identity-ledger/devTools.yml"
-    lessonContentHash: "39d89b435d2ef6939e5f1ae617e1aa433a793905f460adf1eef91929f4dbe9ad"
+    lessonContentHash: "f134bb74c2ab174e05b087eae77b5a3e6725edb69f200e6a4d8354ca298e9529"
     disposition: migrate
     ownerPacket: "07-remaining-domains/03-scripting-automation"
     eligiblePathIds: ["scriptingAutomation"]
@@ -48,7 +67,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "devTools/githubIntro"
     identityLedgerRef: "identity-ledger/devTools.yml"
-    lessonContentHash: "598983e31e8160de01281d4c1fcf52b6b65b1fd1aa92cb723efaa4476bf2ec28"
+    lessonContentHash: "23a94a57d66be8cba77f3add419b19e80877c1283e8ad8d373cbfb90b1052fd5"
     disposition: migrate
     ownerPacket: "07-remaining-domains/03-scripting-automation"
     eligiblePathIds: ["scriptingAutomation"]

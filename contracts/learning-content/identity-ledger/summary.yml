@@ -1,13 +1,13 @@
 schemaVersion: 1
-snapshotDate: '2026-09-06'
+snapshotDate: '2026-10-01'
 canonicalIdentity: category/contentId
-sourceRows: 472
+sourceRows: 473
 categoryFiles: 41
-registeredRows: 472
+registeredRows: 473
 missingRegistryRows: 0
-pendingHumanReviewRows: 0
+pendingHumanReviewRows: 1
 approvedHumanReviewRows: 472
-metaIdMismatchRows: 441
+metaIdMismatchRows: 442
 globalDuplicateAliasCount: 5
 globalDuplicateAliases:
   '31':

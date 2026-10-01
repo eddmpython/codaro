@@ -22,15 +22,15 @@ FAQ_PATH = ROOT / "landing" / "src" / "lib" / "faq.js"
 README_PATH = ROOT / "README.md"
 REFERENCE_PRODUCTS_PATH = ROOT / "examples" / "apps" / "referenceProducts.json"
 REPORT_PATH = ROOT / "output" / "test-runner" / "landing-public" / "public-product-claims-report.json"
-EXPECTED_LESSON_COUNT = 472
-EXPECTED_RUNTIME_COUNTS = {"browser": 310, "local": 162}
+EXPECTED_LESSON_COUNT = 473
+EXPECTED_RUNTIME_COUNTS = {"browser": 310, "local": 163}
 FALSE_CLAIM_PATTERNS = (
     re.compile(r"no browser sandbox", re.IGNORECASE),
     re.compile(r"no WebAssembly fallback", re.IGNORECASE),
     re.compile(r"(?:학습|레슨).{0,30}(?:로컬에서만|Local[- ]only)", re.IGNORECASE),
     re.compile(r"(?:다운로드|설치).{0,20}(?:해야|후에만).{0,30}(?:학습|레슨)"),
     re.compile(
-        r"(?:모든|전체\s*472개|472개)\s*(?:레슨|학습)(?:을|이|은)?\s*"
+        r"(?:모든|전체\s*473개|473개)\s*(?:레슨|학습)(?:을|이|은)?\s*"
         r"(?:브라우저|Web)[^,.;\n]{0,20}(?:실행|강검증)",
         re.IGNORECASE,
     ),
@@ -98,7 +98,7 @@ def loadCatalogRows() -> list[dict[str, Any]]:
     payload = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
     rows = payload.get("lessons")
     if not isinstance(rows, list) or len(rows) != EXPECTED_LESSON_COUNT:
-        raise ValueError("public learning catalog does not contain 472 lessons")
+        raise ValueError("public learning catalog does not contain 473 lessons")
     return rows
 
 
@@ -120,11 +120,11 @@ def validateRenderedClaims(
     homeText = visibleText((BUILD_ROOT / "index.html").read_text(encoding="utf-8"))
     learnText = visibleText((BUILD_ROOT / "learn" / "index.html").read_text(encoding="utf-8"))
     for name, text in (("home", homeText), ("learn", learnText)):
-        for token in ("310", "162", "Web", "Local"):
+        for token in ("310", "163", "Web", "Local"):
             if token not in text:
                 failures.append(f"{name} rendered claim is missing {token}")
-    if "472" not in learnText:
-        failures.append("Learn rendered claim is missing the complete readable lesson count 472")
+    if "473" not in learnText:
+        failures.append("Learn rendered claim is missing the complete readable lesson count 473")
 
     runtimeCounts: Counter[str] = Counter()
     for route, lesson in lessons.items():

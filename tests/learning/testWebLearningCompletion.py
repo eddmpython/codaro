@@ -106,12 +106,12 @@ def passingReports(verifier: ModuleType) -> tuple[dict, dict]:
         "passed": True,
         "gitHead": gitHead,
         "summary": {
-            "contractLessons": 472,
-            "generatedLessons": 472,
-            "lazyPayloads": 472,
-            "prerenderedRoutes": 472,
-            "sitemapRoutes": 472,
-            "searchRoutes": 472,
+            "contractLessons": 473,
+            "generatedLessons": 473,
+            "lazyPayloads": 473,
+            "prerenderedRoutes": 473,
+            "sitemapRoutes": 473,
+            "searchRoutes": 473,
         },
     }
     return browserReport, routesReport

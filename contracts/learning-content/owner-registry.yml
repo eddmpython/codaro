@@ -19,7 +19,7 @@ owners:
   - id: 07-remaining-domains/02-document-automation
     reviewedRowCount: 11
   - id: 07-remaining-domains/03-scripting-automation
-    reviewedRowCount: 11
+    reviewedRowCount: 12
   - id: 07-remaining-domains/05-interactive-dashboards
     reviewedRowCount: 22
   - id: 07-remaining-domains/06-geo-visualization

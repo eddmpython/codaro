@@ -578,6 +578,9 @@ outcomes:
   - id: devLiteracy.gitBasics
     label: Git 기본 사이클 개념
     description: init→add→commit→log 한 사이클과 작업트리·스테이징·이력 3영역을 명령 분해와 터미널 출력 예시로 이해(읽기)
+  - id: devLiteracy.projectRules
+    label: 프로젝트 작업 기준과 하네스
+    description: 규칙 문서·훅·게이트·권한의 역할을 구분하고 실제 작업의 문제에 맞는 기준을 정한다(읽기)
 
 # 사용자가 직접 고르는 실무 목표. AI도 freeText를 이 중 하나로 매핑한다.
 domains:
@@ -3141,6 +3144,10 @@ lessonOutcomes:
     estimatedMinutes: 30
 
   # 개발 교양 트랙
+  "devTools/projectRules":
+    outcomes: [devLiteracy.projectRules]
+    prerequisites: []
+    estimatedMinutes: 15
   "devTools/commandLineIntro":
     outcomes: [devLiteracy.commandLine]
     prerequisites: []

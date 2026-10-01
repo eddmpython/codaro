@@ -20,8 +20,8 @@ LESSON_MODULE_ROOT = GENERATED_ROOT / "curriculumLessons"
 SEARCH_INDEX_PATH = GENERATED_ROOT / "searchIndex.js"
 BUILD_ROOT = ROOT / "landing" / "build"
 REPORT_PATH = ROOT / "output" / "test-runner" / "web-learning" / "web-learning-routes-report.json"
-EXPECTED_LESSON_COUNT = 472
-EXPECTED_RUNTIME_COUNTS = {"browser": 310, "local": 162}
+EXPECTED_LESSON_COUNT = 473
+EXPECTED_RUNTIME_COUNTS = {"browser": 310, "local": 163}
 FEATURED_PATH_IDS = {
     "pythonFoundation",
     "dataReporting",
@@ -99,7 +99,7 @@ def main() -> int:
     if failures:
         print("FAIL: public Web learning routes are incomplete", file=sys.stderr)
         return 1
-    print("ok: 472 canonical public lesson routes verified")
+    print("ok: 473 canonical public lesson routes verified")
     return 0
 
 

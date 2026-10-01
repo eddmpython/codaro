@@ -83,7 +83,7 @@ def testBuildContextStagesCurrentSourceWebBuildAndRootCurriculaWithoutMutation(t
         if path.name != "schema.yaml"
     ]
     assert len(stagedLessons) == summary["lessonCount"]
-    assert summary["lessonCount"] == 472
+    assert summary["lessonCount"] == 473
     assert summary["webAssetCount"] > 1
     assert not list(contextRoot.rglob("*.pyc"))
     assert not any(path.name == "__pycache__" for path in contextRoot.rglob("*"))

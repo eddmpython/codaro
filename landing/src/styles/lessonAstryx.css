@@ -387,6 +387,14 @@
   margin-top: 18px;
 }
 
+.lessonTable { overflow-x: auto; margin-block: 1.2rem; }
+.lessonTable table { width: 100%; border-collapse: collapse; text-align: left; }
+.lessonTable th, .lessonTable td { padding: .75rem; border: 1px solid var(--color-border-default); vertical-align: top; min-width: 9rem; word-break: keep-all; overflow-wrap: break-word; }
+.lessonTable th { color: var(--color-text-primary); }
+.lessonExplanation pre { overflow-x: auto; padding: 1rem; border: 1px solid var(--color-border-default); font-family: var(--font-family-code); }
+.lessonExplanation dt { margin-top: 1rem; }
+.lessonExplanation dd { margin-left: 0; }
+
 /* 코드는 테마를 뒤집지 않는다. 어두운 화면에서 흰 판이 튀어나오면 눈이 먼저 지친다.
    대신 같은 테마 안에서 한 단 눌린 면(muted)에 가는 테두리를 둘러 본문과 구분한다.
    라이트에서는 본문보다 어둡고 다크에서는 밝아서 두 테마 모두 코드가 먼저 보인다. */

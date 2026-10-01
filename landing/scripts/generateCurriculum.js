@@ -146,6 +146,7 @@ for (const file of files) {
     outcome: outcomes,
     prerequisites,
     runtimeTier: contentContract.runtimeTier,
+    readingOnly: meta.badge === "읽기",
     eligiblePathIds: contentContract.eligiblePathIds,
     visualAssetId: DOMAIN_VISUALS[domain] || "runLearningDetail",
     contentModule,

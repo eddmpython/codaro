@@ -1,7 +1,12 @@
 schemaVersion: 1
 category: "devTools"
-sourceCount: 3
+sourceCount: 4
 lessons:
+  - lessonRef: "devTools/projectRules"
+    sourcePath: "curricula/python/devLiteracy/devTools/projectRules.yaml"
+    metaId: "devTools_projectRules"
+    registryStatus: registered
+    reviewStatus: pending
   - lessonRef: "devTools/commandLineIntro"
     sourcePath: "curricula/python/devLiteracy/devTools/commandLineIntro.yaml"
     metaId: "devTools_commandLineIntro"

@@ -91,7 +91,7 @@ def validateCompletionEvidence(
         failures.append("Web learning route report is stale")
     routeSummary = routesReport.get("summary")
     if not isinstance(routeSummary, dict) or any(
-        routeSummary.get(key) != 472
+        routeSummary.get(key) != 473
         for key in (
             "contractLessons",
             "generatedLessons",

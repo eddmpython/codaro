@@ -1098,6 +1098,12 @@
       "runtimeTier": "local"
     },
     {
+      "checkSpecId": "lesson:devTools/projectRules:required:v1",
+      "eligiblePathIds": ["scriptingAutomation"],
+      "lessonRef": "devTools/projectRules",
+      "runtimeTier": "local"
+    },
+    {
       "checkSpecId": "lesson:duckdb/00_DuckDB소개:required:v1",
       "eligiblePathIds": [
         "sqlAnalysis"

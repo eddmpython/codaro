@@ -17,7 +17,7 @@ CATALOG_PATH = ROOT / "contracts" / "publicLearningCatalog.json"
 LESSON_MODULE_ROOT = ROOT / "landing" / "src" / "lib" / "generated" / "curriculumLessons"
 REPORT_PATH = ROOT / "output" / "test-runner" / "landing-public" / "landing-seo-report.json"
 SITE_ORIGIN = "https://eddmpython.github.io"
-EXPECTED_LESSON_COUNT = 472
+EXPECTED_LESSON_COUNT = 473
 
 
 class SeoDocumentParser(HTMLParser):

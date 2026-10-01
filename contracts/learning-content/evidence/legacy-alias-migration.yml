@@ -1,7 +1,7 @@
 schemaVersion: 1
 state: approved
 canonicalIdentity: category/contentId
-migrationRowCount: 441
+migrationRowCount: 442
 categoryScopedCollisionCount: 0
 globalDuplicateAliasCount: 5
 globalDuplicateAliases:
@@ -597,6 +597,12 @@ migrations:
 - legacyLessonRef: devTools/devTools_githubIntro
   canonicalLessonRef: devTools/githubIntro
   sourcePath: curricula/python/devLiteracy/devTools/githubIntro.yaml
+  categoryScopedUnique: true
+  globalCollisionRefs: []
+  migrationDisposition: canonicalize-on-read
+- legacyLessonRef: devTools/devTools_projectRules
+  canonicalLessonRef: devTools/projectRules
+  sourcePath: curricula/python/devLiteracy/devTools/projectRules.yaml
   categoryScopedUnique: true
   globalCollisionRefs: []
   migrationDisposition: canonicalize-on-read
