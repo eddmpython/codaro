@@ -103,17 +103,18 @@ uv run python -X utf8 tests/run.py python-product
 
 ## 실행 격리
 
-`tests/run.py`는 로컬/CI gate 실행 시 도구가 반드시 만드는 실행 작업공간만 저장소 안의 `output/test-runner/<gate>/` 아래로 고정한다. 제품 소스와 원래 build 설정은 건드리지 않고, 사용자 홈의 uv cache, OS temp, 기존 launcher `target` lock, 외부 `npx` fetch 상태가 gate 결과를 흔들지 않게 한다.
+`tests/run.py`는 gate마다 공통 `dev-workspace` 아래 고유 실행 폴더를 만든다. 경로와 수명은 `tests/gateWorkspace.py`가 소유하며 `CODARO_GATE_WORKSPACE`로 verifier에 전달한다. 같은 gate의 명령들은 실행 폴더를 공유하고, gate 종료 시 성공·실패·시간 초과와 관계없이 임시 파일을 정리한다. 보고서·캡처·명령 로그는 기존 `output/test-runner/<gate>/` 경로에 남긴다. 다른 실행의 폴더와 기존 작업물은 자동 삭제하지 않는다.
 
-- 일반 `uv run` 명령은 runner 안에서 `uv --no-cache run`으로 실행한다. 단, `uv run --with ...`처럼 임시 도구 환경을 만드는 명령은 Windows 임시 환경 삭제/파일 잠금 실패를 피하기 위해 `UV_CACHE_DIR=output/test-runner/<gate>/uv-cache`와 `UV_LINK_MODE=copy`를 쓰며 사용자 홈 cache는 쓰지 않는다.
+- 일반 `uv run` 명령은 runner 안에서 `uv --no-cache run`으로 실행한다. `uv run --with ...` 임시 환경은 실행 폴더의 `uv-cache`와 `UV_LINK_MODE=copy`를 쓰고 종료 시 함께 정리한다.
 - 브라우저 gate는 `pyproject.toml`과 `uv.lock`의 exact `playwright==1.61.0`을 사용한다. 각 gate마다 임시 의존성을 다시 해석하지 않으며, CI는 같은 lock으로 Chromium·Firefox·WebKit을 설치한다.
-- pytest suite는 cache provider를 끄고 `--basetemp output/test-runner/<gate>/pytest/run-<pid>-<time_ns>`를 자동으로 붙인다.
-- cargo suite는 `--target-dir output/test-runner/<gate>/cargo-target`를 자동으로 붙여 기존 `target` lock과 충돌하지 않는다.
-- `TMP`, `TEMP`, `TMPDIR`은 도구 실행 중 필요한 scratch 용도로만 `output/test-runner/<gate>/scratch`를 가리킨다.
+- pytest suite는 cache provider를 끄고 실행 폴더의 `pytest/run-<pid>-<time_ns>`를 `--basetemp`로 지정한다.
+- cargo suite는 실행 폴더의 `cargo-target`을 `--target-dir`로 지정해 다른 실행의 build lock과 충돌하지 않는다.
+- `TMP`, `TEMP`, `TMPDIR`은 backend를 포함해 실행 폴더의 `scratch`를 가리킨다.
 - 브라우저 verifier는 `tempfile.mkdtemp`로 OS temp를 직접 만들지 않는다. `repoLocalPlaywrightWorkspace`를 통해 gate runner의 scratch를 쓰고, 직접 실행 시에도 `output/test-runner/<verifier>/scratch/playwright` 아래에서만 Playwright daemon/session 파일을 만든다. `PLAYWRIGHT_DAEMON_SESSION_DIR`와 `PLAYWRIGHT_SERVER_REGISTRY`는 wrapper가 이 workspace로 덮어쓴다.
 - Playwright 커리큘럼 runtime 샘플처럼 내부에서 `python -m pytest`를 다시 호출하는 verifier도 `PYTEST_ADDOPTS=-p no:cacheprovider`를 주입해 루트 `.pytest_cache/`를 만들지 않는다.
 - gate sequence summary는 command log size/mtime이 안정된 뒤 기록해 child process가 stdout handle을 늦게 닫아도 다음 gate에서 bytes evidence가 흔들리지 않게 한다.
-- `output/test-runner`는 disposable 실행 작업공간이며 제품 SSOT나 커밋 대상이 아니다.
+- `tests/gateWorkspace.py`는 새 gate를 시작하기 전 여유 공간을 검사한다. 정리 실패는 성공으로 숨기지 않고 실패 코드로 보고한다. `logs/workspace-*.json`에는 실행 폴더, 정리 결과와 실행 전후 여유 공간을 남긴다. 강제 종료로 남은 폴더는 이 기록과 실행 중인 프로세스를 확인한 뒤 정리한다.
+- `output/test-runner`의 보고서는 제품 SSOT나 커밋 대상이 아니다. 검사 로그의 `exit: 124`는 시간 초과를 뜻한다.
 
 ## 프론트 빌드 재사용
 

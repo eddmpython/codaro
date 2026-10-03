@@ -42,7 +42,7 @@ Codaro의 목표는 출시 딱지를 붙이는 것이 아니라 실제로 잘 �
 첫 실행 전에 사용자가 환경을 추측하게 만들지 않는다.
 
 - launcher doctor는 active release, last-known-good, crash state, rollback marker, Python/runtime hint를 보여준다.
-- `install-launcher-smoke`는 repo-local `output/test-runner/install-launcher-smoke/launcher-cli-root`에서 실제 launcher CLI `doctor`와 `state show`를 실행해 JSON payload, 기본 update config, layout directory 생성을 확인한다.
+- `install-launcher-smoke`는 실행별 공유 작업 폴더의 `launcher-cli-root`에서 실제 launcher CLI `doctor`와 `state show`를 실행해 JSON payload, 기본 update config, layout directory 생성을 확인하고 임시 설치본을 정리한다.
 - `install-launcher-smoke`는 `output/test-runner/install-launcher-smoke/install-launcher-report.json`에 `doctor`/`state show` 명령, layout directory, update config, `freshStateNulls`, source evidence count를 남긴다. report의 `allEvidencePassed`와 `freshStateNulls`는 첫 실행 launcher 상태가 active/last-known-good/crash/rollback 상태와 섞이지 않았다는 증거다.
 - backend는 health check를 통과한 뒤에만 사용 가능 상태가 된다.
 - health timeout은 raw stack이 아니라 `HEALTH_TIMEOUT`과 다음 행동으로 표시한다.
@@ -174,7 +174,7 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 - token/API key/secret은 diagnostic summary/export와 로그에 남기지 않는다.
 - 문제 재현에는 provider/model/latency/error/tool sequence/workloop trace가 충분해야 한다.
 - `diagnostic-summary-contract`는 `output/test-runner/diagnostic-summary-contract/diagnostic-summary-report.json`에 category contract, provider error redaction, system endpoints, frontend notice, onboarding export copy 증거를 case로 남긴다. report의 `allChecksPassed`, `categoryContractCovered`, `providerErrorRedactionCovered`, `systemEndpointsCovered`, `frontendNoticeCovered`, `onboardingExportCovered` signal은 진단/운영 표면이 raw JSON이나 secret 노출 없이 연결됐다는 증거다.
-- gate 실행은 `tests/run.py`가 repo-local `output/test-runner/<gate>/` 아래로 실행 작업공간을 격리한다. 일반 uv/pytest cache는 비활성화하고, `uv run --with ...` 임시 도구 환경만 `output/test-runner/<gate>/uv-cache`와 copy link mode를 써서 Windows 파일 잠금과 사용자 홈 권한을 피한다. pytest basetemp는 실행마다 고유 경로로 잡고, cargo target과 scratch env를 고정해 사용자 홈 권한이나 기존 build lock과 충돌하지 않게 한다.
+- gate 실행 폴더는 `tests/gateWorkspace.py`가 공통 `dev-workspace` 아래에 만들고 종료 시 정리한다. 일반 uv/pytest cache는 비활성화하고, 임시 uv 환경은 copy link mode를 사용한다. 보고서와 명령 로그는 `output/test-runner/<gate>/`에 보관한다. 상세 계약은 [실행 격리](../foundation/testing-and-gates.md#실행-격리)가 소유한다.
 - gate runner는 각 명령 stdout/stderr를 `output/test-runner/<gate>/logs` 아래에 남긴다. 실패하면 콘솔과 sequence summary를 보고 해당 log로 바로 들어가 원인을 확인할 수 있어야 한다. Windows에서 child process가 stdout pipe handle을 물고 있어도 runner가 EOF를 기다리며 멈추지 않도록 stdout/stderr는 log 파일에 직접 연결하고, timeout은 process tree 종료와 `exit: 124` 기록으로 마감한다. sequence summary는 log size/mtime 안정화 뒤 bytes evidence를 기록해 뒤늦은 stdout flush로 artifact audit이 흔들리지 않게 한다.
 - 브라우저 gate 직접 실행도 repo-local `output/test-runner/<verifier>/scratch/playwright` 아래에서 Playwright daemon/session 파일을 만든다. OS temp에 임의 디렉터리를 만들지 않고, 외부 Playwright session env가 남아 있어도 wrapper가 repo-local workspace로 덮어쓴다.
 - 내부 샘플이 `python -m pytest`를 호출하는 Playwright curriculum runtime verifier도 `PYTEST_ADDOPTS=-p no:cacheprovider`를 주입해 루트 `.pytest_cache/`를 만들지 않는다.

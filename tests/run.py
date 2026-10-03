@@ -16,6 +16,8 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
+from gateWorkspace import currentGateWorkspace, gateWorkspace
+
 
 ROOT = Path(__file__).resolve().parents[1]
 GATE_DOC = ROOT / "docs" / "skills" / "ops" / "foundation" / "testing-and-gates.md"
@@ -1738,6 +1740,15 @@ def canReuseFrontendBuild(
 
 
 def runCommand(gateName: str, gateCommand: GateCommand) -> int:
+    try:
+        with gateWorkspace(gateName, localGateWorkspace(gateName) / "logs"):
+            return runCommandInWorkspace(gateName, gateCommand)
+    except OSError as exc:
+        print(f"[{gateName}] execution workspace failed: {exc}", file=sys.stderr)
+        return 74
+
+
+def runCommandInWorkspace(gateName: str, gateCommand: GateCommand) -> int:
     cwd = ROOT / gateCommand.cwd
     commandArgs = localGateArgs(gateName, gateCommand)
     env = localGateEnvironment(gateName, commandArgs)
@@ -1796,6 +1807,9 @@ def runCommand(gateName: str, gateCommand: GateCommand) -> int:
                     log.flush()
                     terminateProcess(process)
                     returnCode = 124
+                except BaseException:
+                    terminateProcess(process)
+                    raise
                 log.write(f"\nexit: {returnCode}\n")
                 log.flush()
                 if returnCode == 0 and frontendProject is not None:
@@ -1855,15 +1869,15 @@ def printLogTail(logPath: Path, maxLines: int = 200) -> None:
 
 
 def localGateEnvironment(gateName: str, commandArgs: tuple[str, ...]) -> dict[str, str]:
-    runRoot = localGateWorkspace(gateName)
+    runRoot = currentGateWorkspace(gateName) or localGateWorkspace(gateName)
     scratchDir = runRoot / "scratch"
     scratchDir.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
-    # TMP/TEMP override는 backend(전체 pytest) gate에서는 끄고, 그 외만 격리.
-    if gateName != "backend":
-        env["TMP"] = str(scratchDir)
-        env["TEMP"] = str(scratchDir)
-        env["TMPDIR"] = str(scratchDir)
+    if currentGateWorkspace(gateName) is not None:
+        env["CODARO_GATE_WORKSPACE"] = str(runRoot)
+    env["TMP"] = str(scratchDir)
+    env["TEMP"] = str(scratchDir)
+    env["TMPDIR"] = str(scratchDir)
     env["PYTHONUTF8"] = "1"
     env["PYTHONIOENCODING"] = "utf-8"
     if _sequenceFrontendBuildReuse and gateName == "astryx-journey":
@@ -1918,7 +1932,7 @@ def normalizePytestArgs(gateName: str, args: tuple[str, ...]) -> tuple[str, ...]
 
 
 def localGatePytestBaseTemp(gateName: str) -> Path:
-    tempRoot = localGateWorkspace(gateName) / "pytest"
+    tempRoot = (currentGateWorkspace(gateName) or localGateWorkspace(gateName)) / "pytest"
     tempRoot.mkdir(parents=True, exist_ok=True)
     return tempRoot / f"run-{os.getpid()}-{time.time_ns()}"
 
@@ -1928,7 +1942,8 @@ def normalizeCargoArgs(gateName: str, args: tuple[str, ...]) -> tuple[str, ...]:
         return args
     if any(item == "--target-dir" or item.startswith("--target-dir=") for item in args):
         return args
-    targetDirArgs = ("--target-dir", str(localGateWorkspace(gateName) / "cargo-target"))
+    runRoot = currentGateWorkspace(gateName) or localGateWorkspace(gateName)
+    targetDirArgs = ("--target-dir", str(runRoot / "cargo-target"))
     if "--" in args:
         splitIndex = args.index("--")
         return (*args[:splitIndex], *targetDirArgs, *args[splitIndex:])
@@ -1942,10 +1957,15 @@ def localGateWorkspace(gateName: str) -> Path:
 
 def runGate(gateName: str) -> int:
     gate = GATES[gateName]
-    for gateCommand in gate.commands:
-        returnCode = runCommand(gateName, gateCommand)
-        if returnCode != 0:
-            return returnCode
+    try:
+        with gateWorkspace(gateName, localGateWorkspace(gateName) / "logs"):
+            for gateCommand in gate.commands:
+                returnCode = runCommand(gateName, gateCommand)
+                if returnCode != 0:
+                    return returnCode
+    except OSError as exc:
+        print(f"[{gateName}] execution workspace failed: {exc}", file=sys.stderr)
+        return 74
     return 0
 
 

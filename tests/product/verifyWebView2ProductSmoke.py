@@ -43,16 +43,17 @@ RUNTIME_MODE = os.environ.get("CODARO_WEBVIEW2_RUNTIME_MODE", "evergreen").strip
 REQUIRE_SUPPORTED_WINDOWS = (
     os.environ.get("CODARO_WEBVIEW2_REQUIRE_SUPPORTED_WINDOWS", "0") == "1"
 )
-WORK_ROOT = ROOT / "output" / "test-runner" / GATE_ID
+REPORT_ROOT = ROOT / "output" / "test-runner" / GATE_ID
+WORK_ROOT = Path(os.environ.get("CODARO_GATE_WORKSPACE", REPORT_ROOT))
 LAUNCHER_ROOT = WORK_ROOT / "launcher-root"
 PRODUCT_HOME = LAUNCHER_ROOT / "user-data"
 WORKSPACE_ROOT = WORK_ROOT / "workspace"
 DIST_ROOT = WORK_ROOT / "dist"
-SCREENSHOT_ROOT = WORK_ROOT / "screenshots"
-REPORT_PATH = WORK_ROOT / "webview2-product-smoke-report.json"
-WEB_ARCHIVE_PATH = WORK_ROOT / "web-origin-learning-archive.json"
-DEPLOYED_WEB_ARCHIVE_PATH = WORK_ROOT / "deployed-web-learning-archive.json"
-DEPLOYED_LOCAL_REEXPORT_PATH = WORK_ROOT / "deployed-local-reexport-learning-archive.json"
+SCREENSHOT_ROOT = REPORT_ROOT / "screenshots"
+REPORT_PATH = REPORT_ROOT / "webview2-product-smoke-report.json"
+WEB_ARCHIVE_PATH = REPORT_ROOT / "web-origin-learning-archive.json"
+DEPLOYED_WEB_ARCHIVE_PATH = REPORT_ROOT / "deployed-web-learning-archive.json"
+DEPLOYED_LOCAL_REEXPORT_PATH = REPORT_ROOT / "deployed-local-reexport-learning-archive.json"
 CARGO_TARGET_ROOT = WORK_ROOT / "cargo-target"
 LAUNCHER_EXE = CARGO_TARGET_ROOT / "debug" / "codaro-launcher.exe"
 ZOOM_CONTROL_PATH = WORK_ROOT / "zoom-control.txt"
@@ -895,7 +896,8 @@ def reset_work_paths() -> None:
         DEPLOYED_LOCAL_REEXPORT_PATH,
     ):
         resolved = path.resolve()
-        if work_root != resolved and work_root not in resolved.parents:
+        report_root = REPORT_ROOT.resolve()
+        if not any(resolved.is_relative_to(parent) and resolved != parent for parent in (work_root, report_root)):
             raise VerificationError(f"unsafe WebView2 work path: {resolved}")
         if path.is_dir():
             remove_tree(path)

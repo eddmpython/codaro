@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -12,11 +13,12 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[2]
-SMOKE_WORK_ROOT = ROOT / "output" / "test-runner" / "install-launcher-smoke"
+REPORT_ROOT = ROOT / "output" / "test-runner" / "install-launcher-smoke"
+SMOKE_WORK_ROOT = Path(os.environ.get("CODARO_GATE_WORKSPACE", REPORT_ROOT))
 LAUNCHER_ROOT = SMOKE_WORK_ROOT / "launcher-cli-root"
 CARGO_TARGET_DIR = SMOKE_WORK_ROOT / "cargo-target"
 LAUNCHER_MANIFEST = ROOT / "launcher" / "codaro-launcher" / "Cargo.toml"
-INSTALL_LAUNCHER_REPORT_PATH = SMOKE_WORK_ROOT / "install-launcher-report.json"
+INSTALL_LAUNCHER_REPORT_PATH = REPORT_ROOT / "install-launcher-report.json"
 
 
 class VerificationError(RuntimeError):

@@ -118,6 +118,11 @@ def resolvePlaywrightCli(root: Path) -> Path:
 def repoLocalPlaywrightWorkspace(root: Path, name: str) -> Path:
     safeName = re.sub(r"[^A-Za-z0-9_.-]+", "-", name).strip("-") or "playwright"
     outputRoot = (root / "output" / "test-runner").resolve()
+    managedRoot = os.environ.get("CODARO_GATE_WORKSPACE")
+    if managedRoot:
+        workspace = Path(managedRoot).resolve() / "scratch" / "playwright" / safeName
+        workspace.mkdir(parents=True, exist_ok=True)
+        return workspace
     envScratch = os.environ.get("TMPDIR") or os.environ.get("TEMP") or os.environ.get("TMP")
 
     if envScratch:

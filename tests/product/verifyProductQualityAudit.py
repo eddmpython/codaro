@@ -870,7 +870,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
     ),
     ProductQualityRequirement(
         requirementId="repo-local-gate-isolation",
-        requirement="The local gate runner disables caches and isolates required tool scratch work inside repo-local disposable paths.",
+        requirement="The gate runner owns isolated temporary files, cleans them at completion, and retains verification reports.",
         evidenceChecks=(
             ("tests/run.py", (
                 "GATE_WORK_ROOT",
@@ -930,11 +930,11 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             ("docs/skills/ops/foundation/testing-and-gates.md", (
                 "`output/test-runner/<gate>/`",
                 "`uv --no-cache run`",
-                "`UV_CACHE_DIR=output/test-runner/<gate>/uv-cache`",
+                "`CODARO_GATE_WORKSPACE`",
                 "`UV_LINK_MODE=copy`",
-                "`--basetemp output/test-runner/<gate>/pytest/run-<pid>-<time_ns>`",
-                "`--target-dir output/test-runner/<gate>/cargo-target`",
-                "`output/test-runner/<gate>/scratch`",
+                "`--basetemp`",
+                "`--target-dir`",
+                "`tests/gateWorkspace.py`",
                 "`output/test-runner/<gate>/logs`",
                 "`exit: 124`",
                 "gate별 command log path/size/freshness",
@@ -943,12 +943,12 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "고정 OS temp 이름을 쓰지 않는다",
             )),
             ("docs/skills/ops/product/service-candidate.md", (
-                "repo-local `output/test-runner/<gate>/`",
+                "`output/test-runner/<gate>/`",
                 "브라우저 gate 직접 실행도 repo-local",
                 "일반 uv/pytest cache는 비활성화",
-                "`output/test-runner/<gate>/uv-cache`",
+                "`tests/gateWorkspace.py`",
                 "copy link mode",
-                "사용자 홈 권한이나 기존 build lock과 충돌하지 않게 한다",
+                "종료 시 정리한다",
                 "`output/test-runner/<gate>/logs`",
                 "`exit: 124`",
                 "command log path/size/freshness",

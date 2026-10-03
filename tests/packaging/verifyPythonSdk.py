@@ -5,6 +5,7 @@ from datetime import UTC, datetime
 import hashlib
 import importlib.util
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -18,9 +19,10 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[2]
 BUILDER_PATH = ROOT / "docs" / "skills" / "ops" / "tools" / "buildPythonDistribution.py"
 GATE_ROOT = ROOT / "output" / "test-runner" / "python-sdk"
-DEFAULT_BUILD_ROOT = GATE_ROOT / "build"
-DEFAULT_DIST_ROOT = GATE_ROOT / "dist"
-SCRATCH_ROOT = GATE_ROOT / "scratch"
+WORK_ROOT = Path(os.environ.get("CODARO_GATE_WORKSPACE", GATE_ROOT))
+DEFAULT_BUILD_ROOT = WORK_ROOT / "build"
+DEFAULT_DIST_ROOT = WORK_ROOT / "dist"
+SCRATCH_ROOT = WORK_ROOT / "scratch"
 REPORT_PATH = GATE_ROOT / "python-sdk-report.json"
 
 
@@ -40,7 +42,7 @@ def loadBuilder() -> Any:
 
 def resetDirectory(path: Path) -> Path:
     resolved = path.resolve()
-    gateRoot = GATE_ROOT.resolve()
+    gateRoot = WORK_ROOT.resolve()
     if resolved == gateRoot or not resolved.is_relative_to(gateRoot):
         raise PythonSdkVerificationError(f"scratch reset escapes gate root: {resolved}")
     if resolved.exists():

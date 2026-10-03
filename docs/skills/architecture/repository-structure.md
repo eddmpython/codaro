@@ -22,7 +22,7 @@ whenToUse: 새 루트 폴더, 배포 산출물, 문서 위치, 로컬 작업공�
 - `localData/`, `output/`, `dist/`, `sns/`는 로컬 또는 generated workspace다. 제품 runtime, 공개 문서, 테스트 fixture가 이 경로의 현재 내용을 source로 믿으면 안 된다.
 - 릴리즈 산출물은 workflow가 만들고 GitHub Release asset과 manifest로 전달한다. wheel, installer, archive를 루트에 커밋하지 않고, launcher는 PyPI 단독 배포를 전제로 삼지 않는다.
 - `docs/skills/`와 `docs/blog/`만 문서 source다. GitHub Pages에 보이는 `landing/src/lib/generated/*`는 build output이므로 source 수정 뒤 `landing-build`로 갱신한다.
-- 테스트 산출물은 `output/test-runner/<gate>/scratch`, `output/test-runner/<gate>/logs`, gate report 경로 중 하나에 둔다. 수동 서버 로그나 임시 캡처는 `$env:TEMP\codaro\...`를 우선 쓴다.
+- gate runner의 임시 실행물은 공통 `dev-workspace`의 실행별 폴더에 두고 종료 시 정리한다. 보관할 검사 로그·보고서·캡처는 `output/test-runner/<gate>/`에 둔다. 수명과 실행 경로 계약은 [실행 격리](../ops/foundation/testing-and-gates.md#실행-격리)가 소유한다.
 - `_backup/`, `_archive/`, `_reference/` 같은 백업성 루트는 만들지 않는다. 다시 쓰는 자료라면 정식 위치로 승격하고, 불필요한 로컬 산출물은 명시 요청이 있을 때 삭제한다.
 - 새 루트 항목은 반드시 이 문서, `tests/verifyRootClean.py`, 관련 인덱스, generated docs를 같은 변경에서 맞춘다.
 - 파일/폴더 이름은 기본적으로 `camelCase`다. 공개 표준 파일, package metadata, 기존 외부 계약 파일, 그리고 `mainPlan/` 트리(차용한 운영방침의 kebab-case + 번호 프리픽스, 규칙은 `mainPlan/README.md`)만 예외로 둔다.
